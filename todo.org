@@ -1,0 +1,8 @@
+* DONE read software defs from files
+* TODO add platform resolution
+** ohai?
+** copy-pasta?
+* TODO add build step dsl
+* TODO support "source-step independence"
+** e.g. install from gems (chef)
+* TODO put modules in their own source files
