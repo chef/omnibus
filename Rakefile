@@ -7,8 +7,6 @@ end
 module Omnibus
   class Project
     include Rake::DSL
-
-
   end
 
 
@@ -151,12 +149,7 @@ module Omnibus
   end
 end
 
-software_file = <<-EOF
-name "zlib"
-description "teh zlibz"
-dependencies []
-source :url => "http://zlib.net/zlib-1.2.5.tar.gz",
-       :md5 => "c735eab2d659a96e5a594c9e8541ad63"
-EOF
+FileList['config/software/*.rb'].each do |f|
+  Omnibus::Software.new(IO.read(f))
+end
 
-Omnibus::Software.new(software_file)
