@@ -1,20 +1,39 @@
+#
+# omnibus dsl module definition (we'll remove this some time in the
+# future
+#
+
 module Omnibus
   module Tasks
     module DSL; end
   end
 end
 
+#
+# omnibus project dsl reader
+#
+
 module Omnibus
   class Project
     include Rake::DSL
   end
+end
 
+#
+# omnibus software dsl reader
+#
 
+require 'mixlib/shellout'
+
+module Omnibus
   class Software
     include Rake::DSL
     include Omnibus::Tasks::DSL
 
+    attr_accessor :build_commands
+
     def initialize(io)
+      @build_commands = []
       instance_eval(io)
       render_tasks
     end
@@ -36,7 +55,13 @@ module Omnibus
     end
 
     def build(&block)
-      # todo
+      yield
+    end
+
+    private
+
+    def command(*args)
+      @build_commands << args
     end
 
     def render_tasks
@@ -47,11 +72,20 @@ module Omnibus
           #
           sourcetask(@source)
 
-          task :build do
-            puts "building the source... not really "
+          task :build  => :source do
+            puts "building the source"
+            @build_commands.each do |cmd|
+              cmd_args = *cmd
+              cwd = {:cwd => 'tmp/src/zlib-1.2.5', :live_stream => STDOUT}
+              if cmd_args.last.is_a? Hash
+                cmd_args.last.merge!(cwd)
+              else
+                cmd_args << cwd
+              end
+              Mixlib::ShellOut.new(*cmd).run_command
+            end
           end
         end
-        task "#{@name}:build" => "#{@name}:source"
 
         desc "fetch and build #{@name}"
         task @name => "#{@name}:build"
