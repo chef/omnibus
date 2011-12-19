@@ -1,15 +1,4 @@
 #
-# omnibus dsl module definition (we'll remove this some time in the
-# future
-#
-
-module Omnibus
-  module Tasks
-    module DSL; end
-  end
-end
-
-#
 # omnibus project dsl reader
 #
 
@@ -28,9 +17,15 @@ require 'mixlib/shellout'
 module Omnibus
   class Software
     include Rake::DSL
-    include Omnibus::Tasks::DSL
 
-    attr_accessor :build_commands
+    attr_reader :name
+    attr_reader :description
+    attr_reader :dependencies
+    attr_reader :source
+
+    attr_reader :sourcedir
+    attr_reader :sourcefile
+    attr_reader :cachedir
 
     def initialize(io)
       @build_commands = []
@@ -46,14 +41,18 @@ module Omnibus
       @description = val
     end
 
-    def dependencies(arr)
-      @dependencies = arr
+    def dependencies(val)
+      @dependencies = val
     end
 
     def source(val)
       @source = val
     end
 
+    #
+    # TODO: this doesn't actually give us any benefit over simply
+    # calling #command from the software file, but I think it's cute
+    #
     def build(&block)
       yield
     end
@@ -72,7 +71,11 @@ module Omnibus
           #
           sourcetask(@source)
 
-          task :build  => :source do
+          #
+          # keep track of the build manifest
+          #
+          directory "tmp/build"
+          file "tmp/build/#{@name}.manifest" => "tmp/build" do |t|
             puts "building the source"
             @build_commands.each do |cmd|
               cmd_args = *cmd
@@ -84,33 +87,33 @@ module Omnibus
               end
               Mixlib::ShellOut.new(*cmd).run_command
             end
+            # TODO: write the actual manifest file
+            touch t.name
+          end
+          FileList["tmp/src/zlib-1.2.5/**/*"].each do |src|
+            file "tmp/build/#{@name}.manifest" => src
           end
         end
 
         desc "fetch and build #{@name}"
-        task @name => "#{@name}:build"
+        task @name => "tmp/build/#{@name}.manifest"
+        file "tmp/build/#{@name}.manifest" => :source
       end
     end
-  end
-end
 
+    #
+    # create a source task
+    #
+    def sourcetask(params)
+      Omnibus::Tasks::SourceTask.define_task(:source).tap do |t|
+        t.url = params[:url]
+        t.md5 = params[:md5]
 
-module Omnibus
-  module Tasks
-    module DSL
-
-      def sourcetask(params)
-        Omnibus::Tasks::SourceTask.define_task(:source).tap do |t|
-          t.url = params[:url]
-          t.md5 = params[:md5]
-
-          file t.srcfile
-          directory t.srcdir
-          directory t.cachedir
-          task :source => [t.srcdir, t.cachedir]
-        end
+        file t.srcfile
+        directory t.srcdir
+        directory t.cachedir
+        task :source => [t.srcdir, t.cachedir]
       end
-
     end
   end
 end
