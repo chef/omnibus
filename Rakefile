@@ -12,7 +12,10 @@ end
 # omnibus software dsl reader
 #
 
+require 'digest/md5'
 require 'mixlib/shellout'
+require 'net/http'
+require 'uri'
 
 module Omnibus
   class Software
@@ -102,7 +105,26 @@ module Omnibus
           #
           # source file download
           #
-          sourcetask(@source)
+          task :source => [source_dir, cache_dir] do
+            #
+            # fetch needed?
+            #
+            to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
+            if to_fetch
+              puts "fetching the source"
+              Net::HTTP.start(@source_uri.host) do |http|
+                resp = http.get(@source_uri.path)
+                open(project_file, "wb") do |f|
+                  f.write(resp.body)
+                end
+              end
+
+              puts "extracting the source"
+              shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
+              shell.run_command
+              shell.error!
+            end
+          end
 
           #
           # keep track of the build manifest
@@ -132,89 +154,6 @@ module Omnibus
         desc "fetch and build #{@name}"
         task @name => manifest_file
         file manifest_file => :source
-      end
-    end
-
-    #
-    # create a source task
-    #
-    def sourcetask(params)
-      Omnibus::Tasks::SourceTask.define_task(:source).tap do |t|
-        t.url = params[:url]
-        t.md5 = params[:md5]
-
-        file t.srcfile
-        directory t.srcdir
-        directory t.cachedir
-        task :source => [t.srcdir, t.cachedir]
-      end
-    end
-  end
-end
-
-module Omnibus
-  module Tasks
-    require 'uri'
-    require 'digest/md5'
-    require 'net/http'
-
-    # -- SourceTask --
-    #
-    # Download some source code from teh internetz
-    #
-    class SourceTask < Rake::Task
-      include Rake::DSL
-
-      attr_accessor :url
-      attr_accessor :md5
-
-      def initialize(name, klass)
-        super
-        @actions << fetch_source
-        @actions << extract_source
-      end
-
-      def needed?
-        ! File.exist?(srcfile) || Digest::MD5.file(srcfile) != @md5
-      end
-
-      def uri
-        @uri ||= URI(@url)
-      end
-
-      def filename
-        uri.path.split('/').last
-      end
-
-      def srcfile
-        "tmp/cache/#{filename}"
-      end
-
-      def cachedir
-        "tmp/cache"
-      end
-
-      def srcdir
-        "tmp/src"
-      end
-
-      def fetch_source
-        Proc.new do
-          puts "downloading #{uri}"
-          Net::HTTP.start(uri.host) do |http|
-            resp = http.get(uri.path)
-            open(srcfile, "wb") do |f|
-              f.write(resp.body)
-            end
-          end
-        end
-      end
-
-      def extract_source
-        Proc.new do
-          puts "extracting #{srcfile}"
-          sh "tar -x -f #{srcfile} -C #{srcdir}"
-        end
       end
     end
   end
