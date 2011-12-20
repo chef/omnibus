@@ -23,10 +23,6 @@ module Omnibus
     attr_reader :dependencies
     attr_reader :source
 
-    attr_reader :sourcedir
-    attr_reader :sourcefile
-    attr_reader :cachedir
-
     def initialize(io)
       @build_commands = []
       instance_eval(io)
@@ -49,6 +45,38 @@ module Omnibus
       @source = val
     end
 
+    def relative_path(val)
+      @relative_path = val
+    end
+
+    def source_uri
+      @source_uri ||= URI(@source[:url])
+    end
+
+    def source_dir
+      "tmp/src".freeze
+    end
+
+    def cache_dir
+      "tmp/cache".freeze
+    end
+
+    def build_dir
+      "tmp/build".freeze
+    end
+
+    def project_file
+      filename = source_uri.path.split('/').last
+      "#{cache_dir}/#{filename}"
+    end
+
+    def project_dir
+      "#{source_dir}/#{@relative_path}"
+    end
+
+    def manifest_file
+      "#{build_dir}/#{@name}.manifest"
+    end
     #
     # TODO: this doesn't actually give us any benefit over simply
     # calling #command from the software file, but I think it's cute
@@ -66,6 +94,11 @@ module Omnibus
     def render_tasks
       namespace :software do
         namespace @name do
+
+          directory source_dir
+          directory cache_dir
+          directory build_dir
+
           #
           # source file download
           #
@@ -74,30 +107,31 @@ module Omnibus
           #
           # keep track of the build manifest
           #
-          directory "tmp/build"
-          file "tmp/build/#{@name}.manifest" => "tmp/build" do |t|
+          file manifest_file => build_dir do
             puts "building the source"
             @build_commands.each do |cmd|
               cmd_args = *cmd
-              cwd = {:cwd => 'tmp/src/zlib-1.2.5', :live_stream => STDOUT}
+              cwd = {:cwd => project_dir, :live_stream => STDOUT}
               if cmd_args.last.is_a? Hash
                 cmd_args.last.merge!(cwd)
               else
                 cmd_args << cwd
               end
-              Mixlib::ShellOut.new(*cmd).run_command
+              shell = Mixlib::ShellOut.new(*cmd)
+              shell.run_command
+              shell.error!
             end
             # TODO: write the actual manifest file
-            touch t.name
+            touch manifest_file
           end
-          FileList["tmp/src/zlib-1.2.5/**/*"].each do |src|
-            file "tmp/build/#{@name}.manifest" => src
+          FileList["#{project_dir}/**/*"].each do |src|
+            file manifest_file => src
           end
         end
 
         desc "fetch and build #{@name}"
-        task @name => "tmp/build/#{@name}.manifest"
-        file "tmp/build/#{@name}.manifest" => :source
+        task @name => manifest_file
+        file manifest_file => :source
       end
     end
 
