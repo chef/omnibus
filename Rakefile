@@ -96,6 +96,12 @@ module Omnibus
 
     def render_tasks
       namespace :software do
+
+        #
+        # set up inter-project dependencies
+        #
+        task @name => @dependencies
+
         namespace @name do
 
           directory source_dir
@@ -105,7 +111,7 @@ module Omnibus
           #
           # source file download
           #
-          task :source => [source_dir, cache_dir] do
+          @source_task = task :source => [source_dir, cache_dir] do
             #
             # fetch needed?
             #
@@ -153,7 +159,8 @@ module Omnibus
 
         desc "fetch and build #{@name}"
         task @name => manifest_file
-        file manifest_file => :source
+
+        file manifest_file => @source_task
       end
     end
   end
