@@ -119,7 +119,7 @@ module Omnibus
             if to_fetch
               puts "fetching the source"
               Net::HTTP.start(@source_uri.host) do |http|
-                resp = http.get(@source_uri.path)
+                resp = http.get(@source_uri.path, 'accept-encoding' => '')
                 open(project_file, "wb") do |f|
                   f.write(resp.body)
                 end
