@@ -109,26 +109,48 @@ module Omnibus
           directory build_dir
 
           #
-          # source file download
+          # source download
           #
           @source_task = task :source => [source_dir, cache_dir] do
-            #
-            # fetch needed?
-            #
-            to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
-            if to_fetch
-              puts "fetching the source"
-              Net::HTTP.start(@source_uri.host) do |http|
-                resp = http.get(@source_uri.path, 'accept-encoding' => '')
-                open(project_file, "wb") do |f|
-                  f.write(resp.body)
+            if @source[:url]
+              #
+              # fetch needed?
+              #
+              to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
+              if to_fetch
+                puts "fetching the source"
+                Net::HTTP.start(@source_uri.host) do |http|
+                  resp = http.get(@source_uri.path, 'accept-encoding' => '')
+                  open(project_file, "wb") do |f|
+                    f.write(resp.body)
+                  end
                 end
+
+                puts "extracting the source"
+                shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
+                shell.run_command
+                shell.error!
+              end
+            elsif @source[:git]
+              #
+              # clone needed?
+              #
+              to_clone = !Dir.exists?(project_dir) # TODO: check for .git file
+              if to_clone
+                puts "cloning the source from git"
+                clone_cmd = "git clone #{@source[:git]} #{project_dir}"
+                shell = Mixlib::ShellOut.new(clone_cmd, :live_stream => STDOUT)
+                shell.run_command
+                shell.error!
               end
 
-              puts "extracting the source"
-              shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
-              shell.run_command
-              shell.error!
+              #
+              # checkout needed?
+              #
+              to_checkout = true
+              if to_checkout
+
+              end
             end
           end
 
