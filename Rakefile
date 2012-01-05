@@ -112,6 +112,12 @@ module Omnibus
           # source download
           #
           @source_task = task :source => [source_dir, cache_dir] do
+            #
+            # we don't need to download / checkout source if there
+            # isn't any specified
+            #
+            next unless @source
+
             if @source[:url]
               #
               # fetch needed?
