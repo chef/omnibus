@@ -1,3 +1,9 @@
+require 'ohai'
+o = Ohai::System.new
+o.require_plugin('os')
+o.require_plugin('platform')
+OHAI = o
+
 #
 # omnibus project dsl reader
 #
@@ -92,6 +98,10 @@ module Omnibus
 
     def command(*args)
       @build_commands << args
+    end
+
+    def platform
+      OHAI.platform
     end
 
     def render_tasks
