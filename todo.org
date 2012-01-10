@@ -13,8 +13,8 @@
 * DONE link inter-project dependencies
 * TODO add build dependency on software configuration
 * TODO sort out dependencies
-** TODO prep (preparation)
-** TODO help2man
+** DONE prep (preparation)
+** DONE help2man
 ** TODO libtool
 ** TODO autoconf
 ** TODO automake
