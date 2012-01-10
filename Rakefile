@@ -11,7 +11,6 @@ OHAI = o
 #
 # omnibus project dsl reader
 #
-
 module Omnibus
   class Project
     include Rake::DSL
@@ -39,6 +38,7 @@ module Omnibus
 
     def initialize(io)
       @build_commands = []
+      @dependencies = ["preparation"]
       instance_eval(io)
       render_tasks
     end
@@ -51,8 +51,10 @@ module Omnibus
       @description = val
     end
 
-    def dependencies(val)
-      @dependencies = val
+    def dependencies(deps)
+      deps.each do |dep|
+        @dependencies << dep
+      end
     end
 
     def source(val)
@@ -115,7 +117,7 @@ module Omnibus
         #
         # set up inter-project dependencies
         #
-        task @name => @dependencies
+        task @name => (@dependencies - [@name]).uniq
 
         namespace @name do
 
