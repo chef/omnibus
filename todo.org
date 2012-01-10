@@ -19,7 +19,7 @@
 ** DONE autoconf
 ** DONE automake
 ** DONE gdbm
-** TODO zlib
+** DONE zlib
 ** TODO libiconv
 ** TODO readline
 ** TODO db
