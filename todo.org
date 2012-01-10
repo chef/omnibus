@@ -15,9 +15,9 @@
 * TODO sort out dependencies
 ** DONE prep (preparation)
 ** DONE help2man
-** TODO libtool
-** TODO autoconf
-** TODO automake
+** DONE libtool
+** DONE autoconf
+** DONE automake
 ** TODO gdbm
 ** TODO zlib
 ** TODO libiconv
