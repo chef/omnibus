@@ -1,11 +1,33 @@
 * DONE read software defs from files
-* TODO make "global" attributes available at software level
+* DONE make "global" attributes available at software level
 ** srcdir, tmpdir, srcfile, etc.
-* TODO structure build dependency tree
+* DONE structure build dependency tree
+* TODO write project manifest file
 * TODO add platform resolution
 ** ohai?
 ** copy-pasta?
 * DONE add build step dsl
-* TODO support "source-step independence"
+* DONE support "source-step independence"
 ** e.g. install from gems (chef)
-* TODO put modules in their own source files
+* TODO refactor
+* DONE link inter-project dependencies
+* TODO add build dependency on software configuration
+* TODO sort out dependencies
+** TODO prep (preparation)
+** TODO help2man
+** TODO libtool
+** TODO autoconf
+** TODO automake
+** TODO gdbm
+** TODO zlib
+** TODO libiconv
+** TODO readline
+** TODO db
+** TODO ncurses
+** TODO openssl
+** TODO libxml2
+** TODO libxslt
+** TODO ruby
+** TODO rsync
+* TODO speed up the rake task reading
+** it takes a loooong loooong time to build the filelist of all the souce trees
