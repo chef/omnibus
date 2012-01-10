@@ -21,7 +21,7 @@
 ** DONE gdbm
 ** DONE zlib
 ** DONE libiconv
-** TODO readline
+** DONE readline
 ** TODO db
 ** TODO ncurses
 ** TODO openssl
