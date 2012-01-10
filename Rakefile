@@ -64,15 +64,15 @@ module Omnibus
     end
 
     def source_dir
-      "/tmp/src".freeze
+      "/tmp/omnibus/src".freeze
     end
 
     def cache_dir
-      "/tmp/cache".freeze
+      "/tmp/omnibus/cache".freeze
     end
 
     def build_dir
-      "/tmp/build".freeze
+      "/tmp/omnibus/build".freeze
     end
 
     def project_file
