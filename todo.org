@@ -20,7 +20,7 @@
 ** DONE automake
 ** DONE gdbm
 ** DONE zlib
-** TODO libiconv
+** DONE libiconv
 ** TODO readline
 ** TODO db
 ** TODO ncurses
