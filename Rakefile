@@ -1,3 +1,7 @@
+require 'rake/clean'
+CLEAN.include('/tmp/omnibus/**/*')
+CLOBBER.include('/opt/opscode/**/*')
+
 require 'ohai'
 o = Ohai::System.new
 o.require_plugin('os')
