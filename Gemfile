@@ -1,4 +1,5 @@
 source "http://rubygems.org"
 
-gem "rake", ">= 0.9"
 gem "mixlib-shellout", :require => 'mixlib/shellout'
+gem "ohai"
+gem "rake", ">= 0.9"
