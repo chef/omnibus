@@ -186,12 +186,16 @@ module Omnibus
           file manifest_file => build_dir do
             puts "building the source"
             @build_commands.each do |cmd|
-              cmd_args = *cmd
-              cwd = {:cwd => project_dir, :live_stream => STDOUT}
+              cmd_args = Array(cmd)
+              options = {
+                :cwd => project_dir,
+                :live_stream => STDOUT,
+                :timeout => 3600
+              }
               if cmd_args.last.is_a? Hash
-                cmd_args.last.merge!(cwd)
+                cmd_args.last.merge!(options)
               else
-                cmd_args << cwd
+                cmd_args << options
               end
               shell = Mixlib::ShellOut.new(*cmd)
               shell.run_command
