@@ -63,15 +63,15 @@ module Omnibus
     end
 
     def source_dir
-      "tmp/src".freeze
+      "/tmp/src".freeze
     end
 
     def cache_dir
-      "tmp/cache".freeze
+      "/tmp/cache".freeze
     end
 
     def build_dir
-      "tmp/build".freeze
+      "/tmp/build".freeze
     end
 
     def project_file
