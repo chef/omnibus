@@ -20,6 +20,7 @@ end
 
 require 'digest/md5'
 require 'mixlib/shellout'
+require 'net/ftp'
 require 'net/http'
 require 'uri'
 
@@ -135,13 +136,22 @@ module Omnibus
               to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
               if to_fetch
                 puts "fetching the source"
-                Net::HTTP.start(@source_uri.host) do |http|
-                  resp = http.get(@source_uri.path, 'accept-encoding' => '')
-                  open(project_file, "wb") do |f|
-                    f.write(resp.body)
+                case @source_uri.scheme
+                when "http"
+                  Net::HTTP.start(@source_uri.host) do |http|
+                    resp = http.get(@source_uri.path, 'accept-encoding' => '')
+                    open(project_file, "wb") do |f|
+                      f.write(resp.body)
+                    end
                   end
+                when "ftp"
+                  Net::FTP.open(@source_uri.host) do |ftp|
+                    ftp.login
+                    ftp.getbinaryfile(@source_uri.path, project_file)
+                  end
+                else
+                  raise
                 end
-
                 puts "extracting the source"
                 shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
                 shell.run_command
