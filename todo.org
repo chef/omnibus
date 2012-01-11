@@ -32,6 +32,8 @@
 ** TODO rsync
 * TODO speed up the rake task reading
 ** it takes a loooong loooong time to build the filelist of all the souce trees
+* TODO implement better logging
+** it would be nice to know what piece of software you're building at any point in time
 * TODO outstanding questions
 ** gdbm
 *** make BINOWN=root BINGRP=wheel
