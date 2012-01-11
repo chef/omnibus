@@ -25,7 +25,7 @@
 ** DONE db
 *** from oracle, not linked, not including
 ** DONE ncurses
-** TODO openssl
+** DONE openssl
 ** TODO libxml2
 ** TODO libxslt
 ** TODO ruby
