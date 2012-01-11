@@ -21,7 +21,6 @@ configure_env =
   end
 
 build do
-  command "mkdir -p /opt/opscode/embedded/lib" # zlib's make needs this for some reason
   command "./configure --prefix=/opt/opscode/embedded", :env => configure_env
   command "make"
   command "make install"
