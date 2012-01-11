@@ -22,7 +22,8 @@
 ** DONE zlib
 ** DONE libiconv
 ** DONE readline
-** TODO db
+** DONE db
+*** from oracle, not linked, not including
 ** TODO ncurses
 ** TODO openssl
 ** TODO libxml2
