@@ -24,7 +24,7 @@
 ** DONE readline
 ** DONE db
 *** from oracle, not linked, not including
-** TODO ncurses
+** DONE ncurses
 ** TODO openssl
 ** TODO libxml2
 ** TODO libxslt
