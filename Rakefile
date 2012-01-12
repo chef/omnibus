@@ -152,8 +152,10 @@ module Omnibus
                   end
                 when "ftp"
                   Net::FTP.open(@source_uri.host) do |ftp|
+                    ftp.passive = true
                     ftp.login
                     ftp.getbinaryfile(@source_uri.path, project_file)
+                    ftp.close
                   end
                 else
                   raise
