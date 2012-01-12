@@ -27,7 +27,7 @@
 ** DONE ncurses
 ** DONE openssl
 ** DONE libxml2
-** TODO libxslt
+** DONE libxslt
 ** TODO ruby
 ** TODO rsync
 * TODO speed up the rake task reading
