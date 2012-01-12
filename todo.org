@@ -26,7 +26,7 @@
 *** from oracle, not linked, not including
 ** DONE ncurses
 ** DONE openssl
-** TODO libxml2
+** DONE libxml2
 ** TODO libxslt
 ** TODO ruby
 ** TODO rsync
