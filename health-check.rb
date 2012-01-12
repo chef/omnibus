@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 bad_libs = {}
 whitelist_libs = [
