@@ -169,7 +169,7 @@ module Omnibus
               #
               # clone needed?
               #
-              to_clone = !Dir.exists?(project_dir) # TODO: check for .git file
+              to_clone = !File.directory?(project_dir) # TODO: check for .git file
               if to_clone
                 puts "cloning the source from git"
                 clone_cmd = "git clone #{@source[:git]} #{project_dir}"
