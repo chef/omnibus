@@ -12,7 +12,9 @@ whitelist_libs = [
   /librt\.so/,
   /libutil\.so/,
   /libgcc_s\.so/,
-  /libstdc\+\+\.so/
+  /libstdc\+\+\.so/,
+  /libnsl\.so/,
+  /libfreebl\d\.so/
 ]
 
 ldd_output = `find /opt/opscode -name '*.so' | xargs ldd`
