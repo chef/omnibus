@@ -212,9 +212,17 @@ module Omnibus
             # TODO: write the actual manifest file
             touch manifest_file
           end
-          FileList["#{project_dir}/**/*"].each do |src|
-            file manifest_file => src
-          end
+
+          #
+          # make the manifest file dependent on the latest file in the
+          # source tree in order to shrink the multi-thousand-node
+          # dependency graph that Rake was generating
+          #
+          latest_file = FileList["#{project_dir}/**/*"].sort { |a,b|
+            File.mtime(a) <=> File.mtime(b)
+          }.last
+
+          file manifest_file => latest_file
         end
 
         desc "fetch and build #{@name}"
