@@ -68,7 +68,7 @@ module Omnibus
     end
 
     def project_dir
-      "#{source_dir}/#{@relative_path}"
+      @relative_path ? "#{source_dir}/#{@relative_path}" : "#{source_dir}/#{@name}"
     end
 
     def manifest_file
@@ -105,67 +105,72 @@ module Omnibus
           directory source_dir
           directory cache_dir
           directory build_dir
+          directory project_dir
 
           #
           # source download
           #
-          @source_task = task :source => [source_dir, cache_dir] do
+          @source_task = task :source => [source_dir, cache_dir, project_dir] do
             #
             # we don't need to download / checkout source if there
             # isn't any specified
             #
-            next unless @source
-
-            if @source[:url]
-              #
-              # fetch needed?
-              #
-              to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
-              if to_fetch
-                puts "fetching the source"
-                case @source_uri.scheme
-                when "http"
-                  Net::HTTP.start(@source_uri.host) do |http|
-                    resp = http.get(@source_uri.path, 'accept-encoding' => '')
-                    open(project_file, "wb") do |f|
-                      f.write(resp.body)
+            if @source
+              if @source[:url]
+                #
+                # fetch needed?
+                #
+                to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
+                if to_fetch
+                  puts "fetching the source"
+                  case @source_uri.scheme
+                  when "http"
+                    Net::HTTP.start(@source_uri.host) do |http|
+                      resp = http.get(@source_uri.path, 'accept-encoding' => '')
+                      open(project_file, "wb") do |f|
+                        f.write(resp.body)
+                      end
                     end
+                  when "ftp"
+                    Net::FTP.open(@source_uri.host) do |ftp|
+                      ftp.passive = true
+                      ftp.login
+                      ftp.getbinaryfile(@source_uri.path, project_file)
+                      ftp.close
+                    end
+                  else
+                    raise
                   end
-                when "ftp"
-                  Net::FTP.open(@source_uri.host) do |ftp|
-                    ftp.passive = true
-                    ftp.login
-                    ftp.getbinaryfile(@source_uri.path, project_file)
-                    ftp.close
-                  end
-                else
-                  raise
+                  puts "extracting the source"
+                  shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
+                  shell.run_command
+                  shell.error!
                 end
-                puts "extracting the source"
-                shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
-                shell.run_command
-                shell.error!
-              end
-            elsif @source[:git]
-              #
-              # clone needed?
-              #
-              to_clone = !File.directory?(project_dir) # TODO: check for .git file
-              if to_clone
-                puts "cloning the source from git"
-                clone_cmd = "git clone #{@source[:git]} #{project_dir}"
-                shell = Mixlib::ShellOut.new(clone_cmd, :live_stream => STDOUT)
-                shell.run_command
-                shell.error!
-              end
+              elsif @source[:git]
+                #
+                # clone needed?
+                #
+                to_clone = !File.directory?(project_dir) # TODO: check for .git file
+                if to_clone
+                  puts "cloning the source from git"
+                  clone_cmd = "git clone #{@source[:git]} #{project_dir}"
+                  shell = Mixlib::ShellOut.new(clone_cmd, :live_stream => STDOUT)
+                  shell.run_command
+                  shell.error!
+                end
 
-              #
-              # checkout needed?
-              #
-              to_checkout = true
-              if to_checkout
+                #
+                # checkout needed?
+                #
+                to_checkout = true
+                if to_checkout
 
+                end
               end
+            else
+              # touch a placeholder file
+              placeholder = "#{project_dir}/placeholder"
+              touch placeholder unless File.exist?(placeholder)
             end
           end
 
