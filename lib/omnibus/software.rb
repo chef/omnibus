@@ -203,7 +203,7 @@ module Omnibus
             File.mtime(a) <=> File.mtime(b)
           }.last
 
-          file manifest_file => latest_file
+          file manifest_file => (file latest_file)
         end
 
         desc "fetch and build #{@name}"
