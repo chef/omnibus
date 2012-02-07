@@ -1,10 +1,13 @@
 name "zlib"
 dependencies []
 
-source :url => "http://zlib.net/zlib-1.2.5.tar.gz",
-       :md5 => "c735eab2d659a96e5a594c9e8541ad63"
+# TODO: this link is subject to change with each new release of zlib.
+#       we'll need to use a more robust link (sourceforge) that will
+#       not change over time.
+source :url => "http://zlib.net/zlib-1.2.6.tar.gz",
+       :md5 => "618e944d7c7cd6521551e30b32322f4a"
 
-relative_path "zlib-1.2.5"
+relative_path "zlib-1.2.6"
 
 configure_env =
   case platform
