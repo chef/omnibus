@@ -150,7 +150,8 @@ module Omnibus
                 #
                 # clone needed?
                 #
-                to_clone = !File.directory?(project_dir) # TODO: check for .git file
+                to_clone = (!File.directory?(project_dir) ||
+                            !File.directory?("#{project_dir}/.git"))
                 if to_clone
                   puts "cloning the source from git"
                   clone_cmd = "git clone #{@source[:git]} #{project_dir}"
@@ -164,7 +165,7 @@ module Omnibus
                 #
                 to_checkout = true
                 if to_checkout
-
+                  # TODO: checkout the most up to date version
                 end
               end
             else
