@@ -1,10 +1,10 @@
-== Installation
+## Installation
 
 Nothing to install here (yet). Move along.
 
-== DSL
+## DSL
 
-=== Software DSL
+### Software DSL
 
 Each piece of sofware built by Omnibus is defined with a DSL in the `config/software` subdirectory of the project. The following is a quick desctiption of that DSL.
 
@@ -24,4 +24,4 @@ Each piece of sofware built by Omnibus is defined with a DSL in the `config/soft
 
 `command`: A command to execute. This encompasses a single build step.
 
-=== Project DSL
+### Project DSL
