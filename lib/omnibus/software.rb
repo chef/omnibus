@@ -188,7 +188,8 @@ module Omnibus
                 :timeout => 3600
               }
               if cmd_args.last.is_a? Hash
-                cmd_args.last.merge!(options)
+                cmd_options = cmd_args.last
+                cmd_args[cmd_args.size - 1] = options.merge(cmd_options)
               else
                 cmd_args << options
               end
