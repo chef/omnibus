@@ -17,7 +17,7 @@ whitelist_libs = [
   /libfreebl\d\.so/
 ]
 
-ldd_output = `find /opt/opscode -name '*.so' | xargs ldd`
+ldd_output = `find /opt/opscode -name '*.so' -o -name '*.cgi' | xargs ldd`
 current_library = nil 
 ldd_output.split("\n").each do |line|
   case line
