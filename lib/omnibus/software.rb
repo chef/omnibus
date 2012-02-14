@@ -6,6 +6,7 @@ require 'digest/md5'
 require 'mixlib/shellout'
 require 'net/ftp'
 require 'net/http'
+require 'net/https'
 require 'uri'
 
 module Omnibus
@@ -124,8 +125,10 @@ module Omnibus
                 if to_fetch
                   puts "fetching the source"
                   case @source_uri.scheme
-                  when "http"
-                    Net::HTTP.start(@source_uri.host) do |http|
+                  when /https?/
+                    http_client = Net::HTTP.new(@source_uri.host, @source_uri.port)
+                    http_client.use_ssl = (@source_uri.scheme == "https")
+                    http_client.start do |http|
                       resp = http.get(@source_uri.path, 'accept-encoding' => '')
                       open(project_file, "wb") do |f|
                         f.write(resp.body)
