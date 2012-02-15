@@ -14,7 +14,8 @@ whitelist_libs = [
   /libgcc_s\.so/,
   /libstdc\+\+\.so/,
   /libnsl\.so/,
-  /libfreebl\d\.so/
+  /libfreebl\d\.so/,
+  /libresolv\.so/
 ]
 
 ldd_output = `find /opt/opscode -name '*.so' -o -name '*.cgi' | xargs ldd`
