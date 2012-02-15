@@ -18,7 +18,11 @@ whitelist_libs = [
   /libresolv\.so/
 ]
 
-ldd_output = `find /opt/opscode -name '*.so' -o -name '*.cgi' | xargs ldd`
+# TODO: use ldd on all regular filles and ignore those that aren't dynamically executable
+# ldd_output = `find /opt/opscode -type f | xargs ldd`
+
+ldd_output = `find /opt/opscode -name '*.so' -o -name '*.cgi' -o -path '/opt/opscode/embedded/nagios/libexec/*' | xargs ldd`
+
 current_library = nil 
 ldd_output.split("\n").each do |line|
   case line
@@ -54,6 +58,7 @@ ldd_output.split("\n").each do |line|
     next
   when /^\s+libmawt.so/
     next
+  when /^\s+not a dynamic executable$/
   else
     puts "line did not match for #{current_library}\n#{line}"
   end
