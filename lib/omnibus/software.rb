@@ -55,6 +55,11 @@ module Omnibus
       @source
     end
 
+    def version(val=NULL_ARG)
+      @version = val unless val.equal?(NULL_ARG)
+      @version
+    end
+
     def relative_path(val)
       @relative_path = val
     end
