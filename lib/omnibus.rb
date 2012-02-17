@@ -8,9 +8,23 @@ o.require_plugin('os')
 o.require_plugin('platform')
 OHAI = o
 
+require 'mixlib/shellout'
+
 require 'omnibus/software'
 require 'omnibus/project'
 
 module Omnibus
-end
+  def self.github_user
+    cmd = Mixlib::ShellOut.new("git", "config", "github.user")
+    cmd.run_command
+    cmd.error!
+    cmd.stdout.strip
+  end
 
+  def self.github_token
+    cmd = Mixlib::ShellOut.new("git", "config", "github.token")
+    cmd.run_command
+    cmd.error!
+    cmd.stdout.strip
+  end
+end

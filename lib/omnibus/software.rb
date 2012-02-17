@@ -51,6 +51,10 @@ module Omnibus
       @source_uri ||= URI(@source[:url])
     end
 
+    def source_github?
+      source_uri.host.end_with?("github.com")
+    end
+
     def source_dir
       "/tmp/omnibus/src".freeze
     end
@@ -64,7 +68,8 @@ module Omnibus
     end
 
     def project_file
-      filename = source_uri.path.split('/').last
+      parts = source_uri.path.split('/')
+      filename = source_github? ? "#{parts[-3]}.tar.gz" : parts.last
       "#{cache_dir}/#{filename}"
     end
 
@@ -121,7 +126,7 @@ module Omnibus
                 #
                 # fetch needed?
                 #
-                to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
+                to_fetch = !File.exists?(project_file) || !@source[:md5] || Digest::MD5.file(project_file) != @source[:md5]
                 if to_fetch
                   puts "fetching the source"
                   case @source_uri.scheme
@@ -129,7 +134,11 @@ module Omnibus
                     http_client = Net::HTTP.new(@source_uri.host, @source_uri.port)
                     http_client.use_ssl = (@source_uri.scheme == "https")
                     http_client.start do |http|
-                      resp = http.get(@source_uri.path, 'accept-encoding' => '')
+                      headers = {'accept-encoding' => ''}
+                      headers['authorization'] = 'Basic ' + ["#{Omnibus::github_user}%2ftoken:#{Omnibus::github_token}"].pack('m').delete("\r\n") if source_github?
+                      puts headers.inspect
+                      resp = http.get(@source_uri.path, headers)
+                      resp.value # Make sure we get a 200 Ok
                       open(project_file, "wb") do |f|
                         f.write(resp.body)
                       end
