@@ -23,6 +23,13 @@ module Omnibus
     attr_reader :dependencies
 
     def initialize(io)
+      @version        = nil
+      @name           = nil
+      @description    = nil
+      @source         = nil
+      @relative_path  = nil
+      @source_uri     = nil
+
       @build_commands = []
       @dependencies = ["preparation"]
       instance_eval(io)
