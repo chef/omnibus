@@ -9,14 +9,18 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 
+require 'omnibus/fetcher'
+require 'omnibus/builder'
+
 module Omnibus
   class Software
     include Rake::DSL
 
+    NULL_ARG = Object.new
+
     attr_reader :name
     attr_reader :description
     attr_reader :dependencies
-    attr_reader :source
 
     def initialize(io)
       @build_commands = []
@@ -39,8 +43,9 @@ module Omnibus
       end
     end
 
-    def source(val)
-      @source = val
+    def source(val=NULL_ARG)
+      @source = val unless val.equal?(NULL_ARG)
+      @source
     end
 
     def relative_path(val)
@@ -117,60 +122,8 @@ module Omnibus
             # isn't any specified
             #
             if @source
-              if @source[:url]
-                #
-                # fetch needed?
-                #
-                to_fetch = !File.exists?(project_file) || Digest::MD5.file(project_file) != @source[:md5]
-                if to_fetch
-                  puts "fetching the source"
-                  case @source_uri.scheme
-                  when /https?/
-                    http_client = Net::HTTP.new(@source_uri.host, @source_uri.port)
-                    http_client.use_ssl = (@source_uri.scheme == "https")
-                    http_client.start do |http|
-                      resp = http.get(@source_uri.path, 'accept-encoding' => '')
-                      open(project_file, "wb") do |f|
-                        f.write(resp.body)
-                      end
-                    end
-                  when "ftp"
-                    Net::FTP.open(@source_uri.host) do |ftp|
-                      ftp.passive = true
-                      ftp.login
-                      ftp.getbinaryfile(@source_uri.path, project_file)
-                      ftp.close
-                    end
-                  else
-                    raise
-                  end
-                  puts "extracting the source"
-                  shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
-                  shell.run_command
-                  shell.error!
-                end
-              elsif @source[:git]
-                #
-                # clone needed?
-                #
-                to_clone = (!File.directory?(project_dir) ||
-                            !File.directory?("#{project_dir}/.git"))
-                if to_clone
-                  puts "cloning the source from git"
-                  clone_cmd = "git clone #{@source[:git]} #{project_dir}"
-                  shell = Mixlib::ShellOut.new(clone_cmd, :live_stream => STDOUT)
-                  shell.run_command
-                  shell.error!
-                end
-
-                #
-                # checkout needed?
-                #
-                to_checkout = true
-                if to_checkout
-                  # TODO: checkout the most up to date version
-                end
-              end
+              fetcher = Fetcher.for(self)
+              fetcher.fetch
             else
               # touch a placeholder file
               placeholder = "#{project_dir}/placeholder"
@@ -182,24 +135,9 @@ module Omnibus
           # keep track of the build manifest
           #
           file manifest_file => build_dir do
-            puts "building the source"
-            @build_commands.each do |cmd|
-              cmd_args = Array(cmd)
-              options = {
-                :cwd => project_dir,
-                :live_stream => STDOUT,
-                :timeout => 3600
-              }
-              if cmd_args.last.is_a? Hash
-                cmd_options = cmd_args.last
-                cmd_args[cmd_args.size - 1] = options.merge(cmd_options)
-              else
-                cmd_args << options
-              end
-              shell = Mixlib::ShellOut.new(*cmd)
-              shell.run_command
-              shell.error!
-            end
+            builder = Builder.new(@build_commands, project_dir)
+            builder.build
+
             # TODO: write the actual manifest file
             touch manifest_file
           end
