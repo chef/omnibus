@@ -80,6 +80,7 @@ module Omnibus
     def manifest_file
       "#{build_dir}/#{@name}.manifest"
     end
+
     #
     # TODO: this doesn't actually give us any benefit over simply
     # calling #command from the software file, but I think it's cute
