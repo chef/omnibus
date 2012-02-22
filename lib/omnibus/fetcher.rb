@@ -1,7 +1,37 @@
 require 'pp'
 
 module Omnibus
+
   class Fetcher
+
+    class ErrorReporter
+
+      def initialize(error, fetcher)
+        @error, @fetcher = error, fetcher
+      end
+
+      def e
+        @error
+      end
+
+      def explain(why)
+        $stderr.puts "* " * 40
+        $stderr.puts why
+        $stderr.puts "Fetcher params:"
+        $stderr.puts indent(@fetcher.description, 2)
+        $stderr.puts "Exception:"
+        $stderr.puts indent("#{e.class}: #{e.message.strip}", 2)
+        e.backtrace.each {|l| $stderr.puts indent(e.backtrace, 4) }
+        $stderr.puts "* " * 40
+      end
+
+      private
+
+      def indent(string, n)
+        string.split("\n").map {|l| " ".rjust(n) << l }.join("\n")
+      end
+
+    end
 
     class UnsupportedSourceLocation < ArgumentError
     end
@@ -15,6 +45,11 @@ module Omnibus
       else
         raise UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
       end
+    end
+
+    def description
+      # Not as pretty as we'd like, but it's a sane default:
+      inspect
     end
 
     def fetcher
@@ -38,6 +73,13 @@ module Omnibus
       @source_dir   = software.source_dir
     end
 
+    def description
+      s=<<-E
+source URI:     #@source_uri
+checksum:       #{@source[:md5]}
+local location: #@project_file
+E
+    end
 
     def fetch
       #
@@ -71,8 +113,8 @@ module Omnibus
         shell.run_command
         shell.error!
       end
-    rescue Exception
-      pp self
+    rescue Exception => e
+      ErrorReporter.new(e, self).explain("Failed to fetch source from #@source_uri (#{e.class}: #{e.message.strip})")
       raise
     end
 
@@ -86,6 +128,13 @@ module Omnibus
     def initialize(software)
       @source       = software.source
       @project_dir  = software.project_dir
+    end
+
+    def description
+      s=<<-E
+repo URI:       #{@source[:git]}
+local location: #{@project_dir}
+E
     end
 
     def fetch
@@ -110,7 +159,7 @@ module Omnibus
         # TODO: checkout the most up to date version
       end
     rescue Exception
-      pp self
+      ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
       raise
     end
   end
