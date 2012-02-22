@@ -13,6 +13,48 @@ require 'omnibus/project'
 
 module Omnibus
 
+  # Used to generate the manifest of all software components with versions
+  class Library
+
+    def initialize
+      @projects = []
+      @components = []
+    end
+
+    def component_added(component)
+      @components << component
+    end
+
+    def version_map
+      @components.inject({}) {|map, component| map[component.name] = component.version; map}
+    end
+
+
+  end
+
+  def self.library
+    @library ||= Library.new
+  end
+
+  def self.component_added(*args)
+    library.component_added(*args)
+  end
+
+  module Reports
+    extend self
+
+    def pretty_version_map
+      out = ""
+      version_map = Omnibus.library.version_map
+      width = version_map.keys.max {|a,b| a.size <=> b.size }.size + 3
+      version_map.each do |name, version|
+        out << "#{name}:".ljust(width) << version.to_s << "\n"
+      end
+      out
+    end
+
+  end
+
   #--
   # Extra indirection so we don't need the Rake::DSL in the Omnibus module
   module Loader
@@ -20,7 +62,9 @@ module Omnibus
 
     def self.software(*path_specs)
       FileList[*path_specs].each do |f|
-        Omnibus::Software.new(IO.read(f))
+        s = Omnibus::Software.new(IO.read(f))
+        Omnibus.component_added(s)
+        s
       end
     end
 

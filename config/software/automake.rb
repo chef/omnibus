@@ -1,4 +1,5 @@
 name "automake"
+version "1.11.2"
 
 source :url => "http://ftp.gnu.org/gnu/automake/automake-1.11.2.tar.gz",
        :md5 => "79ad64a9f6e83ea98d6964cef8d8a0bc"

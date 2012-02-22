@@ -1,4 +1,6 @@
 name "ruby"
+version "1.9.2p290"
+
 dependencies ["autoconf", "zlib", "openssl", "ncurses", "readline"]
 
 source :url => 'http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz',

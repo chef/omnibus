@@ -18,7 +18,6 @@ module Omnibus
 
     NULL_ARG = Object.new
 
-    attr_reader :name
     attr_reader :description
     attr_reader :dependencies
 
@@ -36,8 +35,9 @@ module Omnibus
       render_tasks
     end
 
-    def name(val)
-      @name = val
+    def name(val=NULL_ARG)
+      @name = val unless val.equal?(NULL_ARG)
+      @name
     end
 
     def description(val)
