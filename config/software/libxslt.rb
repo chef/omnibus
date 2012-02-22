@@ -1,4 +1,6 @@
 name "libxslt"
+version "1.1.26"
+
 dependencies ["libxml2"]
 
 source :url => "ftp://xmlsoft.org/libxml2/libxslt-1.1.26.tar.gz",

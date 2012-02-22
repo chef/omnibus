@@ -1,4 +1,6 @@
 name "libxml2"
+version "2.7.8"
+
 dependencies ["zlib", "libiconv", "readline"]
 
 source :url => "ftp://xmlsoft.org/libxml2/libxml2-2.7.8.tar.gz",

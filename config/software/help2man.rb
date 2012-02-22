@@ -1,4 +1,5 @@
 name "help2man"
+version "1.40.5"
 
 dependencies []
 

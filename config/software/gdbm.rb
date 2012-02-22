@@ -1,4 +1,5 @@
 name "gdbm"
+version "1.9.1"
 
 dependencies ["autoconf"]
 

@@ -1,4 +1,5 @@
 name "readline"
+version "6.2"
 
 # NOTE: the clojure omnibus uses readline 5.2, which is super old.
 # there might be a reason for that, and if this doesn't build on other

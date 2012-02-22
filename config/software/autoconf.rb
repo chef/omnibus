@@ -1,4 +1,5 @@
 name "autoconf"
+version "2.68"
 dependencies []
 
 source :url => "http://ftp.gnu.org/gnu/autoconf/autoconf-2.68.tar.gz",
