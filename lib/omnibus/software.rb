@@ -23,6 +23,13 @@ module Omnibus
     attr_reader :dependencies
 
     def initialize(io)
+      @version        = nil
+      @name           = nil
+      @description    = nil
+      @source         = nil
+      @relative_path  = nil
+      @source_uri     = nil
+
       @build_commands = []
       @dependencies = ["preparation"]
       instance_eval(io)
@@ -46,6 +53,11 @@ module Omnibus
     def source(val=NULL_ARG)
       @source = val unless val.equal?(NULL_ARG)
       @source
+    end
+
+    def version(val=NULL_ARG)
+      @version = val unless val.equal?(NULL_ARG)
+      @version
     end
 
     def relative_path(val)
