@@ -124,10 +124,12 @@ E
 
     attr_reader :source
     attr_reader :project_dir
+    attr_reader :version
 
     def initialize(software)
       @source       = software.source
       @project_dir  = software.project_dir
+      @version      = software.version
     end
 
     def description
@@ -138,27 +140,37 @@ E
     end
 
     def fetch
-      #
-      # clone needed?
-      #
+      to_update = true
+
       to_clone = (!File.directory?(project_dir) ||
                   !File.directory?("#{project_dir}/.git"))
       if to_clone
+        # No update needed if we're cloning
+        to_update = false
         puts "cloning the source from git"
         clone_cmd = "git clone #{@source[:git]} #{project_dir}"
         shell = Mixlib::ShellOut.new(clone_cmd, :live_stream => STDOUT)
         shell.run_command
         shell.error!
       end
-
-      #
-      # checkout needed?
-      #
-      to_checkout = true
-      if to_checkout
-        # TODO: checkout the most up to date version
+  
+      if to_update
+        puts "updating source from git"
+        update_cmd = "git pull"
+        shell = Mixlib::ShellOut.new(update_cmd, :live_stream => STDOUT)
+        shell.run_command
+        shell.error!
       end
-    rescue Exception
+
+      to_checkout = version != nil
+      if to_checkout
+        checkout_cmd = "git checkout #{version}"
+        shell = Mixlib::ShellOut.new(checkout_cmd, :live_stream => STDOUT)
+        shell.run_command
+        shell.error!
+      end 
+
+    rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
       raise
     end
