@@ -52,7 +52,7 @@ module Omnibus
       inspect
     end
 
-    def fetcher
+    def fetch
       raise NotImplementedError, "define #fetcher for class #{self.class}"
     end
 
