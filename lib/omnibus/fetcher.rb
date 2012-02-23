@@ -21,7 +21,7 @@ module Omnibus
         $stderr.puts indent(@fetcher.description, 2)
         $stderr.puts "Exception:"
         $stderr.puts indent("#{e.class}: #{e.message.strip}", 2)
-        e.backtrace.each {|l| $stderr.puts indent(e.backtrace, 4) }
+        Array(e.backtrace).each {|l| $stderr.puts indent(l, 4) }
         $stderr.puts "* " * 40
       end
 
