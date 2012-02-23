@@ -174,6 +174,8 @@ E
       puts "fetching updates and resetting to revision #{target_revision}"
       fetch_cmd = "git fetch origin && git fetch origin --tags && git reset --hard #{target_revision}"
       shell = Mixlib::ShellOut.new(fetch_cmd, :live_stream => STDOUT, :cwd => project_dir)
+      shell.run_command
+      shell.error!
     end
 
     def existing_git_clone?
