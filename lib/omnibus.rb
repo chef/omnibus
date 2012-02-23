@@ -10,6 +10,7 @@ OHAI = o
 
 require 'omnibus/software'
 require 'omnibus/project'
+require 'omnibus/fetchers'
 
 module Omnibus
 
