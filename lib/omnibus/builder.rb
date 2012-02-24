@@ -9,8 +9,12 @@ module Omnibus
       @project_dir    = project_dir
     end
 
+    def log(message)
+      puts "[builder] #{message}"
+    end
+
     def build
-      puts "building the source"
+      log "building the source"
       @build_commands.each do |cmd|
         execute(cmd)
       end
