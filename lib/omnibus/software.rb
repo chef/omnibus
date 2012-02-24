@@ -29,7 +29,8 @@ module Omnibus
       @relative_path  = nil
       @source_uri     = nil
 
-      @build_commands = []
+      @builder = NullBuilder.new(self)
+
       @dependencies = ["preparation"]
       instance_eval(io)
       render_tasks
@@ -113,22 +114,18 @@ module Omnibus
       "#{build_dir}/#{software_name}.manifest"
     end
 
-    #
-    # TODO: this doesn't actually give us any benefit over simply
-    # calling #command from the software file, but I think it's cute
-    #
     def build(&block)
-      yield
+      @builder = Builder.new(self, &block)
+    end
+
+    def platform
+      OHAI.platform
     end
 
     private
 
     def command(*args)
-      @build_commands << args
-    end
-
-    def platform
-      OHAI.platform
+      raise "Method Moved."
     end
 
     def render_tasks
@@ -171,8 +168,7 @@ module Omnibus
           # keep track of the build manifest
           #
           file manifest_file => build_dir do
-            builder = Builder.new(@build_commands, project_dir)
-            builder.build
+            @builder.build
 
             # TODO: write the actual manifest file
             touch manifest_file

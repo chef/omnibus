@@ -41,15 +41,17 @@ E
 
     def fetch
       if should_fetch?
-        log "fetching the source"
         download
         verify_checksum!
-        log "extracting the source"
         extract
+      else
+        log "Cached copy of source tarball up to date, skipping"
       end
     end
 
     def download
+      log "fetching the source from #{source_uri}"
+
       case source_uri.scheme
       when /https?/
         http_client = Net::HTTP.new(source_uri.host, source_uri.port)
@@ -86,6 +88,7 @@ E
     end
 
     def extract
+      log "extracting the source in #{project_file} to #{source_dir}"
       shell = Mixlib::ShellOut.new("tar -x -f #{project_file} -C #{source_dir}", :live_stream => STDOUT)
       shell.run_command
       shell.error!
