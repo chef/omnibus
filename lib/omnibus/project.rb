@@ -32,6 +32,11 @@ module Omnibus
 
     def render_tasks
       namespace :projects do
+        shell = Mixlib::ShellOut.new("cp setup.sh /opt/opscode",
+                                     :live_stream => STDOUT, 
+                                     :cwd => './scripts')
+        shell.run_command
+        shell.error!
         PACKAGE_TYPES.each do |pkg_type|
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
@@ -43,6 +48,8 @@ module Omnibus
                    "-v 0.0.1",
                    "-n #{@name}",
                    "/opt/opscode",
+                   "--post-install '../scripts/postinst'",
+                   "--post-uninstall '../scripts/postrm'",
                    "-m 'Opscode, Inc.'",
                    "--description 'The full stack of #{@name}'",
                    "--url http://www.opscode.com"].join(" ")
