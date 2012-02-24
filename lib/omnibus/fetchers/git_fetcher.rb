@@ -3,11 +3,14 @@ module Omnibus
   # Fetcher implementation for projects in git.
   class GitFetcher < Fetcher
 
+    name :git
+
     attr_reader :source
     attr_reader :project_dir
     attr_reader :version
 
     def initialize(software)
+      @name         = software.name
       @source       = software.source
       @project_dir  = software.project_dir
       @version      = software.version

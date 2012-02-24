@@ -9,6 +9,8 @@ module Omnibus
   # Fetcher Implementation for HTTP and FTP hosted tarballs
   class NetFetcher < Fetcher
 
+    name :net
+
     attr_reader :name
     attr_reader :project_file
     attr_reader :source
@@ -25,13 +27,9 @@ module Omnibus
       @source_dir   = software.source_dir
     end
 
-    def log(message)
-      puts "[Net Fetcher::#{name}] #{message}"
-    end
-
     def description
       s=<<-E
-source URI:     #@source_uri
+source URI:     #{source_uri}
 checksum:       #{@checksum}
 local location: #@project_file
 E
@@ -52,28 +50,28 @@ E
     end
 
     def download
-      case @source_uri.scheme
+      case source_uri.scheme
       when /https?/
-        http_client = Net::HTTP.new(@source_uri.host, @source_uri.port)
-        http_client.use_ssl = (@source_uri.scheme == "https")
+        http_client = Net::HTTP.new(source_uri.host, source_uri.port)
+        http_client.use_ssl = (source_uri.scheme == "https")
         http_client.start do |http|
-          resp = http.get(@source_uri.path, 'accept-encoding' => '')
+          resp = http.get(source_uri.path, 'accept-encoding' => '')
           open(project_file, "wb") do |f|
             f.write(resp.body)
           end
         end
       when "ftp"
-        Net::FTP.open(@source_uri.host) do |ftp|
+        Net::FTP.open(source_uri.host) do |ftp|
           ftp.passive = true
           ftp.login
-          ftp.getbinaryfile(@source_uri.path, project_file)
+          ftp.getbinaryfile(source_uri.path, project_file)
           ftp.close
         end
       else
-        raise UnsupportedURIScheme, "Don't know how to download from #{@source_uri}"
+        raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
       end
     rescue Exception => e
-      ErrorReporter.new(e, self).explain("Failed to fetch source from #@source_uri (#{e.class}: #{e.message.strip})")
+      ErrorReporter.new(e, self).explain("Failed to fetch source from #source_uri (#{e.class}: #{e.message.strip})")
       raise
     end
 

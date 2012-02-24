@@ -69,10 +69,33 @@ F
     end
   end
 
-  class S3Cache
+  module SoftwareS3URLs
 
     class InsufficientSpecification < ArgumentError
     end
+
+    def config
+      Omnibus.config
+    end
+
+    def url_for(software)
+      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software)}"
+    end
+
+    private
+
+    def key_for_package(package)
+      package.name     or raise InsufficientSpecification, "Software must have a name to cache it in S3 (#{package.inspect})"
+      package.version  or raise InsufficientSpecification, "Software must set a version to cache it in S3 (#{package.inspect})"
+      package.checksum or raise InsufficientSpecification, "Software must specify a checksum (md5) to cache it in S3 (#{package.inspect})"
+      "#{package.name}-#{package.version}-#{package.checksum}"
+    end
+
+  end
+
+  class S3Cache
+
+    include SoftwareS3URLs
 
     def initialize
       @client = UberS3.new(
@@ -119,7 +142,6 @@ F
         log "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
         @client.store(key, content, :access => :public_read, :content_md5 => software.checksum)
       end
-      
     end
 
     def fetch_missing
@@ -136,7 +158,7 @@ F
 
     def fetch(software)
       log "Fetching #{software.name}"
-      fetcher = Fetcher.for(software)
+      fetcher = Fetcher.without_caching_for(software)
       if fetcher.should_fetch?
         fetcher.download
         fetcher.verify_checksum!
@@ -152,13 +174,6 @@ F
         @client.connection.put("/")
         b
       end
-    end
-
-    def key_for_package(package)
-      package.name     or raise InsufficientSpecification, "Software must have a name to cache it in S3 (#{package.inspect})"
-      package.version  or raise InsufficientSpecification, "Software must set a version to cache it in S3 (#{package.inspect})"
-      package.checksum or raise InsufficientSpecification, "Software must specify a checksum (md5) to cache it in S3 (#{package.inspect})"
-      "#{package.name}-#{package.version}-#{package.checksum}"
     end
 
   end
