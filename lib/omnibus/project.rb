@@ -6,6 +6,7 @@ module Omnibus
     include Rake::DSL
 
     PACKAGE_TYPES = ["deb", "rpm"]
+    PACKAGE_SCRIPTS_PATH = "../omnibus-ruby/package-scripts"
 
     attr_reader :name
     attr_reader :description
@@ -38,17 +39,19 @@ module Omnibus
 
     def render_tasks
       namespace :projects do
-        shell = Mixlib::ShellOut.new("cp setup.sh /opt/opscode",
-                                     :live_stream => STDOUT, 
-                                     :cwd => './scripts')
-        shell.run_command
-        shell.error!
         PACKAGE_TYPES.each do |pkg_type|
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
-              Dir.mkdir("pkg") unless File.exists?("pkg")
+              if !File.exists?("/opt/opscode/setup.sh")  
+                shell = Mixlib::ShellOut.new("cp setup.sh /opt/opscode",
+                                             :live_stream => STDOUT, 
+                                             :cwd => PACKAGE_SCRIPTS_PATH)
+                shell.run_command
+                shell.error!
+              end
 
+              Dir.mkdir("pkg") unless File.exists?("pkg")
               # build the fpm command
               fpm_command = ["fpm",
                              "-s dir",
@@ -56,6 +59,8 @@ module Omnibus
                              "-v 0.0.1",
                              "-n #{@name}",
                              "/opt/opscode",
+                             "--post-install '../#{PACKAGE_SCRIPTS_PATH}/postinst'",
+                             "--post-uninstall '../#{PACKAGE_SCRIPTS_PATH}/postrm'",
                              "--post-install '../scripts/postinst'",
                              "--post-uninstall '../scripts/postrm'",
                              "-m 'Opscode, Inc.'",
