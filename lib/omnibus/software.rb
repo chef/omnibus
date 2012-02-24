@@ -11,6 +11,7 @@ require 'uri'
 
 require 'omnibus/fetcher'
 require 'omnibus/builder'
+require 'omnibus/config'
 
 module Omnibus
   class Software
@@ -73,28 +74,20 @@ module Omnibus
       @source[:md5]
     end
 
-    def source_dir
-      self.class.source_dir
+    def config
+      Omnibus.config
     end
 
-    def self.source_dir
-      "/tmp/omnibus/src".freeze
+    def source_dir
+      config.source_dir
     end
 
     def cache_dir
-      self.class.cache_dir
-    end
-
-    def self.cache_dir
-      "/tmp/omnibus/cache".freeze
+      config.cache_dir
     end
 
     def build_dir
-      self.class.build_dir
-    end
-
-    def self.build_dir
-      "/tmp/omnibus/build".freeze
+      config.build_dir
     end
 
     def project_file
@@ -111,7 +104,7 @@ module Omnibus
     end
 
     def self.manifest_file_from_name(software_name)
-      "#{build_dir}/#{software_name}.manifest"
+      "#{Omnibus.config.build_dir}/#{software_name}.manifest"
     end
 
     def build(&block)
