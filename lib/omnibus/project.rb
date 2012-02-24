@@ -61,8 +61,6 @@ module Omnibus
                              "/opt/opscode",
                              "--post-install '../#{PACKAGE_SCRIPTS_PATH}/postinst'",
                              "--post-uninstall '../#{PACKAGE_SCRIPTS_PATH}/postrm'",
-                             "--post-install '../scripts/postinst'",
-                             "--post-uninstall '../scripts/postrm'",
                              "-m 'Opscode, Inc.'",
                              "--description 'The full stack of #{@name}'",
                              "--url http://www.opscode.com"]
