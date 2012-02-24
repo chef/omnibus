@@ -90,6 +90,10 @@ module Omnibus
       config.build_dir
     end
 
+    def install_dir
+      config.install_dir
+    end
+
     def project_file
       filename = source_uri.path.split('/').last
       "#{cache_dir}/#{filename}"
