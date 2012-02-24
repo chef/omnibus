@@ -7,13 +7,13 @@ source :url => "http://ftp.gnu.org/gnu/automake/automake-1.11.2.tar.gz",
 relative_path "automake-1.11.2"
 
 configure_env = {
-  "LDFLAGS" => "-R/opt/opscode/embedded/lib -L/opt/opscode/embedded/lib -I/opt/opscode/embedded/include",
-  "CFLAGS" => "-L/opt/opscode/embedded/lib -I/opt/opscode/embedded/include"
+  "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
 }
 
 build do
   command "./bootstrap"
-  command "./configure --prefix=/opt/opscode/embedded"
+  command "./configure --prefix=#{install_dir}/embedded"
   command "make"
   command "make install"
 end

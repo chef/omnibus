@@ -9,8 +9,8 @@ source :url => "http://ftp.gnu.org/gnu/gdbm/gdbm-1.9.1.tar.gz",
 relative_path "gdbm-1.9.1"
 
 build do
-  command "/opt/opscode/embedded/bin/autoconf"
-  command "./configure --prefix=/opt/opscode/embedded"
+  command "#{install_dir}/embedded/bin/autoconf"
+  command "./configure --prefix=#{install_dir}/embedded"
   command "make BINOWN=root BINGRP=wheel" # TODO: is this a leftover from os x, a bug?
   command "make install"
 end

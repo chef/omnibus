@@ -10,16 +10,16 @@ relative_path "libxslt-1.1.26"
 
 build do
   env = {
-    "LDFLAGS" => "-L/opt/opscode/embedded/lib -I/opt/opscode/embedded/include",
-    "CFLAGS" => "-L/opt/opscode/embedded/lib -I/opt/opscode/embedded/include",
-    "LD_RUN_PATH" => "/opt/opscode/embedded/lib"
+    "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+    "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+    "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
   }
   command(["./configure",
-           "--prefix=/opt/opscode/embedded",
-           "--with-libxml-prefix=/opt/opscode/embedded",
-           "--with-libxml-include-prefix=/opt/opscode/embedded/include",
-           "--with-libxml-libs-prefix=/opt/opscode/embedded/lib"].join(" "),
+           "--prefix=#{install_dir}/embedded",
+           "--with-libxml-prefix=#{install_dir}/embedded",
+           "--with-libxml-include-prefix=#{install_dir}/embedded/include",
+           "--with-libxml-libs-prefix=#{install_dir}/embedded/lib"].join(" "),
           :env => env)
-  command "make", :env => {"LD_RUN_PATH" => "/opt/opscode/embedded/bin"}
-  command "make install", :env => {"LD_RUN_PATH" => "/opt/opscode/embedded/bin"}
+  command "make", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
+  command "make install", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
 end

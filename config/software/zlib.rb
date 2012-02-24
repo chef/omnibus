@@ -15,18 +15,18 @@ configure_env =
   case platform
   when "darwin"
     {
-      "LDFLAGS" => "-R/opt/opscode/embedded/lib -L/opt/opscode/embedded/lib -I/opt/opscode/embedded/include",
-      "CFLAGS" => "-I/opt/opscode/embedded/include -L/opt/opscode/embedded/lib"
+      "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   else
     {
-      "LDFLAGS" => "-Wl,-rpath /opt/opscode/embedded/lib -L/opt/opscode/embedded/lib -I/opt/opscode/embedded/include",
-      "CFLAGS" => "-I/opt/opscode/embedded/include -L/opt/opscode/embedded/lib"
+      "LDFLAGS" => "-Wl,-rpath #{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   end
 
 build do
-  command "./configure --prefix=/opt/opscode/embedded", :env => configure_env
+  command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
   command "make"
   command "make install"
 end

@@ -15,7 +15,7 @@ make_command =
   end
 
 build do
-  command "./configure --prefix=/opt/opscode/embedded"
+  command "./configure --prefix=#{install_dir}/embedded"
   command make_command
   command "#{make_command} install"
 end

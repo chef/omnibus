@@ -6,10 +6,10 @@ source :url => "http://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz",
 
 relative_path "ncurses-5.9"
 
-env = {"LD_RUN_PATH" => "/opt/opscode/embedded/lib"}
+env = {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
 
 build do
-  command "./configure --prefix=/opt/opscode/embedded --with-shared --without-debug", :env => env
+  command "./configure --prefix=#{install_dir}/embedded --with-shared --without-debug", :env => env
   command "make", :env => env
   command "make install", :env => env
 end
