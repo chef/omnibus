@@ -73,14 +73,26 @@ module Omnibus
     end
 
     def source_dir
+      self.class.source_dir
+    end
+
+    def self.source_dir
       "/tmp/omnibus/src".freeze
     end
 
     def cache_dir
+      self.class.cache_dir
+    end
+
+    def self.cache_dir
       "/tmp/omnibus/cache".freeze
     end
 
     def build_dir
+      self.class.build_dir
+    end
+
+    def self.build_dir
       "/tmp/omnibus/build".freeze
     end
 
@@ -94,7 +106,11 @@ module Omnibus
     end
 
     def manifest_file
-      "#{build_dir}/#{@name}.manifest"
+      self.class.manifest_file_from_name(@name)
+    end
+
+    def self.manifest_file_from_name(software_name)
+      "#{build_dir}/#{software_name}.manifest"
     end
 
     #
@@ -121,7 +137,10 @@ module Omnibus
         #
         # set up inter-project dependencies
         #
-        task @name => (@dependencies - [@name]).uniq
+        (@dependencies - [@name]).uniq.each do |dep|
+          task @name => dep
+          file manifest_file => self.class.manifest_file_from_name(dep)
+        end
 
         namespace @name do
 
