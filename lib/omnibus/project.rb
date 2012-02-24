@@ -12,6 +12,8 @@ module Omnibus
     attr_reader :dependencies
 
     def initialize(io)
+      @exclusions = Array.new
+
       instance_eval(io)
       render_tasks
     end
@@ -28,6 +30,10 @@ module Omnibus
       @dependencies = val
     end
 
+    def exclude(pattern)
+      @exclusions << pattern
+    end
+
     private
 
     def render_tasks
@@ -42,18 +48,25 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
               Dir.mkdir("pkg") unless File.exists?("pkg")
-              command = ["fpm",
-                   "-s dir",
-                   "-t #{pkg_type}",
-                   "-v 0.0.1",
-                   "-n #{@name}",
-                   "/opt/opscode",
-                   "--post-install '../scripts/postinst'",
-                   "--post-uninstall '../scripts/postrm'",
-                   "-m 'Opscode, Inc.'",
-                   "--description 'The full stack of #{@name}'",
-                   "--url http://www.opscode.com"].join(" ")
-              shell = Mixlib::ShellOut.new(command,
+
+              # build the fpm command
+              fpm_command = ["fpm",
+                             "-s dir",
+                             "-t #{pkg_type}",
+                             "-v 0.0.1",
+                             "-n #{@name}",
+                             "/opt/opscode",
+                             "--post-install '../scripts/postinst'",
+                             "--post-uninstall '../scripts/postrm'",
+                             "-m 'Opscode, Inc.'",
+                             "--description 'The full stack of #{@name}'",
+                             "--url http://www.opscode.com"]
+
+              @exclusions.each do |pattern|
+                fpm_command << "--exclude '#{pattern}'"
+              end
+
+              shell = Mixlib::ShellOut.new(fpm_command.join(" "),
                                            :live_stream => STDOUT,
                                            :timeout => 3600,
                                            :cwd => './pkg')
