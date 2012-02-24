@@ -8,10 +8,12 @@ o.require_plugin('os')
 o.require_plugin('platform')
 OHAI = o
 
+require 'omnibus/config'
 require 'omnibus/software'
 require 'omnibus/project'
 require 'omnibus/fetchers'
 require 'omnibus/s3_cacher'
+require 'omnibus/s3_tasks'
 
 module Omnibus
 

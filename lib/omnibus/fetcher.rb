@@ -37,8 +37,18 @@ module Omnibus
     class UnsupportedSourceLocation < ArgumentError
     end
 
+    NULL_ARG = Object.new
+
 
     def self.for(software)
+      if software.source[:url] && Omnibus.config.use_s3_caching
+        S3CacheFetcher.new(software)
+      else
+        without_caching_for(software)
+      end
+    end
+
+    def self.without_caching_for(software)
       if software.source[:url]
         NetFetcher.new(software)
       elsif software.source[:git]
@@ -46,6 +56,17 @@ module Omnibus
       else
         raise UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
       end
+    end
+
+    def self.name(name=NULL_ARG)
+      @name = name unless name.equal?(NULL_ARG)
+      @name
+    end
+
+    attr_reader :name
+
+    def log(message)
+      puts "[fetcher:#{self.class.name}::#{name}] #{message}"
     end
 
     def description
