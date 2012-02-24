@@ -96,8 +96,10 @@ module Omnibus
 
     def build
       log "building #{name}"
-      @build_commands.each do |cmd|
-        execute(cmd)
+      time_it("#{name} build") do
+        @build_commands.each do |cmd|
+          execute(cmd)
+        end
       end
     end
 
@@ -122,14 +124,30 @@ module Omnibus
       log "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
 
       shell = Mixlib::ShellOut.new(*cmd)
-      shell.run_command
-      shell.error!
+
+      cmd_name = cmd.first.split(/\s+/).first
+      time_it("#{cmd_name} command") do
+        shell.run_command
+        shell.error!
+      end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
       raise
     end
 
     private
+
+    def time_it(what)
+      start = Time.now
+      yield
+    rescue Exception
+      elapsed = Time.now - start
+      log "#{what} failed, #{elapsed.to_f}s"
+      raise
+    else
+      elapsed = Time.now - start
+      log "#{what} succeeded, #{elapsed.to_f}s"
+    end
 
     # Convert a hash to a string in the form `key=value`. It should work with
     # whatever input is given but is designed to make the options to ShellOut
