@@ -38,7 +38,10 @@ module Omnibus
     private
 
     def render_tasks
+      directory "pkg"
+
       namespace :projects do
+
         PACKAGE_TYPES.each do |pkg_type|
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
@@ -51,7 +54,6 @@ module Omnibus
                 shell.error!
               end
 
-              Dir.mkdir("pkg") unless File.exists?("pkg")
               # build the fpm command
               fpm_command = ["fpm",
                              "-s dir",
@@ -76,11 +78,14 @@ module Omnibus
               shell.run_command
               shell.error!
             end
+
+            task pkg_type => "pkg"
           end
         end
 
         desc "package #{@name}"
         task @name => (PACKAGE_TYPES.map {|pkg_type| "projects:#{@name}:#{pkg_type}"})
+        task @name => "pkg"
       end
     end
   end
