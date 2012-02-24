@@ -13,7 +13,7 @@ module Omnibus
     end
 
     def fetch
-      log "Fetching cached version from S3"
+      log "S3 Cache enabled, #{name} will be fetched from S3 cache"
       super
     end
 

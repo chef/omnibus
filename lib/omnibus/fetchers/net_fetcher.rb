@@ -50,7 +50,7 @@ E
     end
 
     def download
-      log "fetching the source from #{source_uri}"
+      log "fetching #{project_file} from #{source_uri}"
 
       case source_uri.scheme
       when /https?/

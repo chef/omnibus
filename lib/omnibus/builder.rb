@@ -117,7 +117,7 @@ module Omnibus
       end
 
       cmd_string = cmd_args[0..-2].join(' ')
-      cmd_opts_for_display = cmd_args.last.inject([]) {|opts, (k,v)| opts << "#{k}='#{v}'"}.join(",")
+      cmd_opts_for_display = to_kv_str(cmd_args.last)
 
       log "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
 
@@ -127,6 +127,23 @@ module Omnibus
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
       raise
+    end
+
+    private
+
+    # Convert a hash to a string in the form `key=value`. It should work with
+    # whatever input is given but is designed to make the options to ShellOut
+    # look nice.
+    def to_kv_str(hash, join_str=",")
+      hash.inject([]) do |kv_pair_strs, (k,v)|
+        val_str = case v
+        when Hash
+          %Q["#{to_kv_str(v, " ")}"]
+        else
+          v.to_s
+        end
+        kv_pair_strs << "#{k}=#{val_str}"
+      end.join(join_str)
     end
 
   end
