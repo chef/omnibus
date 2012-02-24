@@ -11,6 +11,7 @@ OHAI = o
 require 'omnibus/software'
 require 'omnibus/project'
 require 'omnibus/fetchers'
+require 'omnibus/s3_cacher'
 
 module Omnibus
 
@@ -28,6 +29,10 @@ module Omnibus
 
     def version_map
       @components.inject({}) {|map, component| map[component.name] = component.version; map}
+    end
+
+    def select(*args, &block)
+      @components.select(*args, &block)
     end
 
 
