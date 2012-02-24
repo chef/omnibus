@@ -95,7 +95,7 @@ module Omnibus
     end
 
     def build
-      log "building the source"
+      log "building #{name}"
       @build_commands.each do |cmd|
         execute(cmd)
       end
@@ -106,9 +106,9 @@ module Omnibus
       cmd_args = Array(cmd)
       options = {
         :cwd => project_dir,
-        :live_stream => STDOUT,
         :timeout => 3600
       }
+      options[:live_stream] = STDOUT if ENV['DEBUG']
       if cmd_args.last.is_a? Hash
         cmd_options = cmd_args.last
         cmd_args[cmd_args.size - 1] = options.merge(cmd_options)
@@ -116,7 +116,7 @@ module Omnibus
         cmd_args << options
       end
 
-      cmd_string = cmd_args[0..-1].join(' ')
+      cmd_string = cmd_args[0..-2].join(' ')
       cmd_opts_for_display = cmd_args.last.inject([]) {|opts, (k,v)| opts << "#{k}='#{v}'"}.join(",")
 
       log "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
