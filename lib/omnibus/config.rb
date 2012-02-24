@@ -27,6 +27,7 @@ module Omnibus
     configurable :cache_dir, :default => "/tmp/omnibus/cache"
     configurable :source_dir, :default => "/tmp/omnibus/src"
     configurable :build_dir, :default => "/tmp/omnibus/build"
+    configurable :install_dir, :default => "/opt/chef"
 
     configurable :use_s3_caching, :default => false
 

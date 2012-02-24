@@ -35,6 +35,10 @@ module Omnibus
       @exclusions << pattern
     end
 
+    def config
+      Omnibus.config
+    end
+
     private
 
     def render_tasks
@@ -46,8 +50,8 @@ module Omnibus
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
-              if !File.exists?("/opt/opscode/setup.sh")  
-                shell = Mixlib::ShellOut.new("cp setup.sh /opt/opscode",
+              if !File.exists?("#{config.install_dir}/setup.sh")
+                shell = Mixlib::ShellOut.new("cp setup.sh #{config.install_dir}",
                                              :live_stream => STDOUT, 
                                              :cwd => PACKAGE_SCRIPTS_PATH)
                 shell.run_command
@@ -60,7 +64,7 @@ module Omnibus
                              "-t #{pkg_type}",
                              "-v 0.0.1",
                              "-n #{@name}",
-                             "/opt/opscode",
+                             config.install_dir,
                              "--post-install '../#{PACKAGE_SCRIPTS_PATH}/postinst'",
                              "--post-uninstall '../#{PACKAGE_SCRIPTS_PATH}/postrm'",
                              "-m 'Opscode, Inc.'",
