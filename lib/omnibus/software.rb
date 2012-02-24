@@ -68,6 +68,10 @@ module Omnibus
       @source_uri ||= URI(@source[:url])
     end
 
+    def checksum
+      @source[:md5]
+    end
+
     def source_dir
       "/tmp/omnibus/src".freeze
     end
