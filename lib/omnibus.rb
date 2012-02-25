@@ -8,6 +8,8 @@ o.require_plugin('os')
 o.require_plugin('platform')
 OHAI = o
 
+require 'omnibus/library'
+require 'omnibus/reports'
 require 'omnibus/config'
 require 'omnibus/software'
 require 'omnibus/project'
@@ -17,51 +19,30 @@ require 'omnibus/s3_tasks'
 
 module Omnibus
 
-  # Used to generate the manifest of all software components with versions
-  class Library
-
-    def initialize
-      @projects = []
-      @components = []
-    end
-
-    def component_added(component)
-      @components << component
-    end
-
-    def version_map
-      @components.inject({}) {|map, component| map[component.name] = component.version; map}
-    end
-
-    def select(*args, &block)
-      @components.select(*args, &block)
-    end
-
-
+  def self.root=(root)
+    @root = root
   end
 
-  def self.library
-    @library ||= Library.new
+  def self.root
+    @root
   end
 
-  def self.component_added(*args)
-    library.component_added(*args)
+  def self.setup
+    self.root = Dir.pwd
+    load_config
   end
 
-  module Reports
-    extend self
+  def self.config_path
+    File.expand_path("omnibus.rb", root)
+  end
 
-    def pretty_version_map
-      out = ""
-      version_map = Omnibus.library.version_map
-      width = version_map.keys.max {|a,b| a.size <=> b.size }.size + 3
-      version_map.keys.sort.each do |name|
-        version = version_map[name]
-        out << "#{name}:".ljust(width) << version.to_s << "\n"
-      end
-      out
+  def self.load_config
+    if File.exist?(config_path)
+      TOPLEVEL_BINDING.eval(IO.read(config_path))
+    else
+      puts("No config file found in #{config_path}, exiting.")
+      exit 1
     end
-
   end
 
   #--
