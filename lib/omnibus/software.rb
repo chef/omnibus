@@ -87,7 +87,7 @@ module Omnibus
     end
 
     def build_dir
-      config.build_dir
+      "#{config.build_dir}/#{camel_case_path(install_dir)}"
     end
 
     def install_dir
@@ -104,11 +104,17 @@ module Omnibus
     end
 
     def manifest_file
-      self.class.manifest_file_from_name(@name)
+      manifest_file_from_name(@name)
     end
 
-    def self.manifest_file_from_name(software_name)
-      "#{Omnibus.config.build_dir}/#{software_name}.manifest"
+    def manifest_file_from_name(software_name)
+      "#{build_dir}/#{software_name}.manifest"
+    end
+
+    def camel_case_path(path)
+      # split the path and remove and empty strings
+      parts = path.split("/") - [""]
+      parts.join("_")
     end
 
     def build(&block)
@@ -133,7 +139,7 @@ module Omnibus
         #
         (@dependencies - [@name]).uniq.each do |dep|
           task @name => dep
-          file manifest_file => self.class.manifest_file_from_name(dep)
+          file manifest_file => manifest_file_from_name(dep)
         end
 
         namespace @name do
