@@ -124,6 +124,7 @@ module Omnibus
       log "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
 
       shell = Mixlib::ShellOut.new(*cmd)
+      shell.environment["HOME"] = "/tmp" unless ENV["HOME"]
 
       cmd_name = cmd.first.split(/\s+/).first
       time_it("#{cmd_name} command") do
