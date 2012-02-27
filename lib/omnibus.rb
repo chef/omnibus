@@ -16,6 +16,7 @@ require 'omnibus/project'
 require 'omnibus/fetchers'
 require 'omnibus/s3_cacher'
 require 'omnibus/s3_tasks'
+require 'omnibus/health_check'
 
 module Omnibus
 

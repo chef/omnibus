@@ -9,3 +9,8 @@ task :versions do
   puts Omnibus::Reports.pretty_version_map
 end
 
+desc "Run the health check against #{Omnibus.config.install_dir}"
+task :health_check do
+  Omnibus::HealthCheck.run
+end
+
