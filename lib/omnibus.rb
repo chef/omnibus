@@ -53,7 +53,7 @@ module Omnibus
 
     def self.software(*path_specs)
       FileList[*path_specs].each do |f|
-        s = Omnibus::Software.new(IO.read(f))
+        s = Omnibus::Software.load(f)
         Omnibus.component_added(s)
         s
       end

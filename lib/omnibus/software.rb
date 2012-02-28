@@ -22,13 +22,18 @@ module Omnibus
     attr_reader :description
     attr_reader :dependencies
 
-    def initialize(io)
+    def self.load(filename)
+      new(IO.read(filename), filename)
+    end
+
+    def initialize(io, filename)
       @version        = nil
       @name           = nil
       @description    = nil
       @source         = nil
       @relative_path  = nil
       @source_uri     = nil
+      @source_config  = filename
 
       @builder = NullBuilder.new(self)
 
@@ -193,6 +198,7 @@ module Omnibus
         task @name => manifest_file
 
         file manifest_file => @source_task
+        file manifest_file => (file @source_config)
       end
     end
   end
