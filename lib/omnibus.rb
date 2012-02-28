@@ -61,7 +61,7 @@ module Omnibus
 
     def self.projects(*path_specs)
       FileList[*path_specs].each do |f|
-        Omnibus::Project.new(IO.read(f))
+        Omnibus::Project.load(f)
       end
     end
   end

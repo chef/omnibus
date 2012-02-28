@@ -12,7 +12,11 @@ module Omnibus
     attr_reader :description
     attr_reader :dependencies
 
-    def initialize(io)
+    def self.load(filename)
+      new(IO.read(filename), filename)
+    end
+
+    def initialize(io, filename)
       @exclusions = Array.new
 
       instance_eval(io)
