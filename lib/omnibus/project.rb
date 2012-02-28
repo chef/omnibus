@@ -5,7 +5,7 @@ module Omnibus
   class Project
     include Rake::DSL
 
-    PACKAGE_TYPES = ["deb", "rpm"]
+    PACKAGE_TYPES = []
     PACKAGE_SCRIPTS_PATH = "../omnibus-ruby/package-scripts"
 
     attr_reader :name
@@ -18,7 +18,12 @@ module Omnibus
 
     def initialize(io, filename)
       @exclusions = Array.new
-
+      case platform_family 
+          when 'debian' 
+            PACKAGE_TYPES << "deb"
+          when 'fedora', 'rhel'
+            PACKAGE_TYPES << "rpm"
+      end
       instance_eval(io)
       render_tasks
     end
@@ -37,6 +42,10 @@ module Omnibus
 
     def exclude(pattern)
       @exclusions << pattern
+    end
+
+    def platform_family
+      OHAI.platform_family
     end
 
     def config
