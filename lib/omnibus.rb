@@ -28,9 +28,20 @@ module Omnibus
     @root
   end
 
-  def self.setup
+  def self.gem_root=(root)
+    @gem_root = root
+  end
+
+  def self.gem_root
+    @gem_root
+  end
+
+  def self.setup(options = {})
     self.root = Dir.pwd
+    self.gem_root = File.expand_path("../../../", __FILE__)
     load_config
+    # Load core software tasks
+    software "#{gem_root}/config/software/*.rb" unless options[:no_core_software]
   end
 
   def self.config_path
