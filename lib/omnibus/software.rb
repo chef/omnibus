@@ -94,6 +94,14 @@ module Omnibus
     def build_dir
       "#{config.build_dir}/#{camel_case_path(install_dir)}"
     end
+    
+    def max_build_jobs
+      if OHAI.cpu == nil
+        2
+      else
+        OHAI.cpu[:total] + 1
+      end
+    end
 
     def install_dir
       config.install_dir
