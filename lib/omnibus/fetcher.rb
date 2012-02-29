@@ -53,6 +53,8 @@ module Omnibus
         NetFetcher.new(software)
       elsif software.source[:git]
         GitFetcher.new(software)
+      elsif software.source[:path]
+        PathFetcher.new(software)
       else
         raise UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
       end
