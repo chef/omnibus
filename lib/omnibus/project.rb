@@ -52,7 +52,7 @@ module Omnibus
     end
 
     def package_scripts_path
-      "#{Omnibus.gem_root}/package_scripts"
+      "#{Omnibus.gem_root}/package-scripts"
     end
 
     private
