@@ -11,6 +11,9 @@ module Omnibus
       extend Forwardable
 
       def_delegator :@builder, :command
+      def_delegator :@builder, :ruby
+      def_delegator :@builder, :gem
+      def_delegator :@builder, :bundle
       def_delegator :@builder, :name
 
 
@@ -69,6 +72,12 @@ module Omnibus
 
     end
 
+    BUNDLER_BUSTER = {  "RUBYOPT"         => nil,
+                        "BUNDLE_BIN_PATH" => nil,
+                        "BUNDLE_GEMFILE"  => nil,
+                        "GEM_PATH"        => nil,
+                        "GEM_HOME"        => nil }
+
     attr_reader :build_commands
 
     def initialize(software, &block)
@@ -86,8 +95,24 @@ module Omnibus
       @build_commands << args
     end
 
+    def ruby(*args)
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/ruby", *args))
+    end
+
+    def gem(*args)
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/gem", *args))
+    end
+
+    def bundle(*args)
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/bundle", *args))
+    end
+
     def project_dir
       @software.project_dir
+    end
+
+    def install_dir
+      @software.install_dir
     end
 
     def log(message)
@@ -137,6 +162,33 @@ module Omnibus
     end
 
     private
+
+    def prepend_cmd(str, *cmd_args)
+      if cmd_args.size == 1
+        # command as a string, no opts
+        "#{str} #{cmd_args}"
+      elsif cmd_args.size == 2 && cmd_args.last.is_a?(Hash)
+        # command as a string w/ opts
+        ["#{str} #{cmd_args.first}", cmd_args.last]
+      elsif cmd_args.size == 0
+        raise ArgumentError, "I don't even"
+      else
+        # cmd given as argv array
+        cmd_args.dup.unshift(str)
+      end
+    end
+
+    def bundle_bust(*cmd_args)
+      if cmd_args.last.is_a?(Hash)
+        cmd_args = cmd_args.dup
+        cmd_opts = cmd_args.pop.dup
+        cmd_opts[:env] = cmd_opts[:env] ? BUNDLER_BUSTER.merge(cmd_opts[:env]) : BUNDLER_BUSTER
+        cmd_args << cmd_opts
+      else
+        cmd_args << {:env => BUNDLER_BUSTER}
+      end
+    end
+
 
     def time_it(what)
       start = Time.now
