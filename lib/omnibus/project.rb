@@ -6,7 +6,6 @@ module Omnibus
     include Rake::DSL
 
     PACKAGE_TYPES = []
-    PACKAGE_SCRIPTS_PATH = "../omnibus-ruby/package-scripts"
 
     attr_reader :name
     attr_reader :description
@@ -52,6 +51,10 @@ module Omnibus
       Omnibus.config
     end
 
+    def package_scripts_path
+      "#{Omnibus.gem_path}/package_scripts"
+    end
+
     private
 
     def render_tasks
@@ -66,7 +69,7 @@ module Omnibus
               if !File.exists?("#{config.install_dir}/setup.sh")
                 shell = Mixlib::ShellOut.new("cp setup.sh #{config.install_dir}",
                                              :live_stream => STDOUT, 
-                                             :cwd => PACKAGE_SCRIPTS_PATH)
+                                             :cwd => package_scripts_path)
                 shell.run_command
                 shell.error!
               end
@@ -78,8 +81,8 @@ module Omnibus
                              "-v 0.0.1",
                              "-n #{@name}",
                              config.install_dir,
-                             "--post-install '../#{PACKAGE_SCRIPTS_PATH}/postinst'",
-                             "--post-uninstall '../#{PACKAGE_SCRIPTS_PATH}/postrm'",
+                             "--post-install '#{package_scripts_path}/postinst'",
+                             "--post-uninstall '#{package_scripts_path}/postrm'",
                              "-m 'Opscode, Inc.'",
                              "--description 'The full stack of #{@name}'",
                              "--url http://www.opscode.com"]
