@@ -11,6 +11,6 @@ relative_path "gdbm-1.9.1"
 build do
   command "#{install_dir}/embedded/bin/autoconf"
   command "./configure --prefix=#{install_dir}/embedded"
-  command "make BINOWN=root BINGRP=wheel" # TODO: is this a leftover from os x, a bug?
+  command "make -j #{max_build_jobs}  BINOWN=root BINGRP=wheel" # TODO: is this a leftover from os x, a bug?
   command "make install"
 end

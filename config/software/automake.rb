@@ -14,6 +14,6 @@ configure_env = {
 build do
   command "./bootstrap"
   command "./configure --prefix=#{install_dir}/embedded"
-  command "make"
+  command "make -j #{max_build_jobs}" 
   command "make install"
 end

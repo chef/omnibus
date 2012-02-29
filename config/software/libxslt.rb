@@ -20,6 +20,6 @@ build do
            "--with-libxml-include-prefix=#{install_dir}/embedded/include",
            "--with-libxml-libs-prefix=#{install_dir}/embedded/lib"].join(" "),
           :env => env)
-  command "make", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
   command "make install", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
 end
