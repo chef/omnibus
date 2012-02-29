@@ -1,7 +1,3 @@
-require 'rake/clean'
-CLEAN.include('/tmp/omnibus/**/*')
-CLOBBER.include('/opt/opscode/**/*')
-
 require 'ohai'
 o = Ohai::System.new
 o.require_plugin('os')
@@ -17,6 +13,7 @@ require 'omnibus/fetchers'
 require 'omnibus/s3_cacher'
 require 'omnibus/s3_tasks'
 require 'omnibus/health_check'
+require 'omnibus/clean_tasks'
 
 module Omnibus
 
