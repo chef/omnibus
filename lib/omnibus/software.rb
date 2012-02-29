@@ -38,7 +38,7 @@ module Omnibus
       @builder = NullBuilder.new(self)
 
       @dependencies = ["preparation"]
-      instance_eval(io)
+      instance_eval(io, filename, 0)
       render_tasks
     end
 
