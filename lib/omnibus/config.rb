@@ -24,9 +24,9 @@ module Omnibus
       reset!
     end
 
-    configurable :cache_dir, :default => "/var/omnibus/cache"
-    configurable :source_dir, :default => "/var/omnibus/src"
-    configurable :build_dir, :default => "/var/omnibus/build"
+    configurable :cache_dir, :default => "/var/cache/omnibus/cache"
+    configurable :source_dir, :default => "/var/cache/omnibus/src"
+    configurable :build_dir, :default => "/var/cache/omnibus/build"
     configurable :install_dir, :default => "/opt/chef"
 
     configurable :use_s3_caching, :default => false
