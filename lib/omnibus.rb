@@ -26,6 +26,17 @@ module Omnibus
     @root
   end
 
+  def self.build_version
+    @build_version ||= begin
+                         git_cmd = "git describe"
+                         shell = Mixlib::ShellOut.new(git_cmd,
+                                                      :cwd => Omnibus.root)
+                         shell.run_command
+                         shell.error!
+                         shell.stdout
+                       end
+  end
+
   def self.gem_root=(root)
     @gem_root = root
   end

@@ -51,6 +51,10 @@ module Omnibus
       Omnibus.config
     end
 
+    def build_version
+      Omnibus.build_version
+    end
+
     def package_scripts_path
       "#{Omnibus.gem_root}/package-scripts"
     end
@@ -78,7 +82,7 @@ module Omnibus
               fpm_command = ["fpm",
                              "-s dir",
                              "-t #{pkg_type}",
-                             "-v 0.0.1",
+                             "-v #{build_version}",
                              "-n #{@name}",
                              config.install_dir,
                              "--post-install '#{package_scripts_path}/postinst'",
