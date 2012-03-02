@@ -9,7 +9,7 @@ module Omnibus
     # can arise from instance_eval.
     class DSLProxy
       extend Forwardable
-
+      def_delegator :@builder, :patch
       def_delegator :@builder, :command
       def_delegator :@builder, :ruby
       def_delegator :@builder, :gem
@@ -93,6 +93,14 @@ module Omnibus
 
     def command(*args)
       @build_commands << args
+    end
+    
+    def patch(*args) 
+      args = args.dup.pop 
+      source = File.expand_path(args[:source])
+      plevel = args[:plevel] || 0
+      @build_commands << 
+       "cat #{source} | patch -p#{plevel} #{args[:target]}"
     end
 
     def ruby(*args)
