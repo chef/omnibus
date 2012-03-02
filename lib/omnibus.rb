@@ -33,7 +33,7 @@ module Omnibus
                                                       :cwd => Omnibus.root)
                          shell.run_command
                          shell.error!
-                         shell.stdout
+                         shell.stdout.chomp
                        end
   end
 
