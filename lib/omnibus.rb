@@ -15,6 +15,7 @@ require 'omnibus/s3_cacher'
 require 'omnibus/s3_tasks'
 require 'omnibus/health_check'
 require 'omnibus/clean_tasks'
+require 'omnibus/build_version'
 
 module Omnibus
 
@@ -24,17 +25,6 @@ module Omnibus
 
   def self.root
     @root
-  end
-
-  def self.build_version
-    @build_version ||= begin
-                         git_cmd = "git describe"
-                         shell = Mixlib::ShellOut.new(git_cmd,
-                                                      :cwd => Omnibus.root)
-                         shell.run_command
-                         shell.error!
-                         shell.stdout.chomp
-                       end
   end
 
   def self.gem_root=(root)
