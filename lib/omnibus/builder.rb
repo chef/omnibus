@@ -14,6 +14,7 @@ module Omnibus
       def_delegator :@builder, :ruby
       def_delegator :@builder, :gem
       def_delegator :@builder, :bundle
+      def_delegator :@builder, :block
       def_delegator :@builder, :name
 
 
@@ -115,6 +116,10 @@ module Omnibus
       @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/bundle", *args))
     end
 
+    def block(&rb_block)
+      @build_commands << rb_block
+    end
+
     def project_dir
       @software.project_dir
     end
@@ -137,6 +142,26 @@ module Omnibus
     end
 
     def execute(cmd)
+      case cmd
+      when Proc
+        execute_proc(cmd)
+      else
+        execute_sh(cmd)
+      end
+    end
+
+    private
+
+    def execute_proc(cmd)
+      cmd.call
+    rescue Exception => e
+      # In Ruby 1.9, Procs have a #source_location method with file/line info.
+      # Too bad we can't use it :(
+      ErrorReporter.new(e, self).explain("Failed to build #{name} while running ruby block build step")
+      raise
+    end
+
+    def execute_sh(cmd)
       shell = nil
       cmd_args = Array(cmd)
       options = {
@@ -168,8 +193,6 @@ module Omnibus
       ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
       raise
     end
-
-    private
 
     def prepend_cmd(str, *cmd_args)
       if cmd_args.size == 1
