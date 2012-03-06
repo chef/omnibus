@@ -52,7 +52,7 @@ module Omnibus
     end
 
     def build_version
-      Omnibus.build_version
+      Omnibus::BuildVersion.full
     end
 
     def package_scripts_path
