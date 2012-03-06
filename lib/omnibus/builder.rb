@@ -98,10 +98,16 @@ module Omnibus
     
     def patch(*args) 
       args = args.dup.pop 
-      source = File.expand_path(args[:source])
-      plevel = args[:plevel] || 0
-      @build_commands << 
-       "cat #{source} | patch -p#{plevel} #{args[:target]}"
+      source = File.expand_path("#{Omnibus.root}/config/patches/#{name}/#{args[:source]}")
+      plevel = args[:plevel] || 1
+      if args[:target] 
+        target = File.expand_path("#{project_dir}/#{args[:target]}")
+        @build_commands << 
+         "cat #{source} | patch -p#{plevel} #{target}"
+      else
+        @build_commands << 
+         "patch -d #{project_dir} -p#{plevel} -i #{source}"
+      end
     end
 
     def ruby(*args)
