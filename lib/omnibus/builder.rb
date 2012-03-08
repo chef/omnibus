@@ -190,7 +190,7 @@ module Omnibus
       shell = Mixlib::ShellOut.new(*cmd)
       shell.environment["HOME"] = "/tmp" unless ENV["HOME"]
 
-      cmd_name = cmd.first.split(/\s+/).first
+      cmd_name = cmd_string.split(/\s+/).first
       time_it("#{cmd_name} command") do
         shell.run_command
         shell.error!
