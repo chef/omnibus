@@ -203,7 +203,7 @@ module Omnibus
     def prepend_cmd(str, *cmd_args)
       if cmd_args.size == 1
         # command as a string, no opts
-        "#{str} #{cmd_args}"
+        "#{str} #{cmd_args.first}"
       elsif cmd_args.size == 2 && cmd_args.last.is_a?(Hash)
         # command as a string w/ opts
         ["#{str} #{cmd_args.first}", cmd_args.last]
