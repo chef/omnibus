@@ -5,8 +5,6 @@ module Omnibus
   class Project
     include Rake::DSL
 
-    PACKAGE_TYPES = []
-
     attr_reader :name
     attr_reader :description
     attr_reader :dependencies
@@ -17,12 +15,6 @@ module Omnibus
 
     def initialize(io, filename)
       @exclusions = Array.new
-      case platform_family 
-          when 'debian' 
-            PACKAGE_TYPES << "deb"
-          when 'fedora', 'rhel'
-            PACKAGE_TYPES << "rpm"
-      end
       instance_eval(io)
       render_tasks
     end
@@ -59,6 +51,15 @@ module Omnibus
       "#{Omnibus.gem_root}/package-scripts"
     end
 
+    def package_types
+      case platform_family 
+      when 'debian' 
+        [ "deb" ]
+      when 'fedora', 'rhel'
+        [ "rpm" ]
+      end
+    end
+
     private
 
     def render_tasks
@@ -66,7 +67,7 @@ module Omnibus
 
       namespace :projects do
 
-        PACKAGE_TYPES.each do |pkg_type|
+        package_types.each do |pkg_type|
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
@@ -108,7 +109,7 @@ module Omnibus
         end
 
         desc "package #{@name}"
-        task @name => (PACKAGE_TYPES.map {|pkg_type| "projects:#{@name}:#{pkg_type}"})
+        task @name => (package_types.map {|pkg_type| "projects:#{@name}:#{pkg_type}"})
         task @name => "pkg"
       end
     end
