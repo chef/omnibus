@@ -5,8 +5,8 @@ module Omnibus
   class Project
     include Rake::DSL
 
-    attr_reader :name
-    attr_reader :description
+    NULL_ARG = Object.new
+
     attr_reader :dependencies
 
     def self.load(filename)
@@ -19,12 +19,14 @@ module Omnibus
       render_tasks
     end
 
-    def name(val)
-      @name = val
+    def name(val=NULL_ARG)
+      @name = val unless val.equal?(NULL_ARG)
+      @name
     end
 
-    def description(val)
-      @description = val
+    def description(val=NULL_ARG)
+      @description = val unless val.equal?(NULL_ARG)
+      @description
     end
 
     def dependencies(val)
@@ -48,7 +50,7 @@ module Omnibus
     end
 
     def package_scripts_path
-      "#{Omnibus.gem_root}/package-scripts"
+      "#{Omnibus.root}/package-scripts/#{name}"
     end
 
     def package_types
