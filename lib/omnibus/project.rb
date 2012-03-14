@@ -65,7 +65,7 @@ module Omnibus
     private
 
     def render_tasks
-      directory "pkg"
+      directory config.package_dir
 
       namespace :projects do
 
@@ -101,18 +101,18 @@ module Omnibus
               shell = Mixlib::ShellOut.new(fpm_command.join(" "),
                                            :live_stream => STDOUT,
                                            :timeout => 3600,
-                                           :cwd => './pkg')
+                                           :cwd => config.package_dir)
               shell.run_command
               shell.error!
             end
 
-            task pkg_type => "pkg"
+            task pkg_type => config.package_dir
           end
         end
 
         desc "package #{@name}"
         task @name => (package_types.map {|pkg_type| "projects:#{@name}:#{pkg_type}"})
-        task @name => "pkg"
+        task @name => config.package_dir
       end
     end
   end

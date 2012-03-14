@@ -27,6 +27,7 @@ module Omnibus
     configurable :cache_dir, :default => "/var/cache/omnibus/cache"
     configurable :source_dir, :default => "/var/cache/omnibus/src"
     configurable :build_dir, :default => "/var/cache/omnibus/build"
+    configurable :package_dir, :default => "/var/cache/omnibus/pkg"
     configurable :install_dir, :default => "/opt/chef"
 
     configurable :use_s3_caching, :default => false
@@ -34,8 +35,6 @@ module Omnibus
     configurable :s3_bucket
     configurable :s3_access_key
     configurable :s3_secret_key
-
-
   end
 
   def self.config
