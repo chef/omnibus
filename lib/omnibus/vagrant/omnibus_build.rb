@@ -34,7 +34,15 @@ class OmnibusBuild < ::Vagrant::Command::Base
       project = argv[1]
       build_command = "cd #{path} && bundle install && rake projects:#{project}"
 
-      # TODO: add some logging here to indicate that we're starting the build
+      vm.ui.info "Starting Omnibus build..."
+      vm.ui.info "Executing command: `#{build_command}`"
+
+      #
+      # TODO:
+      # can we trap interrupts and pass them along to the ssh
+      # session? this is a long running ssh process that we may want
+      # to stop for some reason
+      #
       exit_status = vm.channel.execute(build_command, :error_check => false) do |type, data|
         # Determine the proper channel to send the output onto depending
         # on the type of data we are receiving.
