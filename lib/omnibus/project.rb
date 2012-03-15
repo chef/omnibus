@@ -66,6 +66,7 @@ module Omnibus
 
     def render_tasks
       directory config.package_dir
+      directory "pkg"
 
       namespace :projects do
 
@@ -110,9 +111,16 @@ module Omnibus
           end
         end
 
+        task "#{@name}:copy" => (package_types.map {|pkg_type| "#{@name}:#{pkg_type}"}) do
+          cp_cmd = "cp #{config.package_dir}/* pkg/"
+          shell = Mixlib::ShellOut.new(cp_cmd)
+          shell.run_command
+          shell.error!
+        end
+        task "#{@name}:copy" => "pkg"
+
         desc "package #{@name}"
-        task @name => (package_types.map {|pkg_type| "projects:#{@name}:#{pkg_type}"})
-        task @name => config.package_dir
+        task @name => "#{@name}:copy"
       end
     end
   end
