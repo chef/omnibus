@@ -1,3 +1,4 @@
+require 'omnibus/vagrant/config'
 require 'omnibus/vagrant/omnibus_build'
 
 module Omnibus
@@ -14,6 +15,9 @@ class Omnibus < ::Vagrant::Command::Base
   end
 
   def execute
+    # validate the omnibus config first thing
+    # TODO: validate that we have the omnibus path configured
+
     if @main_args.include?("-h") || @main_args.include?("--help")
       # Print the help for all the omni commands.
       return help
@@ -55,4 +59,5 @@ end # Omnibus
 end # Vagrant
 end # Omnibus
 
+Vagrant.config_keys.register(:omnibus) { Omnibus::Vagrant::Config }
 Vagrant.commands.register(:omnibus) { Omnibus::Vagrant::Omnibus }
