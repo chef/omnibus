@@ -30,9 +30,12 @@ class OmnibusBuild < ::Vagrant::Command::Base
         vm.run_action(:up, "provision.enabled" => true)
       end
 
-      # TODO: argv[1] should be the project to build, not a command
-      command = argv[1]
-      exit_status = vm.channel.execute(command, :error_check => false) do |type, data|
+      path = @env.config.global.omnibus.path
+      project = argv[1]
+      build_command = "cd #{path} && bundle install && rake projects:#{project}"
+
+      # TODO: add some logging here to indicate that we're starting the build
+      exit_status = vm.channel.execute(build_command, :error_check => false) do |type, data|
         # Determine the proper channel to send the output onto depending
         # on the type of data we are receiving.
         channel = type == :stdout ? :out : :error
