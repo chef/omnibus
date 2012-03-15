@@ -1,3 +1,5 @@
+require 'omnibus/vagrant/omnibus_build'
+
 module Omnibus
 module Vagrant
 class Omnibus < ::Vagrant::Command::Base
@@ -8,6 +10,7 @@ class Omnibus < ::Vagrant::Command::Base
     @main_args, @sub_command, @sub_args = split_main_and_subcommand(argv)
 
     @subcommands = ::Vagrant::Registry.new
+    @subcommands.register(:build) { OmnibusBuild }
   end
 
   def execute
