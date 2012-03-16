@@ -24,6 +24,15 @@ module Omnibus
       @name
     end
 
+    def iteration
+      if platform_family == 'rhel'
+        platform_version =~ /^(\d+)/
+        maj = $1
+        return "1.el#{maj}"
+      end
+      return "1.#{platform}.#{platform_version}"
+    end
+
     def description(val=NULL_ARG)
       @description = val unless val.equal?(NULL_ARG)
       @description
@@ -35,6 +44,14 @@ module Omnibus
 
     def exclude(pattern)
       @exclusions << pattern
+    end
+
+    def platform_version
+      OHAI.platform_version
+    end
+
+    def platform
+      OHAI.platform
     end
 
     def platform_family
@@ -88,6 +105,7 @@ module Omnibus
                              "-t #{pkg_type}",
                              "-v #{build_version}",
                              "-n #{@name}",
+                             "--iteration #{iteration}",
                              config.install_dir,
                              "--post-install '#{package_scripts_path}/postinst'",
                              "--post-uninstall '#{package_scripts_path}/postrm'",
