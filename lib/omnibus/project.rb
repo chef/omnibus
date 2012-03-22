@@ -76,6 +76,8 @@ module Omnibus
         [ "deb" ]
       when 'fedora', 'rhel'
         [ "rpm" ]
+      else
+        []
       end
     end
 
