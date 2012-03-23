@@ -13,6 +13,10 @@ module Omnibus
       new(IO.read(filename), filename)
     end
 
+    def self.all_projects
+      @@projects ||= []
+    end
+
     def initialize(io, filename)
       @exclusions = Array.new
       instance_eval(io)
@@ -22,6 +26,11 @@ module Omnibus
     def name(val=NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
       @name
+    end
+
+    def install_path(val=NULL_ARG)
+      @install_path = val unless val.equal?(NULL_ARG)
+      @install_path
     end
 
     def iteration
@@ -76,8 +85,8 @@ module Omnibus
     end
 
     def package_types
-      case platform_family 
-      when 'debian' 
+      case platform_family
+      when 'debian'
         [ "deb" ]
       when 'fedora', 'rhel'
         [ "rpm" ]
@@ -106,7 +115,7 @@ module Omnibus
                              "-v #{build_version}",
                              "-n #{@name}",
                              "--iteration #{iteration}",
-                             config.install_dir,
+                             install_path,
                              "--post-install '#{package_scripts_path}/postinst'",
                              "--pre-uninstall '#{package_scripts_path}/prerm'",
                              "--post-uninstall '#{package_scripts_path}/postrm'",
