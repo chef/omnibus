@@ -75,6 +75,10 @@ module Omnibus
       # Not as pretty as we'd like, but it's a sane default:
       inspect
     end
+    
+    def clean
+      # no action by default - not all fetchers need this implemented. 
+    end
 
     def fetch
       raise NotImplementedError, "define #fetcher for class #{self.class}"

@@ -22,6 +22,19 @@ repo URI:       #{@source[:git]}
 local location: #{@project_dir}
 E
     end
+    
+    def clean
+      if existing_git_clone?
+        log "cleaning existing build"
+        clean_cmd = "git clean -fdx"
+        shell = Mixlib::ShellOut.new(clean_cmd, :live_stream => STDOUT, :cwd => project_dir)
+        shell.run_command
+        shell.error!
+      end
+    rescue Exception => e
+      ErrorReporter.new(e, self).explain("Failed to clean git repository '#{@source[:git]}'")
+      raise
+    end
 
     def fetch
       if existing_git_clone?
