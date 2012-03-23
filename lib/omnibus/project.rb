@@ -37,9 +37,9 @@ module Omnibus
       if platform_family == 'rhel'
         platform_version =~ /^(\d+)/
         maj = $1
-        return "1.el#{maj}"
+        return "#{build_iteration}.el#{maj}"
       end
-      return "1.#{platform}.#{platform_version}"
+      return "#{build_iteration}.#{platform}.#{platform_version}"
     end
 
     def description(val=NULL_ARG)
@@ -50,6 +50,16 @@ module Omnibus
     def replaces(val=NULL_ARG)
       @replaces = val unless val.equal?(NULL_ARG)
       @replaces
+    end
+
+    def build_version(val=NULL_ARG)
+      @build_version = val unless val.equal?(NULL_ARG)
+      @build_version
+    end
+
+    def build_iteration(val=NULL_ARG)
+      @build_iteration = val unless val.equal?(NULL_ARG)
+      @build_iteration
     end
 
     def dependencies(val)
@@ -74,10 +84,6 @@ module Omnibus
 
     def config
       Omnibus.config
-    end
-
-    def build_version
-      Omnibus::BuildVersion.full
     end
 
     def package_scripts_path
