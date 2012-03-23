@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://wiki.opscode.com/"
 
   s.add_dependency "mixlib-shellout", "~>1.0"
-  s.add_dependency "ohai", ">= 0.6.12.rc.1"
+  s.add_dependency "ohai", ">= 0.6.12"
   s.add_dependency "rake", ">= 0.9"
   s.add_dependency "fpm"
   s.add_dependency "uber-s3"
