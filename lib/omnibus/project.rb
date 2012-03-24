@@ -96,6 +96,8 @@ module Omnibus
         [ "deb" ]
       when 'fedora', 'rhel'
         [ "rpm" ]
+      when 'solaris2'
+        [ "solaris" ]
       else
         []
       end
