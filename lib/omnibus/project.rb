@@ -38,6 +38,11 @@ module Omnibus
       @description
     end
 
+    def replaces(val=NULL_ARG)
+      @replaces = val unless val.equal?(NULL_ARG)
+      @replaces
+    end
+
     def dependencies(val)
       @dependencies = val
     end
@@ -118,6 +123,7 @@ module Omnibus
               @exclusions.each do |pattern|
                 fpm_command << "--exclude '#{pattern}'"
               end
+              fpm_command << " --replaces #{@replaces}" if @replaces
 
               shell = Mixlib::ShellOut.new(fpm_command.join(" "),
                                            :live_stream => STDOUT,
