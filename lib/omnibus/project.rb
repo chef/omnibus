@@ -126,10 +126,14 @@ module Omnibus
                              install_path,
                              "--post-install '#{package_scripts_path}/postinst'",
                              "--pre-uninstall '#{package_scripts_path}/prerm'",
-                             "--post-uninstall '#{package_scripts_path}/postrm'",
                              "-m 'Opscode, Inc.'",
                              "--description 'The full stack of #{@name}'",
                              "--url http://www.opscode.com"]
+
+              # solaris packages don't support --post-uninstall
+              unless pkg_type == "solaris"
+                fpm_command << "--post-uninstall '#{package_scripts_path}/postrm'"
+              end
 
               @exclusions.each do |pattern|
                 fpm_command << "--exclude '#{pattern}'"
