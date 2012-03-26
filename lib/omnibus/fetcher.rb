@@ -66,6 +66,11 @@ module Omnibus
     end
 
     attr_reader :name
+    attr_reader :source_timefile
+
+    def initialize(software)
+      @source_timefile = "#{software.build_dir}/#{software.name}.time"
+    end
 
     def log(message)
       puts "[fetcher:#{self.class.name}::#{name}] #{message}"
@@ -75,13 +80,17 @@ module Omnibus
       # Not as pretty as we'd like, but it's a sane default:
       inspect
     end
-    
+
     def clean
-      # no action by default - not all fetchers need this implemented. 
+      raise NotImplementedError, "define #clean for class #{self.class}"
     end
 
-    def fetch
+    def fetch 
       raise NotImplementedError, "define #fetcher for class #{self.class}"
+    end
+
+    def touch_source_timefile
+      FileUtils.touch(source_timefile)
     end
 
   end

@@ -14,6 +14,7 @@ module Omnibus
       @source       = software.source
       @project_dir  = software.project_dir
       @version      = software.version
+      super
     end
 
     def description
@@ -43,6 +44,7 @@ E
         clone
         checkout
       end
+      touch_source_timefile
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
       raise

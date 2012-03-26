@@ -26,6 +26,7 @@ module Omnibus
       @source_uri   = software.source_uri
       @source_dir   = software.source_dir
       @project_dir  = software.project_dir
+      super
     end
 
     def description
@@ -56,7 +57,7 @@ E
         log "Cached copy of source tarball up to date"
       end
       extract
-
+      touch_source_timefile
     end
 
     def download
