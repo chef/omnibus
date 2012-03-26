@@ -41,10 +41,14 @@ module Omnibus
 
 
     def self.for(software)
-      if software.source[:url] && Omnibus.config.use_s3_caching
-        S3CacheFetcher.new(software)
+      if software.source
+        if software.source[:url] && Omnibus.config.use_s3_caching
+          S3CacheFetcher.new(software)
+        else
+          without_caching_for(software)
+        end
       else
-        without_caching_for(software)
+        Fetcher.new(software)
       end
     end
 
@@ -69,7 +73,6 @@ module Omnibus
     attr_reader :source_timefile
 
     def initialize(software)
-      @source_timefile = "#{software.build_dir}/#{software.name}.time"
     end
 
     def log(message)
@@ -82,15 +85,9 @@ module Omnibus
     end
 
     def clean
-      raise NotImplementedError, "define #clean for class #{self.class}"
     end
 
     def fetch 
-      raise NotImplementedError, "define #fetcher for class #{self.class}"
-    end
-
-    def touch_source_timefile
-      FileUtils.touch(source_timefile)
     end
 
   end

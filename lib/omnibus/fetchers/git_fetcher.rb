@@ -12,9 +12,8 @@ module Omnibus
     def initialize(software)
       @name         = software.name
       @source       = software.source
-      @project_dir  = software.project_dir
       @version      = software.version
-      super
+      @project_dir  = software.project_dir
     end
 
     def description
@@ -44,7 +43,6 @@ E
         clone
         checkout
       end
-      touch_source_timefile
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
       raise

@@ -26,7 +26,6 @@ module Omnibus
       @source_uri   = software.source_uri
       @source_dir   = software.source_dir
       @project_dir  = software.project_dir
-      super
     end
 
     def description
@@ -42,11 +41,13 @@ E
     end
 
     def clean
-
       if File.exists?(project_dir) 
         log "cleaning existing build from #{project_dir}" 
         shell = Mixlib::ShellOut.new("rm -rf #{project_dir}", :live_stream => STDOUT)
+        shell.run_command
+        shell.error!
       end
+      extract
     end
 
     def fetch
@@ -56,8 +57,6 @@ E
       else
         log "Cached copy of source tarball up to date"
       end
-      extract
-      touch_source_timefile
     end
 
     def download
