@@ -27,13 +27,12 @@ E
     end
 
     def clean
-      # Here, clean will do the same as fetch: reset source to pristine state.
+      # Here, clean will do the same as fetch: reset source to pristine state
       rsync
     end
 
     def fetch
       rsync
-      touch_source_timefile
     end
   end
 end
