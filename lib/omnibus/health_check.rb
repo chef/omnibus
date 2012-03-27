@@ -39,7 +39,7 @@ module Omnibus
           end
           safe ||= true if current_library =~ /jre\/lib/
 
-          if !safe && linked !~ /\/opt\/opscode/
+          if !safe && linked !~ Regexp.new(install_dir)
             bad_libs[current_library] ||= {}
             bad_libs[current_library][name] ||= {} 
             if bad_libs[current_library][name].has_key?(linked)
