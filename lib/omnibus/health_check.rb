@@ -30,7 +30,7 @@ module Omnibus
         case line
         when /^(.+):$/
           current_library = $1
-        when /^\s+(.+) \=\> (.+) \(.+\)$/
+        when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = $1
           linked = $2
           safe = nil
