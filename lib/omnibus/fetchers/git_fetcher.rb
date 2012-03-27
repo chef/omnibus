@@ -35,6 +35,10 @@ E
       ErrorReporter.new(e, self).explain("Failed to clean git repository '#{@source[:git]}'")
       raise
     end
+    
+    def fetch_required?
+      !existing_git_clone? || !current_rev_matches_target_rev?
+    end
 
     def fetch
       if existing_git_clone?

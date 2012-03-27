@@ -36,9 +36,10 @@ local location: #@project_file
 E
     end
 
-    def should_download?
+    def fetch_required?
       !File.exists?(project_file) || Digest::MD5.file(project_file) != @checksum
     end
+
 
     def clean
       if File.exists?(project_dir) 
@@ -51,7 +52,7 @@ E
     end
 
     def fetch
-      if should_download?
+      if fetch_required?
         download
         verify_checksum!
       else

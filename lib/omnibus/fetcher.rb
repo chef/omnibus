@@ -84,6 +84,10 @@ module Omnibus
       inspect
     end
 
+    def fetch_required?
+      false
+    end
+
     def clean
     end
 
