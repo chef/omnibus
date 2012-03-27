@@ -16,8 +16,7 @@ module Omnibus
                       /libfreebl\d\.so/,
                       /libresolv\.so/]
 
-    def self.run
-      install_dir = Omnibus.config.install_dir
+    def self.run(install_dir)
       ldd_cmd = "find #{install_dir} -type f | xargs ldd"
       shell = Mixlib::ShellOut.new(ldd_cmd)
       shell.run_command

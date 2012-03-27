@@ -149,6 +149,7 @@ module Omnibus
             end
 
             task pkg_type => config.package_dir
+            task pkg_type => "#{@name}:health_check"
           end
         end
 
@@ -162,6 +163,11 @@ module Omnibus
 
         desc "package #{@name}"
         task @name => "#{@name}:copy"
+
+        desc "run the health check on the #{@name} install path"
+        task "#{@name}:health_check" do
+          Omnibus::HealthCheck.run(install_path)
+        end
       end
     end
   end
