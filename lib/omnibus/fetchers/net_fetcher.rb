@@ -16,7 +16,7 @@ module Omnibus
     attr_reader :source
     attr_reader :source_uri
     attr_reader :source_dir
-
+    attr_reader :project_dir
 
     def initialize(software)
       @name         = software.name
@@ -25,6 +25,7 @@ module Omnibus
       @project_file = software.project_file
       @source_uri   = software.source_uri
       @source_dir   = software.source_dir
+      @project_dir  = software.project_dir
     end
 
     def description
@@ -35,17 +36,27 @@ local location: #@project_file
 E
     end
 
-    def should_fetch?
+    def fetch_required?
       !File.exists?(project_file) || Digest::MD5.file(project_file) != @checksum
     end
 
+
+    def clean
+      if File.exists?(project_dir) 
+        log "cleaning existing build from #{project_dir}" 
+        shell = Mixlib::ShellOut.new("rm -rf #{project_dir}", :live_stream => STDOUT)
+        shell.run_command
+        shell.error!
+      end
+      extract
+    end
+
     def fetch
-      if should_fetch?
+      if fetch_required?
         download
         verify_checksum!
-        extract
       else
-        log "Cached copy of source tarball up to date, skipping"
+        log "Cached copy of source tarball up to date"
       end
     end
 

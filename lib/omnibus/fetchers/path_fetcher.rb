@@ -18,12 +18,21 @@ source path:    #{@source[:path]}
 local location: #{@project_dir}
 E
     end
-
-    def fetch
+    
+    def rsync
       sync_cmd = "rsync --delete -a #{@source[:path]}/ #{@project_dir}/"
       shell = Mixlib::ShellOut.new(sync_cmd)
       shell.run_command
       shell.error!
+    end
+
+    def clean
+      # Here, clean will do the same as fetch: reset source to pristine state
+      rsync
+    end
+
+    def fetch
+      rsync
     end
   end
 end

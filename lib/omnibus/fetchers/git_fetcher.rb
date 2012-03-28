@@ -12,8 +12,8 @@ module Omnibus
     def initialize(software)
       @name         = software.name
       @source       = software.source
-      @project_dir  = software.project_dir
       @version      = software.version
+      @project_dir  = software.project_dir
     end
 
     def description
@@ -21,6 +21,23 @@ module Omnibus
 repo URI:       #{@source[:git]}
 local location: #{@project_dir}
 E
+    end
+    
+    def clean
+      if existing_git_clone?
+        log "cleaning existing build"
+        clean_cmd = "git clean -fdx"
+        shell = Mixlib::ShellOut.new(clean_cmd, :live_stream => STDOUT, :cwd => project_dir)
+        shell.run_command
+        shell.error!
+      end
+    rescue Exception => e
+      ErrorReporter.new(e, self).explain("Failed to clean git repository '#{@source[:git]}'")
+      raise
+    end
+    
+    def fetch_required?
+      !existing_git_clone? || !current_rev_matches_target_rev?
     end
 
     def fetch
