@@ -172,8 +172,7 @@ module Omnibus
         directory build_dir
         directory project_dir
         namespace @name do
-
-          task :fetch => project_dir do
+          task :fetch => [ build_dir, source_dir, cache_dir, project_dir ] do
             if !File.exists?(fetch_file) || fetcher.fetch_required?
               # force build to run if we need to do an updated fetch
               fetcher.fetch
