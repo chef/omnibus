@@ -14,19 +14,27 @@ module Omnibus
                       /libstdc\+\+\.so/,
                       /libnsl\.so/,
                       /libfreebl\d\.so/,
-                      /libresolv\.so/,
-                      /libaio\.so/,       # solaris
-                      /libavl\.so/,       # solaris
-                      /libdoor\.so/,      # solaris
-                      /libgen\.so/,       # solaris
-                      /libmd\.so/,        # solaris
-                      /libmp\.so/,        # solaris
-                      /libscf\.so/,       # solaris
-                      /libsec\.so/,       # solaris
-                      /libsocket\.so/,    # solaris
-                      /libuutil\.so/,     # solaris
-                      /libcrypt_[di]\.so/ # solaris
-                     ]
+                      /libresolv\.so/
+                      ]
+
+    SOLARIS_WHITELIST_LIBS = [
+                      /libaio\.so/,
+                      /libavl\.so/,
+                      /libcrypt_[di]\.so/,
+                      /libcrypto.so/,
+                      /libdoor\.so/,
+                      /libgen\.so/,
+                      /libmd5\.so/,
+                      /libmd\.so/,
+                      /libmp\.so/,
+                      /libscf\.so/,
+                      /libsec\.so/,
+                      /libsocket\.so/,
+                      /libssl.so/,
+                      /libuutil\.so/
+                             ]
+
+    WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
 
     def self.run(install_dir)
       ldd_cmd = "find #{install_dir}/ -type f | xargs ldd"
