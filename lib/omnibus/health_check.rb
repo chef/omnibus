@@ -1,39 +1,41 @@
 module Omnibus
   class HealthCheck
 
-    WHITELIST_LIBS = [/linux-vdso.+/,
-                      /libc\.so/,
+    WHITELIST_LIBS = [
                       /ld-linux/,
-                      /libdl/,
-                      /libpthread/,
-                      /libm\.so/,
+                      /libc\.so/,
                       /libcrypt\.so/,
-                      /librt\.so/,
-                      /libutil\.so/,
-                      /libgcc_s\.so/,
-                      /libstdc\+\+\.so/,
-                      /libnsl\.so/,
+                      /libdl/,
                       /libfreebl\d\.so/,
-                      /libresolv\.so/
+                      /libgcc_s\.so/,
+                      /libm\.so/,
+                      /libnsl\.so/,
+                      /libpthread/,
+                      /libresolv\.so/,
+                      /librt\.so/,
+                      /libstdc\+\+\.so/,
+                      /libutil\.so/,
+                      /linux-vdso.+/
                       ]
 
     SOLARIS_WHITELIST_LIBS = [
-                      /libaio\.so/,
-                      /libavl\.so/,
-                      /libcrypt_[di]\.so/,
-                      /libcrypto.so/,
-                      /libdoor\.so/,
-                      /libgen\.so/,
-                      /libmd5\.so/,
-                      /libmd\.so/,
-                      /libmp\.so/,
-                      /libscf\.so/,
-                      /libsec\.so/,
-                      /libsocket\.so/,
-                      /libssl.so/,
-                      /libuutil\.so/
+                              /libaio\.so/,
+                              /libavl\.so/,
+                              /libcrypt_[di]\.so/,
+                              /libcrypto.so/,
+                              /libcurses\.so/,
+                              /libdoor\.so/,
+                              /libgen\.so/,
+                              /libmd5\.so/,
+                              /libmd\.so/,
+                              /libmp\.so/,
+                              /libscf\.so/,
+                              /libsec\.so/,
+                              /libsocket\.so/,
+                              /libssl.so/,
+                              /libuutil\.so/
                              ]
-
+    
     WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
 
     def self.run(install_dir)
