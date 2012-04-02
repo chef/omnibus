@@ -15,21 +15,21 @@ module Omnibus
                       /libnsl\.so/,
                       /libfreebl\d\.so/,
                       /libresolv\.so/,
-                      # /libaio\.so/,     # solaris
-                      # /libavl\.so/,     # solaris
-                      # /libdoor\.so/,    # solaris
-                      # /libgen\.so/,     # solaris
-                      # /libmd\.so/,      # solaris
-                      # /libmp\.so/,      # solaris
-                      # /libscf\.so/,     # solaris
-                      # /libsec\.so/,     # solaris
-                      # /libsocket\.so/,  # solaris
-                      # /libuutil\.so/,   # solaris
-                      # /libcrypt_d\.so/] # solaris
+                      /libaio\.so/,       # solaris
+                      /libavl\.so/,       # solaris
+                      /libdoor\.so/,      # solaris
+                      /libgen\.so/,       # solaris
+                      /libmd\.so/,        # solaris
+                      /libmp\.so/,        # solaris
+                      /libscf\.so/,       # solaris
+                      /libsec\.so/,       # solaris
+                      /libsocket\.so/,    # solaris
+                      /libuutil\.so/,     # solaris
+                      /libcrypt_[di]\.so/ # solaris
                      ]
 
     def self.run(install_dir)
-      ldd_cmd = "find #{install_dir} -type f | xargs ldd"
+      ldd_cmd = "find #{install_dir}/ -type f | xargs ldd"
       shell = Mixlib::ShellOut.new(ldd_cmd)
       shell.run_command
 
