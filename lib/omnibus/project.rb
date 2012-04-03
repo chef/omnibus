@@ -115,6 +115,7 @@ module Omnibus
                              "--iteration #{iteration}",
                              config.install_dir,
                              "--post-install '#{package_scripts_path}/postinst'",
+                             "--pre-uninstall '#{package_scripts_path}/prerm'",
                              "--post-uninstall '#{package_scripts_path}/postrm'",
                              "-m 'Opscode, Inc.'",
                              "--description 'The full stack of #{@name}'",
