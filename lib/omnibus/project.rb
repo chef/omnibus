@@ -98,13 +98,6 @@ module Omnibus
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
-              if !File.exists?("#{config.install_dir}/setup.sh")
-                shell = Mixlib::ShellOut.new("cp setup.sh #{config.install_dir}",
-                                             :live_stream => STDOUT, 
-                                             :cwd => package_scripts_path)
-                shell.run_command
-                shell.error!
-              end
 
               # build the fpm command
               fpm_command = ["fpm",
