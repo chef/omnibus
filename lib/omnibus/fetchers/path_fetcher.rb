@@ -34,5 +34,9 @@ E
     def fetch
       rsync
     end
+
+    def fetch_required?
+      true
+    end
   end
 end
