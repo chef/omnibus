@@ -64,15 +64,20 @@ module Omnibus
 
     def self.software(*path_specs)
       FileList[*path_specs].each do |f|
-        s = Omnibus::Software.load(f)
-        Omnibus.component_added(s)
-        s
+        Omnibus::Project.all_projects.each do |p|
+          s = Omnibus::Software.load(f, p)
+          # TODO: we need to register the software components for
+          # version tracking
+          # Omnibus.component_added(s)
+        end
       end
     end
 
     def self.projects(*path_specs)
       FileList[*path_specs].each do |f|
-        Omnibus::Project.load(f)
+        p = Omnibus::Project.load(f)
+        Omnibus::Project.all_projects << p
+        p
       end
     end
   end

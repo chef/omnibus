@@ -23,11 +23,11 @@ module Omnibus
     attr_reader :dependencies
     attr_reader :fetcher
 
-    def self.load(filename)
-      new(IO.read(filename), filename)
+    def self.load(filename, project)
+      new(IO.read(filename), filename, project)
     end
 
-    def initialize(io, filename)
+    def initialize(io, filename, project)
       @version        = nil
       @name           = nil
       @description    = nil
@@ -35,6 +35,7 @@ module Omnibus
       @relative_path  = nil
       @source_uri     = nil
       @source_config  = filename
+      @project        = project
 
       @builder = NullBuilder.new(self)
 
@@ -96,16 +97,16 @@ module Omnibus
       "#{config.build_dir}/#{camel_case_path(install_dir)}"
     end
 
+    def install_dir
+      @project.install_path
+    end
+
     def max_build_jobs
       if OHAI.cpu == nil
         2
       else
         OHAI.cpu[:total] + 1
       end
-    end
-
-    def install_dir
-      config.install_dir
     end
 
     def project_file
@@ -156,6 +157,7 @@ module Omnibus
     end
 
     def render_tasks
+      namespace "projects:#{@project.name}" do
       namespace :software do
         fetcher = Fetcher.for(self)
 
@@ -215,9 +217,11 @@ module Omnibus
         file fetch_file => (file @source_config)
         file manifest_file => (file fetch_file)
 
-        desc "fetch and build #{@name}"
+        desc "fetch and build #{@name} for #{@project.name}"
         task @name => manifest_file
       end
+      end
     end
+
   end
 end
