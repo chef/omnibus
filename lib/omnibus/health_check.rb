@@ -36,6 +36,12 @@ module Omnibus
                               /libuutil\.so/
                              ]
     
+    WHITELIST_FILES = [
+                       /jre\/bin\/javaws/,
+                       /jre\/bin\/policytool/,
+                       /jre\/lib/
+                      ]
+
     WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
 
     def self.run(install_dir)
@@ -59,7 +65,9 @@ module Omnibus
           WHITELIST_LIBS.each do |reg| 
             safe ||= true if reg.match(name)
           end
-          safe ||= true if current_library =~ /jre\/lib/
+          WHITELIST_FILES.each do |reg|
+            safe ||= true if reg.match(current_library)
+          end
 
           if !safe && linked !~ Regexp.new(install_dir)
             bad_libs[current_library] ||= {}
