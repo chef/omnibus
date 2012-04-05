@@ -3,9 +3,9 @@ module Omnibus
   module Reports
     extend self
 
-    def pretty_version_map
+    def pretty_version_map(project)
       out = ""
-      version_map = Omnibus.library.version_map
+      version_map = Omnibus.library.version_map(project)
       width = version_map.keys.max {|a,b| a.size <=> b.size }.size + 3
       version_map.keys.sort.each do |name|
         version = version_map[name]

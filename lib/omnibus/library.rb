@@ -12,8 +12,10 @@ module Omnibus
       @components << component
     end
 
-    def version_map
-      @components.inject({}) {|map, component| map[component.name] = component.version; map}
+    def version_map(project)
+      @components
+        .select {|c| c.project == project}
+        .inject({}) {|map, component| map[component.name] = component.version; map}
     end
 
     def select(*args, &block)

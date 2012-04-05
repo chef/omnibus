@@ -22,6 +22,7 @@ module Omnibus
     attr_reader :description
     attr_reader :dependencies
     attr_reader :fetcher
+    attr_reader :project
 
     def self.load(filename, project)
       new(IO.read(filename), filename, project)
