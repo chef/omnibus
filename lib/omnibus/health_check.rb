@@ -45,16 +45,22 @@ module Omnibus
     WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
 
     def self.run(install_dir)
-      ldd_cmd = "find #{install_dir}/ -type f | xargs ldd"
-      shell = Mixlib::ShellOut.new(ldd_cmd)
+      #
+      # ShellOut has GC turned off during execution, so when we're
+      # executing extremely long commands with lots of output, we
+      # should be mindful that the string concatentation for building
+      # #stdout will hurt memory usage drastically
+      #
+      ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
+      shell = Mixlib::ShellOut.new(ldd_cmd, :timeout => 3600)
       shell.run_command
 
-      ldd_output = shell.stdout
+      ldd_output = File.read('ldd.out')
 
+      current_library = nil
       bad_libs = {}
 
-      current_library = nil 
-      ldd_output.split("\n").each do |line|
+      ldd_output.each_line do |line|
         case line
         when /^(.+):$/
           current_library = $1
@@ -95,6 +101,8 @@ module Omnibus
           puts "line did not match for #{current_library}\n#{line}"
         end
       end
+
+      File.delete('ldd.out')
 
       if bad_libs.keys.length > 0
         bad_libs.each do |name, lib_hash|
