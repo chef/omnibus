@@ -94,7 +94,7 @@ module Omnibus
     def fetch(software)
       log "Fetching #{software.name}"
       fetcher = Fetcher.without_caching_for(software)
-      if fetcher.should_fetch?
+      if fetcher.fetch_required?
         fetcher.download
         fetcher.verify_checksum!
       else
