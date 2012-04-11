@@ -37,6 +37,7 @@ module Omnibus
       @source_uri     = nil
       @source_config  = filename
       @project        = project
+      @always_build   = false
 
       @builder = NullBuilder.new(self)
 
@@ -76,6 +77,14 @@ module Omnibus
 
     def source_uri
       @source_uri ||= URI(@source[:url])
+    end
+
+    def always_build(val)
+      @always_build = val
+    end
+
+    def always_build?
+      @always_build
     end
 
     def checksum
@@ -184,8 +193,8 @@ module Omnibus
           end
 
           task :build => :fetch do
-            if uptodate?(manifest_file, [fetch_file])
-              # if any deps have been built for any reason, we will need to
+            if !always_build? && uptodate?(manifest_file, [fetch_file])
+              # if any direct deps have been built for any reason, we will need to
               # clean/build ourselves
               (@dependencies - [@name]).uniq.each do |dep|
                 unless uptodate?(manifest_file, [manifest_file_from_name(dep)])
@@ -195,7 +204,8 @@ module Omnibus
               end
 
             else 
-              # if fetch has occurred, do a clean and build.
+              # if fetch has occurred, or the component is configured to 
+              # always build, do a clean and build.
               execute_build(fetcher)
             end
           end
