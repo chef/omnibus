@@ -73,15 +73,47 @@ build_iteration "4"
 dependencies    ["chef"]
 ```
 
-**name**: The name of the project.
+**name:** The name of the project.
 
-**install_path**: The desired install location of the package.
+**install_path:** The desired install location of the package.
 
-**build_version**: The package version.
+**build_version:** The package version.
 
-**build_iteration**: The package iteration number.
+**build_iteration:** The package iteration number.
 
 **dependencies**: A list of software components to include in this package.
+
+## Build Structure
+
+Omnibus creates and stores build arifacts in a direcory tree under `/var/cache/omnnibus`
+
+```
+└── /var/cache/omnibus    
+    └── cache
+    └── src
+    └── build
+        └── install_path
+            └── ruby.latest
+            └── ruby.manifest
+````
+
+### cache
+
+The `cache` directory caches the download artifacts for software sources. It keeps pristine tarballs and git repositories, depending on the type of sorce specified.
+
+### src
+
+The `src` directory is where the extracted source code for a piece of software lives. When a piece of software needs to be rebuilt, the `src` directory is recreated from the pristine copy in the download cache.
+
+### build
+
+The `build` directory is where Omnibus keeps track of the build artifacts for each piece of software.
+
+__install_path:__ The undersocre-separated installation path of the project being built (e.g. /opt/chef => opt_chef). Segregating build artifacts by installation path allows us to keep track of the builds for the same pieces of software that are installed in two different locations (e.g. building an embedded Ruby for /opt/chef and /opt/ohai).
+
+__*.latest:__ A sentinel file representing the mtime of the newest file in the pristine source tree for a particular piece of software.
+
+__*.manifest:__ A sentinel file representing the mtime of the last successful build for a particular piece of software.
 
 ## License
 
