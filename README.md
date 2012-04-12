@@ -61,7 +61,28 @@ end
 
 **command**: An individual build step.
 
-### Project DSL
+### Projects
+
+```ruby
+name            "chef-full"
+
+install_path    "/opt/chef"
+build_version   "0.10.8"
+build_iteration "4"
+
+dependencies    ["chef"]
+```
+
+**name**: The name of the project.
+
+**install_path**: The desired install location of the package.
+
+**build_version**: The package version.
+
+**build_iteration**: The package iteration number.
+
+**dependencies**: A list of software components to include in this package.
+
 ## License
 
 See the LICENSE and NOTICE files for more information.
@@ -80,6 +101,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
-
