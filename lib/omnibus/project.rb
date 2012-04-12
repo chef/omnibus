@@ -105,6 +105,35 @@ module Omnibus
 
     private
 
+    def fpm_command(pkg_type)
+      command_and_opts = ["fpm",
+                          "-s dir",
+                          "-t #{pkg_type}",
+                          "-v #{build_version}",
+                          "-n #{@name}",
+                          "--iteration #{iteration}",
+                          install_path,
+                          "-m 'Opscode, Inc.'",
+                          "--description 'The full stack of #{@name}'",
+                          "--url http://www.opscode.com"]
+      if File.exist?("#{package_scripts_path}/postinst")
+        command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
+      end
+      if File.exist?("#{package_scripts_path}/prerm")
+        command_and_opts << "--pre-uninstall '#{package_scripts_path}/prerm'"
+      end
+      # solaris packages don't support --post-uninstall
+      if File.exist?("#{package_scripts_path}/postrm") && pkg_type != "solaris"
+        command_and_opts << "--post-uninstall '#{package_scripts_path}/postrm'"
+      end
+
+      @exclusions.each do |pattern|
+        command_and_opts << "--exclude '#{pattern}'"
+      end
+      command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts
+    end
+
     def render_tasks
       directory config.package_dir
       directory "pkg"
@@ -116,31 +145,7 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
-              # build the fpm command
-              fpm_command = ["fpm",
-                             "-s dir",
-                             "-t #{pkg_type}",
-                             "-v #{build_version}",
-                             "-n #{@name}",
-                             "--iteration #{iteration}",
-                             install_path,
-                             "--post-install '#{package_scripts_path}/postinst'",
-                             "--pre-uninstall '#{package_scripts_path}/prerm'",
-                             "-m 'Opscode, Inc.'",
-                             "--description 'The full stack of #{@name}'",
-                             "--url http://www.opscode.com"]
-
-              # solaris packages don't support --post-uninstall
-              unless pkg_type == "solaris"
-                fpm_command << "--post-uninstall '#{package_scripts_path}/postrm'"
-              end
-
-              @exclusions.each do |pattern|
-                fpm_command << "--exclude '#{pattern}'"
-              end
-              fpm_command << " --replaces #{@replaces}" if @replaces
-
-              shell = Mixlib::ShellOut.new(fpm_command.join(" "),
+              shell = Mixlib::ShellOut.new(fpm_command(pkg_type).join(" "),
                                            :live_stream => STDOUT,
                                            :timeout => 3600,
                                            :cwd => config.package_dir)
