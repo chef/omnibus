@@ -44,6 +44,10 @@ module Omnibus
 
     WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
 
+    def self.log(msg)
+      puts "[health_check] #{msg}"
+    end
+
     def self.run(install_dir)
       #
       # ShellOut has GC turned off during execution, so when we're
@@ -52,6 +56,7 @@ module Omnibus
       # #stdout will hurt memory usage drastically
       #
       ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
+      log "Executing `#{ldd_cmd}`"
       shell = Mixlib::ShellOut.new(ldd_cmd, :timeout => 3600)
       shell.run_command
 
@@ -84,7 +89,7 @@ module Omnibus
               bad_libs[current_library][name][linked] = 1 
             end
           else
-            puts "Passed: #{current_library} #{name} #{linked}" if ARGV[0] == 'verbose'
+            log "Passed: #{current_library} #{name} #{linked}" if ARGV[0] == 'verbose'
           end
         when /^\s+(.+) \(.+\)$/
           next
@@ -98,7 +103,7 @@ module Omnibus
           next
         when /^\s+not a dynamic executable$/ # ignore non-executable files
         else
-          puts "line did not match for #{current_library}\n#{line}"
+          log "line did not match for #{current_library}\n#{line}"
         end
       end
 
@@ -108,7 +113,7 @@ module Omnibus
         bad_libs.each do |name, lib_hash|
           lib_hash.each do |lib, linked_libs|
             linked_libs.each do |linked, count|
-              puts "#{name}: #{lib} #{linked} #{count}"
+              log "#{name}: #{lib} #{linked} #{count}"
             end
           end
         end
