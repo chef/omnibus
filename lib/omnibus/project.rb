@@ -1,6 +1,7 @@
 #
 # omnibus project dsl reader
 #
+
 module Omnibus
   class Project
     include Rake::DSL
@@ -145,7 +146,10 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
-              shell = Mixlib::ShellOut.new(fpm_command(pkg_type).join(" "),
+              fpm_full_cmd = fpm_command(pkg_type).join(" ")
+              puts "[project:#{name}] Executing `#{fpm_full_cmd}`"
+
+              shell = Mixlib::ShellOut.new(fpm_full_cmd,
                                            :live_stream => STDOUT,
                                            :timeout => 3600,
                                            :cwd => config.package_dir)
