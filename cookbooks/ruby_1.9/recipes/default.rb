@@ -1,24 +1,21 @@
-# -*- coding: utf-8 -*-
 #
 # Author::        Stephen Delano
-# Cookbook Name:: ruby_1.9
-# Recipe::        default
+# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# License:: Apache License, Version 2.0
 #
-# Copyright 2011, Opscode, Inc.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# All rights reserved - Do Not Redistribute
-#
-
-#
-# We are building from source so that we can have more than one
-# version of ruby on the box at a time. at the time of writing (June
-# 2011), the bulk (all) of our ruby infrastructure is running 1.8.7 or
-# REE. All of the chef-clients are run with ruby 1.8.7, which is
-# installed via apt.  The reason for installing ruby 1.9.2 (and in
-# /opt) is to run the `opscode-support` project in the empty cycles
-# and RAM on one of the `opscode-account` boxes. `opsocde-support` is
-# a rails3 project and runs best on (as well as being developed
-# exclusively on) ruby 1.9.2.
+# -*- coding: utf-8 -*-
 #
 
 include_recipe "build-essential"
