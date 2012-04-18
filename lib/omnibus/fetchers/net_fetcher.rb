@@ -81,7 +81,7 @@ E
       raise ArgumentError, 'HTTP redirect too deep' if limit == 0
       log "getting #{project_file} from #{url} with #{limit} redirects left"
 
-      if !url.kind_of?(URL)
+      if !url.kind_of?(URI)
         url = URI.parse(url) 
       end
 
