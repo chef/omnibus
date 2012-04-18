@@ -79,8 +79,9 @@ E
 
     def get_with_redirect(url, headers, limit = 10)
       raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+      log "getting #{project_file} from #{url} with #{limit} redirects left"
 
-      if !uri.kind_of?(URL)
+      if !url.kind_of?(URL)
         url = URI.parse(url) 
       end
 
