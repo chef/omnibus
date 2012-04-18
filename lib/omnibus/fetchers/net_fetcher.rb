@@ -78,14 +78,21 @@ E
     end
 
     def download
+      log source[:warning] if source.has_key?(:warning)
       log "fetching #{project_file} from #{source_uri}"
 
       case source_uri.scheme
       when /https?/
         http_client = Net::HTTP.new(source_uri.host, source_uri.port)
         http_client.use_ssl = (source_uri.scheme == "https")
+        headers = { 
+          'accept-encoding' => '',
+        }
+        if source.has_key?(:cookie)
+          headers['Cookie'] = source[:cookie]
+        end
         http_client.start do |http|
-          resp = http.get(source_uri.path, 'accept-encoding' => '')
+          resp = http.get(source_uri.path, headers)
           open(project_file, "wb") do |f|
             f.write(resp.body)
           end
