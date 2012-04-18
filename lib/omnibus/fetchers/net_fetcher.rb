@@ -79,31 +79,31 @@ E
 
     def get_with_redirect(url, headers, limit = 10)
       raise ArgumentError, 'HTTP redirect too deep' if limit == 0
-      log "getting #{project_file} from #{url} with #{limit} redirects left"
+      log "getting from #{url} with #{limit} redirects left"
 
       if !url.kind_of?(URI)
         url = URI.parse(url) 
       end
 
-      req = Net::HTTP::Get.new(url.path, headers)
+      req = Net::HTTP::Get.new(url.request_uri, headers)
       http_client = Net::HTTP.new(url.host, url.port)
       http_client.use_ssl = (url.scheme == "https")
     
       response = http_client.start { |http| http.request(req) }
-      final_response = case response
-                       when Net::HTTPSuccess     then response
-                       when Net::HTTPRedirection then get_with_redirect(response['location'], headers, limit - 1)
-                       else
-                         response.error!
-                       end
-      open(project_file, "wb") do |f|
-        f.write(final_response.body)
+      case response
+      when Net::HTTPSuccess     
+        open(project_file, "wb") do |f|
+          f.write(response.body)
+        end
+      when Net::HTTPRedirection 
+        get_with_redirect(response['location'], {'Cookie' => headers['Cookie']}, limit - 1)
+      else
+        response.error!
       end
-      true
     end
 
     def download
-      log source[:warning] if source.has_key?(:warning)
+      log "\033[1;31m#{source[:warning]}\033[0m" if source.has_key?(:warning)
       log "fetching #{project_file} from #{source_uri}"
 
       case source_uri.scheme
