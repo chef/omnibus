@@ -77,26 +77,43 @@ E
       end
     end
 
+    def get_with_redirect(url, headers, limit = 10)
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+
+      if !uri.kind_of?(URL)
+        url = URI.parse(url) 
+      end
+
+      req = Net::HTTP::Get.new(url.path, headers)
+      http_client = Net::HTTP.new(url.host, url.port)
+      http_client.use_ssl = (url.scheme == "https")
+    
+      response = http_client.start { |http| http.request(req) }
+      final_response = case response
+                       when Net::HTTPSuccess     then response
+                       when Net::HTTPRedirection then get_with_redirect(response['location'], headers, limit - 1)
+                       else
+                         response.error!
+                       end
+      open(project_file, "wb") do |f|
+        f.write(final_response.body)
+      end
+      true
+    end
+
     def download
       log source[:warning] if source.has_key?(:warning)
       log "fetching #{project_file} from #{source_uri}"
 
       case source_uri.scheme
       when /https?/
-        http_client = Net::HTTP.new(source_uri.host, source_uri.port)
-        http_client.use_ssl = (source_uri.scheme == "https")
         headers = { 
           'accept-encoding' => '',
         }
         if source.has_key?(:cookie)
           headers['Cookie'] = source[:cookie]
         end
-        http_client.start do |http|
-          resp = http.get(source_uri.path, headers)
-          open(project_file, "wb") do |f|
-            f.write(resp.body)
-          end
-        end
+        get_with_redirect(source_uri, headers)
       when "ftp"
         Net::FTP.open(source_uri.host) do |ftp|
           ftp.passive = true
