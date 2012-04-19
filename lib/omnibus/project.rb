@@ -46,6 +46,11 @@ module Omnibus
       @name
     end
 
+    def package_name(val=NULL_ARG)
+      @package_name = val unless val.equal?(NULL_ARG)
+      @package_name.nil? ? @name : @package_name
+    end
+
     def install_path(val=NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
       @install_path
@@ -128,7 +133,7 @@ module Omnibus
                           "-s dir",
                           "-t #{pkg_type}",
                           "-v #{build_version}",
-                          "-n #{@name}",
+                          "-n #{package_name}",
                           "--iteration #{iteration}",
                           install_path,
                           "-m 'Opscode, Inc.'",
