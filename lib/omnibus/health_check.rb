@@ -52,7 +52,11 @@ module Omnibus
                               /libssl.so/,
                               /libuutil\.so/
                              ]
-    
+
+    FREEBSD_WHITELIST_LIBS = [
+                              /libthr\.so/,
+                             ]
+
     WHITELIST_FILES = [
                        /jre\/bin\/javaws/,
                        /jre\/bin\/policytool/,
@@ -60,6 +64,7 @@ module Omnibus
                       ]
 
     WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
+    WHITELIST_LIBS.push(*FREEBSD_WHITELIST_LIBS)
 
     def self.log(msg)
       puts "[health_check] #{msg}"

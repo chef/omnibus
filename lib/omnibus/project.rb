@@ -121,12 +121,90 @@ module Omnibus
         [ "rpm" ]
       when 'solaris2'
         [ "solaris" ]
+      when 'mac_os_x'
+        [ "mac_os_x" ]
+      when 'freebsd'
+        [ "freebsd" ]
       else
         []
       end
     end
 
     private
+
+    def osx_packagemaker_command(pkg_type)
+      pkgmkr_cmd  = '/Developer/Applications/Utilities/PackageMaker.app'
+      pkgmkr_cmd += '/Contents/MacOS/PackageMaker'
+      command_and_opts = [pkgmkr_cmd,
+                          "--root #{install_path}",
+                          "--version #{build_version}",
+                          "--install-to '#{install_path}'",
+                          "--id com.opscode.#{@name}",
+                          "--title 'Opscode #{@name}'",
+                          "--out #{@name}-#{build_version}.pkg",
+                          "--no-relocate",
+                          "--scripts #{package_scripts_path}",
+                          "--root-volume-only",
+                          "&& zip -r #{@name}-#{build_version}.pkg.zip #{@name}-#{build_version}.pkg",
+                          "&& rm -r #{@name}-#{build_version}.pkg",
+                          ]
+
+      # OSX pkg insists it be called 'postupgrade'
+      if File.exist?("#{package_scripts_path}/postinst")
+        if not File.exist?("#{package_scripts_path}/postupgrade")
+          File.link("#{package_scripts_path}/postinst", "#{package_scripts_path}/postupgrade")
+        end
+      end
+
+      # There is no concept of uninstall for OSX packages
+      # We could do some hackery to put an uninstall package in the package
+      # At a later time
+      # Uninstall would be sudo /path/to/chef.pkg/Contents/Resources/postrm
+
+      @exclusions.each do |pattern|
+        command_and_opts << "--filter '#{pattern}'"
+      end
+
+      # no replaces/obsoletes in MacOS pkg
+      # command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts
+    end
+
+    def freebsd_pkg_create_command(pkg_type, exclude_file)
+      command_and_opts = ["/usr/ports/Tools/scripts/plist -Md -m /dev/null",
+                          install_path,
+                          "| awk",
+                          "'{if (/@dirrm/)\
+                             {print \"@exec mkdir -p %D/\"$2\"\\n@dirrm \"\$2} else\
+                             print $0}'",
+                          "| pkg_create",
+                          "-c '-Opscode, Inc. - #{@name} - http://www.opscode.com'",
+                          "-d '-The full stack of #{@name}'",
+                          "-p #{install_path}",
+                          "-f -",
+                          "-j",
+                          "#{package_name}-#{build_version}-#{iteration}"]
+      if File.exist?("#{package_scripts_path}/postinst")
+        command_and_opts << "-I '#{package_scripts_path}/postinst'"
+      end
+      if File.exist?("#{package_scripts_path}/postrm")
+        command_and_opts << "-K '#{package_scripts_path}/postrm'"
+      end
+
+      unless @exclusions.nil? || @exclusions.empty?
+        File.open(exclude_file, 'w') do |fd|
+          @exclusions.each do |pattern|
+            fd.puts(pattern)
+          end
+          fd.close
+        end
+        command_and_opts << "-X '#{exclude_file}'"
+      end
+      # There is no good analogue to replaces/obsoletes with pkg_create
+      # so we'll frag it for now..
+      # command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts
+    end
 
     def fpm_command(pkg_type)
       command_and_opts = ["fpm",
@@ -167,16 +245,31 @@ module Omnibus
           namespace @name do
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
+              exclude_file = 'exclusions.out'
+              if pkg_type == 'freebsd'
+                full_cmd = freebsd_pkg_create_command(pkg_type, exclude_file).join(" ")
+              elsif pkg_type == 'mac_os_x'
+                full_cmd = osx_packagemaker_command(pkg_type).join(" ")
+              else
+                full_cmd = fpm_command(pkg_type).join(" ")
+              end
 
-              fpm_full_cmd = fpm_command(pkg_type).join(" ")
-              puts "[project:#{name}] Executing `#{fpm_full_cmd}`"
+              puts "[project:#{name}] Executing `#{full_cmd}`"
 
-              shell = Mixlib::ShellOut.new(fpm_full_cmd,
+              shell = Mixlib::ShellOut.new(full_cmd,
                                            :live_stream => STDOUT,
                                            :timeout => 3600,
                                            :cwd => config.package_dir)
               shell.run_command
               shell.error!
+              # This is created to supplicate FreeBSD pkg_create
+              if File.exist?(exclude_file)
+                File.delete(exclude_file)
+              end
+              # This is created to supplicate OSX packagemaker
+              if File.exist?("#{package_scripts_path}/postupgrade")
+                File.delete("#{package_scripts_path}/postupgrade")
+              end
             end
 
             task pkg_type => config.package_dir
