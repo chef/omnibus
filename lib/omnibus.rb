@@ -20,6 +20,7 @@ o = Ohai::System.new
 o.require_plugin('os')
 o.require_plugin('platform')
 o.require_plugin('linux/cpu') if o.os == 'linux'
+o.require_plugin('kernel')
 OHAI = o
 
 require 'omnibus/library'

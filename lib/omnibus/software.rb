@@ -171,6 +171,10 @@ module Omnibus
       OHAI.platform
     end
 
+    def architecture
+      OHAI.kernel['machine'] =~ /sun/ ? "sparc" : "intel"
+    end
+
     private
 
     def command(*args)

@@ -52,6 +52,8 @@ module Omnibus
     configurable :s3_bucket
     configurable :s3_access_key
     configurable :s3_secret_key
+
+    configurable :solaris_compiler
   end
 
   def self.config
