@@ -33,6 +33,7 @@ when "centos"
          end
   pkgs << "zlib"
   pkgs << "zlib-devel"
+  pkgs << "openssl-devel"
   pkgs.each do |pkg|
     package pkg do
       action :install
