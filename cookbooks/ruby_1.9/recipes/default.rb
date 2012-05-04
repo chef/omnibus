@@ -30,12 +30,12 @@ end
 # * the source file already exists
 # * ruby 1.9.3 has been installed at the specified patch-level
 #
-remote_file "/tmp/ruby-1.9.3-p320.tar.gz" do
-  source "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p320.tar.gz"
+remote_file "/tmp/ruby-1.9.3-p194.tar.gz" do
+  source "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p194.tar.gz"
   not_if do
-    ::File.exists?("/tmp/ruby-1.9.3-p320.tar.gz") ||
+    ::File.exists?("/tmp/ruby-1.9.3-p194.tar.gz") ||
       (::File.exists?("/opt/ruby1.9/bin/ruby") &&
-       system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p320'"))
+       system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'"))
   end
 end
 
@@ -45,15 +45,15 @@ end
 bash "install ruby-1.9.3" do
   cwd "/tmp"
   code <<-EOH
-tar zxf ruby-1.9.3-p320.tar.gz
-cd ruby-1.9.3-p320
+tar zxf ruby-1.9.3-p194.tar.gz
+cd ruby-1.9.3-p194
 ./configure --prefix=/opt/ruby1.9
 make
 make install
 EOH
   not_if do
     ::File.exists?("/opt/ruby1.9/bin/ruby") &&
-      system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p320'")
+      system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'")
   end
 end
 
