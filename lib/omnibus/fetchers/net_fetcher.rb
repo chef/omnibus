@@ -77,19 +77,44 @@ E
       end
     end
 
+    def get_with_redirect(url, headers, limit = 10)
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+      log "getting from #{url} with #{limit} redirects left"
+
+      if !url.kind_of?(URI)
+        url = URI.parse(url) 
+      end
+
+      req = Net::HTTP::Get.new(url.request_uri, headers)
+      http_client = Net::HTTP.new(url.host, url.port)
+      http_client.use_ssl = (url.scheme == "https")
+    
+      response = http_client.start { |http| http.request(req) }
+      case response
+      when Net::HTTPSuccess     
+        open(project_file, "wb") do |f|
+          f.write(response.body)
+        end
+      when Net::HTTPRedirection 
+        get_with_redirect(response['location'], {'Cookie' => headers['Cookie']}, limit - 1)
+      else
+        response.error!
+      end
+    end
+
     def download
+      log "\033[1;31m#{source[:warning]}\033[0m" if source.has_key?(:warning)
       log "fetching #{project_file} from #{source_uri}"
 
       case source_uri.scheme
       when /https?/
-        http_client = Net::HTTP.new(source_uri.host, source_uri.port)
-        http_client.use_ssl = (source_uri.scheme == "https")
-        http_client.start do |http|
-          resp = http.get(source_uri.path, 'accept-encoding' => '')
-          open(project_file, "wb") do |f|
-            f.write(resp.body)
-          end
+        headers = { 
+          'accept-encoding' => '',
+        }
+        if source.has_key?(:cookie)
+          headers['Cookie'] = source[:cookie]
         end
+        get_with_redirect(source_uri, headers)
       when "ftp"
         Net::FTP.open(source_uri.host) do |ftp|
           ftp.passive = true
