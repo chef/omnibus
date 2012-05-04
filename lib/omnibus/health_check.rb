@@ -32,7 +32,8 @@ module Omnibus
                       /librt\.so/,
                       /libstdc\+\+\.so/,
                       /libutil\.so/,
-                      /linux-vdso.+/
+                      /linux-vdso.+/,
+                      /linux-gate\.so/
                       ]
 
     SOLARIS_WHITELIST_LIBS = [
