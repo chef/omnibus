@@ -31,6 +31,9 @@ when "centos"
          else
            %w{gcc gcc-c++ kernel-devel make}
          end
+  pkgs << "zlib"
+  pkgs << "zlib-devel"
+  pkgs << "openssl-devel"
   pkgs.each do |pkg|
     package pkg do
       action :install
