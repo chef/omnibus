@@ -142,7 +142,8 @@ module Omnibus
       if File.exist?("#{package_scripts_path}/postinst")
         command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
       end
-      if File.exist?("#{package_scripts_path}/prerm")
+      # solaris packages don't support --pre-uninstall
+      if File.exist?("#{package_scripts_path}/prerm") && pkg_type != "solaris"
         command_and_opts << "--pre-uninstall '#{package_scripts_path}/prerm'"
       end
       # solaris packages don't support --post-uninstall
