@@ -57,7 +57,8 @@ module Omnibus
     WHITELIST_FILES = [
                        /jre\/bin\/javaws/,
                        /jre\/bin\/policytool/,
-                       /jre\/lib/
+                       /jre\/lib/,
+                       /jre\/plugin/,
                       ]
 
     WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
