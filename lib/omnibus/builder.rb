@@ -193,7 +193,7 @@ module Omnibus
       cmd_args = Array(cmd)
       options = {
         :cwd => project_dir,
-        :timeout => 3600
+        :timeout => 5400
       }
       options[:live_stream] = STDOUT if ENV['DEBUG']
       if cmd_args.last.is_a? Hash
