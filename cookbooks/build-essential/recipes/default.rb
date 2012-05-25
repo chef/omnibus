@@ -24,6 +24,8 @@ when "ubuntu","debian"
       action :install
     end
   end
+
+
 when "centos"
   centos_major_version = node['platform_version'].split('.').first.to_i
   pkgs = if centos_major_version < 6
@@ -57,4 +59,14 @@ end
 
 package "bison" do
   action :install
+end
+
+# TODO: figure out what the root cause is and remove this dep
+# Background: Erlang fails to ./configure erts on Ubuntu 12.04 platforms
+# because the test program it uses to detect ncurses fails to find ncurses in
+# the embedded/ directory. Installing ncurses-devel causes ./configure to
+# work, and the resulting erlang is linked to the correct ncurses shared
+# object (in embedded/). So this is ugly, but required to make erlang build.
+if platform?("ubuntu") and node[:platform_version].to_f >= 12.04
+  package "ncurses-dev"
 end
