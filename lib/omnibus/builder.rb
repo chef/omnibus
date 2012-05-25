@@ -31,9 +31,9 @@ module Omnibus
       def_delegator :@builder, :ruby
       def_delegator :@builder, :gem
       def_delegator :@builder, :bundle
+      def_delegator :@builder, :rake
       def_delegator :@builder, :block
       def_delegator :@builder, :name
-
 
       def initialize(builder, software)
         @builder, @software = builder, software
@@ -137,6 +137,10 @@ module Omnibus
 
     def bundle(*args)
       @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/bundle", *args))
+    end
+
+    def rake(*args)
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/rake", *args))
     end
 
     def block(&rb_block)
