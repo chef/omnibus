@@ -1,0 +1,33 @@
+{
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "long_description": "= Description\n\nInstalls Homebrew and acts as the native package provider for Mac OS X using\nHomebrew to install packages. See:\n\nhttp://woss.name/2011/01/23/converging-your-home-directory-with-chef/\n\nfor additional background.\n\n= Requirements\n\n== Platform\n\nThis is only going to work on platforms that Homebrew supports which is, I\nthink, just Mac OS X. This cookbook has been tested on Mac OS X 10.6.6 with the\nlatest version of Homebrew (as of Mon 24 Jan 2011 at any rate!).\n\n== Cookbooks\n\nShouldn't require any other cookbooks, though its operation may be greatly\nenhanced by another cookbook I'm brewing that manages launchd. ;-)\n\n= Resources and Providers\n\nThis cookbook provides a package provider called +homebrew_package+ which will\ninstall/remove packages using Homebrew. This becomes the default provider for\n+package+ if your platform is Mac OS X.\n\n= Attributes\n\nNone.\n\n= Usage\n\nJust make sure that this cookbook is selected before you start installing\npackages. You can add:\n\n  include_recipe 'homebrew'\n\nto all your recipes that install packages, or you can just make sure it's on\nthe run list somewhere early on. The bookbook itself ensures that Homebrew is\ninstalled and up to date.\n\n= License and Author\n\nAuthor:: Graeme Mathieson (<mathie@woss.name>)\n\nCopyright:: 2011, Graeme Mathieson\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n",
+  "providing": {
+  },
+  "platforms": {
+    "mac_os_x": [
+
+    ]
+  },
+  "license": "Apache 2.0",
+  "maintainer": "Graeme Mathieson",
+  "replacing": {
+  },
+  "maintainer_email": "mathie@woss.name",
+  "name": "homebrew",
+  "version": "1.0.0",
+  "groupings": {
+  },
+  "dependencies": {
+  },
+  "description": "Install Homebrew and use it as your package provider in Mac OS X",
+  "recipes": {
+    "homebrew": "Install Homebrew"
+  },
+  "attributes": {
+  },
+  "recommendations": {
+  }
+}

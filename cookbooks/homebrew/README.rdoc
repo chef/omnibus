@@ -1,0 +1,60 @@
+= Description
+
+Installs Homebrew and acts as the native package provider for Mac OS X using
+Homebrew to install packages. See:
+
+http://woss.name/2011/01/23/converging-your-home-directory-with-chef/
+
+for additional background.
+
+= Requirements
+
+== Platform
+
+This is only going to work on platforms that Homebrew supports which is, I
+think, just Mac OS X. This cookbook has been tested on Mac OS X 10.6.6 with the
+latest version of Homebrew (as of Mon 24 Jan 2011 at any rate!).
+
+== Cookbooks
+
+Shouldn't require any other cookbooks, though its operation may be greatly
+enhanced by another cookbook I'm brewing that manages launchd. ;-)
+
+= Resources and Providers
+
+This cookbook provides a package provider called +homebrew_package+ which will
+install/remove packages using Homebrew. This becomes the default provider for
++package+ if your platform is Mac OS X.
+
+= Attributes
+
+None.
+
+= Usage
+
+Just make sure that this cookbook is selected before you start installing
+packages. You can add:
+
+  include_recipe 'homebrew'
+
+to all your recipes that install packages, or you can just make sure it's on
+the run list somewhere early on. The bookbook itself ensures that Homebrew is
+installed and up to date.
+
+= License and Author
+
+Author:: Graeme Mathieson (<mathie@woss.name>)
+
+Copyright:: 2011, Graeme Mathieson
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

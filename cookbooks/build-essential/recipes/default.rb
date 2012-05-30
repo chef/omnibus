@@ -25,7 +25,15 @@ when "ubuntu","debian"
     end
   end
 
-
+  # TODO: figure out what the root cause is and remove this dep
+  # Background: Erlang fails to ./configure erts on Ubuntu 12.04 platforms
+  # because the test program it uses to detect ncurses fails to find ncurses in
+  # the embedded/ directory. Installing ncurses-devel causes ./configure to
+  # work, and the resulting erlang is linked to the correct ncurses shared
+  # object (in embedded/). So this is ugly, but required to make erlang build.
+  if platform?("ubuntu") and node[:platform_version].to_f >= 12.04
+    package "ncurses-dev"
+  end
 when "centos"
   centos_major_version = node['platform_version'].split('.').first.to_i
   pkgs = if centos_major_version < 6
@@ -47,26 +55,20 @@ when "redhat","fedora"
       action :install
     end
   end
+when "mac_os_x"
+  include_recipe "homebrew"
 end
 
-package "autoconf" do
-  action :install
-end
+unless node['platform'] == "mac_os_x"
+  package "autoconf" do
+    action :install
+  end
 
-package "flex" do
-  action :install
-end
+  package "flex" do
+    action :install
+  end
 
-package "bison" do
-  action :install
-end
-
-# TODO: figure out what the root cause is and remove this dep
-# Background: Erlang fails to ./configure erts on Ubuntu 12.04 platforms
-# because the test program it uses to detect ncurses fails to find ncurses in
-# the embedded/ directory. Installing ncurses-devel causes ./configure to
-# work, and the resulting erlang is linked to the correct ncurses shared
-# object (in embedded/). So this is ugly, but required to make erlang build.
-if platform?("ubuntu") and node[:platform_version].to_f >= 12.04
-  package "ncurses-dev"
+  package "bison" do
+    action :install
+  end
 end

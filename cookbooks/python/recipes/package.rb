@@ -36,6 +36,9 @@ python_pkgs = if node['platform'] == 'centos'
                                    ["freebsd"] => {
                                      "default" => ["python"]
                                    },
+                                   ["mac_os_x"] => {
+                                     "default" => ["python"]
+                                   },
                                    "default" => ["python","python-dev"]
                                    )
               end

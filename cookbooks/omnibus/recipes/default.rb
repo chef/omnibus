@@ -52,6 +52,9 @@ package_pkgs = value_for_platform(
   },
   ["centos"] => {
     "default" => ["rpm-build"]
+  },
+  ["mac_os_x"] => {
+    "default" => [],
   }
 )
 package_pkgs.each do |pkg|
@@ -67,6 +70,9 @@ xml_pkgs = value_for_platform(
   },
   ["centos"] => {
     "default" => ["libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
+  },
+  ["mac_os_x"] => {
+    "default" => [],
   }
 )
 xml_pkgs.each do |pkg|
