@@ -122,7 +122,7 @@ module Omnibus
       when 'solaris2'
         [ "solaris" ]
       else
-        []
+        [ "tar" ]
       end
     end
 
@@ -157,6 +157,13 @@ module Omnibus
       command_and_opts
     end
 
+    def tar_command(pkg_type)
+      command_and_opts = [ "tar",
+                           "zcvf",
+                           "#{package_name}-#{build_version}_#{iteration}.tar.gz",
+                           "#{install_path}"]
+    end
+
     def render_tasks
       directory config.package_dir
       directory "pkg"
@@ -168,7 +175,11 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
-              fpm_full_cmd = fpm_command(pkg_type).join(" ")
+              if pkg_type == "tar"
+                fpm_full_cmd = tar_command(pkg_type).join(" ")
+              else
+                fpm_full_cmd = fpm_command(pkg_type).join(" ")
+              end
               puts "[project:#{name}] Executing `#{fpm_full_cmd}`"
 
               shell = Mixlib::ShellOut.new(fpm_full_cmd,
