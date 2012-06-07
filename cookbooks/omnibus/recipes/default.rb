@@ -27,7 +27,7 @@ directory "#{Chef::Config[:file_cache_path]}" do
 end
 
 case node['platform']
-when "ubuntu"
+when "ubuntu", "debian"
   include_recipe "apt"
 when "centos"
   include_recipe "yum"
@@ -47,7 +47,7 @@ end
 
 # install the packaging related packages
 package_pkgs = value_for_platform(
-  ["ubuntu"] => {
+  ["ubuntu", "debian"] => {
     "default" => ["dpkg-dev"]
   },
   ["centos"] => {
@@ -65,7 +65,7 @@ end
 
 # install the libxml / libxslt packages
 xml_pkgs = value_for_platform(
-  ["ubuntu"] => {
+  ["ubuntu", "debian"] => {
     "default" => ["libxml2", "libxml2-dev", "libxslt1.1", "libxslt1-dev"]
   },
   ["centos"] => {
