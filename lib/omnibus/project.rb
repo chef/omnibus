@@ -119,6 +119,8 @@ module Omnibus
         [ "deb" ]
       when 'fedora', 'rhel'
         [ "rpm" ]
+      when 'mac_os_x'
+        [ "mac_os_x" ]
       when 'solaris2'
         [ "solaris" ]
       else
@@ -127,6 +129,44 @@ module Omnibus
     end
 
     private
+
+    def osx_packagemaker_command(pkg_type)
+      pkgmkr_cmd  = '/Applications/Xcode.app/Contents/Applications'
+      pkgmkr_cmd += '/PackageMaker.app/Contents/MacOS/PackageMaker'
+      command_and_opts = [pkgmkr_cmd,
+                          "--root #{install_path}",
+                          "--version #{build_version}",
+                          "--install-to '#{install_path}'",
+                          "--id com.opscode.#{@name}",
+                          "--title 'Opscode #{@name}'",
+                          "--out #{@name}-#{build_version}.pkg",
+                          "--no-relocate",
+                          "--scripts #{package_scripts_path}",
+                          "--root-volume-only",
+                          "&& zip -r #{@name}-#{build_version}.pkg.zip #{@name}-#{build_version}.pkg",
+                          "&& rm -r #{@name}-#{build_version}.pkg",
+                          ]
+
+      # OSX pkg insists it be called 'postupgrade'
+      if File.exist?("#{package_scripts_path}/postinst")
+        if not File.exist?("#{package_scripts_path}/postupgrade")
+          File.link("#{package_scripts_path}/postinst", "#{package_scripts_path}/postupgrade")
+        end
+      end
+
+      # There is no concept of uninstall for OSX packages
+      # We could do some hackery to put an uninstall package in the package
+      # At a later time
+      # Uninstall would be sudo /path/to/chef.pkg/Contents/Resources/postrm
+
+      @exclusions.each do |pattern|
+        command_and_opts << "--filter '#{pattern}'"
+      end
+
+      # no replaces/obsoletes in MacOS pkg
+      # command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts
+    end
 
     def fpm_command(pkg_type)
       command_and_opts = ["fpm",
@@ -177,6 +217,12 @@ module Omnibus
 
               if pkg_type == "tar"
                 fpm_full_cmd = tar_command(pkg_type).join(" ")
+              elsif pkg_type == "mac_os_x"
+                if ENV["OMNIBUS_PKG_NATIVE"]
+                  fpm_full_cmd = osx_packagemaker_command(pkg_type).join(" ")
+                else
+                  fpm_full_cmd = tar_command(pkg_type).join(" ")
+                end
               else
                 fpm_full_cmd = fpm_command(pkg_type).join(" ")
               end
@@ -187,6 +233,12 @@ module Omnibus
                                            :timeout => 3600,
                                            :cwd => config.package_dir)
               shell.run_command
+
+              # cleanup, only exists if osx packagemaker is used
+              if File.exist?("#{package_scripts_path}/postupgrade")
+                File.delete("#{package_scripts_path}/postupgrade")
+              end
+
               shell.error!
             end
 
