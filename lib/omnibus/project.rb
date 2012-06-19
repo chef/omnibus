@@ -119,6 +119,8 @@ module Omnibus
         [ "deb" ]
       when 'fedora', 'rhel'
         [ "rpm" ]
+      when 'freebsd'
+        [ "freebsd" ]
       when 'solaris2'
         [ "solaris" ]
       else
@@ -127,6 +129,42 @@ module Omnibus
     end
 
     private
+
+    def freebsd_pkg_create_command(pkg_type, exclude_file)
+      command_and_opts = ["/usr/ports/Tools/scripts/plist -Md -m /dev/null",
+                          install_path,
+                          "| awk",
+                          "'{if (/@dirrm/)\
+                             {print \"@exec mkdir -p %D/\"$2\"\\n@dirrm \"\$2} else\
+                             print $0}'",
+                          "| pkg_create",
+                          "-c '-Opscode, Inc. - #{@name} - http://www.opscode.com'",
+                          "-d '-The full stack of #{@name}'",
+                          "-p #{install_path}",
+                          "-f -",
+                          "-j",
+                          "#{package_name}-#{build_version}-#{iteration}"]
+      if File.exist?("#{package_scripts_path}/postinst")
+        command_and_opts << "-I '#{package_scripts_path}/postinst'"
+      end
+      if File.exist?("#{package_scripts_path}/postrm")
+        command_and_opts << "-K '#{package_scripts_path}/postrm'"
+      end
+
+      unless @exclusions.nil? || @exclusions.empty?
+        File.open(exclude_file, 'w') do |fd|
+          @exclusions.each do |pattern|
+            fd.puts(pattern)
+          end
+          fd.close
+        end
+        command_and_opts << "-X '#{exclude_file}'"
+      end
+      # There is no good analogue to replaces/obsoletes with pkg_create
+      # so we'll frag it for now..
+      # command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts
+    end
 
     def fpm_command(pkg_type)
       command_and_opts = ["fpm",
@@ -175,8 +213,16 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
+              # exclude_file is only used for freebsd pkg_create
+              exclude_file = 'exclusions.out'
               if pkg_type == "tar"
                 fpm_full_cmd = tar_command(pkg_type).join(" ")
+              elsif pkg_type == "freebsd"
+                if ENV["OMNIBUS_PKG_NATIVE"]
+                  fpm_full_cmd = freebsd_pkg_create_command(pkg_type, exclude_file).join(" ")
+                else
+                  fpm_full_cmd = tar_command(pkg_type).join(" ")
+                end
               else
                 fpm_full_cmd = fpm_command(pkg_type).join(" ")
               end
@@ -187,6 +233,12 @@ module Omnibus
                                            :timeout => 3600,
                                            :cwd => config.package_dir)
               shell.run_command
+
+              # cleanup, only exists if using freebsd pkg_create 
+              if File.exist?(exclude_file)
+                File.delete(exclude_file)
+              end
+
               shell.error!
             end
 

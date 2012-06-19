@@ -54,6 +54,18 @@ module Omnibus
                               /libuutil\.so/
                              ]
 
+    FREEBSD_WHITELIST_LIBS = [
+                              /libc.so/,
+                              /libcrypt.so/,
+                              /libcrypto.so/,
+                              /libcurses\.so/,
+                              /libm\.so/,
+                              /librt\.so/,
+                              /libthr\.so/,
+                              /libutil\.so/,
+                              /libz\.so/
+                             ]
+
     MAC_WHITELIST_LIBS = [
       /libobjc\.A\.dylib/,
       /libSystem\.B\.dylib/,
@@ -134,6 +146,8 @@ module Omnibus
       whitelist_libs = case OHAI.platform
                        when 'mac_os_x'
                          MAC_WHITELIST_LIBS
+                       when 'freebsd'
+                         FREEBSD_WHITELIST_LIBS
                        when 'solaris2'
                          SOLARIS_WHITELIST_LIBS
                        else
