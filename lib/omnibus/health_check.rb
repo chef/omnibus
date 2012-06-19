@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ module Omnibus
                       /libutil\.so/,
                       /linux-vdso.+/,
                       /linux-gate\.so/,
-                      ]
+                     ]
 
     SOLARIS_WHITELIST_LIBS = [
                               /libaio\.so/,
@@ -51,32 +51,32 @@ module Omnibus
                               /libsec\.so/,
                               /libsocket\.so/,
                               /libssl.so/,
-                              /libuutil\.so/
+                              /libthread.so/,
+                              /libuutil\.so/,
+                              /libz.so/
                              ]
 
     MAC_WHITELIST_LIBS = [
-      /libobjc\.A\.dylib/,
-      /libSystem\.B\.dylib/,
-      /CoreFoundation/,
-      /Tcl$/,
-      /Cocoa$/,
-      /Carbon$/,
-      /IOKit$/,
-      /Tk$/,
-      /libutil\.dylib/,
-      /libffi\.dylib/,
-      /libncurses\.5\.4\.dylib/,
-      /libiconv/
-    ]
-    
+                          /libobjc\.A\.dylib/,
+                          /libSystem\.B\.dylib/,
+                          /CoreFoundation/,
+                          /Tcl$/,
+                          /Cocoa$/,
+                          /Carbon$/,
+                          /IOKit$/,
+                          /Tk$/,
+                          /libutil\.dylib/,
+                          /libffi\.dylib/,
+                          /libncurses\.5\.4\.dylib/,
+                          /libiconv/
+                         ]
+
     WHITELIST_FILES = [
                        /jre\/bin\/javaws/,
                        /jre\/bin\/policytool/,
                        /jre\/lib/,
                        /jre\/plugin/,
                       ]
-
-    #WHITELIST_LIBS.push(*SOLARIS_WHITELIST_LIBS)
 
     def self.log(msg)
       puts "[health_check] #{msg}"
@@ -89,15 +89,48 @@ module Omnibus
         bad_libs = health_check_ldd(install_dir)
       end
 
+      unresolved = []
+      unreliable = []
+      detail = []
+
       if bad_libs.keys.length > 0
         bad_libs.each do |name, lib_hash|
           lib_hash.each do |lib, linked_libs|
             linked_libs.each do |linked, count|
-              log "#{name}: #{lib} #{linked} #{count}"
+              if linked =~ /not found/
+                unresolved << lib unless unresolved.include? lib
+              else
+                unreliable << linked unless unreliable.include? linked
+              end
+              detail << "#{name}|#{lib}|#{linked}|#{count}"
             end
           end
         end
-        raise "Health Check Failed"
+        log "*** Health Check Failed, Summary follows:"
+        bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? "embedded/lib" }
+        log "*** The following Omnibus-built libraries have unsafe or unmet dependencies:"
+        bad_omnibus_libs.each { |lib| log "    --> #{lib}" }
+        log "*** The following Omnibus-built binaries have unsafe or unmet dependencies:"
+        bad_omnibus_bins.each { |bin| log "    --> #{bin}" }
+        if unresolved.length > 0
+          log "*** The following requirements could not be resolved:"
+          unresolved.each { |lib| log "    --> #{lib}"}
+        end
+        if unreliable.length > 0
+          log "*** The following libraries cannot be guaranteed to be on target systems:"
+          unreliable.each { |lib| log "    --> #{lib}"}
+        end
+        log "*** The precise failures were:"
+        detail.each do |line|
+          item, dependency, location, count = line.split('|')
+          reason = location =~ /not found/ ? "Unresolved dependency" : "Unsafe dependency"
+          log "    --> #{item}"
+          log "    DEPENDS ON: #{dependency}"
+          log "      COUNT: #{count}"
+          log "      PROVIDED BY: #{location}"
+          log "      FAILED BECAUSE: #{reason}"
+        end
+	raise "Health Check Failed"
       end
     end
 
@@ -139,28 +172,32 @@ module Omnibus
                        else
                          WHITELIST_LIBS
                        end
-      whitelist_libs.each do |reg| 
+      whitelist_libs.each do |reg|
         safe ||= true if reg.match(name)
       end
       WHITELIST_FILES.each do |reg|
         safe ||= true if reg.match(current_library)
       end
 
+      log "  --> Dependency: #{name}" if ARGV[0] == "verbose"
+      log "  --> Provided by: #{linked}" if ARGV[0] == "verbose"
+
       if !safe && linked !~ Regexp.new(install_dir)
+        log "    -> FAILED: #{current_library} has unsafe dependencies" if ARGV[0] == "verbose"
         bad_libs[current_library] ||= {}
-        bad_libs[current_library][name] ||= {} 
+        bad_libs[current_library][name] ||= {}
         if bad_libs[current_library][name].has_key?(linked)
-          bad_libs[current_library][name][linked] += 1 
+          bad_libs[current_library][name][linked] += 1
         else
-          bad_libs[current_library][name][linked] = 1 
+          bad_libs[current_library][name][linked] = 1
         end
       else
-        log "Passed: #{current_library} #{name} #{linked}" if ARGV[0] == 'verbose'
+        log "    -> PASSED: #{name} is either whitelisted or safely provided." if ARGV[0] == "verbose"
       end
 
       bad_libs
     end
-    
+
     def self.health_check_ldd(install_dir)
       #
       # ShellOut has GC turned off during execution, so when we're
@@ -182,6 +219,7 @@ module Omnibus
         case line
         when /^(.+):$/
           current_library = $1
+	  log "*** Analysing dependencies for #{current_library}" if ARGV[0] == "verbose"
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = $1
           linked = $2
@@ -198,13 +236,12 @@ module Omnibus
           next
         when /^\s+not a dynamic executable$/ # ignore non-executable files
         else
-          log "line did not match for #{current_library}\n#{line}"
+          log "*** Line did not match for #{current_library}\n#{line}"
         end
       end
 
       File.delete('ldd.out')
       bad_libs
     end
-
   end
 end
