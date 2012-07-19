@@ -112,10 +112,23 @@ module Omnibus
     def command(*args)
       @build_commands << args
     end
-    
-    def patch(*args) 
-      args = args.dup.pop 
-      source = File.expand_path("#{Omnibus.root}/config/patches/#{name}/#{args[:source]}")
+
+    def patch(*args)
+      args = args.dup.pop
+
+      # we'll search for a patch file in the project root AND
+      # the omnibus-software gem
+      candidate_roots = [Omnibus.root]
+      if omnibus_software = Gem::Specification.find_all_by_name('omnibus-software').first
+        candidate_roots << omnibus_software.gem_dir
+      end
+
+      candidate_paths = candidate_roots.map do |root|
+        File.expand_path("#{root}/config/patches/#{name}/#{args[:source]}")
+      end
+
+      source = candidate_paths.find{|path| File.exists?(path) }
+
       plevel = args[:plevel] || 1
       if args[:target] 
         target = File.expand_path("#{project_dir}/#{args[:target]}")
