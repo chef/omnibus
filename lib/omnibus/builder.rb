@@ -236,6 +236,7 @@ module Omnibus
         raise
       else
         retries +=1
+        log "Failed to execute cmd #{cmd} #{retries} time(s). Retrying."
         retry
       end
     end
