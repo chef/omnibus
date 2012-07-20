@@ -231,6 +231,9 @@ module Omnibus
         shell.error!
       end
     rescue Exception => e
+      # Getting lots of errors from github, particularly with erlang/rebar
+      # projects fetching tons of deps via git all the time. This isn't a
+      # particularly elegant way to solve that problem. But it should work.
       if retries >= 3
         ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
         raise
