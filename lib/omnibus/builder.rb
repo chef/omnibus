@@ -202,6 +202,7 @@ module Omnibus
     end
 
     def execute_sh(cmd)
+      retries ||= 0
       shell = nil
       cmd_args = Array(cmd)
       options = {
@@ -230,8 +231,17 @@ module Omnibus
         shell.error!
       end
     rescue Exception => e
-      ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
-      raise
+      # Getting lots of errors from github, particularly with erlang/rebar
+      # projects fetching tons of deps via git all the time. This isn't a
+      # particularly elegant way to solve that problem. But it should work.
+      if retries >= 3
+        ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
+        raise
+      else
+        retries +=1
+        log "Failed to execute cmd #{cmd} #{retries} time(s). Retrying."
+        retry
+      end
     end
 
     def prepend_cmd(str, *cmd_args)
