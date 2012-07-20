@@ -58,6 +58,7 @@ E
     end
 
     def fetch
+      retries ||= 0
       if existing_git_clone?
         fetch_updates unless current_rev_matches_target_rev?
       else
@@ -65,8 +66,15 @@ E
         checkout
       end
     rescue Exception => e
-      ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
-      raise
+      if retries >= 3
+        ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
+        raise
+      else
+        # Deal with github failing all the time :(
+        retries += 1
+        log "git clone/fetch failed for #{@source} #{retries} time(s), retrying"
+        retry
+      end
     end
 
     private
