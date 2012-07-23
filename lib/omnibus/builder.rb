@@ -238,8 +238,10 @@ module Omnibus
         ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
         raise
       else
+        time_to_sleep = 5 * (2 ** retries)
         retries +=1
-        log "Failed to execute cmd #{cmd} #{retries} time(s). Retrying."
+        log "Failed to execute cmd #{cmd} #{retries} time(s). Retrying in #{time_to_sleep}s."
+        sleep(time_to_sleep)
         retry
       end
     end

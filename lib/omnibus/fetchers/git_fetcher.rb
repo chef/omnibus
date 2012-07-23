@@ -71,8 +71,10 @@ E
         raise
       else
         # Deal with github failing all the time :(
+        time_to_sleep = 5 * (2 ** retries)
         retries += 1
-        log "git clone/fetch failed for #{@source} #{retries} time(s), retrying"
+        log "git clone/fetch failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
+        sleep(time_to_sleep)
         retry
       end
     end
