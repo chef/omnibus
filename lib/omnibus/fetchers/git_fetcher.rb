@@ -141,6 +141,7 @@ E
     end
 
     def revision_from_remote_reference(ref)
+      retries ||= 0
       # execute `git ls-remote`
       cmd = "git ls-remote origin #{ref}"
       shell = Mixlib::ShellOut.new(cmd, :live_stream => STDOUT, :cwd => project_dir)
@@ -153,6 +154,18 @@ E
         raise "Could not parse SHA reference"
       end
       return $1
+    rescue Exception => e
+      if retries >= 3
+        ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
+        raise
+      else
+        # Deal with github failing all the time :(
+        time_to_sleep = 5 * (2 ** retries)
+        retries += 1
+        log "git ls-remote failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
+        sleep(time_to_sleep)
+        retry
+      end
     end
   end
 end
