@@ -106,3 +106,13 @@ directory "/var/cache/omnibus" do
   recursive true
 end
 
+# Turn off strict host key checking for github
+# Ensure SSH_AUTH_SOCK is honored under sudo
+execute 'tweak-git' do
+  command <<-EOH
+echo '\nHost github.com\n\tStrictHostKeyChecking no' >> /etc/ssh/ssh_config
+echo '\nDefaults env_keep+=SSH_AUTH_SOCK' >> /etc/sudoers
+  EOH
+  action :run
+  not_if "cat /etc/ssh/ssh_config | grep github.com"
+end
