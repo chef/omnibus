@@ -53,7 +53,14 @@ module Omnibus
                               /libssl.so/,
                               /libthread.so/,
                               /libuutil\.so/,
-                              /libz.so/
+                              /libz.so/,
+                              # solaris 11 libraries:
+                              /libc\.so\.1/,
+                              /libm\.so\.2/,
+                              /libdl\.so\.1/,
+                              /libnsl\.so\.1/,
+                              /libpthread\.so\.1/,
+                              /librt\.so\.1/,
                              ]
 
     MAC_WHITELIST_LIBS = [
