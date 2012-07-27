@@ -62,6 +62,7 @@ module Omnibus
                               /libpthread\.so\.1/,
                               /librt\.so\.1/,
                               /libcrypt\.so\.1/,
+                              /libgdbm\.so\.3/,
                              ]
 
     MAC_WHITELIST_LIBS = [
