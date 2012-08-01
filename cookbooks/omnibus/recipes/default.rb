@@ -23,6 +23,7 @@
 
 # make certain our chef-solo cache dir exists
 directory "#{Chef::Config[:file_cache_path]}" do
+  recursive true
   action :create
 end
 
