@@ -43,7 +43,7 @@ include_recipe "python"
 
 # install ruby and symlink the binaries to /usr/local
 include_recipe "ruby_1.9"
-%w{ruby gem rake bundle fpm}.each do |bin|
+%w{ruby gem rake bundle fpm ronn}.each do |bin|
   link "/usr/local/bin/#{bin}" do
     to "/opt/ruby1.9/bin/#{bin}"
   end
