@@ -86,7 +86,7 @@ xml_pkgs.each do |pkg|
 end
 
 if node['platform'] == "solaris2"
-  %w{libxml2_dev libxslt_dev}.each do |pkg|
+  %w{libxml2_dev libxslt_dev libssl_dev libyaml}.each do |pkg|
     opencsw pkg
   end
 end
