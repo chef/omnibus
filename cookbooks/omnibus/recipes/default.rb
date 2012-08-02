@@ -32,6 +32,9 @@ when "ubuntu", "debian"
   include_recipe "apt"
 when "centos"
   include_recipe "yum"
+when "solaris2"
+  include_recipe "opencsw"
+  include_recipe "solaris_omgwtfbbq"
 end
 
 include_recipe "build-essential"
@@ -46,74 +49,74 @@ include_recipe "ruby_1.9"
   end
 end
 
-# install the packaging related packages
-package_pkgs = value_for_platform(
-  ["ubuntu", "debian"] => {
-    "default" => ["dpkg-dev"]
-  },
-  ["centos"] => {
-    "default" => ["rpm-build"]
-  },
-  ["mac_os_x"] => {
-    "default" => [],
-  }
-)
-package_pkgs.each do |pkg|
-  package pkg do
-    action :install
-  end
-end
-
-# install the libxml / libxslt packages
-xml_pkgs = value_for_platform(
-  ["ubuntu", "debian"] => {
-    "default" => ["libxml2", "libxml2-dev", "libxslt1.1", "libxslt1-dev"]
-  },
-  ["centos"] => {
-    "default" => ["libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
-  },
-  ["mac_os_x"] => {
-    "default" => [],
-  }
-)
-xml_pkgs.each do |pkg|
-  package pkg do
-    action :install
-  end
-end
-
-%w{libtool help2man gettext texinfo}.each do |name|
-  package name
-end
-
-bash "install python packages" do
-  code <<BASH
-pip install Sphinx==1.1.2
-pip install Pygments==1.4
-BASH
-end
-
-node['omnibus']['install-dirs'].each do |d|
-  directory d do
-    mode "755"
-    owner node["omnibus"]["build-user"]
-    recursive true
-  end
-end
-
-directory "/var/cache/omnibus" do
-  mode "755"
-  owner node["omnibus"]["build-user"]
-  recursive true
-end
-
-# Turn off strict host key checking for github
-# Ensure SSH_AUTH_SOCK is honored under sudo
-execute 'tweak-git' do
-  command <<-EOH
-echo '\nHost github.com\n\tStrictHostKeyChecking no' >> /etc/ssh/ssh_config
-echo '\nDefaults env_keep+=SSH_AUTH_SOCK' >> /etc/sudoers
-  EOH
-  action :run
-  not_if "cat /etc/ssh/ssh_config | grep github.com"
-end
+## install the packaging related packages
+#package_pkgs = value_for_platform(
+#  ["ubuntu", "debian"] => {
+#    "default" => ["dpkg-dev"]
+#  },
+#  ["centos"] => {
+#    "default" => ["rpm-build"]
+#  },
+#  ["mac_os_x"] => {
+#    "default" => [],
+#  }
+#)
+#package_pkgs.each do |pkg|
+#  package pkg do
+#    action :install
+#  end
+#end
+#
+## install the libxml / libxslt packages
+#xml_pkgs = value_for_platform(
+#  ["ubuntu", "debian"] => {
+#    "default" => ["libxml2", "libxml2-dev", "libxslt1.1", "libxslt1-dev"]
+#  },
+#  ["centos"] => {
+#    "default" => ["libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
+#  },
+#  ["mac_os_x"] => {
+#    "default" => [],
+#  }
+#)
+#xml_pkgs.each do |pkg|
+#  package pkg do
+#    action :install
+#  end
+#end
+#
+#%w{libtool help2man gettext texinfo}.each do |name|
+#  package name
+#end
+#
+#bash "install python packages" do
+#  code <<BASH
+#pip install Sphinx==1.1.2
+#pip install Pygments==1.4
+#BASH
+#end
+#
+#node['omnibus']['install-dirs'].each do |d|
+#  directory d do
+#    mode "755"
+#    owner node["omnibus"]["build-user"]
+#    recursive true
+#  end
+#end
+#
+#directory "/var/cache/omnibus" do
+#  mode "755"
+#  owner node["omnibus"]["build-user"]
+#  recursive true
+#end
+#
+## Turn off strict host key checking for github
+## Ensure SSH_AUTH_SOCK is honored under sudo
+#execute 'tweak-git' do
+#  command <<-EOH
+#echo '\nHost github.com\n\tStrictHostKeyChecking no' >> /etc/ssh/ssh_config
+#echo '\nDefaults env_keep+=SSH_AUTH_SOCK' >> /etc/sudoers
+#  EOH
+#  action :run
+#  not_if "cat /etc/ssh/ssh_config | grep github.com"
+#end

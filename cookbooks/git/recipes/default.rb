@@ -25,6 +25,8 @@ when "centos","redhat","scientific","fedora"
     include_recipe "yum::epel"
   end
   package "git"
+when "solaris2"
+  opencsw "git"
 else
   package "git"
 end
