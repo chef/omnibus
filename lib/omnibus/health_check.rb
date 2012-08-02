@@ -65,6 +65,8 @@ module Omnibus
                               /libgdbm\.so\.3/,
                               # solaris 9 libraries:
                               /libm\.so\.1/,
+                              /libc_psr\.so\.1/,
+                              /s9_preload\.so\.1/,
                              ]
 
     MAC_WHITELIST_LIBS = [
