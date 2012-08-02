@@ -9,15 +9,23 @@ include_recipe "opencsw"
   opencsw pkg
 end
 
-bash "symlinks for using gnu utilities on solaris" do
-  code <<-EOH
-    ln -s /opt/csw/bin/gmake /opt/csw/bin/make
-    ln -s /opt/csw/bin/gtar /opt/csw/bin/tar
-    ln -s /opt/csw/bin/ginstall /opt/csw/bin/install
-    ln -s /opt/csw/bin/ggrep /opt/csw/bin/grep
-    ln -s /opt/csw/bin/gegrep /opt/csw/bin/egrep
-    ln -s /opt/csw/bin/gfgrep /opt/csw/bin/fgrep
-  EOH
+link "/opt/csw/bin/make" do
+  to "/opt/csw/bin/gmake"
+end
+link "/opt/csw/bin/tar" do
+  to "/opt/csw/bin/gtar"
+end
+link "/opt/csw/bin/install" do
+  to "/opt/csw/bin/ginstall"
+end
+link "/opt/csw/bin/grep" do
+  to "/opt/csw/bin/ggrep"
+end
+link "/opt/csw/bin/egrep" do
+  to "/opt/csw/bin/gegrep"
+end
+link "/opt/csw/bin/fgrep" do
+  to "/opt/csw/bin/gfgrep"
 end
 
 template "/.profile" do

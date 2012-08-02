@@ -86,7 +86,7 @@ xml_pkgs.each do |pkg|
 end
 
 if node['platform'] == "solaris2"
-  %w{libxml2-dev libxslt_dev}.each do |pkg|
+  %w{libxml2_dev libxslt_dev}.each do |pkg|
     opencsw pkg
   end
 end
@@ -96,7 +96,12 @@ if node['platform'] != "solaris2"
     package name
   end
 else
-  %w{
+  %w{libtool help2man ggettext texinfo}.each do |pkg|
+    opencsw pkg
+  end
+  link "/opt/csw/bin/gettext" do
+    to "/opt/csw/bin/gettext"
+  end
 end
 
 #bash "install python packages" do
