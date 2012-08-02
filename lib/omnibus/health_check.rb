@@ -63,6 +63,8 @@ module Omnibus
                               /librt\.so\.1/,
                               /libcrypt\.so\.1/,
                               /libgdbm\.so\.3/,
+                              # solaris 9 libraries:
+                              /libm\.so\.1/,
                              ]
 
     MAC_WHITELIST_LIBS = [
