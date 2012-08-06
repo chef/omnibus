@@ -5,6 +5,23 @@ return unless node['platform'] == "solaris2"
 
 ENV['PATH'] = "/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/bin"
 
+template "/etc/default/su" do
+end
+
+template "/etc/default/login" do
+  source "default.login"
+  user   "root"
+  group  "sys"
+  mode   "0444"
+end
+
+template "/etc/default/su" do
+  source "su.login"
+  user   "root"
+  group  "sys"
+  mode   "0444"
+end
+
 include_recipe "opencsw"
 
 %w{gmake ggrep coreutils gtar}.each do |pkg|
