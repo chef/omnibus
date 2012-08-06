@@ -5,7 +5,7 @@ return unless node['platform'] == "solaris2"
 
 ENV['PATH'] = "/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/bin"
 
-node.default['omnibus']['build-user'] = 'jenkins'
+node.normal['omnibus']['build-user'] = 'jenkins'
 
 template "/etc/default/login" do
   source "default.login"
