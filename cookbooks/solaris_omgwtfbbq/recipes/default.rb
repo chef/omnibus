@@ -32,6 +32,10 @@ end
 
 include_recipe "opencsw"
 
+%w{gcc3core gcc3g++}.each do |pkg|
+  opencsw pkg
+end
+
 %w{gmake ggrep coreutils gtar}.each do |pkg|
   opencsw pkg
 end
