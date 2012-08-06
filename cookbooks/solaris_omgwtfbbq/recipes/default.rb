@@ -7,11 +7,13 @@ ENV['PATH'] = "/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/
 
 node.normal['omnibus']['build-user'] = 'jenkins'
 
-directory "/usr/local/bin" do
-  owner  "root"
-  group  "sys"
-  mode   "0755"
-  action :create
+%w{/usr/local /usr/local/bin}.each do |dir|
+  directory dir do
+    owner  "root"
+    group  "sys"
+    mode   "0755"
+    action :create
+  end
 end
 
 template "/etc/default/login" do
