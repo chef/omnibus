@@ -3,6 +3,8 @@
 
 return unless node['platform'] == "solaris2"
 
+ENV['PATH'] = "/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/bin"
+
 include_recipe "opencsw"
 
 %w{gmake ggrep coreutils gtar}.each do |pkg|
