@@ -15,7 +15,7 @@ template "/etc/default/login" do
 end
 
 template "/etc/default/su" do
-  source "su.login"
+  source "default.su"
   user   "root"
   group  "sys"
   mode   "0444"
