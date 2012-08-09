@@ -159,13 +159,14 @@ module Omnibus
     end
 
     def makeself_command
-      command_and_opts = [ File.expand_path(File.join(Omnibus.root, "bin", "makeself.sh")),
+      command_and_opts = [ File.expand_path(File.join(Omnibus.gem_root, "bin", "makeself.sh")),
                            "--gzip",
                            install_path,
                            "#{package_name}-#{build_version}_#{iteration}.sh",
-                           "The full stack of #{@name}",
-                           "#{package_scripts_path}/postinst"
+                           "The full stack of #{@name}"
                          ]
+      command_and_opts << "./makeselfinst" if File.exists?("#{package_scripts_path}/makeselfinst")
+      command_and_opts
     end
 
     def render_tasks
