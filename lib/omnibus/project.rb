@@ -122,7 +122,7 @@ module Omnibus
       when 'solaris2'
         [ "solaris" ]
       else
-        [ "tar" ]
+        [ "makeself" ]
       end
     end
 
@@ -158,11 +158,14 @@ module Omnibus
       command_and_opts
     end
 
-    def tar_command(pkg_type)
-      command_and_opts = [ "tar",
-                           "zcvf",
-                           "#{package_name}-#{build_version}_#{iteration}.tar.gz",
-                           "#{install_path}"]
+    def makeself_command
+      command_and_opts = [ File.expand_path(File.join(Omnibus.root, "bin", "makeself.sh")),
+                           "--gzip",
+                           install_path,
+                           "#{package_name}-#{build_version}_#{iteration}.sh",
+                           "The full stack of #{@name}",
+                           "#{package_scripts_path}/postinst"
+                         ]
     end
 
     def render_tasks
@@ -176,19 +179,33 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
-              if pkg_type == "tar"
-                fpm_full_cmd = tar_command(pkg_type).join(" ")
-              else
-                fpm_full_cmd = fpm_command(pkg_type).join(" ")
-              end
-              puts "[project:#{name}] Executing `#{fpm_full_cmd}`"
+              package_commands = []
+              if pkg_type == "makeself"
+                # copy the makeself installer into package
+                if File.exists?("#{package_scripts_path}/makeselfinst")
+                  package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
+                end
 
-              shell = Mixlib::ShellOut.new(fpm_full_cmd,
-                                           :live_stream => STDOUT,
-                                           :timeout => 3600,
-                                           :cwd => config.package_dir)
-              shell.run_command
-              shell.error!
+                # run the makeself program
+                package_commands << makeself_command(pkg_type).join(" ")
+
+                # rm the makeself installer (for incremental builds)
+                package_commands << "rm -f #{install_path}/makeselfinst"
+              else # pkg_type == "fpm"
+                package_commands <<  fpm_command(pkg_type).join(" ")
+              end
+
+              # run the commands
+              package_commands.each do |cmd|
+                puts "[project:#{name}] Executing `#{cmd}`"
+
+                shell = Mixlib::ShellOut.new(cmd,
+                                             :live_stream => STDOUT,
+                                             :timeout => 3600,
+                                             :cwd => config.package_dir)
+                shell.run_command
+                shell.error!
+              end
             end
 
             task pkg_type => config.package_dir
