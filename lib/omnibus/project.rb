@@ -188,7 +188,7 @@ module Omnibus
                 end
 
                 # run the makeself program
-                package_commands << makeself_command(pkg_type).join(" ")
+                package_commands << makeself_command.join(" ")
 
                 # rm the makeself installer (for incremental builds)
                 package_commands << "rm -f #{install_path}/makeselfinst"
