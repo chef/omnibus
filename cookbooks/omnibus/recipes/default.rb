@@ -23,6 +23,7 @@
 
 # make certain our chef-solo cache dir exists
 directory "#{Chef::Config[:file_cache_path]}" do
+  recursive true
   action :create
 end
 
@@ -31,6 +32,9 @@ when "ubuntu", "debian"
   include_recipe "apt"
 when "centos"
   include_recipe "yum"
+when "solaris2"
+  include_recipe "opencsw"
+  include_recipe "solaris_omgwtfbbq"
 end
 
 include_recipe "build-essential"
@@ -39,7 +43,7 @@ include_recipe "python"
 
 # install ruby and symlink the binaries to /usr/local
 include_recipe "ruby_1.9"
-%w{ruby gem rake bundle fpm}.each do |bin|
+%w{ruby gem rake bundle fpm ronn}.each do |bin|
   link "/usr/local/bin/#{bin}" do
     to "/opt/ruby1.9/bin/#{bin}"
   end
@@ -53,7 +57,7 @@ package_pkgs = value_for_platform(
   ["centos"] => {
     "default" => ["rpm-build"]
   },
-  ["mac_os_x"] => {
+  ["mac_os_x", "solaris2"] => {
     "default" => [],
   }
 )
@@ -71,7 +75,7 @@ xml_pkgs = value_for_platform(
   ["centos"] => {
     "default" => ["libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]
   },
-  ["mac_os_x"] => {
+  ["mac_os_x", "solaris2"] => {
     "default" => [],
   }
 )
@@ -81,16 +85,31 @@ xml_pkgs.each do |pkg|
   end
 end
 
-%w{libtool help2man gettext texinfo}.each do |name|
-  package name
+if node['platform'] == "solaris2"
+  %w{libxml2_dev libxslt_dev libssl_dev libyaml}.each do |pkg|
+    opencsw pkg
+  end
 end
 
-bash "install python packages" do
-  code <<BASH
-pip install Sphinx==1.1.2
-pip install Pygments==1.4
-BASH
+if node['platform'] != "solaris2"
+  %w{libtool help2man gettext texinfo}.each do |name|
+    package name
+  end
+else
+  %w{libtool help2man ggettext texinfo}.each do |pkg|
+    opencsw pkg
+  end
+  link "/opt/csw/bin/gettext" do
+    to "/opt/csw/bin/gettext"
+  end
 end
+
+#bash "install python packages" do
+#  code <<BASH
+#pip install Sphinx==1.1.2
+#pip install Pygments==1.4
+#BASH
+#end
 
 node['omnibus']['install-dirs'].each do |d|
   directory d do
@@ -106,13 +125,13 @@ directory "/var/cache/omnibus" do
   recursive true
 end
 
-# Turn off strict host key checking for github
-# Ensure SSH_AUTH_SOCK is honored under sudo
-execute 'tweak-git' do
-  command <<-EOH
-echo '\nHost github.com\n\tStrictHostKeyChecking no' >> /etc/ssh/ssh_config
-echo '\nDefaults env_keep+=SSH_AUTH_SOCK' >> /etc/sudoers
-  EOH
-  action :run
-  not_if "cat /etc/ssh/ssh_config | grep github.com"
-end
+## Turn off strict host key checking for github
+## Ensure SSH_AUTH_SOCK is honored under sudo
+#execute 'tweak-git' do
+#  command <<-EOH
+#echo '\nHost github.com\n\tStrictHostKeyChecking no' >> /etc/ssh/ssh_config
+#echo '\nDefaults env_keep+=SSH_AUTH_SOCK' >> /etc/sudoers
+#  EOH
+#  action :run
+#  not_if "cat /etc/ssh/ssh_config | grep github.com"
+#end

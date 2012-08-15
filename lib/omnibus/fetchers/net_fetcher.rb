@@ -142,7 +142,7 @@ E
 
     def extract
       log "extracting the source in #{project_file} to #{source_dir}"
-      shell = Mixlib::ShellOut.new("gzip -dc #{project_file} | tar -xf - -C #{source_dir}", :live_stream => STDOUT)
+      shell = Mixlib::ShellOut.new("gzip -dc #{project_file} | ( cd #{source_dir} && tar -xf - )", :live_stream => STDOUT)
       shell.run_command
       shell.error!
     rescue Exception => e

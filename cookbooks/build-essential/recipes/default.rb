@@ -19,7 +19,7 @@
 
 case node['platform']
 when "ubuntu","debian"
-  %w{build-essential binutils-doc}.each do |pkg|
+  %w{autoconf flex bison build-essential binutils-doc}.each do |pkg|
     package pkg do
       action :install
     end
@@ -44,31 +44,37 @@ when "centos"
   pkgs << "zlib"
   pkgs << "zlib-devel"
   pkgs << "openssl-devel"
+  pkgs << "autoconf"
+  pkgs << "flex"
+  pkgs << "bison"
   pkgs.each do |pkg|
     package pkg do
       action :install
     end
   end
 when "redhat","fedora"
-  %w{gcc gcc-c++ kernel-devel make}.each do |pkg|
+  %w{autoconf flex bison gcc gcc-c++ kernel-devel make}.each do |pkg|
     package pkg do
       action :install
     end
   end
 when "mac_os_x"
   include_recipe "homebrew"
+when "solaris2"
+  %w{
+    gcc4core
+    gcc4g++
+    gcc4objc
+    flex
+    bison
+    autoconf
+    automake
+    gmake
+    ggrep
+    coreutils 
+    pkgconfig
+  }.each do |pkg|
+    opencsw pkg
+  end
 end
 
-unless node['platform'] == "mac_os_x"
-  package "autoconf" do
-    action :install
-  end
-
-  package "flex" do
-    action :install
-  end
-
-  package "bison" do
-    action :install
-  end
-end

@@ -15,14 +15,13 @@ GEM
     fpm (0.3.11)
       json
     ipaddress (0.8.0)
-    json (1.6.6)
-    mime-types (1.18)
+    json (1.7.4)
+    mime-types (1.19)
     mixlib-cli (1.2.2)
     mixlib-config (1.1.2)
-    mixlib-log (1.3.0)
-    mixlib-shellout (1.0.0)
-    net-http-persistent (2.6)
-    ohai (0.6.12)
+    mixlib-log (1.4.1)
+    mixlib-shellout (1.1.0)
+    ohai (6.14.0)
       ipaddress
       mixlib-cli
       mixlib-config
@@ -30,18 +29,17 @@ GEM
       systemu
       yajl-ruby
     rake (0.9.2.2)
-    rspec (2.8.0)
-      rspec-core (~> 2.8.0)
-      rspec-expectations (~> 2.8.0)
-      rspec-mocks (~> 2.8.0)
-    rspec-core (2.8.0)
-    rspec-expectations (2.8.0)
-      diff-lcs (~> 1.1.2)
-    rspec-mocks (2.8.0)
-    systemu (2.5.0)
-    uber-s3 (0.1.9)
+    rspec (2.11.0)
+      rspec-core (~> 2.11.0)
+      rspec-expectations (~> 2.11.0)
+      rspec-mocks (~> 2.11.0)
+    rspec-core (2.11.1)
+    rspec-expectations (2.11.2)
+      diff-lcs (~> 1.1.3)
+    rspec-mocks (2.11.1)
+    systemu (2.5.2)
+    uber-s3 (0.2.4)
       mime-types (~> 1.17)
-      net-http-persistent (~> 2.5)
     yajl-ruby (1.1.0)
 
 PLATFORMS

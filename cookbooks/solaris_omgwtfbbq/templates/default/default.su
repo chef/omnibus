@@ -1,0 +1,25 @@
+#ident  "@(#)su.dfl     1.6     93/08/14 SMI"   /* SVr4.0 1.2   */
+
+# SULOG determines the location of the file used to log all su attempts
+#
+SULOG=/var/adm/sulog
+
+# CONSOLE determines whether attempts to su to root should be logged
+# to the named device
+#
+#CONSOLE=/dev/console
+
+# PATH sets the initial shell PATH variable
+#
+PATH=/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/bin
+
+# SUPATH sets the initial shell PATH variable for root
+#
+SUPATH=/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/bin
+
+# SYSLOG determines whether the syslog(3) LOG_AUTH facility should be used
+# to log all su attempts.  LOG_NOTICE messages are generated for su's to
+# root, LOG_INFO messages are generated for su's to other users, and LOG_CRIT
+# messages are generated for failed su attempts.
+#
+SYSLOG=YES
