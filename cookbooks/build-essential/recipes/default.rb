@@ -72,6 +72,7 @@ when "solaris2"
     gmake
     ggrep
     coreutils 
+    pkgconfig
   }.each do |pkg|
     opencsw pkg
   end
