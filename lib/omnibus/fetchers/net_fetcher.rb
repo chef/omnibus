@@ -104,33 +104,35 @@ E
 
     def download
       tries = 5
-      loop do
-        begin
-          log "\033[1;31m#{source[:warning]}\033[0m" if source.has_key?(:warning)
-          log "fetching #{project_file} from #{source_uri}"
-    
-          case source_uri.scheme
-          when /https?/
-            headers = { 
-              'accept-encoding' => '',
-            }
-            if source.has_key?(:cookie)
-              headers['Cookie'] = source[:cookie]
-            end
-            get_with_redirect(source_uri, headers)
-          when "ftp"
-            Net::FTP.open(source_uri.host) do |ftp|
-              ftp.passive = true
-              ftp.login
-              ftp.getbinaryfile(source_uri.path, project_file)
-              ftp.close
-            end
-          else
-            raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
+      begin
+        log "\033[1;31m#{source[:warning]}\033[0m" if source.has_key?(:warning)
+        log "fetching #{project_file} from #{source_uri}"
+  
+        case source_uri.scheme
+        when /https?/
+          headers = { 
+            'accept-encoding' => '',
+          }
+          if source.has_key?(:cookie)
+            headers['Cookie'] = source[:cookie]
           end
-        rescue Exception => e
-          raise if ( tries -= 1 ) == 0
+          get_with_redirect(source_uri, headers)
+        when "ftp"
+          Net::FTP.open(source_uri.host) do |ftp|
+            ftp.passive = true
+            ftp.login
+            ftp.getbinaryfile(source_uri.path, project_file)
+            ftp.close
+          end
+        else
+          raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
+        end
+      rescue Exception => e
+        if ( tries -= 1 ) != 0
           log "retrying failed download..."
+          retry
+        else
+          raise
         end
       end
     rescue Exception => e
