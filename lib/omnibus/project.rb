@@ -163,7 +163,7 @@ module Omnibus
                            "--gzip",
                            install_path,
                            "#{package_name}-#{build_version}_#{iteration}.sh",
-                           "The full stack of #{@name}"
+                           "'The full stack of #{@name}'"
                          ]
       command_and_opts << "./makeselfinst" if File.exists?("#{package_scripts_path}/makeselfinst")
       command_and_opts
