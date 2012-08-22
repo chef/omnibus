@@ -140,20 +140,23 @@ E
       rev =~ /^[0-9a-f]{40}$/
     end
 
+    # Return the SHA corresponding to ref. If ref is an annotated tag,
+    # return the SHA that was tagged not the SHA of the tag itself.
     def revision_from_remote_reference(ref)
       retries ||= 0
-      # execute `git ls-remote`
-      cmd = "git ls-remote origin #{ref}"
+      # execute `git ls-remote` the trailing '*' does globbing. This
+      # allows us to return the SHA of the tagged commit for annotated
+      # tags. We take care to only return exact matches in
+      # process_remote_list.
+      cmd = "git ls-remote origin #{ref}*"
       shell = Mixlib::ShellOut.new(cmd, :live_stream => STDOUT, :cwd => project_dir)
       shell.run_command
       shell.error!
-      stdout = shell.stdout
-
-      # parse the output for the git SHA
-      unless stdout =~ /^([0-9a-f]{40})\s+(\S+)/
+      commit_ref = process_remote_list(shell.stdout, ref)
+      if !commit_ref
         raise "Could not parse SHA reference"
       end
-      return $1
+      commit_ref
     rescue Exception => e
       if retries >= 3
         ErrorReporter.new(e, self).explain("Failed to fetch git repository '#{@source[:git]}'")
@@ -165,6 +168,39 @@ E
         log "git ls-remote failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
         sleep(time_to_sleep)
         retry
+      end
+    end
+
+    def process_remote_list(stdout, ref)
+      # Dereference annotated tags.
+      #
+      # Output will look like this:
+      #
+      # a2ed66c01f42514bcab77fd628149eccb4ecee28        refs/tags/rel-0.11.0
+      # f915286abdbc1907878376cce9222ac0b08b12b8        refs/tags/rel-0.11.0^{}
+      #
+      # The SHA with ^{} is the commit pointed to by an annotated
+      # tag. If ref isn't an annotated tag, there will not be a line
+      # with trailing ^{}.
+      #
+      # We'll return the SHA corresponding to the ^{} which is the
+      # commit pointed to by an annotated tag. If no such commit
+      # exists (not an annotated tag) then we return the SHA of the
+      # ref.  If nothing matches, return "".
+      lines = stdout.split("\n")
+      matches = lines.map { |line| line.split("\t") }
+      # first try for ^{} indicating the commit pointed to by an
+      # annotated tag
+      tagged_commit = matches.find { |m| m[1].end_with?("#{ref}^{}") }
+      if tagged_commit
+        tagged_commit[0]
+      else
+        found = matches.find { |m| m[1].end_with?("#{ref}") }
+        if found
+          found[0]
+        else
+          nil
+        end
       end
     end
   end
