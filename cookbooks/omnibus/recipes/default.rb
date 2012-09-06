@@ -31,7 +31,7 @@ case node['platform']
 when "ubuntu", "debian"
   include_recipe "apt"
 when "centos"
-  include_recipe "yum"
+  include_recipe "yum::epel"
 when "solaris2"
   include_recipe "opencsw"
   include_recipe "solaris_omgwtfbbq"

@@ -17,25 +17,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-major = node['platform_version'].to_i
-epel  = node['yum']['epel_release']
+if platform?("amazon")
+  # Enable the amazon-provided epel repository
+  execute "enable-epel-repository" do
+    command "yum-config-manager --quiet --enable epel"
+  end
 
-# If rpm installation from a URL supported 302's, we'd just use that.
-# Instead, we get to remote_file then rpm_package.
+else
+  major = node['platform_version'].to_i
+  epel  = node['yum']['epel_release']
+  if node[:kernel][:machine] == "i686"
+     rpm_arch = "i386"
+  else
+     rpm_arch = node[:kernel][:machine]
+  end
 
-remote_file "#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm" do
-  source "http://download.fedoraproject.org/pub/epel/#{major}/i386/epel-release-#{epel}.noarch.rpm"
-  not_if "rpm -qa | egrep -qx 'epel-release-#{epel}(|.noarch)'"
-  notifies :install, "rpm_package[epel-release]", :immediately
-end
+  # If rpm installation from a URL supported 302's, we'd just use that.
+  # Instead, we get to remote_file then rpm_package.
 
-rpm_package "epel-release" do
-  source "#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm"
-  only_if {::File.exists?("#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm")}
-  action :nothing
-end
+  remote_file "#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm" do
+    source "http://download.fedoraproject.org/pub/epel/#{major}/#{rpm_arch}/epel-release-#{epel}.noarch.rpm"
+    not_if "rpm -qa | egrep -qx 'epel-release-#{epel}(|.noarch)'"
+    notifies :install, "rpm_package[epel-release]", :immediately
+    retries 5 # We may be redirected to a FTP URL, CHEF-1031.
+  end
 
-file "epel-release-cleanup" do
-  path "#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm"
-  action :delete
+  rpm_package "epel-release" do
+    source "#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm"
+    only_if {::File.exists?("#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm")}
+    action :nothing
+  end
+
+  file "epel-release-cleanup" do
+    path "#{Chef::Config[:file_cache_path]}/epel-release-#{epel}.noarch.rpm"
+    action :delete
+  end
 end

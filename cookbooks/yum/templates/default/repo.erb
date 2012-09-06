@@ -5,10 +5,9 @@ name=<%= @description %>
 <% if @type %>
 type=<%= @type %>
 <% end %>
-<% if @mirrorlist %>
-mirrorlist=<%= @url %>
-<% else %>
 baseurl=<%= @url %>
+<% if @mirrorlist %>
+mirrorlist=<%= @mirrorlist %>
 <% end %>
 <% if @key %>
 gpgcheck=1
@@ -22,4 +21,7 @@ failovermethod=<%= @failovermethod %>
 <% end %>
 <% if @bootstrapurl %>
 bootstrapurl=<%= @bootstrapurl %>
+<% end %>
+<% if @includepkgs %>
+includepkgs=<%= @includepkgs %>
 <% end %>
