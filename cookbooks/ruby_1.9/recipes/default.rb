@@ -6,9 +6,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +20,16 @@
 
 include_recipe "build-essential"
 
-# ensure ruby1.9 builds with openssl gem
+# fix yaml and ensure ruby1.9 builds with openssl gem
 case node[:platform]
 when "ubuntu", "debian"
+  package "libtool"
+  package "libyaml-dev"
   package "libssl-dev"
+when "centos", "redhat"
+  package "libtool"
+  package "libyaml-devel"
+  package "openssl-devel"
 end
 
 # Download the ruby source for 1.9.3. Skip the download if:
@@ -42,15 +48,19 @@ end
 # Install ruby from source unless it already exists at the correct
 # version
 #
-bash "install ruby-1.9.3" do
+execute "install ruby-1.9.3" do
   cwd "/tmp"
-  code <<-EOH
+  command <<-EOH
 tar zxf ruby-1.9.3-p194.tar.gz
 cd ruby-1.9.3-p194
 ./configure --prefix=/opt/ruby1.9
 make
 make install
 EOH
+  environment(
+    'CFLAGS' => '-L/usr/lib -I/usr/include',
+    'LDFLAGS' => '-L/usr/lib -R/usr/lib -I/usr/include'
+  )
   not_if do
     ::File.exists?("/opt/ruby1.9/bin/ruby") &&
       system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'")
