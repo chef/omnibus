@@ -33,6 +33,13 @@ action :add do
     execute "yum -q makecache" do
       action :nothing
     end
+    #reload internal Chef yum cache
+    ruby_block "reload-internal-yum-cache" do
+      block do
+        Chef::Provider::Package::Yum::YumCache.instance.reload
+      end
+      action :nothing
+    end
     #write out the file
     template "/etc/yum.repos.d/#{new_resource.repo_name}.repo" do
       cookbook "yum"
@@ -47,9 +54,13 @@ action :add do
                   :enabled => new_resource.enabled,
                   :type => new_resource.type,
                   :failovermethod => new_resource.failovermethod,
-                  :bootstrapurl => new_resource.bootstrapurl
+                  :bootstrapurl => new_resource.bootstrapurl,
+                  :includepkgs => new_resource.includepkgs
                 })
-      notifies :run, resources(:execute => "yum -q makecache"), :immediately
+      if new_resource.make_cache
+        notifies :run, resources(:execute => "yum -q makecache"), :immediately
+        notifies :create, resources(:ruby_block => "reload-internal-yum-cache"), :immediately
+      end
     end
   end
 end
