@@ -2,17 +2,17 @@ maintainer        "Opscode, Inc."
 maintainer_email  "cookbooks@opscode.com"
 license           "Apache 2.0"
 long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version           "0.5.2"
-recipe            "yum", "Runs 'yum update' during compile phase"
-recipe            "yum::yum", "manages yum configuration"
+version           "0.8.0"
+recipe            "yum", "Empty recipe."
+recipe            "yum::yum", "Manages yum configuration"
 
-%w{ redhat centos scientific }.each do |os|
+%w{ redhat centos scientific amazon }.each do |os|
   supports os, ">= 5.0"
 end
 
 attribute "yum/exclude",
   :display_name => "yum.conf exclude",
-  :description => "List of packages to exclude from updates or installs. This should be a space separated list.  Shell globs using wildcards (eg. * and ?) are allowed.",
+  :description => "List of packages to exclude from updates or installs. This should be an array.  Shell globs using wildcards (eg. * and ?) are allowed.",
   :required => "optional"
 
 attribute "yum/installonlypkgs",
