@@ -59,7 +59,7 @@ make install
 EOH
   environment(
     'CFLAGS' => '-L/usr/lib -I/usr/include',
-    'LDFLAGS' => '-L/usr/lib -R/usr/lib -I/usr/include'
+    'LDFLAGS' => '-L/usr/lib -I/usr/include'
   )
   not_if do
     ::File.exists?("/opt/ruby1.9/bin/ruby") &&
