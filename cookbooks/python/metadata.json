@@ -14,7 +14,8 @@
     "freebsd": ">= 0.0.0"
   },
   "dependencies": {
-    "build-essential": ">= 0.0.0"
+    "build-essential": ">= 0.0.0",
+    "yum": ">= 0.0.0"
   },
   "recommendations": {
   },
@@ -37,5 +38,5 @@
     "python::pip": "Installs pip from source.",
     "python::virtualenv": "Installs virtualenv using the python_pip resource."
   },
-  "version": "1.0.6"
+  "version": "1.0.8"
 }

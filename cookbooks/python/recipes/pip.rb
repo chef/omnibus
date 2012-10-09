@@ -18,30 +18,27 @@
 # limitations under the License.
 #
 
-# Ubuntu's python-setuptools, python-pip and python-virtualenv packages 
+if platform_family?("rhel")
+  pip_binary = "/usr/bin/pip"
+else
+  pip_binary = "/usr/local/bin/pip"
+end
+
+# Ubuntu's python-setuptools, python-pip and python-virtualenv packages
 # are broken...this feels like Rubygems!
 # http://stackoverflow.com/questions/4324558/whats-the-proper-way-to-install-pip-virtualenv-and-distribute-for-python
 # https://bitbucket.org/ianb/pip/issue/104/pip-uninstall-on-ubuntu-linux
 remote_file "#{Chef::Config[:file_cache_path]}/distribute_setup.py" do
   source "http://python-distribute.org/distribute_setup.py"
   mode "0644"
-  not_if "which pip"
+  not_if { ::File.exists?(pip_binary) }
 end
 
-py_version = if node['platform'] == 'centos' && node['platform_version'].split('.').first.to_i < 6
-               '26'
-             else
-               nil
-             end
-
-bash "install-pip" do
+execute "install-pip" do
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
-  python#{py_version} distribute_setup.py
-  easy_install pip
+  command <<-EOF
+  #{node['python']['binary']} distribute_setup.py
+  #{::File.dirname(pip_binary)}/easy_install pip
   EOF
-
-  # the `which pip` command isn't very helpful if you install pip
-  # against the wrong python the first time around
-  not_if "which pip"
+  not_if { ::File.exists?(pip_binary) }
 end
