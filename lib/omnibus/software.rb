@@ -36,6 +36,7 @@ module Omnibus
 
     NULL_ARG = Object.new
 
+    attr_reader :builder
     attr_reader :description
     attr_reader :dependencies
     attr_reader :fetcher
