@@ -9,6 +9,6 @@ version           "0.10.0"
   supports os
 end
 
-%w{ opencsw git build-essential solaris_omgwtfbbq }.each do |cb|
+%w{ apt build-essential git opencsw python ruby_1.9 solaris_omgwtfbbq yum }.each do |cb|
   depends cb
 end
