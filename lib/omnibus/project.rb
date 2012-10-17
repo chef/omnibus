@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ module Omnibus
     NULL_ARG = Object.new
 
     attr_reader :dependencies
+    attr_reader :runtime_dependencies
 
     def self.load(filename)
       new(IO.read(filename), filename)
@@ -87,6 +88,10 @@ module Omnibus
 
     def dependencies(val)
       @dependencies = val
+    end
+
+    def runtime_dependencies(val)
+      @runtime_dependencies = val
     end
 
     def exclude(pattern)
@@ -154,6 +159,11 @@ module Omnibus
       @exclusions.each do |pattern|
         command_and_opts << "--exclude '#{pattern}'"
       end
+
+      @runtime_dependencies.each do |runtime_dep|
+        command_and_opts << "--depends '#{runtime_dep}'"
+      end
+
       command_and_opts << " --replaces #{@replaces}" if @replaces
       command_and_opts
     end
