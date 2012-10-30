@@ -26,7 +26,6 @@ module Omnibus
     NULL_ARG = Object.new
 
     attr_reader :dependencies
-    attr_reader :runtime_dependencies
 
     def self.load(filename)
       new(IO.read(filename), filename)
@@ -38,6 +37,7 @@ module Omnibus
 
     def initialize(io, filename)
       @exclusions = Array.new
+      @runtime_dependencies = Array.new
       instance_eval(io)
       render_tasks
     end
