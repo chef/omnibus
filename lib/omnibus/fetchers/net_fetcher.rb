@@ -96,7 +96,7 @@ E
           f.write(response.body)
         end
       when Net::HTTPRedirection 
-        get_with_redirect(response['location'], {'Cookie' => headers['Cookie']}, limit - 1)
+        get_with_redirect(response['location'], headers, limit - 1)
       else
         response.error!
       end
