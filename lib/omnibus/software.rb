@@ -160,8 +160,14 @@ module Omnibus
 
     def camel_case_path(path)
       # split the path and remove and empty strings
-      parts = path.split("/") - [""]
-      parts.join("_")
+      if platform == 'windows'
+        path.sub!(":", "")
+        parts = path.split("\\") - [""]
+        parts.join("_")
+      else
+        parts = path.split("/") - [""]
+        parts.join("_")
+      end
     end
 
     def build(&block)
