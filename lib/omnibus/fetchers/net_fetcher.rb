@@ -99,8 +99,8 @@ E
         open(project_file, "wb") do |f|
           f.write(response.body)
         end
-      when Net::HTTPRedirection
-        get_with_redirect(response['location'], {'Cookie' => headers['Cookie']}, limit - 1)
+      when Net::HTTPRedirection 
+        get_with_redirect(response['location'], headers, limit - 1)
       else
         response.error!
       end
