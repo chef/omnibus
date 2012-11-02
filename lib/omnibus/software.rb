@@ -177,8 +177,9 @@ module Omnibus
       "#{build_dir}/#{@name}.fetch"
     end
 
-    def camel_case_path(path)
-      # split the path and remove and empty strings
+    def camel_case_path(project_path)
+      path = project_path.dup
+      # split the path and remmove and empty strings
       if platform == 'windows'
         path.sub!(":", "")
         parts = path.split("\\") - [""]
