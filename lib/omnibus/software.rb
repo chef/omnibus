@@ -89,6 +89,10 @@ module Omnibus
       @version
     end
 
+    def build_version
+      @project.build_version
+    end
+
     def relative_path(val)
       @relative_path = val
     end

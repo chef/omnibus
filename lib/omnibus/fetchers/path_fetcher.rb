@@ -37,10 +37,16 @@ E
     end
     
     def rsync
-      sync_cmd = "rsync --delete -a #{@source[:path]}/ #{@project_dir}/"
-      shell = Mixlib::ShellOut.new(sync_cmd)
+      if OHAI.platform == "windows"
+        # Robocopy's return code is 1 if it succesfully copies over the
+        # files and 0 if the files are already existing at the destination
+        sync_cmd = "robocopy #{@source[:path]}\\ #{@project_dir}\\ /MIR /S"
+        shell = Mixlib::ShellOut.new(sync_cmd, :returns => [0, 1])
+      else
+        sync_cmd = "rsync --delete -a #{@source[:path]}/ #{@project_dir}/"
+        shell = Mixlib::ShellOut.new(sync_cmd)
+      end
       shell.run_command
-      shell.error!
     end
 
     def clean
