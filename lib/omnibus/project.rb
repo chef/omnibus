@@ -126,6 +126,8 @@ module Omnibus
         [ "rpm" ]
       when 'solaris2'
         [ "solaris" ]
+      when 'windows'
+        [ "msi" ]
       else
         [ "makeself" ]
       end
@@ -133,6 +135,21 @@ module Omnibus
 
     private
 
+    def msi_command
+      msi_command = ["light.exe",
+                          "-nologo",
+                          "-ext WixUIExtension",
+                          "-cultures:en-us",
+                          "-loc #{install_path}\\msi-tmp\\ChefClient-en-us.wxl",
+                          "#{install_path}\\msi-tmp\\ChefClient-Files.wixobj",
+                          "#{install_path}\\msi-tmp\\ChefClient.wixobj",
+                          "-out #{config.package_dir}\\chef-client-#{build_version}.msi"]
+
+      # Don't care about the 204 return code from light.exe since it's
+      # about some expected warnings...
+      [msi_command.join(" "), {:returns => [0, 204]}]
+    end
+    
     def fpm_command(pkg_type)
       command_and_opts = ["fpm",
                           "-s dir",
@@ -202,18 +219,28 @@ module Omnibus
 
                 # rm the makeself installer (for incremental builds)
                 package_commands << "rm -f #{install_path}/makeselfinst"
+              elsif pkg_type == "msi"
+                package_commands <<  msi_command
               else # pkg_type == "fpm"
                 package_commands <<  fpm_command(pkg_type).join(" ")
               end
 
               # run the commands
               package_commands.each do |cmd|
-                puts "[project:#{name}] Executing `#{cmd}`"
-
-                shell = Mixlib::ShellOut.new(cmd,
-                                             :live_stream => STDOUT,
-                                             :timeout => 3600,
-                                             :cwd => config.package_dir)
+                cmd_options = {
+                  :live_stream => STDOUT,
+                  :timeout => 3600,
+                  :cwd => config.package_dir
+                }
+                
+                if cmd.is_a?(Array)
+                  command = cmd[0]
+                  cmd_options.merge!(cmd[1])
+                else
+                  command = cmd
+                end
+                
+                shell = Mixlib::ShellOut.new(command, cmd_options)
                 shell.run_command
                 shell.error!
               end
@@ -225,7 +252,11 @@ module Omnibus
         end
 
         task "#{@name}:copy" => (package_types.map {|pkg_type| "#{@name}:#{pkg_type}"}) do
-          cp_cmd = "cp #{config.package_dir}/* pkg/"
+          if OHAI.platform == "windows"
+            cp_cmd = "xcopy #{config.package_dir}\\* pkg\\ /Y"
+          else
+            cp_cmd = "cp #{config.package_dir}/* pkg/"
+          end
           shell = Mixlib::ShellOut.new(cp_cmd)
           shell.run_command
           shell.error!
@@ -237,7 +268,11 @@ module Omnibus
 
         desc "run the health check on the #{@name} install path"
         task "#{@name}:health_check" do
-          Omnibus::HealthCheck.run(install_path)
+          if OHAI.platform == "windows"
+            puts "Skipping health check on windows..."
+          else
+            Omnibus::HealthCheck.run(install_path)
+          end
         end
       end
     end
