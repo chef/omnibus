@@ -154,9 +154,17 @@ E
 
     def extract
       log "extracting the source in #{project_file} to #{source_dir}"
-      shell = Mixlib::ShellOut.new(extract_cmd, :live_stream => STDOUT)
-      shell.run_command
-      shell.error!
+      cmd = extract_cmd
+      case cmd
+      when Proc
+        cmd.call
+      when String
+        shell = Mixlib::ShellOut.new(cmd, :live_stream => STDOUT)
+        shell.run_command
+        shell.error!
+      else
+        raise "Don't know how to extract command for #{cmd.class} class"
+      end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to unpack archive at #{project_file} (#{e.class}: #{e.message.strip})")
       raise
@@ -169,6 +177,14 @@ E
         "bzip2 -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
       elsif project_file.end_with?(".7z")
         "\"C:\\Program Files\\7-zip\\7z.exe\" x #{project_file} -o#{source_dir} -r -y"
+      else
+        #if we don't recognize the extension, simply copy over the file
+        Proc.new do
+          log "#{project_file} not an archive. Copying to #{project_dir}"
+          # hack hack hack, no project dir yet
+          FileUtils.mkdir_p(project_dir)
+          FileUtils.cp(project_file, "#{project_dir}\\")
+        end
       end
     end
   end
