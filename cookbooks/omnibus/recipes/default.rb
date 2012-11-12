@@ -35,6 +35,8 @@ when "rhel"
 when "solaris2"
   include_recipe "opencsw"
   include_recipe "solaris_omgwtfbbq"
+when "windows"
+  include_recipe "wix"
 end
 
 include_recipe "build-essential"
