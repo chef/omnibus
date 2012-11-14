@@ -20,7 +20,6 @@
 
 remote_directory node['chef_handler']['handler_path'] do
   source 'handlers'
-  mode "0755"
   recursive true
   action :create
 end

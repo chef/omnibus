@@ -70,7 +70,6 @@ module Windows
           r = Chef::Resource::RemoteFile.new(cache_file_path, run_context)
           r.source(source)
           r.backup(false)
-          r.mode("0755")
           r.checksum(checksum) if checksum
           r.run_action(:create)
         else

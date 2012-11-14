@@ -1,11 +1,9 @@
 #
-# Author:: Doug MacEachern (<dougm@vmware.com>)
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
+# Author:: Doug MacEachern <dougm@vmware.com>
 # Cookbook Name:: windows
-# Resource:: registry
+# Resource:: shortcut
 #
 # Copyright:: 2010, VMware, Inc.
-# Copyright:: 2011, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,14 +18,10 @@
 # limitations under the License.
 #
 
-actions :create, :modify, :force_modify, :remove
+actions :create
 
-attribute :key_name, :kind_of => String, :name_attribute => true
-attribute :values, :kind_of => Hash
-attribute :type, :kind_of => Symbol, :default => nil, :equal_to => [:binary, :string, :multi_string, :expand_string, :dword, :dword_big_endian, :qword]
-
-def initialize(name, run_context=nil)
-  super
-  @action = :modify
-  @key_name = name
-end
+attribute :name, :kind_of => String
+attribute :target, :kind_of => String
+attribute :arguments, :kind_of => String
+attribute :description, :kind_of => String
+attribute :cwd, :kind_of => String

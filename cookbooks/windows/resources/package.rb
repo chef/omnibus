@@ -26,6 +26,7 @@ attribute :version, :kind_of => String
 attribute :options, :kind_of => String
 attribute :installer_type, :kind_of => Symbol, :default => nil, :equal_to => [:msi, :inno, :nsis, :wise, :installshield, :custom]
 attribute :checksum, :kind_of => String
+attribute :timeout, :kind_of => Integer, :default => 600
 
 # TODO 
 

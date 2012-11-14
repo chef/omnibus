@@ -25,3 +25,11 @@ action :add do
     value new_resource.path
   end
 end
+
+action :remove do
+  env "PATH" do
+    action :delete
+    delim ::File::PATH_SEPARATOR
+    value new_resource.path
+  end
+end

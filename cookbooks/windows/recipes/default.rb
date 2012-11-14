@@ -20,7 +20,7 @@
 
 # gems with precompiled binaries
 %w{ win32-api win32-service }.each do |win_gem|
-  gem_package win_gem do
+  chef_gem win_gem do
     options '--platform=mswin32'
     action :install
   end
@@ -28,7 +28,7 @@ end
 
 # the rest
 %w{ windows-api windows-pr win32-dir win32-event win32-mutex }.each do |win_gem|
-  gem_package win_gem do
+  chef_gem win_gem do
     action :install
   end
 end
