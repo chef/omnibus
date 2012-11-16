@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-file_name = ::File.basename(node['wix']['url'])
+file_name = node['wix']['file_name']
 
 remote_file "#{Chef::Config[:file_cache_path]}/#{file_name}" do
   source node['wix']['url']
