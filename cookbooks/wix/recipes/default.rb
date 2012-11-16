@@ -23,7 +23,7 @@ file_name = node['wix']['file_name']
 remote_file "#{Chef::Config[:file_cache_path]}/#{file_name}" do
   source node['wix']['url']
   checksum node['wix']['checksum']
-  not_if File.exists? "#{Chef::Config[:file_cache_path]}/#{file_name}"
+  not_if { File.exists? "#{Chef::Config[:file_cache_path]}/#{file_name}" }
 end
 
 cookbook_file "#{Chef::Config[:file_cache_path]}/#{file_name}" do

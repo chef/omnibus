@@ -130,8 +130,10 @@ node['omnibus']['install-dirs'].each do |d|
   end
 end
 
-directory "/var/cache/omnibus" do
-  mode "755"
-  owner node["omnibus"]["build-user"]
-  recursive true
+node['omnibus']['cache-dirs'].each do |d|
+  directory d do
+    mode "755"
+    owner node["omnibus"]["build-user"]
+    recursive true
+  end
 end

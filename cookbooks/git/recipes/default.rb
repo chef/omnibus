@@ -27,6 +27,8 @@ when "centos","redhat","scientific","fedora"
   package "git"
 when "solaris2"
   opencsw "git"
+when "windows"
+  include_recipe "git::windows"
 else
   package "git"
 end
