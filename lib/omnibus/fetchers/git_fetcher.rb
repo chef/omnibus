@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,7 +39,12 @@ repo URI:       #{@source[:git]}
 local location: #{@project_dir}
 E
     end
-    
+
+    def version_guid
+      "git: #{current_revision}".chomp
+    rescue
+    end
+
     def clean
       if existing_git_clone?
         log "cleaning existing build"
@@ -52,7 +57,7 @@ E
       ErrorReporter.new(e, self).explain("Failed to clean git repository '#{@source[:git]}'")
       raise
     end
-    
+
     def fetch_required?
       !existing_git_clone? || !current_rev_matches_target_rev?
     end
