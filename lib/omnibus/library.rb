@@ -31,8 +31,13 @@ module Omnibus
 
     def version_map(project)
       @components.select {|c| c.project == project}.inject({}) {|map, component|
-        map[component.name] = {:version => component.version,
-                               :version_guid => component.version_guid}
+        map[component.name] = if component.version
+                                {:version => component.version,
+                                 :version_guid => component.version_guid}
+                              else
+                                {:version => Omnibus::BuildVersion.full,
+                                 :version_guid => "git: #{Omnibus::BuildVersion.git_sha}"}
+                              end
         map
       }
     end
