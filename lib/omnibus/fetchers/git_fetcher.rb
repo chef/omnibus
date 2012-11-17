@@ -40,6 +40,11 @@ local location: #{@project_dir}
 E
     end
     
+    def version_guid
+      "git: #{current_revision}".chomp
+    rescue
+    end
+
     def clean
       if existing_git_clone?
         log "cleaning existing build"

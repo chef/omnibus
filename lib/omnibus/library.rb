@@ -31,7 +31,9 @@ module Omnibus
 
     def version_map(project)
       @components.select {|c| c.project == project}.inject({}) {|map, component|
-        map[component.name] = component.version; map
+        map[component.name] = {:version => component.version,
+                               :version_guid => component.version_guid}
+        map
       }
     end
 

@@ -53,6 +53,10 @@ local location: #@project_file
 E
     end
 
+    def version_guid
+      "md5: #{@checksum}"
+    end
+
     def fetch_required?
       !File.exists?(project_file) || Digest::MD5.file(project_file) != @checksum
     end

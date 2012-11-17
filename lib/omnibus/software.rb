@@ -89,6 +89,10 @@ module Omnibus
       @version
     end
 
+    def version_guid
+      Fetcher.for(self).version_guid
+    end
+
     def relative_path(val)
       @relative_path = val
     end

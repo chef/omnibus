@@ -108,7 +108,10 @@ module Omnibus
     def clean
     end
 
-    def fetch 
+    def fetch
+    end
+
+    def version_guid
     end
 
   end
