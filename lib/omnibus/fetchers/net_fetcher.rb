@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,8 +63,8 @@ E
 
 
     def clean
-      if File.exists?(project_dir) 
-        log "cleaning existing build from #{project_dir}" 
+      if File.exists?(project_dir)
+        log "cleaning existing build from #{project_dir}"
         shell = Mixlib::ShellOut.new("rm -rf #{project_dir}", :live_stream => STDOUT)
         shell.run_command
         shell.error!
@@ -86,20 +86,20 @@ E
       log "getting from #{url} with #{limit} redirects left"
 
       if !url.kind_of?(URI)
-        url = URI.parse(url) 
+        url = URI.parse(url)
       end
 
       req = Net::HTTP::Get.new(url.request_uri, headers)
       http_client = Net::HTTP.new(url.host, url.port)
       http_client.use_ssl = (url.scheme == "https")
-    
+
       response = http_client.start { |http| http.request(req) }
       case response
-      when Net::HTTPSuccess     
+      when Net::HTTPSuccess
         open(project_file, "wb") do |f|
           f.write(response.body)
         end
-      when Net::HTTPRedirection 
+      when Net::HTTPRedirection
         get_with_redirect(response['location'], {'Cookie' => headers['Cookie']}, limit - 1)
       else
         response.error!
@@ -111,10 +111,10 @@ E
       begin
         log "\033[1;31m#{source[:warning]}\033[0m" if source.has_key?(:warning)
         log "fetching #{project_file} from #{source_uri}"
-  
+
         case source_uri.scheme
         when /https?/
-          headers = { 
+          headers = {
             'accept-encoding' => '',
           }
           if source.has_key?(:cookie)
