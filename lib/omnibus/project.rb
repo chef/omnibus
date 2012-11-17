@@ -86,8 +86,9 @@ module Omnibus
       @build_iteration
     end
 
-    def dependencies(val)
-      @dependencies = val
+    def dependencies(val=NULL_ARG)
+      @dependencies = val unless val.equal?(NULL_ARG)
+      @dependencies
     end
 
     def runtime_dependencies(val)
@@ -129,6 +130,15 @@ module Omnibus
       else
         [ "makeself" ]
       end
+    end
+
+    def dependency?(software)
+      name = if software.respond_to?(:name)
+               software.send(:name)
+             elsif
+               software
+             end
+      @dependencies.include?(name)
     end
 
     private
