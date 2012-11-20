@@ -176,7 +176,7 @@ E
       elsif project_file.end_with?(".bz2")
         "bzip2 -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
       elsif project_file.end_with?(".7z")
-        "\"C:\\Program Files\\7-zip\\7z.exe\" x #{project_file} -o#{source_dir} -r -y"
+        "7z.exe x #{project_file} -o#{source_dir} -r -y"
       else
         #if we don't recognize the extension, simply copy over the file
         Proc.new do
