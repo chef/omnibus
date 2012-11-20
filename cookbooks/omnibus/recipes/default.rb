@@ -37,7 +37,7 @@ when "solaris2"
   include_recipe "solaris_omgwtfbbq"
 when "windows"
   include_recipe "wix"
-  # include_recipe "7-zip"
+  include_recipe "7-zip"
 end
 
 include_recipe "build-essential"
