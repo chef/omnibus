@@ -93,7 +93,7 @@ Omnibus creates and stores build arifacts in a direcory tree under `/var/cache/o
     └── src
     └── build
         └── install_path
-            └── ruby.latest
+            └── ruby.fetch
             └── ruby.manifest
 ````
 
@@ -111,7 +111,7 @@ The `build` directory is where Omnibus keeps track of the build artifacts for ea
 
 __install_path:__ The undersocre-separated installation path of the project being built (e.g. /opt/chef => opt_chef). Segregating build artifacts by installation path allows us to keep track of the builds for the same pieces of software that are installed in two different locations (e.g. building an embedded Ruby for /opt/chef and /opt/ohai).
 
-__*.latest:__ A sentinel file representing the mtime of the newest file in the pristine source tree for a particular piece of software.
+__*.fetch:__ A sentinel file representing the mtime of the most recent local fetch of the software.
 
 __*.manifest:__ A sentinel file representing the mtime of the last successful build for a particular piece of software.
 
