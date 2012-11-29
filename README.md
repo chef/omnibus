@@ -1,6 +1,13 @@
+## Prerequisites
+
+Omnibus is designed to run with a minimal set of prerequisites. At a minimun, you'll need the following:
+
+- Ruby 1.8.7 or later (http://ruby-lang.org)
+- Bundler (http://gembundler.com, http://rubygems.org/gems/bundler)
+
 ## Get Started
 
-To get started using Omnibus, create a new project and add it to your Gemfile.
+To get started using Omnibus, create a new project and add it to your Gemfile. Executing `bundle install` will pull in all of the gems required for Omnibus to operate.
 
 ```ruby
 gem 'omnibus', :git => 'git@github.com/opscode/omnibus-ruby'
