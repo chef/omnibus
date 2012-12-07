@@ -42,7 +42,8 @@ module Omnibus
     attr_reader :fetcher
     attr_reader :project
 
-    attr_accessor :override_version
+    attr_reader :given_version
+    attr_reader :override_version
 
     def self.load(filename, project, overrides={})
       new(IO.read(filename), filename, project, overrides)
