@@ -12,6 +12,10 @@ module Omnibus
       File.join(SPEC_DATA, "software", "#{name}.rb")
     end
 
+    def overrides_path(name)
+      File.join(SPEC_DATA, "overrides", "#{name}.overrides")
+    end
+    
   end
 end
 
