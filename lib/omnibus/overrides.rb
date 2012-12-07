@@ -1,6 +1,8 @@
 module Omnibus
   module Overrides
 
+    DEFAULT_OVERRIDE_FILE_NAME = "omnibus.overrides"
+
     # Parses a file of override information into a hash.
     #
     # Each line of the file must be of the form
@@ -18,5 +20,14 @@ module Omnibus
       end
     end
 
+    # Return the full path to an overrides file, or +nil+ if no such
+    # file exists.
+    def self.resolve_override_file
+      file = ENV['OMNIBUS_OVERRIDE_FILE'] || DEFAULT_OVERRIDE_FILE_NAME
+      path = File.expand_path(file)
+      path if File.exist?(path)
+    end
+    
   end
 end
+
