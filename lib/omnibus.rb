@@ -34,6 +34,7 @@ require 'omnibus/s3_tasks'
 require 'omnibus/health_check'
 require 'omnibus/clean_tasks'
 require 'omnibus/build_version'
+require 'omnibus/overrides'
 
 module Omnibus
 
@@ -78,10 +79,11 @@ module Omnibus
   module Loader
     extend Rake::DSL
 
-    def self.software(*path_specs)
+    def self.software(overrides, *path_specs)
+      raise "Overrides argument must be a hash!  You passed #{overrides}." if overrides.class != Hash
       FileList[*path_specs].each do |f|
         Omnibus::Project.all_projects.each do |p|
-          s = Omnibus::Software.load(f, p)
+          s = Omnibus::Software.load(f, p, overrides)
           Omnibus.component_added(s) if p.dependency?(s)
         end
       end
@@ -96,8 +98,8 @@ module Omnibus
     end
   end
 
-  def self.software(*path_specs)
-    Loader.software(*path_specs)
+  def self.software(overrides, *path_specs)
+    Loader.software(overrides, *path_specs)
   end
 
   def self.projects(*path_specs)

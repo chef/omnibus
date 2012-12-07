@@ -44,11 +44,11 @@ module Omnibus
 
     attr_accessor :override_version
 
-    def self.load(filename, project)
-      new(IO.read(filename), filename, project)
+    def self.load(filename, project, overrides={})
+      new(IO.read(filename), filename, project, overrides)
     end
 
-    def initialize(io, filename, project)
+    def initialize(io, filename, project, overrides={})
       @given_version    = nil
       @override_version = nil
       @name             = nil
@@ -64,6 +64,10 @@ module Omnibus
 
       @dependencies = ["preparation"]
       instance_eval(io, filename, 0)
+      
+      # Set override information after the DSL file has been consumed
+      @override_version = overrides[name]
+
       render_tasks
     end
 
@@ -93,6 +97,10 @@ module Omnibus
     def version(val=NULL_ARG)
       @given_version = val unless val.equal?(NULL_ARG)
       @override_version || @given_version
+    end
+
+    def overridden?
+      @override_version && (@override_version != @given_version)
     end
 
     def version_guid

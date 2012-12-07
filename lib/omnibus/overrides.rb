@@ -28,6 +28,13 @@ module Omnibus
       path if File.exist?(path)
     end
     
+    # Return a hash of override information.  If no such information
+    # can be found, the hash will be empty
+    def self.overrides
+      file = resolve_override_file
+      file ? parse_file(file) : {}
+    end
+    
   end
 end
 
