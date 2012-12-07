@@ -42,20 +42,23 @@ module Omnibus
     attr_reader :fetcher
     attr_reader :project
 
+    attr_accessor :override_version
+
     def self.load(filename, project)
       new(IO.read(filename), filename, project)
     end
 
     def initialize(io, filename, project)
-      @version        = nil
-      @name           = nil
-      @description    = nil
-      @source         = nil
-      @relative_path  = nil
-      @source_uri     = nil
-      @source_config  = filename
-      @project        = project
-      @always_build   = false
+      @given_version    = nil
+      @override_version = nil
+      @name             = nil
+      @description      = nil
+      @source           = nil
+      @relative_path    = nil
+      @source_uri       = nil
+      @source_config    = filename
+      @project          = project
+      @always_build     = false
 
       @builder = NullBuilder.new(self)
 
@@ -84,9 +87,12 @@ module Omnibus
       @source
     end
 
+    # Set a version from a software descriptor file, or receive the
+    # effective version, taking into account any override information
+    # (if set)
     def version(val=NULL_ARG)
-      @version = val unless val.equal?(NULL_ARG)
-      @version
+      @given_version = val unless val.equal?(NULL_ARG)
+      @override_version || @given_version
     end
 
     def version_guid
