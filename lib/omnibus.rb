@@ -58,8 +58,6 @@ module Omnibus
     self.gem_root = File.expand_path("../../", __FILE__)
     load_config
     yield self if block_given?
-    # Load core software tasks
-    software "#{gem_root}/config/software/*.rb" unless options[:no_core_software]
   end
 
   def self.config_path
