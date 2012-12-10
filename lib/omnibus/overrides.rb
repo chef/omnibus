@@ -1,3 +1,5 @@
+require 'pp'
+
 module Omnibus
   module Overrides
 
@@ -32,9 +34,18 @@ module Omnibus
     # can be found, the hash will be empty
     def self.overrides
       file = resolve_override_file
-      file ? parse_file(file) : {}
-    end
-    
+      overrides = file ? parse_file(file) : {}
+            
+      if overrides != {}
+        puts "********************************************************************************"
+        puts "Using Overrides from #{Omnibus::Overrides.resolve_override_file}"
+        pp overrides
+        puts "********************************************************************************"
+      end
+      
+      overrides
+    end    
+
   end
 end
 
