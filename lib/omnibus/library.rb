@@ -31,12 +31,18 @@ module Omnibus
 
     def version_map(project)
       @components.select {|c| c.project == project}.inject({}) {|map, component|
-        map[component.name] = if component.version
-                                {:version => component.version,
-                                 :version_guid => component.version_guid}
+        map[component.name] = if component.given_version
+                                {:version       => component.version,
+                                 :given_version => component.given_version,
+                                 :overridden    => component.overridden?,
+                                 :version_guid  => component.version_guid}
                               else
-                                {:version => Omnibus::BuildVersion.full,
-                                 :version_guid => "git: #{Omnibus::BuildVersion.git_sha}"}
+                                ## Components without a version are
+                                ## pieces of the omnibus project
+                                ## itself, and so don't really fit
+                                ## with the concept of overrides
+                                {:version       => Omnibus::BuildVersion.full,
+                                 :version_guid  => "git: #{Omnibus::BuildVersion.git_sha}"}
                               end
         map
       }
