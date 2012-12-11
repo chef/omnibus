@@ -42,25 +42,33 @@ module Omnibus
     attr_reader :fetcher
     attr_reader :project
 
-    def self.load(filename, project)
-      new(IO.read(filename), filename, project)
+    attr_reader :given_version
+    attr_reader :override_version
+
+    def self.load(filename, project, overrides={})
+      new(IO.read(filename), filename, project, overrides)
     end
 
-    def initialize(io, filename, project)
-      @version        = nil
-      @name           = nil
-      @description    = nil
-      @source         = nil
-      @relative_path  = nil
-      @source_uri     = nil
-      @source_config  = filename
-      @project        = project
-      @always_build   = false
+    def initialize(io, filename, project, overrides={})
+      @given_version    = nil
+      @override_version = nil
+      @name             = nil
+      @description      = nil
+      @source           = nil
+      @relative_path    = nil
+      @source_uri       = nil
+      @source_config    = filename
+      @project          = project
+      @always_build     = false
 
       @builder = NullBuilder.new(self)
 
       @dependencies = ["preparation"]
       instance_eval(io, filename, 0)
+      
+      # Set override information after the DSL file has been consumed
+      @override_version = overrides[name]
+
       render_tasks
     end
 
@@ -84,9 +92,16 @@ module Omnibus
       @source
     end
 
+    # Set a version from a software descriptor file, or receive the
+    # effective version, taking into account any override information
+    # (if set)
     def version(val=NULL_ARG)
-      @version = val unless val.equal?(NULL_ARG)
-      @version
+      @given_version = val unless val.equal?(NULL_ARG)
+      @override_version || @given_version
+    end
+
+    def overridden?
+      @override_version && (@override_version != @given_version)
     end
 
     def version_guid
