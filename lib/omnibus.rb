@@ -80,7 +80,7 @@ module Omnibus
     extend Rake::DSL
 
     def self.software(overrides, *path_specs)
-      raise "Overrides argument must be a hash!  You passed #{overrides}." if overrides.class != Hash
+      raise ArgumentError, "Overrides argument must be a hash!  You passed #{overrides}." unless overrides.is_a? Hash
       FileList[*path_specs].each do |f|
         Omnibus::Project.all_projects.each do |p|
           s = Omnibus::Software.load(f, p, overrides)
