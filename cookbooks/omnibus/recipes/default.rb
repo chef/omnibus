@@ -35,6 +35,9 @@ when "rhel"
 when "solaris2"
   include_recipe "opencsw"
   include_recipe "solaris_omgwtfbbq"
+when "windows"
+  include_recipe "wix"
+  include_recipe "7-zip"
 end
 
 include_recipe "build-essential"
@@ -42,9 +45,12 @@ include_recipe "git"
 
 # install ruby and symlink the binaries to /usr/local
 include_recipe "ruby_1.9"
-%w{ruby gem rake bundle fpm ronn}.each do |bin|
-  link "/usr/local/bin/#{bin}" do
-    to "/opt/ruby1.9/bin/#{bin}"
+
+unless node['platform_family'] == 'windows'
+  %w{ruby gem rake bundle fpm ronn}.each do |bin|
+    link "/usr/local/bin/#{bin}" do
+      to "/opt/ruby1.9/bin/#{bin}"
+    end
   end
 end
 
@@ -82,6 +88,12 @@ when "solaris2"
   link "/opt/csw/bin/gettext" do
     to "/opt/csw/bin/gettext"
   end
+
+when "windows"
+
+  #
+  # nothing to do here
+  #
 
 else
 
@@ -128,8 +140,10 @@ node['omnibus']['install-dirs'].each do |d|
   end
 end
 
-directory "/var/cache/omnibus" do
-  mode "755"
-  owner node["omnibus"]["build-user"]
-  recursive true
+node['omnibus']['cache-dirs'].each do |d|
+  directory d do
+    mode "755"
+    owner node["omnibus"]["build-user"]
+    recursive true
+  end
 end
