@@ -108,6 +108,10 @@ module Omnibus
       Fetcher.for(self).version_guid
     end
 
+    def build_version
+      @project.build_version
+    end
+
     def relative_path(val)
       @relative_path = val
     end
@@ -177,10 +181,17 @@ module Omnibus
       "#{build_dir}/#{@name}.fetch"
     end
 
-    def camel_case_path(path)
-      # split the path and remove and empty strings
-      parts = path.split("/") - [""]
-      parts.join("_")
+    def camel_case_path(project_path)
+      path = project_path.dup
+      # split the path and remmove and empty strings
+      if platform == 'windows'
+        path.sub!(":", "")
+        parts = path.split("\\") - [""]
+        parts.join("_")
+      else
+        parts = path.split("/") - [""]
+        parts.join("_")
+      end
     end
 
     def build(&block)

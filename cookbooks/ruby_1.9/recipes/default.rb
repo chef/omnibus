@@ -32,43 +32,49 @@ when "centos", "redhat"
   package "openssl-devel"
 end
 
-# Download the ruby source for 1.9.3. Skip the download if:
-# * the source file already exists
-# * ruby 1.9.3 has been installed at the specified patch-level
-#
-remote_file "/tmp/ruby-1.9.3-p194.tar.gz" do
-  source "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p194.tar.gz"
-  not_if do
-    ::File.exists?("/tmp/ruby-1.9.3-p194.tar.gz") ||
-      (::File.exists?("/opt/ruby1.9/bin/ruby") &&
-       system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'"))
+if node['platform_family'] == 'windows'
+ include_recipe "ruby_1.9::windows"
+else
+  # Download the ruby source for 1.9.3. Skip the download if:
+  # * the source file already exists
+  # * ruby 1.9.3 has been installed at the specified patch-level
+  #
+  remote_file "/tmp/ruby-1.9.3-p194.tar.gz" do
+    source "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p194.tar.gz"
+    not_if do
+      ::File.exists?("/tmp/ruby-1.9.3-p194.tar.gz") ||
+        (::File.exists?("/opt/ruby1.9/bin/ruby") &&
+         system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'"))
+    end
   end
-end
 
-# Install ruby from source unless it already exists at the correct
-# version
-#
-execute "install ruby-1.9.3" do
-  cwd "/tmp"
-  command <<-EOH
+  # Install ruby from source unless it already exists at the correct
+  # version
+  #
+  execute "install ruby-1.9.3" do
+    cwd "/tmp"
+    command <<-EOH
 tar zxf ruby-1.9.3-p194.tar.gz
 cd ruby-1.9.3-p194
 ./configure --prefix=/opt/ruby1.9
 make
 make install
 EOH
-  environment(
-    'CFLAGS' => '-L/usr/lib -I/usr/include',
-    'LDFLAGS' => '-L/usr/lib -I/usr/include'
-  )
-  not_if do
-    ::File.exists?("/opt/ruby1.9/bin/ruby") &&
-      system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'")
+    environment(
+                'CFLAGS' => '-L/usr/lib -I/usr/include',
+                'LDFLAGS' => '-L/usr/lib -I/usr/include'
+                )
+    not_if do
+      ::File.exists?("/opt/ruby1.9/bin/ruby") &&
+        system("/opt/ruby1.9/bin/ruby --version | grep -q '1.9.3p194'")
+    end
   end
 end
+
+ruby_bindir = (node['platform_family'] == 'windows') ? "C:\\Ruby193\\bin\\" : "/opt/ruby1.9/bin/"
 
 gem_package "1.9-bundler" do
   package_name "bundler"
   version "1.0.18"
-  gem_binary "/opt/ruby1.9/bin/gem"
+  gem_binary "#{ruby_bindir}gem"
 end

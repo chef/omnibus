@@ -63,11 +63,9 @@ E
 
 
     def clean
-      if File.exists?(project_dir)
-        log "cleaning existing build from #{project_dir}"
-        shell = Mixlib::ShellOut.new("rm -rf #{project_dir}", :live_stream => STDOUT)
-        shell.run_command
-        shell.error!
+      if File.exists?(project_dir) 
+        log "cleaning existing build from #{project_dir}" 
+        FileUtils.rm_rf(project_dir)
       end
       extract
     end
@@ -99,8 +97,8 @@ E
         open(project_file, "wb") do |f|
           f.write(response.body)
         end
-      when Net::HTTPRedirection
-        get_with_redirect(response['location'], {'Cookie' => headers['Cookie']}, limit - 1)
+      when Net::HTTPRedirection 
+        get_with_redirect(response['location'], headers, limit - 1)
       else
         response.error!
       end
@@ -156,19 +154,37 @@ E
 
     def extract
       log "extracting the source in #{project_file} to #{source_dir}"
-      shell = Mixlib::ShellOut.new("#{extract_cmd} #{project_file} | ( cd #{source_dir} && tar -xf - )", :live_stream => STDOUT)
-      shell.run_command
-      shell.error!
+      cmd = extract_cmd
+      case cmd
+      when Proc
+        cmd.call
+      when String
+        shell = Mixlib::ShellOut.new(cmd, :live_stream => STDOUT)
+        shell.run_command
+        shell.error!
+      else
+        raise "Don't know how to extract command for #{cmd.class} class"
+      end
     rescue Exception => e
-      ErrorReporter.new(e, self).explain("Failed to unpack tarball at #{project_file} (#{e.class}: #{e.message.strip})")
+      ErrorReporter.new(e, self).explain("Failed to unpack archive at #{project_file} (#{e.class}: #{e.message.strip})")
       raise
     end
 
     def extract_cmd
       if project_file.end_with?(".gz") || project_file.end_with?(".tgz")
-        "gzip -dc"
+        "gzip -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
       elsif project_file.end_with?(".bz2")
-        "bzip2 -dc"
+        "bzip2 -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
+      elsif project_file.end_with?(".7z")
+        "7z.exe x #{project_file} -o#{source_dir} -r -y"
+      else
+        #if we don't recognize the extension, simply copy over the file
+        Proc.new do
+          log "#{project_file} not an archive. Copying to #{project_dir}"
+          # hack hack hack, no project dir yet
+          FileUtils.mkdir_p(project_dir)
+          FileUtils.cp(project_file, "#{project_dir}\\")
+        end
       end
     end
   end
