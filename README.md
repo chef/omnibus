@@ -1,30 +1,126 @@
-## Installation
+## Prerequisites
 
-Nothing to install here (yet). Move along.
+Omnibus is designed to run with a minimal set of prerequisites. At a minimun, you'll need the following:
 
-## DSL
+- Ruby 1.8.7 or later (http://ruby-lang.org)
+- Bundler (http://gembundler.com, http://rubygems.org/gems/bundler)
 
-### Software DSL
+## Get Started
 
-Each piece of sofware built by Omnibus is defined with a DSL in the `config/software` subdirectory of the project. The following is a quick desctiption of that DSL.
+To get started using Omnibus, create a new project and add it to your Gemfile. Executing `bundle install` will pull in all of the gems required for Omnibus to operate.
 
-`name`: The name of the software.
+```ruby
+gem 'omnibus', :git => 'git@github.com/opscode/omnibus-ruby'
+```
 
-`dependencies`: An ::Array of ::Strings referring to the `name`s of softwares that need to be present before building this piece.
+In your Rakefile, generate the require the Omnibus gem and load your project and software congifurations to generate the tasks.
 
-`source`: A ::Hash describing where the source of the software is to be downloaded from. Hash keys are the following:
+```ruby
+require 'omnibus'
 
-* URL Downloads
-** `:url` The url of the source tarball.
-** `:md5' The md5sum of the source tarball.
-* Git Downloads
-** `:git` The location of the git repository from which to fetch the source code.
+Omnibus.projects('config/projects/*.rb')
+Omnibus.software('config/software/*/.rb')
+```
 
-`build`: The instructions for building the software.
+If you've already set up software and project configurations, executing `rake -T` prints a list of things that you can build:
 
-`command`: A command to execute. This encompasses a single build step.
+```
+rake projects:chef                    # build and package chef
+rake prokects:chef:software:ruby      # fetch and build ruby
+rake projects:chef:software:rubygems  # fetch and build rubygems
+rake prokects:chef:software:chef-gem  # fetch and build chef-gem
+```
 
-### Project DSL
+Executing `rake projects:chef` will recursively build all of the dependencies of Chef from scratch. In the case above, Ruby is build first, followed by the installation of Rubygems. Finally, Chef is installed from gems. Executing the top-level project task (projects:chef) also packages the project for distribution on the target platform (e.g. RPM on RedHat-based systems and DEB on Debian-based systems).
+
+## Configuration DSL
+
+### Software
+
+```ruby
+name    "ruby"
+version "1.9.2-p290"
+source  :url => "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
+        :md5 => "604da71839a6ae02b5b5b5e1b792d5eb"
+
+dependencies ["zlib", "ncurses", "openssl"]
+
+relative_path "ruby-#{version}"
+
+build do
+  command "./configure"
+  command "make"
+  command "make install"
+end
+```
+
+**name**: The name of the software component.
+
+**version**: The version of the software component.
+
+**source**: Directions to the location of the source.
+
+**dependencies**: A list of components that this software depends on.
+
+**relative_path**: The relative path of the extracted tarball.
+
+**build**: The build instructions.
+
+**command**: An individual build step.
+
+### Projects
+
+```ruby
+name            "chef-full"
+
+install_path    "/opt/chef"
+build_version   "0.10.8"
+build_iteration "4"
+
+dependencies    ["chef"]
+```
+
+**name:** The name of the project.
+
+**install_path:** The desired install location of the package.
+
+**build_version:** The package version.
+
+**build_iteration:** The package iteration number.
+
+**dependencies**: A list of software components to include in this package.
+
+## Build Structure
+
+Omnibus creates and stores build arifacts in a direcory tree under `/var/cache/omnnibus`
+
+```
+└── /var/cache/omnibus    
+    └── cache
+    └── src
+    └── build
+        └── install_path
+            └── ruby.fetch
+            └── ruby.manifest
+````
+
+### cache
+
+The `cache` directory caches the download artifacts for software sources. It keeps pristine tarballs and git repositories, depending on the type of sorce specified.
+
+### src
+
+The `src` directory is where the extracted source code for a piece of software lives. When a piece of software needs to be rebuilt, the `src` directory is recreated from the pristine copy in the download cache.
+
+### build
+
+The `build` directory is where Omnibus keeps track of the build artifacts for each piece of software.
+
+__install_path:__ The undersocre-separated installation path of the project being built (e.g. /opt/chef => opt_chef). Segregating build artifacts by installation path allows us to keep track of the builds for the same pieces of software that are installed in two different locations (e.g. building an embedded Ruby for /opt/chef and /opt/ohai).
+
+__*.fetch:__ A sentinel file representing the mtime of the most recent local fetch of the software.
+
+__*.manifest:__ A sentinel file representing the mtime of the last successful build for a particular piece of software.
 
 ## License
 
@@ -44,6 +140,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
-
