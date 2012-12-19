@@ -64,6 +64,16 @@ describe Omnibus::BuildVersion do
       its(:development_version?){ should be_false }
       its(:prerelease_version?){ should be_true }
     end
+
+    context "10.16.0.rc.0" do
+      let(:git_describe){ "10.16.0.rc.0" }
+      its(:version_tag){ should == "10.16.0" }
+      its(:prerelease_tag){ should == "rc.0" }
+      its(:git_sha){ should be_nil }
+      its(:commits_since_tag){ should == 0 }
+      its(:development_version?){ should be_false }
+      its(:prerelease_version?){ should be_true }
+    end
   end
 
   describe "semver output" do
