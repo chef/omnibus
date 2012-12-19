@@ -41,7 +41,7 @@ module Omnibus
                                 ## pieces of the omnibus project
                                 ## itself, and so don't really fit
                                 ## with the concept of overrides
-                                {:version       => Omnibus::BuildVersion.full,
+                                {:version       => Omnibus::BuildVersion.semver,
                                  :version_guid  => "git: #{Omnibus::BuildVersion.git_sha}"}
                               end
         map
