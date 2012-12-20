@@ -43,7 +43,7 @@ module Omnibus
                                 ## with the concept of overrides
                                 v = {:version => project.build_version}
                                 if project.build_version.respond_to?(:git_sha)
-                                  v[:version_guid] = "git: #{project.build_version.git_sha}"
+                                  v[:version_guid] = "git:#{project.build_version.git_sha}"
                                 end
                                 v
                               end
