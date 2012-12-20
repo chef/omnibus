@@ -54,12 +54,14 @@ module Omnibus
     def semver
       build_tag = version_tag
       if prerelease_version?
-        # ensure all dashes are dots per precedence rules in Semver spec
+        # ensure all dashes are dots per precedence rules (#12) in Semver
+        # 2.0.0-rc.1
         prerelease = prerelease_tag.gsub("-", ".")
         build_tag << "-" << prerelease
       end
-      # TODO: we need to find a way to allow release builds to 'opt out' of
-      # timestamps
+      # TODO: We need a configurable option that allows a build to be marked as
+      # a release build and thus leave the build denotation (ie `+` and
+      # everything after) bit off.
       build_tag << "+" << build_time.strftime("%Y%m%d%H%M%S")
       unless commits_since_tag == 0
         build_tag << "." << ["git", commits_since_tag, git_sha_tag].join(".")
