@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 
+require 'time'
 require 'mixlib/shellout'
 
 module Omnibus
