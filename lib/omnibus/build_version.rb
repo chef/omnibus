@@ -27,10 +27,7 @@ module Omnibus
       Omnibus::BuildVersion.new.git_describe
     end
 
-    attr_reader :build_time
-
     def initialize
-      @build_time = retrieve_build_time
     end
 
     #
@@ -52,7 +49,7 @@ module Omnibus
       # TODO: We need a configurable option that allows a build to be marked as
       # a release build and thus leave the build denotation (ie `+` and
       # everything after) bit off.
-      build_tag << "+" << build_time.strftime("%Y%m%d%H%M%S")
+      build_tag << "+" << build_start_time.strftime("%Y%m%d%H%M%S")
       unless commits_since_tag == 0
         build_tag << "." << ["git", commits_since_tag, git_sha_tag].join(".")
       end
@@ -134,19 +131,21 @@ module Omnibus
     # We'll attempt to retrive the timestamp from the Jenkin's set BUILD_ID
     # environment variable. This will ensure platform specfic packages for the
     # same build will share the same timestamp.
-    def retrieve_build_time
-      if !ENV['BUILD_ID'].nil?
-        begin
-          Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
-        rescue ArguementError
-          error_message =  "BUILD_ID environment variable "
-          error_message << "should be in YYYY-MM-DD_hh-mm-ss "
-          error_message << "format."
-          raise ArguementError, error_message
-        end
-      else
-        Time.now.utc
-      end
+    def build_start_time
+      @build_start_time ||= begin
+                              if !ENV['BUILD_ID'].nil?
+                                begin
+                                  Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
+                                rescue ArgumentError
+                                  error_message =  "BUILD_ID environment variable "
+                                  error_message << "should be in YYYY-MM-DD_hh-mm-ss "
+                                  error_message << "format."
+                                  raise ArgumentError, error_message
+                                end
+                              else
+                                Time.now.utc
+                              end
+                            end
     end
 
     def version_composition
