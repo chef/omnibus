@@ -54,7 +54,7 @@ E
     end
 
     def version_guid
-      "md5: #{@checksum}"
+      "md5:#{@checksum}"
     end
 
     def fetch_required?
