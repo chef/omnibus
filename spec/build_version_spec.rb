@@ -23,14 +23,12 @@ describe Omnibus::BuildVersion do
   let(:git_describe){ "11.0.0-alpha1-207-g694b062" }
   let(:valid_semver_regex){/^\d+\.\d+\.\d+(\-[\dA-Za-z\-\.]+)?(\+[\dA-Za-z\-\.]+)?$/}
   let(:valid_git_describe_regex){/^\d+\.\d+\.\d+(\-[A-Za-z0-9\-\.]+)?(\-\d+\-g[0-9a-f]+)?$/}
-  subject(:build_version){ Omnibus::BuildVersion }
+
+  subject(:build_version){ Omnibus::BuildVersion.new }
 
   before :each do
-    # FIXME - memoized class instance variables are a code smell
-    build_version.instance_variable_set(:@git_describe, nil)
-    build_version.instance_variable_set(:@build_time, nil)
-    build_version.stub(:git_describe).and_return(git_describe)
     ENV['BUILD_ID'] = nil
+    Omnibus::BuildVersion.any_instance.stub(:git_describe).and_return(git_describe)
   end
 
   describe "build version parsing" do
@@ -39,7 +37,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe){ "11.0.1" }
       its(:version_tag){ should == "11.0.1" }
       its(:prerelease_tag){ should be_nil }
-      its(:git_sha){ should be_nil }
+      its(:git_sha_tag){ should be_nil }
       its(:commits_since_tag){ should == 0 }
       its(:development_version?){ should be_true }
       its(:prerelease_version?){ should be_false }
@@ -49,7 +47,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe){ "11.0.0-alpha2" }
       its(:version_tag){ should == "11.0.0" }
       its(:prerelease_tag){ should == "alpha2" }
-      its(:git_sha){ should be_nil }
+      its(:git_sha_tag){ should be_nil }
       its(:commits_since_tag){ should == 0 }
       its(:development_version?){ should be_false }
       its(:prerelease_version?){ should be_true }
@@ -59,7 +57,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe){ "11.0.0-alpha-59-gf55b180" }
       its(:version_tag){ should == "11.0.0" }
       its(:prerelease_tag){ should == "alpha" }
-      its(:git_sha){ should == "f55b180" }
+      its(:git_sha_tag){ should == "f55b180" }
       its(:commits_since_tag){ should == 59 }
       its(:development_version?){ should be_false }
       its(:prerelease_version?){ should be_true }
@@ -69,7 +67,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe){ "10.16.0.rc.0" }
       its(:version_tag){ should == "10.16.0" }
       its(:prerelease_tag){ should == "rc.0" }
-      its(:git_sha){ should be_nil }
+      its(:git_sha_tag){ should be_nil }
       its(:commits_since_tag){ should == 0 }
       its(:development_version?){ should be_false }
       its(:prerelease_version?){ should be_true }
@@ -89,12 +87,12 @@ describe Omnibus::BuildVersion do
 
     it "uses ENV['BUILD_ID'] to generate timestamp if set" do
       ENV['BUILD_ID'] = "2012-12-25_16-41-40"
-      build_version.semver.should == "11.0.0-alpha1+20121225164140.git.207.694b062"
+      Omnibus::BuildVersion.new.semver.should == "11.0.0-alpha1+20121225164140.git.207.694b062"
     end
 
     it "fails on invalid ENV['BUILD_ID'] values" do
       ENV['BUILD_ID'] = "AAAA"
-      expect { build_version.semver }.to raise_error(ArgumentError)
+      expect { Omnibus::BuildVersion.new }.to raise_error(ArgumentError)
     end
 
     context "prerelease version with dashes" do
@@ -126,12 +124,12 @@ describe Omnibus::BuildVersion do
 
   describe "deprecated full output" do
     it "generates a valid git describe version" do
-      build_version.full.should =~ valid_git_describe_regex
+      Omnibus::BuildVersion.full.should =~ valid_git_describe_regex
     end
 
     it "outputs a deprecation message" do
-      build_version.should_receive(:puts).with(/is deprecated/)
-      build_version.full
+      Omnibus::BuildVersion.should_receive(:puts).with(/is deprecated/)
+      Omnibus::BuildVersion.full
     end
   end
 end

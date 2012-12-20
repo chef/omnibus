@@ -15,13 +15,31 @@
 # limitations under the License.
 #
 
+require 'mixlib/shellout'
+
 module Omnibus
-  module BuildVersion
+  class BuildVersion
 
     # This method is still here for compatibility in existing projects.
     def self.full
-      puts "#{self.name}.full is deprecated. Use #{self.name}.semver or #{self.name}.git_describe."
-      git_describe
+      puts "#{self.name}.full is deprecated. Use #{self.name}.new.semver or #{self.name}.new.git_describe."
+      Omnibus::BuildVersion.new.git_describe
+    end
+
+    attr_reader :build_time
+
+    def initialize
+      @build_time = begin
+                      # We'll attempt to retrive the timestamp from the
+                      # Jenkin's set BUILD_ID environment variable.
+                      # This will ensure platform specfic packages for
+                      # the same build will share the same timestamp.
+                      if !ENV['BUILD_ID'].nil?
+                        Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
+                      else
+                        Time.now.utc
+                      end
+                    end
     end
 
     #
@@ -32,7 +50,7 @@ module Omnibus
     #    MAJOR.MINOR.PATCH-PRERELEASE+TIMESTAMP.git.COMMITS_SINCE.GIT_SHA
     #    11.0.0-alpha1+20121218164140.git.207.694b062
     #
-    def self.semver
+    def semver
       build_tag = version_tag
       if prerelease_version?
         # ensure all dashes are dots per precedence rules in Semver spec
@@ -43,7 +61,7 @@ module Omnibus
       # timestamps
       build_tag << "+" << build_time.strftime("%Y%m%d%H%M%S")
       unless commits_since_tag == 0
-        build_tag << "." << ["git", commits_since_tag, git_sha].join(".")
+        build_tag << "." << ["git", commits_since_tag, git_sha_tag].join(".")
       end
       build_tag
     end
@@ -56,24 +74,30 @@ module Omnibus
     #    MAJOR.MINOR.PATCH-PRERELEASE-COMMITS_SINCE-gGIT_SHA
     #    11.0.0-alpha1-207-g694b062
     #
-    def self.git_describe
-      git_describe
+    def git_describe
+      @git_describe ||= begin
+                          git_cmd = "git describe"
+                          shell = Mixlib::ShellOut.new(git_cmd,
+                                                       :cwd => Omnibus.root)
+                          shell.run_command
+                          shell.error!
+                          shell.stdout.chomp
+                        end
     end
 
     # 1.2.7-208-ge908a52 -> 1.2.7
     # 11.0.0-alpha-59-gf55b180 -> 11.0.0
     # 11.0.0-alpha2 -> 11.0.0
     # 10.16.2.rc.1 -> 10.16.2
-    def self.version_tag
-      major, minor, patch = version_composition
-      "#{major}.#{minor}.#{patch}"
+    def version_tag
+      version_composition.join(".")
     end
 
     # 1.2.7-208-ge908a52 -> nil
     # 11.0.0-alpha-59-gf55b180 -> alpha
     # 11.0.0-alpha2 -> alpha2
     # 10.16.2.rc.1 -> rc.1
-    def self.prerelease_tag
+    def prerelease_tag
       prerelease_regex = if commits_since_tag > 0
                            /^\d+\.\d+\.\d+(?:-|\.)([0-9A-Za-z.-]+)-\d+-g[0-9a-f]+$/
                          else
@@ -87,7 +111,7 @@ module Omnibus
     # 11.0.0-alpha-59-gf55b180 -> f55b180
     # 11.0.0-alpha2 -> nil
     # 10.16.2.rc.1 -> nil
-    def self.git_sha
+    def git_sha_tag
       sha_regexp = /g([0-9a-f]+)$/
       match = sha_regexp.match(git_describe)
       match ? match[1] : nil
@@ -97,49 +121,24 @@ module Omnibus
     # 11.0.0-alpha-59-gf55b180 -> 59
     # 11.0.0-alpha2 -> 0
     # 10.16.2.rc.1 -> 0
-    def self.commits_since_tag
+    def commits_since_tag
       commits_regexp = /^.*-(\d+)\-g[0-9a-f]+$/
       match = commits_regexp.match(git_describe)
       match ? match[1].to_i : 0
     end
 
-    def self.development_version?
+    def development_version?
       patch = version_composition.last
       patch.to_i.odd?
     end
 
-    def self.prerelease_version?
+    def prerelease_version?
       !!(prerelease_tag)
     end
 
     private
 
-    def self.git_describe
-      @git_describe ||= begin
-                           git_cmd = "git describe"
-                           shell = Mixlib::ShellOut.new(git_cmd,
-                                                        :cwd => Omnibus.root)
-                           shell.run_command
-                           shell.error!
-                           shell.stdout.chomp
-                         end
-    end
-
-    def self.build_time
-      @build_time ||= begin
-                        # We'll attempt to retrive the timestamp from the
-                        # Jenkin's set BUILD_ID environment variable.
-                        # This will ensure platform specfic packages for
-                        # the same build will share the same timestamp.
-                        if !ENV['BUILD_ID'].nil?
-                          Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
-                        else
-                          Time.now.utc
-                        end
-                      end
-    end
-
-    def self.version_composition
+    def version_composition
       version_regexp = /^(\d+)\.(\d+)\.(\d+)/
       version_regexp.match(git_describe)[1..3]
     end
