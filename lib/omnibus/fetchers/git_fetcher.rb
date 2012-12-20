@@ -41,7 +41,7 @@ E
     end
 
     def version_guid
-      "git: #{current_revision}".chomp
+      "git:#{current_revision}".chomp
     rescue
     end
 
