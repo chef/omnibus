@@ -31,8 +31,11 @@ describe Omnibus::BuildVersion do
     Omnibus::BuildVersion.any_instance.stub(:git_describe).and_return(git_describe)
   end
 
-  describe "build version parsing" do
+  describe "git describe parsing" do
 
+    # we prefer our git tags to be SemVer compliant
+
+    # release version
     context "11.0.1" do
       let(:git_describe){ "11.0.1" }
       its(:version_tag){ should == "11.0.1" }
@@ -43,30 +46,68 @@ describe Omnibus::BuildVersion do
       its(:prerelease_version?){ should be_false }
     end
 
-    context "11.0.0-alpha2" do
-      let(:git_describe){ "11.0.0-alpha2" }
+    # SemVer compliant prerelease version
+    context "11.0.0-alpha.2" do
+      let(:git_describe){ "11.0.0-alpha.2" }
       its(:version_tag){ should == "11.0.0" }
-      its(:prerelease_tag){ should == "alpha2" }
+      its(:prerelease_tag){ should == "alpha.2" }
       its(:git_sha_tag){ should be_nil }
       its(:commits_since_tag){ should == 0 }
       its(:development_version?){ should be_false }
       its(:prerelease_version?){ should be_true }
     end
 
-    context "11.0.0-alpha-59-gf55b180" do
-      let(:git_describe){ "11.0.0-alpha-59-gf55b180" }
+    # full git describe string
+    context "11.0.0-alpha.3-59-gf55b180" do
+      let(:git_describe){ "11.0.0-alpha.3-59-gf55b180" }
       its(:version_tag){ should == "11.0.0" }
-      its(:prerelease_tag){ should == "alpha" }
+      its(:prerelease_tag){ should == "alpha.3" }
       its(:git_sha_tag){ should == "f55b180" }
       its(:commits_since_tag){ should == 59 }
       its(:development_version?){ should be_false }
       its(:prerelease_version?){ should be_true }
     end
 
+    # Degenerate git tag formats
+
+    # RubyGems compliant git tag
     context "10.16.0.rc.0" do
       let(:git_describe){ "10.16.0.rc.0" }
       its(:version_tag){ should == "10.16.0" }
       its(:prerelease_tag){ should == "rc.0" }
+      its(:git_sha_tag){ should be_nil }
+      its(:commits_since_tag){ should == 0 }
+      its(:development_version?){ should be_false }
+      its(:prerelease_version?){ should be_true }
+    end
+
+    # dash seperated prerelease
+    context "11.0.0-alpha-2" do
+      let(:git_describe){ "11.0.0-alpha-2" }
+      its(:version_tag){ should == "11.0.0" }
+      its(:prerelease_tag){ should == "alpha-2" }
+      its(:git_sha_tag){ should be_nil }
+      its(:commits_since_tag){ should == 0 }
+      its(:development_version?){ should be_false }
+      its(:prerelease_version?){ should be_true }
+    end
+
+    # dash seperated prerelease full git describe string
+    context "11.0.0-alpha-2-59-gf55b180" do
+      let(:git_describe){ "11.0.0-alpha-2-59-gf55b180" }
+      its(:version_tag){ should == "11.0.0" }
+      its(:prerelease_tag){ should == "alpha-2" }
+      its(:git_sha_tag){ should == "f55b180" }
+      its(:commits_since_tag){ should == 59 }
+      its(:development_version?){ should be_false }
+      its(:prerelease_version?){ should be_true }
+    end
+
+    # WTF git tag
+    context "11.0.0-alpha2" do
+      let(:git_describe){ "11.0.0-alpha2" }
+      its(:version_tag){ should == "11.0.0" }
+      its(:prerelease_tag){ should == "alpha2" }
       its(:git_sha_tag){ should be_nil }
       its(:commits_since_tag){ should == 0 }
       its(:development_version?){ should be_false }

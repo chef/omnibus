@@ -30,17 +30,7 @@ module Omnibus
     attr_reader :build_time
 
     def initialize
-      @build_time = begin
-                      # We'll attempt to retrive the timestamp from the
-                      # Jenkin's set BUILD_ID environment variable.
-                      # This will ensure platform specfic packages for
-                      # the same build will share the same timestamp.
-                      if !ENV['BUILD_ID'].nil?
-                        Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
-                      else
-                        Time.now.utc
-                      end
-                    end
+      @build_time = retrieve_build_time
     end
 
     #
@@ -140,6 +130,24 @@ module Omnibus
     end
 
     private
+
+    # We'll attempt to retrive the timestamp from the Jenkin's set BUILD_ID
+    # environment variable. This will ensure platform specfic packages for the
+    # same build will share the same timestamp.
+    def retrieve_build_time
+      if !ENV['BUILD_ID'].nil?
+        begin
+          Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
+        rescue ArguementError
+          error_message =  "BUILD_ID environment variable "
+          error_message << "should be in YYYY-MM-DD_hh-mm-ss "
+          error_message << "format."
+          raise ArguementError, error_message
+        end
+      else
+        Time.now.utc
+      end
+    end
 
     def version_composition
       version_regexp = /^(\d+)\.(\d+)\.(\d+)/
