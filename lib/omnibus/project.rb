@@ -263,7 +263,7 @@ module Omnibus
 
         task "#{@name}:copy" => (package_types.map {|pkg_type| "#{@name}:#{pkg_type}"}) do
           if OHAI.platform == "windows"
-            cp_cmd = "xcopy #{config.package_dir}\\* pkg\\ /Y"
+            cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
           else
             cp_cmd = "cp #{config.package_dir}/* pkg/"
           end
