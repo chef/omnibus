@@ -147,13 +147,13 @@ module Omnibus
 
     def msi_command
       msi_command = ["light.exe",
-                          "-nologo",
-                          "-ext WixUIExtension",
-                          "-cultures:en-us",
-                          "-loc #{install_path}\\msi-tmp\\ChefClient-en-us.wxl",
-                          "#{install_path}\\msi-tmp\\ChefClient-Files.wixobj",
-                          "#{install_path}\\msi-tmp\\ChefClient.wixobj",
-                          "-out #{config.package_dir}\\chef-client-#{build_version}.msi"]
+                     "-nologo",
+                     "-ext WixUIExtension",
+                     "-cultures:en-us",
+                     "-loc #{install_path}\\msi-tmp\\ChefClient-en-us.wxl",
+                     "#{install_path}\\msi-tmp\\ChefClient-Files.wixobj",
+                     "#{install_path}\\msi-tmp\\ChefClient.wixobj",
+                     "-out #{config.package_dir}\\chef-client-#{build_version}-#{iteration}.msi"]
 
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
