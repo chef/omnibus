@@ -58,12 +58,16 @@ module Omnibus
     end
 
     def iteration
-      if platform_family == 'rhel'
+      case platform_family
+      when 'rhel'
         platform_version =~ /^(\d+)/
         maj = $1
-        return "#{build_iteration}.el#{maj}"
+        "#{build_iteration}.el#{maj}"
+      when 'windows'
+        "#{build_iteration}.windows"
+      else
+        "#{build_iteration}.#{platform}.#{platform_version}"
       end
-      return "#{build_iteration}.#{platform}.#{platform_version}"
     end
 
     def description(val=NULL_ARG)
