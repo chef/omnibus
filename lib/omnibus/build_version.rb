@@ -27,7 +27,11 @@ module Omnibus
       Omnibus::BuildVersion.new.git_describe
     end
 
-    def initialize
+    # Create a new BuildVersion
+    #
+    # @param [String] path      Path from which to read git version information
+    def initialize(path=nil)
+      @path = path || Omnibus.root
     end
 
     #
@@ -68,7 +72,7 @@ module Omnibus
       @git_describe ||= begin
                           git_cmd = "git describe"
                           shell = Mixlib::ShellOut.new(git_cmd,
-                                                       :cwd => Omnibus.root)
+                                                       :cwd => @path)
                           shell.run_command
                           shell.error!
                           shell.stdout.chomp
