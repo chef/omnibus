@@ -45,8 +45,11 @@ module Omnibus
       Omnibus::BuildVersion.new.git_describe
     end
 
-    # @todo Remove this... it does nothing
-    def initialize
+    # Create a new BuildVersion
+    #
+    # @param [String] path      Path from which to read git version information
+    def initialize(path=nil)
+      @path = path || Omnibus.root
     end
 
     # @!group Version Generator Methods
@@ -130,7 +133,7 @@ module Omnibus
                           git_cmd = "git describe"
                           cmd = shellout(git_cmd,
                                          :live_stream => nil,
-                                         :cwd => Omnibus.project_root)
+                                         :cwd => @path)
                           if cmd.exitstatus == 0
                             cmd.stdout.chomp
                           else
