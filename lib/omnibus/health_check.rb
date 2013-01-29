@@ -69,6 +69,22 @@ module Omnibus
                               /s9_preload\.so\.1/,
                              ]
 
+    SMARTOS_WHITELIST_LIBS = [
+                              /libm.so/,
+                              /libpthread.so/,
+                              /librt.so/,
+                              /libsocket.so/,
+                              /libdl.so/,
+                              /libnsl.so/,
+                              /libgen.so/,
+                              /libmp.so/,
+                              /libmd.so/,
+                              /libc.so/,
+                              /libgcc_s.so/,
+                              /libcrypt.so/,
+                              /libcurses.so/
+                             ]
+
     MAC_WHITELIST_LIBS = [
                           /libobjc\.A\.dylib/,
                           /libSystem\.B\.dylib/,
@@ -182,6 +198,8 @@ module Omnibus
                          MAC_WHITELIST_LIBS
                        when 'solaris2'
                          SOLARIS_WHITELIST_LIBS
+                       when 'smartos'
+                         SMARTOS_WHITELIST_LIBS
                        else
                          WHITELIST_LIBS
                        end
