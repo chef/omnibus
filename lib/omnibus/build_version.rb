@@ -40,19 +40,38 @@ module Omnibus
     #
     def semver
       build_tag = version_tag
+
+      # PRERELEASE VERSION
       if prerelease_version?
         # ensure all dashes are dots per precedence rules (#12) in Semver
         # 2.0.0-rc.1
         prerelease = prerelease_tag.gsub("-", ".")
         build_tag << "-" << prerelease
       end
-      # TODO: We need a configurable option that allows a build to be marked as
-      # a release build and thus leave the build denotation (ie `+` and
-      # everything after) bit off.
-      build_tag << "+" << build_start_time.strftime("%Y%m%d%H%M%S")
+
+      # BUILD VERSION
+      # Follows SemVer conventions and the build version begins with a '+'.
+      build_version_items = []
+
+      # By default we will append a timestamp to every build. This behavior can
+      # be overriden by setting the OMNIBUS_APPEND_TIMESTAMP environment
+      # variable to a 'falsey' value (ie false, f, no, n or 0).
+      #
+      # format: YYYYMMDDHHMMSS example: 20130131123345
+      build_version_items << build_start_time.strftime("%Y%m%d%H%M%S") if append_timestamp?
+
+      # We'll append the git describe information unless we are sitting right
+      # on an annotated tag.
+      #
+      # format: git.COMMITS_SINCE_TAG.GIT_SHA example: git.207.694b062
       unless commits_since_tag == 0
-        build_tag << "." << ["git", commits_since_tag, git_sha_tag].join(".")
+        build_version_items << ["git", commits_since_tag, git_sha_tag].join(".")
       end
+
+      unless build_version_items.empty?
+        build_tag << "+" << build_version_items.join(".")
+      end
+
       build_tag
     end
 
@@ -153,5 +172,13 @@ module Omnibus
       version_regexp.match(git_describe)[1..3]
     end
 
+
+    def append_timestamp?
+      append_timestamp = true
+      if ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/(false|f|no|n|0)$/i))
+        append_timestamp = false
+      end
+      append_timestamp
+    end
   end
 end

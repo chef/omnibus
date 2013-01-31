@@ -28,6 +28,7 @@ describe Omnibus::BuildVersion do
 
   before :each do
     ENV['BUILD_ID'] = nil
+    ENV['OMNIBUS_APPEND_TIMESTAMP'] = nil
     Omnibus::BuildVersion.any_instance.stub(:git_describe).and_return(git_describe)
   end
 
@@ -150,6 +151,38 @@ describe Omnibus::BuildVersion do
       it "appends a timestamp with no git info" do
         build_version.semver.should =~ /11.0.0-alpha2\+#{today_string}[0-9]+/
       end
+    end
+
+    describe "ENV['OMNIBUS_APPEND_TIMESTAMP'] usage" do
+
+      let(:git_describe){ "11.0.0-alpha-3-207-g694b062" }
+
+      it "appends a timestamp if not set" do
+        build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+      end
+
+      context "appends a timestamp if set to a truthy value" do
+        ["true","t","yes","y",1].each do |truthy|
+          let(:value) { truthy }
+          before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = value.to_s }
+
+          it "with #{truthy}" do
+            build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+          end
+        end
+      end
+
+      context "does not append a timestamp if set to a falsey value" do
+        ["false","f","no","n",0].each do |falsey|
+          let(:value) { falsey }
+          before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = value.to_s }
+
+          it "with #{falsey}" do
+            build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
+          end
+        end
+      end
+
     end
   end
 
