@@ -17,6 +17,7 @@
 
 require 'thor'
 require 'omnibus/version'
+require 'mixlib/shellout'
 
 module Omnibus
   class CLI < Thor
@@ -35,8 +36,7 @@ module Omnibus
 
     desc "build PROJECT", "Build the given Omnibus project"
     def build(project)
-      Dir.chdir(options[:path])
-      if looks_like_omnibus_project?
+      if looks_like_omnibus_project?(options[:path])
         say("Building #{project}", :green)
         unless options[:timestamp]
           say("I won't append a timestamp to the version identifier.", :yellow)
@@ -44,9 +44,9 @@ module Omnibus
         # Until we have time to integrate the CLI deeply into the Omnibus codebase
         # this will have to suffice! (sadpanda)
         env = {'OMNIBUS_APPEND_TIMESTAMP' => options[:timestamp].to_s}
-        system(env, "rake projects:#{project}")
+        shellout!("rake projects:#{project}", :environment => env, :cwd => options[:path])
       else
-        say("Given path [#{options[:path]}] does not appear to be a valid Omnibus project root.", :red)
+        raise Thor::Error, "Given path [#{options[:path]}] does not appear to be a valid Omnibus project root."
       end
     end
 
@@ -57,9 +57,25 @@ module Omnibus
 
     private
 
-    def looks_like_omnibus_project?
-      File.exist?(File.join(Dir.pwd, "Rakefile")) &&
-        Dir["#{Dir.pwd}/config/projects/*.rb"].any?
+    def shellout!(command, options={})
+      STDOUT.sync = true
+      default_options = {
+        :live_stream => STDOUT,
+        :environment => {}
+      }
+      shellout = Mixlib::ShellOut.new(command, default_options.merge(options))
+      shellout.run_command
+      shellout.error!
+    end
+
+    # Forces command to exit with a 1 on any failure...so raise away.
+    def self.exit_on_failure?
+      true
+    end
+
+    def looks_like_omnibus_project?(path)
+      File.exist?(File.join(path, "Rakefile")) &&
+        Dir["#{path}/config/projects/*.rb"].any?
     end
   end
 end
