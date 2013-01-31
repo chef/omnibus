@@ -21,17 +21,19 @@ require 'omnibus/version'
 module Omnibus
   class CLI < Thor
 
-    desc "build PROJECT", "Build the given Omnibus project"
     method_option :timestamp,
-    :aliases => [:t],
-    :type => :boolean,
-    :default => true,
-    :desc => "Append timestamp information to the version identifier?  Add a timestamp for nightly releases; leave it off for release and prerelease builds"
+      :aliases => [:t],
+      :type => :boolean,
+      :default => true,
+      :desc => "Append timestamp information to the version identifier?  Add a timestamp for nightly releases; leave it off for release and prerelease builds"
+
     method_option :path,
-    :aliases => [:p],
-    :type => :string,
-    :default => Dir.pwd,
-    :desc => "Path to Omnibus project root."
+      :aliases => [:p],
+      :type => :string,
+      :default => Dir.pwd,
+      :desc => "Path to Omnibus project root."
+
+    desc "build PROJECT", "Build the given Omnibus project"
     def build(project)
       Dir.chdir(options[:path])
       if looks_like_omnibus_project?
