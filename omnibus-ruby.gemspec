@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rake", ">= 0.9"
   s.add_dependency "fpm", "= 0.3.11"
   s.add_dependency "uber-s3"
-  s.add_dependency('thor', '0.16.0')
+  s.add_dependency('thor', '0.17.0')
 
   %w(rspec).each { |gem| s.add_development_dependency gem }
 
