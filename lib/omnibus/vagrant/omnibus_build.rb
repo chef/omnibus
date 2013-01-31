@@ -49,7 +49,7 @@ class OmnibusBuild < ::Vagrant::Command::Base
 
       path = @env.config.global.omnibus.path
       project = argv[1]
-      build_command = "cd #{path} && bundle install && rake projects:#{project}"
+      build_command = "cd #{path} && bundle install && bundle exec omnibus build #{project}"
 
       vm.ui.info "Starting Omnibus build..."
       vm.ui.info "Executing command: `#{build_command}`"
