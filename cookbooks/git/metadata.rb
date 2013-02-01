@@ -11,6 +11,8 @@ recipe            "git::server", "Sets up a runit_service for git daemon"
   supports os
 end
 
-%w{ opencsw runit yum }.each do |cb|
+%w{ opencsw yum }.each do |cb|
   depends cb
 end
+
+suggests "runit", "<= 0.16.2"
