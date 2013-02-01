@@ -44,7 +44,7 @@ module Omnibus
         # Until we have time to integrate the CLI deeply into the Omnibus codebase
         # this will have to suffice! (sadpanda)
         env = {'OMNIBUS_APPEND_TIMESTAMP' => options[:timestamp].to_s}
-        shellout!("rake projects:#{project}", :environment => env, :cwd => options[:path])
+        shellout!("rake projects:#{project} 2>&1", :environment => env, :cwd => options[:path])
       else
         raise Thor::Error, "Given path [#{options[:path]}] does not appear to be a valid Omnibus project root."
       end
