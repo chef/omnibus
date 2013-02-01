@@ -61,6 +61,7 @@ module Omnibus
       STDOUT.sync = true
       default_options = {
         :live_stream => STDOUT,
+        :timeout => 7200, # 2 hours
         :environment => {}
       }
       shellout = Mixlib::ShellOut.new(command, default_options.merge(options))
