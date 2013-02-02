@@ -1,3 +1,7 @@
 *.gem
-Gemfile.lock
 tmp
+
+# Bundler related
+Gemfile.lock
+.bundle/
+vendor/
