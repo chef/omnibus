@@ -227,7 +227,11 @@ module Omnibus
 
       cmd_name = cmd_string.split(/\s+/).first
       time_it("#{cmd_name} command") do
-        shell.run_command
+        if defined?(Bundler)
+          Bundler.with_clean_env { shell.run_command }
+        else
+          shell.run_command
+        end
         shell.error!
       end
     rescue Exception => e
