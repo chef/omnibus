@@ -157,7 +157,7 @@ module Omnibus
                      "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
                      "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
                      "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
-                     "-out #{config.package_dir}\\#{package_name}-#{build_version}.msi"]
+                     "-out #{config.package_dir}\\#{package_name}-#{build_version}-#{iteration}.msi"]
 
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
