@@ -38,6 +38,7 @@ module Omnibus
     def initialize(io, filename)
       @exclusions = Array.new
       @runtime_dependencies = Array.new
+			@conflicts = Array.new
       instance_eval(io)
       render_tasks
     end
