@@ -93,7 +93,7 @@ module Omnibus
 		end
 
 		def pkg_url
-			@url.nil ? "http://www.opscode.com" : @url
+			@url.nil? ? "http://www.opscode.com" : @url
 		end
 
     def replaces(val=NULL_ARG)
