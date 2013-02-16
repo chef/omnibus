@@ -120,6 +120,10 @@ module Omnibus
       @runtime_dependencies = val
     end
 
+		def conflicts(val)
+			@conflicts = val
+		end
+
     def exclude(pattern)
       @exclusions << pattern
     end
@@ -215,6 +219,10 @@ module Omnibus
       @runtime_dependencies.each do |runtime_dep|
         command_and_opts << "--depends '#{runtime_dep}'"
       end
+
+			@conflicts.each do |conflict|
+				command_and_opts << "--conflicts '#{conflict}'"
+			end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
       command_and_opts
