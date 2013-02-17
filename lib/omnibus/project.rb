@@ -38,7 +38,8 @@ module Omnibus
     def initialize(io, filename)
       @exclusions = Array.new
       @runtime_dependencies = Array.new
-			@conflicts = Array.new
+      @conflicts = Array.new
+
       instance_eval(io)
       render_tasks
     end
@@ -71,31 +72,31 @@ module Omnibus
       end
     end
 
-		def pkg_maintainer
-			@maintainer.nil? ? "Opscode, Inc." : @maintainer
-		end
+    def pkg_maintainer
+      @maintainer.nil? ? "Opscode, Inc." : @maintainer
+    end
 
-		def maintainer(val=NULL_ARG)
-			@maintainer = val unless val.equal?(NULL_ARG)
-		end
+    def maintainer(val=NULL_ARG)
+      @maintainer = val unless val.equal?(NULL_ARG)
+    end
 
     def description(val=NULL_ARG)
       @description = val unless val.equal?(NULL_ARG)
       @description
     end
 
-		def pkg_description
-			@description.nil? ? "The full stack of #{@name}" : @description
-		end
+    def pkg_description
+      @description.nil? ? "The full stack of #{@name}" : @description
+    end
 
-		def url(val=NULL_ARG)
-			@url = val unless val.equal?(NULL_ARG)
-			@url
-		end
+    def url(val=NULL_ARG)
+      @url = val unless val.equal?(NULL_ARG)
+      @url
+    end
 
-		def pkg_url
-			@url.nil? ? "http://www.opscode.com" : @url
-		end
+    def pkg_url
+      @url.nil? ? "http://www.opscode.com" : @url
+    end
 
     def replaces(val=NULL_ARG)
       @replaces = val unless val.equal?(NULL_ARG)
@@ -121,9 +122,9 @@ module Omnibus
       @runtime_dependencies = val
     end
 
-		def conflicts(val)
-			@conflicts = val
-		end
+    def conflicts(val)
+      @conflicts = val
+    end
 
     def exclude(pattern)
       @exclusions << pattern
