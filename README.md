@@ -10,7 +10,7 @@ Omnibus is designed to run with a minimal set of prerequisites. At a minimun, yo
 To get started using Omnibus, create a new project and add it to your Gemfile. Executing `bundle install` will pull in all of the gems required for Omnibus to operate.
 
 ```ruby
-gem 'omnibus', :git => 'git@github.com/opscode/omnibus-ruby'
+gem 'omnibus', :git => 'git@github.com:opscode/omnibus-ruby.git'
 ```
 
 In your Rakefile, generate the require the Omnibus gem and load your project and software congifurations to generate the tasks.
