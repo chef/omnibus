@@ -1,6 +1,6 @@
 ## Prerequisites
 
-Omnibus is designed to run with a minimal set of prerequisites. At a minimun, you'll need the following:
+Omnibus is designed to run with a minimal set of prerequisites. At a minimum, you'll need the following:
 
 - Ruby 1.8.7 or later (http://ruby-lang.org)
 - Bundler (http://gembundler.com, http://rubygems.org/gems/bundler)
@@ -13,7 +13,7 @@ To get started using Omnibus, create a new project and add it to your Gemfile. E
 gem 'omnibus', :git => 'git@github.com/opscode/omnibus-ruby'
 ```
 
-In your Rakefile, generate the require the Omnibus gem and load your project and software congifurations to generate the tasks.
+In your Rakefile, require the Omnibus gem and load your project and software configurations to generate the tasks.
 
 ```ruby
 require 'omnibus'
@@ -26,12 +26,12 @@ If you've already set up software and project configurations, executing `rake -T
 
 ```
 rake projects:chef                    # build and package chef
-rake prokects:chef:software:ruby      # fetch and build ruby
+rake projects:chef:software:ruby      # fetch and build ruby
 rake projects:chef:software:rubygems  # fetch and build rubygems
-rake prokects:chef:software:chef-gem  # fetch and build chef-gem
+rake projects:chef:software:chef-gem  # fetch and build chef-gem
 ```
 
-Executing `rake projects:chef` will recursively build all of the dependencies of Chef from scratch. In the case above, Ruby is build first, followed by the installation of Rubygems. Finally, Chef is installed from gems. Executing the top-level project task (projects:chef) also packages the project for distribution on the target platform (e.g. RPM on RedHat-based systems and DEB on Debian-based systems).
+Executing `rake projects:chef` will recursively build all of the dependencies of Chef from scratch. In the case above, Ruby is built first, followed by the installation of Rubygems. Finally, Chef is installed from gems. Executing the top-level project task (projects:chef) also packages the project for distribution on the target platform (e.g. RPM on RedHat-based systems and DEB on Debian-based systems).
 
 ## Configuration DSL
 
@@ -92,7 +92,7 @@ dependencies    ["chef"]
 
 ## Build Structure
 
-Omnibus creates and stores build arifacts in a direcory tree under `/var/cache/omnnibus`
+Omnibus creates and stores build artifacts in a directory tree under `/var/cache/omnnibus`
 
 ```
 └── /var/cache/omnibus    
@@ -106,7 +106,7 @@ Omnibus creates and stores build arifacts in a direcory tree under `/var/cache/o
 
 ### cache
 
-The `cache` directory caches the download artifacts for software sources. It keeps pristine tarballs and git repositories, depending on the type of sorce specified.
+The `cache` directory caches the download artifacts for software sources. It keeps pristine tarballs and git repositories, depending on the type of source specified.
 
 ### src
 
@@ -116,7 +116,7 @@ The `src` directory is where the extracted source code for a piece of software l
 
 The `build` directory is where Omnibus keeps track of the build artifacts for each piece of software.
 
-__install_path:__ The undersocre-separated installation path of the project being built (e.g. /opt/chef => opt_chef). Segregating build artifacts by installation path allows us to keep track of the builds for the same pieces of software that are installed in two different locations (e.g. building an embedded Ruby for /opt/chef and /opt/ohai).
+__install_path:__ The underscore-separated installation path of the project being built (e.g. /opt/chef => opt_chef). Segregating build artifacts by installation path allows us to keep track of the builds for the same pieces of software that are installed in two different locations (e.g. building an embedded Ruby for /opt/chef and /opt/ohai).
 
 __*.fetch:__ A sentinel file representing the mtime of the most recent local fetch of the software.
 
