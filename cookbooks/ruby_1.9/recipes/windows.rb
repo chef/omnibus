@@ -31,7 +31,7 @@ remote_file "#{Chef::Config[:file_cache_path]}/#{ruby_name}" do
 end
 
 windows_batch "install ruby" do
-  command "#{Chef::Config[:file_cache_path]}/#{ruby_name} /verysilent /dir=C:\\Ruby193 /tasks=\"assocfiles\""
+  command "#{Chef::Config[:file_cache_path]}/#{ruby_name} /silent /dir=C:\\Ruby193 /tasks=\"assocfiles\""
   creates "C:\\Ruby193\\bin\\ruby.exe"
 end
 
