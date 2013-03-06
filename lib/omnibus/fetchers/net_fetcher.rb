@@ -177,6 +177,8 @@ E
         "bzip2 -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
       elsif project_file.end_with?(".7z")
         "7z.exe x #{project_file} -o#{source_dir} -r -y"
+      elsif project_file.end_with?(".zip")
+        "unzip #{project_file} -d #{source_dir}"
       else
         #if we don't recognize the extension, simply copy over the file
         Proc.new do
