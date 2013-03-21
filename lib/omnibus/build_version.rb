@@ -16,7 +16,7 @@
 #
 
 require 'time'
-require 'mixlib/shellout'
+require 'omnibus/util'
 
 module Omnibus
 
@@ -31,6 +31,7 @@ module Omnibus
   # @todo Rename this class to reflect its absolute dependence on running in a
   #   Git repository.
   class BuildVersion
+    include Omnibus::Util
 
     # Formatting string for the timestamp component of our SemVer build specifier.
     #
@@ -127,11 +128,16 @@ module Omnibus
     def git_describe
       @git_describe ||= begin
                           git_cmd = "git describe"
-                          shell = Mixlib::ShellOut.new(git_cmd,
-                                                       :cwd => Omnibus.project_root)
-                          shell.run_command
-                          shell.error!
-                          shell.stdout.chomp
+                          cmd = shellout(git_cmd,
+                                         :cwd => Omnibus.project_root)
+                          if cmd.exitstatus == 0
+                            cmd.stdout.chomp
+                          else
+                            msg =  "Could not extract version information from `git describe`. "
+                            msg << "Setting version to 0.0.0"
+                            puts msg
+                            "0.0.0"
+                          end
                         end
     end
 

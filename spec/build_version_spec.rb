@@ -29,7 +29,9 @@ describe Omnibus::BuildVersion do
   before :each do
     ENV['BUILD_ID'] = nil
     ENV['OMNIBUS_APPEND_TIMESTAMP'] = nil
-    Omnibus::BuildVersion.any_instance.stub(:git_describe).and_return(git_describe)
+    Omnibus::BuildVersion.any_instance.stub(:shellout)
+                 .with("git describe", {:cwd => nil})
+                 .and_return(mock("ouput", :stdout => git_describe, :exitstatus => 0))
   end
 
   describe "git describe parsing" do
@@ -204,6 +206,23 @@ describe Omnibus::BuildVersion do
     it "outputs a deprecation message" do
       Omnibus::BuildVersion.should_receive(:puts).with(/is deprecated/)
       Omnibus::BuildVersion.full
+    end
+  end
+
+  describe "`git describe` command failure" do
+    before do
+      stderr =<<-STDERR
+fatal: No tags can describe '809ea1afcce67e1148c1bf0822d40a7ef12c380e'.
+Try --always, or create some tags.
+      STDERR
+      build_version.stub(:shellout)
+                   .with("git describe", {:cwd => nil})
+                   .and_return(mock("ouput",
+                                    :stderr => stderr,
+                                    :exitstatus => 128))
+    end
+    it "sets the version to 0.0.0" do
+      build_version.git_describe.should eq("0.0.0")
     end
   end
 end
