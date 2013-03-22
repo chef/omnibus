@@ -24,6 +24,7 @@ require 'thor'
 module Omnibus
   class CLI < Thor
     include Omnibus::Util
+    include Thor::Actions
 
     # Constructs a new instance.
     def initialize(*args)
@@ -71,12 +72,44 @@ module Omnibus
       end
     end
 
+    desc "project PROJECT", "Creates a skeletal Omnibus project"
+    def project(name)
+      target = File.join(Dir.pwd, name)
+      install_path = File.join("/opt", name)
+      opts = {
+        :name => name,
+        :install_path => install_path
+      }
+
+      create_file(File.join(target, "config", "software", "README.md"),
+                  "Software definitions for your project's dependencies go here!")
+      template(File.join("Gemfile.erb"), File.join(target, "Gemfile"), opts)
+      template(File.join("gitignore.erb"), File.join(target, ".gitignore"), opts)
+      template(File.join("project.rb.erb"), File.join(target, "config", "projects", "#{name}.rb"), opts)
+      template(File.join("README.md.erb"), File.join(target, "README.md"), opts)
+
+      # render out stub packge scripts
+      %w{ makeselfinst postinst postrm }.each do |package_script|
+        script_path = File.join(target, "package-scripts", name, package_script)
+        template_path = File.join("package_scripts", "#{package_script}.erb")
+        # render the package script
+        template(template_path, script_path, opts)
+        # ensure the package script is executable
+        FileUtils.chmod(0755, script_path)
+      end
+    end
+
     desc "version", "Display version information"
     def version
       say("Omnibus: #{Omnibus::VERSION}", :yellow)
     end
 
     private
+
+    # Used by `Thor::Actions#template` to locate ERB templates
+    def self.source_root
+      File.expand_path(File.join(File.dirname(__FILE__), 'templates'))
+    end
 
     # Forces command to exit with a 1 on any failure...so raise away.
     def self.exit_on_failure?
