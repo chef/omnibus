@@ -1,0 +1,23 @@
+
+name "<%= config[:name] %>"
+
+replaces        "<%= config[:name] %>"
+install_path    "<%= config[:install_path] %>"
+build_version   Omnibus::BuildVersion.new.semver
+build_iteration "1"
+
+deps = []
+
+# global
+deps << "preparation" # creates required build directories
+
+# <%= config[:name] %> deps
+# deps << "somedep"
+
+# version manifest file
+deps << "version-manifest"
+
+dependencies deps
+
+exclude "\.git*"
+exclude "bundler\/git"
