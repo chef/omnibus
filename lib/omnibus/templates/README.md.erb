@@ -1,0 +1,38 @@
+# "<%= config[:name] %>" omnibus project
+
+This project creates a full-stack platform-specific package for "foobaz"!
+
+## Installation
+
+We'll assume you have Ruby 1.9+ and Bundler installed. Ensure all required gems
+are installed and ready to use:
+
+```shell
+$ bundle install --binstubs
+```
+
+## Usage
+
+### Build
+
+You create a platform-specific package using the `build` command:
+
+```shell
+$ bin/omnibus build <%= config[:name] %>
+```
+
+Packages will be available in `pkg/`.
+
+### Clean
+
+You can clean up Omnibus build artifacts with the `clean` command:
+
+```shell
+$ bin/omnibus clean
+```
+
+### Help
+
+```shell
+$ bin/omnibus help
+```
