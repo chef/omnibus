@@ -45,6 +45,8 @@ module Omnibus
     configurable :source_dir, :default => "/var/cache/omnibus/src"
     configurable :build_dir, :default => "/var/cache/omnibus/build"
     configurable :package_dir, :default => "/var/cache/omnibus/pkg"
+
+    # @todo This appears to be unused, and actually conflated with Omnibus::Project#install_path
     configurable :install_dir, :default => "/opt/chef"
 
     configurable :use_s3_caching, :default => false
