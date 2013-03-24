@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,9 @@ module Omnibus
     # can arise from instance_eval.
     class DSLProxy
       extend Forwardable
+
+      # @todo def_delegators :@builder, :patch, :command, :ruby, ...
+
       def_delegator :@builder, :patch
       def_delegator :@builder, :command
       def_delegator :@builder, :ruby
@@ -61,14 +64,16 @@ module Omnibus
 
     end
 
-    #--
-    # TODO: code duplication with Fetcher::ErrorReporter
+
+    # @todo code duplication with {Fetcher::ErrorReporter}
     class ErrorReporter
 
+      # @todo fetcher isn't even used
       def initialize(error, fetcher)
         @error, @fetcher = error, fetcher
       end
 
+      # @todo this isn't necessary
       def e
         @error
       end
@@ -90,6 +95,7 @@ module Omnibus
 
     end
 
+    # @todo Look at using Bundler.with_clean_env{ ... } instead
     BUNDLER_BUSTER = {  "RUBYOPT"         => nil,
                         "BUNDLE_BIN_PATH" => nil,
                         "BUNDLE_GEMFILE"  => nil,
@@ -140,6 +146,9 @@ module Omnibus
       end
     end
 
+    # @todo all these ruby commands (ruby, gem, bundle, rake) could
+    #   all be collapsed into a single underlying implementation, since
+    #   they all just differ on the executable being called
     def ruby(*args)
       @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/ruby", *args))
     end
@@ -302,6 +311,9 @@ module Omnibus
 
   end
 
+  # @todo What's the point of this class?  Can we not just detect that
+  #   there are no commands in {Omnibus::Builder#build} and output the
+  #   appropriate message?  Seems like a lot of extra ceremony.
   class NullBuilder < Builder
 
     def build
