@@ -15,18 +15,27 @@
 # limitations under the License.
 #
 
-#
-# omnibus project dsl reader
-#
-
 module Omnibus
+
+  # Omnibus project DSL reader
+  #
+  # @todo It seems like there's a bit of a conflation between a
+  #   "project" and a "package" in this class... perhaps the
+  #   package-building portions should be extracted to a separate
+  #   class.
+  # @todo: Reorder DSL methods to fit in the same YARD group
+  # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
     include Rake::DSL
 
+    # @todo Why not just use `nil`?
     NULL_ARG = Object.new
 
     attr_reader :dependencies
 
+    # Convenience method to initialize a Project from a DSL file.
+    #
+    # @param filename [String] the filename of the Project DSL file to load.
     def self.load(filename)
       new(IO.read(filename), filename)
     end
@@ -35,6 +44,17 @@ module Omnibus
       @@projects ||= []
     end
 
+
+    # Create a new Project from the contents of a DSL file.  Prefer
+    # calling {Omnibus::Project#load} instead of using this method
+    # directly.
+    #
+    # @param io [String] the contents of a Project DSL (_not_ the filename!)
+    # @param filename [String] unused!
+    #
+    # @see Omnibus::Project#load
+    #
+    # @todo Remove filename parameter, as it is unused.
     def initialize(io, filename)
       @exclusions = Array.new
       @runtime_dependencies = Array.new
@@ -42,21 +62,49 @@ module Omnibus
       render_tasks
     end
 
+    # @!group DSL methods
+    # Here is some broad documentation for the DSL methods as a whole.
+
+    # Set or retrieve the name of the project
+    #
+    # @param val [String] the name to set
+    # @return [String]
+    #
+    # @todo We should fail if this is left nil
     def name(val=NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
       @name
     end
 
+    # Set or retrieve the package name of the project.  Unless
+    # explicitly set, the package name defaults to the project name
+    #
+    # @param val [String] the package name to set
+    # @return [String]
     def package_name(val=NULL_ARG)
       @package_name = val unless val.equal?(NULL_ARG)
       @package_name.nil? ? @name : @package_name
     end
 
+    # Set or retrieve the path at which the project should be
+    # installed by the generated package.
+    #
+    # @param val [String]
+    # @return [String]
+    #
+    # @todo We should fail if this is left nil
     def install_path(val=NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
       @install_path
     end
 
+    # Defines the iteration for the package to be generated.  Adheres
+    # to the conventions of the platform for which the package is
+    # being built.
+    #
+    # All iteration strings begin with the value set in {#build_iteration}
+    #
+    # @return [String]
     def iteration
       case platform_family
       when 'rhel'
@@ -70,59 +118,201 @@ module Omnibus
       end
     end
 
+    # Set or retrieve the project description.
+    #
+    # @param val [String] the project description
+    # @return [String]
+    #
+    # @todo Does not currently appear to be used; the `--description`
+    #   flag in {#fpm_command} is currently set to "The full stack of @name".
+    #   That should be the default here.  When the fpm command uses
+    #   this value, the documentation here should indicate that this
+    #   will be used for fpm's `--description` flag, to give users a
+    #   better idea of what is expected.
     def description(val=NULL_ARG)
       @description = val unless val.equal?(NULL_ARG)
       @description
     end
 
+    # Set or retrieve the name of the package this package will replace.
+    #
+    # Ultimately used as the value for the `--replaces` flag in
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @param val [String] the name of the package to replace
+    # @return [String]
+    #
+    # @todo Consider having this default to {#package_name}; many uses of this
+    #   method effectively do this already.
     def replaces(val=NULL_ARG)
       @replaces = val unless val.equal?(NULL_ARG)
       @replaces
     end
 
+    # Set or retrieve the version of the project.
+    #
+    # @param val [String] the version to set
+    # @return [String]
+    #
+    # @see Omnibus::BuildVersion
     def build_version(val=NULL_ARG)
       @build_version = val unless val.equal?(NULL_ARG)
       @build_version
     end
 
+    # Set or retrieve the build iteration of the project.
+    #
+    # @param val [String, Fixnum]
+    # @return [String, Fixnum]
+    #
+    # @todo Current usage shows both Strings and Integers are
+    #   used... Is a real string (e.g. "foo") ever a legitimate value?
+    #   If not, we should just document this as accepting integers for
+    #   simplicity.
+    # @todo This should default to some sensible value ("1"?), since
+    #   it will end up generating weird iteration values if it is
+    #   allowed to remain nil
+    # @todo Is there a better name for this than "build_iteration"?
+    #   Would be nice to cut down confusiton with {#iteration}.
     def build_iteration(val=NULL_ARG)
       @build_iteration = val unless val.equal?(NULL_ARG)
       @build_iteration
     end
 
+    # Set or retrieve the list of software dependencies for this
+    # project.  As this is a DSL method, only pass the names of
+    # software components, not {Omnibus::Software} objects.
+    #
+    # These is the software that comprises your project, and is
+    # distinct from runtime dependencies.
+    #
+    # @param val [Array<String>] a list of names of Software components
+    # @return [Array<String>]
+    #
+    # @see Omnibus::Software
+    # @see #runtime_dependencies
+    #
+    # @todo Consider renaming / aliasing this to "components" to
+    #   prevent confusion with {#runtime_dependencies}
+    # @todo Why does this class also have a `dependencies` attribute
+    #   reader defined?  I suppose this overwrites it, eh?  It should
+    #   be removed.
+    # @todo It would be more useful to have a `depend` method (similar
+    #   to {#exclude}), that appends to an array.  That would
+    #   eliminate patterns like we see in omnibus-chef, where we have
+    #   code like:
+    #     deps = []
+    #     deps << "chef"
+    #     ...
+    #     dependencies deps
     def dependencies(val=NULL_ARG)
       @dependencies = val unless val.equal?(NULL_ARG)
       @dependencies
     end
 
+    # Set the names of packages that are runtime dependencies of this
+    # project.
+    #
+    # Corresponds to the `--depends` flag of
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @param val [Array<String>]
+    #
+    # @return [Array<String>]
+    #
+    # @todo Is it useful to rename / alias this to "depends", in
+    #   keeping with the usage in fpm, as well as our own # {#replaces}
+    #   method?
+    # @todo This method should to be brought into line with the other
+    #   DSL methods, and not have @runtime_dependencies initialized in
+    #   the constructor.
     def runtime_dependencies(val)
       @runtime_dependencies = val
     end
 
+    # Add a new exclusion pattern.
+    #
+    # Corresponds to the `--exclude` flag of {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @param pattern [String]
+    # @return void
     def exclude(pattern)
       @exclusions << pattern
     end
 
+    # Returns the platform version of the machine on which Omnibus is
+    # running, as determined by Ohai.
+    #
+    # @return [String]
     def platform_version
       OHAI.platform_version
     end
 
+    # Returns the platform of the machine on which Omnibus is running,
+    # as determined by Ohai.
+    #
+    # @return [String]
     def platform
       OHAI.platform
     end
 
+    # Returns the platform family of the machine on which Omnibus is
+    # running, as determined by Ohai.
+    #
+    # @return [String]
     def platform_family
       OHAI.platform_family
     end
 
+    # Convenience method for accessing the global Omnibus configuration object.
+    #
+    # @return Omnibus::Config
+    #
+    # @see Omnibus::Config
     def config
       Omnibus.config
     end
 
+    # The path to the package scripts directory for this project.
+    # These are optional scripts that can be bundled into the
+    # resulting package for running at various points in the package
+    # management lifecycle.
+    #
+    # Currently supported scripts include:
+    #
+    # * postinst
+    #
+    #   A post-install script
+    # * prerm
+    #
+    #   A pre-uninstall script
+    # * postrm
+    #
+    #   A post-uninstall script
+    #
+    # Any scripts with these names that are present in the package
+    # scripts directory will be incorporated into the package that is
+    # built.  This only applies to fpm-built packages.
+    #
+    # Additionally, there may be a `makeselfinst` script.
+    #
+    # @return [String]
+    #
+    # @todo This documentation really should be up at a higher level,
+    #   particularly since the user has no way to change the path.
     def package_scripts_path
       "#{Omnibus.root}/package-scripts/#{name}"
     end
 
+    # Determine the package type(s) to be built, based on the platform
+    # family for which the package is being built.
+    #
+    # If specific types cannot be determined, default to `["makeself"]`.
+    #
+    # @return [Array<(String)>]
+    #
+    # @todo Why does this only ever return a single-element array,
+    #   instead of just a string, or symbol?
     def package_types
       case platform_family
       when 'debian'
@@ -138,6 +328,13 @@ module Omnibus
       end
     end
 
+    # Indicates whether `software` is defined as a software component
+    # of this project.
+    #
+    # @param software [String, Omnibus::Software, #name]
+    # @return [Boolean]
+    #
+    # @see #dependencies
     def dependency?(software)
       name = if software.respond_to?(:name)
                software.send(:name)
@@ -147,8 +344,22 @@ module Omnibus
       @dependencies.include?(name)
     end
 
+    # @!endgroup
+
     private
 
+    # The command to generate an MSI package on Windows platforms.
+    #
+    # Does not execute the command, only assembles it.
+    #
+    # @return [Array<(String, Hash)>] The complete MSI command, plus a
+    #   Hash of options to be passed on to Mixlib::ShellOut
+    #
+    # @see Mixlib::ShellOut
+    #
+    # @todo For this and all the *_command methods, just return a
+    #   Mixlib::ShellOut object ready for execution.  Using Arrays
+    #   makes downstream processing needlessly complicated.
     def msi_command
       msi_command = ["light.exe",
                      "-nologo",
@@ -163,7 +374,26 @@ module Omnibus
       # about some expected warnings...
       [msi_command.join(" "), {:returns => [0, 204]}]
     end
-    
+
+    # The {https://github.com/jordansissel/fpm fpm} command to
+    # generate a package for RedHat, Ubuntu, Solaris, etc. platforms.
+    #
+    # Does not execute the command, only assembles it.
+    #
+    # In contrast to {#msi_command}, command generated by
+    # {#fpm_command} does not require any Mixlib::Shellout options.
+    #
+    # @return Array[<String>] the components of the fpm command; need
+    #   to be joined with " " first.
+    #
+    # @todo Just make this return a String instead of an Array
+    # @todo The package maintainer is currently hard-coded as
+    #   "Opscode, Inc.", which is sub-optimal for users that are not
+    #   Opscode.  We should add a "maintainer" method to the project DSL
+    # @todo The url is also hard-coded to "http://www.opscode.com".
+    #   This should also be governed by a method in the DSL.
+    # @todo Use the long option names (i.e., the double-dash ones) in
+    #   the fpm command for maximum clarity.
     def fpm_command(pkg_type)
       command_and_opts = ["fpm",
                           "-s dir",
@@ -199,6 +429,7 @@ module Omnibus
       command_and_opts
     end
 
+    # TODO: what's this do?
     def makeself_command
       command_and_opts = [ File.expand_path(File.join(Omnibus.gem_root, "bin", "makeself.sh")),
                            "--gzip",
@@ -210,6 +441,11 @@ module Omnibus
       command_and_opts
     end
 
+    # Dynamically generate Rake tasks to build projects and all the software they depend on.
+    #
+    # @note Much Rake magic ahead!
+    #
+    # @return void
     def render_tasks
       directory config.package_dir
       directory "pkg"
@@ -260,6 +496,8 @@ module Omnibus
               end
             end
 
+            # TODO: why aren't these dependencies just added in at the
+            # initial creation of the 'pkg_type' task?
             task pkg_type => config.package_dir
             task pkg_type => "#{@name}:health_check"
           end
