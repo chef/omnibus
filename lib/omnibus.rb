@@ -30,80 +30,188 @@ require 'omnibus/software'
 require 'omnibus/project'
 require 'omnibus/fetchers'
 require 'omnibus/s3_cacher'
-require 'omnibus/s3_tasks'
 require 'omnibus/health_check'
-require 'omnibus/clean_tasks'
 require 'omnibus/build_version'
 require 'omnibus/overrides'
 
+require 'pathname'
+
 module Omnibus
 
-  def self.root=(root)
-    @root = root
+  # Configure Omnibus.
+  #
+  # After this has been called, the {Omnibus::Config} object is
+  # available as `Omnibus.config`.
+  #
+  # @yieldparam config [Omnibus::Config] a new configuration object
+  # @yieldreturn [void]
+  #
+  # @example Simple Configuration using Default Values
+  #   Omnibus.configure
+  # @example Configuring with a Block
+  #   Omnibus.configure do |config|
+  #     config.project_dir  = 'omnibus/files/projects'
+  #     config.software_dir = 'omnibus/files/software'
+  #   end
+  # @return [void]
+  def self.configure
+    root = Pathname.pwd.to_s
+    gem_root = Pathname.new(__FILE__).expand_path("../..").to_s
+
+    configuration = Omnibus::Config.new(root, gem_root)
+
+    yield configuration if block_given?
+
+    configuration.validate
+    @configuration = configuration
+
+    process_dsl_files(configuration)
+    generate_extra_rake_tasks(configuration)
   end
 
-  def self.root
-    @root
+  # Provide access to a completely set-up {Omnibus::Config} object.
+  #
+  # @raise [Omnibus::NoConfiguration] if Omnibus has not been configured yet.
+  #
+  # @see Omnibus#configure
+  def self.config
+    @configuration ||= raise NoConfiguration
   end
 
-  def self.gem_root=(root)
-    @gem_root = root
+  # All the {Omnibus::Project} objects that have been created.
+  #
+  # @return [Array<Omnibus::Project>]
+  def self.projects
+    @projects ||= []
   end
 
-  def self.gem_root
-    @gem_root
+  private
+
+  # Generates {Omnibus::Project}s for each project DSL file in
+  # `project_specs`.  All projects are then accessible at
+  # {Omnibus#projects}
+  #
+  # @param project_files [Array<String>] paths to all the project DSL
+  #   files to expand
+  # @return [void]
+  #
+  # @see Omnibus::Project
+  def self.expand_projects(project_files)
+    project_files.each do |spec|
+      Omnibus.projects << Omnibus::Project.load(spec)
+    end
   end
 
-  def self.setup(options = {})
-    self.root = Dir.pwd
-    self.gem_root = File.expand_path("../../", __FILE__)
-    load_config
-    yield self if block_given?
+  # Generate {Omnibus::Software} objects for all software DSL files in
+  # `software_specs`.
+  #
+  # @param overrides [Hash] a hash of version override information.
+  # @param software_files [Array<String>]
+  # @return [void]
+  #
+  # @see Omnibus::Overrides#overrides
+  def self.expand_software(overrides, software_files)
+    unless overrides.is_a? Hash
+      raise ArgumentError, "Overrides argument must be a hash!  You passed #{overrides.inspect}."
+    end
+
+    # TODO: Why are we doing a full Cartesian product of (projects x
+    # software) without regard for the actual dependencies of the
+    # projects?
+    software_files.each do |f|
+      Omnibus.projects.each do |p|
+        s = Omnibus::Software.load(f, p, overrides)
+        Omnibus.component_added(s) if p.dependency?(s)
+      end
+    end
   end
 
-  def self.config_path
-    File.expand_path("omnibus.rb", root)
+  # Processes all configured {Omnibus::Project} and
+  # {Omnibus::Software} DSL files.
+  #
+  # @param config [Omnibus::Config]
+  # @return [void]
+  def self.process_dsl_files(config)
+
+    # Do projects first
+    project_files = ruby_files(config.project_dir)
+    expand_projects(project_files)
+
+    # Then do software
+    software_files = prefer_local_software(omnibus_software_files,
+                                           ruby_files(config.software_dir))
+
+    overrides = config.override_file ? Omnibus::Overrides.overrides : {}
+
+    expand_software(overrides, software_files)
   end
 
-  def self.load_config
-    if File.exist?(config_path)
-      TOPLEVEL_BINDING.eval(IO.read(config_path))
+  # Creates some additional Rake tasks beyond those generated in the
+  # process of reading in the DSL files.
+  #
+  # @param config [Omnibus::Config]
+  # @return [void]
+  #
+  # @todo Not so sure I like how this is being done, but at least it
+  #   isolates the Rake stuff.
+  def self.generate_extra_rake_tasks(config)
+    require 'omnibus/clean_tasks'
+
+    if config.use_s3_caching
+      require 'omnibus/s3_tasks'
+    end
+  end
+
+  # Return a list of all the Ruby files (i.e., those with an "rb"
+  # extension) in the given directory
+  #
+  # @param dir [String]
+  # @return [Array<String>]
+  def self.ruby_files(dir)
+    Dir.glob("#{dir}/*.rb")
+  end
+
+  # Retrieve the fully-qualified paths to every software definition
+  # file bundled in the {https://github.com/opscode/omnibus-software omnibus-software} gem.
+  #
+  # @return [Array<String>] the list of paths.  Will be empty if the
+  #   `omnibus-software` gem is not in the bundle
+  def self.omnibus_software_files
+    specs = Bundler.definition.specs["omnibus-software"]
+    if specs.empty?
+      []
     else
-      puts("No config file found in #{config_path}, exiting.")
-      exit 1
+      gem_dir = specs[0].gem_dir
+      Dir.glob(File.join(gem_dir, 'config', 'software', '*.rb'))
     end
   end
 
-  #--
-  # Extra indirection so we don't need the Rake::DSL in the Omnibus module
-  module Loader
-    extend Rake::DSL
-
-    def self.software(overrides, *path_specs)
-      raise ArgumentError, "Overrides argument must be a hash!  You passed #{overrides}." unless overrides.is_a? Hash
-      FileList[*path_specs].each do |f|
-        Omnibus::Project.all_projects.each do |p|
-          s = Omnibus::Software.load(f, p, overrides)
-          Omnibus.component_added(s) if p.dependency?(s)
-        end
-      end
-    end
-
-    def self.projects(*path_specs)
-      FileList[*path_specs].each do |f|
-        p = Omnibus::Project.load(f)
-        Omnibus::Project.all_projects << p
-        p
-      end
-    end
+  # Given a list of software definitions from `omnibus-software` itself, and a
+  # list of software files local to the current project, create a
+  # single list of software definitions.  If the software was defined
+  # in both sets, the locally-defined one ends up in the final list.
+  #
+  # The base name of the software file determines what software it
+  # defines.
+  #
+  # @param omnibus_files [Array<String>]
+  # @param local_files [Array<String>]
+  # @return [Array<String>]
+  def self.prefer_local_software(omnibus_files, local_files)
+    base = software_map(omnibus_files)
+    local = software_map(local_files)
+    base.merge(local).values
   end
 
-  def self.software(overrides, *path_specs)
-    Loader.software(overrides, *path_specs)
-  end
-
-  def self.projects(*path_specs)
-    Loader.projects(*path_specs)
+  # Given a list of file paths, create a map of the basename (without
+  # extension) to the complete path.
+  #
+  # @param files [Array<String>]
+  # @return [Hash<String, String>]
+  def self.software_map(files)
+    files.each_with_object({}) do |file, collection|
+      software_name = File.basename(file, ".*")
+      collection[software_name] = file
+    end
   end
 end
-

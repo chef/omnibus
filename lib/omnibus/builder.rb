@@ -124,7 +124,7 @@ module Omnibus
 
       # we'll search for a patch file in the project root AND
       # the omnibus-software gem
-      candidate_roots = [Omnibus.root]
+      candidate_roots = [Omnibus.config.root]
       if omnibus_software = Gem::Specification.find_all_by_name('omnibus-software').first
         candidate_roots << omnibus_software.gem_dir
       end

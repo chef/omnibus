@@ -40,10 +40,6 @@ module Omnibus
       new(IO.read(filename), filename)
     end
 
-    def self.all_projects
-      @@projects ||= []
-    end
-
 
     # Create a new Project from the contents of a DSL file.  Prefer
     # calling {Omnibus::Project#load} instead of using this method
@@ -301,7 +297,7 @@ module Omnibus
     # @todo This documentation really should be up at a higher level,
     #   particularly since the user has no way to change the path.
     def package_scripts_path
-      "#{Omnibus.root}/package-scripts/#{name}"
+      "#{Omnibus.config.root}/package-scripts/#{name}"
     end
 
     # Determine the package type(s) to be built, based on the platform

@@ -128,7 +128,7 @@ module Omnibus
       @git_describe ||= begin
                           git_cmd = "git describe"
                           shell = Mixlib::ShellOut.new(git_cmd,
-                                                       :cwd => Omnibus.root)
+                                                       :cwd => Omnibus.config.root)
                           shell.run_command
                           shell.error!
                           shell.stdout.chomp
