@@ -96,6 +96,13 @@ module Omnibus
     @source_root ||= Pathname.new(File.expand_path("../..", __FILE__))
   end
 
+  # Backward compat alias
+  #
+  # @todo print a deprecation message
+  class << self
+    alias :root :source_root
+  end
+
   private
 
   # Generates {Omnibus::Project}s for each project DSL file in
