@@ -124,10 +124,8 @@ module Omnibus
 
       # we'll search for a patch file in the project root AND
       # the omnibus-software gem
-      candidate_roots = [Omnibus.config.root]
-      if omnibus_software = Gem::Specification.find_all_by_name('omnibus-software').first
-        candidate_roots << omnibus_software.gem_dir
-      end
+      candidate_roots = [Omnibus.project_root]
+      candidate_roots << Omnibus.omnibus_software_root if Omnibus.omnibus_software_root
 
       candidate_paths = candidate_roots.map do |root|
         File.expand_path("#{root}/config/patches/#{name}/#{args[:source]}")

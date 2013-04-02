@@ -89,11 +89,25 @@ module Omnibus
     @project_root ||= Pathname.pwd
   end
 
-  # The source root is the path to the root directory of the Omnibus gem.
+  # The source root is the path to the root directory of the `omnibus` gem.
   #
   # @return [Pathname]
   def self.source_root
     @source_root ||= Pathname.new(File.expand_path("../..", __FILE__))
+  end
+
+  # The source root is the path to the root directory of the `omnibus-software`
+  # gem.
+  #
+  # @return [Pathname]
+  def self.omnibus_software_root
+    @omnibus_software_root ||= begin
+      if spec = Gem::Specification.find_all_by_name('omnibus-software').first
+        Pathname.new(spec.gem_dir)
+      else
+        nil
+      end
+    end
   end
 
   # Backward compat alias
@@ -192,15 +206,13 @@ module Omnibus
   # Retrieve the fully-qualified paths to every software definition
   # file bundled in the {https://github.com/opscode/omnibus-software omnibus-software} gem.
   #
-  # @return [Array<String>] the list of paths.  Will be empty if the
-  #   `omnibus-software` gem is not in the bundle
+  # @return [Array<String>] the list of paths. Will be empty if the
+  #   `omnibus-software` gem is not in the gem path.
   def self.omnibus_software_files
-    specs = Bundler.definition.specs["omnibus-software"]
-    if specs.empty?
-      []
+    if omnibus_software_root
+      Dir.glob(File.join(omnibus_software_root, 'config', 'software', '*.rb'))
     else
-      gem_dir = specs[0].gem_dir
-      Dir.glob(File.join(gem_dir, 'config', 'software', '*.rb'))
+      []
     end
   end
 
