@@ -122,7 +122,7 @@ module Omnibus
     # Asserts that the Config object is in a valid state.  If invalid
     # for any reason, an exception will be thrown.
     #
-    # @throw [RuntimeError]
+    # @raise [RuntimeError]
     # @return [void]
     def validate
       [:valid_s3_config?].each do |test|
