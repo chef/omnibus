@@ -22,8 +22,6 @@ module Omnibus
   # Global configuration object for Omnibus runs.
   class Config
 
-    attr_reader :root, :gem_root
-
     # This macro is just for setting up a read/write attribute whose
     # reader has a default value.  We're doing it this way in order to
     # expose the defaults in API documentation.
@@ -44,10 +42,6 @@ module Omnibus
         x = self.instance_variable_get("@#{name}")
         x ||= default
       end
-    end
-
-    def initialize(root, gem_root)
-      @root, @gem_root = root, gem_root
     end
 
     # @!group Directory Configuration Parameters

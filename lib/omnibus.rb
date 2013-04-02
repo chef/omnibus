@@ -55,10 +55,7 @@ module Omnibus
   #   end
   # @return [void]
   def self.configure
-    root = Pathname.pwd.to_s
-    gem_root = Pathname.new(__FILE__).expand_path("../..").to_s
-
-    configuration = Omnibus::Config.new(root, gem_root)
+    configuration = Omnibus::Config.new
 
     yield configuration if block_given?
 
@@ -83,6 +80,20 @@ module Omnibus
   # @return [Array<Omnibus::Project>]
   def self.projects
     @projects ||= []
+  end
+
+  # The absolute path to the Omnibus project/repository directory.
+  #
+  # @return [Pathname]
+  def self.project_root
+    @project_root ||= Pathname.pwd
+  end
+
+  # The source root is the path to the root directory of the Omnibus gem.
+  #
+  # @return [Pathname]
+  def self.source_root
+    @source_root ||= Pathname.new(File.expand_path("../..", __FILE__))
   end
 
   private

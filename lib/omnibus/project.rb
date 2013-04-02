@@ -297,7 +297,7 @@ module Omnibus
     # @todo This documentation really should be up at a higher level,
     #   particularly since the user has no way to change the path.
     def package_scripts_path
-      "#{Omnibus.config.root}/package-scripts/#{name}"
+      "#{Omnibus.project_root}/package-scripts/#{name}"
     end
 
     # Determine the package type(s) to be built, based on the platform
@@ -427,7 +427,7 @@ module Omnibus
 
     # TODO: what's this do?
     def makeself_command
-      command_and_opts = [ File.expand_path(File.join(Omnibus.gem_root, "bin", "makeself.sh")),
+      command_and_opts = [ File.expand_path(File.join(Omnibus.source_root, "bin", "makeself.sh")),
                            "--gzip",
                            install_path,
                            "#{package_name}-#{build_version}_#{iteration}.sh",
@@ -478,14 +478,14 @@ module Omnibus
                   :timeout => 3600,
                   :cwd => config.package_dir
                 }
-                
+
                 if cmd.is_a?(Array)
                   command = cmd[0]
                   cmd_options.merge!(cmd[1])
                 else
                   command = cmd
                 end
-                
+
                 shell = Mixlib::ShellOut.new(command, cmd_options)
                 shell.run_command
                 shell.error!
