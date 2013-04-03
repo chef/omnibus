@@ -1,0 +1,67 @@
+#
+# Copyright:: Copyright (c) 2013 Opscode, Inc.
+# License:: Apache License, Version 2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+require 'omnibus/cli/base'
+
+module Omnibus
+  module CLI
+    class Build < Base
+
+      namespace :build
+
+      def initialize(args, options, config)
+        super(args, options, config)
+        options = config[:class_options]
+        load_omnibus_projects!(options[:path], options[:config])
+      end
+
+      method_option :timestamp,
+        :aliases => [:t],
+        :type => :boolean,
+        :default => true,
+        :desc => "Append timestamp information to the version identifier? Add a timestamp for build versions; leave it off for release and pre-release versions"
+      desc "project PROJECT", "Build the given Omnibus project"
+      def project(project_name)
+        project = load_project!(project_name)
+        project_task_name = "projects:#{project.name}"
+
+        say("Building #{project.name}", :green)
+        unless options[:timestamp]
+          say("I won't append a timestamp to the version identifier.", :yellow)
+        end
+
+        # Until we have time to integrate the CLI deeply into the Omnibus codebase
+        # this will have to suffice! (sadpanda)
+        ENV['OMNIBUS_APPEND_TIMESTAMP'] = options[:timestamp].to_s
+
+        Rake::Task[project_task_name].invoke
+      end
+
+      desc "software PROJECT SOFTWARE", "Build the given software component"
+      def software(project_name, software_name)
+        project = load_project!(project_name)
+
+        software_task_name = "projects:#{project.name}:software:#{software_name}"
+
+        say("Building #{software_name} for #{project.name} project", :green)
+
+        Rake::Task[software_task_name].invoke
+      end
+
+    end
+  end
+end

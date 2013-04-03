@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
 require 'omnibus/cli'
-Omnibus::CLI.start
+
+Omnibus::CLI::Application.start
