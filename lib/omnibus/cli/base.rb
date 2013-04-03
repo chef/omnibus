@@ -79,9 +79,9 @@ module Omnibus
       def load_project!(project_name)
         project = Omnibus.project(project_name)
         unless project
-          error_msg = "\nI don't know anythinga about project '#{project_name}'. \n\n"
-          error_msg << "Valid project names include: #{Omnibus.project_names.join(', ')}\n"
-          raise Omnibus::CLI::Error, set_color(error_msg, :red)
+          error_msg = "I don't know anythinga about project '#{project_name}'."
+          error_msg << " Valid project names include: #{Omnibus.project_names.join(', ')}"
+          raise Omnibus::CLI::Error, error_msg
         end
         project
       end
@@ -104,34 +104,8 @@ module Omnibus
         begin
           Omnibus.process_configuration
         rescue => e
-          error_msg = "Something went wrong loading the Omnibus projects.\n"
-
-          if File.exist?(config_file)
-
-            error_msg << <<-CONFIG
-
-  Configuration file location:
-
-  \t#{config_file}
-
-  Configuration file contents:
-
-  #{config_file_contents}
-  CONFIG
-          end
-
-        error_msg << <<-ERROR
-
-  Error raised was:
-
-  \t#{$!}
-
-  Backtrace:
-
-  \t#{e.backtrace.join("\n\t")}
-
-          ERROR
-          raise Omnibus::CLI::Error, set_color(error_msg, :red)
+          error_msg = "Could not load the Omnibus projects."
+          raise Omnibus::CLI::Error.new(error_msg, e)
         end
       end
 

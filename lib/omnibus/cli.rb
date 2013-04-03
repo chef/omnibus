@@ -22,7 +22,14 @@ require 'omnibus/cli/build'
 module Omnibus
   module CLI
 
-    class Error < Thor::Error; end
+    class Error < StandardError
+      attr_reader :original
+
+      def initialize(msg, original=nil)
+        super(msg)
+        @original = original
+      end
+    end
 
   end
 end
