@@ -37,39 +37,56 @@ module Omnibus
       :type => :string,
       :default => File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME),
       :desc => "Path to Omnibus configuration to use."
+    class_option :path,
+      :aliases => [:p],
+      :type => :string,
+      :default => Dir.pwd,
+      :desc => "Path to Omnibus project root."
 
     method_option :timestamp,
       :aliases => [:t],
       :type => :boolean,
       :default => true,
       :desc => "Append timestamp information to the version identifier? Add a timestamp for build versions; leave it off for release and pre-release versions"
-    method_option :path,
-      :aliases => [:p],
-      :type => :string,
-      :default => Dir.pwd,
-      :desc => "Path to Omnibus project root."
     desc "build PROJECT", "Build the given Omnibus project"
-    def build(project)
+    def build(project_name)
       load_omnibus_projects!(options[:path], options[:config])
-      project_task_name = "projects:#{project}"
+      project = load_project!(project_name)
+      project_task_name = "projects:#{project.name}"
 
-      if Rake::Task.task_defined?(project_task_name)
-        say("Building #{project}", :green)
-        unless options[:timestamp]
-          say("I won't append a timestamp to the version identifier.", :yellow)
-        end
-
-        # Until we have time to integrate the CLI deeply into the Omnibus codebase
-        # this will have to suffice! (sadpanda)
-        ENV['OMNIBUS_APPEND_TIMESTAMP'] = options[:timestamp].to_s
-
-        Rake::Task[project_task_name].invoke
-      else
-        project_names = Omnibus.projects.map{|p| p.name}
-        error_msg = "I don't know anythinga about project '#{project}'. \n"
-        error_msg << "Valid project names include: #{project_names.join(', ')}"
-        raise Thor::Error, error_msg
+      say("Building #{project}", :green)
+      unless options[:timestamp]
+        say("I won't append a timestamp to the version identifier.", :yellow)
       end
+
+      # Until we have time to integrate the CLI deeply into the Omnibus codebase
+      # this will have to suffice! (sadpanda)
+      ENV['OMNIBUS_APPEND_TIMESTAMP'] = options[:timestamp].to_s
+
+      Rake::Task[project_task_name].invoke
+    end
+
+    method_option :purge,
+      :type => :boolean,
+      :default => false,
+      :desc => "Remove ALL files generated during the build (including packages)."
+    desc "clean PROJECT", "Remove temporary files generated during the build process."
+    def clean(project_name)
+      load_omnibus_projects!(options[:path], options[:config])
+      project = load_project!(project_name)
+
+      deletion_list = []
+      deletion_list << Dir.glob("#{Omnibus.config.source_dir}/**/*")
+      deletion_list << Dir.glob("#{Omnibus.config.build_dir}/**/*")
+
+      if options[:purge]
+        deletion_list << Dir.glob("#{Omnibus.config.package_dir}/**/*")
+        deletion_list << Dir.glob("#{Omnibus.config.cache_dir}/**/*")
+        deletion_list << project.install_path if File.exist?(project.install_path)
+      end
+
+      deletion_list.flatten!
+      deletion_list.each{|f| remove_file(f) }
     end
 
     desc "project PROJECT", "Creates a skeletal Omnibus project"
@@ -114,6 +131,16 @@ module Omnibus
     # Forces command to exit with a 1 on any failure...so raise away.
     def self.exit_on_failure?
       true
+    end
+
+    def load_project!(project_name)
+      project = Omnibus.project(project_name)
+      unless project
+        error_msg = "\nI don't know anythinga about project '#{project_name}'. \n\n"
+        error_msg << "Valid project names include: #{Omnibus.project_names.join(', ')}\n"
+        raise Thor::Error, set_color(error_msg, :red)
+      end
+      project
     end
 
     def load_omnibus_projects!(path, config_file=nil)
