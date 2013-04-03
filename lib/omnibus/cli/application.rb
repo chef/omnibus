@@ -84,6 +84,28 @@ module Omnibus
       desc "build [COMMAND]", "Perform build-related tasks."
       subcommand "build", Omnibus::CLI::Build
 
+      ###########################################################################
+      # Class Methods
+      ###########################################################################
+
+      # Override start so we can catch and process any exceptions bubbling up
+      def self.start(*args)
+        begin
+          super
+        rescue => e
+          error_msg = "Something went wrong...the Omnibus just ran off the road!"
+          error_msg << "\n\nError raised was:\n\n\t#{$!}"
+          error_msg << "\n\nBacktrace:\n\n\t#{e.backtrace.join("\n\t")}"
+          if e.respond_to?(:original) && e.original
+            error_msg << "\n\nOriginal Error:\n\n\t#{e.original}"
+            error_msg << "\n\nOriginal Backtrace:\n\n\t#{e.original.backtrace.join("\n\t")}"
+          end
+          # TODO - we need a proper UI class
+          Thor::Base.shell.new.say(error_msg, :red)
+          exit 1
+        end
+      end
+
     end
   end
 end
