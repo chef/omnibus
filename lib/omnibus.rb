@@ -38,6 +38,8 @@ require 'pathname'
 
 module Omnibus
 
+  DEFAULT_CONFIG_FILENAME = 'omnibus.rb'.freeze
+
   # Configure Omnibus.
   #
   # After this has been called, the {Omnibus::Config} object is
