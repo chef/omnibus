@@ -77,11 +77,26 @@ module Omnibus
     @configuration ||= raise NoConfiguration
   end
 
-  # All the {Omnibus::Project} objects that have been created.
+  # All {Omnibus::Project} instances that have been created.
   #
   # @return [Array<Omnibus::Project>]
   def self.projects
     @projects ||= []
+  end
+
+  # Names of all the {Omnibus::Project} instances that have been created.
+  #
+  # @return [Array<String>]
+  def self.project_names
+    projects.map{|p| p.name}
+  end
+
+  # Load the {Omnibus::Project} instance with the given name.
+  #
+  # @param name [String]
+  # @return {Omnibus::Project}
+  def self.project(name)
+    projects.find{ |p| p.name == name}
   end
 
   # The absolute path to the Omnibus project/repository directory.
