@@ -15,38 +15,59 @@
 # limitations under the License.
 #
 
-require 'thor'
+require 'omnibus'
+require 'omnibus/util'
 require 'omnibus/version'
-require 'mixlib/shellout'
+
+require 'fileutils'
+require 'thor'
 
 module Omnibus
   class CLI < Thor
+
+    # Constructs a new instance.
+    def initialize(*args)
+      super
+      $stdout.sync = true
+    end
+
+    class_option :config,
+      :aliases => [:c],
+      :type => :string,
+      :default => File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME),
+      :desc => "Path to Omnibus configuration to use."
 
     method_option :timestamp,
       :aliases => [:t],
       :type => :boolean,
       :default => true,
-      :desc => "Append timestamp information to the version identifier?  Add a timestamp for nightly releases; leave it off for release and prerelease builds"
-
+      :desc => "Append timestamp information to the version identifier? Add a timestamp for build versions; leave it off for release and pre-release versions"
     method_option :path,
       :aliases => [:p],
       :type => :string,
       :default => Dir.pwd,
       :desc => "Path to Omnibus project root."
-
     desc "build PROJECT", "Build the given Omnibus project"
     def build(project)
-      if looks_like_omnibus_project?(options[:path])
+      load_omnibus_projects!(options[:path], options[:config])
+      project_task_name = "projects:#{project}"
+
+      if Rake::Task.task_defined?(project_task_name)
         say("Building #{project}", :green)
         unless options[:timestamp]
           say("I won't append a timestamp to the version identifier.", :yellow)
         end
+
         # Until we have time to integrate the CLI deeply into the Omnibus codebase
         # this will have to suffice! (sadpanda)
-        env = {'OMNIBUS_APPEND_TIMESTAMP' => options[:timestamp].to_s}
-        shellout!("rake projects:#{project} 2>&1", :environment => env, :cwd => options[:path])
+        ENV['OMNIBUS_APPEND_TIMESTAMP'] = options[:timestamp].to_s
+
+        Rake::Task[project_task_name].invoke
       else
-        raise Thor::Error, "Given path [#{options[:path]}] does not appear to be a valid Omnibus project root."
+        project_names = Omnibus.projects.map{|p| p.name}
+        error_msg = "I don't know anythinga about project '#{project}'. \n"
+        error_msg << "Valid project names include: #{project_names.join(', ')}"
+        raise Thor::Error, error_msg
       end
     end
 
@@ -57,26 +78,53 @@ module Omnibus
 
     private
 
-    def shellout!(command, options={})
-      STDOUT.sync = true
-      default_options = {
-        :live_stream => STDOUT,
-        :timeout => 7200, # 2 hours
-        :environment => {}
-      }
-      shellout = Mixlib::ShellOut.new(command, default_options.merge(options))
-      shellout.run_command
-      shellout.error!
-    end
-
     # Forces command to exit with a 1 on any failure...so raise away.
     def self.exit_on_failure?
       true
     end
 
-    def looks_like_omnibus_project?(path)
-      File.exist?(File.join(path, "Rakefile")) &&
-        Dir["#{path}/config/projects/*.rb"].any?
+    def load_omnibus_projects!(path, config_file=nil)
+      unless Dir["#{path}/config/projects/*.rb"].any?
+        raise Thor::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
+      end
+
+      config_file_contents = nil
+
+      begin
+        if config_file && File.exist?(config_file)
+          config_file_contents = IO.read(config_file)
+          eval(config_file_contents)
+          say("Using Omnibus configuration file #{config_file}", :green)
+        else
+          Omnibus.configure
+        end
+      rescue => e
+        error_msg = "Something went wrong loading the Omnibus project!"
+        if config_file
+
+          error_msg << <<-CONFIG
+
+Configuration file location:
+
+\t#{config_file}
+
+Configuration file contents:
+
+#{config_file_contents}
+CONFIG
+        end
+
+      error_msg << <<-ERROR
+
+Error raised was: #{$!}
+
+Backtrace:
+\t#{e.backtrace.join("\n\t")}
+
+        ERROR
+        raise Thor::Error, error_msg
+      end
     end
+
   end
 end
