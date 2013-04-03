@@ -160,8 +160,9 @@ module Omnibus
           Omnibus.configure
         end
       rescue => e
-        error_msg = "Something went wrong loading the Omnibus project!"
-        if config_file
+        error_msg = "Something went wrong loading the Omnibus projects.\n"
+
+        if File.exist?(config_file)
 
           error_msg << <<-CONFIG
 
@@ -177,13 +178,16 @@ CONFIG
 
       error_msg << <<-ERROR
 
-Error raised was: #{$!}
+Error raised was:
+
+\t#{$!}
 
 Backtrace:
+
 \t#{e.backtrace.join("\n\t")}
 
         ERROR
-        raise Thor::Error, error_msg
+        raise Thor::Error, set_color(error_msg, :red)
       end
     end
 
