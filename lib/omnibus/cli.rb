@@ -83,20 +83,22 @@ module Omnibus
     end
 
     def load_omnibus_projects!(path, config_file=nil)
-      unless Dir["#{path}/config/projects/*.rb"].any?
+
+      if config_file && File.exist?(config_file)
+        say("Using Omnibus configuration file #{config_file}", :green)
+        Omnibus.load_configuration(config_file)
+      end
+
+      # TODO: merge in all relevant CLI options here, as they should
+      # override anything from a configuration file.
+      Omnibus::Config.project_root path
+
+      unless Omnibus.project_files.any?
         raise Thor::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
       end
 
-      config_file_contents = nil
-
       begin
-        if config_file && File.exist?(config_file)
-          config_file_contents = IO.read(config_file)
-          eval(config_file_contents)
-          say("Using Omnibus configuration file #{config_file}", :green)
-        else
-          Omnibus.configure
-        end
+        Omnibus.process_configuration
       rescue => e
         error_msg = "Something went wrong loading the Omnibus project!"
         if config_file
