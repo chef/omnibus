@@ -69,7 +69,7 @@ module Omnibus
 
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
-    #   DSL files.  This is relative to your repository directory.
+    #   DSL files.  This is relative to {#project_root}.
     #
     #   Defaults to `"config/projects"`.
     #
@@ -78,12 +78,21 @@ module Omnibus
 
     # @!attribute [rw] software_dir
     #   The relative path of the directory containing {Omnibus::Software}
-    #   DSL files.  This is relative to your repository directory.
+    #   DSL files.  This is relative {#project_root}.
     #
     #   Defaults to `"config/software"`.
     #
     #   @return [String]
     software_dir "config/software"
+
+    # @!attribute [rw] project_root
+    #   The root directory in which to look for {Omnibus::Project} and
+    #   {Omnibus::Software} DSL files.
+    #
+    #   Defaults to the current working directory.
+    #
+    #   @return [String]
+    project_root Dir.pwd
 
     # @!attribute [rw] install_dir
     #   Installation directory
