@@ -45,36 +45,45 @@ module Omnibus
   # After this has been called, the {Omnibus::Config} object is
   # available as `Omnibus.config`.
   #
-  # @yieldparam config [Omnibus::Config] a new configuration object
-  # @yieldreturn [void]
-  #
-  # @example Simple Configuration using Default Values
-  #   Omnibus.configure
-  # @example Configuring with a Block
-  #   Omnibus.configure do |config|
-  #     config.project_dir  = 'omnibus/files/projects'
-  #     config.software_dir = 'omnibus/files/software'
-  #   end
   # @return [void]
+  #
+  # @deprecated Use {#load_configuration} if you need to process a
+  #   config file, followed by {#process_configuration} to act upon it.
   def self.configure
-    configuration = Omnibus::Config.new
-
-    yield configuration if block_given?
-
-    configuration.validate
-    @configuration = configuration
-
-    process_dsl_files(configuration)
-    generate_extra_rake_tasks(configuration)
+    load_configuration
+    process_configuration
   end
 
-  # Provide access to a completely set-up {Omnibus::Config} object.
+  # Convenience method for access to the Omnibus::Config object.
+  # Provided for backward compatibility.
   #
-  # @raise [Omnibus::NoConfiguration] if Omnibus has not been configured yet.
+  # @ return [Omnibus::Config]
   #
-  # @see Omnibus#configure
+  # @deprecated Just refer to {Omnibus::Config} directly.
   def self.config
-    @configuration ||= raise NoConfiguration
+    Config
+  end
+
+  # Load in an Omnibus configuration file.  Values will be merged with
+  # and override the defaults defined in {Omnibus::Config}.
+  #
+  # @param file [String] path to a configuration file to load
+  #
+  # @return [void]
+  def self.load_configuration(file=nil)
+    if file
+      Config.from_file(file)
+    end
+  end
+
+  # Processes the configuration to construct the dependency tree of
+  # projects and software.
+  #
+  # @return [void]
+  def self.process_configuration
+    Config.validate
+    process_dsl_files
+    generate_extra_rake_tasks
   end
 
   # All the {Omnibus::Project} objects that have been created.
@@ -163,19 +172,17 @@ module Omnibus
   # Processes all configured {Omnibus::Project} and
   # {Omnibus::Software} DSL files.
   #
-  # @param config [Omnibus::Config]
   # @return [void]
-  def self.process_dsl_files(config)
-
+  def self.process_dsl_files
     # Do projects first
-    project_files = ruby_files(config.project_dir)
+    project_files = ruby_files(Config.project_dir)
     expand_projects(project_files)
 
     # Then do software
     software_files = prefer_local_software(omnibus_software_files,
-                                           ruby_files(config.software_dir))
+                                           ruby_files(Config.software_dir))
 
-    overrides = config.override_file ? Omnibus::Overrides.overrides : {}
+    overrides = Config.override_file ? Omnibus::Overrides.overrides : {}
 
     expand_software(overrides, software_files)
   end
@@ -183,15 +190,14 @@ module Omnibus
   # Creates some additional Rake tasks beyond those generated in the
   # process of reading in the DSL files.
   #
-  # @param config [Omnibus::Config]
   # @return [void]
   #
   # @todo Not so sure I like how this is being done, but at least it
   #   isolates the Rake stuff.
-  def self.generate_extra_rake_tasks(config)
+  def self.generate_extra_rake_tasks
     require 'omnibus/clean_tasks'
 
-    if config.use_s3_caching
+    if Config.use_s3_caching
       require 'omnibus/s3_tasks'
     end
   end
