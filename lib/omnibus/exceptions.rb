@@ -19,17 +19,19 @@ module Omnibus
           s3_access_key => #{@s3_access_key.inspect}
           s3_secret_key => #{@s3_secret_key.inspect}
 
-      If you truly do want S3 caching, you can use a configuration
-      block similar to this in your Rakefile:
+      If you truly do want S3 caching, you should add values similar
+      to the following in your Omnibus config file:
 
-          Omnibus.configure do |config|
-            ...
-            config.use_s3_caching = true
-            config.s3_bucket      = 'my_bucket_name'
-            config.s3_access_key  = MY_ACCESS_KEY
-            config.s3_secret_key  = MY_SECRET_KEY
-            ...
-          end
+            use_s3_caching true
+            s3_bucket      ENV['S3_BUCKET_NAME']
+            s3_access_key  ENV['S3_ACCESS_KEY']
+            s3_secret_key  ENV['S3_SECRET_KEY']
+
+      Note that you are not required to use environment variables as
+      illustrated (and the ones listed have no special significance in
+      Omnibus), but it is encouraged to prevent spread of sensitive
+      information and inadvertent check-in of same to version control
+      systems.
 
       """
     end
