@@ -15,128 +15,163 @@
 # limitations under the License.
 #
 
+require 'mixlib/config'
 require 'omnibus/exceptions'
 
 module Omnibus
 
   # Global configuration object for Omnibus runs.
+  #
+  # @todo Write a {http://yardoc.org/guides/extending-yard/writing-handlers.html
+  #   Yard handler} for Mixlib::Config-style DSL methods.  I'd like
+  #   the default value to show up in the docs without having to type
+  #   it out twice, which I'm doing now for benefit of viewers of the Yard docs.
   class Config
-
-    # This macro is just for setting up a read/write attribute whose
-    # reader has a default value.  We're doing it this way in order to
-    # expose the defaults in API documentation.
-    #
-    # @param name [Symbol, String] the name of the attribute
-    # @param type [Class, String] the type of the attribute.
-    #   Currently this is ONLY used by Yard to generate proper
-    #   documentation.  It is not used in the code at all.
-    # @param default [Object] the default value for the attribute in
-    #   the absence of being explicitly set to anything else
-    #
-    # @!macro [attach] configurable
-    #   Defaults to `$3`
-    #   @return [$2]
-    def self.configurable(name, type, default)
-      attr_writer name
-      define_method name do
-        x = self.instance_variable_get("@#{name}")
-        x ||= default
-      end
-    end
+    extend Mixlib::Config
 
     # @!group Directory Configuration Parameters
 
-    # The absolute path to the directory on the virtual machine where
-    # code will be cached.
-    #
     # @!attribute [rw] cache_dir
-    configurable :cache_dir, String, "/var/cache/omnibus/cache"
-
-    # The absolute path to the directory on the virtual machine where
-    # source code will be downloaded.
+    #   The absolute path to the directory on the virtual machine where
+    #   code will be cached.
     #
+    #   Defaults to `"/var/cache/omnibus/cache"`.
+    #
+    #   @return [String]
+    cache_dir "/var/cache/omnibus/cache"
+
     # @!attribute [rw] source_dir
-    configurable :source_dir, String, "/var/cache/omnibus/src"
-
-    # The absolute path to the directory on the virtual machine where
-    # software will be built.
+    #   The absolute path to the directory on the virtual machine where
+    #   source code will be downloaded.
     #
+    #   Defaults to `"/var/cache/omnibus/src"`.
+    #
+    #   @return [String]
+    source_dir "/var/cache/omnibus/src"
+
     # @!attribute [rw] build_dir
-    configurable :build_dir, String, "/var/cache/omnibus/build"
-
-    # The absolute path to the directory on the virtual machine where
-    # packages will be constructed.
+    #   The absolute path to the directory on the virtual machine where
+    #   software will be built.
     #
+    #   Defaults to `"/var/cache/omnibus/build"`.
+    #
+    #   @return [String]
+    build_dir "/var/cache/omnibus/build"
+
     # @!attribute [rw] package_dir
-    configurable :package_dir, String, "/var/cache/omnibus/pkg"
-
-    # The relative path of the directory containing {Omnibus::Project}
-    # DSL files.  This is relative to your repository directory.
+    #   The absolute path to the directory on the virtual machine where
+    #   packages will be constructed.
     #
+    #   Defaults to `"/var/cache/omnibus/pkg"`.
+    #
+    #   @return [String]
+    package_dir "/var/cache/omnibus/pkg"
+
     # @!attribute [rw] project_dir
-    configurable :project_dir, String, "config/projects"
-
-    # The relative path of the directory containing {Omnibus::Software}
-    # DSL files.  This is relative to your repository directory.
+    #   The relative path of the directory containing {Omnibus::Project}
+    #   DSL files.  This is relative to your repository directory.
     #
+    #   Defaults to `"config/projects"`.
+    #
+    #   @return [String]
+    project_dir "config/projects"
+
     # @!attribute [rw] software_dir
-    configurable :software_dir, String, "config/software"
-
-    # Installation directory
+    #   The relative path of the directory containing {Omnibus::Software}
+    #   DSL files.  This is relative to your repository directory.
     #
-    # @todo This appears to be unused, and actually conflated with
-    #   Omnibus::Project#install_path
+    #   Defaults to `"config/software"`.
+    #
+    #   @return [String]
+    software_dir "config/software"
+
     # @!attribute [rw] install_dir
-    configurable :install_dir, String, "/opt/chef"
+    #   Installation directory
+    #
+    #   Defaults to `"/opt/chef"`.
+    #
+    #   @todo This appears to be unused, and actually conflated with
+    #     {Omnibus::Project#install_path}
+    #
+    #   @return [String]
+    install_dir "/opt/chef"
 
     # @!endgroup
 
     # @!group S3 Caching Configuration Parameters
 
     # @!attribute [rw] use_s3_caching
-    configurable :use_s3_caching, 'Boolean', false # "Boolean" isn't really a Ruby type,
-                                                   # but it's just used for Yard
-                                                   # documentation, so a String is fine
+    #   Indicate if you wish to cache software artifacts in S3 for
+    #   quicker build times.  Requires {#s3_bucket}, {#s3_access_key},
+    #   and {#s3_secret_key} to be set if this is set to `true`.
+    #
+    #   Defaults to `false`.
+    #
+    #   @return [Boolean]
+    use_s3_caching false
 
     # @!attribute [rw] s3_bucket
-    configurable :s3_bucket, String, nil
+    #   The name of the S3 bucket you want to cache software artifacts in.
+    #
+    #   Defaults to `nil`.  Must be set if {#use_s3_caching} is `true`.
+    #
+    #   @return [String, nil]
+    s3_bucket nil
 
     # @!attribute [rw] s3_access_key
-    configurable :s3_access_key, String, nil
+    #   The S3 access key to use with S3 caching.
+    #
+    #   Defaults to `nil`.  Must be set if {#use_s3_caching} is `true`.
+    #
+    #   @return [String, nil]
+    s3_access_key nil
 
     # @!attribute [rw] s3_secret_key
-    configurable :s3_secret_key, String, nil
+    #   The S3 secret key to use with S3 caching.
+    #
+    #   Defaults to `nil`.  Must be set if {#use_s3_caching} is `true.`
+    #
+    #   @return [String, nil]
+    s3_secret_key nil
 
     # @!endgroup
 
     # @!group Miscellaneous Configuration Parameters
 
     # @!attribute [rw] override_file
-    configurable :override_file, String, nil
+    #
+    #   @return [Boolean]
+    override_file nil
 
     # @!attribute [rw] solaris_compiler
-    configurable :solaris_compiler, String, nil
+    #
+    #   @return [String, nil]
+    solaris_compiler nil
 
     # @!endgroup
+
+    # @!group Validation Methods
 
     # Asserts that the Config object is in a valid state.  If invalid
     # for any reason, an exception will be thrown.
     #
     # @raise [RuntimeError]
     # @return [void]
-    def validate
-      [:valid_s3_config?].each do |test|
-        send(test)
-      end
+    def self.validate
+      valid_s3_config?
+      # add other validation methods as needed
     end
 
     # @raise [InvalidS3Configuration]
-    def valid_s3_config?
+    def self.valid_s3_config?
       if use_s3_caching
         unless s3_bucket && s3_access_key && s3_secret_key
           raise InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
         end
       end
     end
-  end
-end
+
+    # @!endgroup
+
+  end # Config
+end # Omnibus
