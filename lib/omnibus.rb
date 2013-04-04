@@ -95,9 +95,12 @@ module Omnibus
 
   # The absolute path to the Omnibus project/repository directory.
   #
-  # @return [Pathname]
+  # @return [String]
+  #
+  # @deprecated Call {Omnibus::Config.project_root} instead.  We need
+  #   to be able to easily tweak this at runtime via the CLI tool.
   def self.project_root
-    @project_root ||= Pathname.pwd
+    Config.project_root
   end
 
   # The source root is the path to the root directory of the `omnibus` gem.
