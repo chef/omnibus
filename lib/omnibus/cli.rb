@@ -16,7 +16,6 @@
 #
 
 require 'omnibus'
-require 'omnibus/util'
 require 'omnibus/version'
 
 require 'fileutils'
