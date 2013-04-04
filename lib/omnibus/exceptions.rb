@@ -1,24 +1,5 @@
 module Omnibus
 
-  class NoConfiguration < RuntimeError
-    def to_s
-      """
-      Omnibus has not been configured yet!
-
-      Please add a block like the following to your project's
-      Rakefile:
-
-          Omnibus.configure do |config|
-            config.install_dir = '/path/to/install_dir'
-            ...
-          end
-
-
-      See the documentation for Omnibus::Config for available options.
-      """
-    end
-  end
-
   class InvalidS3Configuration < RuntimeError
     def initialize(s3_bucket, s3_access_key, s3_secret_key)
       @s3_bucket, @s3_access_key, @s3_secret_key = s3_bucket, s3_access_key, s3_secret_key
