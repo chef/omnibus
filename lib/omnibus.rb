@@ -124,6 +124,20 @@ module Omnibus
     end
   end
 
+  # Return paths to all configured {Omnibus::Project} DSL files.
+  #
+  # @return [Array<String>]
+  def self.project_files
+    ruby_files(File.join(project_root, Config.project_dir))
+  end
+
+  # Return paths to all configured {Omnibus::Software} DSL files.
+  #
+  # @return [Array<String>]
+  def self.software_files
+    ruby_files(File.join(project_root, Config.software_dir))
+  end
+
   # Backward compat alias
   #
   # @todo print a deprecation message
@@ -137,12 +151,10 @@ module Omnibus
   # `project_specs`.  All projects are then accessible at
   # {Omnibus#projects}
   #
-  # @param project_files [Array<String>] paths to all the project DSL
-  #   files to expand
   # @return [void]
   #
   # @see Omnibus::Project
-  def self.expand_projects(project_files)
+  def self.expand_projects
     project_files.each do |spec|
       Omnibus.projects << Omnibus::Project.load(spec)
     end
@@ -178,16 +190,15 @@ module Omnibus
   # @return [void]
   def self.process_dsl_files
     # Do projects first
-    project_files = ruby_files(Config.project_dir)
-    expand_projects(project_files)
+    expand_projects
 
     # Then do software
-    software_files = prefer_local_software(omnibus_software_files,
-                                           ruby_files(Config.software_dir))
+    final_software_files = prefer_local_software(omnibus_software_files,
+                                           software_files)
 
     overrides = Config.override_file ? Omnibus::Overrides.overrides : {}
 
-    expand_software(overrides, software_files)
+    expand_software(overrides, final_software_files)
   end
 
   # Creates some additional Rake tasks beyond those generated in the
