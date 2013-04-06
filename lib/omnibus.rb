@@ -29,7 +29,6 @@ require 'omnibus/config'
 require 'omnibus/software'
 require 'omnibus/project'
 require 'omnibus/fetchers'
-require 'omnibus/s3_cacher'
 require 'omnibus/health_check'
 require 'omnibus/build_version'
 require 'omnibus/overrides'
@@ -225,10 +224,6 @@ module Omnibus
   #   isolates the Rake stuff.
   def self.generate_extra_rake_tasks
     require 'omnibus/clean_tasks'
-
-    if Config.use_s3_caching
-      require 'omnibus/s3_tasks'
-    end
   end
 
   # Return a list of all the Ruby files (i.e., those with an "rb"

@@ -1,5 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2013 Opscode, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 require 'omnibus'
 require 'omnibus/cli/base'
 require 'omnibus/cli/build'
+require 'omnibus/cli/cache'
 
 module Omnibus
   module CLI
@@ -81,8 +82,12 @@ module Omnibus
       ###########################################################################
       # Subcommands
       ###########################################################################
-      desc "build [COMMAND]", "Perform build-related tasks."
+
+      desc "build [COMMAND]", "Perform build-related tasks"
       subcommand "build", Omnibus::CLI::Build
+
+      desc "cache [COMMAND]", "Perform cache management tasks"
+      subcommand "cache", Omnibus::CLI::Cache
 
       ###########################################################################
       # Class Methods
