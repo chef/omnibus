@@ -58,10 +58,12 @@ module Omnibus
 
         create_file(File.join(target, "config", "software", "README.md"),
                     "Software definitions for your project's dependencies go here!")
+        template(File.join("Berksfile.erb"), File.join(target, "Berksfile"), opts)
         template(File.join("Gemfile.erb"), File.join(target, "Gemfile"), opts)
         template(File.join("gitignore.erb"), File.join(target, ".gitignore"), opts)
         template(File.join("project.rb.erb"), File.join(target, "config", "projects", "#{name}.rb"), opts)
         template(File.join("README.md.erb"), File.join(target, "README.md"), opts)
+        template(File.join("Vagrantfile.erb"), File.join(target, "Vagrantfile"), opts)
 
         # render out stub packge scripts
         %w{ makeselfinst postinst postrm }.each do |package_script|
