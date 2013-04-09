@@ -19,7 +19,7 @@ In your Rakefile, generate the require the Omnibus gem and load your project and
 require 'omnibus'
 
 Omnibus.projects('config/projects/*.rb')
-Omnibus.software('config/software/*/.rb')
+Omnibus.software('config/software/*.rb')
 ```
 
 If you've already set up software and project configurations, executing `rake -T` prints a list of things that you can build:
