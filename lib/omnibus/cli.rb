@@ -23,6 +23,7 @@ require 'thor'
 
 module Omnibus
   class CLI < Thor
+    include Omnibus::Util
 
     # Constructs a new instance.
     def initialize(*args)
