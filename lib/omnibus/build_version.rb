@@ -131,7 +131,14 @@ module Omnibus
                           cmd = shellout(git_cmd,
                                          :live_stream => nil,
                                          :cwd => Omnibus.project_root)
+                          if cmd.exitstatus == 0
                             cmd.stdout.chomp
+                          else
+                            msg =  "Could not extract version information from `git describe`. "
+                            msg << "Setting version to 0.0.0"
+                            puts msg
+                            "0.0.0"
+                          end
                         end
     end
 
