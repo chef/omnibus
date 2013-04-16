@@ -49,7 +49,8 @@ module Omnibus
 
       desc "project PROJECT", "Creates a skeletal Omnibus project"
       def project(name)
-        target = File.join(options[:path], name)
+        name = name.chomp("/") # remove trailing slash if present
+        target = File.join(Dir.pwd, "omnibus-#{name}")
         install_path = File.join("/opt", name)
         opts = {
           :name => name,
