@@ -174,7 +174,7 @@ module Omnibus
     # @raise [InvalidS3Configuration]
     def self.valid_s3_config?
       if use_s3_caching
-        unless s3_bucket && s3_access_key && s3_secret_key
+        unless s3_bucket
           raise InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
         end
       end
