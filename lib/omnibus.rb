@@ -32,6 +32,7 @@ require 'omnibus/fetchers'
 require 'omnibus/health_check'
 require 'omnibus/build_version'
 require 'omnibus/overrides'
+require 'omnibus/version'
 
 require 'pathname'
 
