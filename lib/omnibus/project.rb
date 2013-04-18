@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require 'omnibus/exceptions'
 
 module Omnibus
 
@@ -92,6 +93,19 @@ module Omnibus
     def install_path(val=NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
       @install_path
+    end
+
+    # Set or retrieve the the package maintainer.
+    #
+    # @param val [String]
+    # @return [String]
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., a maintainer must
+    #   be set in order to build a project)
+    def maintainer(val=NULL_ARG)
+      @maintainer = val unless val.equal?(NULL_ARG)
+      @maintainer || raise(MissingProjectConfiguration.new("maintainer", "Opscode, Inc."))
     end
 
     # Defines the iteration for the package to be generated.  Adheres
@@ -383,9 +397,6 @@ module Omnibus
     #   to be joined with " " first.
     #
     # @todo Just make this return a String instead of an Array
-    # @todo The package maintainer is currently hard-coded as
-    #   "Opscode, Inc.", which is sub-optimal for users that are not
-    #   Opscode.  We should add a "maintainer" method to the project DSL
     # @todo The url is also hard-coded to "http://www.opscode.com".
     #   This should also be governed by a method in the DSL.
     # @todo Use the long option names (i.e., the double-dash ones) in
@@ -398,7 +409,7 @@ module Omnibus
                           "-n #{package_name}",
                           "--iteration #{iteration}",
                           install_path,
-                          "-m 'Opscode, Inc.'",
+                          "-m '#{maintainer}'",
                           "--description 'The full stack of #{@name}'",
                           "--url http://www.opscode.com"]
       if File.exist?("#{package_scripts_path}/postinst")
