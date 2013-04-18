@@ -67,10 +67,12 @@ module Omnibus
     # @param val [String] the name to set
     # @return [String]
     #
-    # @todo We should fail if this is left nil
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., a name
+    #   must be set in order to build a project)
     def name(val=NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name
+      @name || raise(MissingProjectConfiguration.new("name", "my_project"))
     end
 
     # Set or retrieve the package name of the project.  Unless
