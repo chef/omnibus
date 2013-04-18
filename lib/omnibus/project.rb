@@ -187,23 +187,17 @@ module Omnibus
       @build_version
     end
 
-    # Set or retrieve the build iteration of the project.
+    # Set or retrieve the build iteration of the project.  Defaults to
+    # `1` if not otherwise set.
     #
-    # @param val [String, Fixnum]
-    # @return [String, Fixnum]
+    # @param val [Fixnum]
+    # @return [Fixnum]
     #
-    # @todo Current usage shows both Strings and Integers are
-    #   used... Is a real string (e.g. "foo") ever a legitimate value?
-    #   If not, we should just document this as accepting integers for
-    #   simplicity.
-    # @todo This should default to some sensible value ("1"?), since
-    #   it will end up generating weird iteration values if it is
-    #   allowed to remain nil
     # @todo Is there a better name for this than "build_iteration"?
     #   Would be nice to cut down confusiton with {#iteration}.
     def build_iteration(val=NULL_ARG)
       @build_iteration = val unless val.equal?(NULL_ARG)
-      @build_iteration
+      @build_iteration || 1
     end
 
     # Set or retrieve the list of software dependencies for this
