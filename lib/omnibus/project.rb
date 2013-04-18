@@ -91,10 +91,12 @@ module Omnibus
     # @param val [String]
     # @return [String]
     #
-    # @todo We should fail if this is left nil
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., an install_path
+    #   must be set in order to build a project)
     def install_path(val=NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
-      @install_path
+      @install_path || raise(MissingProjectConfiguration.new("install_path", "/opt/opscode"))
     end
 
     # Set or retrieve the the package maintainer.
