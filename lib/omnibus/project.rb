@@ -54,6 +54,7 @@ module Omnibus
     # @todo Remove filename parameter, as it is unused.
     def initialize(io, filename)
       @exclusions = Array.new
+      @conflicts = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io)
       render_tasks
@@ -173,6 +174,17 @@ module Omnibus
     def replaces(val=NULL_ARG)
       @replaces = val unless val.equal?(NULL_ARG)
       @replaces
+    end
+
+    # Add to the list of packages this one conflicts with.
+    #
+    # Specifying conflicts is optional.  See the `--conflicts` flag in
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @param val [String]
+    # @return [void]
+    def conflict(val)
+      @conflicts << val
     end
 
     # Set or retrieve the version of the project.
@@ -438,6 +450,10 @@ module Omnibus
 
       @runtime_dependencies.each do |runtime_dep|
         command_and_opts << "--depends '#{runtime_dep}'"
+      end
+
+      @conflicts.each do |conflict|
+        command_and_opts << "--conflicts '#{conflict}'"
       end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
