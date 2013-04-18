@@ -145,20 +145,19 @@ module Omnibus
       end
     end
 
-    # Set or retrieve the project description.
+    # Set or retrieve the project description.  Defaults to `"The full
+    # stack of #{name}"`
+    #
+    # Corresponds to the `--description` flag of
+    # {https://github.com/jordansissel/fpm fpm}.
     #
     # @param val [String] the project description
     # @return [String]
     #
-    # @todo Does not currently appear to be used; the `--description`
-    #   flag in {#fpm_command} is currently set to "The full stack of @name".
-    #   That should be the default here.  When the fpm command uses
-    #   this value, the documentation here should indicate that this
-    #   will be used for fpm's `--description` flag, to give users a
-    #   better idea of what is expected.
+    # @see #name
     def description(val=NULL_ARG)
       @description = val unless val.equal?(NULL_ARG)
-      @description
+      @description || "The full stack of #{name}"
     end
 
     # Set or retrieve the name of the package this package will replace.
@@ -419,7 +418,7 @@ module Omnibus
                           "--iteration #{iteration}",
                           install_path,
                           "-m '#{maintainer}'",
-                          "--description 'The full stack of #{@name}'",
+                          "--description '#{description}'",
                           "--url #{homepage}"]
       if File.exist?("#{package_scripts_path}/postinst")
         command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
