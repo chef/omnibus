@@ -56,7 +56,17 @@ module Omnibus
       @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io)
+      validate
       render_tasks
+    end
+
+    # Ensures that certain project information has been set
+    #
+    # @raise [MissingProjectConfiguration] if a required parameter has
+    #   not been set
+    # @return [void]
+    def validate
+      name && install_path && maintainer && homepage
     end
 
     # @!group DSL methods
