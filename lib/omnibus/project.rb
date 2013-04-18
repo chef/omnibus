@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require 'omnibus/exceptions'
 
 module Omnibus
 
@@ -30,8 +31,6 @@ module Omnibus
 
     # @todo Why not just use `nil`?
     NULL_ARG = Object.new
-
-    attr_reader :dependencies
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -53,9 +52,21 @@ module Omnibus
     # @todo Remove filename parameter, as it is unused.
     def initialize(io, filename)
       @exclusions = Array.new
+      @conflicts = Array.new
+      @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io)
+      validate
       render_tasks
+    end
+
+    # Ensures that certain project information has been set
+    #
+    # @raise [MissingProjectConfiguration] if a required parameter has
+    #   not been set
+    # @return [void]
+    def validate
+      name && install_path && maintainer && homepage
     end
 
     # @!group DSL methods
@@ -66,10 +77,12 @@ module Omnibus
     # @param val [String] the name to set
     # @return [String]
     #
-    # @todo We should fail if this is left nil
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., a name
+    #   must be set in order to build a project)
     def name(val=NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name
+      @name || raise(MissingProjectConfiguration.new("name", "my_project"))
     end
 
     # Set or retrieve the package name of the project.  Unless
@@ -88,10 +101,38 @@ module Omnibus
     # @param val [String]
     # @return [String]
     #
-    # @todo We should fail if this is left nil
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., an install_path
+    #   must be set in order to build a project)
     def install_path(val=NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
-      @install_path
+      @install_path || raise(MissingProjectConfiguration.new("install_path", "/opt/opscode"))
+    end
+
+    # Set or retrieve the the package maintainer.
+    #
+    # @param val [String]
+    # @return [String]
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., a maintainer must
+    #   be set in order to build a project)
+    def maintainer(val=NULL_ARG)
+      @maintainer = val unless val.equal?(NULL_ARG)
+      @maintainer || raise(MissingProjectConfiguration.new("maintainer", "Opscode, Inc."))
+    end
+
+    # Set or retrive the package homepage.
+    #
+    # @param val [String]
+    # @return [String]
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., a homepage must be
+    #   set in order to build a project)
+    def homepage(val=NULL_ARG)
+      @homepage = val unless val.equal?(NULL_ARG)
+      @homepage || raise(MissingProjectConfiguration.new("homepage", "http://www.opscode.com"))
     end
 
     # Defines the iteration for the package to be generated.  Adheres
@@ -114,20 +155,19 @@ module Omnibus
       end
     end
 
-    # Set or retrieve the project description.
+    # Set or retrieve the project description.  Defaults to `"The full
+    # stack of #{name}"`
+    #
+    # Corresponds to the `--description` flag of
+    # {https://github.com/jordansissel/fpm fpm}.
     #
     # @param val [String] the project description
     # @return [String]
     #
-    # @todo Does not currently appear to be used; the `--description`
-    #   flag in {#fpm_command} is currently set to "The full stack of @name".
-    #   That should be the default here.  When the fpm command uses
-    #   this value, the documentation here should indicate that this
-    #   will be used for fpm's `--description` flag, to give users a
-    #   better idea of what is expected.
+    # @see #name
     def description(val=NULL_ARG)
       @description = val unless val.equal?(NULL_ARG)
-      @description
+      @description || "The full stack of #{name}"
     end
 
     # Set or retrieve the name of the package this package will replace.
@@ -145,6 +185,17 @@ module Omnibus
       @replaces
     end
 
+    # Add to the list of packages this one conflicts with.
+    #
+    # Specifying conflicts is optional.  See the `--conflicts` flag in
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @param val [String]
+    # @return [void]
+    def conflict(val)
+      @conflicts << val
+    end
+
     # Set or retrieve the version of the project.
     #
     # @param val [String] the version to set
@@ -156,74 +207,44 @@ module Omnibus
       @build_version
     end
 
-    # Set or retrieve the build iteration of the project.
+    # Set or retrieve the build iteration of the project.  Defaults to
+    # `1` if not otherwise set.
     #
-    # @param val [String, Fixnum]
-    # @return [String, Fixnum]
+    # @param val [Fixnum]
+    # @return [Fixnum]
     #
-    # @todo Current usage shows both Strings and Integers are
-    #   used... Is a real string (e.g. "foo") ever a legitimate value?
-    #   If not, we should just document this as accepting integers for
-    #   simplicity.
-    # @todo This should default to some sensible value ("1"?), since
-    #   it will end up generating weird iteration values if it is
-    #   allowed to remain nil
     # @todo Is there a better name for this than "build_iteration"?
     #   Would be nice to cut down confusiton with {#iteration}.
     def build_iteration(val=NULL_ARG)
       @build_iteration = val unless val.equal?(NULL_ARG)
-      @build_iteration
+      @build_iteration || 1
     end
 
-    # Set or retrieve the list of software dependencies for this
-    # project.  As this is a DSL method, only pass the names of
-    # software components, not {Omnibus::Software} objects.
+    # Add an Omnibus software dependency.
     #
-    # These is the software that comprises your project, and is
-    # distinct from runtime dependencies.
+    # Note that this is a *build time* dependency.  If you need to
+    # specify an external dependency that is required at runtime, see
+    # {#runtime_dependency} instead.
     #
-    # @param val [Array<String>] a list of names of Software components
-    # @return [Array<String>]
-    #
-    # @see Omnibus::Software
-    # @see #runtime_dependencies
-    #
-    # @todo Consider renaming / aliasing this to "components" to
-    #   prevent confusion with {#runtime_dependencies}
-    # @todo Why does this class also have a `dependencies` attribute
-    #   reader defined?  I suppose this overwrites it, eh?  It should
-    #   be removed.
-    # @todo It would be more useful to have a `depend` method (similar
-    #   to {#exclude}), that appends to an array.  That would
-    #   eliminate patterns like we see in omnibus-chef, where we have
-    #   code like:
-    #     deps = []
-    #     deps << "chef"
-    #     ...
-    #     dependencies deps
-    def dependencies(val=NULL_ARG)
-      @dependencies = val unless val.equal?(NULL_ARG)
-      @dependencies
+    # @param val [String] the name of a Software dependency
+    # @return [void]
+    def dependency(val)
+      @dependencies << val
     end
 
-    # Set the names of packages that are runtime dependencies of this
+    # Add a package that is a runtime dependency of this
     # project.
+    #
+    # This is distinct from a build-time dependency, which should
+    # correspond to an Omnibus software definition.
     #
     # Corresponds to the `--depends` flag of
     # {https://github.com/jordansissel/fpm fpm}.
     #
-    # @param val [Array<String>]
-    #
-    # @return [Array<String>]
-    #
-    # @todo Is it useful to rename / alias this to "depends", in
-    #   keeping with the usage in fpm, as well as our own # {#replaces}
-    #   method?
-    # @todo This method should to be brought into line with the other
-    #   DSL methods, and not have @runtime_dependencies initialized in
-    #   the constructor.
-    def runtime_dependencies(val)
-      @runtime_dependencies = val
+    # @param val [String] the name of the runtime dependency
+    # @return [void]
+    def runtime_dependency(val)
+      @runtime_dependencies << val
     end
 
     # Add a new exclusion pattern.
@@ -383,11 +404,6 @@ module Omnibus
     #   to be joined with " " first.
     #
     # @todo Just make this return a String instead of an Array
-    # @todo The package maintainer is currently hard-coded as
-    #   "Opscode, Inc.", which is sub-optimal for users that are not
-    #   Opscode.  We should add a "maintainer" method to the project DSL
-    # @todo The url is also hard-coded to "http://www.opscode.com".
-    #   This should also be governed by a method in the DSL.
     # @todo Use the long option names (i.e., the double-dash ones) in
     #   the fpm command for maximum clarity.
     def fpm_command(pkg_type)
@@ -398,9 +414,9 @@ module Omnibus
                           "-n #{package_name}",
                           "--iteration #{iteration}",
                           install_path,
-                          "-m 'Opscode, Inc.'",
-                          "--description 'The full stack of #{@name}'",
-                          "--url http://www.opscode.com"]
+                          "-m '#{maintainer}'",
+                          "--description '#{description}'",
+                          "--url #{homepage}"]
       if File.exist?("#{package_scripts_path}/postinst")
         command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
       end
@@ -419,6 +435,10 @@ module Omnibus
 
       @runtime_dependencies.each do |runtime_dep|
         command_and_opts << "--depends '#{runtime_dep}'"
+      end
+
+      @conflicts.each do |conflict|
+        command_and_opts << "--conflicts '#{conflict}'"
       end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
