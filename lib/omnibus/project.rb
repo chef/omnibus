@@ -242,24 +242,19 @@ module Omnibus
       @dependencies
     end
 
-    # Set the names of packages that are runtime dependencies of this
+    # Add a package that is a runtime dependency of this
     # project.
+    #
+    # This is distinct from a build-time dependency, which should
+    # correspond to an Omnibus software definition.
     #
     # Corresponds to the `--depends` flag of
     # {https://github.com/jordansissel/fpm fpm}.
     #
-    # @param val [Array<String>]
-    #
-    # @return [Array<String>]
-    #
-    # @todo Is it useful to rename / alias this to "depends", in
-    #   keeping with the usage in fpm, as well as our own # {#replaces}
-    #   method?
-    # @todo This method should to be brought into line with the other
-    #   DSL methods, and not have @runtime_dependencies initialized in
-    #   the constructor.
-    def runtime_dependencies(val)
-      @runtime_dependencies = val
+    # @param val [String] the name of the runtime dependency
+    # @return [void]
+    def runtime_dependency(val)
+      @runtime_dependencies << val
     end
 
     # Add a new exclusion pattern.
