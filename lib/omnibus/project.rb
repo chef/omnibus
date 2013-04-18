@@ -32,8 +32,6 @@ module Omnibus
     # @todo Why not just use `nil`?
     NULL_ARG = Object.new
 
-    attr_reader :dependencies
-
     # Convenience method to initialize a Project from a DSL file.
     #
     # @param filename [String] the filename of the Project DSL file to load.
@@ -55,6 +53,7 @@ module Omnibus
     def initialize(io, filename)
       @exclusions = Array.new
       @conflicts = Array.new
+      @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io)
       render_tasks
@@ -211,35 +210,16 @@ module Omnibus
       @build_iteration || 1
     end
 
-    # Set or retrieve the list of software dependencies for this
-    # project.  As this is a DSL method, only pass the names of
-    # software components, not {Omnibus::Software} objects.
+    # Add an Omnibus software dependency.
     #
-    # These is the software that comprises your project, and is
-    # distinct from runtime dependencies.
+    # Note that this is a *build time* dependency.  If you need to
+    # specify an external dependency that is required at runtime, see
+    # {#runtime_dependency} instead.
     #
-    # @param val [Array<String>] a list of names of Software components
-    # @return [Array<String>]
-    #
-    # @see Omnibus::Software
-    # @see #runtime_dependencies
-    #
-    # @todo Consider renaming / aliasing this to "components" to
-    #   prevent confusion with {#runtime_dependencies}
-    # @todo Why does this class also have a `dependencies` attribute
-    #   reader defined?  I suppose this overwrites it, eh?  It should
-    #   be removed.
-    # @todo It would be more useful to have a `depend` method (similar
-    #   to {#exclude}), that appends to an array.  That would
-    #   eliminate patterns like we see in omnibus-chef, where we have
-    #   code like:
-    #     deps = []
-    #     deps << "chef"
-    #     ...
-    #     dependencies deps
-    def dependencies(val=NULL_ARG)
-      @dependencies = val unless val.equal?(NULL_ARG)
-      @dependencies
+    # @param val [String] the name of a Software dependency
+    # @return [void]
+    def dependency(val)
+      @dependencies << val
     end
 
     # Add a package that is a runtime dependency of this
