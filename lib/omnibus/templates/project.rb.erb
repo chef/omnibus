@@ -1,23 +1,21 @@
 
 name "<%= config[:name] %>"
+maintainer "CHANGE ME"
+homepage "CHANGEME.com"
 
 replaces        "<%= config[:name] %>"
 install_path    "<%= config[:install_path] %>"
 build_version   Omnibus::BuildVersion.new.semver
-build_iteration "1"
-
-deps = []
+build_iteration 1
 
 # global
-deps << "preparation" # creates required build directories
+dependency "preparation" # creates required build directories
 
 # <%= config[:name] %> deps
-# deps << "somedep"
+# dependency "somedep"
 
 # version manifest file
-deps << "version-manifest"
-
-dependencies deps
+dependency "version-manifest"
 
 exclude "\.git*"
 exclude "bundler\/git"
