@@ -108,6 +108,19 @@ module Omnibus
       @maintainer || raise(MissingProjectConfiguration.new("maintainer", "Opscode, Inc."))
     end
 
+    # Set or retrive the package homepage.
+    #
+    # @param val [String]
+    # @return [String]
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set
+    #   before being subsequently retrieved (i.e., a homepage must be
+    #   set in order to build a project)
+    def homepage(val=NULL_ARG)
+      @homepage = val unless val.equal?(NULL_ARG)
+      @homepage || raise(MissingProjectConfiguration.new("homepage", "http://www.opscode.com"))
+    end
+
     # Defines the iteration for the package to be generated.  Adheres
     # to the conventions of the platform for which the package is
     # being built.
@@ -397,8 +410,6 @@ module Omnibus
     #   to be joined with " " first.
     #
     # @todo Just make this return a String instead of an Array
-    # @todo The url is also hard-coded to "http://www.opscode.com".
-    #   This should also be governed by a method in the DSL.
     # @todo Use the long option names (i.e., the double-dash ones) in
     #   the fpm command for maximum clarity.
     def fpm_command(pkg_type)
@@ -411,7 +422,7 @@ module Omnibus
                           install_path,
                           "-m '#{maintainer}'",
                           "--description 'The full stack of #{@name}'",
-                          "--url http://www.opscode.com"]
+                          "--url #{homepage}"]
       if File.exist?("#{package_scripts_path}/postinst")
         command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
       end
