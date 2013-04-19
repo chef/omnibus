@@ -22,11 +22,11 @@ module Omnibus
   module CLI
     class Cache < Base
 
-      def initialize(args, options, config)
-        super(args, options, config)
-        options = config[:class_options]
-        load_omnibus_projects!(options[:path], options[:config])
-      end
+      class_option :path,
+        :aliases => [:p],
+        :type => :string,
+        :default => Dir.pwd,
+        :desc => "Path to the Omnibus project root."
 
       namespace :cache
 

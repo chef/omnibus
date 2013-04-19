@@ -23,11 +23,11 @@ module Omnibus
 
       namespace :build
 
-      def initialize(args, options, config)
-        super(args, options, config)
-        options = config[:class_options]
-        load_omnibus_projects!(options[:path], options[:config])
-      end
+      class_option :path,
+        :aliases => [:p],
+        :type => :string,
+        :default => Dir.pwd,
+        :desc => "Path to the Omnibus project root."
 
       method_option :timestamp,
         :aliases => [:t],
@@ -54,7 +54,6 @@ module Omnibus
       desc "software PROJECT SOFTWARE", "Build the given software component"
       def software(project_name, software_name)
         project = load_project!(project_name)
-
         software_task_name = "projects:#{project.name}:software:#{software_name}"
 
         say("Building #{software_name} for #{project.name} project", :green)

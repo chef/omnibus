@@ -28,9 +28,13 @@ module Omnibus
         :type => :boolean,
         :default => false,
         :desc => "Remove ALL files generated during the build (including packages)."
+      method_option :path,
+        :aliases => [:p],
+        :type => :string,
+        :default => Dir.pwd,
+        :desc => "Path to the Omnibus project root."
       desc "clean PROJECT", "Remove temporary files generated during the build process."
       def clean(project_name)
-        load_omnibus_projects!(options[:path], options[:config])
         project = load_project!(project_name)
 
         deletion_list = []

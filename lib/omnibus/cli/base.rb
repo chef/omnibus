@@ -28,15 +28,36 @@ module Omnibus
         :type => :string,
         :default => File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME),
         :desc => "Path to the Omnibus configuration file to use."
-      class_option :path,
-        :aliases => [:p],
-        :type => :string,
-        :default => Dir.pwd,
-        :desc => "Path to the Omnibus project root."
 
-      def initialize(*args)
-        super
+      def initialize(args, options, config)
+        super(args, options, config)
         $stdout.sync = true
+
+        # Don't try to initialize the Omnibus project for help commands
+        return if config[:current_command].name == "help"
+
+        if path = @options[:path]
+          if (config = @options[:config]) && File.exist?(@options[:config])
+            say("Using Omnibus configuration file #{config}", :green)
+            Omnibus.load_configuration(config)
+          end
+
+          # TODO: merge in all relevant CLI options here, as they should
+          # override anything from a configuration file.
+          Omnibus::Config.project_root(path)
+
+          unless Omnibus.project_files.any?
+            raise Omnibus::CLI::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
+          end
+
+          begin
+            Omnibus.process_configuration
+          rescue => e
+            error_msg = "Could not load the Omnibus projects."
+            raise Omnibus::CLI::Error.new(error_msg, e)
+          end
+        end
+
       end
 
       ##################################################################
@@ -84,29 +105,6 @@ module Omnibus
           raise Omnibus::CLI::Error, error_msg
         end
         project
-      end
-
-      def load_omnibus_projects!(path, config_file=nil)
-
-        if config_file && File.exist?(config_file)
-          say("Using Omnibus configuration file #{config_file}", :green)
-          Omnibus.load_configuration(config_file)
-        end
-
-        # TODO: merge in all relevant CLI options here, as they should
-        # override anything from a configuration file.
-        Omnibus::Config.project_root path
-
-        unless Omnibus.project_files.any?
-          raise Omnibus::CLI::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
-        end
-
-        begin
-          Omnibus.process_configuration
-        rescue => e
-          error_msg = "Could not load the Omnibus projects."
-          raise Omnibus::CLI::Error.new(error_msg, e)
-        end
       end
 
     end
