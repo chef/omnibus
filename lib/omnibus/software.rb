@@ -43,7 +43,6 @@ module Omnibus
     #   implementing what are effectively the same DSL methods?  Compare
     #   with Omnibus::Project.
     attr_reader :description
-    attr_reader :dependencies
 
     # @todo This doesn't appear to be used at all
     attr_reader :fetcher
@@ -85,7 +84,7 @@ module Omnibus
       # Seems like this should just be Builder.new(self) instead
       @builder = NullBuilder.new(self)
 
-      @dependencies = ["preparation"]
+      @dependencies = Array.new
       instance_eval(io, filename, 0)
 
       # Set override information after the DSL file has been consumed
@@ -103,11 +102,30 @@ module Omnibus
       @description = val
     end
 
-    # @todo See comments on {Omnibus::Project#dependencies}
-    def dependencies(deps)
-      deps.each do |dep|
-        @dependencies << dep
-      end
+    # Add an Omnibus software dependency.
+    #
+    # @param val [String] the name of a Software dependency
+    # @return [void]
+    def dependency(val)
+      @dependencies << val
+    end
+
+    # Set or retrieve the list of software dependencies for this
+    # project.  As this is a DSL method, only pass the names of
+    # software components, not {Omnibus::Software} objects.
+    #
+    # These is the software that comprises your project, and is
+    # distinct from runtime dependencies.
+    #
+    # @note This will reinitialize the internal depdencies Array
+    #   and overwrite any dependencies that may have been set using
+    #   {#dependency}.
+    #
+    # @param val [Array<String>] a list of names of Software components
+    # @return [Array<String>]
+    def dependencies(val=NULL_ARG)
+      @dependencies = val unless val.equal?(NULL_ARG)
+      @dependencies
     end
 
     # Set or retrieve the source for the software
