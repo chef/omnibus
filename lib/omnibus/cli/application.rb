@@ -65,6 +65,7 @@ module Omnibus
         template(File.join("Gemfile.erb"), File.join(target, "Gemfile"), opts)
         template(File.join("gitignore.erb"), File.join(target, ".gitignore"), opts)
         template(File.join("README.md.erb"), File.join(target, "README.md"), opts)
+        template(File.join("omnibus.rb.example.erb"), File.join(target, "omnibus.rb.example"), opts)
 
         # project definition
         template(File.join("project.rb.erb"), File.join(target, "config", "projects", "#{name}.rb"), opts)
