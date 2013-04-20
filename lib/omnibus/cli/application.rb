@@ -78,8 +78,6 @@ module Omnibus
                  File.join(config_software, "erlang-example.rb"), opts)
         template(File.join("software", "ruby-example.rb.erb"),
                  File.join(config_software, "ruby-example.rb"), opts)
-        template(File.join("software", "README.md.erb"),
-                 File.join(config_software, "README.md"), opts)
 
         # Vagrant build lab
         template(File.join("Berksfile.erb"), File.join(target, "Berksfile"), opts)

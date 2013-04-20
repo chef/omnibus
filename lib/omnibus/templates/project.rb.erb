@@ -8,10 +8,10 @@ install_path    "<%= config[:install_path] %>"
 build_version   Omnibus::BuildVersion.new.semver
 build_iteration 1
 
-# global
-dependency "preparation" # creates required build directories
+# creates required build directories
+dependency "preparation"
 
-# <%= config[:name] %> deps
+# <%= config[:name] %> dependencies/components
 # dependency "somedep"
 
 # version manifest file
