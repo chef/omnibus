@@ -61,13 +61,27 @@ module Omnibus
           :install_path => install_path
         }
 
-        create_file(File.join(target, "config", "software", "README.md"),
-                    "Software definitions for your project's dependencies go here!")
-        template(File.join("Berksfile.erb"), File.join(target, "Berksfile"), opts)
+        # core project files
         template(File.join("Gemfile.erb"), File.join(target, "Gemfile"), opts)
         template(File.join("gitignore.erb"), File.join(target, ".gitignore"), opts)
-        template(File.join("project.rb.erb"), File.join(target, "config", "projects", "#{name}.rb"), opts)
         template(File.join("README.md.erb"), File.join(target, "README.md"), opts)
+
+        # project definition
+        template(File.join("project.rb.erb"), File.join(target, "config", "projects", "#{name}.rb"), opts)
+
+        # example software definitions
+        config_software = File.join(target, "config", "software")
+        template(File.join("software", "c-example.rb.erb"),
+                 File.join(config_software, "c-example.rb"), opts)
+        template(File.join("software", "erlang-example.rb.erb"),
+                 File.join(config_software, "erlang-example.rb"), opts)
+        template(File.join("software", "ruby-example.rb.erb"),
+                 File.join(config_software, "ruby-example.rb"), opts)
+        template(File.join("software", "README.md.erb"),
+                 File.join(config_software, "README.md"), opts)
+
+        # Vagrant build lab
+        template(File.join("Berksfile.erb"), File.join(target, "Berksfile"), opts)
         template(File.join("Vagrantfile.erb"), File.join(target, "Vagrantfile"), opts)
 
         # render out stub packge scripts
