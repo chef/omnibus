@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 #
 
 require 'fileutils'
+require 'uber-s3'
 require 'omnibus/fetchers'
 
 module Omnibus
@@ -50,6 +51,9 @@ module Omnibus
     include SoftwareS3URLs
 
     def initialize
+      unless config.s3_bucket && config.s3_access_key && config.s3_secret_key
+        raise InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
+      end
       @client = UberS3.new(
         :access_key         => config.s3_access_key,
         :secret_access_key  => config.s3_secret_key,
