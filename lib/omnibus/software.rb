@@ -5,18 +5,14 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-
-#
-# omnibus software dsl reader
 #
 
 require 'digest/md5'
@@ -30,16 +26,27 @@ require 'omnibus/fetcher'
 require 'omnibus/builder'
 require 'omnibus/config'
 
+require 'rake'
+
 module Omnibus
+
+  # Omnibus software DSL reader
   class Software
     include Rake::DSL
 
     NULL_ARG = Object.new
 
+    # It appears that this is not used
     attr_reader :builder
+
+    # @todo Why do we apparently use two different ways of
+    #   implementing what are effectively the same DSL methods?  Compare
+    #   with Omnibus::Project.
     attr_reader :description
-    attr_reader :dependencies
+
+    # @todo This doesn't appear to be used at all
     attr_reader :fetcher
+
     attr_reader :project
 
     attr_reader :given_version
@@ -49,6 +56,19 @@ module Omnibus
       new(IO.read(filename), filename, project, overrides)
     end
 
+    # @param io [String]
+    # @param filename [String]
+    # @param project [???] Is this a string or an Omnibus::Project?
+    # @param overrides [Hash]
+    #
+    # @see Omnibus::Overrides
+    #
+    # @todo See comment on {Omnibus::NullBuilder}
+    # @todo does `filename` need to be absolute, or does it matter?
+    # @ @todo Any reason to not have this just take a filename,
+    #   project, and override hash directly?  That is, why io AND a
+    #   filename, if the filename can always get you the contents you
+    #   need anyway?
     def initialize(io, filename, project, overrides={})
       @given_version    = nil
       @override_version = nil
@@ -61,14 +81,15 @@ module Omnibus
       @project          = project
       @always_build     = false
 
+      # Seems like this should just be Builder.new(self) instead
       @builder = NullBuilder.new(self)
 
-      @dependencies = ["preparation"]
+      @dependencies = Array.new
       instance_eval(io, filename, 0)
-      
+
       # Set override information after the DSL file has been consumed
       @override_version = overrides[name]
-
+      
       render_tasks
     end
 
@@ -81,12 +102,44 @@ module Omnibus
       @description = val
     end
 
-    def dependencies(deps)
-      deps.each do |dep|
-        @dependencies << dep
-      end
+    # Add an Omnibus software dependency.
+    #
+    # @param val [String] the name of a Software dependency
+    # @return [void]
+    def dependency(val)
+      @dependencies << val
     end
 
+    # Set or retrieve the list of software dependencies for this
+    # project.  As this is a DSL method, only pass the names of
+    # software components, not {Omnibus::Software} objects.
+    #
+    # These is the software that comprises your project, and is
+    # distinct from runtime dependencies.
+    #
+    # @note This will reinitialize the internal depdencies Array
+    #   and overwrite any dependencies that may have been set using
+    #   {#dependency}.
+    #
+    # @param val [Array<String>] a list of names of Software components
+    # @return [Array<String>]
+    def dependencies(val=NULL_ARG)
+      @dependencies = val unless val.equal?(NULL_ARG)
+      @dependencies
+    end
+
+    # Set or retrieve the source for the software
+    #
+    # @param val [Hash<Symbol, String>] a single key/pair that defines
+    #   the kind of source and a path specifier
+    # @option val [String] :git (nil) a Git URL
+    # @option val [String] :url (nil) a general URL
+    # @option val [String] :path (nil) a fully-qualified local file system path
+    #
+    # @todo Consider changing this to accept two arguments instead
+    # @todo This should throw an error if an invalid key is given, or
+    #   if more than one pair is given, or if no source value is ever
+    #   set.
     def source(val=NULL_ARG)
       @source = val unless val.equal?(NULL_ARG)
       @source
@@ -100,41 +153,73 @@ module Omnibus
       @override_version || @given_version
     end
 
+    # Was this software version overridden externally, relative to the
+    # version declared within the software DSL file?
+    #
+    # @return [Boolean]
     def overridden?
       @override_version && (@override_version != @given_version)
     end
 
+    # @todo see comments on {Omnibus::Fetcher#without_caching_for}
     def version_guid
       Fetcher.for(self).version_guid
     end
 
+    # @todo Define as a delegator
     def build_version
       @project.build_version
     end
 
+    # @todo Judging by existing usage, this should sensibly default to
+    #   the name of the software, since that's what it effectively does down in #project_dir
     def relative_path(val)
       @relative_path = val
     end
 
+    # @todo Code smell... this only has meaning if the software was
+    #   defined with a :uri, and this is only used in
+    #   {Omnibus::NetFetcher}.  This responsibility is distributed
+    #   across two classes, one of which is a specific interface
+    #   implementation
+    # @todo Why the caching of the URI?
     def source_uri
       @source_uri ||= URI(@source[:url])
     end
 
+    # @param val [Boolean]
+    # @return void
+    #
+    # @todo Doesn't necessarily need to be a Boolean if #always_build?
+    #   uses !! operator
     def always_build(val)
       @always_build = val
     end
 
+    # @return [Boolean]
     def always_build?
+      # Should do !!(@always_build)
       @always_build
     end
 
+    # @todo Code smell... this only has meaning if the software was
+    #   defined with a :uri, and this is only used in
+    #   {Omnibus::NetFetcher}.  This responsibility is distributed
+    #   across two classes, one of which is a specific interface
+    #   implementation
     def checksum
       @source[:md5]
     end
 
+    # @todo Should this ever be legitimately used in the DSL?  It
+    #   seems that that facility shouldn't be provided, and thus this
+    #   should be made a private function (if it even really needs to
+    #   exist at all).
     def config
       Omnibus.config
     end
+
+    # @!group Directory Accessors
 
     def source_dir
       config.source_dir
@@ -144,14 +229,24 @@ module Omnibus
       config.cache_dir
     end
 
+    # The directory that the software will be built in
+    #
+    # @return [String] an absolute filesystem path
     def build_dir
       "#{config.build_dir}/#{camel_case_path(install_dir)}"
     end
 
+    # @todo Why the different name (i.e. *_dir instead of *_path, or
+    #   vice versa?)  Given the patterns that are being set up
+    #   elsewhere, this is just confusing inconsistency.
     def install_dir
       @project.install_path
     end
 
+    # @!endgroup
+
+    # @todo It seems like this isn't used, and if it were, it should
+    # probably be part of Opscode::Builder instead
     def max_build_jobs
       if OHAI.cpu == nil
         2
@@ -160,27 +255,48 @@ module Omnibus
       end
     end
 
+    # @todo See comments for {#source_uri}... same applies here.  If
+    #   this is called in a non-source-software context, bad things will
+    #   happen.
     def project_file
       filename = source_uri.path.split('/').last
       "#{cache_dir}/#{filename}"
     end
 
+    # @todo this would be simplified and clarified if @relative_path
+    #   defaulted to @name... see the @todo tag for #relative_path
+    # @todo Move this up with the other *_dir methods for better
+    #   logical grouping
     def project_dir
       @relative_path ? "#{source_dir}/#{@relative_path}" : "#{source_dir}/#{@name}"
     end
 
+    # @todo all the *_file methods should be next to each other for
+    #   better logical grouping
     def manifest_file
       manifest_file_from_name(@name)
     end
 
+    # @todo Seems like this should be a private method, since it's
+    #   just used internally
     def manifest_file_from_name(software_name)
       "#{build_dir}/#{software_name}.manifest"
     end
 
+    # The name of the sentinel file that marks the most recent fetch
+    # time of the software
+    #
+    # @return [String] an absolute path
+    #
+    # @see Omnibus::Fetcher
+    # @todo seems like this should be a private
+    #   method, since it's an implementation detail.
     def fetch_file
       "#{build_dir}/#{@name}.fetch"
     end
 
+    # @todo This is actually "snake case", not camel case
+    # @todo this should be a private method
     def camel_case_path(project_path)
       path = project_path.dup
       # split the path and remmove and empty strings
@@ -194,20 +310,44 @@ module Omnibus
       end
     end
 
+    # Define a series of {Omnibus::Builder} DSL commands that are
+    # required to successfully build the software.
+    #
+    # @param block [block] a block of build commands
+    # @return void
+    #
+    # @see Omnibus::Builder
+    #
+    # @todo Not quite sure the proper way to document a "block"
+    #   parameter in Yard
+    # @todo Seems like this renders the setting of @builder in the
+    #   initializer moot
+    # @todo Rename this to something like "build_commands", since it
+    #   doesn't actually do any building
     def build(&block)
       @builder = Builder.new(self, &block)
     end
 
+    # Returns the platform of the machine on which Omnibus is running,
+    # as determined by Ohai.
+    #
+    # @return [String]
     def platform
       OHAI.platform
     end
 
+    # Return the architecture of the machine, as determined by Ohai.
+    # @return [String] Either "sparc" or "intel", as appropriate
+    # @todo Is this used?  Doesn't appear to be...
     def architecture
       OHAI.kernel['machine'] =~ /sun/ ? "sparc" : "intel"
     end
 
     private
 
+    # @todo What?!
+    # @todo It seems that this is not used... remove it
+    # @deprecated Use something else (?)
     def command(*args)
       raise "Method Moved."
     end
