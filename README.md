@@ -1,41 +1,82 @@
+## Omnibus
+
+Easily create full-stack installers for your project across a variety
+of platforms.
+
 ## Prerequisites
 
-Omnibus is designed to run with a minimal set of prerequisites. At a minimun, you'll need the following:
+Omnibus is designed to run with a minimal set of prerequisites. You'll
+need the following:
 
-- Ruby 1.8.7 or later (http://ruby-lang.org)
+- Ruby 1.9 or later (http://ruby-lang.org)
 - Bundler (http://gembundler.com, http://rubygems.org/gems/bundler)
+
+Though not *strictly* necessary, Vagrant makes using Omnibus easier,
+and is highly recommended.
+- Vagrant 1.2.1 or later (http://www.vagrantup.com)
 
 ## Get Started
 
-To get started using Omnibus, create a new project and add it to your Gemfile. Executing `bundle install` will pull in all of the gems required for Omnibus to operate.
+Omnibus provides both a DSL for defining Omnibus projects for your
+software, as well as a command-line tool for generating installer
+artifacts from that definition.
 
-```ruby
-gem 'omnibus', :git => 'git@github.com/opscode/omnibus-ruby'
-```
-
-In your Rakefile, generate the require the Omnibus gem and load your project and software congifurations to generate the tasks.
-
-```ruby
-require 'omnibus'
-
-Omnibus.projects('config/projects/*.rb')
-Omnibus.software('config/software/*/.rb')
-```
-
-If you've already set up software and project configurations, executing `rake -T` prints a list of things that you can build:
+To get started, install Omnibus locally on your workstation.
 
 ```
-rake projects:chef                    # build and package chef
-rake prokects:chef:software:ruby      # fetch and build ruby
-rake projects:chef:software:rubygems  # fetch and build rubygems
-rake prokects:chef:software:chef-gem  # fetch and build chef-gem
+$ gem install omnibus
 ```
 
-Executing `rake projects:chef` will recursively build all of the dependencies of Chef from scratch. In the case above, Ruby is build first, followed by the installation of Rubygems. Finally, Chef is installed from gems. Executing the top-level project task (projects:chef) also packages the project for distribution on the target platform (e.g. RPM on RedHat-based systems and DEB on Debian-based systems).
+You can now create an Omnibus project in your current directory by
+using the project generator feature.
+
+```
+$ omnibus project $MY_PROJECT_NAME
+```
+
+This will generate a complete project skeleton in the directory
+`omnibus-$MY_PROJECT_NAME`
+
+This minimal project will actually build.
+
+``` shell
+$ cd omnibus-$MY_PROJECT_NAME
+$ bundle install --binstubs
+$ bin/omnibus build project $MY_PROJECT_NAME
+```
+
+More details can be found in the generated project README file.
 
 ## Configuration DSL
 
+Though the template project will build, it won't do anything exciting.
+For that, you'll need to use the Omnibus DSL to define the specifics
+of your own application.
+
 ### Software
+
+Omnibus "software" files define individual software components that go
+into making your overall package.  They are the building blocks of
+your application.  The Software DSL provides a way to define where to
+retrieve the software sources, how to build them, and what
+dependencies they have.  These dependencies are also defined in their
+own Software DSL files, thus forming the basis for a dependency-aware
+build ordering.
+
+All Software definitions should go in the `config/software` directory
+of your Omnibus project repository.
+
+Opscode has created software definitions for a number of
+commonly-needed components, available in the
+[omnibus-software](https://github.com/opscode/omnibus-software.git)
+repository.  When you create a new project skeleton using Omnibus,
+this is automatically added to the project's Gemfile, making all these
+software definitions available to you.  (If you prefer, however, you
+can write your own versions of these same definitions in your project
+repository; local copies in `config/software` have precedence over
+anything from the `omnibus-software` repository.)
+
+An example:
 
 ```ruby
 name    "ruby"
@@ -43,7 +84,9 @@ version "1.9.2-p290"
 source  :url => "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
         :md5 => "604da71839a6ae02b5b5b5e1b792d5eb"
 
-dependencies ["zlib", "ncurses", "openssl"]
+dependency "zlib"
+dependency "ncurses"
+dependency "openssl"
 
 relative_path "ruby-#{version}"
 
@@ -54,13 +97,15 @@ build do
 end
 ```
 
+Some of the DSL methods available include:
+
 **name**: The name of the software component.
 
 **version**: The version of the software component.
 
 **source**: Directions to the location of the source.
 
-**dependencies**: A list of components that this software depends on.
+**dependency**: An Omnibus software-defined component that this software depends on.
 
 **relative_path**: The relative path of the extracted tarball.
 
@@ -68,17 +113,32 @@ end
 
 **command**: An individual build step.
 
+For more, consult the documentation.
+
 ### Projects
+
+A Project DSL file defines your actual application; this is the thing
+you are creating a full-stack installer for in the first place.  It
+provides a means to define the dependencies of the project (again, as
+specified in Software DSL definition files), as well as ways to set
+installer package metadata.
+
+All Project definitions (yes, you can have more than one) should go in
+the `config/projects` directory of your Omnibus project repository.
 
 ```ruby
 name            "chef-full"
+maintainer      "YOUR NAME"
+homepage        "http://yoursite.com"
 
 install_path    "/opt/chef"
 build_version   "0.10.8"
-build_iteration "4"
+build_iteration 4
 
-dependencies    ["chef"]
+dependency "chef"
 ```
+
+Some DSL methods available include:
 
 **name:** The name of the project.
 
@@ -88,45 +148,29 @@ dependencies    ["chef"]
 
 **build_iteration:** The package iteration number.
 
-**dependencies**: A list of software components to include in this package.
+**dependency**: An Omnibus software-defined component to include in this package.
 
-## Build Structure
+For more, see the documentation.
 
-Omnibus creates and stores build arifacts in a direcory tree under `/var/cache/omnnibus`
+## A Note On Builds
 
-```
-└── /var/cache/omnibus    
-    └── cache
-    └── src
-    └── build
-        └── install_path
-            └── ruby.fetch
-            └── ruby.manifest
-````
+As stated above, the generated project skeleton can run "as-is".
+However, Omnibus determines the platform for which to build an
+installer based on *the platform it is currently running on*.  That
+is, you can only generate a `.deb` file for Ubuntu if you're actually
+running Omnibus *on Ubuntu*.
 
-### cache
-
-The `cache` directory caches the download artifacts for software sources. It keeps pristine tarballs and git repositories, depending on the type of sorce specified.
-
-### src
-
-The `src` directory is where the extracted source code for a piece of software lives. When a piece of software needs to be rebuilt, the `src` directory is recreated from the pristine copy in the download cache.
-
-### build
-
-The `build` directory is where Omnibus keeps track of the build artifacts for each piece of software.
-
-__install_path:__ The undersocre-separated installation path of the project being built (e.g. /opt/chef => opt_chef). Segregating build artifacts by installation path allows us to keep track of the builds for the same pieces of software that are installed in two different locations (e.g. building an embedded Ruby for /opt/chef and /opt/ohai).
-
-__*.fetch:__ A sentinel file representing the mtime of the most recent local fetch of the software.
-
-__*.manifest:__ A sentinel file representing the mtime of the last successful build for a particular piece of software.
+This is currently achieved using [Vagrant](http://www.vagrantup.com).
+A valid `Vagrantfile` for generating builds on Ubuntu and Centos
+platforms (though Omnibus is not limited to just those!) is created
+for each project that you generate using `omnibus project
+$MY_PROJECT_NAME`
 
 ## License
 
 See the LICENSE and NOTICE files for more information.
 
-Copyright: Copyright (c) 2012 Opscode, Inc.
+Copyright: Copyright (c) 2012--2013 Opscode, Inc.
 License: Apache License, Version 2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");
