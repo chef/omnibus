@@ -7,11 +7,7 @@ module Omnibus
 
     def to_s
       """
-      You indicated that you would like to use S3 caching by setting
-      the `use_s3_caching` parameter to true
-
-      However, this requires non-nil values for several other
-      important parameters.
+      One or more required S3 configuration values is missing.
 
       Your effective configuration was the following:
 
@@ -22,7 +18,6 @@ module Omnibus
       If you truly do want S3 caching, you should add values similar
       to the following in your Omnibus config file:
 
-            use_s3_caching true
             s3_bucket      ENV['S3_BUCKET_NAME']
             s3_access_key  ENV['S3_ACCESS_KEY']
             s3_secret_key  ENV['S3_SECRET_KEY']
