@@ -5,3 +5,5 @@ tmp
 Gemfile.lock
 .bundle/
 vendor/
+.yardoc
+doc/
