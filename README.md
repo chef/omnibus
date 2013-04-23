@@ -1,5 +1,8 @@
 ## Omnibus
 
+[![Build Status](https://travis-ci.org/opscode/omnibus-ruby.png?branch=master)](https://travis-ci.org/opscode/omnibus-ruby)
+[![Code Climate](https://codeclimate.com/github/opscode/omnibus-ruby.png)](https://codeclimate.com/github/opscode/omnibus-ruby)
+
 Easily create full-stack installers for your project across a variety
 of platforms.
 
