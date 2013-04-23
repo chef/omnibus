@@ -39,10 +39,10 @@ module Omnibus
         project = load_project!(project_name)
         project_task_name = "projects:#{project.name}"
 
-        say("Building #{project.name}", :green)
         unless options[:timestamp]
           say("I won't append a timestamp to the version identifier.", :yellow)
         end
+        say("Building #{project.name} #{project.build_version}", :green)
 
         Rake::Task[project_task_name].invoke
       end
