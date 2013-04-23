@@ -269,13 +269,14 @@ module Omnibus
       version_regexp.match(git_describe)[1..3]
     end
 
-
     def append_timestamp?
-      append_timestamp = true
-      if ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/(false|f|no|n|0)$/i))
-        append_timestamp = false
+      if ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/^(false|f|no|n|0)$/i))
+        false
+      elsif ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/^(true|t|yes|y|1)$/i))
+        true
+      else
+        Omnibus::Config.append_timestamp
       end
-      append_timestamp
     end
   end
 end
