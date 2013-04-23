@@ -11,7 +11,7 @@ Gem::Specification.new do |gem|
   gem.email          = "info@opscode.com"
   gem.description    = "Omnibus helps you build self-installing, full-stack software builds."
   gem.summary        = gem.description
-  gem.homepage       = "https://github.com/opscode/opscode-ruby"
+  gem.homepage       = "https://github.com/opscode/omnibus-ruby"
 
   gem.required_ruby_version = ">= 1.9.1"
 
