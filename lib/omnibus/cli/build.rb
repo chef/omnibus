@@ -44,10 +44,6 @@ module Omnibus
           say("I won't append a timestamp to the version identifier.", :yellow)
         end
 
-        # Until we have time to integrate the CLI deeply into the Omnibus codebase
-        # this will have to suffice! (sadpanda)
-        ENV['OMNIBUS_APPEND_TIMESTAMP'] = options[:timestamp].to_s
-
         Rake::Task[project_task_name].invoke
       end
 
