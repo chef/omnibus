@@ -1,3 +1,14 @@
+## 1.0.2 (April 23, 2013)
+
+IMPROVEMENTS:
+
+* Travis CI support
+
+BUG FIXES:
+
+* [CHEF-4112] `omnibus build project` command does not respect the
+  `--no-timestamp` flag
+
 ## 1.0.1 (April 21, 2013)
 
 BUG FIXES:
