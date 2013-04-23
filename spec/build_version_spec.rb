@@ -156,36 +156,58 @@ describe Omnibus::BuildVersion do
       end
     end
 
-    describe "ENV['OMNIBUS_APPEND_TIMESTAMP'] usage" do
-
+    describe "appending a timestamp" do
       let(:git_describe){ "11.0.0-alpha-3-207-g694b062" }
 
-      it "appends a timestamp if not set" do
+      it "appends a timestamp by default" do
         build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
       end
 
-      context "appends a timestamp if set to a truthy value" do
+      describe "ENV['OMNIBUS_APPEND_TIMESTAMP'] is set" do
         ["true","t","yes","y",1].each do |truthy|
-          let(:value) { truthy }
-          before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = value.to_s }
+          context "to #{truthy}" do
+            before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = truthy.to_s }
+            it "appends a timestamp" do
+              build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+            end
+          end
+        end
 
-          it "with #{truthy}" do
-            build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+        ["false","f","no","n",0].each do |falsey|
+          context "to #{falsey}" do
+            before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = falsey.to_s }
+            it "does not append a timestamp" do
+              build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
+            end
           end
         end
       end
 
-      context "does not append a timestamp if set to a falsey value" do
-        ["false","f","no","n",0].each do |falsey|
-          let(:value) { falsey }
-          before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = value.to_s }
+      describe "Omnibus::Config.append_timestamp is set" do
+        context "is true" do
+          before { Omnibus::Config.append_timestamp(true) }
+          it "appends a timestamp" do
+            build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+          end
+        end
 
-          it "with #{falsey}" do
+        context "is false" do
+          before { Omnibus::Config.append_timestamp(false) }
+          it "does not append a timestamp" do
             build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
           end
         end
       end
 
+      describe "both are set" do
+        before do
+          ENV['OMNIBUS_APPEND_TIMESTAMP'] = "false"
+          Omnibus::Config.append_timestamp(true)
+        end
+        it "prefers the value from ENV['OMNIBUS_APPEND_TIMESTAMP']" do
+          build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
+        end
+      end
     end
   end
 

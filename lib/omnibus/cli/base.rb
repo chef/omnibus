@@ -45,6 +45,7 @@ module Omnibus
           # TODO: merge in all relevant CLI options here, as they should
           # override anything from a configuration file.
           Omnibus::Config.project_root(path)
+          Omnibus::Config.append_timestamp(@options[:timestamp]) if @options.key?('timestamp')
 
           unless Omnibus.project_files.any?
             raise Omnibus::CLI::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."

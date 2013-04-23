@@ -159,6 +159,15 @@ module Omnibus
 
     # @!endgroup
 
+    # @!group Build Version Parameters
+
+    # @!attribute [rw] append_timestamp
+    #
+    #   @return [Boolean]
+    append_timestamp true
+
+    # # @!endgroup
+
     # @!group Validation Methods
 
     # Asserts that the Config object is in a valid state.  If invalid
