@@ -148,6 +148,10 @@ module Omnibus
         platform_version =~ /^(\d+)/
         maj = $1
         "#{build_iteration}.el#{maj}"
+      when 'freebsd'
+        platform_version =~ /^(\d+)/
+        maj = $1
+        "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
       else
@@ -297,6 +301,10 @@ module Omnibus
     # @return [String]
     def platform_family
       OHAI.platform_family
+    end
+
+    def machine
+      OHAI['kernel']['machine']
     end
 
     # Convenience method for accessing the global Omnibus configuration object.
