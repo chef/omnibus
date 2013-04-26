@@ -84,6 +84,16 @@ module Omnibus
                           /libiconv/
                          ]
 
+  FREEBSD_WHITELIST_LIBS = [
+                             /libc\.so/,
+                             /libcrypt\.so/,
+                             /libm\.so/,
+                             /librt\.so/,
+                             /libthr\.so/,
+                             /libutil\.so/,
+                             /libz.so/,
+                            ]
+
     WHITELIST_FILES = [
                        /jre\/bin\/javaws/,
                        /jre\/bin\/policytool/,
@@ -182,6 +192,8 @@ module Omnibus
                          MAC_WHITELIST_LIBS
                        when 'solaris2'
                          SOLARIS_WHITELIST_LIBS
+                       when 'freebsd'
+                         FREEBSD_WHITELIST_LIBS
                        else
                          WHITELIST_LIBS
                        end
