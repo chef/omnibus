@@ -33,8 +33,9 @@ module Omnibus
         super(args, options, config)
         $stdout.sync = true
 
-        # Don't try to initialize the Omnibus project for help commands
-        return if config[:current_command].name == "help"
+        # Don't try to initialize the Omnibus project for help commands. current_task renamed to current_command in Thor 0.18.0
+        current_command = config[:current_command] ? config[:current_command].name : config[:current_task].name
+        return if current_command == "help"
 
         if path = @options[:path]
           if (config = @options[:config]) && File.exist?(@options[:config])
