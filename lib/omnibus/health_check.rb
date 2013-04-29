@@ -99,15 +99,15 @@ module Omnibus
                           /libiconv/
                          ]
 
-  FREEBSD_WHITELIST_LIBS = [
-                             /libc\.so/,
-                             /libcrypt\.so/,
-                             /libm\.so/,
-                             /librt\.so/,
-                             /libthr\.so/,
-                             /libutil\.so/,
-                             /libz.so/,
-                            ]
+    FREEBSD_WHITELIST_LIBS = [
+                               /libc\.so/,
+                               /libcrypt\.so/,
+                               /libm\.so/,
+                               /librt\.so/,
+                               /libthr\.so/,
+                               /libutil\.so/,
+                               /libz.so/,
+                              ]
 
     WHITELIST_FILES = [
                        /jre\/bin\/javaws/,
