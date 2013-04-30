@@ -81,8 +81,7 @@ module Omnibus
                               /libmd.so/,
                               /libc.so/,
                               /libgcc_s.so/,
-                              /libcrypt.so/,
-                              /libcurses.so/
+                              /libcrypt.so/
                              ]
 
     MAC_WHITELIST_LIBS = [
