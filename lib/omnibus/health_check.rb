@@ -33,7 +33,7 @@ module Omnibus
                       /libstdc\+\+\.so/,
                       /libutil\.so/,
                       /linux-vdso.+/,
-                      /linux-gate\.so/,
+                      /linux-gate\.so/
                      ]
 
     SOLARIS_WHITELIST_LIBS = [
@@ -66,7 +66,7 @@ module Omnibus
                               # solaris 9 libraries:
                               /libm\.so\.1/,
                               /libc_psr\.so\.1/,
-                              /s9_preload\.so\.1/,
+                              /s9_preload\.so\.1/
                              ]
 
     MAC_WHITELIST_LIBS = [
@@ -84,11 +84,20 @@ module Omnibus
                           /libiconv/
                          ]
 
+    FREEBSD_WHITELIST_LIBS = [
+                               /libc\.so/,
+                               /libcrypt\.so/,
+                               /libm\.so/,
+                               /librt\.so/,
+                               /libthr\.so/,
+                               /libutil\.so/
+                              ]
+
     WHITELIST_FILES = [
                        /jre\/bin\/javaws/,
                        /jre\/bin\/policytool/,
                        /jre\/lib/,
-                       /jre\/plugin/,
+                       /jre\/plugin/
                       ]
 
     def self.log(msg)
@@ -182,6 +191,8 @@ module Omnibus
                          MAC_WHITELIST_LIBS
                        when 'solaris2'
                          SOLARIS_WHITELIST_LIBS
+                       when 'freebsd'
+                         FREEBSD_WHITELIST_LIBS
                        else
                          WHITELIST_LIBS
                        end
