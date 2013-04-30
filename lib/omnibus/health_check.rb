@@ -90,8 +90,7 @@ module Omnibus
                                /libm\.so/,
                                /librt\.so/,
                                /libthr\.so/,
-                               /libutil\.so/,
-                               /libz.so/,
+                               /libutil\.so/
                               ]
 
     WHITELIST_FILES = [
