@@ -33,7 +33,7 @@ module Omnibus
                       /libstdc\+\+\.so/,
                       /libutil\.so/,
                       /linux-vdso.+/,
-                      /linux-gate\.so/,
+                      /linux-gate\.so/
                      ]
 
     SOLARIS_WHITELIST_LIBS = [
@@ -66,7 +66,7 @@ module Omnibus
                               # solaris 9 libraries:
                               /libm\.so\.1/,
                               /libc_psr\.so\.1/,
-                              /s9_preload\.so\.1/,
+                              /s9_preload\.so\.1/
                              ]
 
     SMARTOS_WHITELIST_LIBS = [
@@ -112,7 +112,7 @@ module Omnibus
                        /jre\/bin\/javaws/,
                        /jre\/bin\/policytool/,
                        /jre\/lib/,
-                       /jre\/plugin/,
+                       /jre\/plugin/
                       ]
 
     def self.log(msg)
