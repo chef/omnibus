@@ -39,7 +39,6 @@ module Omnibus
       new(IO.read(filename), filename)
     end
 
-
     # Create a new Project from the contents of a DSL file.  Prefer
     # calling {Omnibus::Project#load} instead of using this method
     # directly.
@@ -51,6 +50,14 @@ module Omnibus
     #
     # @todo Remove filename parameter, as it is unused.
     def initialize(io, filename)
+      @output_package = nil
+      @name = nil
+      @package_name = nil
+      @install_path = nil
+      @homepage = nil
+      @description = nil
+      @replaces = nil
+
       @exclusions = Array.new
       @conflicts = Array.new
       @dependencies = Array.new
@@ -411,7 +418,7 @@ module Omnibus
                      "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
                      "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
                      "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
-                     "-out #{config.package_dir}\\#{package_name}-#{build_version}-#{iteration}.msi"]
+                     "-out #{config.package_dir}\\#{output_package}"]
 
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
@@ -476,11 +483,65 @@ module Omnibus
       command_and_opts = [ File.expand_path(File.join(Omnibus.source_root, "bin", "makeself.sh")),
                            "--gzip",
                            install_path,
-                           "#{package_name}-#{build_version}_#{iteration}.sh",
+                           output_package,
                            "'The full stack of #{@name}'"
                          ]
       command_and_opts << "./makeselfinst" if File.exists?("#{package_scripts_path}/makeselfinst")
       command_and_opts
+    end
+
+    # Runs the makeself commands to make a self extracting archive package.
+    # As a (necessary) side-effect, sets 
+    # @return void
+    def run_makeself
+      package_commands = []
+      # copy the makeself installer into package
+      if File.exists?("#{package_scripts_path}/makeselfinst")
+        package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
+      end
+
+      # run the makeself program
+      package_commands << makeself_command.join(" ")
+
+      # rm the makeself installer (for incremental builds)
+      package_commands << "rm -f #{install_path}/makeselfinst"
+      package_commands.each {|cmd| run_package_command(cmd) }
+    end
+
+    # Runs the necessary command to make an MSI. As a side-effect, sets `output_package`
+    # @return void
+    def run_msi
+      run_package_command(msi_command)
+    end
+
+    # Runs the necessary command to make a package with fpm. As a side-effect,
+    # sets `output_package`
+    # @return void
+    def run_fpm(pkg_type)
+      run_package_command(fpm_command(pkg_type).join(" "))
+    end
+
+    # Executes the given command via mixlib-shellout.
+    # @return [Mixlib::ShellOut] returns the underlying Mixlib::ShellOut
+    #   object, so the caller can inspect the stdout and stderr.
+    def run_package_command(cmd)
+      cmd_options = {
+        :live_stream => STDOUT,
+        :timeout => 3600,
+        :cwd => config.package_dir
+      }
+
+      if cmd.is_a?(Array)
+        command = cmd[0]
+        cmd_options.merge!(cmd[1])
+      else
+        command = cmd
+      end
+
+      shell = Mixlib::ShellOut.new(command, cmd_options)
+      shell.run_command
+      shell.error!
+      shell
     end
 
     # Dynamically generate Rake tasks to build projects and all the software they depend on.
@@ -499,43 +560,14 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
-              package_commands = []
               if pkg_type == "makeself"
-                # copy the makeself installer into package
-                if File.exists?("#{package_scripts_path}/makeselfinst")
-                  package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
-                end
-
-                # run the makeself program
-                package_commands << makeself_command.join(" ")
-
-                # rm the makeself installer (for incremental builds)
-                package_commands << "rm -f #{install_path}/makeselfinst"
+                run_makeself
               elsif pkg_type == "msi"
-                package_commands <<  msi_command
+                run_msi
               else # pkg_type == "fpm"
-                package_commands <<  fpm_command(pkg_type).join(" ")
+                run_fpm(pkg_type)
               end
 
-              # run the commands
-              package_commands.each do |cmd|
-                cmd_options = {
-                  :live_stream => STDOUT,
-                  :timeout => 3600,
-                  :cwd => config.package_dir
-                }
-
-                if cmd.is_a?(Array)
-                  command = cmd[0]
-                  cmd_options.merge!(cmd[1])
-                else
-                  command = cmd
-                end
-
-                shell = Mixlib::ShellOut.new(command, cmd_options)
-                shell.run_command
-                shell.error!
-              end
             end
 
             # TODO: why aren't these dependencies just added in at the
