@@ -1,3 +1,17 @@
+## 1.0.3 (May 2, 2013)
+
+FEATURES:
+
+* [CHEF-2576] - SmartOS health check whitelist support
+* [CHEF-4141] - FreeBSD health check whitelist support
+* [CHEF-3990] - Add support to uncompress zip file
+
+BUG FIXES:
+
+* Fix project homepage in gemspec
+* Proper Thor 0.16.0, 0.17.0 suppport - Thor 0.18.0 renamed current_task to
+  current_command
+
 ## 1.0.2 (April 23, 2013)
 
 IMPROVEMENTS:
