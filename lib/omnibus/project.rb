@@ -398,6 +398,24 @@ module Omnibus
 
     private
 
+    # The basename of the resulting package file.
+    # @return [String] the basename of the package file
+    def output_package(pkg_type)
+      case pkg_type
+      when "makeself"
+        "#{package_name}-#{build_version}_#{iteration}.sh"
+      when "msi"
+        "#{package_name}-#{build_version}-#{iteration}.msi"
+      else # fpm
+        require "fpm/package/#{pkg_type}"
+        pkg = FPM::Package.types[pkg_type].new
+        pkg.version = build_version
+        pkg.name = package_name
+        pkg.iteration = iteration
+        pkg.to_s
+      end
+    end
+
     # The command to generate an MSI package on Windows platforms.
     #
     # Does not execute the command, only assembles it.
@@ -418,7 +436,7 @@ module Omnibus
                      "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
                      "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
                      "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
-                     "-out #{config.package_dir}\\#{output_package}"]
+                     "-out #{config.package_dir}\\#{output_package("msi")}"]
 
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
@@ -445,6 +463,7 @@ module Omnibus
                           "-t #{pkg_type}",
                           "-v #{build_version}",
                           "-n #{package_name}",
+                          "-p #{output_package(pkg_type)}",
                           "--iteration #{iteration}",
                           install_path,
                           "-m '#{maintainer}'",
@@ -483,7 +502,7 @@ module Omnibus
       command_and_opts = [ File.expand_path(File.join(Omnibus.source_root, "bin", "makeself.sh")),
                            "--gzip",
                            install_path,
-                           output_package,
+                           output_package("makeself"),
                            "'The full stack of #{@name}'"
                          ]
       command_and_opts << "./makeselfinst" if File.exists?("#{package_scripts_path}/makeselfinst")
@@ -567,6 +586,7 @@ module Omnibus
               else # pkg_type == "fpm"
                 run_fpm(pkg_type)
               end
+
 
             end
 
