@@ -51,12 +51,15 @@ describe Omnibus::Artifact do
   end
 
   it "generates 'flat' metadata" do
+    File.should_receive(:open).twice.with(path).and_return(content)
     flat_metadata = artifact.flat_metadata
     flat_metadata["platform"].should == "el"
     flat_metadata["platform_version"].should == "5"
     flat_metadata["arch"].should == "x86_64"
     flat_metadata["version"].should == "11.4.0-1"
     flat_metadata["basename"].should == "demoproject-11.4.0-1.el5.x86_64.rpm"
+    flat_metadata["md5"].should == md5
+    flat_metadata["sha256"].should == sha256
   end
 
   it "adds the package to a release manifest" do

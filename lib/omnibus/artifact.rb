@@ -96,7 +96,9 @@ module Omnibus
         "platform_version" => version,
         "arch" => arch,
         "version" => build_version,
-        "basename" => File.basename(path)
+        "basename" => File.basename(path),
+        "md5" => md5,
+        "sha256" => sha256
       }
     end
 
