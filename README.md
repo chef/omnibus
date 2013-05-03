@@ -6,6 +6,12 @@
 Easily create full-stack installers for your project across a variety
 of platforms.
 
+Seth Chisamore and Christopher Maier of Opscode gave an introductory
+talk on Omnibus at ChefConf 2013, entitled **Eat the Whole Bowl:
+Building a Full-Stack Installer with Omnibus**
+([video](http://www.youtube.com/watch?v=q8iJAntXCNY),
+[slides](https://speakerdeck.com/schisamo/eat-the-whole-bowl-building-a-full-stack-installer-with-omnibus)).
+
 ## Prerequisites
 
 Omnibus is designed to run with a minimal set of prerequisites. You'll
