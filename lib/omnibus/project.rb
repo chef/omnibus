@@ -421,10 +421,10 @@ module Omnibus
     end
 
     # Platform name to be used when creating metadata for the artifact.
-    # "rhel" becomes "el", all others are just platform
+    # rhel/centos become "el", all others are just platform
     # @return [String] the platform family short name
     def platform_shortname
-      if platform == "rhel"
+      if platform_family == "rhel"
         "el"
       else
         platform
