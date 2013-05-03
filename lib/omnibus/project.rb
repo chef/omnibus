@@ -465,7 +465,6 @@ module Omnibus
                           "-n #{package_name}",
                           "-p #{output_package(pkg_type)}",
                           "--iteration #{iteration}",
-                          install_path,
                           "-m '#{maintainer}'",
                           "--description '#{description}'",
                           "--url #{homepage}"]
@@ -494,6 +493,7 @@ module Omnibus
       end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts << install_path
       command_and_opts
     end
 
