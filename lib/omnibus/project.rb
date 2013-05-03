@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 require 'omnibus/exceptions'
+require 'omnibus/artifact'
 
 module Omnibus
 
@@ -398,6 +399,48 @@ module Omnibus
 
     private
 
+    # An Array of platform data suitable for `Artifact.new`. This will go into
+    # metadata generated for the artifact, and be used for the file hierarchy
+    # of released packages if the default release scripts are used.
+    # @return [Array<String>] platform_shortname, platform_version_for_package,
+    #   machine architecture.
+    def platform_tuple
+      [platform_shortname, platform_version_for_package, machine]
+    end
+
+    # Platform version to be used in package metadata. For rhel, the minor
+    # version is removed, e.g., "5.6" becomes "5". For all other platforms,
+    # this is just the platform_version.
+    # @return [String] the platform version
+    def platform_version_for_package
+      if platform == "rhel"
+        platform_version[/([\d]+)\..+/, 1]
+      else
+        platform_version
+      end
+    end
+
+    # Platform name to be used when creating metadata for the artifact.
+    # "rhel" becomes "el", all others are just platform
+    # @return [String] the platform family short name
+    def platform_shortname
+      if platform == "rhel"
+        "el"
+      else
+        platform
+      end
+    end
+
+    def render_metadata(pkg_type)
+      basename = output_package(pkg_type)
+      pkg_path = "#{config.package_dir}/#{basename}"
+      artifact = Artifact.new(pkg_path, [ platform_tuple ], :version => build_version)
+      metadata = artifact.flat_metadata
+      File.open("#{pkg_path}.metadata.json", "w+") do |f|
+        f.print(JSON.pretty_generate(metadata))
+      end
+    end
+
     # The basename of the resulting package file.
     # @return [String] the basename of the package file
     def output_package(pkg_type)
@@ -587,6 +630,7 @@ module Omnibus
                 run_fpm(pkg_type)
               end
 
+              render_metadata(pkg_type)
 
             end
 

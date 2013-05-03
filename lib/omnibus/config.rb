@@ -17,6 +17,7 @@
 
 require 'mixlib/config'
 require 'omnibus/exceptions'
+require 'json'
 
 module Omnibus
 
