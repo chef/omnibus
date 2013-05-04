@@ -17,6 +17,7 @@
 
 require 'omnibus/cli/base'
 require 'omnibus/cli/application'
+require 'json'
 
 module Omnibus
   module CLI
@@ -37,20 +38,9 @@ module Omnibus
       desc "package PATH", "Upload a single package to S3"
       option :bucket, :required => true, :desc => "S3 bucket to upload to", :aliases => :b
       option :package_s3_config_file, :required => true, :desc => "Path to s3cmd config file for packages bucket", :aliases => :C
-      option :platform, :required => true, :desc => "build platform of the package", :aliases => :P
-      option :platform_version, :required => true, :desc => "build platform version", :aliases => :V
-      option :arch, :required => true, :desc => "Build architecture", :aliases => :a
       option :public, :type => :boolean, :default => false, :desc => "Make S3 object publicly readable"
       def package(path)
-        o = options
-        package_name = File.basename(path)
-        # /el/6/i686/chef-10.12.0-1.el6.i686.rpm
-        remote_path = File.join(o[:platform], o[:platform_version], o[:arch], package_name)
-        remote_uri = "s3://#{o[:bucket]}/#{remote_path}"
-        cmd = ["s3cmd", "-c", o[:package_s3_config_file]]
-        cmd << "--acl-public" if o[:public]
-        cmd.concat ["put", path, remote_uri]
-        puts cmd.join(" ")
+        raise "TODO"
       end
 
       desc "omnitruck-package", "Upload all packages from a Jenkins Matrix job to S3, with a separate metadata bucket"
@@ -62,6 +52,10 @@ module Omnibus
       option :metadata_s3_config_file, :required => true, :desc => "Path to s3cmd config file for metadata bucket", :aliases => :m
       option :ignore_missing_packages, :type => :boolean, :default => false
       def jenkins_matrix
+      end
+
+      def read_package_metadata(metadata_path)
+        JSON.parse(IO.read(metadata_path))
       end
 
     end

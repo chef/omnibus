@@ -146,6 +146,34 @@ module Omnibus
 
     # @!endgroup
 
+    # @!group S3 Release Parameters
+
+    # @!attribute [rw] release_s3_bucket
+    #   The name of the S3 bucket you want to release artifacts to.
+    #
+    #   Defaults to `nil`.  Must be set to use `release package` command.
+    #
+    #   @return [String, nil]
+    release_s3_bucket nil
+
+    # @!attribute [rw] release_s3_access_key
+    #   The S3 access key to use for S3 artifact release.
+    #
+    #   Defaults to `nil`.  Must be set to use `release package` command.
+    #
+    #   @return [String, nil]
+    release_s3_access_key nil
+
+    # @!attribute [rw] release_s3_secret_key
+    #   The S3 secret key to use for S3 artifact release
+    #
+    #   Defaults to `nil`.  Must be set to use `release package` command.
+    #
+    #   @return [String, nil]
+    release_s3_secret_key nil
+
+    # @!endgroup
+
     # @!group Miscellaneous Configuration Parameters
 
     # @!attribute [rw] override_file
