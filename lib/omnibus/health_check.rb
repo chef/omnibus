@@ -105,7 +105,8 @@ module Omnibus
                                /libm\.so/,
                                /librt\.so/,
                                /libthr\.so/,
-                               /libutil\.so/
+                               /libutil\.so/,
+                               /libexecinfo\.so/
                               ]
 
     WHITELIST_FILES = [
