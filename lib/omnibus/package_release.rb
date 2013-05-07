@@ -30,20 +30,46 @@ module Omnibus
     attr_reader :package_path
     attr_reader :access_policy
 
-    def initialize(package_path, opts={:access=>:private})
+    # @param package_path [String] file system path to the package artifact
+    # @option opts [:private, :public_read] :access specifies access control on
+    #   uploaded files
+    # @yield callback triggered by successful upload. Allows users of this
+    #   class to add UI feedback.
+    # @yieldparam s3_object_key [String] the S3 key of the uploaded object.
+    def initialize(package_path, opts={:access=>:private}, &block)
       @package_path = package_path
       @metadata = nil
       @s3_client = nil
+
+      @after_upload = if block_given?
+        block
+      else
+        lambda { |item_key| nil }
+      end
 
       # sets @access_policy
       handle_opts(opts)
     end
 
+    # Primary API for this class. Validates S3 configuration and package files,
+    # then runs the upload.
+    # @return [void]
+    # @raise [NoPackageFile, NoPackageMetadataFile] when the package or
+    #   associated metadata file do not exist.
+    # @raise [InvalidS3ReleaseConfiguration] when the Omnibus configuration is
+    #   missing required settings.
+    # @raise Also may raise errors from uber-s3 or net/http.
     def release
       validate_config!
       validate_package!
       s3_client.store(metadata_key, metadata_json, :access => access_policy)
+      uploaded(metadata_key)
       s3_client.store(package_key, package_content, :access => access_policy, :content_md5 => md5)
+      uploaded(package_key)
+    end
+
+    def uploaded(key)
+      @after_upload.call(key)
     end
 
     def package_key

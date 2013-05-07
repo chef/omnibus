@@ -126,9 +126,32 @@ describe Omnibus::PackageRelease do
       package_release.platform_path.should == platform_path
     end
 
-    context "and the package is not public" do
 
-      it "uploads the package and metadata" do
+    it "uploads the package and metadata" do
+      package_release.s3_client.should_receive(:store).with(
+        "#{platform_path}/#{basename}.metadata.json",
+        metadata_json,
+        :access => :private
+      )
+      package_release.s3_client.should_receive(:store).with(
+        "#{platform_path}/#{basename}",
+        pkg_content,
+        :access => :private,
+        :content_md5 => md5
+      )
+      package_release.release
+    end
+
+    context "and a callback is given for after upload" do
+      let(:upload_records) { [] }
+
+      subject(:package_release) do
+        Omnibus::PackageRelease.new(pkg_path) do |uploaded|
+          upload_records << uploaded
+        end
+      end
+
+      it "fires the after_upload callback for each item uploaded" do
         package_release.s3_client.should_receive(:store).with(
           "#{platform_path}/#{basename}.metadata.json",
           metadata_json,
@@ -141,8 +164,10 @@ describe Omnibus::PackageRelease do
           :content_md5 => md5
         )
         package_release.release
-      end
 
+        upload_records.should == [ "#{platform_path}/#{basename}.metadata.json",
+                                   "#{platform_path}/#{basename}" ]
+      end
     end
 
     context "and the package is public" do
