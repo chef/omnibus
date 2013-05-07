@@ -17,6 +17,7 @@
 
 require 'omnibus/cli/base'
 require 'omnibus/cli/application'
+require 'omnibus/package_release'
 require 'json'
 
 module Omnibus
@@ -25,10 +26,6 @@ module Omnibus
 
     class Release < Base
 
-      # NOTE: This only removes the options from help output. They still shadow
-      # the options here, so you can't define -c or -p.
-      class_options.clear
-
       namespace :release
 
       def initialize(args, options, config)
@@ -36,26 +33,14 @@ module Omnibus
       end
 
       desc "package PATH", "Upload a single package to S3"
-      option :bucket, :required => true, :desc => "S3 bucket to upload to", :aliases => :b
-      option :package_s3_config_file, :required => true, :desc => "Path to s3cmd config file for packages bucket", :aliases => :C
       option :public, :type => :boolean, :default => false, :desc => "Make S3 object publicly readable"
       def package(path)
-        raise "TODO"
-      end
+        access_policy = options[:public] ? :public_read : :private
 
-      desc "omnitruck-package", "Upload all packages from a Jenkins Matrix job to S3, with a separate metadata bucket"
-      option :project, :required => true, :desc => "Project to release", :aliases => :p
-      option :version, :desc => "Project version. Defaults to git-based version", :aliases => :v
-      option :bucket, :required => true, :desc => "S3 bucket to upload to", :aliases => :b
-      option :package_s3_config_file, :required => true, :desc => "Path to s3cmd config file for packages bucket", :aliases => :c
-      option :metadata_bucket, :required => true, :desc => "Name of S3 bucket where package metadata is stored", :aliases => :M
-      option :metadata_s3_config_file, :required => true, :desc => "Path to s3cmd config file for metadata bucket", :aliases => :m
-      option :ignore_missing_packages, :type => :boolean, :default => false
-      def jenkins_matrix
-      end
-
-      def read_package_metadata(metadata_path)
-        JSON.parse(IO.read(metadata_path))
+        uploader = PackageRelease.new(path, :access => access_policy) do |uploaded_item|
+          say("Uploaded #{uploaded_item}", :green)
+        end
+        uploader.release
       end
 
     end
