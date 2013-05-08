@@ -37,12 +37,16 @@ module Omnibus
         current_command = config[:current_command] ? config[:current_command].name : config[:current_task].name
         return if current_command == "help"
 
-        if path = @options[:path]
-          if (config = @options[:config]) && File.exist?(@options[:config])
+        if config = @options[:config]
+          if config && File.exist?(@options[:config])
             say("Using Omnibus configuration file #{config}", :green)
             Omnibus.load_configuration(config)
+          elsif config
+            say("No configuration file `#{config}', using defaults", :yellow)
           end
+        end
 
+        if path = @options[:path]
           # TODO: merge in all relevant CLI options here, as they should
           # override anything from a configuration file.
           Omnibus::Config.project_root(path)

@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 require 'omnibus/exceptions'
+require 'omnibus/artifact'
+require 'omnibus/util'
 
 module Omnibus
 
@@ -28,6 +30,7 @@ module Omnibus
   # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
     include Rake::DSL
+    include Util
 
     # @todo Why not just use `nil`?
     NULL_ARG = Object.new
@@ -38,7 +41,6 @@ module Omnibus
     def self.load(filename)
       new(IO.read(filename), filename)
     end
-
 
     # Create a new Project from the contents of a DSL file.  Prefer
     # calling {Omnibus::Project#load} instead of using this method
@@ -51,6 +53,14 @@ module Omnibus
     #
     # @todo Remove filename parameter, as it is unused.
     def initialize(io, filename)
+      @output_package = nil
+      @name = nil
+      @package_name = nil
+      @install_path = nil
+      @homepage = nil
+      @description = nil
+      @replaces = nil
+
       @exclusions = Array.new
       @conflicts = Array.new
       @dependencies = Array.new
@@ -391,6 +401,66 @@ module Omnibus
 
     private
 
+    # An Array of platform data suitable for `Artifact.new`. This will go into
+    # metadata generated for the artifact, and be used for the file hierarchy
+    # of released packages if the default release scripts are used.
+    # @return [Array<String>] platform_shortname, platform_version_for_package,
+    #   machine architecture.
+    def platform_tuple
+      [platform_shortname, platform_version_for_package, machine]
+    end
+
+    # Platform version to be used in package metadata. For rhel, the minor
+    # version is removed, e.g., "5.6" becomes "5". For all other platforms,
+    # this is just the platform_version.
+    # @return [String] the platform version
+    def platform_version_for_package
+      if platform == "rhel"
+        platform_version[/([\d]+)\..+/, 1]
+      else
+        platform_version
+      end
+    end
+
+    # Platform name to be used when creating metadata for the artifact.
+    # rhel/centos become "el", all others are just platform
+    # @return [String] the platform family short name
+    def platform_shortname
+      if platform_family == "rhel"
+        "el"
+      else
+        platform
+      end
+    end
+
+    def render_metadata(pkg_type)
+      basename = output_package(pkg_type)
+      pkg_path = "#{config.package_dir}/#{basename}"
+      artifact = Artifact.new(pkg_path, [ platform_tuple ], :version => build_version)
+      metadata = artifact.flat_metadata
+      File.open("#{pkg_path}.metadata.json", "w+") do |f|
+        f.print(JSON.pretty_generate(metadata))
+      end
+    end
+
+    # The basename of the resulting package file.
+    # @return [String] the basename of the package file
+    def output_package(pkg_type)
+      case pkg_type
+      when "makeself"
+        "#{package_name}-#{build_version}_#{iteration}.sh"
+      when "msi"
+        "#{package_name}-#{build_version}-#{iteration}.msi"
+      else # fpm
+        require "fpm/package/#{pkg_type}"
+        pkg = FPM::Package.types[pkg_type].new
+        pkg.version = build_version
+        pkg.name = package_name
+        pkg.iteration = iteration
+        pkg.to_s
+      end
+    end
+
     # The command to generate an MSI package on Windows platforms.
     #
     # Does not execute the command, only assembles it.
@@ -411,7 +481,7 @@ module Omnibus
                      "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
                      "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
                      "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
-                     "-out #{config.package_dir}\\#{package_name}-#{build_version}-#{iteration}.msi"]
+                     "-out #{config.package_dir}\\#{output_package("msi")}"]
 
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
@@ -438,8 +508,8 @@ module Omnibus
                           "-t #{pkg_type}",
                           "-v #{build_version}",
                           "-n #{package_name}",
+                          "-p #{output_package(pkg_type)}",
                           "--iteration #{iteration}",
-                          install_path,
                           "-m '#{maintainer}'",
                           "--description '#{description}'",
                           "--url #{homepage}"]
@@ -468,6 +538,7 @@ module Omnibus
       end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts << install_path
       command_and_opts
     end
 
@@ -476,11 +547,61 @@ module Omnibus
       command_and_opts = [ File.expand_path(File.join(Omnibus.source_root, "bin", "makeself.sh")),
                            "--gzip",
                            install_path,
-                           "#{package_name}-#{build_version}_#{iteration}.sh",
+                           output_package("makeself"),
                            "'The full stack of #{@name}'"
                          ]
       command_and_opts << "./makeselfinst" if File.exists?("#{package_scripts_path}/makeselfinst")
       command_and_opts
+    end
+
+    # Runs the makeself commands to make a self extracting archive package.
+    # As a (necessary) side-effect, sets 
+    # @return void
+    def run_makeself
+      package_commands = []
+      # copy the makeself installer into package
+      if File.exists?("#{package_scripts_path}/makeselfinst")
+        package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
+      end
+
+      # run the makeself program
+      package_commands << makeself_command.join(" ")
+
+      # rm the makeself installer (for incremental builds)
+      package_commands << "rm -f #{install_path}/makeselfinst"
+      package_commands.each {|cmd| run_package_command(cmd) }
+    end
+
+    # Runs the necessary command to make an MSI. As a side-effect, sets `output_package`
+    # @return void
+    def run_msi
+      run_package_command(msi_command)
+    end
+
+    # Runs the necessary command to make a package with fpm. As a side-effect,
+    # sets `output_package`
+    # @return void
+    def run_fpm(pkg_type)
+      run_package_command(fpm_command(pkg_type).join(" "))
+    end
+
+    # Executes the given command via mixlib-shellout.
+    # @return [Mixlib::ShellOut] returns the underlying Mixlib::ShellOut
+    #   object, so the caller can inspect the stdout and stderr.
+    def run_package_command(cmd)
+      cmd_options = {
+        :timeout => 3600,
+        :cwd => config.package_dir
+      }
+
+      if cmd.is_a?(Array)
+        command = cmd[0]
+        cmd_options.merge!(cmd[1])
+      else
+        command = cmd
+      end
+
+      shellout!(command, cmd_options)
     end
 
     # Dynamically generate Rake tasks to build projects and all the software they depend on.
@@ -499,43 +620,16 @@ module Omnibus
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
 
-              package_commands = []
               if pkg_type == "makeself"
-                # copy the makeself installer into package
-                if File.exists?("#{package_scripts_path}/makeselfinst")
-                  package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
-                end
-
-                # run the makeself program
-                package_commands << makeself_command.join(" ")
-
-                # rm the makeself installer (for incremental builds)
-                package_commands << "rm -f #{install_path}/makeselfinst"
+                run_makeself
               elsif pkg_type == "msi"
-                package_commands <<  msi_command
+                run_msi
               else # pkg_type == "fpm"
-                package_commands <<  fpm_command(pkg_type).join(" ")
+                run_fpm(pkg_type)
               end
 
-              # run the commands
-              package_commands.each do |cmd|
-                cmd_options = {
-                  :live_stream => STDOUT,
-                  :timeout => 3600,
-                  :cwd => config.package_dir
-                }
+              render_metadata(pkg_type)
 
-                if cmd.is_a?(Array)
-                  command = cmd[0]
-                  cmd_options.merge!(cmd[1])
-                else
-                  command = cmd
-                end
-
-                shell = Mixlib::ShellOut.new(command, cmd_options)
-                shell.run_command
-                shell.error!
-              end
             end
 
             # TODO: why aren't these dependencies just added in at the
