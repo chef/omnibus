@@ -16,6 +16,7 @@
 #
 require 'omnibus/exceptions'
 require 'omnibus/artifact'
+require 'omnibus/util'
 
 module Omnibus
 
@@ -29,6 +30,7 @@ module Omnibus
   # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
     include Rake::DSL
+    include Util
 
     # @todo Why not just use `nil`?
     NULL_ARG = Object.new
@@ -588,7 +590,6 @@ module Omnibus
     #   object, so the caller can inspect the stdout and stderr.
     def run_package_command(cmd)
       cmd_options = {
-        :live_stream => STDOUT,
         :timeout => 3600,
         :cwd => config.package_dir
       }
@@ -600,10 +601,7 @@ module Omnibus
         command = cmd
       end
 
-      shell = Mixlib::ShellOut.new(command, cmd_options)
-      shell.run_command
-      shell.error!
-      shell
+      shellout!(command, cmd_options)
     end
 
     # Dynamically generate Rake tasks to build projects and all the software they depend on.
