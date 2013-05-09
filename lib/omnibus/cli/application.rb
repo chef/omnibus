@@ -19,6 +19,7 @@ require 'omnibus'
 require 'omnibus/cli/base'
 require 'omnibus/cli/build'
 require 'omnibus/cli/cache'
+require 'omnibus/cli/release'
 
 module Omnibus
   module CLI
@@ -108,6 +109,9 @@ module Omnibus
 
       desc "cache [COMMAND]", "Perform cache management tasks"
       subcommand "cache", Omnibus::CLI::Cache
+
+      desc "release [COMMAND]", "Perform release tasks"
+      subcommand "release", Omnibus::CLI::Release
 
       ###########################################################################
       # Class Methods
