@@ -36,6 +36,19 @@ module Omnibus
                       /linux-gate\.so/
                      ]
 
+    ARCH_WHITELIST_LIBS = [
+                           /libc\.so/,
+                           /libcrypt\.so/,
+                           /libdb-5\.3\.so/,
+                           /libdl\.so/,
+                           /libffi\.so/,
+                           /libgdbm\.so/,
+                           /libm\.so/,
+                           /libpthread\.so/,
+                           /librt\.so/,
+                           /libutil\.so/
+                          ]
+
     SOLARIS_WHITELIST_LIBS = [
                               /libaio\.so/,
                               /libavl\.so/,
@@ -202,6 +215,8 @@ module Omnibus
       safe = nil
 
       whitelist_libs = case OHAI.platform
+                       when 'arch'
+                         ARCH_WHITELIST_LIBS
                        when 'mac_os_x'
                          MAC_WHITELIST_LIBS
                        when 'solaris2'
