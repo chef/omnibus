@@ -96,7 +96,8 @@ module Omnibus
                           /libutil\.dylib/,
                           /libffi\.dylib/,
                           /libncurses\.5\.4\.dylib/,
-                          /libiconv/
+                          /libiconv/,
+                          /libstdc\+\+\.6\.dylib/
                          ]
 
     FREEBSD_WHITELIST_LIBS = [
