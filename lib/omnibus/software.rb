@@ -89,7 +89,7 @@ module Omnibus
 
       # Set override information after the DSL file has been consumed
       @override_version = overrides[name]
-      
+
       render_tasks
     end
 
@@ -233,7 +233,7 @@ module Omnibus
     #
     # @return [String] an absolute filesystem path
     def build_dir
-      "#{config.build_dir}/#{camel_case_path(install_dir)}"
+      "#{config.build_dir}/#{@project.name}"
     end
 
     # @todo Why the different name (i.e. *_dir instead of *_path, or
@@ -368,7 +368,7 @@ module Omnibus
         #
         (@dependencies - [@name]).uniq.each do |dep|
           task @name => dep
-          file manifest_file => manifest_file_from_name(dep)  
+          file manifest_file => manifest_file_from_name(dep)
         end
 
         directory source_dir
@@ -395,8 +395,8 @@ module Omnibus
                 end
               end
 
-            else 
-              # if fetch has occurred, or the component is configured to 
+            else
+              # if fetch has occurred, or the component is configured to
               # always build, do a clean and build.
               execute_build(fetcher)
             end
@@ -414,7 +414,7 @@ module Omnibus
 
         file manifest_file => (file latest_file)
 
-        file fetch_file => "#{name}:fetch" 
+        file fetch_file => "#{name}:fetch"
         file manifest_file => "#{name}:build"
 
         file fetch_file => (file @source_config)
