@@ -1,3 +1,22 @@
+## 1.0.4 (May 23, 2013)
+
+FEATURES:
+
+* Add `release package` command which releases a single package with associated 
+  metadata file to a single S3 bucket.
+* Arch Linux health check whitelist support
+
+IMPROVEMENTS:
+
+* Add libstdc++ to Mac whitelist libs - this allows the health check pass when 
+  depending on C++ libs.
+* Change scope of `Omnibus::Library` instance from global to project.
+
+BUG FIXES:
+
+* [CHEF-4214] - projects in multi-project omnibus repositories share dependency scope
+
+
 ## 1.0.3 (May 2, 2013)
 
 FEATURES:
