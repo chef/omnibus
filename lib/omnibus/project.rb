@@ -14,8 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require 'omnibus/exceptions'
 require 'omnibus/artifact'
+require 'omnibus/exceptions'
+require 'omnibus/library'
 require 'omnibus/util'
 
 module Omnibus
@@ -32,8 +33,9 @@ module Omnibus
     include Rake::DSL
     include Util
 
-    # @todo Why not just use `nil`?
     NULL_ARG = Object.new
+
+    attr_reader :library
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -67,6 +69,8 @@ module Omnibus
       @runtime_dependencies = Array.new
       instance_eval(io)
       validate
+
+      @library = Omnibus::Library.new(self)
       render_tasks
     end
 
@@ -391,7 +395,7 @@ module Omnibus
     def dependency?(software)
       name = if software.respond_to?(:name)
                software.send(:name)
-             elsif
+             else
                software
              end
       @dependencies.include?(name)
@@ -555,7 +559,7 @@ module Omnibus
     end
 
     # Runs the makeself commands to make a self extracting archive package.
-    # As a (necessary) side-effect, sets 
+    # As a (necessary) side-effect, sets
     # @return void
     def run_makeself
       package_commands = []
@@ -614,12 +618,15 @@ module Omnibus
       directory "pkg"
 
       namespace :projects do
+        namespace @name do
 
-        package_types.each do |pkg_type|
-          namespace @name do
+          package_types.each do |pkg_type|
+            dep_tasks = @dependencies.map {|dep| "software:#{dep}"}
+            dep_tasks << config.package_dir
+            dep_tasks << "health_check"
+
             desc "package #{@name} into a #{pkg_type}"
-            task pkg_type => (@dependencies.map {|dep| "software:#{dep}"}) do
-
+            task pkg_type => dep_tasks do
               if pkg_type == "makeself"
                 run_makeself
               elsif pkg_type == "msi"
@@ -631,37 +638,32 @@ module Omnibus
               render_metadata(pkg_type)
 
             end
+          end
 
-            # TODO: why aren't these dependencies just added in at the
-            # initial creation of the 'pkg_type' task?
-            task pkg_type => config.package_dir
-            task pkg_type => "#{@name}:health_check"
+          task "copy" => package_types do
+            if OHAI.platform == "windows"
+              cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
+            else
+              cp_cmd = "cp #{config.package_dir}/* pkg/"
+            end
+            shell = Mixlib::ShellOut.new(cp_cmd)
+            shell.run_command
+            shell.error!
+          end
+          task "copy" => "pkg"
+
+          desc "run the health check on the #{@name} install path"
+          task "health_check" do
+            if OHAI.platform == "windows"
+              puts "Skipping health check on windows..."
+            else
+              Omnibus::HealthCheck.run(install_path)
+            end
           end
         end
-
-        task "#{@name}:copy" => (package_types.map {|pkg_type| "#{@name}:#{pkg_type}"}) do
-          if OHAI.platform == "windows"
-            cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
-          else
-            cp_cmd = "cp #{config.package_dir}/* pkg/"
-          end
-          shell = Mixlib::ShellOut.new(cp_cmd)
-          shell.run_command
-          shell.error!
-        end
-        task "#{@name}:copy" => "pkg"
 
         desc "package #{@name}"
         task @name => "#{@name}:copy"
-
-        desc "run the health check on the #{@name} install path"
-        task "#{@name}:health_check" do
-          if OHAI.platform == "windows"
-            puts "Skipping health check on windows..."
-          else
-            Omnibus::HealthCheck.run(install_path)
-          end
-        end
       end
     end
   end
