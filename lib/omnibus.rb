@@ -188,13 +188,10 @@ module Omnibus
       raise ArgumentError, "Overrides argument must be a hash!  You passed #{overrides.inspect}."
     end
 
-    # TODO: Why are we doing a full Cartesian product of (projects x
-    # software) without regard for the actual dependencies of the
-    # projects?
-    software_files.each do |f|
-      Omnibus.projects.each do |p|
+    Omnibus.projects.each do |p|
+      software_files.each do |f|
         s = Omnibus::Software.load(f, p, overrides)
-        Omnibus.component_added(s) if p.dependency?(s)
+        p.library.component_added(s) if p.dependency?(s.name)
       end
     end
   end

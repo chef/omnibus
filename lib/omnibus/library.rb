@@ -20,17 +20,19 @@ module Omnibus
   # Used to generate the manifest of all software components with versions
   class Library
 
-    def initialize
-      @projects = []
+    attr_reader :components
+
+    def initialize(project)
       @components = []
+      @project = project
     end
 
     def component_added(component)
       @components << component
     end
 
-    def version_map(project)
-      @components.select {|c| c.project == project}.inject({}) {|map, component|
+    def version_map
+      @components.inject({}) {|map, component|
         map[component.name] = if component.given_version
                                 {:version       => component.version,
                                  :given_version => component.given_version,
@@ -41,9 +43,9 @@ module Omnibus
                                 ## pieces of the omnibus project
                                 ## itself, and so don't really fit
                                 ## with the concept of overrides
-                                v = {:version => project.build_version}
-                                if project.build_version.respond_to?(:git_sha)
-                                  v[:version_guid] = "git:#{project.build_version.git_sha}"
+                                v = {:version => @project.build_version}
+                                if @project.build_version.respond_to?(:git_sha)
+                                  v[:version_guid] = "git:#{@project.build_version.git_sha}"
                                 end
                                 v
                               end
@@ -54,16 +56,6 @@ module Omnibus
     def select(*args, &block)
       @components.select(*args, &block)
     end
-
-
-  end
-
-  def self.library
-    @library ||= Library.new
-  end
-
-  def self.component_added(*args)
-    library.component_added(*args)
   end
 
 end

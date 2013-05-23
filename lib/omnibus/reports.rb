@@ -22,7 +22,7 @@ module Omnibus
 
 
     PADDING = 3
- 
+
     # Determine how wide a column should be, taking into account both
     # the column name as well as all data in that column.  If no data
     # will be stored in the column, the width is 0 (i.e., nothing
@@ -43,9 +43,9 @@ module Omnibus
 
     def pretty_version_map(project)
       out = ""
-      version_map = Omnibus.library.version_map(project)
+      version_map = project.library.version_map
 
-      
+
       # Pull out data to print out
       versions = non_nil_values(version_map.values, :version)
       guids = non_nil_values(version_map.values, :version_guid)
@@ -55,7 +55,7 @@ module Omnibus
       # overridden, but nothing if no packages were changed
       overridden_versions = non_nil_values(version_map.values.select{|v| v[:overridden]},
                                            :given_version)
-  
+
 
       # Determine how wide the printed table columns need to be
       name_width = column_width(version_map.keys, "Component")
@@ -65,7 +65,7 @@ module Omnibus
 
       total_width = name_width + version_width + guid_width + override_width
       divider = "-" * total_width
-      
+
       # Print out the column headers
       out << "Component".ljust(name_width)
       out << "Installed Version".ljust(version_width)
