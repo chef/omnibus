@@ -49,6 +49,16 @@ module Omnibus
                            /libutil\.so/
                           ]
 
+    AIX_WHITELIST_LIBS = [
+      /libpthread\.a/,
+      /libpthreads\.a/,
+      /libdl.a/,
+      /librtl\.a/,
+      /libc\.a/,
+      /libcrypt\.a/,
+      /unix$/,
+    ]
+
     SOLARIS_WHITELIST_LIBS = [
                               /libaio\.so/,
                               /libavl\.so/,
@@ -134,8 +144,11 @@ module Omnibus
     end
 
     def self.run(install_dir)
-      if OHAI.platform == "mac_os_x"
+      case OHAI.platform
+      when "mac_os_x"
         bad_libs = health_check_otool(install_dir)
+      when "aix"
+        bad_libs = health_check_aix(install_dir)
       else
         bad_libs = health_check_ldd(install_dir)
       end
@@ -226,6 +239,8 @@ module Omnibus
                          SMARTOS_WHITELIST_LIBS
                        when 'freebsd'
                          FREEBSD_WHITELIST_LIBS
+                       when 'aix'
+                         AIX_WHITELIST_LIBS
                        else
                          WHITELIST_LIBS
                        end
@@ -255,6 +270,43 @@ module Omnibus
       bad_libs
     end
 
+    def self.health_check_aix(install_dir)
+      #
+      # ShellOut has GC turned off during execution, so when we're
+      # executing extremely long commands with lots of output, we
+      # should be mindful that the string concatentation for building
+      # #stdout will hurt memory usage drastically
+      #
+      ldd_cmd = "find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd > ldd.out 2>/dev/null"
+
+      log "Executing `#{ldd_cmd}`"
+      shell = Mixlib::ShellOut.new(ldd_cmd, :timeout => 3600)
+      shell.run_command
+
+      ldd_output = File.read('ldd.out')
+
+      current_library = nil
+      bad_libs = {}
+
+      ldd_output.each_line do |line|
+        case line
+        when /^(.+) needs:$/
+          current_library = $1
+	  log "*** Analysing dependencies for #{current_library}" if ARGV[0] == "verbose"
+        when /^\s+(.+)$/
+          name = $1
+          linked = $1
+          bad_libs = check_for_bad_library(install_dir, bad_libs, current_library, name, linked)
+        when /File is not an executable XCOFF file/ # ignore non-executable files
+        else
+          log "*** Line did not match for #{current_library}\n#{line}"
+        end
+      end
+
+      File.delete('ldd.out')
+      bad_libs
+    end
+
     def self.health_check_ldd(install_dir)
       #
       # ShellOut has GC turned off during execution, so when we're
@@ -263,6 +315,7 @@ module Omnibus
       # #stdout will hurt memory usage drastically
       #
       ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
+
       log "Executing `#{ldd_cmd}`"
       shell = Mixlib::ShellOut.new(ldd_cmd, :timeout => 3600)
       shell.run_command

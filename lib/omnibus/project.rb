@@ -168,6 +168,8 @@ module Omnibus
         "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
+      when 'aix'
+        "#{build_iteration}"
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
       end
@@ -376,6 +378,8 @@ module Omnibus
         [ "deb" ]
       when 'fedora', 'rhel'
         [ "rpm" ]
+      when 'aix'
+        [ "bff" ]
       when 'solaris2'
         [ "solaris" ]
       when 'windows'
@@ -455,6 +459,8 @@ module Omnibus
         "#{package_name}-#{build_version}_#{iteration}.sh"
       when "msi"
         "#{package_name}-#{build_version}-#{iteration}.msi"
+      when "bff"
+        "#{package_name}.#{bff_version}.bff"
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
@@ -490,6 +496,11 @@ module Omnibus
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
       [msi_command.join(" "), {:returns => [0, 204]}]
+    end
+
+    def bff_command
+      bff_command = ["mkinstallp -d / -T /tmp/bff/gen.template"]
+      [bff_command.join(" "), {:returns => [0]}]
     end
 
     # The {https://github.com/jordansissel/fpm fpm} command to
@@ -582,6 +593,30 @@ module Omnibus
       run_package_command(msi_command)
     end
 
+    def bff_version
+      build_version.split(/[^\d]/)[0..2].join(".") + ".#{iteration}"
+    end
+
+    def run_bff
+      FileUtils.rm_rf "/.info"
+      FileUtils.rm_rf "/tmp/bff"
+      FileUtils.mkdir "/tmp/bff"
+
+      system "find #{install_path} -print > /tmp/bff/file.list"
+
+      system "cat #{package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble"
+
+      # @todo can we just use an erb template here?
+      system "cat /tmp/bff/gen.preamble /tmp/bff/file.list #{package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template"
+
+      FileUtils.cp "#{package_scripts_path}/aix/unpostinstall.sh", "#{install_path}/bin"
+      FileUtils.cp "#{package_scripts_path}/aix/postinstall.sh", "#{install_path}/bin"
+
+      run_package_command(bff_command)
+
+      FileUtils.cp "/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff"
+    end
+
     # Runs the necessary command to make a package with fpm. As a side-effect,
     # sets `output_package`
     # @return void
@@ -631,6 +666,8 @@ module Omnibus
                 run_makeself
               elsif pkg_type == "msi"
                 run_msi
+              elsif pkg_type == "bff"
+                run_bff
               else # pkg_type == "fpm"
                 run_fpm(pkg_type)
               end
@@ -643,6 +680,8 @@ module Omnibus
           task "copy" => package_types do
             if OHAI.platform == "windows"
               cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
+            elsif OHAI.platform == "aix"
+              cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
             else
               cp_cmd = "cp #{config.package_dir}/* pkg/"
             end
