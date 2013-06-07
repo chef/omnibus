@@ -85,7 +85,9 @@ module Omnibus
     end
 
     def tarball_software
-      Omnibus.library.select {|s| s.source && s.source.key?(:url)}
+      Omnibus.projects.map do |project|
+        project.library.select {|s| s.source && s.source.key?(:url)}
+      end.flatten
     end
 
     def populate
