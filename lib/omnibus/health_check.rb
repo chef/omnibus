@@ -104,6 +104,7 @@ module Omnibus
                               /libmd.so/,
                               /libc.so/,
                               /libgcc_s.so/,
+                              /libstdc\+\+\.so/,
                               /libcrypt.so/
                              ]
 
