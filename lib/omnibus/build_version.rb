@@ -48,8 +48,8 @@ module Omnibus
     # Create a new BuildVersion
     #
     # @param [String] path      Path from which to read git version information
-    def initialize(path=nil)
-      @path = path || Omnibus.root
+    def initialize(path=Omnibus.root)
+      @path = path
     end
 
     # @!group Version Generator Methods
