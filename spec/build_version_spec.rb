@@ -247,4 +247,20 @@ Try --always, or create some tags.
       build_version.git_describe.should eq("0.0.0")
     end
   end
+
+  describe "#initialize `path` parameter" do
+    let(:path) { "/some/fake/path" }
+    subject(:build_version){ Omnibus::BuildVersion.new(path) }
+
+    it "runs `git describe` at an alternate path" do
+      build_version.should_receive(:shellout)
+                   .with("git describe",
+                         {:live_stream => nil,
+                         :cwd => path})
+                    .and_return(mock("ouput",
+                                :stdout => git_describe,
+                                :exitstatus => 0))
+      build_version.git_describe
+    end
+  end
 end
