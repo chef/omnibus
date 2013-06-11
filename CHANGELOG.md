@@ -1,3 +1,19 @@
+## 1.1.0 (June 12, 2013)
+
+FEATURES:
+
+* AIX health check whitelist support
+* AIX Backup-File Format (BFF) package support
+
+IMPROVEMENTS:
+
+* Add libstdc++ to SmartOS whitelist libs - this allows the health check pass when 
+  depending on C++ libs.
+
+BUG FIXES:
+
+* [CHEF-4246] - omnibus cache populate failing
+
 ## 1.0.4 (May 23, 2013)
 
 FEATURES:
@@ -15,7 +31,6 @@ IMPROVEMENTS:
 BUG FIXES:
 
 * [CHEF-4214] - projects in multi-project omnibus repositories share dependency scope
-
 
 ## 1.0.3 (May 2, 2013)
 
