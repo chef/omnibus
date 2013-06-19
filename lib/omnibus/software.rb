@@ -248,10 +248,10 @@ module Omnibus
     # @todo It seems like this isn't used, and if it were, it should
     # probably be part of Opscode::Builder instead
     def max_build_jobs
-      if OHAI.cpu == nil
-        2
-      else
+      if OHAI.cpu && OHAI.cpu[:total] && OHAI.cpu[:total] =~ /^\d+$/
         OHAI.cpu[:total] + 1
+      else
+        2
       end
     end
 
