@@ -16,6 +16,7 @@
 #
 
 require 'forwardable'
+require 'omnibus/exceptions'
 
 module Omnibus
   class Builder
@@ -132,6 +133,10 @@ module Omnibus
       end
 
       source = candidate_paths.find{|path| File.exists?(path) }
+
+      unless source
+        raise MissingPatch.new(args[:source], candidate_paths)
+      end
 
       plevel = args[:plevel] || 1
       if args[:target] 
