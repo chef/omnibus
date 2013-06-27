@@ -467,7 +467,11 @@ module Omnibus
         pkg.version = build_version
         pkg.name = package_name
         pkg.iteration = iteration
-        pkg.to_s
+        if pkg_type == "solaris"
+          pkg.to_s("NAME.FULLVERSION.ARCH.TYPE")
+        else
+          pkg.to_s
+        end
       end
     end
 
