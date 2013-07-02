@@ -1,3 +1,12 @@
+## 1.1.1 (July 2, 2013)
+
+BUG FIXES:
+
+* Raise an exception if a patch file is not found.
+* Be more explicit about types in CPU computation.
+* Include pkg version, iteration, arch for solaris packages.
+* Fix assorted typos in CLI output.
+
 ## 1.1.0 (June 12, 2013)
 
 FEATURES:
