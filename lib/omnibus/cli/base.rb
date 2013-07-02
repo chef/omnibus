@@ -106,7 +106,7 @@ module Omnibus
       def load_project!(project_name)
         project = Omnibus.project(project_name)
         unless project
-          error_msg = "I don't know anythinga about project '#{project_name}'."
+          error_msg = "I don't know anything about project '#{project_name}'."
           error_msg << " Valid project names include: #{Omnibus.project_names.join(', ')}"
           raise Omnibus::CLI::Error, error_msg
         end
