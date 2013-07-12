@@ -1,3 +1,19 @@
+## 1.2.0 (July 12, 2013)
+
+FEATURES:
+
+* Add `whitelist_file` to software DSL. This allows an individual software 
+  definition to declare files that should be ignored during health checking.
+
+IMPROVEMENTS:
+
+* Raise an exception if a project's dependency is not found.
+
+BUG FIXES:
+
+* Properly load a project's transitive dependencies.
+* Ensure a component is only added to a library one time.
+
 ## 1.1.1 (July 2, 2013)
 
 BUG FIXES:
