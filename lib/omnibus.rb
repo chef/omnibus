@@ -183,15 +183,14 @@ module Omnibus
   # @return [void]
   #
   # @see Omnibus::Overrides#overrides
-  def self.expand_software(overrides, software_files)
+  def self.expand_software(overrides, software_map)
     unless overrides.is_a? Hash
       raise ArgumentError, "Overrides argument must be a hash!  You passed #{overrides.inspect}."
     end
 
-    Omnibus.projects.each do |p|
-      software_files.each do |f|
-        s = Omnibus::Software.load(f, p, overrides)
-        p.library.component_added(s) if p.dependency?(s.name)
+    Omnibus.projects.each do |project|
+      project.dependencies.each do |dependency|
+        recursively_load_dependency(dependency, project, overrides, software_map)
       end
     end
   end
@@ -205,12 +204,12 @@ module Omnibus
     expand_projects
 
     # Then do software
-    final_software_files = prefer_local_software(omnibus_software_files,
+    final_software_map = prefer_local_software(omnibus_software_files,
                                            software_files)
 
     overrides = Config.override_file ? Omnibus::Overrides.overrides : {}
 
-    expand_software(overrides, final_software_files)
+    expand_software(overrides, final_software_map)
   end
 
   # Creates some additional Rake tasks beyond those generated in the
@@ -260,7 +259,7 @@ module Omnibus
   def self.prefer_local_software(omnibus_files, local_files)
     base = software_map(omnibus_files)
     local = software_map(local_files)
-    base.merge(local).values
+    base.merge(local)
   end
 
   # Given a list of file paths, create a map of the basename (without
@@ -272,6 +271,26 @@ module Omnibus
     files.each_with_object({}) do |file, collection|
       software_name = File.basename(file, ".*")
       collection[software_name] = file
+    end
+  end
+
+  # Loads a project's dependency recursively, ensuring all transitive dependencies
+  # are also loaded.
+  #
+  # @param dependency_name [String]
+  # @param project [Omnibus::Project]
+  # @param overrides [Hash] a hash of version override information.
+  # @param software_map [Hash<String, String>]
+  #
+  # @return [void]
+  def self.recursively_load_dependency(dependency_name, project, overrides, software_map)
+    dep_file = software_map[dependency_name]
+    dep_software = Omnibus::Software.load(dep_file, project, overrides)
+    project.library.component_added(dep_software)
+
+    # load any transitive deps for the component into the library also
+    dep_software.dependencies.each do |dep|
+      recursively_load_dependency(dep, project, overrides, software_map)
     end
   end
 end
