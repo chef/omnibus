@@ -28,7 +28,7 @@ module Omnibus
     end
 
     def component_added(component)
-      @components << component
+      @components << component unless @components.include?(component)
     end
 
     def version_map

@@ -700,7 +700,9 @@ module Omnibus
             if OHAI.platform == "windows"
               puts "Skipping health check on windows..."
             else
-              Omnibus::HealthCheck.run(install_path)
+              # build a list of all whitelist files from all project dependencies
+              whitelist_files = library.components.map{|component| component.whitelist_files }.flatten
+              Omnibus::HealthCheck.run(install_path, whitelist_files)
             end
           end
         end

@@ -125,4 +125,19 @@ module Omnibus
       """
     end
   end
+
+  class MissingProjectDependency < RuntimeError
+    def initialize(dep_name, search_paths)
+      @dep_name, @search_paths = dep_name, search_paths
+    end
+
+    def to_s
+      """
+      Attempting to load the project dependency '#{@dep_name}', but it was
+      not found at any of the following locations:
+
+      #{@search_paths.join("\n      ")}
+      """
+    end
+  end
 end

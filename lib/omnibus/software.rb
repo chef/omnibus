@@ -51,6 +51,7 @@ module Omnibus
 
     attr_reader :given_version
     attr_reader :override_version
+    attr_reader :whitelist_files
 
     def self.load(filename, project, overrides={})
       new(IO.read(filename), filename, project, overrides)
@@ -85,6 +86,7 @@ module Omnibus
       @builder = NullBuilder.new(self)
 
       @dependencies = Array.new
+      @whitelist_files = Array.new
       instance_eval(io, filename, 0)
 
       # Set override information after the DSL file has been consumed
@@ -151,6 +153,15 @@ module Omnibus
     def version(val=NULL_ARG)
       @given_version = val unless val.equal?(NULL_ARG)
       @override_version || @given_version
+    end
+
+    # Add an Omnibus software dependency.
+    #
+    # @param file [String, Regexp] the name of a file to ignore in the healthcheck
+    # @return [void]
+    def whitelist_file(file)
+      file = Regexp.new(file) unless file.kind_of?(Regexp)
+      @whitelist_files << file
     end
 
     # Was this software version overridden externally, relative to the
