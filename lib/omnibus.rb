@@ -26,6 +26,7 @@ OHAI = o
 require 'omnibus/library'
 require 'omnibus/reports'
 require 'omnibus/config'
+require 'omnibus/exceptions'
 require 'omnibus/software'
 require 'omnibus/project'
 require 'omnibus/fetchers'
@@ -285,6 +286,13 @@ module Omnibus
   # @return [void]
   def self.recursively_load_dependency(dependency_name, project, overrides, software_map)
     dep_file = software_map[dependency_name]
+
+    unless dep_file
+      raise MissingProjectDependency.new(dependency_name,
+                                         [File.join(project_root, Config.software_dir),
+                                          File.join(omnibus_software_root, 'config', 'software')])
+    end
+
     dep_software = Omnibus::Software.load(dep_file, project, overrides)
     project.library.component_added(dep_software)
 
