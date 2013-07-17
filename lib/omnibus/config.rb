@@ -202,7 +202,7 @@ module Omnibus
     # @! attribute [rw] build_retries
     #
     #   @return [Integer, nil]
-    build_retries 5
+    build_retries 3
 
     # @!group Validation Methods
 
