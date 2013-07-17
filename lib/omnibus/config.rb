@@ -197,6 +197,13 @@ module Omnibus
 
     # # @!endgroup
 
+    # @!group Build Control Parameters
+
+    # @! attribute [rw] build_retries
+    #
+    #   @return [Integer, nil]
+    build_retries 5
+
     # @!group Validation Methods
 
     # Asserts that the Config object is in a valid state.  If invalid
