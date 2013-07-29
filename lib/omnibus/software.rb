@@ -262,7 +262,7 @@ module Omnibus
       if OHAI.cpu && OHAI.cpu[:total] && OHAI.cpu[:total].to_s =~ /^\d+$/
         OHAI.cpu[:total].to_i + 1
       else
-        2
+        3
       end
     end
 
