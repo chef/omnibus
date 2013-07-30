@@ -39,6 +39,15 @@ describe Omnibus::Software do
     end
   end
 
+  describe "#library_path" do
+
+    it "appends to the library_paths array" do
+      software.library_paths.size.should equal 0
+      software.library_path(/foo\/bar/)
+      software.library_paths.size.should equal 1
+    end
+  end
+
   context "testing version overrides" do
 
     context "without overrides" do

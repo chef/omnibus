@@ -702,7 +702,8 @@ module Omnibus
             else
               # build a list of all whitelist files from all project dependencies
               whitelist_files = library.components.map{|component| component.whitelist_files }.flatten
-              Omnibus::HealthCheck.run(install_path, whitelist_files)
+              library_paths = library.components.map{|component| component.library_paths }.flatten
+              Omnibus::HealthCheck.run(install_path, whitelist_files, library_paths)
             end
           end
         end

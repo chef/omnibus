@@ -52,6 +52,7 @@ module Omnibus
     attr_reader :given_version
     attr_reader :override_version
     attr_reader :whitelist_files
+    attr_reader :library_paths
 
     def self.load(filename, project, overrides={})
       new(IO.read(filename), filename, project, overrides)
@@ -87,6 +88,7 @@ module Omnibus
 
       @dependencies = Array.new
       @whitelist_files = Array.new
+      @library_paths = Array.new
       instance_eval(io, filename, 0)
 
       # Set override information after the DSL file has been consumed
@@ -162,6 +164,14 @@ module Omnibus
     def whitelist_file(file)
       file = Regexp.new(file) unless file.kind_of?(Regexp)
       @whitelist_files << file
+    end
+
+    # Add an alternate library path to check for dependencies
+    #
+    # @param path [String] a glob-style path to search in the healthcheck
+    # @return [void]
+    def library_path(path)
+      @library_paths << path
     end
 
     # Was this software version overridden externally, relative to the
