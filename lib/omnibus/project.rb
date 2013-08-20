@@ -532,6 +532,10 @@ module Omnibus
                           "-m '#{maintainer}'",
                           "--description '#{description}'",
                           "--url #{homepage}"]
+      if File.exist?(File.join(package_scripts_path, "preinst"))
+        command_and_opts << "--before-install '#{File.join(package_scripts_path, "preinst")}'"
+      end
+
       if File.exist?("#{package_scripts_path}/postinst")
         command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
       end
