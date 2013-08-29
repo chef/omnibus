@@ -23,6 +23,8 @@ need the following:
 Though not *strictly* necessary, Vagrant makes using Omnibus easier,
 and is highly recommended.
 - Vagrant 1.2.1 or later (http://www.vagrantup.com)
+- the vagrant-berkshelf plugin (https://github.com/RiotGames/vagrant-berkshelf)
+- the vagrant-omnibus plugin (https://github.com/schisamo/vagrant-omnibus)
 
 ## Get Started
 
