@@ -179,6 +179,8 @@ E
         "7z.exe x #{project_file} -o#{source_dir} -r -y"
       elsif project_file.end_with?(".zip")
         "unzip #{project_file} -d #{source_dir}"
+      elsif project_file.end_with?(".xz") || project_file.end_with?(".txz")
+        "xz -dc #{project_file} | ( cd #{source_dir} && tar -xf - )"
       else
         #if we don't recognize the extension, simply copy over the file
         Proc.new do
