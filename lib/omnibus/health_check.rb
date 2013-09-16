@@ -33,7 +33,8 @@ module Omnibus
                       /libstdc\+\+\.so/,
                       /libutil\.so/,
                       /linux-vdso.+/,
-                      /linux-gate\.so/
+                      /linux-gate\.so/,
+                      /libz\.so.\d/
                      ]
 
     ARCH_WHITELIST_LIBS = [
@@ -46,7 +47,8 @@ module Omnibus
                            /libm\.so/,
                            /libpthread\.so/,
                            /librt\.so/,
-                           /libutil\.so/
+                           /libutil\.so/,
+                           /libz\.so.\d/
                           ]
 
     AIX_WHITELIST_LIBS = [
@@ -105,7 +107,8 @@ module Omnibus
                               /libc.so/,
                               /libgcc_s.so/,
                               /libstdc\+\+\.so/,
-                              /libcrypt.so/
+                              /libcrypt.so/,
+                              /libz\.so.\d/
                              ]
 
     MAC_WHITELIST_LIBS = [
@@ -121,7 +124,8 @@ module Omnibus
                           /libffi\.dylib/,
                           /libncurses\.5\.4\.dylib/,
                           /libiconv/,
-                          /libstdc\+\+\.6\.dylib/
+                          /libstdc\+\+\.6\.dylib/,
+                          /libz.1.dylib/
                          ]
 
     FREEBSD_WHITELIST_LIBS = [
@@ -130,7 +134,8 @@ module Omnibus
                                /libm\.so/,
                                /librt\.so/,
                                /libthr\.so/,
-                               /libutil\.so/
+                               /libutil\.so/,
+                               /libz\.so.\d/
                               ]
 
     def self.log(msg)
