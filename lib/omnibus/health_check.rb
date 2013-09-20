@@ -189,7 +189,7 @@ module Omnibus
           log "      PROVIDED BY: #{location}"
           log "      FAILED BECAUSE: #{reason}"
         end
-	raise "Health Check Failed"
+        raise "Health Check Failed"
       end
     end
 
