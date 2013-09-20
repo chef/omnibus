@@ -18,6 +18,7 @@ require 'omnibus/artifact'
 require 'omnibus/exceptions'
 require 'omnibus/library'
 require 'omnibus/util'
+require 'time'
 
 module Omnibus
 
@@ -632,38 +633,46 @@ module Omnibus
       FileUtils.cp "/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff"
     end
 
+    def pkgmk_version
+      "#{build_version}-#{iteration}"
+    end
+
     def run_pkgmk
       system "sudo rm -rf /tmp/pkgmk"
       FileUtils.mkdir "/tmp/pkgmk"
 
       system "find #{install_path} -print > /tmp/pkgmk/files"
 
-      File.open "/tmp/pkgmk/Prototype", "w+" do |f|
-        f.write <<-EOF
+      prototype_content = <<-EOF
 i pkginfo
 i postinstall
 i postremove
-        EOF
+      EOF
+
+      File.open "/tmp/pkgmk/Prototype", "w+" do |f|
+        f.write prototype_content
       end
 
       system "pkgproto < /tmp/pkgmk/files >> /tmp/pkgmk/Prototype"
 
-      File.open "/tmp/pkgmk/pkginfo", "w+" do |f|
-        f.write <<-EOF
+      pkginfo_content = <<-EOF
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
 BASEDIR=/
-PKG=chef
-NAME=chef
-ARCH=sparc
-VERSION=11.8.0.alpha.0-166-g918ae91-1.solaris2.5.9
+PKG=#{package_name}
+NAME=#{package_name}
+ARCH=#{`uname -p`.chomp}
+VERSION=#{pkgmk_version}
 CATEGORY=application
-DESC=The full stack of chef
-VENDOR=Opscode, Inc.
-EMAIL=Opscode, Inc.
-PSTAMP=build-oss-sol9-sparc20130913220319
-        EOF
+DESC=#{description}
+VENDOR=#{maintainer}
+EMAIL=#{maintainer}
+PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
+      EOF
+
+      File.open "/tmp/pkgmk/pkginfo", "w+" do |f|
+        f.write pkginfo_content
       end
 
       FileUtils.cp "#{package_scripts_path}/postinst", "/tmp/pkgmk/postinstall"
