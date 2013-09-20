@@ -44,6 +44,7 @@ module Omnibus
                            /libffi\.so/,
                            /libgdbm\.so/,
                            /libm\.so/,
+                           /libnsl\.so/,
                            /libpthread\.so/,
                            /librt\.so/,
                            /libutil\.so/
