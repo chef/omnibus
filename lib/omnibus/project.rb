@@ -18,6 +18,7 @@ require 'omnibus/artifact'
 require 'omnibus/exceptions'
 require 'omnibus/library'
 require 'omnibus/util'
+require 'time'
 
 module Omnibus
 
@@ -381,7 +382,7 @@ module Omnibus
       when 'aix'
         [ "bff" ]
       when 'solaris2'
-        [ "solaris" ]
+        [ "pkgmk" ]
       when 'windows'
         [ "msi" ]
       else
@@ -461,6 +462,8 @@ module Omnibus
         "#{package_name}-#{build_version}-#{iteration}.msi"
       when "bff"
         "#{package_name}.#{bff_version}.bff"
+      when "pkgmk"
+        "#{package_name}-#{build_version}-#{iteration}.solaris"
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
@@ -507,6 +510,11 @@ module Omnibus
       [bff_command.join(" "), {:returns => [0]}]
     end
 
+    def pkgmk_command
+      pkgmk_command = ["pkgmk -o -r / -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"]
+      [pkgmk_command.join(" "), {:returns => [0]}]
+    end
+
     # The {https://github.com/jordansissel/fpm fpm} command to
     # generate a package for RedHat, Ubuntu, Solaris, etc. platforms.
     #
@@ -537,15 +545,15 @@ module Omnibus
       end
 
       if File.exist?("#{package_scripts_path}/postinst")
-        command_and_opts << "--post-install '#{package_scripts_path}/postinst'"
+        command_and_opts << "--after-install '#{File.join(package_scripts_path, "postinst")}'"
       end
       # solaris packages don't support --pre-uninstall
-      if File.exist?("#{package_scripts_path}/prerm") && pkg_type != "solaris"
-        command_and_opts << "--pre-uninstall '#{package_scripts_path}/prerm'"
+      if File.exist?("#{package_scripts_path}/prerm")
+        command_and_opts << "--before-remove '#{File.join(package_scripts_path, "prerm")}'"
       end
       # solaris packages don't support --post-uninstall
-      if File.exist?("#{package_scripts_path}/postrm") && pkg_type != "solaris"
-        command_and_opts << "--post-uninstall '#{package_scripts_path}/postrm'"
+      if File.exist?("#{package_scripts_path}/postrm")
+        command_and_opts << "--after-remove '#{File.join(package_scripts_path, "postrm")}'"
       end
 
       @exclusions.each do |pattern|
@@ -625,6 +633,58 @@ module Omnibus
       FileUtils.cp "/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff"
     end
 
+    def pkgmk_version
+      "#{build_version}-#{iteration}"
+    end
+
+    def run_pkgmk
+      system "sudo rm -rf /tmp/pkgmk"
+      FileUtils.mkdir "/tmp/pkgmk"
+
+      system "find #{install_path} -print > /tmp/pkgmk/files"
+
+      prototype_content = <<-EOF
+i pkginfo
+i postinstall
+i postremove
+      EOF
+
+      File.open "/tmp/pkgmk/Prototype", "w+" do |f|
+        f.write prototype_content
+      end
+
+      system "pkgproto < /tmp/pkgmk/files >> /tmp/pkgmk/Prototype"
+
+      pkginfo_content = <<-EOF
+CLASSES=none
+TZ=PST
+PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
+BASEDIR=/
+PKG=#{package_name}
+NAME=#{package_name}
+ARCH=#{`uname -p`.chomp}
+VERSION=#{pkgmk_version}
+CATEGORY=application
+DESC=#{description}
+VENDOR=#{maintainer}
+EMAIL=#{maintainer}
+PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
+      EOF
+
+      File.open "/tmp/pkgmk/pkginfo", "w+" do |f|
+        f.write pkginfo_content
+      end
+
+      FileUtils.cp "#{package_scripts_path}/postinst", "/tmp/pkgmk/postinstall"
+      FileUtils.cp "#{package_scripts_path}/postrm", "/tmp/pkgmk/postremove"
+
+      run_package_command(pkgmk_command)
+
+      system "pkgchk -vd /tmp/pkgmk chef"
+
+      system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
+    end
+
     # Runs the necessary command to make a package with fpm. As a side-effect,
     # sets `output_package`
     # @return void
@@ -676,6 +736,8 @@ module Omnibus
                 run_msi
               elsif pkg_type == "bff"
                 run_bff
+              elsif pkg_type == "pkgmk"
+                run_pkgmk
               else # pkg_type == "fpm"
                 run_fpm(pkg_type)
               end
