@@ -31,6 +31,7 @@ module Omnibus
       # @todo def_delegators :@builder, :patch, :command, :ruby, ...
 
       def_delegator :@builder, :patch
+      def_delegator :@builder, :erb
       def_delegator :@builder, :command
       def_delegator :@builder, :ruby
       def_delegator :@builder, :gem
@@ -146,6 +147,23 @@ module Omnibus
       else
         @build_commands << 
          "patch -d #{project_dir} -p#{plevel} -i #{source}"
+      end
+    end
+
+    def erb(source, dest, vars)
+      args = args.dup.pop
+
+      source_path = File.expand_path("#{root}/config/templates/#{name}/#{args[:source]}")
+
+      unless File.exists?(source_path)
+        raise MissingTemplate.new(source, "#{root}/config/templates/#{name}")
+      end
+
+      block do
+        template = ERB.new(File.new(source_path).read, nil, "%")
+        File.open(dest, "w") do |file|
+          file.write(template.result(vars))
+        end
       end
     end
 
