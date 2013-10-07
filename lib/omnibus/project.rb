@@ -638,10 +638,13 @@ module Omnibus
     end
 
     def run_pkgmk
+      install_dirname = File.dirname(install_path)
+      install_basename = File.basename(install_path)
+
       system "sudo rm -rf /tmp/pkgmk"
       FileUtils.mkdir "/tmp/pkgmk"
 
-      system "cd #{install_path} && find . -print > /tmp/pkgmk/files"
+      system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
 
       prototype_content = <<-EOF
 i pkginfo
@@ -654,7 +657,7 @@ i postremove
       end
 
       # generate the prototype's file list
-      system "pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
+      system "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
 
       # fix up the user and group in the file list to root
       system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
@@ -663,7 +666,7 @@ i postremove
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_path.sub(/^\//, "")}
+BASEDIR=#{install_dirname)}
 PKG=#{package_name}
 NAME=#{package_name}
 ARCH=#{`uname -p`.chomp}
