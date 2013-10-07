@@ -653,7 +653,14 @@ i postremove
         f.write prototype_content
       end
 
-      system "pkgproto < /tmp/pkgmk/files >> /tmp/pkgmk/Prototype"
+      # generate the prototype's file list
+      system "pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
+
+      # fix up the user and group in the file list to root
+      system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files > /tmp/pkgmk/Prototype.files2"
+
+      # strip the leading slash off the files in the file list and apply the list to the prototype file
+      system "sed -e 's/ \// /' < /tmp/pkgmk/Prototype.files2 >> /tmp/pkgmk/Prototype"
 
       pkginfo_content = <<-EOF
 CLASSES=none
