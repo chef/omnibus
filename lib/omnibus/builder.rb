@@ -17,6 +17,7 @@
 
 require 'forwardable'
 require 'omnibus/exceptions'
+require 'ostruct'
 
 module Omnibus
   class Builder
@@ -150,20 +151,22 @@ module Omnibus
       end
     end
 
-    def erb(source, dest, vars)
+    def erb(*args)
       args = args.dup.pop
 
-      source_path = File.expand_path("#{root}/config/templates/#{name}/#{args[:source]}")
+      source_path = File.expand_path("#{Omnibus.project_root}/config/templates/#{name}/#{args[:source]}")
 
       unless File.exists?(source_path)
-        raise MissingTemplate.new(source, "#{root}/config/templates/#{name}")
+        raise MissingTemplate.new(source, "#{Omnibus.project_root}/config/templates/#{name}")
       end
 
       block do
         template = ERB.new(File.new(source_path).read, nil, "%")
-        File.open(dest, "w") do |file|
-          file.write(template.result(vars))
+        File.open(args[:dest], "w") do |file|
+          file.write(template.result(OpenStruct.new(args[:vars]).instance_eval { binding }))
         end
+
+        File.chmod(args[:mode], args[:dest])
       end
     end
 
