@@ -510,10 +510,6 @@ module Omnibus
       [bff_command.join(" "), {:returns => [0]}]
     end
 
-    def pkgmk_command
-      pkgmk_command = ["pkgmk -o -r / -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"]
-      [pkgmk_command.join(" "), {:returns => [0]}]
-    end
 
     # The {https://github.com/jordansissel/fpm fpm} command to
     # generate a package for RedHat, Ubuntu, Solaris, etc. platforms.
@@ -685,7 +681,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       FileUtils.cp "#{package_scripts_path}/postinst", "/tmp/pkgmk/postinstall"
       FileUtils.cp "#{package_scripts_path}/postrm", "/tmp/pkgmk/postremove"
 
-      run_package_command(pkgmk_command)
+      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype", :timeout => 3600)
 
       system "pkgchk -vd /tmp/pkgmk chef"
 
