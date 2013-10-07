@@ -666,7 +666,7 @@ i postremove
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_dirname)}
+BASEDIR=#{install_dirname}
 PKG=#{package_name}
 NAME=#{package_name}
 ARCH=#{`uname -p`.chomp}
