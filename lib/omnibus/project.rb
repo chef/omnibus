@@ -641,7 +641,7 @@ module Omnibus
       system "sudo rm -rf /tmp/pkgmk"
       FileUtils.mkdir "/tmp/pkgmk"
 
-      system "find #{install_path} -print > /tmp/pkgmk/files"
+      system "cd #{install_path} && find . -print > /tmp/pkgmk/files"
 
       prototype_content = <<-EOF
 i pkginfo
@@ -657,16 +657,13 @@ i postremove
       system "pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
 
       # fix up the user and group in the file list to root
-      system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files > /tmp/pkgmk/Prototype.files2"
-
-      # strip the leading slash off the files in the file list and apply the list to the prototype file
-      system "sed -e 's/ \// /' < /tmp/pkgmk/Prototype.files2 >> /tmp/pkgmk/Prototype"
+      system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
 
       pkginfo_content = <<-EOF
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=/
+BASEDIR=#{install_path.sub(/^\//, "")}
 PKG=#{package_name}
 NAME=#{package_name}
 ARCH=#{`uname -p`.chomp}
