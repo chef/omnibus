@@ -510,10 +510,6 @@ module Omnibus
       [bff_command.join(" "), {:returns => [0]}]
     end
 
-    def pkgmk_command
-      pkgmk_command = ["pkgmk -o -r / -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"]
-      [pkgmk_command.join(" "), {:returns => [0]}]
-    end
 
     # The {https://github.com/jordansissel/fpm fpm} command to
     # generate a package for RedHat, Ubuntu, Solaris, etc. platforms.
@@ -638,10 +634,13 @@ module Omnibus
     end
 
     def run_pkgmk
+      install_dirname = File.dirname(install_path)
+      install_basename = File.basename(install_path)
+
       system "sudo rm -rf /tmp/pkgmk"
       FileUtils.mkdir "/tmp/pkgmk"
 
-      system "find #{install_path} -print > /tmp/pkgmk/files"
+      system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
 
       prototype_content = <<-EOF
 i pkginfo
@@ -653,13 +652,17 @@ i postremove
         f.write prototype_content
       end
 
-      system "pkgproto < /tmp/pkgmk/files >> /tmp/pkgmk/Prototype"
+      # generate the prototype's file list
+      system "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
+
+      # fix up the user and group in the file list to root
+      system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
 
       pkginfo_content = <<-EOF
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=/
+BASEDIR=#{install_dirname}
 PKG=#{package_name}
 NAME=#{package_name}
 ARCH=#{`uname -p`.chomp}
@@ -678,7 +681,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       FileUtils.cp "#{package_scripts_path}/postinst", "/tmp/pkgmk/postinstall"
       FileUtils.cp "#{package_scripts_path}/postrm", "/tmp/pkgmk/postremove"
 
-      run_package_command(pkgmk_command)
+      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype", :timeout => 3600)
 
       system "pkgchk -vd /tmp/pkgmk chef"
 
