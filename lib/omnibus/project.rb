@@ -506,7 +506,7 @@ module Omnibus
     end
 
     def bff_command
-      bff_command = ["mkinstallp -d / -T /tmp/bff/gen.template"]
+      bff_command = ["sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template"]
       [bff_command.join(" "), {:returns => [0]}]
     end
 
@@ -610,7 +610,7 @@ module Omnibus
     end
 
     def run_bff
-      FileUtils.rm_rf "/.info"
+      FileUtils.rm_rf "/.info/*"
       FileUtils.rm_rf "/tmp/bff"
       FileUtils.mkdir "/tmp/bff"
 
