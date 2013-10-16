@@ -88,7 +88,14 @@ E
       end
 
       req = Net::HTTP::Get.new(url.request_uri, headers)
-      http_client = Net::HTTP.new(url.host, url.port)
+
+      no_proxy = (ENV['NO_PROXY'] || ENV['no_proxy'] || "").split(/\s*,\s*/)
+      proxy    = URI.parse(ENV['http_proxy'] || ENV['HTTP_PROXY']) if ENV['http_proxy'] || ENV['HTTP_PROXY']
+      http_client = if proxy && no_proxy.none? {|e| url.host.end_with? e }
+        Net::HTTP::Proxy(proxy.host, proxy.port, proxy.user, proxy.password).new(url.host, url.port)
+      else
+        Net::HTTP.new(url.host, url.port)
+      end
       http_client.use_ssl = (url.scheme == "https")
 
       response = http_client.start { |http| http.request(req) }
