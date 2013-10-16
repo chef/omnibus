@@ -89,10 +89,8 @@ E
 
       req = Net::HTTP::Get.new(url.request_uri, headers)
 
-      no_proxy = (ENV['NO_PROXY'] || ENV['no_proxy'] || "").split(/\s*,\s*/)
-      proxy    = URI.parse(ENV['http_proxy'] || ENV['HTTP_PROXY']) if ENV['http_proxy'] || ENV['HTTP_PROXY']
-      http_client = if proxy && no_proxy.none? {|e| url.host.end_with? e }
-        Net::HTTP::Proxy(proxy.host, proxy.port, proxy.user, proxy.password).new(url.host, url.port)
+      http_client = if http_proxy && !excluded_from_proxy?(url.host)
+        Net::HTTP::Proxy(http_proxy.host, http_proxy.port, http_proxy.user, http_proxy.password).new(url.host, url.port)
       else
         Net::HTTP.new(url.host, url.port)
       end
@@ -109,6 +107,31 @@ E
       else
         response.error!
       end
+    end
+
+    #search environment variable as given, all lowercase and all upper case
+    def get_env(name)
+      ENV[name] || ENV[name.downcase] || ENV[name.upcase] || nil
+    end
+
+    #constructs a http_proxy uri from HTTP_PROXY* env vars
+    def http_proxy
+      @http_proxy ||= begin
+        proxy = get_env('HTTP_PROXY') or return
+        proxy = "http://#{proxy}" unless proxy =~ /^https?:/
+        uri = URI.parse(proxy)
+        uri.user ||= get_env 'HTTP_PROXY_USER' 
+        uri.password ||= get_env 'HTTP_PROXY_PASS' 
+        uri
+      end
+    end
+
+    #return true if the host is excluded from proxying via the no_proxy directive.
+    #the 'no_proxy' variable contains a list of host suffixes separated by comma
+    #example: example.com,www.examle.org,localhost
+    def excluded_from_proxy?(host)
+      no_proxy = get_env 'no_proxy' || "" 
+      no_proxy.split(/\s*,\s*/).any? {|pattern| host.end_with? pattern}
     end
 
     def download
