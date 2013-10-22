@@ -47,7 +47,7 @@ describe Omnibus::PackageRelease do
   describe "validating configuration" do
 
     before do
-      Omnibus.stub!(:config).and_return(config)
+      Omnibus.stub(:config).and_return(config)
     end
 
     it "validates that the s3 key is set" do
@@ -104,7 +104,7 @@ describe Omnibus::PackageRelease do
     end
 
     before do
-      package_release.stub!(:config).and_return(config)
+      package_release.stub(:config).and_return(config)
       File.stub(:exist?).with(pkg_metadata_path).and_return(true)
       File.stub(:exist?).with(pkg_path).and_return(true)
       IO.stub(:read).with(pkg_metadata_path).and_return(metadata_json)

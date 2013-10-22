@@ -6,8 +6,8 @@ require 'spec_helper'
 describe Omnibus::Software do
 
   let(:project) do
-    p = mock(Omnibus::Project)
-    p.should_receive(:install_path).any_number_of_times.and_return("monkeys")
+    p = double(Omnibus::Project)
+    p.stub(:install_path).and_return("monkeys")
     p
   end
 

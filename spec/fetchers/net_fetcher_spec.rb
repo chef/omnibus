@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Omnibus::NetFetcher do
   it "should download and uncompress zip files" do
-    software_mock = stub 'software'
+    software_mock = double('software')
     software_mock.stub :project_file => 'file.zip',
                        :name         => 'file',
                        :source       => '/tmp/out',
@@ -14,7 +14,7 @@ describe Omnibus::NetFetcher do
     net_fetcher.extract_cmd.should == 'unzip file.zip -d /tmp/out'
   end
   it "should download and uncompress .tar.xz files" do
-    software_mock = stub 'software'
+    software_mock = double('software')
     software_mock.stub :project_file => 'file.tar.xz',
                        :name         => 'file',
                        :source       => '/tmp/out',
@@ -26,7 +26,7 @@ describe Omnibus::NetFetcher do
     net_fetcher.extract_cmd.should == 'xz -dc file.tar.xz | ( cd /tmp/out && tar -xf - )'
   end
   it "should download and uncompress .txz files" do
-    software_mock = stub 'software'
+    software_mock = double('software')
     software_mock.stub :project_file => 'file.txz',
                        :name         => 'file',
                        :source       => '/tmp/out',
@@ -40,7 +40,7 @@ describe Omnibus::NetFetcher do
 
   describe "http_proxy helper" do
     before(:each) do
-      software_mock = stub('software')
+      software_mock = double('software')
       software_mock.stub(:project_file => 'file.txz',
                          :name         => 'file',
                          :source       => '/tmp/out',

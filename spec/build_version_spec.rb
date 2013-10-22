@@ -30,9 +30,9 @@ describe Omnibus::BuildVersion do
     ENV['BUILD_ID'] = nil
     ENV['OMNIBUS_APPEND_TIMESTAMP'] = nil
     Omnibus::BuildVersion.any_instance.stub(:shellout)
-                         .and_return(mock("ouput",
-                                          :stdout => git_describe,
-                                          :exitstatus => 0))
+                         .and_return(double("ouput",
+                                            :stdout => git_describe,
+                                            :exitstatus => 0))
   end
 
   describe "git describe parsing" do
@@ -239,9 +239,9 @@ fatal: No tags can describe '809ea1afcce67e1148c1bf0822d40a7ef12c380e'.
 Try --always, or create some tags.
       STDERR
       build_version.stub(:shellout)
-                   .and_return(mock("ouput",
-                                    :stderr => stderr,
-                                    :exitstatus => 128))
+                   .and_return(double("ouput",
+                                      :stderr => stderr,
+                                      :exitstatus => 128))
     end
     it "sets the version to 0.0.0" do
       build_version.git_describe.should eq("0.0.0")
@@ -257,9 +257,9 @@ Try --always, or create some tags.
                    .with("git describe",
                          {:live_stream => nil,
                          :cwd => path})
-                    .and_return(mock("ouput",
-                                :stdout => git_describe,
-                                :exitstatus => 0))
+                    .and_return(double("ouput",
+                                       :stdout => git_describe,
+                                       :exitstatus => 0))
       build_version.git_describe
     end
   end
