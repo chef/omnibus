@@ -109,29 +109,29 @@ E
       end
     end
 
-    #search environment variable as given, all lowercase and all upper case
+    # search environment variable as given, all lowercase and all upper case
     def get_env(name)
       ENV[name] || ENV[name.downcase] || ENV[name.upcase] || nil
     end
 
-    #constructs a http_proxy uri from HTTP_PROXY* env vars
+    # constructs a http_proxy uri from HTTP_PROXY* env vars
     def http_proxy
       @http_proxy ||= begin
         proxy = get_env('HTTP_PROXY') or return
         proxy = "http://#{proxy}" unless proxy =~ /^https?:/
         uri = URI.parse(proxy)
-        uri.user ||= get_env 'HTTP_PROXY_USER' 
-        uri.password ||= get_env 'HTTP_PROXY_PASS' 
+        uri.user ||= get_env('HTTP_PROXY_USER')
+        uri.password ||= get_env('HTTP_PROXY_PASS')
         uri
       end
     end
 
-    #return true if the host is excluded from proxying via the no_proxy directive.
-    #the 'no_proxy' variable contains a list of host suffixes separated by comma
-    #example: example.com,www.examle.org,localhost
+    # return true if the host is excluded from proxying via the no_proxy directive.
+    # the 'no_proxy' variable contains a list of host suffixes separated by comma
+    # example: example.com,www.examle.org,localhost
     def excluded_from_proxy?(host)
-      no_proxy = get_env 'no_proxy' || "" 
-      no_proxy.split(/\s*,\s*/).any? {|pattern| host.end_with? pattern}
+      no_proxy = get_env('no_proxy') || ""
+      no_proxy.split(/\s*,\s*/).any? { |pattern| host.end_with? pattern }
     end
 
     def download
