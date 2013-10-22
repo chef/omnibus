@@ -37,5 +37,89 @@ describe Omnibus::NetFetcher do
     net_fetcher = Omnibus::NetFetcher.new software_mock
     net_fetcher.extract_cmd.should == 'xz -dc file.txz | ( cd /tmp/out && tar -xf - )'
   end
+
+  describe "http_proxy helper" do
+    before(:each) do
+      software_mock = stub('software')
+      software_mock.stub(:project_file => 'file.txz',
+                         :name         => 'file',
+                         :source       => '/tmp/out',
+                         :checksum     => 'abc123',
+                         :source_uri   => 'http://example.com/file.txz',
+                         :source_dir   => '/tmp/out',
+                         :project_dir  => '/tmp/project')
+      @net_fetcher = Omnibus::NetFetcher.new(software_mock)
+      env_vars = ['HTTP_PROXY',
+                  'HTTP_PROXY_USER',
+                  'HTTP_PROXY_PASS',
+                  'http_proxy',
+                  'http_proxy_user',
+                  'http_proxy_pass']
+      @orig_env = env_vars.inject({}) do |h, var|
+        h[var] = ENV.delete(var)
+        h
+      end
+    end
+
+    after(:each) do
+      # restore ENV hash
+      @orig_env.each { |var, val| ENV[var] = val }
+    end
+
+    describe "get_env handles upper and lower case env vars" do
+      it "lower via upper" do
+        ENV['lower'] = "abc"
+        @net_fetcher.get_env('LOWER').should == "abc"
+        @net_fetcher.get_env('lower').should == "abc"
+      end
+
+      it "upper via lower" do
+        ENV['UPPER'] = "abc"
+        @net_fetcher.get_env('upper').should == "abc"
+        @net_fetcher.get_env('UPPER').should == "abc"
+      end
+    end
+
+    it "should return nil when no proxy is set in env" do
+      @net_fetcher.http_proxy.should be_nil
+    end
+
+    it "should return a URI object when HTTP_PROXY is set" do
+      ENV['HTTP_PROXY'] = "http://my.proxy"
+      @net_fetcher.http_proxy.should == URI.parse("http://my.proxy")
+    end
+
+    it "sets user and pass from env when set" do
+      ENV['HTTP_PROXY'] = "my.proxy"
+      ENV['HTTP_PROXY_USER'] = "alex"
+      ENV['HTTP_PROXY_PASS'] = "sesame"
+      @net_fetcher.http_proxy.should == URI.parse("http://alex:sesame@my.proxy")
+    end
+
+    it "uses user and pass in URL before those in env" do
+      ENV['HTTP_PROXY'] = "sally:peanut@my.proxy"
+      ENV['HTTP_PROXY_USER'] = "alex"
+      ENV['HTTP_PROXY_PASS'] = "sesame"
+      @net_fetcher.http_proxy.should == URI.parse("http://sally:peanut@my.proxy")
+    end
+
+    it "proxies if host doesn't match exclude list" do
+      ENV['NO_PROXY'] = "google.com,www.buz.org"
+      a_url = URI.parse("http://should.proxy.com/123")
+      @net_fetcher.excluded_from_proxy?(a_url.host).should be_false
+
+      b_url = URI.parse("http://buz.org/123")
+      @net_fetcher.excluded_from_proxy?(b_url.host).should be_false
+    end
+
+    it "does not proxy if host matches exclude list" do
+      ENV['NO_PROXY'] = "google.com,www.buz.org"
+      a_url = URI.parse("http://google.com/hello")
+      @net_fetcher.excluded_from_proxy?(a_url.host).should be_true
+
+      b_url = URI.parse("http://www.buz.org/123")
+      @net_fetcher.excluded_from_proxy?(b_url.host).should be_true
+    end
+  end
 end
 
