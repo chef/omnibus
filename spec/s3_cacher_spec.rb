@@ -23,17 +23,17 @@ describe Omnibus::S3Cache do
   describe '#tarball_software' do
     subject(:tarball_software) { described_class.new.tarball_software }
 
-    let(:source_a) { stub(source: { url: 'a' }) }
-    let(:source_b) { stub(source: { url: 'b' }) }
-    let(:source_c) { stub(source: {}) }
+    let(:source_a) { double(source: { url: 'a' }) }
+    let(:source_b) { double(source: { url: 'b' }) }
+    let(:source_c) { double(source: {}) }
     let(:projects) { [
-      stub({ library: [source_a, source_c] }),
-      stub({ library: [source_c, source_b] })
+      double({ library: [source_a, source_c] }),
+      double({ library: [source_c, source_b] })
     ] }
     let(:software_with_urls) { [source_a, source_b] }
 
     before do
-      Omnibus.stub(config: stub({
+      Omnibus.stub(config: double({
         s3_bucket: 'test', s3_access_key: 'test', s3_secret_key: 'test'
       }))
 
