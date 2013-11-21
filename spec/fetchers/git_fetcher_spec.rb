@@ -78,7 +78,7 @@ describe Omnibus::GitFetcher do
                }
              }
             Omnibus::Fetcher::ErrorReporter.any_instance
-              .should_receive(:explain).with(%q|Failed to fetch git repository 'git@example.com:test/project.git'|)
+              .should_receive(:explain).with(%q|Failed to find any commits for the ref '0.0.1'|)
             subject.should_receive(:log).with(%r|git ls-remote failed|).at_least(1).times
             subject.should_receive(:log).with(%r|git clone/fetch failed|).at_least(1).times
             # Prevent sleeping to run the spec fast
