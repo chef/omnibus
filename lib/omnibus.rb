@@ -154,6 +154,17 @@ module Omnibus
     ruby_files(File.join(project_root, Config.software_dir))
   end
 
+  # Return directories to search for {Omnibus::Software} DSL files.
+  #
+  # @return [Array<String>]
+  def self.software_dirs
+    @software_dirs ||= begin
+      software_dirs = [File.join(project_root, Config.software_dir)]
+      software_dirs << File.join(omnibus_software_root, 'config', 'software') if omnibus_software_root
+      software_dirs
+    end
+  end
+
   # Backward compat alias
   #
   # @todo print a deprecation message
@@ -288,9 +299,7 @@ module Omnibus
     dep_file = software_map[dependency_name]
 
     unless dep_file
-      raise MissingProjectDependency.new(dependency_name,
-                                         [File.join(project_root, Config.software_dir),
-                                          File.join(omnibus_software_root, 'config', 'software')])
+      raise MissingProjectDependency.new(dependency_name, software_dirs)
     end
 
     dep_software = Omnibus::Software.load(dep_file, project, overrides)
