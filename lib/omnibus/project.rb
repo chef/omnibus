@@ -241,6 +241,24 @@ module Omnibus
       @build_iteration || 1
     end
 
+    # Set or retrieve the {deb/rpm/solaris}-user fpm argument.
+    #
+    # @param val [String]
+    # @return [String]
+    def package_user(val=NULL_ARG)
+      @pkg_user = val unless val.equal?(NULL_ARG)
+      @pkg_user
+    end
+
+    # Set or retrieve the {deb/rpm/solaris}-group fpm argument.
+    #
+    # @param val [String]
+    # @return [String]
+    def package_group(val=NULL_ARG)
+      @pkg_group = val unless val.equal?(NULL_ARG)
+      @pkg_group
+    end
+
     # Add an Omnibus software dependency.
     #
     # Note that this is a *build time* dependency.  If you need to
@@ -562,6 +580,18 @@ module Omnibus
 
       @conflicts.each do |conflict|
         command_and_opts << "--conflicts '#{conflict}'"
+      end
+
+      if @pkg_user
+        %w[ deb rpm solaris ].each do |type|
+          command_and_opts << " --#{type}-user #{@pkg_user}"
+        end
+      end
+
+      if @pkg_group
+        %w[ deb rpm solaris ].each do |type|
+          command_and_opts << " --#{type}-group #{@pkg_group}"
+        end
       end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
