@@ -62,8 +62,6 @@ Vagrant.configure("2") do |config|
   # The path to the Berksfile to use with Vagrant Berkshelf
   config.berkshelf.berksfile_path = "./Berksfile"
 
-  config.ssh.max_tries = 40
-  config.ssh.timeout   = 120
   config.ssh.forward_agent = true
 
   host_project_path = File.expand_path("..", __FILE__)
