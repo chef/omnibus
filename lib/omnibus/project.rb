@@ -66,6 +66,7 @@ module Omnibus
 
       @exclusions = Array.new
       @conflicts = Array.new
+      @config_files = Array.new
       @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io)
@@ -312,6 +313,14 @@ module Omnibus
     # @return void
     def exclude(pattern)
       @exclusions << pattern
+    end
+
+    # Add a config file.
+    #
+    # @param val [String] the name of a config file of your software
+    # @return [void]
+    def config_file(val)
+      @config_files << val
     end
 
     # Returns the platform version of the machine on which Omnibus is
@@ -572,6 +581,10 @@ module Omnibus
 
       @exclusions.each do |pattern|
         command_and_opts << "--exclude '#{pattern}'"
+      end
+      
+      @config_files.each do |config_file|
+        command_and_opts << "--config-files '#{config_file}'"
       end
 
       @runtime_dependencies.each do |runtime_dep|
