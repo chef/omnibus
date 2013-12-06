@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency "mixlib-shellout", "~> 1.0"
+  gem.add_dependency "mixlib-shellout", "~> 1.3.0"
   gem.add_dependency "mixlib-config", "~> 1.1.2"
   gem.add_dependency "ohai", ">= 0.6.12"
   gem.add_dependency "rake", ">= 0.9"
