@@ -158,7 +158,7 @@ module Omnibus
       source_path = File.expand_path("#{Omnibus.project_root}/config/templates/#{name}/#{args[:source]}")
 
       unless File.exists?(source_path)
-        raise MissingTemplate.new(source, "#{Omnibus.project_root}/config/templates/#{name}")
+        raise MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
       end
 
       block do
