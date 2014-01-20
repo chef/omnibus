@@ -191,6 +191,15 @@ module Omnibus
     #   @return [Boolean]
     override_file nil
 
+    # @!attribute [rw] software_gem
+    #
+    #   The gem to pull software definitions from.
+    #
+    #   Defaults to "omnibus-software".
+    #
+    #   @return [String, nil]
+    software_gem 'omnibus-software'
+
     # @!attribute [rw] solaris_compiler
     #
     #   @return [String, nil]
