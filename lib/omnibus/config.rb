@@ -193,7 +193,9 @@ module Omnibus
 
     # @!attribute [rw] software_gem
     #
-    #   The gem to pull software definitions from.
+    #   The gem to pull software definitions from.  This is just the name of the gem, which is used
+    #   to find the path to your software definitions, and you must also specify this gem in the
+    #   Gemfile of your project repo in order to include the gem in your bundle.
     #
     #   Defaults to "omnibus-software".
     #
