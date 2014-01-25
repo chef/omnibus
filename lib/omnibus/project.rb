@@ -170,7 +170,7 @@ module Omnibus
         "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
-      when 'aix'
+      when 'aix', 'debian'
         "#{build_iteration}"
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
