@@ -2,6 +2,7 @@
 require 'rake/dsl_definition'
 
 require 'omnibus'
+require 'fauxhai'
 
 module Omnibus
   module RSpec
@@ -15,7 +16,11 @@ module Omnibus
     def overrides_path(name)
       File.join(SPEC_DATA, "overrides", "#{name}.overrides")
     end
-    
+
+    def project_path(name)
+      File.join(SPEC_DATA, "projects", "#{name}.rb")
+    end
+
   end
 end
 

@@ -7,3 +7,7 @@ group :docs do
   gem "redcarpet", "~> 2.2.2"
   gem "github-markup", "~> 0.7.5"
 end
+
+group :test do
+  gem 'fauxhai'
+end
