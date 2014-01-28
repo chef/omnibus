@@ -1,5 +1,6 @@
 #
 # Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2014 Noah Kantrowitz
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -170,7 +171,7 @@ module Omnibus
         "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
-      when 'aix'
+      when 'aix', 'debian'
         "#{build_iteration}"
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
