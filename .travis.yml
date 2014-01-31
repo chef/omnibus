@@ -3,3 +3,8 @@ rvm:
   - 1.9.2
   - 1.9.3
 script: rake spec
+notifications:
+  hipchat:
+    rooms:
+      - secure: nDjKIyOwWS8qJqpHvBu1BadTyycWCqPM6/o1hdaOT41kO80GsYfJhvLk1QSAdDxPC5Y67/krKIXNR2ykfXvJWco6OCPXNLc8bsod+d8Srknqe8RJFBP+ExLzou21OLvNKqI0FhULB/mA39o5eC/jmkXjQIqj6eszNA7oLQYhQL8=
+      - secure: W+qOMYUnvBGg+/mpOuti3nS2IeNarvQyAzE4z3A2h13OwKz+ugIfjrxM3Ry5Moi0xf6kW49PJAC6q+9Sqx0h9Z6KNvOESaD/KDNYSkPgHsRgQIpzSENORPGnTMGFWO0DhdZhIjEE0qs3BqBbrJSZ1qL2yNGFTyHsW3VQXZeVUWE=
