@@ -413,6 +413,8 @@ module Omnibus
         [ "pkgmk" ]
       when 'windows'
         [ "msi" ]
+      when 'mac_os_x'
+        [ "mac_pkg" ]
       else
         [ "makeself" ]
       end
@@ -732,6 +734,53 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
     end
 
+    def run_pkgbuild_product_build
+      # TODO: check prerequisites.
+      # Need a dir in files named mac_pkg/Resources
+      # must contain:
+      # * background.png
+      # * license.html
+      # * welcome.html
+
+      pkg_build_cmd = [
+        "pkgbuild",
+        # TODO: how does this get specified?
+        "--identifier", "com.getchef.chef-client",
+        # TODO: pull this in from wherever we get it from.
+        "--version", "11.8.2",
+        # TODO: postinst _should_ work, if renamed to postinstall (maybe copy to staging dir)?
+        "--scripts", "~/oc/omnibus-chef/package-scripts/chef/",
+        # TODO: comes from project config
+        "--root", "/opt/chef",
+        # TODO: comes from project config
+        "--install-location", "/opt/chef",
+        # TODO: comes from project config; use convention of -core (?)
+        "chef-client-core.pkg",
+      ]
+
+      cmd_options = {
+        :timeout => 3600,
+        :cwd => config.package_dir
+      }
+
+      shellout!(*pkg_build_cmd, cmd_options)
+
+      product_build_cmd = [
+        # TODO: if pkg from previous command is not in cwd, then must add:
+        # --package-path /stuff
+        "productbuild",
+        # TODO: Distribution file needs to be generated
+        "--distribution", "Distribution",
+        # TODO: full path to this
+        "--resources", "Resources",
+        "chef-mac.pkg"
+      ]
+
+      shellout!(*product_build_cmd, cmd_options)
+
+    end
+
+
     # Runs the necessary command to make a package with fpm. As a side-effect,
     # sets `output_package`
     # @return void
@@ -785,6 +834,8 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
                 run_bff
               elsif pkg_type == "pkgmk"
                 run_pkgmk
+              elsif pkg_type == "mac_pkg"
+                run_pkgbuild_product_build
               else # pkg_type == "fpm"
                 run_fpm(pkg_type)
               end
