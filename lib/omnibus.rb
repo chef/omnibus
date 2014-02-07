@@ -28,6 +28,7 @@ require 'omnibus/reports'
 require 'omnibus/config'
 require 'omnibus/exceptions'
 require 'omnibus/software'
+require 'omnibus/software_definition'
 require 'omnibus/project'
 require 'omnibus/fetchers'
 require 'omnibus/health_check'
@@ -281,8 +282,11 @@ module Omnibus
   # @return [Hash<String, String>]
   def self.software_map(files)
     files.each_with_object({}) do |file, collection|
-      software_name = File.basename(file, ".*")
-      collection[software_name] = file
+      # Change the software map to store software using the name specified in its definition.
+      # We can have more than 1 same named software with different versions.
+      software = Omnibus::SoftwareDefinition.load(file)
+      collection[software.name] ||= [ ]
+      collection[software.name] << software
     end
   end
 
@@ -296,13 +300,23 @@ module Omnibus
   #
   # @return [void]
   def self.recursively_load_dependency(dependency_name, project, overrides, software_map)
-    dep_file = software_map[dependency_name]
+    dependency = software_map[dependency_name]
 
-    unless dep_file
+    if dependency.nil? || dependency.empty?
       raise MissingProjectDependency.new(dependency_name, software_dirs)
     end
 
-    dep_software = Omnibus::Software.load(dep_file, project, overrides)
+    dep_software = nil
+    if project.software_version_pinning && project.software_version_pinning[dependency_name]
+      # Project is pinning this software to a specific version. Try to find the matching version
+      dependency.select! {|a| a.version == project.software_version_pinning[dependency_name] }
+    end
+
+    if dependency.length != 1
+      raise "There are more than 1 versions of your dependency '#{dependency_name}' in '#{project.name}' project. Specify which one."
+    end
+
+    dep_software = Omnibus::Software.load(dependency.first.filename, project, overrides)
     project.library.component_added(dep_software)
 
     # load any transitive deps for the component into the library also
