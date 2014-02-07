@@ -29,8 +29,6 @@ module Omnibus
     class DSLProxy
       extend Forwardable
 
-      # @todo def_delegators :@builder, :patch, :command, :ruby, ...
-
       def_delegator :@builder, :patch
       def_delegator :@builder, :erb
       def_delegator :@builder, :command
