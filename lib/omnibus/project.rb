@@ -68,6 +68,7 @@ module Omnibus
       @exclusions = Array.new
       @conflicts = Array.new
       @config_files = Array.new
+      @files = Array.new
       @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io, filename)
@@ -327,6 +328,14 @@ module Omnibus
     # @return [void]
     def config_file(val)
       @config_files << val
+    end
+
+    # Add other files or dirs outside of install_path
+    #
+    # @param val [String] the name of a dir or file to include in build
+    # @return [void]
+    def file(val)
+      @files << val
     end
 
     # Returns the platform version of the machine on which Omnibus is
@@ -623,7 +632,7 @@ module Omnibus
       @exclusions.each do |pattern|
         command_and_opts << "--exclude '#{pattern}'"
       end
-      
+
       @config_files.each do |config_file|
         command_and_opts << "--config-files '#{config_file}'"
       end
@@ -650,6 +659,11 @@ module Omnibus
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
       command_and_opts << install_path
+
+      @files.each do |file|
+        command_and_opts << file
+      end
+
       command_and_opts
     end
 
