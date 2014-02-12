@@ -103,6 +103,4 @@ describe Omnibus::Project do
       end
     end
   end
-
-
 end
