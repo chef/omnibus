@@ -338,6 +338,22 @@ module Omnibus
       @files << val
     end
 
+    # Set or retrieve the array of files and directories used to
+    # build this project. If you use this to write, only pass the
+    # full path to the dir or file you want included in the omnibus
+    # package build.
+    #
+    # @note - similar to the depdencies array - this will reinitialize
+    # the files array and overwrite and dependencies that were set using
+    # {#file}.
+    #
+    # @param val [Array<String>] a list of names of Software components
+    # @return [Array<String>]
+    def files(val=NULL_ARG)
+      @files = val unless val.equal?(NULL_ARG)
+      @files
+    end
+
     # Returns the platform version of the machine on which Omnibus is
     # running, as determined by Ohai.
     #
