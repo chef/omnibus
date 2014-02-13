@@ -165,8 +165,26 @@ module Omnibus
         "#{name}-core.pkg"
       end
 
+      # The basename of the end-result package (that will be distributed to
+      # users).
+      #
+      # Project uses this to generate metadata about the package after its
+      # built.
+      #
+      # @return [String] the basename of the package file
+      def package_name
+        "#{name}.pkg"
+      end
+
+      # Internally in this class we want to call this the "product package" so
+      # we can be unambiguous and consistent.
+      alias :product_pkg_name :package_name
+
+      # The full path where the product package was/will be written.
+      #
+      # @return [String] Path to the packge file.
       def product_pkg_path
-        File.join(package_dir, "#{name}.pkg")
+        File.join(package_dir, product_pkg_name)
       end
 
       # @return [String] Filesystem path where the Distribution file is written.

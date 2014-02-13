@@ -19,6 +19,7 @@ require 'omnibus/artifact'
 require 'omnibus/exceptions'
 require 'omnibus/library'
 require 'omnibus/util'
+require 'omnibus/packagers/mac_pkg'
 require 'time'
 
 module Omnibus
@@ -520,6 +521,8 @@ module Omnibus
         "#{package_name}.#{bff_version}.bff"
       when "pkgmk"
         "#{package_name}-#{build_version}-#{iteration}.solaris"
+      when "mac_pkg"
+        Packagers::MacPkg.new(self).package_name
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
@@ -760,50 +763,8 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
     end
 
-    def run_pkgbuild_product_build
-      # TODO: check prerequisites.
-      # Need a dir in files named mac_pkg/Resources
-      # must contain:
-      # * background.png
-      # * license.html
-      # * welcome.html
-
-      pkg_build_cmd = [
-        "pkgbuild",
-        # TODO: how does this get specified?
-        "--identifier", "com.getchef.chef-client",
-        # TODO: pull this in from wherever we get it from.
-        "--version", "11.8.2",
-        # TODO: postinst _should_ work, if renamed to postinstall (maybe copy to staging dir)?
-        "--scripts", "~/oc/omnibus-chef/package-scripts/chef/",
-        # TODO: comes from project config
-        "--root", "/opt/chef",
-        # TODO: comes from project config
-        "--install-location", "/opt/chef",
-        # TODO: comes from project config; use convention of -core (?)
-        "chef-client-core.pkg",
-      ]
-
-      cmd_options = {
-        :timeout => 3600,
-        :cwd => config.package_dir
-      }
-
-      shellout!(*pkg_build_cmd, cmd_options)
-
-      product_build_cmd = [
-        # TODO: if pkg from previous command is not in cwd, then must add:
-        # --package-path /stuff
-        "productbuild",
-        # TODO: Distribution file needs to be generated
-        "--distribution", "Distribution",
-        # TODO: full path to this
-        "--resources", "Resources",
-        "chef-mac.pkg"
-      ]
-
-      shellout!(*product_build_cmd, cmd_options)
-
+    def run_mac_package_build
+      Packagers::MacPkg.new(self).build
     end
 
 
@@ -861,7 +822,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
               elsif pkg_type == "pkgmk"
                 run_pkgmk
               elsif pkg_type == "mac_pkg"
-                run_pkgbuild_product_build
+                run_mac_package_build
               else # pkg_type == "fpm"
                 run_fpm(pkg_type)
               end

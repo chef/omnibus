@@ -133,6 +133,13 @@ EOH
     expect(packager.component_pkg_name).to eq("myproject-core.pkg")
   end
 
+  it "names the product package PROJECT_NAME.pkg" do
+    # NOTE: #package_name is used by Project, so it's part of the **PUBLIC**
+    # API.
+    expect(packager.package_name).to eq("myproject.pkg")
+    expect(packager.product_pkg_name).to eq("myproject.pkg")
+  end
+
   it "use's the project's package_scripts_path" do
     expect(packager.scripts).to eq(project.package_scripts_path)
   end
