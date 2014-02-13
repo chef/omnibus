@@ -176,6 +176,11 @@ module Omnibus
         "#{name}.pkg"
       end
 
+      def identifier
+        project.mac_pkg_identifier or
+          "test.#{sanitized_maintainer}.pkg.#{sanitized_name}"
+      end
+
       # Internally in this class we want to call this the "product package" so
       # we can be unambiguous and consistent.
       alias :product_pkg_name :package_name
@@ -237,6 +242,14 @@ module Omnibus
           license_file_path,
           welcome_file_path
         ]
+      end
+
+      def sanitized_name
+        name.gsub(/[^[:alnum:]]/, '').downcase
+      end
+
+      def sanitized_maintainer
+        project.maintainer.gsub(/[^[:alnum:]]/, '').downcase
       end
 
       # The path to the directory inside the omnibus project's repo where the

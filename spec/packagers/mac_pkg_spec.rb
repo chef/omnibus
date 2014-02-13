@@ -21,21 +21,16 @@ require 'spec_helper'
 
 describe Omnibus::Packagers::MacPkg do
 
+  let(:project_name) { "myproject" }
 
-  # TODO: need project to support a mac_pkg_identifier attribute.
-  # IOW, this isn't consistent with Project's interface
   let(:mac_pkg_identifier) { "com.mycorp.myproject" }
 
   let(:omnibus_root) { "/omnibus/project/root" }
 
   let(:scripts_path) { "#{omnibus_root}/scripts" }
 
-  # TODO: need project to provide a package_dir method
-  # IOW, this isn't consistent with Project's interface
   let(:package_dir) { "/home/someuser/omnibus-myproject/pkg" }
 
-  # TODO: need project to provide a files_dir method
-  # IOW, this isn't consistent with Project's interface
   let(:files_path) { "#{omnibus_root}/files" }
 
   let(:expected_distribution_content) do
@@ -94,8 +89,9 @@ EOH
 
   let(:project) do
     double(Omnibus::Project,
-           :name => "myproject",
+           :name => project_name,
            :build_version => "23.4.2",
+           :maintainer => "Joe's Software",
            :install_path => "/opt/myproject",
            :package_scripts_path => scripts_path,
            :files_path => files_path,
@@ -228,10 +224,18 @@ E
   context "when the mac_pkg_identifier isn't specified by the project" do
 
     let(:mac_pkg_identifier) { nil }
+    let(:project_name) { "My $Project" }
+
+    it "sanitizes the MAINTAINER name" do
+      expect(packager.sanitized_maintainer).to eq("joessoftware")
+    end
+
+    it "sanitizes the project name" do
+      expect(packager.sanitized_name).to eq("myproject")
+    end
 
     it "uses com.example.PROJECT_NAME as the identifier" do
-      pending
-      expect(packager.identifier).to eq("com.example.myproject")
+      expect(packager.identifier).to eq("test.joessoftware.pkg.myproject")
     end
 
   end
