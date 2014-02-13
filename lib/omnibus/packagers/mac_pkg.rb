@@ -45,8 +45,8 @@ module Omnibus
       def_delegator :@project, :name
 
       # !@method version
-      #   @return (see Project#version)
-      def_delegator :@project, :version
+      #   @return (see Project#build_version)
+      def_delegator :@project, :build_version, :version
 
       # !@method identifier
       #   @return (see Project#mac_pkg_identifier)

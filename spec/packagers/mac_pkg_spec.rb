@@ -95,7 +95,7 @@ EOH
   let(:project) do
     double(Omnibus::Project,
            :name => "myproject",
-           :version => "23.4.2",
+           :build_version => "23.4.2",
            :install_path => "/opt/myproject",
            :package_scripts_path => scripts_path,
            :files_path => files_path,
@@ -110,7 +110,7 @@ EOH
   end
 
   it "uses the project's version" do
-    expect(packager.version).to eq(project.version)
+    expect(packager.version).to eq(project.build_version)
   end
 
   it "uses the project's name" do

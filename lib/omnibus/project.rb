@@ -54,8 +54,6 @@ module Omnibus
     # @param filename [String] unused!
     #
     # @see Omnibus::Project#load
-    #
-    # @todo Remove filename parameter, as it is unused.
     def initialize(io, filename)
       @output_package = nil
       @name = nil
@@ -64,13 +62,14 @@ module Omnibus
       @homepage = nil
       @description = nil
       @replaces = nil
+      @mac_pkg_identifier = nil
 
       @exclusions = Array.new
       @conflicts = Array.new
       @config_files = Array.new
       @dependencies = Array.new
       @runtime_dependencies = Array.new
-      instance_eval(io)
+      instance_eval(io, filename)
       validate
 
       @library = Omnibus::Library.new(self)
@@ -243,6 +242,11 @@ module Omnibus
       @build_iteration || 1
     end
 
+    def mac_pkg_identifier(val=NULL_ARG)
+      @mac_pkg_identifier = val unless val.equal?(NULL_ARG)
+      @mac_pkg_identifier
+    end
+
     # Set or retrieve the {deb/rpm/solaris}-user fpm argument.
     #
     # @param val [String]
@@ -390,6 +394,28 @@ module Omnibus
     #   particularly since the user has no way to change the path.
     def package_scripts_path
       "#{Omnibus.project_root}/package-scripts/#{name}"
+    end
+
+    # Path to the /files directory in the omnibus project. This directory can
+    # contain assets used for creating packages (e.g., Mac .pkg files and
+    # Windows MSIs can be installed by GUI which can optionally be customized
+    # with background images, license agreements, etc.)
+    #
+    # This method delegates to the Omnibus.project_root module function so that
+    # Packagers classes rely only on the Project object for their inputs.
+    #
+    # @return [String] path to the files directory.
+    def files_path
+      "#{Omnibus.project_root}/files"
+    end
+
+    # The directory where packages are written when created. Delegates to
+    # #config. The delegation allows Packagers (like Packagers::MacPkg) to
+    # define the implementation rather than using the global config everywhere.
+    #
+    # @return [String] path to the package directory
+    def package_dir
+      config.package_dir
     end
 
     # Determine the package type(s) to be built, based on the platform

@@ -32,15 +32,19 @@ describe Omnibus::Packagers::MacPkg do
   let(:package_dir) { Dir.pwd }
 
   let(:project) do
-    double(Omnibus::Project,
-           :name => "functional-test-project",
-           :version => "23.4.2",
-           :install_path => "/opt/functional-test-project",
-           :package_scripts_path => scripts_path,
-           :files_path => files_path,
-           :package_dir => package_dir,
-           :mac_pkg_identifier => mac_pkg_identifier)
 
+    Omnibus.stub(:project_root).and_return(omnibus_root)
+    Omnibus.config.stub(:package_dir).and_return(package_dir)
+
+    project_file=<<-P
+      name "functional-test-project"
+      maintainer "YOU"
+      homepage "http://www.theonion.com/articles/drunken-man-careens-wildly-across-internet,35249/"
+      build_version "23.4.2"
+      install_path "/opt/functional-test-project"
+      mac_pkg_identifier "#{mac_pkg_identifier}"
+    P
+    Omnibus::Project.new(project_file, __FILE__)
   end
 
 
