@@ -1,6 +1,7 @@
 *.gem
 tmp
-
+# package file created by functional tests:
+*.pkg
 # Bundler related
 Gemfile.lock
 .bundle/
