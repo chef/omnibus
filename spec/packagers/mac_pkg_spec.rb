@@ -31,6 +31,8 @@ describe Omnibus::Packagers::MacPkg do
 
   let(:package_dir) { "/home/someuser/omnibus-myproject/pkg" }
 
+  let(:package_tmp) { "/var/cache/omnibus/pkg-tmp" }
+
   let(:files_path) { "#{omnibus_root}/files" }
 
   let(:expected_distribution_content) do
@@ -59,10 +61,12 @@ describe Omnibus::Packagers::MacPkg do
 EOH
   end
 
+  let(:expected_distribution_path) { "/var/cache/omnibus/pkg-tmp/mac-pkg/Distribution" }
+
   let(:productbuild_argv) do
-    %w[
+    %W[
       productbuild
-      --distribution /tmp/omnibus-mac-pkg-tmp/Distribution
+      --distribution #{expected_distribution_path}
       --resources /omnibus/project/root/files/mac_pkg/Resources
       /home/someuser/omnibus-myproject/pkg/myproject.pkg
     ]
@@ -83,7 +87,7 @@ EOH
   let(:shellout_opts) do
      {
         :timeout => 3600,
-        :cwd => "/tmp/omnibus-mac-pkg-tmp"
+        :cwd => File.join(package_tmp, "mac-pkg")
       }
   end
 
@@ -96,6 +100,7 @@ EOH
            :package_scripts_path => scripts_path,
            :files_path => files_path,
            :package_dir => package_dir,
+           :package_tmp => package_tmp,
            :mac_pkg_identifier => mac_pkg_identifier)
 
   end
@@ -169,8 +174,8 @@ E
   end
 
   it "clears and recreates the staging dir" do
-    FileUtils.should_receive(:rm_rf).with("/tmp/omnibus-mac-pkg-tmp")
-    FileUtils.should_receive(:mkdir).with("/tmp/omnibus-mac-pkg-tmp")
+    FileUtils.should_receive(:rm_rf).with("/var/cache/omnibus/pkg-tmp/mac-pkg")
+    FileUtils.should_receive(:mkdir_p).with("/var/cache/omnibus/pkg-tmp/mac-pkg")
     packager.setup_staging_dir!
   end
 
@@ -185,7 +190,7 @@ E
   end
 
   it "has a temporary staging location for the distribution file" do
-    expect(packager.staging_dir).to eq("/tmp/omnibus-mac-pkg-tmp")
+    expect(packager.staging_dir).to eq("/var/cache/omnibus/pkg-tmp/mac-pkg")
   end
 
   it "generates a Distribution file describing the product package content" do
@@ -203,7 +208,7 @@ E
 
     before do
       File.should_receive(:open).
-        with("/tmp/omnibus-mac-pkg-tmp/Distribution", File::RDWR|File::CREAT|File::EXCL, 0600).
+        with(expected_distribution_path, File::RDWR|File::CREAT|File::EXCL, 0600).
         and_yield(distribution_file)
     end
 

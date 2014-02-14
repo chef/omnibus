@@ -414,9 +414,18 @@ module Omnibus
     # #config. The delegation allows Packagers (like Packagers::MacPkg) to
     # define the implementation rather than using the global config everywhere.
     #
-    # @return [String] path to the package directory
+    # @return [String] path to the package directory.
     def package_dir
       config.package_dir
+    end
+
+    # The directory where intermediate packaging products may be stored.
+    # Delegates to Config so that Packagers have a consistent API.
+    #
+    # @see Config.package_tmp some caveats.
+    # @return [String] path to the package temp directory.
+    def package_tmp
+      config.package_tmp
     end
 
     # Determine the package type(s) to be built, based on the platform

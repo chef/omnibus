@@ -109,7 +109,7 @@ module Omnibus
       # @return [void]
       def setup_staging_dir!
         FileUtils.rm_rf(staging_dir)
-        FileUtils.mkdir(staging_dir)
+        FileUtils.mkdir_p(staging_dir)
       end
 
       def build_component_pkg
@@ -231,7 +231,7 @@ module Omnibus
       # A directory where intermediate build products are stored.
       # @return [String] Path to the directory
       def staging_dir
-        "/tmp/omnibus-mac-pkg-tmp"
+        File.join(project.package_tmp, "mac-pkg")
       end
 
       # A list of the files that will be used to customize the "product" package.P
