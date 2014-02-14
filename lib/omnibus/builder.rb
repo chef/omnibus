@@ -29,8 +29,6 @@ module Omnibus
     class DSLProxy
       extend Forwardable
 
-      # @todo def_delegators :@builder, :patch, :command, :ruby, ...
-
       def_delegator :@builder, :patch
       def_delegator :@builder, :erb
       def_delegator :@builder, :command
@@ -345,9 +343,6 @@ module Omnibus
 
   end
 
-  # @todo What's the point of this class?  Can we not just detect that
-  #   there are no commands in {Omnibus::Builder#build} and output the
-  #   appropriate message?  Seems like a lot of extra ceremony.
   class NullBuilder < Builder
 
     def build
