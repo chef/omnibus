@@ -155,4 +155,18 @@ module Omnibus
       """
     end
   end
+
+  class MissingMacPkgResource < StandardError
+    def initialize(missing_file_paths)
+      @missing_file_paths = missing_file_paths
+    end
+
+    def to_s
+      <<-E
+      Your omnibus repo is missing the following files required to build Mac
+      packages:
+      #{@missing_file_paths.map {|p| "* #{p}"}.join("\n      ")}
+E
+    end
+  end
 end

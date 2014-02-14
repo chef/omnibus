@@ -68,6 +68,17 @@ module Omnibus
     #   @return [String]
     package_dir "/var/cache/omnibus/pkg"
 
+    # @!attribute [rw] package_tmp
+    #   The absolute path to the directory on the virtual machine where
+    #   packagers will store intermediate packaging products. Some packaging
+    #   methods (notably fpm) handle this internally so not all packagers will
+    #   use this setting.
+    #
+    #   Defaults to `"/var/cache/omnibus/pkg-tmp"`.
+    #
+    #   @return [String]
+    package_tmp "/var/cache/omnibus/pkg-tmp"
+
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
     #   DSL files.  This is relative to {#project_root}.

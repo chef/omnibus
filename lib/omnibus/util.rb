@@ -25,21 +25,33 @@ module Omnibus
   module Util
     # Shells out and runs +command+.
     #
-    # @param command [String]
-    # @param opts [Hash] the options passed to the initializer of the
-    #   +Mixlib::ShellOut+ instance.
+    # @overload shellout(command, opts={})
+    #   @param command [String]
+    #   @param opts [Hash] the options passed to the initializer of the
+    #     +Mixlib::ShellOut+ instance.
+    # @overload shellout(command_fragments, opts={})
+    #   @param command [Array<String>] command argv as individual strings
+    #   @param opts [Hash] the options passed to the initializer of the
+    #     +Mixlib::ShellOut+ instance.
     # @return [Mixlib::ShellOut] the underlying +Mixlib::ShellOut+ instance
     #   which which has +stdout+, +stderr+, +status+, and +exitstatus+
     #   populated with results of the command.
     #
-    def shellout(command, opts={})
+    def shellout(*command_fragments)
       STDOUT.sync = true
+
+      opts = if command_fragments.last.kind_of?(Hash)
+        command_fragments.pop
+      else
+        {}
+      end
+
       default_options = {
         :live_stream => STDOUT,
         :timeout => 7200, # 2 hours
         :environment => {}
       }
-      cmd = Mixlib::ShellOut.new(command, default_options.merge(opts))
+      cmd = Mixlib::ShellOut.new(*command_fragments, default_options.merge(opts))
       cmd.run_command
       cmd
     end
@@ -52,8 +64,8 @@ module Omnibus
     # @raise [Mixlib::ShellOut::ShellCommandFailed] if +exitstatus+ is not in
     #   the list of +valid_exit_codes+.
     #
-    def shellout!(command, opts={})
-      cmd = shellout(command, opts)
+    def shellout!(*command_fragments)
+      cmd = shellout(*command_fragments)
       cmd.error!
       cmd
     end
