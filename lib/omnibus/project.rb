@@ -65,6 +65,7 @@ module Omnibus
       @replaces = nil
       @mac_pkg_identifier = nil
 
+      @software_version_pinning = { }
       @exclusions = Array.new
       @conflicts = Array.new
       @config_files = Array.new
@@ -101,6 +102,12 @@ module Omnibus
       @name = val unless val.equal?(NULL_ARG)
       @name || raise(MissingProjectConfiguration.new("name", "my_project"))
     end
+
+    def software_version_pinning(val=NULL_ARG)
+      @software_version_pinning = val unless val.equal?(NULL_ARG)
+      @software_version_pinning
+    end
+
 
     # Set or retrieve the package name of the project.  Unless
     # explicitly set, the package name defaults to the project name
@@ -623,7 +630,7 @@ module Omnibus
       @exclusions.each do |pattern|
         command_and_opts << "--exclude '#{pattern}'"
       end
-      
+
       @config_files.each do |config_file|
         command_and_opts << "--config-files '#{config_file}'"
       end
