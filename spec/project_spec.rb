@@ -52,7 +52,7 @@ describe Omnibus::Project do
     end
 
     it 'should return an array of files and dirs' do
-      project.files.should eq(['/path/to/sample_dir', '/path/to/file.conf'])
+      project.extra_package_files.should eq(['/path/to/sample_dir', '/path/to/file.conf'])
     end
   end
 

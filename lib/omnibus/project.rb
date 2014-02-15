@@ -68,7 +68,7 @@ module Omnibus
       @exclusions = Array.new
       @conflicts = Array.new
       @config_files = Array.new
-      @files = Array.new
+      @extra_package_files = Array.new
       @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io, filename)
@@ -334,8 +334,11 @@ module Omnibus
     #
     # @param val [String] the name of a dir or file to include in build
     # @return [void]
-    def file(val)
-      @files << val
+    # NOTE: This option is currently only supported with FPM based package
+    # builds such as RPM, DEB and .sh (makeselfinst).  This isn't supported
+    # on Mac OSX packages, Windows MSI, AIX and Solaris
+    def extra_package_file(val)
+      @extra_package_files << val
     end
 
     # Set or retrieve the array of files and directories used to
@@ -349,9 +352,9 @@ module Omnibus
     #
     # @param val [Array<String>] a list of names of Software components
     # @return [Array<String>]
-    def files(val=NULL_ARG)
-      @files = val unless val.equal?(NULL_ARG)
-      @files
+    def extra_package_files(val=NULL_ARG)
+      @extra_package_files = val unless val.equal?(NULL_ARG)
+      @extra_package_files
     end
 
     # Returns the platform version of the machine on which Omnibus is
@@ -676,8 +679,8 @@ module Omnibus
       command_and_opts << " --replaces #{@replaces}" if @replaces
       command_and_opts << install_path
 
-      @files.each do |file|
-        command_and_opts << file
+      @extra_package_files.each do |files|
+        command_and_opts << files
       end
 
       command_and_opts
