@@ -68,6 +68,7 @@ module Omnibus
       @exclusions = Array.new
       @conflicts = Array.new
       @config_files = Array.new
+      @extra_package_files = Array.new
       @dependencies = Array.new
       @runtime_dependencies = Array.new
       instance_eval(io, filename)
@@ -327,6 +328,33 @@ module Omnibus
     # @return [void]
     def config_file(val)
       @config_files << val
+    end
+
+    # Add other files or dirs outside of install_path
+    #
+    # @param val [String] the name of a dir or file to include in build
+    # @return [void]
+    # NOTE: This option is currently only supported with FPM based package
+    # builds such as RPM, DEB and .sh (makeselfinst).  This isn't supported
+    # on Mac OSX packages, Windows MSI, AIX and Solaris
+    def extra_package_file(val)
+      @extra_package_files << val
+    end
+
+    # Set or retrieve the array of files and directories used to
+    # build this project. If you use this to write, only pass the
+    # full path to the dir or file you want included in the omnibus
+    # package build.
+    #
+    # @note - similar to the depdencies array - this will reinitialize
+    # the files array and overwrite and dependencies that were set using
+    # {#file}.
+    #
+    # @param val [Array<String>] a list of names of Software components
+    # @return [Array<String>]
+    def extra_package_files(val=NULL_ARG)
+      @extra_package_files = val unless val.equal?(NULL_ARG)
+      @extra_package_files
     end
 
     # Returns the platform version of the machine on which Omnibus is
@@ -623,7 +651,7 @@ module Omnibus
       @exclusions.each do |pattern|
         command_and_opts << "--exclude '#{pattern}'"
       end
-      
+
       @config_files.each do |config_file|
         command_and_opts << "--config-files '#{config_file}'"
       end
@@ -650,6 +678,11 @@ module Omnibus
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
       command_and_opts << install_path
+
+      @extra_package_files.each do |files|
+        command_and_opts << files
+      end
+
       command_and_opts
     end
 
