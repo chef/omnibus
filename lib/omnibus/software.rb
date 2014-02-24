@@ -174,14 +174,13 @@ module Omnibus
     #
     # @todo Consider changing this to accept two arguments instead
     # @todo This should throw an error if an invalid key is given, or
-    #   if more than one pair is given, or if no source value is ever
-    #   set.
+    #   if more than one pair is given
     def source(val=NULL_ARG)
       unless val.equal?(NULL_ARG)
         @source ||= {}
         @source.merge!(val)
       end
-      apply_overrides(:source) || raise(MissingSoftwareConfiguration.new(name, "source", "[Hash]"))
+      apply_overrides(:source)
     end
 
     # Set or retrieve the default version of the software
