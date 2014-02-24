@@ -91,6 +91,7 @@ module Omnibus
       """
     end
   end
+
   # Raise this error if a needed Project configuration value has not
   # been set.
   class MissingProjectConfiguration < RuntimeError
@@ -104,6 +105,26 @@ module Omnibus
       a value for '#{@parameter_name}'!
 
       Please add code similar to the following to your project DSL file:
+
+         #{@parameter_name} '#{@sample_value}'
+
+      """
+    end
+  end
+
+  # Raise this error if a needed Software configuration value has not
+  # been set.
+  class MissingSoftwareConfiguration < RuntimeError
+    def initialize(parameter_name, sample_value)
+      @parameter_name, @sample_value = parameter_name, sample_value
+    end
+
+    def to_s
+      """
+      You are attempting to build a software, but have not specified
+      a value for '#{@parameter_name}'!
+
+      Please add code similar to the following to your software DSL file:
 
          #{@parameter_name} '#{@sample_value}'
 

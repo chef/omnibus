@@ -140,12 +140,12 @@ module Omnibus
       end
 
       plevel = args[:plevel] || 1
-      if args[:target] 
+      if args[:target]
         target = File.expand_path("#{project_dir}/#{args[:target]}")
-        @build_commands << 
+        @build_commands <<
          "cat #{source} | patch -p#{plevel} #{target}"
       else
-        @build_commands << 
+        @build_commands <<
          "patch -d #{project_dir} -p#{plevel} -i #{source}"
       end
     end
@@ -210,6 +210,7 @@ module Omnibus
 
     def build
       log "building #{name}"
+      log "version overridden from #{@software.given_version} to #{@software.override_version}" if @software.overridden?
       time_it("#{name} build") do
         @build_commands.each do |cmd|
           execute(cmd)

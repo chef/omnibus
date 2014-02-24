@@ -103,4 +103,36 @@ describe Omnibus::Project do
       end
     end
   end
+
+  describe "#overrides" do
+    let(:project) { Omnibus::Project.load(project_path('chefdk')) }
+
+    it 'should set an override for the zlib version' do
+      expect(project.overrides[:zlib][:version]).to eq("1.2.8")
+    end
+
+    it 'should access the zlib version through the #override method as well' do
+      expect(project.override(:zlib)[:version]).to eq("1.2.8")
+    end
+
+    it 'should set all the things through #overrides' do
+      project.overrides(:thing => {:version => "6.6.6" })
+      expect(project.override(:zlib)).to be_nil
+    end
+
+    it 'should retrieve the things set through #overrides' do
+      project.overrides(:thing => {:version => "6.6.6" })
+      expect(project.override(:thing)[:version]).to eq("6.6.6")
+    end
+
+    it 'should not set other things through setting a single #override' do
+      project.override(:thing, :version => "6.6.6" )
+      expect(project.override(:zlib)[:version]).to eq("1.2.8")
+    end
+
+    it 'should retrieve the things set through #overrides' do
+      project.override(:thing, :version => "6.6.6" )
+      expect(project.override(:thing)[:version]).to eq("6.6.6")
+    end
+  end
 end

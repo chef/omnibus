@@ -64,6 +64,7 @@ module Omnibus
       @description = nil
       @replaces = nil
       @mac_pkg_identifier = nil
+      @overrides = { }
 
       @exclusions = Array.new
       @conflicts = Array.new
@@ -256,6 +257,26 @@ module Omnibus
     def package_user(val=NULL_ARG)
       @pkg_user = val unless val.equal?(NULL_ARG)
       @pkg_user
+    end
+
+    # Set or retrieve the full overrides hash for all software being overridden.  Calling it as
+    # a setter does not merge hash entries and will obliterate any previous overrides that have been setup.
+    #
+    # @param val [Hash]
+    # @return [Hash]
+    def overrides(val=NULL_ARG)
+      @overrides = val unless val.equal?(NULL_ARG)
+      @overrides
+    end
+
+    # Set or retrieve the overrides hash for one piece of software being overridden.  Calling it as a
+    # setter does not merge hash entries and it will set all the overrides for a given software definition.
+    #
+    # @param val [Hash]
+    # @return [Hash]
+    def override(name, val=NULL_ARG)
+      @overrides[name] = val unless val.equal?(NULL_ARG)
+      @overrides[name]
     end
 
     # Set or retrieve the {deb/rpm/solaris}-group fpm argument.

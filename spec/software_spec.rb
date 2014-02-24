@@ -6,79 +6,101 @@ require 'spec_helper'
 describe Omnibus::Software do
 
   let(:project) do
-    p = double(Omnibus::Project)
-    p.stub(:install_path).and_return("monkeys")
-    p
+    double(Omnibus::Project, :install_path => "monkeys", :overrides => {})
   end
 
   let(:software_name) { "erchef" }
-  let(:software_file){ software_path(software_name) }
-  let(:version_from_file){ "4b19a96d57bff9bbf4764d7323b92a0944009b9e" }
-  let(:software){ Omnibus::Software.load(software_file, project) }
+  let(:software_file) { software_path(software_name) }
 
-  before :each do
-    # We don't want to mess with any of this stuff for these
-    # tests... we're just looking at version info right now
-    Omnibus::Software.any_instance.stub(:render_tasks)
+  let(:software) do
+    Omnibus::Software.load(software_file, project)
   end
 
-  subject { software }
+  before do
+    allow_any_instance_of(Omnibus::Software).to receive(:render_tasks)
+  end
 
   describe "#whitelist_file" do
 
     it "appends to the whitelist_files array" do
-      software.whitelist_files.size.should equal 0
+      expect(software.whitelist_files.size).to equal 0
       software.whitelist_file(/foo\/bar/)
-      software.whitelist_files.size.should equal 1
+      expect(software.whitelist_files.size).to equal 1
     end
 
     it "converts Strings to Regexp instances" do
       software.whitelist_file "foo/bar"
-      software.whitelist_files.size.should equal 1
-      software.whitelist_files.first.should be_kind_of(Regexp)
+      expect(software.whitelist_files.size).to equal 1
+      expect(software.whitelist_files.first).to be_kind_of(Regexp)
     end
   end
 
-  context "testing version overrides" do
+  context "testing repo-level version overrides" do
+    let(:software_name) { "zlib" }
+    let(:default_version) { "1.2.6" }
+    let(:expected_version) { "1.2.6" }
+    let(:expected_override_version) { nil }
+    let(:expected_md5) { "618e944d7c7cd6521551e30b32322f4a" }
+    let(:expected_url) { "http://downloads.sourceforge.net/project/libpng/zlib/1.2.6/zlib-1.2.6.tar.gz" }
 
-    context "without overrides" do
-      its(:name){should eq(software_name)}
-      its(:version){should eq(version_from_file)}
-      its(:given_version){should eq(software.version)}
-      its(:override_version){should be_nil}
+    shared_examples_for "a software definition" do
+      it "should have the same name" do
+        expect(software.name).to eq(software_name)
+      end
+
+      it "should have the same version" do
+        expect(software.version).to eq(expected_version)
+      end
+
+      it "should have the right given_version" do
+        expect(software.given_version).to eq(default_version)
+      end
+
+      it "should have nil for an override_version" do
+        expect(software.override_version).to eq(expected_override_version)
+      end
+
+      it "should have the md5 of the default version" do
+        expect(software.source[:md5]).to eq(expected_md5)
+      end
+
+      it "should have the url of the default version" do
+        expect(software.source[:url]).to eq(expected_url)
+      end
     end
 
-    context "with overrides" do
-      let(:override_software_version){"6.6.6"}
-      let(:overrides) do
-        {override_software_name => override_software_version}
+    context "without overrides" do
+      it_behaves_like "a software definition"
+    end
+
+    context "with overrides for different software" do
+      let(:overrides) { { "chaos_monkey" => "1.2.8" } }
+      let(:software) { Omnibus::Software.load(software_file, project, overrides) }
+
+      it_behaves_like "a software definition"
+    end
+
+    context "with overrides for this software" do
+      let(:expected_version) { "1.2.8" }
+      let(:expected_override_version) { "1.2.8" }
+      let(:overrides) { { software_name => expected_override_version } }
+      let(:software) { Omnibus::Software.load(software_file, project, overrides) }
+      let(:expected_md5) { "44d667c142d7cda120332623eab69f40" }
+      let(:expected_url) { "http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz" }
+
+      it_behaves_like "a software definition"
+    end
+
+    context "with an overide in the project" do
+      let(:project) do
+        double(Omnibus::Project, :install_path => "monkeys", :overrides => { :zlib => { :version =>  "1.2.8"} })
       end
-      let(:software){Omnibus::Software.load(software_file, project, overrides)}
+      let(:expected_version) { "1.2.8" }
+      let(:expected_override_version) { "1.2.8" }
+      let(:expected_md5) { "44d667c142d7cda120332623eab69f40" }
+      let(:expected_url) { "http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz" }
 
-      context "but not for this software" do
-        let(:override_software_name){"chaos_monkey"}
-
-        it "really should not have any overrides for this software" do
-          overrides.should_not have_key(software_name)
-        end
-
-        its(:version){should eq(version_from_file)}
-        its(:given_version){should eq(software.version)}
-        its(:override_version){should be_nil}
-      end
-
-      context "for this software" do
-        let(:override_software_name){software_name}
-
-        it "really should have an override for this software" do
-          overrides.should have_key(software_name)
-        end
-
-        its(:version){should eq(override_software_version)}
-        its(:override_version){should eq(software.version)}
-        its(:version){should_not eq(software.given_version)}
-        its(:given_version){should eq(version_from_file)}
-      end
+      it_behaves_like "a software definition"
     end
 
   end
