@@ -118,7 +118,7 @@ module Omnibus
 
     def name(val=NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name || raise(MissingSoftwareConfiguration.new("name", "libxslt"))
+      @name || raise(MissingSoftwareConfiguration.new(name, "name", "libxslt"))
     end
 
     def description(val)
@@ -181,7 +181,7 @@ module Omnibus
         @source ||= {}
         @source.merge!(val)
       end
-      apply_overrides(:source) || raise(MissingSoftwareConfiguration.new("source", "[Hash]"))
+      apply_overrides(:source) || raise(MissingSoftwareConfiguration.new(name, "source", "[Hash]"))
     end
 
     # Set or retrieve the default version of the software
