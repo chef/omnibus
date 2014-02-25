@@ -1,5 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,8 @@
 #
 
 name       "chefdk"
-maintainer "Opscode, Inc."
-homepage   "http://www.opscode.com"
+maintainer "Chef Software, Inc."
+homepage   "http://www.getchef.com"
 
 install_path    "/opt/chefdk"
 build_version   Omnibus::BuildVersion.full

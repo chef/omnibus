@@ -181,7 +181,7 @@ $MY_PROJECT_NAME`
 
 See the LICENSE and NOTICE files for more information.
 
-Copyright: Copyright (c) 2012--2013 Opscode, Inc.
+Copyright: Copyright (c) 2012--2013-2014 Chef Software, Inc.
 License: Apache License, Version 2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");

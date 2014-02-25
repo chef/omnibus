@@ -1,6 +1,6 @@
 #
-# Author:: Seth Chisamore (<schisamo@opscode.com>)
-# Copyright:: Copyright (c) 2013 Opscode, Inc.
+# Author:: Seth Chisamore (<schisamo@getchef.com>)
+# Copyright:: Copyright (c) 2013-2014 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ require 'mixlib/shellout'
 
 module Omnibus
   #
-  # @author Seth Chisamore (<schisamo@opscode.com>)
+  # @author Seth Chisamore (<schisamo@getchef.com>)
   #
   module Util
     # Shells out and runs +command+.
