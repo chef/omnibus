@@ -75,7 +75,7 @@ MS_VERSION=2.1.5
 MS_COMMAND="$0"
 unset CDPATH
 
-for f in "${1+"$@" }"; do
+for f in "${1+"$@"}"; do
     MS_COMMAND="$MS_COMMAND \\\\
     \\\"$f\\\""
 done
@@ -355,7 +355,7 @@ if test "$NOMD5" = y; then
 else
 	# Try to locate a MD5 binary
 	OLD_PATH=$PATH
-	PATH=${GUESS_MD5_PATH:-"$OLD_PATH:/bin:/usr/bin:/sbin:/usr/local/ssl/bin:/usr/local/bin:/opt/openssl/bin" }
+	PATH=${GUESS_MD5_PATH:-"$OLD_PATH:/bin:/usr/bin:/sbin:/usr/local/ssl/bin:/usr/local/bin:/opt/openssl/bin"}
 	MD5_ARG=""
 	MD5_PATH=`exec <&- 2>&-; which md5sum || type md5sum`
 	test -x "$MD5_PATH" || MD5_PATH=`exec <&- 2>&-; which md5 || type md5`
