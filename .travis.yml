@@ -2,6 +2,9 @@ rvm:
   - 1.9.3
 
 bundler_args: --jobs 7 --without docs
+
+script: bundle exec rake travis:ci
+
 notifications:
   hipchat:
     rooms:
