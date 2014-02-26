@@ -80,14 +80,14 @@ module Omnibus
         version = version_map[name][:version]
         version_guid = version_map[name][:version_guid]
 
-        given_version = version_map[name][:given_version]
+        default_version = version_map[name][:default_version]
         overridden = version_map[name][:overridden]
 
         out << "#{name}".ljust(name_width)
         out << version.to_s.ljust(version_width)
         out << version_guid.to_s.ljust(guid_width) if version_guid
         # Only print out column if something was overridden
-        out << given_version.ljust(override_width) if overridden
+        out << default_version.ljust(override_width) if overridden
         out << "\n"
       end
       out
