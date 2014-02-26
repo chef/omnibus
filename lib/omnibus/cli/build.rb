@@ -20,21 +20,22 @@ require 'omnibus/cli/base'
 module Omnibus
   module CLI
     class Build < Base
-
       namespace :build
 
       class_option :path,
-        :aliases => [:p],
-        :type => :string,
-        :default => Dir.pwd,
-        :desc => "Path to the Omnibus project root."
+                   aliases: [:p],
+                   type: :string,
+                   default: Dir.pwd,
+                   desc: 'Path to the Omnibus project root.'
 
       method_option :timestamp,
-        :aliases => [:t],
-        :type => :boolean,
-        :default => true,
-        :desc => "Append timestamp information to the version identifier? Add a timestamp for build versions; leave it off for release and pre-release versions"
-      desc "project PROJECT", "Build the given Omnibus project"
+                    aliases: [:t],
+                    type: :boolean,
+                    default: true,
+                    desc: 'Append timestamp information to the version ' \
+                          'identifier? Add a timestamp for build versions; ' \
+                          'leave it off for release and pre-release versions'
+      desc 'project PROJECT', 'Build the given Omnibus project'
       def project(project_name)
         project = load_project!(project_name)
         project_task_name = "projects:#{project.name}"
@@ -47,7 +48,7 @@ module Omnibus
         Rake::Task[project_task_name].invoke
       end
 
-      desc "software PROJECT SOFTWARE", "Build the given software component"
+      desc 'software PROJECT SOFTWARE', 'Build the given software component'
       def software(project_name, software_name)
         project = load_project!(project_name)
         software_task_name = "projects:#{project.name}:software:#{software_name}"
@@ -56,7 +57,6 @@ module Omnibus
 
         Rake::Task[software_task_name].invoke
       end
-
     end
   end
 end

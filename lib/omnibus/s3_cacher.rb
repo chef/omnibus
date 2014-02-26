@@ -20,10 +20,7 @@ require 'uber-s3'
 require 'omnibus/fetchers'
 
 module Omnibus
-
-
   module SoftwareS3URLs
-
     class InsufficientSpecification < ArgumentError
     end
 
@@ -32,33 +29,31 @@ module Omnibus
     end
 
     def url_for(software)
-      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software)}"
+      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software) }"
     end
 
     private
 
     def key_for_package(package)
-      package.name     or raise InsufficientSpecification, "Software must have a name to cache it in S3 (#{package.inspect})"
-      package.version  or raise InsufficientSpecification, "Software must set a version to cache it in S3 (#{package.inspect})"
-      package.checksum or raise InsufficientSpecification, "Software must specify a checksum (md5) to cache it in S3 (#{package.inspect})"
+      package.name     || fail(InsufficientSpecification, "Software must have a name to cache it in S3 (#{package.inspect})")
+      package.version  || fail(InsufficientSpecification, "Software must set a version to cache it in S3 (#{package.inspect})")
+      package.checksum || fail(InsufficientSpecification, "Software must specify a checksum (md5) to cache it in S3 (#{package.inspect})")
       "#{package.name}-#{package.version}-#{package.checksum}"
     end
-
   end
 
   class S3Cache
-
     include SoftwareS3URLs
 
     def initialize
       unless config.s3_bucket && config.s3_access_key && config.s3_secret_key
-        raise InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
+        fail InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
       end
       @client = UberS3.new(
-        :access_key         => config.s3_access_key,
-        :secret_access_key  => config.s3_secret_key,
-        :bucket             => config.s3_bucket,
-        :adaper             => :net_http
+        access_key: config.s3_access_key,
+        secret_access_key: config.s3_secret_key,
+        bucket: config.s3_bucket,
+        adapter: :net_http,
       )
     end
 
@@ -72,7 +67,7 @@ module Omnibus
 
     def list
       existing_keys = list_by_key
-      tarball_software.select {|s| existing_keys.include?(key_for_package(s))}
+      tarball_software.select { |s| existing_keys.include?(key_for_package(s)) }
     end
 
     def list_by_key
@@ -81,12 +76,12 @@ module Omnibus
 
     def missing
       already_cached = list_by_key
-      tarball_software.delete_if {|s| already_cached.include?(key_for_package(s))}
+      tarball_software.delete_if { |s| already_cached.include?(key_for_package(s)) }
     end
 
     def tarball_software
       Omnibus.projects.map do |project|
-        project.library.select {|s| s.source && s.source.key?(:url)}
+        project.library.select { |s| s.source && s.source.key?(:url) }
       end.flatten
     end
 
@@ -98,7 +93,7 @@ module Omnibus
         content = IO.read(software.project_file)
 
         log "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
-        @client.store(key, content, :access => :public_read, :content_md5 => software.checksum)
+        @client.store(key, content, access: :public_read, content_md5: software.checksum)
       end
     end
 
@@ -121,7 +116,7 @@ module Omnibus
         fetcher.download
         fetcher.verify_checksum!
       else
-        log "Cached copy up to date, skipping."
+        log 'Cached copy up to date, skipping.'
       end
     end
 
@@ -129,10 +124,9 @@ module Omnibus
       @bucket ||= begin
         b = UberS3::Bucket.new(@client, @client.bucket)
         # creating the bucket is idempotent, make sure it's created:
-        @client.connection.put("/")
+        @client.connection.put('/')
         b
       end
     end
-
   end
 end

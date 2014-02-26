@@ -24,17 +24,16 @@ require 'omnibus/cli/release'
 module Omnibus
   module CLI
     class Application < Base
-
       method_option :purge,
-        :type => :boolean,
-        :default => false,
-        :desc => "Remove ALL files generated during the build (including packages)."
+                    type: :boolean,
+                    default: false,
+                    desc: 'Remove ALL files generated during the build (including packages).'
       method_option :path,
-        :aliases => [:p],
-        :type => :string,
-        :default => Dir.pwd,
-        :desc => "Path to the Omnibus project root."
-      desc "clean PROJECT", "Remove temporary files generated during the build process."
+                    aliases: [:p],
+                    type: :string,
+                    default: Dir.pwd,
+                    desc: 'Path to the Omnibus project root.'
+      desc 'clean PROJECT', 'Remove temporary files generated during the build process.'
       def clean(project_name)
         project = load_project!(project_name)
 
@@ -49,45 +48,42 @@ module Omnibus
         end
 
         deletion_list.flatten!
-        deletion_list.each{|f| remove_file(f) }
+        deletion_list.each { |f| remove_file(f) }
       end
 
-      desc "project PROJECT", "Creates a skeletal Omnibus project"
+      desc 'project PROJECT', 'Creates a skeletal Omnibus project'
       def project(name)
-        name = name.chomp("/") # remove trailing slash if present
+        name = name.chomp('/') # remove trailing slash if present
         target = File.join(Dir.pwd, "omnibus-#{name}")
-        install_path = File.join("/opt", name)
+        install_path = File.join('/opt', name)
         opts = {
-          :name => name,
-          :install_path => install_path
+          name: name,
+          install_path: install_path,
         }
 
         # core project files
-        template(File.join("Gemfile.erb"), File.join(target, "Gemfile"), opts)
-        template(File.join("gitignore.erb"), File.join(target, ".gitignore"), opts)
-        template(File.join("README.md.erb"), File.join(target, "README.md"), opts)
-        template(File.join("omnibus.rb.example.erb"), File.join(target, "omnibus.rb.example"), opts)
+        template(File.join('Gemfile.erb'), File.join(target, 'Gemfile'), opts)
+        template(File.join('gitignore.erb'), File.join(target, '.gitignore'), opts)
+        template(File.join('README.md.erb'), File.join(target, 'README.md'), opts)
+        template(File.join('omnibus.rb.example.erb'), File.join(target, 'omnibus.rb.example'), opts)
 
         # project definition
-        template(File.join("project.rb.erb"), File.join(target, "config", "projects", "#{name}.rb"), opts)
+        template(File.join('project.rb.erb'), File.join(target, 'config', 'projects', "#{name}.rb"), opts)
 
         # example software definitions
-        config_software = File.join(target, "config", "software")
-        template(File.join("software", "c-example.rb.erb"),
-                 File.join(config_software, "c-example.rb"), opts)
-        template(File.join("software", "erlang-example.rb.erb"),
-                 File.join(config_software, "erlang-example.rb"), opts)
-        template(File.join("software", "ruby-example.rb.erb"),
-                 File.join(config_software, "ruby-example.rb"), opts)
+        config_software = File.join(target, 'config', 'software')
+        template(File.join('software', 'c-example.rb.erb'), File.join(config_software, 'c-example.rb'), opts)
+        template(File.join('software', 'erlang-example.rb.erb'), File.join(config_software, 'erlang-example.rb'), opts)
+        template(File.join('software', 'ruby-example.rb.erb'), File.join(config_software, 'ruby-example.rb'), opts)
 
         # Vagrant build lab
-        template(File.join("Berksfile.erb"), File.join(target, "Berksfile"), opts)
-        template(File.join("Vagrantfile.erb"), File.join(target, "Vagrantfile"), opts)
+        template(File.join('Berksfile.erb'), File.join(target, 'Berksfile'), opts)
+        template(File.join('Vagrantfile.erb'), File.join(target, 'Vagrantfile'), opts)
 
         # render out stub packge scripts
         %w{ makeselfinst preinst prerm postinst postrm }.each do |package_script|
-          script_path = File.join(target, "package-scripts", name, package_script)
-          template_path = File.join("package_scripts", "#{package_script}.erb")
+          script_path = File.join(target, 'package-scripts', name, package_script)
+          template_path = File.join('package_scripts', "#{package_script}.erb")
           # render the package script
           template(template_path, script_path, opts)
           # ensure the package script is executable
@@ -95,7 +91,7 @@ module Omnibus
         end
       end
 
-      desc "version", "Display version information"
+      desc 'version', 'Display version information'
       def version
         say("Omnibus: #{Omnibus::VERSION}", :yellow)
       end
@@ -104,14 +100,14 @@ module Omnibus
       # Subcommands
       ###########################################################################
 
-      desc "build [COMMAND]", "Perform build-related tasks"
-      subcommand "build", Omnibus::CLI::Build
+      desc 'build [COMMAND]', 'Perform build-related tasks'
+      subcommand 'build', Omnibus::CLI::Build
 
-      desc "cache [COMMAND]", "Perform cache management tasks"
-      subcommand "cache", Omnibus::CLI::Cache
+      desc 'cache [COMMAND]', 'Perform cache management tasks'
+      subcommand 'cache', Omnibus::CLI::Cache
 
-      desc "release [COMMAND]", "Perform release tasks"
-      subcommand "release", Omnibus::CLI::Release
+      desc 'release [COMMAND]', 'Perform release tasks'
+      subcommand 'release', Omnibus::CLI::Release
 
       ###########################################################################
       # Class Methods
@@ -119,22 +115,19 @@ module Omnibus
 
       # Override start so we can catch and process any exceptions bubbling up
       def self.start(*args)
-        begin
-          super
-        rescue => e
-          error_msg = "Something went wrong...the Omnibus just ran off the road!"
-          error_msg << "\n\nError raised was:\n\n\t#{$!}"
-          error_msg << "\n\nBacktrace:\n\n\t#{e.backtrace.join("\n\t")}"
-          if e.respond_to?(:original) && e.original
-            error_msg << "\n\nOriginal Error:\n\n\t#{e.original}"
-            error_msg << "\n\nOriginal Backtrace:\n\n\t#{e.original.backtrace.join("\n\t")}"
-          end
-          # TODO - we need a proper UI class
-          Thor::Base.shell.new.say(error_msg, :red)
-          exit 1
+        super
+      rescue => e
+        error_msg = 'Something went wrong...the Omnibus just ran off the road!'
+        error_msg << "\n\nError raised was:\n\n\t#{$ERROR_INFO}"
+        error_msg << "\n\nBacktrace:\n\n\t#{e.backtrace.join("\n\t") }"
+        if e.respond_to?(:original) && e.original
+          error_msg << "\n\nOriginal Error:\n\n\t#{e.original}"
+          error_msg << "\n\nOriginal Backtrace:\n\n\t#{e.original.backtrace.join("\n\t") }"
         end
+        # TODO: we need a proper UI class
+        Thor::Base.shell.new.say(error_msg, :red)
+        exit 1
       end
-
     end
   end
 end

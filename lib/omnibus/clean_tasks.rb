@@ -23,8 +23,6 @@
 
 require 'rake/clean'
 
-::CLEAN.include("#{Omnibus.config.source_dir}/**/*",
-                "#{Omnibus.config.build_dir}/**/*")
+::CLEAN.include("#{Omnibus.config.source_dir}/**/*", "#{Omnibus.config.build_dir}/**/*")
 
-::CLOBBER.include("#{Omnibus.config.cache_dir}/**/*",
-                  "#{Omnibus.config.package_dir}/**/*")
+::CLOBBER.include("#{Omnibus.config.cache_dir}/**/*", "#{Omnibus.config.package_dir}/**/*")

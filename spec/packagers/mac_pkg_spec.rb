@@ -21,17 +21,17 @@ require 'spec_helper'
 
 describe Omnibus::Packagers::MacPkg do
 
-  let(:project_name) { "myproject" }
+  let(:project_name) { 'myproject' }
 
-  let(:mac_pkg_identifier) { "com.mycorp.myproject" }
+  let(:mac_pkg_identifier) { 'com.mycorp.myproject' }
 
-  let(:omnibus_root) { "/omnibus/project/root" }
+  let(:omnibus_root) { '/omnibus/project/root' }
 
   let(:scripts_path) { "#{omnibus_root}/scripts" }
 
-  let(:package_dir) { "/home/someuser/omnibus-myproject/pkg" }
+  let(:package_dir) { '/home/someuser/omnibus-myproject/pkg' }
 
-  let(:package_tmp) { "/var/cache/omnibus/pkg-tmp" }
+  let(:package_tmp) { '/var/cache/omnibus/pkg-tmp' }
 
   let(:files_path) { "#{omnibus_root}/files" }
 
@@ -61,7 +61,7 @@ describe Omnibus::Packagers::MacPkg do
 EOH
   end
 
-  let(:expected_distribution_path) { "/var/cache/omnibus/pkg-tmp/mac-pkg/Distribution" }
+  let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac-pkg/Distribution' }
 
   let(:productbuild_argv) do
     %W[
@@ -85,26 +85,24 @@ EOH
   end
 
   let(:shellout_opts) do
-     {
-        :timeout => 3600,
-        :cwd => File.join(package_tmp, "mac-pkg")
-      }
+    {
+      timeout: 3600,
+      cwd: File.join(package_tmp, 'mac-pkg'),
+    }
   end
 
   let(:project) do
-    double(Omnibus::Project,
-           :name => project_name,
-           :build_version => "23.4.2",
-           :maintainer => "Joe's Software",
-           :install_path => "/opt/myproject",
-           :package_scripts_path => scripts_path,
-           :files_path => files_path,
-           :package_dir => package_dir,
-           :package_tmp => package_tmp,
-           :mac_pkg_identifier => mac_pkg_identifier)
-
+    double Omnibus::Project,
+           name: project_name,
+           build_version: '23.4.2',
+           maintainer: "Joe's Software",
+           install_path: '/opt/myproject',
+           package_scripts_path: scripts_path,
+           files_path: files_path,
+           package_dir: package_dir,
+           package_tmp: package_tmp,
+           mac_pkg_identifier: mac_pkg_identifier
   end
-
 
   let(:packager) do
     Omnibus::Packagers::MacPkg.new(project)
@@ -130,15 +128,15 @@ EOH
     expect(packager.install_location).to eq(project.install_path)
   end
 
-  it "names the component package PROJECT_NAME-core.pkg" do
-    expect(packager.component_pkg_name).to eq("myproject-core.pkg")
+  it 'names the component package PROJECT_NAME-core.pkg' do
+    expect(packager.component_pkg_name).to eq('myproject-core.pkg')
   end
 
-  it "names the product package PROJECT_NAME.pkg" do
+  it 'names the product package PROJECT_NAME.pkg' do
     # NOTE: #package_name is used by Project, so it's part of the **PUBLIC**
     # API.
-    expect(packager.package_name).to eq("myproject.pkg")
-    expect(packager.product_pkg_name).to eq("myproject.pkg")
+    expect(packager.package_name).to eq('myproject.pkg')
+    expect(packager.product_pkg_name).to eq('myproject.pkg')
   end
 
   it "use's the project's package_scripts_path" do
@@ -146,7 +144,7 @@ EOH
   end
 
   it "makes a list of required files to generate the 'product' pkg file" do
-    project_file_path = "/omnibus/project/root/files/mac_pkg/Resources"
+    project_file_path = '/omnibus/project/root/files/mac_pkg/Resources'
     required_files = %w[background.png welcome.html license.html].map do |basename|
       File.join(project_file_path, basename)
     end
@@ -154,8 +152,8 @@ EOH
     expect(packager.required_files).to match_array(required_files)
   end
 
-  it "validates that all required files are present" do
-    expected_error_text=<<-E
+  it 'validates that all required files are present' do
+    expected_error_text = <<-E
       Your omnibus repo is missing the following files required to build Mac
       packages:
       * /omnibus/project/root/files/mac_pkg/Resources/background.png
@@ -173,51 +171,50 @@ E
     expect(e.to_s).to eq(expected_error_text)
   end
 
-  it "clears and recreates the staging dir" do
-    FileUtils.should_receive(:rm_rf).with("/var/cache/omnibus/pkg-tmp/mac-pkg")
-    FileUtils.should_receive(:mkdir_p).with("/var/cache/omnibus/pkg-tmp/mac-pkg")
+  it 'clears and recreates the staging dir' do
+    FileUtils.should_receive(:rm_rf).with('/var/cache/omnibus/pkg-tmp/mac-pkg')
+    FileUtils.should_receive(:mkdir_p).with('/var/cache/omnibus/pkg-tmp/mac-pkg')
     packager.setup_staging_dir!
   end
 
-  it "generates a pkgbuild command" do
+  it 'generates a pkgbuild command' do
     expect(packager.pkgbuild_command).to eq(pkgbuild_argv)
   end
 
-  it "runs pkgbuild" do
+  it 'runs pkgbuild' do
     expected_args = pkgbuild_argv + [shellout_opts]
     packager.should_receive(:shellout!).with(*expected_args)
     packager.build_component_pkg
   end
 
-  it "has a temporary staging location for the distribution file" do
-    expect(packager.staging_dir).to eq("/var/cache/omnibus/pkg-tmp/mac-pkg")
+  it 'has a temporary staging location for the distribution file' do
+    expect(packager.staging_dir).to eq('/var/cache/omnibus/pkg-tmp/mac-pkg')
   end
 
-  it "generates a Distribution file describing the product package content" do
+  it 'generates a Distribution file describing the product package content' do
     expect(packager.distribution).to eq(expected_distribution_content)
   end
 
-
-  it "generates a productbuild command" do
+  it 'generates a productbuild command' do
     expect(packager.productbuild_command).to eq(productbuild_argv)
   end
 
-  describe "building the product package" do
+  describe 'building the product package' do
 
     let(:distribution_file) { StringIO.new }
 
     before do
-      File.should_receive(:open).
-        with(expected_distribution_path, File::RDWR|File::CREAT|File::EXCL, 0600).
-        and_yield(distribution_file)
+      File.should_receive(:open)
+        .with(expected_distribution_path, File::RDWR | File::CREAT | File::EXCL, 0600)
+        .and_yield(distribution_file)
     end
 
-    it "writes the distribution file to the staging directory" do
+    it 'writes the distribution file to the staging directory' do
       packager.generate_distribution
       distribution_file.string.should eq(expected_distribution_content)
     end
 
-    it "generates the distribution and runs productbuild" do
+    it 'generates the distribution and runs productbuild' do
       expected_shellout_args = productbuild_argv + [shellout_opts]
 
       packager.should_receive(:shellout!).with(*expected_shellout_args)
@@ -229,39 +226,36 @@ E
   context "when the mac_pkg_identifier isn't specified by the project" do
 
     let(:mac_pkg_identifier) { nil }
-    let(:project_name) { "My $Project" }
+    let(:project_name) { 'My $Project' }
 
-    it "sanitizes the MAINTAINER name" do
-      expect(packager.sanitized_maintainer).to eq("joessoftware")
+    it 'sanitizes the MAINTAINER name' do
+      expect(packager.sanitized_maintainer).to eq('joessoftware')
     end
 
-    it "sanitizes the project name" do
-      expect(packager.sanitized_name).to eq("myproject")
+    it 'sanitizes the project name' do
+      expect(packager.sanitized_name).to eq('myproject')
     end
 
-    it "uses com.example.PROJECT_NAME as the identifier" do
-      expect(packager.identifier).to eq("test.joessoftware.pkg.myproject")
+    it 'uses com.example.PROJECT_NAME as the identifier' do
+      expect(packager.identifier).to eq('test.joessoftware.pkg.myproject')
     end
 
   end
 
-  context "when the project has the required Resource files" do
+  context 'when the project has the required Resource files' do
 
     before do
-      project_file_path = "/omnibus/project/root/files/mac_pkg/Resources"
+      project_file_path = '/omnibus/project/root/files/mac_pkg/Resources'
       %w[background.png welcome.html license.html].each do |basename|
         path = File.join(project_file_path, basename)
         File.stub(:exist?).with(path).and_return(true)
       end
     end
 
-    it "validates the presence of the required files" do
+    it 'validates the presence of the required files' do
       expect(packager.validate_omnibus_project!).to be_true
     end
-
 
   end
 
 end
-
-

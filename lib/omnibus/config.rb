@@ -20,7 +20,6 @@ require 'omnibus/exceptions'
 require 'json'
 
 module Omnibus
-
   # Global configuration object for Omnibus runs.
   #
   # @todo Write a {http://yardoc.org/guides/extending-yard/writing-handlers.html
@@ -39,7 +38,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache"`.
     #
     #   @return [String]
-    cache_dir "/var/cache/omnibus/cache"
+    cache_dir '/var/cache/omnibus/cache'
 
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where
@@ -48,7 +47,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/src"`.
     #
     #   @return [String]
-    source_dir "/var/cache/omnibus/src"
+    source_dir '/var/cache/omnibus/src'
 
     # @!attribute [rw] build_dir
     #   The absolute path to the directory on the virtual machine where
@@ -57,7 +56,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/build"`.
     #
     #   @return [String]
-    build_dir "/var/cache/omnibus/build"
+    build_dir '/var/cache/omnibus/build'
 
     # @!attribute [rw] package_dir
     #   The absolute path to the directory on the virtual machine where
@@ -66,7 +65,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg"`.
     #
     #   @return [String]
-    package_dir "/var/cache/omnibus/pkg"
+    package_dir '/var/cache/omnibus/pkg'
 
     # @!attribute [rw] package_tmp
     #   The absolute path to the directory on the virtual machine where
@@ -77,7 +76,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg-tmp"`.
     #
     #   @return [String]
-    package_tmp "/var/cache/omnibus/pkg-tmp"
+    package_tmp '/var/cache/omnibus/pkg-tmp'
 
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
@@ -86,7 +85,7 @@ module Omnibus
     #   Defaults to `"config/projects"`.
     #
     #   @return [String]
-    project_dir "config/projects"
+    project_dir 'config/projects'
 
     # @!attribute [rw] software_dir
     #   The relative path of the directory containing {Omnibus::Software}
@@ -95,7 +94,7 @@ module Omnibus
     #   Defaults to `"config/software"`.
     #
     #   @return [String]
-    software_dir "config/software"
+    software_dir 'config/software'
 
     # @!attribute [rw] project_root
     #   The root directory in which to look for {Omnibus::Project} and
@@ -115,7 +114,7 @@ module Omnibus
     #     {Omnibus::Project#install_path}
     #
     #   @return [String]
-    install_dir "/opt/chef"
+    install_dir '/opt/chef'
 
     # @!endgroup
 
@@ -231,12 +230,11 @@ module Omnibus
     def self.valid_s3_config?
       if use_s3_caching
         unless s3_bucket
-          raise InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
+          fail InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
         end
       end
     end
 
     # @!endgroup
-
   end # Config
 end # Omnibus

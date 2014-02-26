@@ -8,7 +8,7 @@ if Vagrant::VERSION < '1.2.1'
 end
 
 host_project_path = File.expand_path('..', __FILE__)
-guest_project_path = "/home/vagrant/#{File.basename(host_project_path)}"
+guest_project_path = "/home/vagrant/#{File.basename(host_project_path) }"
 project_name = '<%= config[:name] %>'
 
 Vagrant.configure('2') do |config|
@@ -47,7 +47,7 @@ Vagrant.configure('2') do |config|
   config.ssh.forward_agent = true
 
   host_project_path = File.expand_path('..', __FILE__)
-  guest_project_path = "/home/vagrant/#{File.basename(host_project_path)}"
+  guest_project_path = "/home/vagrant/#{File.basename(host_project_path) }"
 
   config.vm.synced_folder host_project_path, guest_project_path
 

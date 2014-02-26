@@ -41,15 +41,15 @@ module Omnibus
       STDOUT.sync = true
 
       opts = if command_fragments.last.kind_of?(Hash)
-        command_fragments.pop
-      else
-        {}
-      end
+               command_fragments.pop
+             else
+               {}
+             end
 
       default_options = {
-        :live_stream => STDOUT,
-        :timeout => 7200, # 2 hours
-        :environment => {}
+        live_stream: STDOUT,
+        timeout: 7200, # 2 hours
+        environment: {},
       }
       cmd = Mixlib::ShellOut.new(*command_fragments, default_options.merge(opts))
       cmd.run_command

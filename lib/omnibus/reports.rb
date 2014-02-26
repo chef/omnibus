@@ -16,10 +16,8 @@
 #
 
 module Omnibus
-
   module Reports
     extend self
-
 
     PADDING = 3
 
@@ -28,7 +26,7 @@ module Omnibus
     # will be stored in the column, the width is 0 (i.e., nothing
     # should be printed, not even the column header)
     def column_width(items, column_name)
-      widest_item = items.max{|a,b| a.size <=> b.size}
+      widest_item = items.max { |a, b| a.size <=> b.size }
       if widest_item
         widest = (widest_item.size >= column_name.size) ? widest_item : column_name
         widest.size + PADDING
@@ -38,13 +36,12 @@ module Omnibus
     end
 
     def non_nil_values(hashes, selector_key)
-      hashes.map{|v| v[selector_key]}.compact
+      hashes.map { |v| v[selector_key] }.compact
     end
 
     def pretty_version_map(project)
-      out = ""
+      out = ''
       version_map = project.library.version_map
-
 
       # Pull out data to print out
       versions = non_nil_values(version_map.values, :version)
@@ -53,25 +50,23 @@ module Omnibus
       # We only want the versions that have truly been overridden;
       # because we want to output a column only if something was
       # overridden, but nothing if no packages were changed
-      overridden_versions = non_nil_values(version_map.values.select{|v| v[:overridden]},
-                                           :default_version)
-
+      overridden_versions = non_nil_values(version_map.values.select { |v| v[:overridden] }, :default_version)
 
       # Determine how wide the printed table columns need to be
-      name_width = column_width(version_map.keys, "Component")
-      version_width = column_width(versions, "Installed Version")
-      guid_width = column_width(guids, "Version GUID")
-      override_width = column_width(overridden_versions, "Overridden From")
+      name_width = column_width(version_map.keys, 'Component')
+      version_width = column_width(versions, 'Installed Version')
+      guid_width = column_width(guids, 'Version GUID')
+      override_width = column_width(overridden_versions, 'Overridden From')
 
       total_width = name_width + version_width + guid_width + override_width
-      divider = "-" * total_width
+      divider = '-' * total_width
 
       # Print out the column headers
-      out << "Component".ljust(name_width)
-      out << "Installed Version".ljust(version_width)
-      out << "Version GUID".ljust(guid_width)
+      out << 'Component'.ljust(name_width)
+      out << 'Installed Version'.ljust(version_width)
+      out << 'Version GUID'.ljust(guid_width)
       # Only print out column if something was overridden
-      out << "Overridden From".ljust(override_width) if override_width > 0
+      out << 'Overridden From'.ljust(override_width) if override_width > 0
       out << "\n"
       out << divider << "\n"
 
@@ -92,8 +87,5 @@ module Omnibus
       end
       out
     end
-
   end
-
-
 end

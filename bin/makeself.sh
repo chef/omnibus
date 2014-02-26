@@ -22,13 +22,13 @@
 #         support for non-temporary archives. Ideas thanks to Francois Petitjean
 # - 1.3 : More patches from Bjarni R. Einarsson and Francois Petitjean:
 #         Support for no compression (--nocomp), script is no longer mandatory,
-#         automatic launch in an xterm, optional verbose output, and -target 
+#         automatic launch in an xterm, optional verbose output, and -target
 #         archive option to indicate where to extract the files.
 # - 1.4 : Improved UNIX compatibility (Francois Petitjean)
 #         Automatic integrity checking, support of LSM files (Francois Petitjean)
 # - 1.5 : Many bugfixes. Optionally disable xterm spawning.
 # - 1.5.1 : More bugfixes, added archive options -list and -check.
-# - 1.5.2 : Cosmetic changes to inform the user of what's going on with big 
+# - 1.5.2 : Cosmetic changes to inform the user of what's going on with big
 #           archives (Quake III demo)
 # - 1.5.3 : Check for validity of the DISPLAY variable before launching an xterm.
 #           More verbosity in xterms and check for embedded command's return value.
@@ -75,7 +75,7 @@ MS_VERSION=2.1.5
 MS_COMMAND="$0"
 unset CDPATH
 
-for f in "${1+"$@"}"; do
+for f in "${1+"$@" }"; do
     MS_COMMAND="$MS_COMMAND \\\\
     \\\"$f\\\""
 done
@@ -355,7 +355,7 @@ if test "$NOMD5" = y; then
 else
 	# Try to locate a MD5 binary
 	OLD_PATH=$PATH
-	PATH=${GUESS_MD5_PATH:-"$OLD_PATH:/bin:/usr/bin:/sbin:/usr/local/ssl/bin:/usr/local/bin:/opt/openssl/bin"}
+	PATH=${GUESS_MD5_PATH:-"$OLD_PATH:/bin:/usr/bin:/sbin:/usr/local/ssl/bin:/usr/local/bin:/opt/openssl/bin" }
 	MD5_ARG=""
 	MD5_PATH=`exec <&- 2>&-; which md5sum || type md5sum`
 	test -x "$MD5_PATH" || MD5_PATH=`exec <&- 2>&-; which md5 || type md5`

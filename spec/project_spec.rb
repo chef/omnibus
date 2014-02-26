@@ -69,70 +69,70 @@ describe Omnibus::Project do
     end
 
     context 'when on RHEL' do
-      let(:fauxhai_options) { {:platform => 'redhat', :version => '6.4'} }
+      let(:fauxhai_options) { { platform: 'redhat', version: '6.4' } }
       it 'should return a RHEL iteration' do
         project.iteration.should eq('1.el6')
       end
     end
 
     context 'when on Debian' do
-      let(:fauxhai_options) { {:platform => 'debian', :version => '7.2'} }
+      let(:fauxhai_options) { { platform: 'debian', version: '7.2' } }
       it 'should return a Debian iteration' do
         project.iteration.should eq('1')
       end
     end
 
     context 'when on FreeBSD' do
-      let(:fauxhai_options) { {:platform => 'freebsd', :version => '9.1'} }
+      let(:fauxhai_options) { { platform: 'freebsd', version: '9.1' } }
       it 'should return a FreeBSD iteration' do
         project.iteration.should eq('1.freebsd.9.amd64')
       end
     end
 
     context 'when on Windows' do
-      let(:fauxhai_options) { {:platform => 'windows', :version => '2008R2'} }
+      let(:fauxhai_options) { { platform: 'windows', version: '2008R2' } }
       it 'should return a Windows iteration' do
         project.iteration.should eq('1.windows')
       end
     end
 
     context 'when on OS X' do
-      let(:fauxhai_options) { {:platform => 'mac_os_x', :version => '10.8.2'} }
+      let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
       it 'should return a generic iteration' do
         project.iteration.should eq('1.mac_os_x.10.8.2')
       end
     end
   end
 
-  describe "#overrides" do
+  describe '#overrides' do
     let(:project) { Omnibus::Project.load(project_path('chefdk')) }
 
     it 'should set an override for the zlib version' do
-      expect(project.overrides[:zlib][:version]).to eq("1.2.8")
+      expect(project.overrides[:zlib][:version]).to eq('1.2.8')
     end
 
     it 'should access the zlib version through the #override method as well' do
-      expect(project.override(:zlib)[:version]).to eq("1.2.8")
+      expect(project.override(:zlib)[:version]).to eq('1.2.8')
     end
 
     it 'should set all the things through #overrides' do
-      project.overrides(:thing => {:version => "6.6.6" })
+      project.overrides(thing: { version: '6.6.6' })
       expect(project.override(:zlib)).to be_nil
     end
 
     it 'should retrieve the things set through #overrides' do
-      project.overrides(:thing => {:version => "6.6.6" })
-      expect(project.override(:thing)[:version]).to eq("6.6.6")
+      project.overrides(thing: { version: '6.6.6' })
+      expect(project.override(:thing)[:version]).to eq('6.6.6')
     end
 
     it 'should not set other things through setting a single #override' do
-      project.override(:thing, :version => "6.6.6" )
-      expect(project.override(:zlib)[:version]).to eq("1.2.8")
+      project.override(:thing, version: '6.6.6')
+      expect(project.override(:zlib)[:version]).to eq('1.2.8')
     end
 
     it 'should retrieve the things set through #overrides' do
-      project.override(:thing, :version => "6.6.6" )
-      expect(project.override(:thing)[:version]).to eq("6.6.6")
+      project.override(:thing, version: '6.6.6')
+      expect(project.override(:thing)[:version]).to eq('6.6.6')
     end
   end
 end

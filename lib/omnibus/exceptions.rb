@@ -1,5 +1,4 @@
 module Omnibus
-
   class InvalidS3Configuration < RuntimeError
     def initialize(s3_bucket, s3_access_key, s3_secret_key)
       @s3_bucket, @s3_access_key, @s3_secret_key = s3_bucket, s3_access_key, s3_secret_key
@@ -142,7 +141,7 @@ module Omnibus
       Attempting to apply the patch #{@patch_name}, but it was not
       found at any of the following locations:
 
-      #{@search_paths.join("\n      ")}
+      #{@search_paths.join("\n      ") }
       """
     end
   end
@@ -157,7 +156,7 @@ module Omnibus
       Attempting to evaluate the template #{@template_name}, but it was not
       found at any of the following locations:
 
-      #{@search_paths.join("\n      ")}
+      #{@search_paths.join("\n      ") }
       """
     end
   end
@@ -172,7 +171,7 @@ module Omnibus
       Attempting to load the project dependency '#{@dep_name}', but it was
       not found at any of the following locations:
 
-      #{@search_paths.join("\n      ")}
+      #{@search_paths.join("\n      ") }
       """
     end
   end
@@ -186,7 +185,7 @@ module Omnibus
       <<-E
       Your omnibus repo is missing the following files required to build Mac
       packages:
-      #{@missing_file_paths.map {|p| "* #{p}"}.join("\n      ")}
+      #{@missing_file_paths.map { |p| "* #{p}" }.join("\n      ") }
 E
     end
   end

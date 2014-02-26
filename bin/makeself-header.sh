@@ -65,7 +65,7 @@ Makeself version $MS_VERSION
   \$0 --lsm    Print embedded lsm entry (or no LSM)
   \$0 --list   Print the list of files in the archive
   \$0 --check  Checks integrity of the archive
- 
+
  2) Running \$0 :
   \$0 [options] [--] [additional arguments to embedded script]
   with following options (in that order)
@@ -84,7 +84,7 @@ EOH
 MS_Check()
 {
     OLD_PATH="\$PATH"
-    PATH=\${GUESS_MD5_PATH:-"\$OLD_PATH:/bin:/usr/bin:/sbin:/usr/local/ssl/bin:/usr/local/bin:/opt/openssl/bin"}
+    PATH=\${GUESS_MD5_PATH:-"\$OLD_PATH:/bin:/usr/bin:/sbin:/usr/local/ssl/bin:/usr/local/bin:/opt/openssl/bin" }
 	MD5_ARG=""
     MD5_PATH=\`exec <&- 2>&-; which md5sum || type md5sum\`
     test -x "\$MD5_PATH" || MD5_PATH=\`exec <&- 2>&-; which md5 || type md5\`

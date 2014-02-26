@@ -2,8 +2,7 @@ require 'pp'
 
 module Omnibus
   module Overrides
-
-    DEFAULT_OVERRIDE_FILE_NAME = "omnibus.overrides"
+    DEFAULT_OVERRIDE_FILE_NAME = 'omnibus.overrides'
 
     # Parses a file of override information into a Hash.
     #
@@ -18,17 +17,17 @@ module Omnibus
     # @return [Hash, nil]
     def self.parse_file(file)
       if file
-        File.readlines(file).inject({}) do |acc, line|
+        File.readlines(file).reduce({}) do |acc, line|
           info = line.split
 
           unless info.count == 2
-            raise ArgumentError, "Invalid overrides line: '#{line.chomp}'"
+            fail ArgumentError, "Invalid overrides line: '#{line.chomp}'"
           end
 
           package, version = info
 
           if acc[package]
-            raise ArgumentError, "Multiple overrides present for '#{package}' in overrides file #{file}!"
+            fail ArgumentError, "Multiple overrides present for '#{package}' in overrides file #{file}!"
           end
 
           acc[package] = version
@@ -56,14 +55,13 @@ module Omnibus
       overrides = parse_file(file)
 
       if overrides
-        puts "********************************************************************************"
+        puts '********************************************************************************'
         puts "Using Overrides from #{Omnibus::Overrides.resolve_override_file}"
         pp overrides
-        puts "********************************************************************************"
+        puts '********************************************************************************'
       end
 
       overrides || {}
     end
-
   end
 end

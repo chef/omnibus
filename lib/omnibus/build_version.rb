@@ -19,7 +19,6 @@ require 'time'
 require 'omnibus/util'
 
 module Omnibus
-
   # Provides methods for generating Omnibus project build version
   # strings automatically from Git repository information.
   #
@@ -37,18 +36,18 @@ module Omnibus
     #
     # @see Omnibus::BuildVersion#semver
     # @see Time#strftime
-    TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
+    TIMESTAMP_FORMAT = '%Y%m%d%H%M%S'
 
     # @deprecated Use {#semver} or {#git_describe} instead
     def self.full
-      puts "#{self.name}.full is deprecated. Use #{self.name}.new.semver or #{self.name}.new.git_describe."
+      puts "#{name}.full is deprecated. Use #{name}.new.semver or #{name}.new.git_describe."
       Omnibus::BuildVersion.new.git_describe
     end
 
     # Create a new BuildVersion
     #
     # @param [String] path      Path from which to read git version information
-    def initialize(path=Omnibus.root)
+    def initialize(path = Omnibus.root)
       @path = path
     end
 
@@ -87,8 +86,8 @@ module Omnibus
       if prerelease_version?
         # ensure all dashes are dots per precedence rules (#12) in Semver
         # 2.0.0-rc.1
-        prerelease = prerelease_tag.gsub("-", ".")
-        build_tag << "-" << prerelease
+        prerelease = prerelease_tag.gsub('-', '.')
+        build_tag << '-' << prerelease
       end
 
       # BUILD VERSION
@@ -107,11 +106,11 @@ module Omnibus
       #
       # format: git.COMMITS_SINCE_TAG.GIT_SHA example: git.207.694b062
       unless commits_since_tag == 0
-        build_version_items << ["git", commits_since_tag, git_sha_tag].join(".")
+        build_version_items << ['git', commits_since_tag, git_sha_tag].join('.')
       end
 
       unless build_version_items.empty?
-        build_tag << "+" << build_version_items.join(".")
+        build_tag << '+' << build_version_items.join('.')
       end
 
       build_tag
@@ -130,17 +129,15 @@ module Omnibus
     # @return [String]
     def git_describe
       @git_describe ||= begin
-                          git_cmd = "git describe"
-                          cmd = shellout(git_cmd,
-                                         :live_stream => nil,
-                                         :cwd => @path)
+                          git_cmd = 'git describe'
+                          cmd = shellout(git_cmd, live_stream: nil, cwd: @path)
                           if cmd.exitstatus == 0
                             cmd.stdout.chomp
                           else
-                            msg =  "Could not extract version information from `git describe`. "
-                            msg << "Setting version to 0.0.0"
+                            msg =  'Could not extract version information from `git describe`. '
+                            msg << 'Setting version to 0.0.0'
                             puts msg
-                            "0.0.0"
+                            '0.0.0'
                           end
                         end
     end
@@ -161,7 +158,7 @@ module Omnibus
     #
     # @return [String]
     def version_tag
-      version_composition.join(".")
+      version_composition.join('.')
     end
 
     # Return a prerelease tag string (if it exists), as extracted from {#git_describe}.
@@ -245,11 +242,11 @@ module Omnibus
       @build_start_time ||= begin
                               if !ENV['BUILD_ID'].nil?
                                 begin
-                                  Time.strptime(ENV['BUILD_ID'], "%Y-%m-%d_%H-%M-%S")
+                                  Time.strptime(ENV['BUILD_ID'], '%Y-%m-%d_%H-%M-%S')
                                 rescue ArgumentError
-                                  error_message =  "BUILD_ID environment variable "
-                                  error_message << "should be in YYYY-MM-DD_hh-mm-ss "
-                                  error_message << "format."
+                                  error_message =  'BUILD_ID environment variable '
+                                  error_message << 'should be in YYYY-MM-DD_hh-mm-ss '
+                                  error_message << 'format.'
                                   raise ArgumentError, error_message
                                 end
                               else

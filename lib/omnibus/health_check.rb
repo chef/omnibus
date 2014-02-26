@@ -17,38 +17,37 @@
 
 module Omnibus
   class HealthCheck
-
     WHITELIST_LIBS = [
-                      /ld-linux/,
-                      /libc\.so/,
-                      /libcrypt\.so/,
-                      /libdl/,
-                      /libfreebl\d\.so/,
-                      /libgcc_s\.so/,
-                      /libm\.so/,
-                      /libnsl\.so/,
-                      /libpthread/,
-                      /libresolv\.so/,
-                      /librt\.so/,
-                      /libstdc\+\+\.so/,
-                      /libutil\.so/,
-                      /linux-vdso.+/,
-                      /linux-gate\.so/
-                     ]
+      /ld-linux/,
+      /libc\.so/,
+      /libcrypt\.so/,
+      /libdl/,
+      /libfreebl\d\.so/,
+      /libgcc_s\.so/,
+      /libm\.so/,
+      /libnsl\.so/,
+      /libpthread/,
+      /libresolv\.so/,
+      /librt\.so/,
+      /libstdc\+\+\.so/,
+      /libutil\.so/,
+      /linux-vdso.+/,
+      /linux-gate\.so/,
+    ]
 
     ARCH_WHITELIST_LIBS = [
-                           /libc\.so/,
-                           /libcrypt\.so/,
-                           /libdb-5\.3\.so/,
-                           /libdl\.so/,
-                           /libffi\.so/,
-                           /libgdbm\.so/,
-                           /libm\.so/,
-                           /libnsl\.so/,
-                           /libpthread\.so/,
-                           /librt\.so/,
-                           /libutil\.so/
-                          ]
+      /libc\.so/,
+      /libcrypt\.so/,
+      /libdb-5\.3\.so/,
+      /libdl\.so/,
+      /libffi\.so/,
+      /libgdbm\.so/,
+      /libm\.so/,
+      /libnsl\.so/,
+      /libpthread\.so/,
+      /librt\.so/,
+      /libutil\.so/,
+    ]
 
     AIX_WHITELIST_LIBS = [
       /libpthread\.a/,
@@ -61,78 +60,78 @@ module Omnibus
     ]
 
     SOLARIS_WHITELIST_LIBS = [
-                              /libaio\.so/,
-                              /libavl\.so/,
-                              /libcrypt_[di]\.so/,
-                              /libcrypto.so/,
-                              /libcurses\.so/,
-                              /libdoor\.so/,
-                              /libgen\.so/,
-                              /libmd5\.so/,
-                              /libmd\.so/,
-                              /libmp\.so/,
-                              /libscf\.so/,
-                              /libsec\.so/,
-                              /libsocket\.so/,
-                              /libssl.so/,
-                              /libthread.so/,
-                              /libuutil\.so/,
-                              /libz.so/,
-                              # solaris 11 libraries:
-                              /libc\.so\.1/,
-                              /libm\.so\.2/,
-                              /libdl\.so\.1/,
-                              /libnsl\.so\.1/,
-                              /libpthread\.so\.1/,
-                              /librt\.so\.1/,
-                              /libcrypt\.so\.1/,
-                              /libgdbm\.so\.3/,
-                              # solaris 9 libraries:
-                              /libm\.so\.1/,
-                              /libc_psr\.so\.1/,
-                              /s9_preload\.so\.1/
-                             ]
+      /libaio\.so/,
+      /libavl\.so/,
+      /libcrypt_[di]\.so/,
+      /libcrypto.so/,
+      /libcurses\.so/,
+      /libdoor\.so/,
+      /libgen\.so/,
+      /libmd5\.so/,
+      /libmd\.so/,
+      /libmp\.so/,
+      /libscf\.so/,
+      /libsec\.so/,
+      /libsocket\.so/,
+      /libssl.so/,
+      /libthread.so/,
+      /libuutil\.so/,
+      /libz.so/,
+      # solaris 11 libraries:
+      /libc\.so\.1/,
+      /libm\.so\.2/,
+      /libdl\.so\.1/,
+      /libnsl\.so\.1/,
+      /libpthread\.so\.1/,
+      /librt\.so\.1/,
+      /libcrypt\.so\.1/,
+      /libgdbm\.so\.3/,
+      # solaris 9 libraries:
+      /libm\.so\.1/,
+      /libc_psr\.so\.1/,
+      /s9_preload\.so\.1/,
+    ]
 
     SMARTOS_WHITELIST_LIBS = [
-                              /libm.so/,
-                              /libpthread.so/,
-                              /librt.so/,
-                              /libsocket.so/,
-                              /libdl.so/,
-                              /libnsl.so/,
-                              /libgen.so/,
-                              /libmp.so/,
-                              /libmd.so/,
-                              /libc.so/,
-                              /libgcc_s.so/,
-                              /libstdc\+\+\.so/,
-                              /libcrypt.so/
-                             ]
+      /libm.so/,
+      /libpthread.so/,
+      /librt.so/,
+      /libsocket.so/,
+      /libdl.so/,
+      /libnsl.so/,
+      /libgen.so/,
+      /libmp.so/,
+      /libmd.so/,
+      /libc.so/,
+      /libgcc_s.so/,
+      /libstdc\+\+\.so/,
+      /libcrypt.so/,
+    ]
 
     MAC_WHITELIST_LIBS = [
-                          /libobjc\.A\.dylib/,
-                          /libSystem\.B\.dylib/,
-                          /CoreFoundation/,
-                          /Tcl$/,
-                          /Cocoa$/,
-                          /Carbon$/,
-                          /IOKit$/,
-                          /Tk$/,
-                          /libutil\.dylib/,
-                          /libffi\.dylib/,
-                          /libncurses\.5\.4\.dylib/,
-                          /libiconv/,
-                          /libstdc\+\+\.6\.dylib/
-                         ]
+      /libobjc\.A\.dylib/,
+      /libSystem\.B\.dylib/,
+      /CoreFoundation/,
+      /Tcl$/,
+      /Cocoa$/,
+      /Carbon$/,
+      /IOKit$/,
+      /Tk$/,
+      /libutil\.dylib/,
+      /libffi\.dylib/,
+      /libncurses\.5\.4\.dylib/,
+      /libiconv/,
+      /libstdc\+\+\.6\.dylib/,
+    ]
 
     FREEBSD_WHITELIST_LIBS = [
-                               /libc\.so/,
-                               /libcrypt\.so/,
-                               /libm\.so/,
-                               /librt\.so/,
-                               /libthr\.so/,
-                               /libutil\.so/
-                              ]
+      /libc\.so/,
+      /libcrypt\.so/,
+      /libm\.so/,
+      /librt\.so/,
+      /libthr\.so/,
+      /libutil\.so/,
+    ]
 
     def self.log(msg)
       puts "[health_check] #{msg}"
@@ -140,9 +139,9 @@ module Omnibus
 
     def self.run(install_dir, whitelist_files = [])
       case OHAI.platform
-      when "mac_os_x"
+      when 'mac_os_x'
         bad_libs = health_check_otool(install_dir, whitelist_files)
-      when "aix"
+      when 'aix'
         bad_libs = health_check_aix(install_dir, whitelist_files)
       else
         bad_libs = health_check_ldd(install_dir, whitelist_files)
@@ -165,38 +164,38 @@ module Omnibus
             end
           end
         end
-        log "*** Health Check Failed, Summary follows:"
-        bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? "embedded/lib" }
-        log "*** The following Omnibus-built libraries have unsafe or unmet dependencies:"
+        log '*** Health Check Failed, Summary follows:'
+        bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
+        log '*** The following Omnibus-built libraries have unsafe or unmet dependencies:'
         bad_omnibus_libs.each { |lib| log "    --> #{lib}" }
-        log "*** The following Omnibus-built binaries have unsafe or unmet dependencies:"
+        log '*** The following Omnibus-built binaries have unsafe or unmet dependencies:'
         bad_omnibus_bins.each { |bin| log "    --> #{bin}" }
         if unresolved.length > 0
-          log "*** The following requirements could not be resolved:"
-          unresolved.each { |lib| log "    --> #{lib}"}
+          log '*** The following requirements could not be resolved:'
+          unresolved.each { |lib| log "    --> #{lib}" }
         end
         if unreliable.length > 0
-          log "*** The following libraries cannot be guaranteed to be on target systems:"
-          unreliable.each { |lib| log "    --> #{lib}"}
+          log '*** The following libraries cannot be guaranteed to be on target systems:'
+          unreliable.each { |lib| log "    --> #{lib}" }
         end
-        log "*** The precise failures were:"
+        log '*** The precise failures were:'
         detail.each do |line|
           item, dependency, location, count = line.split('|')
-          reason = location =~ /not found/ ? "Unresolved dependency" : "Unsafe dependency"
+          reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
           log "    --> #{item}"
           log "    DEPENDS ON: #{dependency}"
           log "      COUNT: #{count}"
           log "      PROVIDED BY: #{location}"
           log "      FAILED BECAUSE: #{reason}"
         end
-        raise "Health Check Failed"
+        fail 'Health Check Failed'
       end
     end
 
     def self.health_check_otool(install_dir, whitelist_files)
       otool_cmd = "find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L > otool.out 2>/dev/null"
       log "Executing `#{otool_cmd}`"
-      shell = Mixlib::ShellOut.new(otool_cmd, :timeout => 3600)
+      shell = Mixlib::ShellOut.new(otool_cmd, timeout: 3600)
       shell.run_command
 
       otool_output = File.read('otool.out')
@@ -207,9 +206,9 @@ module Omnibus
       otool_output.each_line do |line|
         case line
         when /^(.+):$/
-          current_library = $1
+          current_library = Regexp.last_match[1]
         when /^\s+(.+) \(.+\)$/
-          linked = $1
+          linked = Regexp.last_match[1]
           name = File.basename(linked)
           bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
         end
@@ -246,20 +245,20 @@ module Omnibus
         safe ||= true if reg.match(current_library)
       end
 
-      log "  --> Dependency: #{name}" if ARGV[0] == "verbose"
-      log "  --> Provided by: #{linked}" if ARGV[0] == "verbose"
+      log "  --> Dependency: #{name}" if ARGV[0] == 'verbose'
+      log "  --> Provided by: #{linked}" if ARGV[0] == 'verbose'
 
       if !safe && linked !~ Regexp.new(install_dir)
-        log "    -> FAILED: #{current_library} has unsafe dependencies" if ARGV[0] == "verbose"
+        log "    -> FAILED: #{current_library} has unsafe dependencies" if ARGV[0] == 'verbose'
         bad_libs[current_library] ||= {}
         bad_libs[current_library][name] ||= {}
-        if bad_libs[current_library][name].has_key?(linked)
+        if bad_libs[current_library][name].key?(linked)
           bad_libs[current_library][name][linked] += 1
         else
           bad_libs[current_library][name][linked] = 1
         end
       else
-        log "    -> PASSED: #{name} is either whitelisted or safely provided." if ARGV[0] == "verbose"
+        log "    -> PASSED: #{name} is either whitelisted or safely provided." if ARGV[0] == 'verbose'
       end
 
       bad_libs
@@ -275,7 +274,7 @@ module Omnibus
       ldd_cmd = "find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd > ldd.out 2>/dev/null"
 
       log "Executing `#{ldd_cmd}`"
-      shell = Mixlib::ShellOut.new(ldd_cmd, :timeout => 3600)
+      shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
       shell.run_command
 
       ldd_output = File.read('ldd.out')
@@ -286,11 +285,11 @@ module Omnibus
       ldd_output.each_line do |line|
         case line
         when /^(.+) needs:$/
-          current_library = $1
-	  log "*** Analysing dependencies for #{current_library}" if ARGV[0] == "verbose"
+          current_library = Regexp.last_match[1]
+          log "*** Analysing dependencies for #{current_library}" if ARGV[0] == 'verbose'
         when /^\s+(.+)$/
-          name = $1
-          linked = $1
+          name = Regexp.last_match[1]
+          linked = Regexp.last_match[1]
           bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
         when /File is not an executable XCOFF file/ # ignore non-executable files
         else
@@ -312,7 +311,7 @@ module Omnibus
       ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
 
       log "Executing `#{ldd_cmd}`"
-      shell = Mixlib::ShellOut.new(ldd_cmd, :timeout => 3600)
+      shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
       shell.run_command
 
       ldd_output = File.read('ldd.out')
@@ -323,11 +322,11 @@ module Omnibus
       ldd_output.each_line do |line|
         case line
         when /^(.+):$/
-          current_library = $1
-	  log "*** Analysing dependencies for #{current_library}" if ARGV[0] == "verbose"
+          current_library = Regexp.last_match[1]
+          log "*** Analysing dependencies for #{current_library}" if ARGV[0] == 'verbose'
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
-          name = $1
-          linked = $2
+          name = Regexp.last_match[1]
+          linked = Regexp.last_match[2]
           bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
         when /^\s+(.+) \(.+\)$/
           next
