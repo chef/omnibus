@@ -52,8 +52,8 @@ describe Omnibus::Software do
         expect(software.version).to eq(expected_version)
       end
 
-      it "should have the right given_version" do
-        expect(software.given_version).to eq(default_version)
+      it "should have the right default_version" do
+        expect(software.default_version).to eq(default_version)
       end
 
       it "should have nil for an override_version" do

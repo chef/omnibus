@@ -33,9 +33,9 @@ module Omnibus
 
     def version_map
       @components.inject({}) {|map, component|
-        map[component.name] = if component.given_version
+        map[component.name] = if component.default_version
                                 {:version       => component.version,
-                                 :given_version => component.given_version,
+                                 :default_version => component.default_version,
                                  :overridden    => component.overridden?,
                                  :version_guid  => component.version_guid}
                               else

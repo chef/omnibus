@@ -54,7 +54,7 @@ module Omnibus
       # because we want to output a column only if something was
       # overridden, but nothing if no packages were changed
       overridden_versions = non_nil_values(version_map.values.select{|v| v[:overridden]},
-                                           :given_version)
+                                           :default_version)
 
 
       # Determine how wide the printed table columns need to be
