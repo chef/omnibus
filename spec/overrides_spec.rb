@@ -90,10 +90,10 @@ describe Omnibus::Overrides do
         it "should still return 'nil', because environment variable has priority" do
           stub_const('Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME', new_default_file)
 
-          File.exist?(Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME).should be_true
-          ENV['OMNIBUS_OVERRIDE_FILE'].should_not be_nil
+          expect(File.exist?(Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME)).to be_true
+          expect(ENV['OMNIBUS_OVERRIDE_FILE']).to_not be_nil
 
-          subject.should be_nil
+          expect(subject).to be_nil
         end
       end
     end
@@ -106,7 +106,7 @@ describe Omnibus::Overrides do
       end
 
       it 'returns an empty hash' do
-        Omnibus::Overrides.overrides.should eq({})
+        expect(Omnibus::Overrides.overrides).to eq({})
       end
     end
   end

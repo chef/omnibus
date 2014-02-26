@@ -76,7 +76,7 @@ describe Omnibus::NetFetcher do
     end
 
     it 'should return nil when no proxy is set in env' do
-      @net_fetcher.http_proxy.should be_nil
+      expect(@net_fetcher.http_proxy).to be_nil
     end
 
     it 'should return a URI object when HTTP_PROXY is set' do
@@ -101,19 +101,19 @@ describe Omnibus::NetFetcher do
     it "proxies if host doesn't match exclude list" do
       ENV['NO_PROXY'] = 'google.com,www.buz.org'
       a_url = URI.parse('http://should.proxy.com/123')
-      @net_fetcher.excluded_from_proxy?(a_url.host).should be_false
+      expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_false
 
       b_url = URI.parse('http://buz.org/123')
-      @net_fetcher.excluded_from_proxy?(b_url.host).should be_false
+      expect(@net_fetcher.excluded_from_proxy?(b_url.host)).to be_false
     end
 
     it 'does not proxy if host matches exclude list' do
       ENV['NO_PROXY'] = 'google.com,www.buz.org'
       a_url = URI.parse('http://google.com/hello')
-      @net_fetcher.excluded_from_proxy?(a_url.host).should be_true
+      expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_true
 
       b_url = URI.parse('http://www.buz.org/123')
-      @net_fetcher.excluded_from_proxy?(b_url.host).should be_true
+      expect(@net_fetcher.excluded_from_proxy?(b_url.host)).to be_true
     end
   end
 end

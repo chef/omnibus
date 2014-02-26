@@ -172,8 +172,8 @@ E
   end
 
   it 'clears and recreates the staging dir' do
-    FileUtils.should_receive(:rm_rf).with('/var/cache/omnibus/pkg-tmp/mac-pkg')
-    FileUtils.should_receive(:mkdir_p).with('/var/cache/omnibus/pkg-tmp/mac-pkg')
+    expect(FileUtils).to receive(:rm_rf).with('/var/cache/omnibus/pkg-tmp/mac-pkg')
+    expect(FileUtils).to receive(:mkdir_p).with('/var/cache/omnibus/pkg-tmp/mac-pkg')
     packager.setup_staging_dir!
   end
 
@@ -183,7 +183,7 @@ E
 
   it 'runs pkgbuild' do
     expected_args = pkgbuild_argv + [shellout_opts]
-    packager.should_receive(:shellout!).with(*expected_args)
+    expect(packager).to receive(:shellout!).with(*expected_args)
     packager.build_component_pkg
   end
 
@@ -204,22 +204,22 @@ E
     let(:distribution_file) { StringIO.new }
 
     before do
-      File.should_receive(:open)
+      expect(File).to receive(:open)
         .with(expected_distribution_path, File::RDWR | File::CREAT | File::EXCL, 0600)
         .and_yield(distribution_file)
     end
 
     it 'writes the distribution file to the staging directory' do
       packager.generate_distribution
-      distribution_file.string.should eq(expected_distribution_content)
+      expect(distribution_file.string).to eq(expected_distribution_content)
     end
 
     it 'generates the distribution and runs productbuild' do
       expected_shellout_args = productbuild_argv + [shellout_opts]
 
-      packager.should_receive(:shellout!).with(*expected_shellout_args)
+      expect(packager).to receive(:shellout!).with(*expected_shellout_args)
       packager.build_product_pkg
-      distribution_file.string.should eq(expected_distribution_content)
+      expect(distribution_file.string).to eq(expected_distribution_content)
     end
 
   end

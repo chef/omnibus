@@ -121,16 +121,16 @@ describe Omnibus::BuildVersion do
     let(:today_string) { Time.now.utc.strftime('%Y%m%d') }
 
     it 'generates a valid semver version' do
-      build_version.semver.should =~ valid_semver_regex
+      expect(build_version.semver).to match(valid_semver_regex)
     end
 
     it "generates a version matching format 'MAJOR.MINOR.PATCH-PRERELEASE+TIMESTAMP.git.COMMITS_SINCE.GIT_SHA'" do
-      build_version.semver.should =~ /11.0.0-alpha1\+#{today_string}[0-9]+.git.207.694b062/
+      expect(build_version.semver).to match(/11.0.0-alpha1\+#{today_string}[0-9]+.git.207.694b062/)
     end
 
     it "uses ENV['BUILD_ID'] to generate timestamp if set" do
       ENV['BUILD_ID'] = '2012-12-25_16-41-40'
-      build_version.semver.should == '11.0.0-alpha1+20121225164140.git.207.694b062'
+      expect(build_version.semver).to eq('11.0.0-alpha1+20121225164140.git.207.694b062')
     end
 
     it "fails on invalid ENV['BUILD_ID'] values" do
@@ -142,7 +142,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe) { '11.0.0-alpha-3-207-g694b062' }
 
       it 'converts all dashes to dots' do
-        build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+        expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
       end
     end
 
@@ -150,7 +150,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe) { '11.0.0-alpha2' }
 
       it 'appends a timestamp with no git info' do
-        build_version.semver.should =~ /11.0.0-alpha2\+#{today_string}[0-9]+/
+        expect(build_version.semver).to match(/11.0.0-alpha2\+#{today_string}[0-9]+/)
       end
     end
 
@@ -158,7 +158,7 @@ describe Omnibus::BuildVersion do
       let(:git_describe) { '11.0.0-alpha-3-207-g694b062' }
 
       it 'appends a timestamp by default' do
-        build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+        expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
       end
 
       describe "ENV['OMNIBUS_APPEND_TIMESTAMP'] is set" do
@@ -166,7 +166,7 @@ describe Omnibus::BuildVersion do
           context "to #{truthy}" do
             before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = truthy.to_s }
             it 'appends a timestamp' do
-              build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+              expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
             end
           end
         end
@@ -175,7 +175,7 @@ describe Omnibus::BuildVersion do
           context "to #{falsey}" do
             before { ENV['OMNIBUS_APPEND_TIMESTAMP'] = falsey.to_s }
             it 'does not append a timestamp' do
-              build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
+              expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
             end
           end
         end
@@ -185,14 +185,14 @@ describe Omnibus::BuildVersion do
         context 'is true' do
           before { Omnibus::Config.append_timestamp(true) }
           it 'appends a timestamp' do
-            build_version.semver.should =~ /11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/
+            expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
           end
         end
 
         context 'is false' do
           before { Omnibus::Config.append_timestamp(false) }
           it 'does not append a timestamp' do
-            build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
+            expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
           end
         end
       end
@@ -203,7 +203,7 @@ describe Omnibus::BuildVersion do
           Omnibus::Config.append_timestamp(true)
         end
         it "prefers the value from ENV['OMNIBUS_APPEND_TIMESTAMP']" do
-          build_version.semver.should =~ /11.0.0-alpha.3\+git.207.694b062/
+          expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
         end
       end
     end
@@ -211,21 +211,21 @@ describe Omnibus::BuildVersion do
 
   describe 'git describe output' do
     it 'generates a valid git describe version' do
-      build_version.git_describe.should =~ valid_git_describe_regex
+      expect(build_version.git_describe).to match(valid_git_describe_regex)
     end
 
     it "generates a version matching format 'MAJOR.MINOR.PATCH-PRELEASE.COMMITS_SINCE-gGIT_SHA'" do
-      build_version.git_describe.should == git_describe
+      expect(build_version.git_describe).to eq(git_describe)
     end
   end
 
   describe 'deprecated full output' do
     it 'generates a valid git describe version' do
-      Omnibus::BuildVersion.full.should =~ valid_git_describe_regex
+      expect(Omnibus::BuildVersion.full).to match(valid_git_describe_regex)
     end
 
     it 'outputs a deprecation message' do
-      Omnibus::BuildVersion.should_receive(:puts).with(/is deprecated/)
+      expect(Omnibus::BuildVersion).to receive(:puts).with(/is deprecated/)
       Omnibus::BuildVersion.full
     end
   end
@@ -240,7 +240,7 @@ Try --always, or create some tags.
         .and_return(double('ouput', stderr: stderr, exitstatus: 128))
     end
     it 'sets the version to 0.0.0' do
-      build_version.git_describe.should eq('0.0.0')
+      expect(build_version.git_describe).to eq('0.0.0')
     end
   end
 
@@ -249,7 +249,7 @@ Try --always, or create some tags.
     subject(:build_version) { Omnibus::BuildVersion.new(path) }
 
     it 'runs `git describe` at an alternate path' do
-      build_version.should_receive(:shellout)
+      expect(build_version).to receive(:shellout)
         .with('git describe', live_stream: nil, cwd: path)
         .and_return(double('ouput', stdout: git_describe, exitstatus: 0))
       build_version.git_describe

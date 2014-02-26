@@ -40,7 +40,7 @@ describe Omnibus::S3Cache do
     end
 
     it 'lists all software with urls' do
-      tarball_software.should == software_with_urls
+      expect(tarball_software).to eq(software_with_urls)
     end
   end
 end

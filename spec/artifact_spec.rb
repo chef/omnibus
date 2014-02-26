@@ -41,17 +41,17 @@ describe Omnibus::Artifact do
   end
 
   it 'generates a MD5 of an artifact' do
-    File.should_receive(:open).with(path).and_return(content)
+    expect(File).to receive(:open).with(path).and_return(content)
     expect(artifact.md5).to eq(md5)
   end
 
   it 'generates a SHA256 of an artifact' do
-    File.should_receive(:open).with(path).and_return(content)
+    expect(File).to receive(:open).with(path).and_return(content)
     expect(artifact.sha256).to eq(sha256)
   end
 
   it "generates 'flat' metadata" do
-    File.should_receive(:open).twice.with(path).and_return(content)
+    expect(File).to receive(:open).twice.with(path).and_return(content)
     flat_metadata = artifact.flat_metadata
     expect(flat_metadata['platform']).to eq('el')
     expect(flat_metadata['platform_version']).to eq('5')
@@ -77,7 +77,7 @@ describe Omnibus::Artifact do
   end
 
   it 'adds the package to a v2 release manifest' do
-    File.should_receive(:open).with(path).twice.and_return(content)
+    expect(File).to receive(:open).with(path).twice.and_return(content)
     expected = {
       'el' => {
         '5' => {

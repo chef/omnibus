@@ -22,23 +22,23 @@ describe Omnibus::GitFetcher do
 
   def expect_git_clone
     double('git_clone').tap do |g|
-      shell_out.should_receive(:new)
+      expect(shell_out).to receive(:new)
         .with('git clone git@example.com:test/project.git /tmp/project', live_stream: STDOUT)
         .ordered
         .and_return(g)
-      g.should_receive(:run_command).ordered
-      g.should_receive(:error!).ordered
+      expect(g).to receive(:run_command).ordered
+      expect(g).to receive(:error!).ordered
     end
   end
 
   def expect_git_ls_remote
     double('git_ls_remote').tap do |g|
-      shell_out.should_receive(:new)
+      expect(shell_out).to receive(:new)
         .with('git ls-remote origin 0.0.1*', live_stream: STDOUT, cwd: '/tmp/project')
         .ordered
         .and_return(g)
-      g.should_receive(:run_command).ordered
-      g.should_receive(:error!).ordered
+      expect(g).to receive(:run_command).ordered
+      expect(g).to receive(:error!).ordered
       g.stub(stdout: git_ls_remote_out)
     end
   end
@@ -62,12 +62,12 @@ describe Omnibus::GitFetcher do
           it 'should clone the Git repository and then check out the commit' do
             1.times { expect_git_clone_and_ls_remote }
             double('git_checkout').tap do |g|
-              shell_out.should_receive(:new)
+              expect(shell_out).to receive(:new)
                 .with('git checkout a2ed66c01f42514bcab77fd628149eccb4ecee28', live_stream: STDOUT, cwd: '/tmp/project')
                 .ordered
                 .and_return(g)
-              g.should_receive(:run_command).ordered
-              g.should_receive(:error!).ordered
+              expect(g).to receive(:run_command).ordered
+              expect(g).to receive(:error!).ordered
             end
 
             expect { subject.fetch }.to_not raise_error
@@ -85,10 +85,10 @@ describe Omnibus::GitFetcher do
               end
             end
 
-            Omnibus::Fetcher::ErrorReporter.any_instance
-              .should_receive(:explain).with(%q|Failed to find any commits for the ref '0.0.1'|)
-            subject.should_receive(:log).with(/git ls\-remote failed/).at_least(1).times
-            subject.should_receive(:log).with(/git clone\/fetch failed/).at_least(1).times
+            expect_any_instance_of(Omnibus::Fetcher::ErrorReporter).to receive(:explain)
+              .with(%q|Failed to find any commits for the ref '0.0.1'|)
+            expect(subject).to receive(:log).with(/git ls\-remote failed/).at_least(1).times
+            expect(subject).to receive(:log).with(/git clone\/fetch failed/).at_least(1).times
             # Prevent sleeping to run the spec fast
             subject.stub(:sleep)
             expect { subject.fetch }.to raise_error(/Could not parse SHA reference/)

@@ -22,14 +22,14 @@ describe Omnibus::Software do
 
   describe '#whitelist_file' do
     it 'appends to the whitelist_files array' do
-      expect(software.whitelist_files.size).to equal 0
+      expect(software.whitelist_files.size).to eq(0)
       software.whitelist_file(/foo\/bar/)
-      expect(software.whitelist_files.size).to equal 1
+      expect(software.whitelist_files.size).to eq(1)
     end
 
     it 'converts Strings to Regexp instances' do
       software.whitelist_file 'foo/bar'
-      expect(software.whitelist_files.size).to equal 1
+      expect(software.whitelist_files.size).to eq(1)
       expect(software.whitelist_files.first).to be_kind_of(Regexp)
     end
   end

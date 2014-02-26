@@ -37,11 +37,11 @@ describe Omnibus::PackageRelease do
   end
 
   it 'has a package path' do
-    package_release.package_path.should == pkg_path
+    expect(package_release.package_path).to eq(pkg_path)
   end
 
   it "defaults to `:private' access policy" do
-    package_release.access_policy.should == :private
+    expect(package_release.access_policy).to eq(:private)
   end
 
   describe 'validating configuration' do
@@ -52,33 +52,33 @@ describe Omnibus::PackageRelease do
 
     it 'validates that the s3 key is set' do
       config.delete(:release_s3_access_key)
-      expect { package_release.validate_config! }.should raise_error(Omnibus::InvalidS3ReleaseConfiguration)
+      expect { package_release.validate_config! }.to raise_error(Omnibus::InvalidS3ReleaseConfiguration)
     end
 
     it 'validates that the s3 secret key is set' do
       config.delete(:release_s3_secret_key)
-      expect { package_release.validate_config! }.should raise_error(Omnibus::InvalidS3ReleaseConfiguration)
+      expect { package_release.validate_config! }.to raise_error(Omnibus::InvalidS3ReleaseConfiguration)
     end
 
     it 'validates that the s3 bucket is set' do
       config.delete(:release_s3_bucket)
-      expect { package_release.validate_config! }.should raise_error(Omnibus::InvalidS3ReleaseConfiguration)
+      expect { package_release.validate_config! }.to raise_error(Omnibus::InvalidS3ReleaseConfiguration)
     end
 
     it 'does not error on a valid configuration' do
-      expect { package_release.validate_config! }.should_not raise_error
+      expect { package_release.validate_config! }.to_not raise_error
     end
   end
 
   describe 'validating package for upload' do
     it 'ensures that the package file exists' do
-      expect { package_release.validate_package! }.should raise_error(Omnibus::NoPackageFile)
+      expect { package_release.validate_package! }.to raise_error(Omnibus::NoPackageFile)
     end
 
     it 'ensures that there is a metadata file for the package' do
-      File.should_receive(:exist?).with(pkg_path).and_return(true)
-      File.should_receive(:exist?).with(pkg_metadata_path).and_return(false)
-      expect { package_release.validate_package! }.should raise_error(Omnibus::NoPackageMetadataFile)
+      expect(File).to receive(:exist?).with(pkg_path).and_return(true)
+      expect(File).to receive(:exist?).with(pkg_metadata_path).and_return(false)
+      expect { package_release.validate_package! }.to raise_error(Omnibus::NoPackageMetadataFile)
     end
   end
 
@@ -118,21 +118,21 @@ describe Omnibus::PackageRelease do
         bucket: s3_bucket,
         adaper: :net_http,
       }
-      UberS3.should_receive(:new).with(expected_s3_config)
+      expect(UberS3).to receive(:new).with(expected_s3_config)
       package_release.s3_client
     end
 
     it 'generates the relative path for the package s3 key' do
-      package_release.platform_path.should == platform_path
+      expect(package_release.platform_path).to eq(platform_path)
     end
 
     it 'uploads the package and metadata' do
-      package_release.s3_client.should_receive(:store).with(
+      expect(package_release.s3_client).to receive(:store).with(
         "#{platform_path}/#{basename}.metadata.json",
         metadata_json,
         access: :private,
       )
-      package_release.s3_client.should_receive(:store).with(
+      expect(package_release.s3_client).to receive(:store).with(
         "#{platform_path}/#{basename}",
         pkg_content,
         access: :private,
@@ -151,12 +151,12 @@ describe Omnibus::PackageRelease do
       end
 
       it 'fires the after_upload callback for each item uploaded' do
-        package_release.s3_client.should_receive(:store).with(
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}.metadata.json",
           metadata_json,
           access: :private,
         )
-        package_release.s3_client.should_receive(:store).with(
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}",
           pkg_content,
           access: :private,
@@ -164,7 +164,7 @@ describe Omnibus::PackageRelease do
         )
         package_release.release
 
-        upload_records.should == [
+        expect(upload_records).to eq [
           "#{platform_path}/#{basename}.metadata.json",
           "#{platform_path}/#{basename}",
         ]
@@ -178,12 +178,12 @@ describe Omnibus::PackageRelease do
       end
 
       it 'uploads the package and metadata' do
-        package_release.s3_client.should_receive(:store).with(
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}.metadata.json",
           metadata_json,
           access: :public_read,
         )
-        package_release.s3_client.should_receive(:store).with(
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}",
           pkg_content,
           access: :public_read,
