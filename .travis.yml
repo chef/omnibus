@@ -2,7 +2,8 @@ language: ruby
 rvm:
   - 1.9.2
   - 1.9.3
-script: rake spec
+
+bundler_args: --jobs 7 --without docs
 notifications:
   hipchat:
     rooms:
