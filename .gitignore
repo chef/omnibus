@@ -6,5 +6,7 @@ tmp
 Gemfile.lock
 .bundle/
 vendor/
+.rspec
 .yardoc
+.yardopts
 doc/
