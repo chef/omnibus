@@ -210,7 +210,8 @@ module Omnibus
 
     def build
       log "building #{name}"
-      log "version overridden from #{@software.default_version} to #{@software.version}" if @software.overridden?
+      log "version overridden from #{@software.default_version} to " \
+          "#{@software.version}" if @software.overridden?
       time_it("#{name} build") do
         @build_commands.each do |cmd|
           execute(cmd)
