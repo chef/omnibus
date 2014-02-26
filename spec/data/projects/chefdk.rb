@@ -37,5 +37,5 @@ override :zlib,      version: "1.2.8"
 
 dependency "preparation"
 dependency "chefdk"
-dependency "ohai" if ENV["OHAI_GIT_REV"]
+dependency "ohai"
 dependency "version-manifest"

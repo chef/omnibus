@@ -28,9 +28,6 @@ version "1.2.8" do
   source md5: "44d667c142d7cda120332623eab69f40"
 end
 
-# TODO: this link is subject to change with each new release of zlib.
-#       we'll need to use a more robust link (sourceforge) that will
-#       not change over time.
 source :url => "http://downloads.sourceforge.net/project/libpng/zlib/#{version}/zlib-#{version}.tar.gz"
 
 relative_path "zlib-#{version}"
