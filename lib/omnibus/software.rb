@@ -52,15 +52,7 @@ module Omnibus
 
     attr_reader :version
 
-    def given_version  # deprecated
-      @version
-    end
-
     attr_reader :overrides
-
-    def override_version  # deprecated
-      overrides[:version]
-    end
 
     attr_reader :whitelist_files
 
@@ -104,9 +96,25 @@ module Omnibus
       render_tasks
     end
 
+
+    # Retrieves the override_version
+    #
+    # @return [Hash]
+    #
+    # @todo: can't we just use #version here or are we testing this against nil? somewhere and
+    #        not using #overridden?
+    def override_version
+      $stderr.puts "The #override_version is DEPRECATED, please use #version or test with #overridden?"
+      overrides[:version]
+    end
+
+    # Retrieves the repo-level and project-level overrides for the software.
+    #
+    # @return [Hash]
     def overrides
       # deliberately not providing a setter since that feels like a shotgun pointed at a foot
       if @overrides == UNINITIALIZED
+        # lazily initialized because we need the 'name' to be parsed first
         @overrides = {}
         @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
         if @repo_overrides[name]
@@ -116,11 +124,19 @@ module Omnibus
       @overrides
     end
 
+    # Sets or retreives the name of the software
+    #
+    # @param val [String] name of the Software
+    # @return [String]
     def name(val=NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
       @name || raise(MissingSoftwareConfiguration.new(name, "name", "libxslt"))
     end
 
+    # Sets the description of the software
+    #
+    # @param val [String] description of the Software
+    # @return [void]
     def description(val)
       @description = val
     end
@@ -151,19 +167,6 @@ module Omnibus
       @dependencies
     end
 
-    def apply_overrides(attr)
-      # convert :foo into :@foo for instance_variable_get
-      instance_symbol = attr.to_s.sub(/^/, '@').to_sym
-      val = instance_variable_get(instance_symbol)
-      if val.is_a?(Hash) || overrides[attr].is_a?(Hash)
-        val ||= {}
-        override = overrides[attr] || {}
-        val.merge(override)
-      else
-        overrides[attr] || val
-      end
-    end
-
     # Set or retrieve the source for the software
     #
     # @param val [Hash<Symbol, String>] a single key/pair that defines
@@ -183,14 +186,35 @@ module Omnibus
       apply_overrides(:source)
     end
 
-    # Set or retrieve the default version of the software
-    def default_version(val=NULL_ARG)
-      @version = val unless val.equal?(NULL_ARG)
+    # Retieve the default_version of the software
+    #
+    # @return [String]
+    #
+    # @todo: remove this in favor of default_version
+    def given_version
+      $stderr.puts "Getting the default version via #given_version is DEPRECATED, please use 'default_version'"
+      default_version
     end
 
-    # Set a version from a software descriptor file, or receive the
-    # effective version, taking into account any override information
-    # (if set)
+    # Set or retieve the default_version of the software to build
+    #
+    # @param val [String]
+    # @return [String]
+    def default_version(val=NULL_ARG)
+      @version = val unless val.equal?(NULL_ARG)
+      @version
+    end
+
+    # Evaluate a block only if the version matches.
+    #
+    # Note that passing only a string without a block will set the default_version but this
+    # behavior is deprecated and will be removed, use the default_version method instead.
+    #
+    # @param val [String] version of the software.
+    # @param block [Proc] block to run if the version we are building matches the argument.
+    # @return [void]
+    #
+    # @todo remove deprecated setting of version
     def version(val=NULL_ARG)
       if block_given?
         if val.equal?(NULL_ARG)
@@ -202,7 +226,7 @@ module Omnibus
         end
       else
         unless val.equal?(NULL_ARG)
-          puts "Setting the version via 'version' is DEPRECATED, please use 'default_version'"
+          $stderr.puts "Setting the version via 'version' is DEPRECATED, please use 'default_version'"
           @version = val
         end
       end
@@ -223,7 +247,7 @@ module Omnibus
     #
     # @return [Boolean]
     def overridden?
-      # note: we hit the instance variables and bypass the accessors very deliberately
+      # note: using instance variables to bypass accessors that enforce overrides
       @overrides.has_key?(:version) && (@overrides[:version] != @version)
     end
 
@@ -410,6 +434,20 @@ module Omnibus
     end
 
     private
+
+    # Apply overrides in the @overrides hash that mask instance variables
+    # that are set by parsing the DSL
+    #
+    def apply_overrides(attr)
+      val = instance_variable_get(:"@#{attr}")
+      if val.is_a?(Hash) || overrides[attr].is_a?(Hash)
+        val ||= {}
+        override = overrides[attr] || {}
+        val.merge(override)
+      else
+        overrides[attr] || val
+      end
+    end
 
     # @todo What?!
     # @todo It seems that this is not used... remove it

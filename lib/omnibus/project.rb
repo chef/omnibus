@@ -1,5 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
 # Copyright:: Copyright (c) 2014 Noah Kantrowitz
 # License:: Apache License, Version 2.0
 #
@@ -125,7 +125,7 @@ module Omnibus
     #   must be set in order to build a project)
     def install_path(val=NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
-      @install_path || raise(MissingProjectConfiguration.new("install_path", "/opt/opscode"))
+      @install_path || raise(MissingProjectConfiguration.new("install_path", "/opt/chef"))
     end
 
     # Set or retrieve the the package maintainer.
@@ -138,7 +138,7 @@ module Omnibus
     #   be set in order to build a project)
     def maintainer(val=NULL_ARG)
       @maintainer = val unless val.equal?(NULL_ARG)
-      @maintainer || raise(MissingProjectConfiguration.new("maintainer", "Opscode, Inc."))
+      @maintainer || raise(MissingProjectConfiguration.new("maintainer", "Chef Software, Inc."))
     end
 
     # Set or retrive the package homepage.
@@ -151,7 +151,7 @@ module Omnibus
     #   set in order to build a project)
     def homepage(val=NULL_ARG)
       @homepage = val unless val.equal?(NULL_ARG)
-      @homepage || raise(MissingProjectConfiguration.new("homepage", "http://www.opscode.com"))
+      @homepage || raise(MissingProjectConfiguration.new("homepage", "http://www.getchef.com"))
     end
 
     # Defines the iteration for the package to be generated.  Adheres
