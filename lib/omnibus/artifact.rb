@@ -121,7 +121,7 @@ module Omnibus
     #     "/el/6/x86_64/chef-11.4.0-1.el5.x86_64.rpm"
     def relpath
       # upload build to build platform directory
-      "/#{build_platform.join('/') }/#{path.split('/').last}"
+      "/#{build_platform.join('/')}/#{path.split('/').last}"
     end
 
     # @return [String] hex encoded MD5 of the package
