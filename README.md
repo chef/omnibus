@@ -90,10 +90,10 @@ anything from the `omnibus-software` repository.)
 An example:
 
 ```ruby
-name    "ruby"
-version "1.9.2-p290"
-source  :url => "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
-        :md5 => "604da71839a6ae02b5b5b5e1b792d5eb"
+name            "ruby"
+default_version "1.9.2-p290"
+source          :url => "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
+                :md5 => "604da71839a6ae02b5b5b5e1b792d5eb"
 
 dependency "zlib"
 dependency "ncurses"
@@ -110,9 +110,9 @@ end
 
 Some of the DSL methods available include:
 
-**name**: The name of the software component.
+**name**: The name of the software component (this should come first).
 
-**version**: The version of the software component.
+**default_version**: The version of the software component.
 
 **source**: Directions to the location of the source.
 
@@ -176,6 +176,62 @@ A valid `Vagrantfile` for generating builds on Ubuntu and Centos
 platforms (though Omnibus is not limited to just those!) is created
 for each project that you generate using `omnibus project
 $MY_PROJECT_NAME`
+
+## Multiple Software Versions and Version Overrides
+
+You can support building multiple verisons of the same software in the same
+software definition file:
+
+```ruby
+name    "ruby"
+default_version "1.9.2-p290"
+
+version "1.9.2-p290" do
+  source  :url => "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
+          :md5 => "604da71839a6ae02b5b5b5e1b792d5eb"
+end
+
+version "2.1.1" do
+  source  :url => "http://ftp.ruby-lang.org/pub/ruby/2.1/ruby-#{version}.tar.gz",
+          :md5 => "e57fdbb8ed56e70c43f39c79da1654b2"
+end
+
+
+dependency "zlib"
+dependency "ncurses"
+dependency "openssl"
+
+relative_path "ruby-#{version}"
+
+build do
+  command "./configure"
+  command "make"
+  command "make install"
+end
+```
+
+Since the software definitions are simply ruby code, you can conditionally
+execute anything by wrapping it with pure ruby that tests for the version number.
+
+The project definitions can then take advange of this by passing in overrides
+to use the correct version:
+
+```ruby
+name            "chef-full"
+maintainer      "YOUR NAME"
+homepage        "http://yoursite.com"
+
+install_path    "/opt/chef"
+build_version   "0.10.8"
+build_iteration 4
+
+override :chef, version: "2.1.1"
+
+dependency "chef"
+```
+
+There is no checking that the version override that you supply has been
+provided in a version override block in the software definition.
 
 ## License
 
