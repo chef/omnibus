@@ -3,6 +3,10 @@ rvm:
 
 bundler_args: --jobs 7 --without docs
 
+branches:
+  only:
+    - master
+
 script: bundle exec rake travis:ci
 
 notifications:
