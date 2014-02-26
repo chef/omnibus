@@ -6,6 +6,8 @@ Documentation:
   Enabled: false
 GlobalVars:
   Enabled: false
+Encoding:
+  Enabled: false
 HandleExceptions:
   Enabled: false
 IfUnlessModifier:
