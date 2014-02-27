@@ -131,7 +131,7 @@ module Omnibus
   # @return [Pathname]
   def self.omnibus_software_root
     @omnibus_software_root ||= begin
-      if (spec = Gem::Specification.find_all_by_name('omnibus-software').first)
+      if (spec = Gem::Specification.find_all_by_name(Config.software_gem).first)
         Pathname.new(spec.gem_dir)
       else
         nil
