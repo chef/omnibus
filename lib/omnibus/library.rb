@@ -1,5 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,9 +33,9 @@ module Omnibus
 
     def version_map
       @components.inject({}) {|map, component|
-        map[component.name] = if component.given_version
+        map[component.name] = if component.default_version
                                 {:version       => component.version,
-                                 :given_version => component.given_version,
+                                 :default_version => component.default_version,
                                  :overridden    => component.overridden?,
                                  :version_guid  => component.version_guid}
                               else

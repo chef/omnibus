@@ -1,5 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,7 @@ module Omnibus
       # because we want to output a column only if something was
       # overridden, but nothing if no packages were changed
       overridden_versions = non_nil_values(version_map.values.select{|v| v[:overridden]},
-                                           :given_version)
+                                           :default_version)
 
 
       # Determine how wide the printed table columns need to be
@@ -80,14 +80,14 @@ module Omnibus
         version = version_map[name][:version]
         version_guid = version_map[name][:version_guid]
 
-        given_version = version_map[name][:given_version]
+        default_version = version_map[name][:default_version]
         overridden = version_map[name][:overridden]
 
         out << "#{name}".ljust(name_width)
         out << version.to_s.ljust(version_width)
         out << version_guid.to_s.ljust(guid_width) if version_guid
         # Only print out column if something was overridden
-        out << given_version.ljust(override_width) if overridden
+        out << default_version.ljust(override_width) if overridden
         out << "\n"
       end
       out

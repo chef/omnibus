@@ -35,6 +35,7 @@ module Omnibus
     include Rake::DSL
 
     NULL_ARG = Object.new
+    UNINITIALIZED = Object.new
 
     # It appears that this is not used
     attr_reader :builder
@@ -49,18 +50,20 @@ module Omnibus
 
     attr_reader :project
 
-    attr_reader :given_version
-    attr_reader :override_version
+    attr_reader :version
+
+    attr_reader :overrides
+
     attr_reader :whitelist_files
 
-    def self.load(filename, project, overrides={})
-      new(IO.read(filename), filename, project, overrides)
+    def self.load(filename, project, repo_overrides={})
+      new(IO.read(filename), filename, project, repo_overrides)
     end
 
     # @param io [String]
     # @param filename [String]
     # @param project [???] Is this a string or an Omnibus::Project?
-    # @param overrides [Hash]
+    # @param repo_overrides [Hash]
     #
     # @see Omnibus::Overrides
     #
@@ -70,9 +73,9 @@ module Omnibus
     #   project, and override hash directly?  That is, why io AND a
     #   filename, if the filename can always get you the contents you
     #   need anyway?
-    def initialize(io, filename, project, overrides={})
-      @given_version    = nil
-      @override_version = nil
+    def initialize(io, filename, project, repo_overrides={})
+      @version          = nil
+      @overrides        = UNINITIALIZED
       @name             = nil
       @description      = nil
       @source           = nil
@@ -81,6 +84,7 @@ module Omnibus
       @source_config    = filename
       @project          = project
       @always_build     = false
+      @repo_overrides   = repo_overrides
 
       # Seems like this should just be Builder.new(self) instead
       @builder = NullBuilder.new(self)
@@ -89,17 +93,50 @@ module Omnibus
       @whitelist_files = Array.new
       instance_eval(io, filename, 0)
 
-      # Set override information after the DSL file has been consumed
-      @override_version = overrides[name]
-
       render_tasks
     end
 
-    def name(val=NULL_ARG)
-      @name = val unless val.equal?(NULL_ARG)
-      @name
+
+    # Retrieves the override_version
+    #
+    # @return [Hash]
+    #
+    # @todo: can't we just use #version here or are we testing this against nil? somewhere and
+    #        not using #overridden?
+    def override_version
+      $stderr.puts "The #override_version is DEPRECATED, please use #version or test with #overridden?"
+      overrides[:version]
     end
 
+    # Retrieves the repo-level and project-level overrides for the software.
+    #
+    # @return [Hash]
+    def overrides
+      # deliberately not providing a setter since that feels like a shotgun pointed at a foot
+      if @overrides == UNINITIALIZED
+        # lazily initialized because we need the 'name' to be parsed first
+        @overrides = {}
+        @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
+        if @repo_overrides[name]
+          @overrides[:version] = @repo_overrides[name]
+        end
+      end
+      @overrides
+    end
+
+    # Sets or retreives the name of the software
+    #
+    # @param val [String] name of the Software
+    # @return [String]
+    def name(val=NULL_ARG)
+      @name = val unless val.equal?(NULL_ARG)
+      @name || raise(MissingSoftwareConfiguration.new(name, "name", "libxslt"))
+    end
+
+    # Sets the description of the software
+    #
+    # @param val [String] description of the Software
+    # @return [void]
     def description(val)
       @description = val
     end
@@ -140,19 +177,60 @@ module Omnibus
     #
     # @todo Consider changing this to accept two arguments instead
     # @todo This should throw an error if an invalid key is given, or
-    #   if more than one pair is given, or if no source value is ever
-    #   set.
+    #   if more than one pair is given
     def source(val=NULL_ARG)
-      @source = val unless val.equal?(NULL_ARG)
-      @source
+      unless val.equal?(NULL_ARG)
+        @source ||= {}
+        @source.merge!(val)
+      end
+      apply_overrides(:source)
     end
 
-    # Set a version from a software descriptor file, or receive the
-    # effective version, taking into account any override information
-    # (if set)
+    # Retieve the default_version of the software
+    #
+    # @return [String]
+    #
+    # @todo: remove this in favor of default_version
+    def given_version
+      $stderr.puts "Getting the default version via #given_version is DEPRECATED, please use 'default_version'"
+      default_version
+    end
+
+    # Set or retieve the default_version of the software to build
+    #
+    # @param val [String]
+    # @return [String]
+    def default_version(val=NULL_ARG)
+      @version = val unless val.equal?(NULL_ARG)
+      @version
+    end
+
+    # Evaluate a block only if the version matches.
+    #
+    # Note that passing only a string without a block will set the default_version but this
+    # behavior is deprecated and will be removed, use the default_version method instead.
+    #
+    # @param val [String] version of the software.
+    # @param block [Proc] block to run if the version we are building matches the argument.
+    # @return [void]
+    #
+    # @todo remove deprecated setting of version
     def version(val=NULL_ARG)
-      @given_version = val unless val.equal?(NULL_ARG)
-      @override_version || @given_version
+      if block_given?
+        if val.equal?(NULL_ARG)
+          raise "block needs a version argument to apply against"
+        else
+          if val == apply_overrides(:version)
+            yield
+          end
+        end
+      else
+        unless val.equal?(NULL_ARG)
+          $stderr.puts "Setting the version via 'version' is DEPRECATED, please use 'default_version'"
+          @version = val
+        end
+      end
+      apply_overrides(:version)
     end
 
     # Add an Omnibus software dependency.
@@ -169,7 +247,8 @@ module Omnibus
     #
     # @return [Boolean]
     def overridden?
-      @override_version && (@override_version != @given_version)
+      # note: using instance variables to bypass accessors that enforce overrides
+      @overrides.has_key?(:version) && (@overrides[:version] != @version)
     end
 
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
@@ -355,6 +434,20 @@ module Omnibus
     end
 
     private
+
+    # Apply overrides in the @overrides hash that mask instance variables
+    # that are set by parsing the DSL
+    #
+    def apply_overrides(attr)
+      val = instance_variable_get(:"@#{attr}")
+      if val.is_a?(Hash) || overrides[attr].is_a?(Hash)
+        val ||= {}
+        override = overrides[attr] || {}
+        val.merge(override)
+      else
+        overrides[attr] || val
+      end
+    end
 
     # @todo What?!
     # @todo It seems that this is not used... remove it

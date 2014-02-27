@@ -1,5 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
+# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -140,12 +140,12 @@ module Omnibus
       end
 
       plevel = args[:plevel] || 1
-      if args[:target] 
+      if args[:target]
         target = File.expand_path("#{project_dir}/#{args[:target]}")
-        @build_commands << 
+        @build_commands <<
          "cat #{source} | patch -p#{plevel} #{target}"
       else
-        @build_commands << 
+        @build_commands <<
          "patch -d #{project_dir} -p#{plevel} -i #{source}"
       end
     end
@@ -210,6 +210,8 @@ module Omnibus
 
     def build
       log "building #{name}"
+      log "version overridden from #{@software.default_version} to " \
+          "#{@software.version}" if @software.overridden?
       time_it("#{name} build") do
         @build_commands.each do |cmd|
           execute(cmd)
