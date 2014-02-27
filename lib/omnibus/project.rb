@@ -615,7 +615,7 @@ module Omnibus
         "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
         "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
         "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
-        "-out #{config.package_dir}\\#{output_package("msi") }",
+        "-out #{config.package_dir}\\#{output_package("msi")}",
       ]
 
       # Don't care about the 204 return code from light.exe since it's
@@ -649,7 +649,7 @@ module Omnibus
         "-t #{pkg_type}",
         "-v #{build_version}",
         "-n #{package_name}",
-        "-p #{output_package(pkg_type) }",
+        "-p #{output_package(pkg_type)}",
         "--iteration #{iteration}",
         "-m '#{maintainer}'",
         "--description '#{description}'",
@@ -657,19 +657,19 @@ module Omnibus
       ]
 
       if File.exist?(File.join(package_scripts_path, 'preinst'))
-        command_and_opts << "--before-install '#{File.join(package_scripts_path, "preinst") }'"
+        command_and_opts << "--before-install '#{File.join(package_scripts_path, "preinst")}'"
       end
 
       if File.exist?("#{package_scripts_path}/postinst")
-        command_and_opts << "--after-install '#{File.join(package_scripts_path, "postinst") }'"
+        command_and_opts << "--after-install '#{File.join(package_scripts_path, "postinst")}'"
       end
       # solaris packages don't support --pre-uninstall
       if File.exist?("#{package_scripts_path}/prerm")
-        command_and_opts << "--before-remove '#{File.join(package_scripts_path, "prerm") }'"
+        command_and_opts << "--before-remove '#{File.join(package_scripts_path, "prerm")}'"
       end
       # solaris packages don't support --post-uninstall
       if File.exist?("#{package_scripts_path}/postrm")
-        command_and_opts << "--after-remove '#{File.join(package_scripts_path, "postrm") }'"
+        command_and_opts << "--after-remove '#{File.join(package_scripts_path, "postrm")}'"
       end
 
       @exclusions.each do |pattern|
@@ -827,7 +827,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
 
       system 'pkgchk -vd /tmp/pkgmk chef'
 
-      system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk") } chef"
+      system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
     end
 
     def run_mac_package_build

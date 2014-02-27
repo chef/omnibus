@@ -29,7 +29,7 @@ module Omnibus
     end
 
     def url_for(software)
-      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software) }"
+      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software)}"
     end
 
     private
