@@ -16,7 +16,6 @@
 #
 
 module Omnibus
-
   class UnsupportedURIScheme < ArgumentError
   end
 
@@ -25,7 +24,6 @@ module Omnibus
 
   # Fetcher Implementation for HTTP and FTP hosted tarballs
   class NetFetcher < Fetcher
-
     name :net
 
     attr_reader :name
@@ -46,10 +44,10 @@ module Omnibus
     end
 
     def description
-      s=<<-E
+      <<-E
 source URI:     #{source_uri}
 checksum:       #{@checksum}
-local location: #@project_file
+local location: #{@project_file}
 E
     end
 
@@ -60,7 +58,6 @@ E
     def fetch_required?
       !File.exists?(project_file) || Digest::MD5.file(project_file) != @checksum
     end
-
 
     def clean
       if File.exists?(project_dir)
@@ -75,31 +72,29 @@ E
         download
         verify_checksum!
       else
-        log "Cached copy of source tarball up to date"
+        log 'Cached copy of source tarball up to date'
       end
     end
 
     def get_with_redirect(url, headers, limit = 10)
-      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+      fail ArgumentError, 'HTTP redirect too deep' if limit == 0
       log "getting from #{url} with #{limit} redirects left"
 
-      if !url.kind_of?(URI)
-        url = URI.parse(url)
-      end
+      url = URI.parse(url) unless url.kind_of?(URI)
 
       req = Net::HTTP::Get.new(url.request_uri, headers)
 
       http_client = if http_proxy && !excluded_from_proxy?(url.host)
-        Net::HTTP::Proxy(http_proxy.host, http_proxy.port, http_proxy.user, http_proxy.password).new(url.host, url.port)
-      else
-        Net::HTTP.new(url.host, url.port)
-      end
-      http_client.use_ssl = (url.scheme == "https")
+                      Net::HTTP::Proxy(http_proxy.host, http_proxy.port, http_proxy.user, http_proxy.password).new(url.host, url.port)
+                    else
+                      Net::HTTP.new(url.host, url.port)
+                    end
+      http_client.use_ssl = (url.scheme == 'https')
 
       response = http_client.start { |http| http.request(req) }
       case response
       when Net::HTTPSuccess
-        open(project_file, "wb") do |f|
+        open(project_file, 'wb') do |f|
           f.write(response.body)
         end
       when Net::HTTPRedirection
@@ -117,7 +112,7 @@ E
     # constructs a http_proxy uri from HTTP_PROXY* env vars
     def http_proxy
       @http_proxy ||= begin
-        proxy = get_env('HTTP_PROXY') or return
+        proxy = get_env('HTTP_PROXY') || return
         proxy = "http://#{proxy}" unless proxy =~ /^https?:/
         uri = URI.parse(proxy)
         uri.user ||= get_env('HTTP_PROXY_USER')
@@ -130,14 +125,14 @@ E
     # the 'no_proxy' variable contains a list of host suffixes separated by comma
     # example: example.com,www.examle.org,localhost
     def excluded_from_proxy?(host)
-      no_proxy = get_env('no_proxy') || ""
+      no_proxy = get_env('no_proxy') || ''
       no_proxy.split(/\s*,\s*/).any? { |pattern| host.end_with? pattern }
     end
 
     def download
       tries = 5
       begin
-        log "\033[1;31m#{source[:warning]}\033[0m" if source.has_key?(:warning)
+        log "\033[1;31m#{source[:warning]}\033[0m" if source.key?(:warning)
         log "fetching #{project_file} from #{source_uri}"
 
         case source_uri.scheme
@@ -145,11 +140,11 @@ E
           headers = {
             'accept-encoding' => '',
           }
-          if source.has_key?(:cookie)
+          if source.key?(:cookie)
             headers['Cookie'] = source[:cookie]
           end
           get_with_redirect(source_uri, headers)
-        when "ftp"
+        when 'ftp'
           Net::FTP.open(source_uri.host) do |ftp|
             ftp.passive = true
             ftp.login
@@ -157,11 +152,12 @@ E
             ftp.close
           end
         else
-          raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
+          fail UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
         end
-      rescue Exception => e
-        if ( tries -= 1 ) != 0
-          log "retrying failed download..."
+      rescue Exception
+        tries = tries - 1
+        if tries != 0
+          log 'retrying failed download...'
           retry
         else
           raise
@@ -175,10 +171,10 @@ E
     def verify_checksum!
       actual_md5 = Digest::MD5.file(project_file)
       unless actual_md5 == @checksum
-        log "Invalid MD5 for #@name"
+        log "Invalid MD5 for #{@name}"
         log "Expected: #{@checksum}"
         log "Actual:   #{actual_md5}"
-        raise InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
+        fail InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
       end
     end
 
@@ -189,11 +185,11 @@ E
       when Proc
         cmd.call
       when String
-        shell = Mixlib::ShellOut.new(cmd, :live_stream => STDOUT)
+        shell = Mixlib::ShellOut.new(cmd, live_stream: STDOUT)
         shell.run_command
         shell.error!
       else
-        raise "Don't know how to extract command for #{cmd.class} class"
+        fail "Don't know how to extract command for #{cmd.class} class"
       end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to unpack archive at #{project_file} (#{e.class}: #{e.message.strip})")
@@ -201,21 +197,21 @@ E
     end
 
     def extract_cmd
-      if project_file.end_with?(".gz") || project_file.end_with?(".tgz")
+      if project_file.end_with?('.gz') || project_file.end_with?('.tgz')
         "gzip -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
-      elsif project_file.end_with?(".bz2")
+      elsif project_file.end_with?('.bz2')
         "bzip2 -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
-      elsif project_file.end_with?(".7z")
+      elsif project_file.end_with?('.7z')
         "7z.exe x #{project_file} -o#{source_dir} -r -y"
-      elsif project_file.end_with?(".zip")
+      elsif project_file.end_with?('.zip')
         "unzip #{project_file} -d #{source_dir}"
-      elsif project_file.end_with?(".xz") || project_file.end_with?(".txz")
+      elsif project_file.end_with?('.xz') || project_file.end_with?('.txz')
         "xz -dc #{project_file} | ( cd #{source_dir} && tar -xf - )"
       else
-        #if we don't recognize the extension, simply copy over the file
-        Proc.new do
+        # if we don't recognize the extension, simply copy over the file
+        proc do
           log "#{project_file} not an archive. Copying to #{project_dir}"
-          # hack hack hack, no project dir yet
+          # WARNING: hack hack hack, no project dir yet
           FileUtils.mkdir_p(project_dir)
           FileUtils.cp(project_file, project_dir)
         end

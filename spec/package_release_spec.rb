@@ -19,75 +19,75 @@ require 'omnibus/package_release'
 require 'spec_helper'
 
 describe Omnibus::PackageRelease do
-  let(:s3_key) { "s3key" }
-  let(:s3_secret) { "hey-bezos-store-my-stuff" }
-  let(:s3_bucket) { "myorg-omnibus-packages" }
-  let(:pkg_path) { "pkg/chef_11.4.0-183-g2c0040c-0.el6.x86_64.rpm" }
+  let(:s3_key) { 's3key' }
+  let(:s3_secret) { 'hey-bezos-store-my-stuff' }
+  let(:s3_bucket) { 'myorg-omnibus-packages' }
+  let(:pkg_path) { 'pkg/chef_11.4.0-183-g2c0040c-0.el6.x86_64.rpm' }
   let(:pkg_metadata_path) { "#{pkg_path}.metadata.json" }
 
   let(:config) do
     {
-      :release_s3_access_key => s3_key,
-      :release_s3_secret_key => s3_secret,
-      :release_s3_bucket => s3_bucket
+      release_s3_access_key: s3_key,
+      release_s3_secret_key: s3_secret,
+      release_s3_bucket: s3_bucket,
     }
   end
   subject(:package_release) do
     Omnibus::PackageRelease.new(pkg_path)
   end
 
-  it "has a package path" do
-    package_release.package_path.should == pkg_path
+  it 'has a package path' do
+    expect(package_release.package_path).to eq(pkg_path)
   end
 
   it "defaults to `:private' access policy" do
-    package_release.access_policy.should == :private
+    expect(package_release.access_policy).to eq(:private)
   end
 
-  describe "validating configuration" do
+  describe 'validating configuration' do
 
     before do
       Omnibus.stub(:config).and_return(config)
     end
 
-    it "validates that the s3 key is set" do
+    it 'validates that the s3 key is set' do
       config.delete(:release_s3_access_key)
-      lambda { package_release.validate_config! }.should raise_error(Omnibus::InvalidS3ReleaseConfiguration)
+      expect { package_release.validate_config! }.to raise_error(Omnibus::InvalidS3ReleaseConfiguration)
     end
 
-    it "validates that the s3 secret key is set" do
+    it 'validates that the s3 secret key is set' do
       config.delete(:release_s3_secret_key)
-      lambda { package_release.validate_config! }.should raise_error(Omnibus::InvalidS3ReleaseConfiguration)
+      expect { package_release.validate_config! }.to raise_error(Omnibus::InvalidS3ReleaseConfiguration)
     end
 
-    it "validates that the s3 bucket is set" do
+    it 'validates that the s3 bucket is set' do
       config.delete(:release_s3_bucket)
-      lambda { package_release.validate_config! }.should raise_error(Omnibus::InvalidS3ReleaseConfiguration)
+      expect { package_release.validate_config! }.to raise_error(Omnibus::InvalidS3ReleaseConfiguration)
     end
 
-    it "does not error on a valid configuration" do
-      lambda { package_release.validate_config! }.should_not raise_error
-    end
-  end
-
-  describe "validating package for upload" do
-    it "ensures that the package file exists" do
-      lambda { package_release.validate_package! }.should raise_error(Omnibus::NoPackageFile)
-    end
-
-    it "ensures that there is a metadata file for the package" do
-      File.should_receive(:exist?).with(pkg_path).and_return(true)
-      File.should_receive(:exist?).with(pkg_metadata_path).and_return(false)
-      lambda { package_release.validate_package! }.should raise_error(Omnibus::NoPackageMetadataFile)
+    it 'does not error on a valid configuration' do
+      expect { package_release.validate_config! }.to_not raise_error
     end
   end
 
-  context "with a valid config and package" do
+  describe 'validating package for upload' do
+    it 'ensures that the package file exists' do
+      expect { package_release.validate_package! }.to raise_error(Omnibus::NoPackageFile)
+    end
 
-    let(:basename) { "chef_11.4.0-183-g2c0040c-0.el6.x86_64.rpm" }
-    let(:md5) { "016f2e0854c69901b3f0ad8f99ffdb75" }
-    let(:platform_path) { "el/6/x86_64" }
-    let(:pkg_content) { "expected package content" }
+    it 'ensures that there is a metadata file for the package' do
+      expect(File).to receive(:exist?).with(pkg_path).and_return(true)
+      expect(File).to receive(:exist?).with(pkg_metadata_path).and_return(false)
+      expect { package_release.validate_package! }.to raise_error(Omnibus::NoPackageMetadataFile)
+    end
+  end
+
+  context 'with a valid config and package' do
+
+    let(:basename) { 'chef_11.4.0-183-g2c0040c-0.el6.x86_64.rpm' }
+    let(:md5) { '016f2e0854c69901b3f0ad8f99ffdb75' }
+    let(:platform_path) { 'el/6/x86_64' }
+    let(:pkg_content) { 'expected package content' }
 
     let(:metadata_json) do
       <<-E
@@ -111,38 +111,37 @@ describe Omnibus::PackageRelease do
       IO.stub(:read).with(pkg_path).and_return(pkg_content)
     end
 
-    it "configures s3 with the given credentials" do
+    it 'configures s3 with the given credentials' do
       expected_s3_config = {
-        :access_key         => s3_key,
-        :secret_access_key  => s3_secret,
-        :bucket             => s3_bucket,
-        :adaper             => :net_http
+        access_key: s3_key,
+        secret_access_key: s3_secret,
+        bucket: s3_bucket,
+        adaper: :net_http,
       }
-      UberS3.should_receive(:new).with(expected_s3_config)
+      expect(UberS3).to receive(:new).with(expected_s3_config)
       package_release.s3_client
     end
 
-    it "generates the relative path for the package s3 key" do
-      package_release.platform_path.should == platform_path
+    it 'generates the relative path for the package s3 key' do
+      expect(package_release.platform_path).to eq(platform_path)
     end
 
-
-    it "uploads the package and metadata" do
-      package_release.s3_client.should_receive(:store).with(
+    it 'uploads the package and metadata' do
+      expect(package_release.s3_client).to receive(:store).with(
         "#{platform_path}/#{basename}.metadata.json",
         metadata_json,
-        :access => :private
+        access: :private,
       )
-      package_release.s3_client.should_receive(:store).with(
+      expect(package_release.s3_client).to receive(:store).with(
         "#{platform_path}/#{basename}",
         pkg_content,
-        :access => :private,
-        :content_md5 => md5
+        access: :private,
+        content_md5: md5,
       )
       package_release.release
     end
 
-    context "and a callback is given for after upload" do
+    context 'and a callback is given for after upload' do
       let(:upload_records) { [] }
 
       subject(:package_release) do
@@ -151,42 +150,44 @@ describe Omnibus::PackageRelease do
         end
       end
 
-      it "fires the after_upload callback for each item uploaded" do
-        package_release.s3_client.should_receive(:store).with(
+      it 'fires the after_upload callback for each item uploaded' do
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}.metadata.json",
           metadata_json,
-          :access => :private
+          access: :private,
         )
-        package_release.s3_client.should_receive(:store).with(
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}",
           pkg_content,
-          :access => :private,
-          :content_md5 => md5
+          access: :private,
+          content_md5: md5,
         )
         package_release.release
 
-        upload_records.should == [ "#{platform_path}/#{basename}.metadata.json",
-                                   "#{platform_path}/#{basename}" ]
+        expect(upload_records).to eq [
+          "#{platform_path}/#{basename}.metadata.json",
+          "#{platform_path}/#{basename}",
+        ]
       end
     end
 
-    context "and the package is public" do
+    context 'and the package is public' do
 
       subject(:package_release) do
-        Omnibus::PackageRelease.new(pkg_path, :access => :public_read)
+        Omnibus::PackageRelease.new(pkg_path, access: :public_read)
       end
 
-      it "uploads the package and metadata" do
-        package_release.s3_client.should_receive(:store).with(
+      it 'uploads the package and metadata' do
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}.metadata.json",
           metadata_json,
-          :access => :public_read
+          access: :public_read,
         )
-        package_release.s3_client.should_receive(:store).with(
+        expect(package_release.s3_client).to receive(:store).with(
           "#{platform_path}/#{basename}",
           pkg_content,
-          :access => :public_read,
-          :content_md5 => md5
+          access: :public_read,
+          content_md5: md5,
         )
         package_release.release
       end

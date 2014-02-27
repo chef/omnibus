@@ -21,7 +21,6 @@ require 'omnibus/util'
 
 module Omnibus
   module Packagers
-
     # Builds a Mac OS X "product" package (.pkg extension)
     #
     # Mac OS X packages are built in two stages. First, files are packaged up
@@ -32,7 +31,6 @@ module Omnibus
     # and a license. It can also allow for user customization of which
     # component packages to install, but MacPkg does not expose this feature.
     class MacPkg
-
       include Util
 
       extend Forwardable
@@ -97,11 +95,11 @@ module Omnibus
       # @return [true] if required files are present.
       # @raise [MissingMacPkgResource] if anything is missing.
       def validate_omnibus_project!
-        missing_files = required_files.select {|f| !File.exist?(f) }
+        missing_files = required_files.select { |f| !File.exist?(f) }
         if missing_files.empty?
           true # all good
         else
-          raise MissingMacPkgResource.new(missing_files)
+          fail MissingMacPkgResource.new(missing_files)
         end
       end
 
@@ -154,7 +152,7 @@ module Omnibus
       # Writes the Distribution file to the staging area.
       # @return [void]
       def generate_distribution
-        File.open(distribution_staging_path, File::RDWR|File::CREAT|File::EXCL, 0600) do |file|
+        File.open(distribution_staging_path, File::RDWR | File::CREAT | File::EXCL, 0600) do |file|
           file.print(distribution)
         end
       end
@@ -177,13 +175,13 @@ module Omnibus
       end
 
       def identifier
-        project.mac_pkg_identifier or
+        project.mac_pkg_identifier ||
           "test.#{sanitized_maintainer}.pkg.#{sanitized_name}"
       end
 
       # Internally in this class we want to call this the "product package" so
       # we can be unambiguous and consistent.
-      alias :product_pkg_name :package_name
+      alias_method :product_pkg_name, :package_name
 
       # The full path where the product package was/will be written.
       #
@@ -194,7 +192,7 @@ module Omnibus
 
       # @return [String] Filesystem path where the Distribution file is written.
       def distribution_staging_path
-        File.join(staging_dir, "Distribution")
+        File.join(staging_dir, 'Distribution')
       end
 
       # Generates the content of the Distribution file, which is used by
@@ -231,7 +229,7 @@ module Omnibus
       # A directory where intermediate build products are stored.
       # @return [String] Path to the directory
       def staging_dir
-        File.join(project.package_tmp, "mac-pkg")
+        File.join(project.package_tmp, 'mac-pkg')
       end
 
       # A list of the files that will be used to customize the "product" package.P
@@ -240,7 +238,7 @@ module Omnibus
         [
           background_png_path,
           license_file_path,
-          welcome_file_path
+          welcome_file_path,
         ]
       end
 
@@ -256,33 +254,32 @@ module Omnibus
       # pkg resource files are.
       # @return [String] path to the Resources directory
       def mac_pkg_files_path
-        File.join(files_path, "mac_pkg", "Resources")
+        File.join(files_path, 'mac_pkg', 'Resources')
       end
 
       # @return [String] path to the license file
       def license_file_path
-        File.join(mac_pkg_files_path, "license.html")
+        File.join(mac_pkg_files_path, 'license.html')
       end
 
       # @return [String] path to the background image for the product package.
       def background_png_path
-        File.join(mac_pkg_files_path, "background.png")
+        File.join(mac_pkg_files_path, 'background.png')
       end
 
       # Path to the welcome file. This is the content that's displayed on the
       # first screen of the installer.
       # @return [String] path to the welcome file
       def welcome_file_path
-        File.join(mac_pkg_files_path, "welcome.html")
+        File.join(mac_pkg_files_path, 'welcome.html')
       end
 
       def shellout_opts
-       {
-          :timeout => 3600,
-          :cwd => staging_dir
+        {
+          timeout: 3600,
+          cwd: staging_dir,
         }
       end
-
     end
   end
 end

@@ -1,5 +1,4 @@
 module Omnibus
-
   class InvalidS3Configuration < RuntimeError
     def initialize(s3_bucket, s3_access_key, s3_secret_key)
       @s3_bucket, @s3_access_key, @s3_secret_key = s3_bucket, s3_access_key, s3_secret_key
@@ -186,7 +185,7 @@ module Omnibus
       <<-E
       Your omnibus repo is missing the following files required to build Mac
       packages:
-      #{@missing_file_paths.map {|p| "* #{p}"}.join("\n      ")}
+      #{@missing_file_paths.map { |p| "* #{p}" }.join("\n      ")}
 E
     end
   end

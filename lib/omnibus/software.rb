@@ -29,7 +29,6 @@ require 'omnibus/config'
 require 'rake'
 
 module Omnibus
-
   # Omnibus software DSL reader
   class Software
     include Rake::DSL
@@ -56,7 +55,7 @@ module Omnibus
 
     attr_reader :whitelist_files
 
-    def self.load(filename, project, repo_overrides={})
+    def self.load(filename, project, repo_overrides = {})
       new(IO.read(filename), filename, project, repo_overrides)
     end
 
@@ -73,7 +72,7 @@ module Omnibus
     #   project, and override hash directly?  That is, why io AND a
     #   filename, if the filename can always get you the contents you
     #   need anyway?
-    def initialize(io, filename, project, repo_overrides={})
+    def initialize(io, filename, project, repo_overrides = {})
       @version          = nil
       @overrides        = UNINITIALIZED
       @name             = nil
@@ -89,13 +88,12 @@ module Omnibus
       # Seems like this should just be Builder.new(self) instead
       @builder = NullBuilder.new(self)
 
-      @dependencies = Array.new
-      @whitelist_files = Array.new
+      @dependencies = []
+      @whitelist_files = []
       instance_eval(io, filename, 0)
 
       render_tasks
     end
-
 
     # Retrieves the override_version
     #
@@ -104,7 +102,7 @@ module Omnibus
     # @todo: can't we just use #version here or are we testing this against nil? somewhere and
     #        not using #overridden?
     def override_version
-      $stderr.puts "The #override_version is DEPRECATED, please use #version or test with #overridden?"
+      $stderr.puts 'The #override_version is DEPRECATED, please use #version or test with #overridden?'
       overrides[:version]
     end
 
@@ -128,9 +126,9 @@ module Omnibus
     #
     # @param val [String] name of the Software
     # @return [String]
-    def name(val=NULL_ARG)
+    def name(val = NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name || raise(MissingSoftwareConfiguration.new(name, "name", "libxslt"))
+      @name || fail(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
     end
 
     # Sets the description of the software
@@ -162,7 +160,7 @@ module Omnibus
     #
     # @param val [Array<String>] a list of names of Software components
     # @return [Array<String>]
-    def dependencies(val=NULL_ARG)
+    def dependencies(val = NULL_ARG)
       @dependencies = val unless val.equal?(NULL_ARG)
       @dependencies
     end
@@ -178,7 +176,7 @@ module Omnibus
     # @todo Consider changing this to accept two arguments instead
     # @todo This should throw an error if an invalid key is given, or
     #   if more than one pair is given
-    def source(val=NULL_ARG)
+    def source(val = NULL_ARG)
       unless val.equal?(NULL_ARG)
         @source ||= {}
         @source.merge!(val)
@@ -200,7 +198,7 @@ module Omnibus
     #
     # @param val [String]
     # @return [String]
-    def default_version(val=NULL_ARG)
+    def default_version(val = NULL_ARG)
       @version = val unless val.equal?(NULL_ARG)
       @version
     end
@@ -215,10 +213,10 @@ module Omnibus
     # @return [void]
     #
     # @todo remove deprecated setting of version
-    def version(val=NULL_ARG)
+    def version(val = NULL_ARG)
       if block_given?
         if val.equal?(NULL_ARG)
-          raise "block needs a version argument to apply against"
+          fail 'block needs a version argument to apply against'
         else
           if val == apply_overrides(:version)
             yield
@@ -248,7 +246,7 @@ module Omnibus
     # @return [Boolean]
     def overridden?
       # note: using instance variables to bypass accessors that enforce overrides
-      @overrides.has_key?(:version) && (@overrides[:version] != @version)
+      @overrides.key?(:version) && (@overrides[:version] != @version)
     end
 
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
@@ -391,12 +389,12 @@ module Omnibus
       path = project_path.dup
       # split the path and remmove and empty strings
       if platform == 'windows'
-        path.sub!(":", "")
-        parts = path.split("\\") - [""]
-        parts.join("_")
+        path.sub!(':', '')
+        parts = path.split('\\') - ['']
+        parts.join('_')
       else
-        parts = path.split("/") - [""]
-        parts.join("_")
+        parts = path.split('/') - ['']
+        parts.join('_')
       end
     end
 
@@ -430,7 +428,7 @@ module Omnibus
     # @return [String] Either "sparc" or "intel", as appropriate
     # @todo Is this used?  Doesn't appear to be...
     def architecture
-      OHAI.kernel['machine'] =~ /sun/ ? "sparc" : "intel"
+      OHAI.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
     end
 
     private
@@ -453,7 +451,7 @@ module Omnibus
     # @todo It seems that this is not used... remove it
     # @deprecated Use something else (?)
     def command(*args)
-      raise "Method Moved."
+      fail 'Method Moved.'
     end
 
     def execute_build(fetcher)
@@ -464,71 +462,70 @@ module Omnibus
 
     def render_tasks
       namespace "projects:#{@project.name}" do
-      namespace :software do
-        fetcher = Fetcher.for(self)
+        namespace :software do
+          fetcher = Fetcher.for(self)
 
-        #
-        # set up inter-project dependencies
-        #
-        (@dependencies - [@name]).uniq.each do |dep|
-          task @name => dep
-          file manifest_file => manifest_file_from_name(dep)
-        end
-
-        directory source_dir
-        directory cache_dir
-        directory build_dir
-        directory project_dir
-        namespace @name do
-          task :fetch => [ build_dir, source_dir, cache_dir, project_dir ] do
-            if !File.exists?(fetch_file) || fetcher.fetch_required?
-              # force build to run if we need to do an updated fetch
-              fetcher.fetch
-              touch fetch_file
-            end
+          #
+          # set up inter-project dependencies
+          #
+          (@dependencies - [@name]).uniq.each do |dep|
+            task @name => dep
+            file manifest_file => manifest_file_from_name(dep)
           end
 
-          task :build => :fetch do
-            if !always_build? && uptodate?(manifest_file, [fetch_file])
-              # if any direct deps have been built for any reason, we will need to
-              # clean/build ourselves
-              (@dependencies - [@name]).uniq.each do |dep|
-                unless uptodate?(manifest_file, [manifest_file_from_name(dep)])
-                  execute_build(fetcher)
-                  break
-                end
+          directory source_dir
+          directory cache_dir
+          directory build_dir
+          directory project_dir
+          namespace @name do
+            task fetch: [build_dir, source_dir, cache_dir, project_dir] do
+              if !File.exists?(fetch_file) || fetcher.fetch_required?
+                # force build to run if we need to do an updated fetch
+                fetcher.fetch
+                touch fetch_file
               end
+            end
 
-            else
-              # if fetch has occurred, or the component is configured to
-              # always build, do a clean and build.
-              execute_build(fetcher)
+            task build: :fetch do
+              if !always_build? && uptodate?(manifest_file, [fetch_file])
+                # if any direct deps have been built for any reason, we will need to
+                # clean/build ourselves
+                (@dependencies - [@name]).uniq.each do |dep|
+                  unless uptodate?(manifest_file, [manifest_file_from_name(dep)])
+                    execute_build(fetcher)
+                    break
+                  end
+                end
+
+              else
+                # if fetch has occurred, or the component is configured to
+                # always build, do a clean and build.
+                execute_build(fetcher)
+              end
             end
           end
+
+          #
+          # make the manifest file dependent on the latest file in the
+          # source tree in order to shrink the multi-thousand-node
+          # dependency graph that Rake was generating
+          #
+          latest_file = FileList["#{project_dir}/**/*"].sort do |a, b|
+            File.mtime(a) <=> File.mtime(b)
+          end.last
+
+          file manifest_file => (file latest_file)
+
+          file fetch_file => "#{name}:fetch"
+          file manifest_file => "#{name}:build"
+
+          file fetch_file => (file @source_config)
+          file manifest_file => (file fetch_file)
+
+          desc "fetch and build #{@name} for #{@project.name}"
+          task @name => manifest_file
         end
-
-        #
-        # make the manifest file dependent on the latest file in the
-        # source tree in order to shrink the multi-thousand-node
-        # dependency graph that Rake was generating
-        #
-        latest_file = FileList["#{project_dir}/**/*"].sort { |a,b|
-          File.mtime(a) <=> File.mtime(b)
-        }.last
-
-        file manifest_file => (file latest_file)
-
-        file fetch_file => "#{name}:fetch"
-        file manifest_file => "#{name}:build"
-
-        file fetch_file => (file @source_config)
-        file manifest_file => (file fetch_file)
-
-        desc "fetch and build #{@name} for #{@project.name}"
-        task @name => manifest_file
-      end
       end
     end
-
   end
 end

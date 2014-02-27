@@ -21,9 +21,9 @@ require 'spec_helper'
 
 describe Omnibus::Packagers::MacPkg do
 
-  let(:mac_pkg_identifier) { "test.pkg.functional-test-project" }
+  let(:mac_pkg_identifier) { 'test.pkg.functional-test-project' }
 
-  let(:omnibus_root) { File.expand_path("../../fixtures/mac_pkg", __FILE__) }
+  let(:omnibus_root) { File.expand_path('../../fixtures/mac_pkg', __FILE__) }
 
   let(:scripts_path) { "#{omnibus_root}/package-scripts" }
 
@@ -36,7 +36,7 @@ describe Omnibus::Packagers::MacPkg do
     Omnibus.stub(:project_root).and_return(omnibus_root)
     Omnibus.config.stub(:package_dir).and_return(package_dir)
 
-    project_file=<<-P
+    project_file = <<-P
       name "functional-test-project"
       maintainer "YOU"
       homepage "http://www.theonion.com/articles/drunken-man-careens-wildly-across-internet,35249/"
@@ -47,15 +47,14 @@ describe Omnibus::Packagers::MacPkg do
     Omnibus::Project.new(project_file, __FILE__)
   end
 
-
   let(:packager) do
     Omnibus::Packagers::MacPkg.new(project)
   end
 
   def create_app_dir
-    FileUtils.mkdir("/opt/functional-test-project") unless File.directory?("/opt/functional-test-project")
-    File.open("/opt/functional-test-project/itworks.txt", "w+") do |f|
-      f.puts "hello world"
+    FileUtils.mkdir('/opt/functional-test-project') unless File.directory?('/opt/functional-test-project')
+    File.open('/opt/functional-test-project/itworks.txt', 'w+') do |f|
+      f.puts 'hello world'
     end
   end
 
@@ -65,10 +64,9 @@ describe Omnibus::Packagers::MacPkg do
   #
   # There is no verification that the package was correctly created, you have
   # to install it yourself to verify.
-  it "builds a package" do
+  it 'builds a package' do
     create_app_dir
     packager.build
   end
 
 end
-

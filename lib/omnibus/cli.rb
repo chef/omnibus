@@ -21,15 +21,13 @@ require 'omnibus/cli/build'
 
 module Omnibus
   module CLI
-
     class Error < StandardError
       attr_reader :original
 
-      def initialize(msg, original=nil)
+      def initialize(msg, original = nil)
         super(msg)
         @original = original
       end
     end
-
   end
 end

@@ -21,40 +21,38 @@ require 'omnibus/s3_cacher'
 module Omnibus
   module CLI
     class Cache < Base
-
       class_option :path,
-        :aliases => [:p],
-        :type => :string,
-        :default => Dir.pwd,
-        :desc => "Path to the Omnibus project root."
+                   aliases: [:p],
+                   type: :string,
+                   default: Dir.pwd,
+                   desc: 'Path to the Omnibus project root.'
 
       namespace :cache
 
-      desc "existing", "List source packages which exist in the cache"
+      desc 'existing', 'List source packages which exist in the cache'
       def existing
-        S3Cache.new.list.each {|s| puts s.name}
+        S3Cache.new.list.each { |s| puts s.name }
       end
 
-      desc "list", "List all cached files (by S3 key)"
+      desc 'list', 'List all cached files (by S3 key)'
       def list
-        S3Cache.new.list_by_key.each {|k| puts k}
+        S3Cache.new.list_by_key.each { |k| puts k }
       end
 
-      desc "missing", "Lists source packages that are required but not yet cached"
+      desc 'missing', 'Lists source packages that are required but not yet cached'
       def missing
-        S3Cache.new.missing.each {|s| puts s.name}
+        S3Cache.new.missing.each { |s| puts s.name }
       end
 
-      desc "fetch", "Fetches missing source packages to local tmp dir"
+      desc 'fetch', 'Fetches missing source packages to local tmp dir'
       def fetch
         S3Cache.new.fetch_missing
       end
 
-      desc "populate", "Populate the S3 Cache"
+      desc 'populate', 'Populate the S3 Cache'
       def populate
         S3Cache.new.populate
       end
-
     end
   end
 end

@@ -2,9 +2,9 @@
 
 # Trap interrupts to quit cleanly. See
 # https://twitter.com/mitchellh/status/283014103189053442
-Signal.trap("INT") { exit 1 }
+Signal.trap('INT') { exit 1 }
 
-$:.unshift File.expand_path("../../lib", __FILE__)
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'omnibus/cli'
 

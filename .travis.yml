@@ -1,10 +1,16 @@
-language: ruby
 rvm:
-  - 1.9.2
   - 1.9.3
-script: rake spec
+
+bundler_args: --jobs 7 --without docs
+
+branches:
+  only:
+    - master
+
+script: bundle exec rake travis:ci
+
 notifications:
   hipchat:
     rooms:
-      - secure: nDjKIyOwWS8qJqpHvBu1BadTyycWCqPM6/o1hdaOT41kO80GsYfJhvLk1QSAdDxPC5Y67/krKIXNR2ykfXvJWco6OCPXNLc8bsod+d8Srknqe8RJFBP+ExLzou21OLvNKqI0FhULB/mA39o5eC/jmkXjQIqj6eszNA7oLQYhQL8=
-      - secure: W+qOMYUnvBGg+/mpOuti3nS2IeNarvQyAzE4z3A2h13OwKz+ugIfjrxM3Ry5Moi0xf6kW49PJAC6q+9Sqx0h9Z6KNvOESaD/KDNYSkPgHsRgQIpzSENORPGnTMGFWO0DhdZhIjEE0qs3BqBbrJSZ1qL2yNGFTyHsW3VQXZeVUWE=
+      - secure: JdLOITSPHW5xk8eoFOmH1Js5PT6iFgswUG8fIqNq69ie2Qws2K58hPDR6HW2NBEsBb7dW1S5jT6V9RHhm0ykekvEJVa5AjebO3EsZa+Cu/VahFMg4DL+SGYgKlKrZQosd+EgVQQ3C9gj0dApGtKqf2Ej7RNESwCPY8SOduTC6d8= # Build Statuses
+      - secure: PmOaqp2DFyy79VpCuvSYILblK6tP0eDa9fDG9X2j+wggoosBkmlGfnSxp3A2TXlUyK62mr6/B89dRkL2aDWTJ/gqaZ34Elx2rV5S2A5YJIx9stA2+4iXeSlOF2YMNKGwBVmF/kp/nNoG2FqUkUBrRurWAOXZnwxKIhQ7+kLVb/0= # Release Engineering

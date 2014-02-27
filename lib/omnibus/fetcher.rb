@@ -18,7 +18,6 @@
 require 'pp'
 
 module Omnibus
-
   # Base class for classes that fetch project sources from the internet.
   #
   # @abstract Subclass and override the {#clean}, {#description},
@@ -27,7 +26,6 @@ module Omnibus
   # @todo Is this class supposed to be abstract or not?  Pretty sure
   #   it's supposed to be abstract
   class Fetcher
-
     # Given an error and a fetcher that generated the error, print a
     # formatted report of the error and stacktrace, along with fetcher
     # details to stderr.
@@ -43,7 +41,6 @@ module Omnibus
     #   since we're already outputting the real error and stacktrace
     #   here.
     class ErrorReporter
-
       def initialize(error, fetcher)
         @error, @fetcher = error, fetcher
       end
@@ -61,14 +58,14 @@ module Omnibus
       #   parameters (presumably the kind of fetcher and the software it
       #   is fetching?),
       def explain(why)
-        $stderr.puts "* " * 40
+        $stderr.puts '* ' * 40
         $stderr.puts why
-        $stderr.puts "Fetcher params:"
+        $stderr.puts 'Fetcher params:'
         $stderr.puts indent(@fetcher.description, 2)
-        $stderr.puts "Exception:"
+        $stderr.puts 'Exception:'
         $stderr.puts indent("#{e.class}: #{e.message.strip}", 2)
-        Array(e.backtrace).each {|l| $stderr.puts indent(l, 4) }
-        $stderr.puts "* " * 40
+        Array(e.backtrace).each { |l| $stderr.puts indent(l, 4) }
+        $stderr.puts '* ' * 40
       end
 
       private
@@ -82,9 +79,8 @@ module Omnibus
       # @param n [Fixnum] the number of " " characters to indent each line.
       # @return [String]
       def indent(string, n)
-        string.split("\n").map {|l| " ".rjust(n) << l }.join("\n")
+        string.split("\n").map { |l| ' '.rjust(n) << l }.join("\n")
       end
-
     end
 
     class UnsupportedSourceLocation < ArgumentError
@@ -129,11 +125,11 @@ module Omnibus
       elsif software.source[:path]
         PathFetcher.new(software)
       else
-        raise UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
+        fail UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
       end
     end
 
-    def self.name(name=NULL_ARG)
+    def self.name(name = NULL_ARG)
       @name = name unless name.equal?(NULL_ARG)
       @name
     end

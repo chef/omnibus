@@ -23,7 +23,6 @@ require 'omnibus/packagers/mac_pkg'
 require 'time'
 
 module Omnibus
-
   # Omnibus project DSL reader
   #
   # @todo It seems like there's a bit of a conflation between a
@@ -64,14 +63,14 @@ module Omnibus
       @description = nil
       @replaces = nil
       @mac_pkg_identifier = nil
-      @overrides = { }
+      @overrides = {}
 
-      @exclusions = Array.new
-      @conflicts = Array.new
-      @config_files = Array.new
-      @extra_package_files = Array.new
-      @dependencies = Array.new
-      @runtime_dependencies = Array.new
+      @exclusions = []
+      @conflicts = []
+      @config_files = []
+      @extra_package_files = []
+      @dependencies = []
+      @runtime_dependencies = []
       instance_eval(io, filename)
       validate
 
@@ -99,9 +98,9 @@ module Omnibus
     # @raise [MissingProjectConfiguration] if a value was not set
     #   before being subsequently retrieved (i.e., a name
     #   must be set in order to build a project)
-    def name(val=NULL_ARG)
+    def name(val = NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name || raise(MissingProjectConfiguration.new("name", "my_project"))
+      @name || fail(MissingProjectConfiguration.new('name', 'my_project'))
     end
 
     # Set or retrieve the package name of the project.  Unless
@@ -109,7 +108,7 @@ module Omnibus
     #
     # @param val [String] the package name to set
     # @return [String]
-    def package_name(val=NULL_ARG)
+    def package_name(val = NULL_ARG)
       @package_name = val unless val.equal?(NULL_ARG)
       @package_name.nil? ? @name : @package_name
     end
@@ -123,9 +122,9 @@ module Omnibus
     # @raise [MissingProjectConfiguration] if a value was not set
     #   before being subsequently retrieved (i.e., an install_path
     #   must be set in order to build a project)
-    def install_path(val=NULL_ARG)
+    def install_path(val = NULL_ARG)
       @install_path = val unless val.equal?(NULL_ARG)
-      @install_path || raise(MissingProjectConfiguration.new("install_path", "/opt/chef"))
+      @install_path || fail(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
 
     # Set or retrieve the the package maintainer.
@@ -136,9 +135,9 @@ module Omnibus
     # @raise [MissingProjectConfiguration] if a value was not set
     #   before being subsequently retrieved (i.e., a maintainer must
     #   be set in order to build a project)
-    def maintainer(val=NULL_ARG)
+    def maintainer(val = NULL_ARG)
       @maintainer = val unless val.equal?(NULL_ARG)
-      @maintainer || raise(MissingProjectConfiguration.new("maintainer", "Chef Software, Inc."))
+      @maintainer || fail(MissingProjectConfiguration.new('maintainer', 'Chef Software, Inc.'))
     end
 
     # Set or retrive the package homepage.
@@ -149,9 +148,9 @@ module Omnibus
     # @raise [MissingProjectConfiguration] if a value was not set
     #   before being subsequently retrieved (i.e., a homepage must be
     #   set in order to build a project)
-    def homepage(val=NULL_ARG)
+    def homepage(val = NULL_ARG)
       @homepage = val unless val.equal?(NULL_ARG)
-      @homepage || raise(MissingProjectConfiguration.new("homepage", "http://www.getchef.com"))
+      @homepage || fail(MissingProjectConfiguration.new('homepage', 'http://www.getchef.com'))
     end
 
     # Defines the iteration for the package to be generated.  Adheres
@@ -165,11 +164,11 @@ module Omnibus
       case platform_family
       when 'rhel'
         platform_version =~ /^(\d+)/
-        maj = $1
+        maj = Regexp.last_match[1]
         "#{build_iteration}.el#{maj}"
       when 'freebsd'
         platform_version =~ /^(\d+)/
-        maj = $1
+        maj = Regexp.last_match[1]
         "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
@@ -190,7 +189,7 @@ module Omnibus
     # @return [String]
     #
     # @see #name
-    def description(val=NULL_ARG)
+    def description(val = NULL_ARG)
       @description = val unless val.equal?(NULL_ARG)
       @description || "The full stack of #{name}"
     end
@@ -205,7 +204,7 @@ module Omnibus
     #
     # @todo Consider having this default to {#package_name}; many uses of this
     #   method effectively do this already.
-    def replaces(val=NULL_ARG)
+    def replaces(val = NULL_ARG)
       @replaces = val unless val.equal?(NULL_ARG)
       @replaces
     end
@@ -227,7 +226,7 @@ module Omnibus
     # @return [String]
     #
     # @see Omnibus::BuildVersion
-    def build_version(val=NULL_ARG)
+    def build_version(val = NULL_ARG)
       @build_version = val unless val.equal?(NULL_ARG)
       @build_version
     end
@@ -240,12 +239,12 @@ module Omnibus
     #
     # @todo Is there a better name for this than "build_iteration"?
     #   Would be nice to cut down confusiton with {#iteration}.
-    def build_iteration(val=NULL_ARG)
+    def build_iteration(val = NULL_ARG)
       @build_iteration = val unless val.equal?(NULL_ARG)
       @build_iteration || 1
     end
 
-    def mac_pkg_identifier(val=NULL_ARG)
+    def mac_pkg_identifier(val = NULL_ARG)
       @mac_pkg_identifier = val unless val.equal?(NULL_ARG)
       @mac_pkg_identifier
     end
@@ -254,7 +253,7 @@ module Omnibus
     #
     # @param val [String]
     # @return [String]
-    def package_user(val=NULL_ARG)
+    def package_user(val = NULL_ARG)
       @pkg_user = val unless val.equal?(NULL_ARG)
       @pkg_user
     end
@@ -264,7 +263,7 @@ module Omnibus
     #
     # @param val [Hash]
     # @return [Hash]
-    def overrides(val=NULL_ARG)
+    def overrides(val = NULL_ARG)
       @overrides = val unless val.equal?(NULL_ARG)
       @overrides
     end
@@ -274,7 +273,7 @@ module Omnibus
     #
     # @param val [Hash]
     # @return [Hash]
-    def override(name, val=NULL_ARG)
+    def override(name, val = NULL_ARG)
       @overrides[name] = val unless val.equal?(NULL_ARG)
       @overrides[name]
     end
@@ -283,7 +282,7 @@ module Omnibus
     #
     # @param val [String]
     # @return [String]
-    def package_group(val=NULL_ARG)
+    def package_group(val = NULL_ARG)
       @pkg_group = val unless val.equal?(NULL_ARG)
       @pkg_group
     end
@@ -328,7 +327,7 @@ module Omnibus
     #
     # @param val [Array<String>] a list of names of Software components
     # @return [Array<String>]
-    def dependencies(val=NULL_ARG)
+    def dependencies(val = NULL_ARG)
       @dependencies = val unless val.equal?(NULL_ARG)
       @dependencies
     end
@@ -373,7 +372,7 @@ module Omnibus
     #
     # @param val [Array<String>] a list of names of Software components
     # @return [Array<String>]
-    def extra_package_files(val=NULL_ARG)
+    def extra_package_files(val = NULL_ARG)
       @extra_package_files = val unless val.equal?(NULL_ARG)
       @extra_package_files
     end
@@ -489,19 +488,19 @@ module Omnibus
     def package_types
       case platform_family
       when 'debian'
-        [ "deb" ]
+        ['deb']
       when 'fedora', 'rhel'
-        [ "rpm" ]
+        ['rpm']
       when 'aix'
-        [ "bff" ]
+        ['bff']
       when 'solaris2'
-        [ "pkgmk" ]
+        ['pkgmk']
       when 'windows'
-        [ "msi" ]
+        ['msi']
       when 'mac_os_x'
-        [ "mac_pkg" ]
+        ['mac_pkg']
       else
-        [ "makeself" ]
+        ['makeself']
       end
     end
 
@@ -539,7 +538,7 @@ module Omnibus
     # this is just the platform_version.
     # @return [String] the platform version
     def platform_version_for_package
-      if platform == "rhel"
+      if platform == 'rhel'
         platform_version[/([\d]+)\..+/, 1]
       else
         platform_version
@@ -550,8 +549,8 @@ module Omnibus
     # rhel/centos become "el", all others are just platform
     # @return [String] the platform family short name
     def platform_shortname
-      if platform_family == "rhel"
-        "el"
+      if platform_family == 'rhel'
+        'el'
       else
         platform
       end
@@ -560,9 +559,9 @@ module Omnibus
     def render_metadata(pkg_type)
       basename = output_package(pkg_type)
       pkg_path = "#{config.package_dir}/#{basename}"
-      artifact = Artifact.new(pkg_path, [ platform_tuple ], :version => build_version)
+      artifact = Artifact.new(pkg_path, [platform_tuple], version: build_version)
       metadata = artifact.flat_metadata
-      File.open("#{pkg_path}.metadata.json", "w+") do |f|
+      File.open("#{pkg_path}.metadata.json", 'w+') do |f|
         f.print(JSON.pretty_generate(metadata))
       end
     end
@@ -571,15 +570,15 @@ module Omnibus
     # @return [String] the basename of the package file
     def output_package(pkg_type)
       case pkg_type
-      when "makeself"
+      when 'makeself'
         "#{package_name}-#{build_version}_#{iteration}.sh"
-      when "msi"
+      when 'msi'
         "#{package_name}-#{build_version}-#{iteration}.msi"
-      when "bff"
+      when 'bff'
         "#{package_name}.#{bff_version}.bff"
-      when "pkgmk"
+      when 'pkgmk'
         "#{package_name}-#{build_version}-#{iteration}.solaris"
-      when "mac_pkg"
+      when 'mac_pkg'
         Packagers::MacPkg.new(self).package_name
       else # fpm
         require "fpm/package/#{pkg_type}"
@@ -587,8 +586,8 @@ module Omnibus
         pkg.version = build_version
         pkg.name = package_name
         pkg.iteration = iteration
-        if pkg_type == "solaris"
-          pkg.to_s("NAME.FULLVERSION.ARCH.TYPE")
+        if pkg_type == 'solaris'
+          pkg.to_s('NAME.FULLVERSION.ARCH.TYPE')
         else
           pkg.to_s
         end
@@ -608,25 +607,26 @@ module Omnibus
     #   Mixlib::ShellOut object ready for execution.  Using Arrays
     #   makes downstream processing needlessly complicated.
     def msi_command
-      msi_command = ["light.exe",
-                     "-nologo",
-                     "-ext WixUIExtension",
-                     "-cultures:en-us",
-                     "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
-                     "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
-                     "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
-                     "-out #{config.package_dir}\\#{output_package("msi")}"]
+      msi_command = [
+        'light.exe',
+        '-nologo',
+        '-ext WixUIExtension',
+        '-cultures:en-us',
+        "-loc #{install_path}\\msi-tmp\\#{package_name}-en-us.wxl",
+        "#{install_path}\\msi-tmp\\#{package_name}-Files.wixobj",
+        "#{install_path}\\msi-tmp\\#{package_name}.wixobj",
+        "-out #{config.package_dir}\\#{output_package("msi")}",
+      ]
 
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
-      [msi_command.join(" "), {:returns => [0, 204]}]
+      [msi_command.join(' '), { returns: [0, 204] }]
     end
 
     def bff_command
-      bff_command = ["sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template"]
-      [bff_command.join(" "), {:returns => [0]}]
+      bff_command = ['sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template']
+      [bff_command.join(' '), { returns: [0] }]
     end
-
 
     # The {https://github.com/jordansissel/fpm fpm} command to
     # generate a package for RedHat, Ubuntu, Solaris, etc. platforms.
@@ -643,17 +643,20 @@ module Omnibus
     # @todo Use the long option names (i.e., the double-dash ones) in
     #   the fpm command for maximum clarity.
     def fpm_command(pkg_type)
-      command_and_opts = ["fpm",
-                          "-s dir",
-                          "-t #{pkg_type}",
-                          "-v #{build_version}",
-                          "-n #{package_name}",
-                          "-p #{output_package(pkg_type)}",
-                          "--iteration #{iteration}",
-                          "-m '#{maintainer}'",
-                          "--description '#{description}'",
-                          "--url #{homepage}"]
-      if File.exist?(File.join(package_scripts_path, "preinst"))
+      command_and_opts = [
+        'fpm',
+        '-s dir',
+        "-t #{pkg_type}",
+        "-v #{build_version}",
+        "-n #{package_name}",
+        "-p #{output_package(pkg_type)}",
+        "--iteration #{iteration}",
+        "-m '#{maintainer}'",
+        "--description '#{description}'",
+        "--url #{homepage}",
+      ]
+
+      if File.exist?(File.join(package_scripts_path, 'preinst'))
         command_and_opts << "--before-install '#{File.join(package_scripts_path, "preinst")}'"
       end
 
@@ -709,13 +712,14 @@ module Omnibus
 
     # TODO: what's this do?
     def makeself_command
-      command_and_opts = [ File.expand_path(File.join(Omnibus.source_root, "bin", "makeself.sh")),
-                           "--gzip",
-                           install_path,
-                           output_package("makeself"),
-                           "'The full stack of #{@name}'"
-                         ]
-      command_and_opts << "./makeselfinst" if File.exists?("#{package_scripts_path}/makeselfinst")
+      command_and_opts = [
+        File.expand_path(File.join(Omnibus.source_root, 'bin', 'makeself.sh')),
+        '--gzip',
+        install_path,
+        output_package('makeself'),
+        "'The full stack of #{@name}'",
+      ]
+      command_and_opts << './makeselfinst' if File.exists?("#{package_scripts_path}/makeselfinst")
       command_and_opts
     end
 
@@ -730,11 +734,11 @@ module Omnibus
       end
 
       # run the makeself program
-      package_commands << makeself_command.join(" ")
+      package_commands << makeself_command.join(' ')
 
       # rm the makeself installer (for incremental builds)
       package_commands << "rm -f #{install_path}/makeselfinst"
-      package_commands.each {|cmd| run_package_command(cmd) }
+      package_commands.each { |cmd| run_package_command(cmd) }
     end
 
     # Runs the necessary command to make an MSI. As a side-effect, sets `output_package`
@@ -744,13 +748,13 @@ module Omnibus
     end
 
     def bff_version
-      build_version.split(/[^\d]/)[0..2].join(".") + ".#{iteration}"
+      build_version.split(/[^\d]/)[0..2].join('.') + ".#{iteration}"
     end
 
     def run_bff
-      FileUtils.rm_rf "/.info/*"
-      FileUtils.rm_rf "/tmp/bff"
-      FileUtils.mkdir "/tmp/bff"
+      FileUtils.rm_rf '/.info/*'
+      FileUtils.rm_rf '/tmp/bff'
+      FileUtils.mkdir '/tmp/bff'
 
       system "find #{install_path} -print > /tmp/bff/file.list"
 
@@ -775,8 +779,8 @@ module Omnibus
       install_dirname = File.dirname(install_path)
       install_basename = File.basename(install_path)
 
-      system "sudo rm -rf /tmp/pkgmk"
-      FileUtils.mkdir "/tmp/pkgmk"
+      system 'sudo rm -rf /tmp/pkgmk'
+      FileUtils.mkdir '/tmp/pkgmk'
 
       system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
 
@@ -786,7 +790,7 @@ i postinstall
 i postremove
       EOF
 
-      File.open "/tmp/pkgmk/Prototype", "w+" do |f|
+      File.open '/tmp/pkgmk/Prototype', 'w+' do |f|
         f.write prototype_content
       end
 
@@ -812,16 +816,16 @@ EMAIL=#{maintainer}
 PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       EOF
 
-      File.open "/tmp/pkgmk/pkginfo", "w+" do |f|
+      File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
         f.write pkginfo_content
       end
 
-      FileUtils.cp "#{package_scripts_path}/postinst", "/tmp/pkgmk/postinstall"
-      FileUtils.cp "#{package_scripts_path}/postrm", "/tmp/pkgmk/postremove"
+      FileUtils.cp "#{package_scripts_path}/postinst", '/tmp/pkgmk/postinstall'
+      FileUtils.cp "#{package_scripts_path}/postrm", '/tmp/pkgmk/postremove'
 
-      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype", :timeout => 3600)
+      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype", timeout: 3600)
 
-      system "pkgchk -vd /tmp/pkgmk chef"
+      system 'pkgchk -vd /tmp/pkgmk chef'
 
       system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
     end
@@ -830,12 +834,11 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       Packagers::MacPkg.new(self).build
     end
 
-
     # Runs the necessary command to make a package with fpm. As a side-effect,
     # sets `output_package`
     # @return void
     def run_fpm(pkg_type)
-      run_package_command(fpm_command(pkg_type).join(" "))
+      run_package_command(fpm_command(pkg_type).join(' '))
     end
 
     # Executes the given command via mixlib-shellout.
@@ -843,8 +846,8 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
     #   object, so the caller can inspect the stdout and stderr.
     def run_package_command(cmd)
       cmd_options = {
-        :timeout => 3600,
-        :cwd => config.package_dir
+        timeout: 3600,
+        cwd: config.package_dir,
       }
 
       if cmd.is_a?(Array)
@@ -864,27 +867,27 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
     # @return void
     def render_tasks
       directory config.package_dir
-      directory "pkg"
+      directory 'pkg'
 
       namespace :projects do
         namespace @name do
 
           package_types.each do |pkg_type|
-            dep_tasks = @dependencies.map {|dep| "software:#{dep}"}
+            dep_tasks = @dependencies.map { |dep| "software:#{dep}" }
             dep_tasks << config.package_dir
-            dep_tasks << "health_check"
+            dep_tasks << 'health_check'
 
             desc "package #{@name} into a #{pkg_type}"
             task pkg_type => dep_tasks do
-              if pkg_type == "makeself"
+              if pkg_type == 'makeself'
                 run_makeself
-              elsif pkg_type == "msi"
+              elsif pkg_type == 'msi'
                 run_msi
-              elsif pkg_type == "bff"
+              elsif pkg_type == 'bff'
                 run_bff
-              elsif pkg_type == "pkgmk"
+              elsif pkg_type == 'pkgmk'
                 run_pkgmk
-              elsif pkg_type == "mac_pkg"
+              elsif pkg_type == 'mac_pkg'
                 run_mac_package_build
               else # pkg_type == "fpm"
                 run_fpm(pkg_type)
@@ -895,10 +898,10 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
             end
           end
 
-          task "copy" => package_types do
-            if OHAI.platform == "windows"
+          task 'copy' => package_types do
+            if OHAI.platform == 'windows'
               cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
-            elsif OHAI.platform == "aix"
+            elsif OHAI.platform == 'aix'
               cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
             else
               cp_cmd = "cp #{config.package_dir}/* pkg/"
@@ -907,15 +910,15 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
             shell.run_command
             shell.error!
           end
-          task "copy" => "pkg"
+          task 'copy' => 'pkg'
 
           desc "run the health check on the #{@name} install path"
-          task "health_check" do
-            if OHAI.platform == "windows"
-              puts "Skipping health check on windows..."
+          task 'health_check' do
+            if OHAI.platform == 'windows'
+              puts 'Skipping health check on windows...'
             else
               # build a list of all whitelist files from all project dependencies
-              whitelist_files = library.components.map{|component| component.whitelist_files }.flatten
+              whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
               Omnibus::HealthCheck.run(install_path, whitelist_files)
             end
           end

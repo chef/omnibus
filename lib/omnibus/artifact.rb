@@ -1,6 +1,5 @@
 module Omnibus
   class Artifact
-
     attr_reader :path
     attr_reader :platforms
     attr_reader :config
@@ -65,9 +64,9 @@ module Omnibus
     def add_to_v2_release_manifest!(release_manifest)
       platforms.each do |distro, version, arch|
         pkg_info = {
-          "relpath" => relpath,
-          "md5" => md5,
-          "sha256" => sha256
+          'relpath' => relpath,
+          'md5'     => md5,
+          'sha256'  => sha256,
         }
 
         release_manifest[distro] ||= {}
@@ -92,13 +91,13 @@ module Omnibus
     def flat_metadata
       distro, version, arch = build_platform
       {
-        "platform" => distro,
-        "platform_version" => version,
-        "arch" => arch,
-        "version" => build_version,
-        "basename" => File.basename(path),
-        "md5" => md5,
-        "sha256" => sha256
+        'platform' => distro,
+        'platform_version' => version,
+        'arch' => arch,
+        'version' => build_version,
+        'basename' => File.basename(path),
+        'md5' => md5,
+        'sha256' => sha256,
       }
     end
 
@@ -140,7 +139,7 @@ module Omnibus
     def digest(digest_class)
       digest = digest_class.new
       File.open(path) do |io|
-        while chunk = io.read(1024 * 8)
+        while (chunk = io.read(1024 * 8))
           digest.update(chunk)
         end
       end
@@ -148,4 +147,3 @@ module Omnibus
     end
   end
 end
-

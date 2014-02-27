@@ -16,7 +16,7 @@ describe Omnibus do
       end
 
       it 'will include list of software from omnibus-software gem' do
-        Omnibus.software_dirs.length.should eq 2
+        expect(Omnibus.software_dirs.length).to eq(2)
       end
     end
 
@@ -26,7 +26,7 @@ describe Omnibus do
       end
 
       it 'will not include list of software from omnibus-software gem' do
-        Omnibus.software_dirs.length.should eq 1
+        expect(Omnibus.software_dirs.length).to eq(1)
       end
     end
   end

@@ -19,7 +19,6 @@ module Omnibus
   #
   # Used to generate the manifest of all software components with versions
   class Library
-
     attr_reader :components
 
     def initialize(project)
@@ -32,31 +31,31 @@ module Omnibus
     end
 
     def version_map
-      @components.inject({}) {|map, component|
+      @components.reduce({}) do |map, component|
         map[component.name] = if component.default_version
-                                {:version       => component.version,
-                                 :default_version => component.default_version,
-                                 :overridden    => component.overridden?,
-                                 :version_guid  => component.version_guid}
+                                {
+                                  version: component.version,
+                                  default_version: component.default_version,
+                                  overridden: component.overridden?,
+                                  version_guid: component.version_guid,
+                                }
                               else
                                 ## Components without a version are
                                 ## pieces of the omnibus project
                                 ## itself, and so don't really fit
                                 ## with the concept of overrides
-                                v = {:version => @project.build_version}
+                                v = { version: @project.build_version }
                                 if @project.build_version.respond_to?(:git_sha)
                                   v[:version_guid] = "git:#{@project.build_version.git_sha}"
                                 end
                                 v
                               end
         map
-      }
+      end
     end
 
     def select(*args, &block)
       @components.select(*args, &block)
     end
   end
-
 end
-

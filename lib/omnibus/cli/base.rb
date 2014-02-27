@@ -24,20 +24,21 @@ module Omnibus
       include Thor::Actions
 
       class_option :config,
-        :aliases => [:c],
-        :type => :string,
-        :default => File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME),
-        :desc => "Path to the Omnibus configuration file to use."
+                   aliases: [:c],
+                   type: :string,
+                   default: File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME),
+                   desc: 'Path to the Omnibus configuration file to use.'
 
       def initialize(args, options, config)
         super(args, options, config)
         $stdout.sync = true
 
-        # Don't try to initialize the Omnibus project for help commands. current_task renamed to current_command in Thor 0.18.0
+        # Don't try to initialize the Omnibus project for help commands.#
+        # current_task renamed to current_command in Thor 0.18.0
         current_command = config[:current_command] ? config[:current_command].name : config[:current_task].name
-        return if current_command == "help"
+        return if current_command == 'help'
 
-        if config = @options[:config]
+        if (config = @options[:config])
           if config && File.exist?(@options[:config])
             say("Using Omnibus configuration file #{config}", :green)
             Omnibus.load_configuration(config)
@@ -46,24 +47,23 @@ module Omnibus
           end
         end
 
-        if path = @options[:path]
+        if (path = @options[:path])
           # TODO: merge in all relevant CLI options here, as they should
           # override anything from a configuration file.
           Omnibus::Config.project_root(path)
           Omnibus::Config.append_timestamp(@options[:timestamp]) if @options.key?('timestamp')
 
           unless Omnibus.project_files.any?
-            raise Omnibus::CLI::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
+            fail Omnibus::CLI::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
           end
 
           begin
             Omnibus.process_configuration
           rescue => e
-            error_msg = "Could not load the Omnibus projects."
+            error_msg = 'Could not load the Omnibus projects.'
             raise Omnibus::CLI::Error.new(error_msg, e)
           end
         end
-
       end
 
       ##################################################################
@@ -91,10 +91,8 @@ module Omnibus
       def self.banner(command, namespace = nil, subcommand = false)
         # Main commands have an effective namespace of 'application' OR
         # contain subcommands
-        if (self.namespace.split(':').last != 'application') || self.subcommands.empty?
-          subcommand = true
-        end
-        "#{basename} #{command.formatted_usage(self, $thor_runner, subcommand)}"
+        subcommand = self.namespace.split(':').last != 'application' || subcommands.empty?
+        "#{basename} #{command.formatted_usage(self, $thor_runner, subcommand) }"
       end
 
       protected
@@ -107,12 +105,11 @@ module Omnibus
         project = Omnibus.project(project_name)
         unless project
           error_msg = "I don't know anything about project '#{project_name}'."
-          error_msg << " Valid project names include: #{Omnibus.project_names.join(', ')}"
-          raise Omnibus::CLI::Error, error_msg
+          error_msg << " Valid project names include: #{Omnibus.project_names.join(', ') }"
+          fail Omnibus::CLI::Error, error_msg
         end
         project
       end
-
     end
   end
 end
