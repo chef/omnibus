@@ -1,135 +1,158 @@
+Omnibus Ruby CHANGELOG
+======================
+
+v2.0.0 (Unreleased)
+-------------------
+Major changes:
+- `version` is now `default_version`
+- Added support for multiple software versions and version overrides
+- Added support for project-specific overrides
+- Added Mac DMG packaging functionality
+- Require Mixlib::Config 2.0
+
+Minor changes:
+- Added a new CI pipeline on Travis
+- Switch to Ruby 1.9 hash syntaxes
+
+Tiny changes that probably won't affect you:
+- `.yardopts` are no longer committed
+- `.rspec` is no longer committed
+- Updated copyrights to new company name
+- Improved test coverage
+- Miscellaneous bug fixes
+
 ## 1.3.0 (December 6, 2013)
 
 FEATURES:
 
-* Add `build_retries` global config value (still 3 by default). ([@fujin][], [#63][])
-* Add support for pre-install scripts. ([@christophermaier][])
-* Add support for `*.tar.xz` files. ([@jf647][], [#71][])
-* Add `erb` builder command. ([@ohlol][], [#79][])
-* Add `package_user`, `package_group` to project definitions for setting 
+- Add `build_retries` global config value (still 3 by default). ([@fujin][], [#63][])
+- Add support for pre-install scripts. ([@christophermaier][])
+- Add support for `*.tar.xz` files. ([@jf647][], [#71][])
+- Add `erb` builder command. ([@ohlol][], [#79][])
+- Add `package_user`, `package_group` to project definitions for setting
   user and group ownership for of deb/rpm/solaris packages. ([@ohlol][], [#80][])
-* Add `config_file` to project definitions for passing `--config-files` 
+- Add `config_file` to project definitions for passing `--config-files`
   options to the `fpm` builder commands. ([@christophergeers][], [#85][])
 
 IMPROVEMENTS:
 
-* Bump default cpus to get better throughput when Ohai is wrong. ([@lamont-granquist][])
-* Whitelist `libnsl` on Arch Linux. ([@sl4mmy][], [#67][])
-* Switch to using pkgmk for Solaris. ([@lamont-granquist][], [#72][])
-* Remove make install from c-example. ([@johntdyer][], [#73][])
-* Update Vagrantfile template to use provisionerless base boxes. ([@schisamo][], [#74][])
-* Allow access to `Omnibus.project_root` in builder blocks. ([@ohlol][], [#78][])
-* Refactor how we handle loading dirs for software files. ([@benjaminws][], [#82][])
-* Update depdencies: ([@schisamo][], [#86][])
-  * fpm 1.0.0
-  * mixlib-config 2.1.0
-  * mixlib-shellout 1.3.0
+- Bump default cpus to get better throughput when Ohai is wrong. ([@lamont-granquist][])
+- Whitelist `libnsl` on Arch Linux. ([@sl4mmy][], [#67][])
+- Switch to using pkgmk for Solaris. ([@lamont-granquist][], [#72][])
+- Remove make install from c-example. ([@johntdyer][], [#73][])
+- Update Vagrantfile template to use provisionerless base boxes. ([@schisamo][], [#74][])
+- Allow access to `Omnibus.project_root` in builder blocks. ([@ohlol][], [#78][])
+- Refactor how we handle loading dirs for software files. ([@benjaminws][], [#82][])
+- Update depdencies: ([@schisamo][], [#86][])
+  - fpm 1.0.0
+  - mixlib-config 2.1.0
+  - mixlib-shellout 1.3.0
 
 BUG FIXES:
 
-* Properly handle `HTTP_PROXY_USER` and `HTTP_PROXY_PASS`. ([@databus23][], [#77][])
-* Fix the incorrect error message logged when the Git fetcher failed to 
+- Properly handle `HTTP_PROXY_USER` and `HTTP_PROXY_PASS`. ([@databus23][], [#77][])
+- Fix the incorrect error message logged when the Git fetcher failed to
   resolve refs to commits. ([@mumoshu][], [#81][])
-* Removin unsupported `config.ssh.max_tries` and `config.ssh.timeout` 
+- Removin unsupported `config.ssh.max_tries` and `config.ssh.timeout`
   from Vagrantfile template. ([@totally][], [#83][])
-* Mention the required Vagrant plugins. ([@jacobvosmaer][], [#70][])
+- Mention the required Vagrant plugins. ([@jacobvosmaer][], [#70][])
 
 ## 1.2.0 (July 12, 2013)
 
 FEATURES:
 
-* Add `whitelist_file` to software DSL. This allows an individual software 
+- Add `whitelist_file` to software DSL. This allows an individual software
   definition to declare files that should be ignored during health checking.
 
 IMPROVEMENTS:
 
-* Raise an exception if a project's dependency is not found.
+- Raise an exception if a project's dependency is not found.
 
 BUG FIXES:
 
-* Properly load a project's transitive dependencies.
-* Ensure a component is only added to a library one time.
+- Properly load a project's transitive dependencies.
+- Ensure a component is only added to a library one time.
 
 ## 1.1.1 (July 2, 2013)
 
 BUG FIXES:
 
-* Raise an exception if a patch file is not found.
-* Be more explicit about types in CPU computation.
-* Include pkg version, iteration, arch for solaris packages.
-* Fix assorted typos in CLI output.
+- Raise an exception if a patch file is not found.
+- Be more explicit about types in CPU computation.
+- Include pkg version, iteration, arch for solaris packages.
+- Fix assorted typos in CLI output.
 
 ## 1.1.0 (June 12, 2013)
 
 FEATURES:
 
-* AIX health check whitelist support
-* AIX Backup-File Format (BFF) package support
+- AIX health check whitelist support
+- AIX Backup-File Format (BFF) package support
 
 IMPROVEMENTS:
 
-* Add libstdc++ to SmartOS whitelist libs - this allows the health check pass when 
+- Add libstdc++ to SmartOS whitelist libs - this allows the health check pass when
   depending on C++ libs.
 
 BUG FIXES:
 
-* [CHEF-4246] - omnibus cache populate failing
+- [CHEF-4246] - omnibus cache populate failing
 
 ## 1.0.4 (May 23, 2013)
 
 FEATURES:
 
-* Add `release package` command which releases a single package with associated 
+- Add `release package` command which releases a single package with associated
   metadata file to a single S3 bucket.
-* Arch Linux health check whitelist support
+- Arch Linux health check whitelist support
 
 IMPROVEMENTS:
 
-* Add libstdc++ to Mac whitelist libs - this allows the health check pass when 
+- Add libstdc++ to Mac whitelist libs - this allows the health check pass when
   depending on C++ libs.
-* Change scope of `Omnibus::Library` instance from global to project.
+- Change scope of `Omnibus::Library` instance from global to project.
 
 BUG FIXES:
 
-* [CHEF-4214] - projects in multi-project omnibus repositories share dependency scope
+- [CHEF-4214] - projects in multi-project omnibus repositories share dependency scope
 
 ## 1.0.3 (May 2, 2013)
 
 FEATURES:
 
-* [CHEF-2576] - SmartOS health check whitelist support
-* [CHEF-4141] - FreeBSD health check whitelist support
-* [CHEF-3990] - Add support to uncompress zip file
+- [CHEF-2576] - SmartOS health check whitelist support
+- [CHEF-4141] - FreeBSD health check whitelist support
+- [CHEF-3990] - Add support to uncompress zip file
 
 BUG FIXES:
 
-* Fix project homepage in gemspec
-* Proper Thor 0.16.0, 0.17.0 suppport - Thor 0.18.0 renamed current_task to
+- Fix project homepage in gemspec
+- Proper Thor 0.16.0, 0.17.0 suppport - Thor 0.18.0 renamed current_task to
   current_command
 
 ## 1.0.2 (April 23, 2013)
 
 IMPROVEMENTS:
 
-* Travis CI support
+- Travis CI support
 
 BUG FIXES:
 
-* [CHEF-4112] `omnibus build project` command does not respect the
+- [CHEF-4112] `omnibus build project` command does not respect the
   `--no-timestamp` flag
 
 ## 1.0.1 (April 21, 2013)
 
 BUG FIXES:
 
-* Vagrant and Berkshelf Vagrant plugin version updates in generated project's
+- Vagrant and Berkshelf Vagrant plugin version updates in generated project's
   README.md. Current requirements for the virtualized build lab are:
-  * Vagrant 1.2.1+
-  * `vagrant-berkshelf` plugin (this was renamed from `berkshelf-vagrant`)
+  - Vagrant 1.2.1+
+  - `vagrant-berkshelf` plugin (this was renamed from `berkshelf-vagrant`)
 
 ## 1.0.0 (April 21, 2013)
 
-* The initial release.
+- The initial release.
 
 <!--- The following link definition list is generated by PimpMyChangelog --->
 [#63]: https://github.com/opscode/omnibus-ruby/issues/63
