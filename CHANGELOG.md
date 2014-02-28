@@ -7,7 +7,7 @@ Major changes:
 - `version` is now `default_version`
 - Added support for multiple software versions and version overrides
 - Added support for project-specific overrides
-- Added Mac DMG packaging functionality
+- Added Mac .pkg packaging functionality (DMG coming soon)
 - Require Mixlib::Config 2.0
 
 Minor changes:
