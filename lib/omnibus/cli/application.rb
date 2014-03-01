@@ -118,7 +118,7 @@ module Omnibus
         super
       rescue => e
         error_msg = 'Something went wrong...the Omnibus just ran off the road!'
-        error_msg << "\n\nError raised was:\n\n\t#{$ERROR_INFO}"
+        error_msg << "\n\nError raised was:\n\n\t#{e}"
         error_msg << "\n\nBacktrace:\n\n\t#{e.backtrace.join("\n\t") }"
         if e.respond_to?(:original) && e.original
           error_msg << "\n\nOriginal Error:\n\n\t#{e.original}"
