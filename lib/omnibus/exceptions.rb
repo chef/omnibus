@@ -189,4 +189,8 @@ module Omnibus
 E
     end
   end
+
+  class UnresolvableGitReference < RuntimeError
+  end
+
 end

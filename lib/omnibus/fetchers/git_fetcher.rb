@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+require 'omnibus/exceptions'
+
 module Omnibus
   # Fetcher implementation for projects in git.
   class GitFetcher < Fetcher
@@ -156,8 +158,19 @@ E
       shell.run_command
       shell.error!
       commit_ref = process_remote_list(shell.stdout, ref)
-      fail 'Could not parse SHA reference' unless commit_ref
+
+      unless commit_ref
+        raise UnresolvableGitReference.new("Could not resolve `#{ref}' to a SHA.")
+      end
       commit_ref
+    rescue UnresolvableGitReference => e # skip retries
+      ErrorReporter.new(e, self).explain(<<-E)
+Command `#{cmd}' did not find a commit for reference `#{ref}'.
+The tag or branch you're looking for doesn't exist on the remote repo.
+If your project uses version tags like v1.2.3, include the 'v' in your
+software's version.
+E
+      raise
     rescue Exception => e
       if retries >= 3
         ErrorReporter.new(e, self).explain("Failed to find any commits for the ref '#{ref}'")
