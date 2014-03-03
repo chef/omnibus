@@ -28,3 +28,7 @@ TrailingComma:
   EnforcedStyleForMultiline: comma
 TrivialAccessors:
   Enabled: false
+SignalException:
+  Enabled: false
+EmptyLinesAroundBody:
+  Enabled: false
