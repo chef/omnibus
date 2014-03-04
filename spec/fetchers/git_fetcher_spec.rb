@@ -76,22 +76,25 @@ describe Omnibus::GitFetcher do
 
         context 'when the ref does not exist' do
           let(:git_ls_remote_out) { '' }
+          let(:error_reporter) { double('ErrorReporter', explain: nil) }
+
+          before { Omnibus::Fetcher::ErrorReporter.stub(:new).and_return(error_reporter) }
 
           it 'should clone the Git repository and then fail while retrying 3 times' do
+            expect(error_reporter).to receive(:explain)
+              .with(%|Failed to fetch git repository 'git@example.com:test/project.git'|)
+
             4.times do
               expect_git_clone
-              4.times do
-                expect_git_ls_remote
-              end
             end
 
-            expect_any_instance_of(Omnibus::Fetcher::ErrorReporter).to receive(:explain)
-              .with(%q|Failed to find any commits for the ref '0.0.1'|)
+            expect_git_ls_remote
+
             expect(subject).to receive(:log).with(/git ls\-remote failed/).at_least(1).times
             expect(subject).to receive(:log).with(/git clone\/fetch failed/).at_least(1).times
             # Prevent sleeping to run the spec fast
             subject.stub(:sleep)
-            expect { subject.fetch }.to raise_error(/Could not parse SHA reference/)
+            expect { subject.fetch }.to raise_error(Omnibus::UnresolvableGitReference)
           end
         end
       end
