@@ -19,6 +19,7 @@ module Omnibus
     end
 
     include_examples 'a configurable', :cache_dir, '/var/cache/omnibus/cache'
+    include_examples 'a configurable', :install_path_cache_dir, '/var/cache/omnibus/cache/install_path'
     include_examples 'a configurable', :source_dir, '/var/cache/omnibus/src'
     include_examples 'a configurable', :build_dir, '/var/cache/omnibus/build'
     include_examples 'a configurable', :package_dir, '/var/cache/omnibus/pkg'

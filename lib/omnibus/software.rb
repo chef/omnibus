@@ -26,13 +26,11 @@ require 'omnibus/fetcher'
 require 'omnibus/builder'
 require 'omnibus/config'
 
-require 'rake'
+require 'fileutils'
 
 module Omnibus
   # Omnibus software DSL reader
   class Software
-    include Rake::DSL
-
     NULL_ARG = Object.new
     UNINITIALIZED = Object.new
 
@@ -91,8 +89,6 @@ module Omnibus
       @dependencies = []
       @whitelist_files = []
       instance_eval(io, filename, 0)
-
-      render_tasks
     end
 
     # Retrieves the override_version
@@ -286,6 +282,7 @@ module Omnibus
 
     # @return [Boolean]
     def always_build?
+      return true if project.dirty_cache
       # Should do !!(@always_build)
       @always_build
     end
@@ -359,18 +356,6 @@ module Omnibus
       @relative_path ? "#{source_dir}/#{@relative_path}" : "#{source_dir}/#{@name}"
     end
 
-    # @todo all the *_file methods should be next to each other for
-    #   better logical grouping
-    def manifest_file
-      manifest_file_from_name(@name)
-    end
-
-    # @todo Seems like this should be a private method, since it's
-    #   just used internally
-    def manifest_file_from_name(software_name)
-      "#{build_dir}/#{software_name}.manifest"
-    end
-
     # The name of the sentinel file that marks the most recent fetch
     # time of the software
     #
@@ -431,6 +416,42 @@ module Omnibus
       OHAI.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
     end
 
+    # Actually build the software package
+    def build_me
+      # Fetch the source
+      fetcher = fetch_me
+
+      # Build if we need to
+      if always_build?
+        execute_build(fetcher)
+      else
+        if Omnibus::InstallPathCache.new(install_dir, self).restore
+          true
+        else
+          execute_build(fetcher)
+        end
+      end
+      true
+    end
+
+    # Fetch the software
+    def fetch_me
+      # Create the directories we need
+      [build_dir, source_dir, cache_dir, project_dir].each do |dir|
+        FileUtils.mkdir_p dir
+      end
+
+      fetcher = Fetcher.for(self)
+
+      if !File.exist?(fetch_file) || fetcher.fetch_required?
+        # force build to run if we need to do an updated fetch
+        fetcher.fetch
+        touch fetch_file
+      end
+
+      fetcher
+    end
+
     private
 
     # Apply overrides in the @overrides hash that mask instance variables
@@ -457,74 +478,15 @@ module Omnibus
     def execute_build(fetcher)
       fetcher.clean
       @builder.build
-      touch manifest_file
+      puts "[software:#{name}] caching build"
+      Omnibus::InstallPathCache.new(install_dir, self).incremental
+      puts "[software:#{name}] has dirtied the cache"
+      project.dirty_cache = true
     end
 
-    def render_tasks
-      namespace "projects:#{@project.name}" do
-        namespace :software do
-          fetcher = Fetcher.for(self)
-
-          #
-          # set up inter-project dependencies
-          #
-          (@dependencies - [@name]).uniq.each do |dep|
-            task @name => dep
-            file manifest_file => manifest_file_from_name(dep)
-          end
-
-          directory source_dir
-          directory cache_dir
-          directory build_dir
-          directory project_dir
-          namespace @name do
-            task fetch: [build_dir, source_dir, cache_dir, project_dir] do
-              if !File.exist?(fetch_file) || fetcher.fetch_required?
-                # force build to run if we need to do an updated fetch
-                fetcher.fetch
-                touch fetch_file
-              end
-            end
-
-            task build: :fetch do
-              if !always_build? && uptodate?(manifest_file, [fetch_file])
-                # if any direct deps have been built for any reason, we will need to
-                # clean/build ourselves
-                (@dependencies - [@name]).uniq.each do |dep|
-                  unless uptodate?(manifest_file, [manifest_file_from_name(dep)])
-                    execute_build(fetcher)
-                    break
-                  end
-                end
-
-              else
-                # if fetch has occurred, or the component is configured to
-                # always build, do a clean and build.
-                execute_build(fetcher)
-              end
-            end
-          end
-
-          #
-          # make the manifest file dependent on the latest file in the
-          # source tree in order to shrink the multi-thousand-node
-          # dependency graph that Rake was generating
-          #
-          latest_file = FileList["#{project_dir}/**/*"].sort do |a, b|
-            File.mtime(a) <=> File.mtime(b)
-          end.last
-
-          file manifest_file => (file latest_file)
-
-          file fetch_file => "#{name}:fetch"
-          file manifest_file => "#{name}:build"
-
-          file fetch_file => (file @source_config)
-          file manifest_file => (file fetch_file)
-
-          desc "fetch and build #{@name} for #{@project.name}"
-          task @name => manifest_file
-        end
+    def touch(file)
+      File.open(file, 'w') do |f|
+        f.print ''
       end
     end
   end

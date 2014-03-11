@@ -83,7 +83,6 @@ module Omnibus
   def self.process_configuration
     Config.validate
     process_dsl_files
-    generate_extra_rake_tasks
   end
 
   # All {Omnibus::Project} instances that have been created.
@@ -222,17 +221,6 @@ module Omnibus
     expand_software(overrides, final_software_map)
   end
 
-  # Creates some additional Rake tasks beyond those generated in the
-  # process of reading in the DSL files.
-  #
-  # @return [void]
-  #
-  # @todo Not so sure I like how this is being done, but at least it
-  #   isolates the Rake stuff.
-  def self.generate_extra_rake_tasks
-    require 'omnibus/clean_tasks'
-  end
-
   # Return a list of all the Ruby files (i.e., those with an "rb"
   # extension) in the given directory
   #
@@ -301,11 +289,12 @@ module Omnibus
     end
 
     dep_software = Omnibus::Software.load(dep_file, project, overrides)
-    project.library.component_added(dep_software)
 
     # load any transitive deps for the component into the library also
     dep_software.dependencies.each do |dep|
       recursively_load_dependency(dep, project, overrides, software_map)
     end
+
+    project.library.component_added(dep_software)
   end
 end

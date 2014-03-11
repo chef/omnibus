@@ -27,7 +27,24 @@ module Omnibus
     end
 
     def component_added(component)
-      @components << component unless @components.include?(component)
+      unless @components.find { |c| c.name == component.name }
+        @components << component
+      end
+    end
+
+    def build_order
+      head = []
+      tail = []
+      @components.each do |component|
+        if head.length == 0
+          head << component
+        elsif @project.dependencies.include?(component.name)
+          tail << component
+        else
+          head << component
+        end
+      end
+      [head, tail].flatten
     end
 
     def version_map
