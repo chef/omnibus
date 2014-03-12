@@ -1,8 +1,8 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v2.0.0 (Unreleased)
--------------------
+v2.0.0 (March, 12, 2014)
+------------------------
 Major changes:
 - `version` is now `default_version`
 - Added support for multiple software versions and version overrides
