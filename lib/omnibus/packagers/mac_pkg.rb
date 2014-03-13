@@ -46,6 +46,10 @@ module Omnibus
       #   @return (see Project#build_version)
       def_delegator :@project, :build_version, :version
 
+      # !@method iteration
+      #   @return (see Project#iteration)
+      def_delegator :@project, :iteration, :iteration
+
       # !@method identifier
       #   @return (see Project#mac_pkg_identifier)
       def_delegator :@project, :mac_pkg_identifier, :identifier
@@ -171,7 +175,7 @@ module Omnibus
       #
       # @return [String] the basename of the package file
       def package_name
-        "#{name}.pkg"
+        "#{name}-#{version}-#{iteration}.pkg"
       end
 
       def identifier
