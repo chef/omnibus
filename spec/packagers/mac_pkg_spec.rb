@@ -68,7 +68,7 @@ EOH
       productbuild
       --distribution #{expected_distribution_path}
       --resources /omnibus/project/root/files/mac_pkg/Resources
-      /home/someuser/omnibus-myproject/pkg/myproject.pkg
+      /home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg
     )
   end
 
@@ -95,6 +95,7 @@ EOH
     double Omnibus::Project,
            name: project_name,
            build_version: '23.4.2',
+           iteration: 4,
            maintainer: "Joe's Software",
            install_path: '/opt/myproject',
            package_scripts_path: scripts_path,
@@ -135,8 +136,8 @@ EOH
   it 'names the product package PROJECT_NAME.pkg' do
     # NOTE: #package_name is used by Project, so it's part of the **PUBLIC**
     # API.
-    expect(packager.package_name).to eq('myproject.pkg')
-    expect(packager.product_pkg_name).to eq('myproject.pkg')
+    expect(packager.package_name).to eq('myproject-23.4.2-4.pkg')
+    expect(packager.product_pkg_name).to eq('myproject-23.4.2-4.pkg')
   end
 
   it "use's the project's package_scripts_path" do
