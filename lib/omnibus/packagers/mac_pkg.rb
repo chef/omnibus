@@ -129,7 +129,7 @@ module Omnibus
       # to customize the installer UI.
       # @return [Array<String>] argv for the pkgbuild command.
       def pkgbuild_command
-        %W[
+        %W(
           pkgbuild
           --identifier #{identifier}
           --version #{version}
@@ -137,7 +137,7 @@ module Omnibus
           --root #{pkg_root}
           --install-location #{install_location}
           #{component_pkg_name}
-        ]
+        )
       end
 
       # The argv for a productbuild command that will build the product package.
@@ -145,12 +145,12 @@ module Omnibus
       # users.
       # @return [Array<String>] argv for the productbuild command
       def productbuild_command
-        %W[
+        %W(
           productbuild
           --distribution #{distribution_staging_path}
           --resources #{mac_pkg_files_path}
           #{product_pkg_path}
-        ]
+        )
       end
 
       # Writes the Distribution file to the staging area.

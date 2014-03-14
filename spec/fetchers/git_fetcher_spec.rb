@@ -82,7 +82,7 @@ describe Omnibus::GitFetcher do
 
           it 'should clone the Git repository and then fail while retrying 3 times' do
             expect(error_reporter).to receive(:explain)
-              .with(%|Failed to fetch git repository 'git@example.com:test/project.git'|)
+              .with(%(Failed to fetch git repository 'git@example.com:test/project.git'))
 
             4.times do
               expect_git_clone

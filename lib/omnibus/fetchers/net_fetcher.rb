@@ -56,11 +56,11 @@ E
     end
 
     def fetch_required?
-      !File.exists?(project_file) || Digest::MD5.file(project_file) != @checksum
+      !File.exist?(project_file) || Digest::MD5.file(project_file) != @checksum
     end
 
     def clean
-      if File.exists?(project_dir)
+      if File.exist?(project_dir)
         log "cleaning existing build from #{project_dir}"
         FileUtils.rm_rf(project_dir)
       end
@@ -155,7 +155,7 @@ E
           fail UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
         end
       rescue Exception
-        tries = tries - 1
+        tries -= 1
         if tries != 0
           log 'retrying failed download...'
           retry

@@ -689,13 +689,13 @@ module Omnibus
       end
 
       if @pkg_user
-        %w[ deb rpm solaris ].each do |type|
+        %w(deb rpm solaris).each do |type|
           command_and_opts << " --#{type}-user #{@pkg_user}"
         end
       end
 
       if @pkg_group
-        %w[ deb rpm solaris ].each do |type|
+        %w(deb rpm solaris).each do |type|
           command_and_opts << " --#{type}-group #{@pkg_group}"
         end
       end
@@ -719,7 +719,7 @@ module Omnibus
         output_package('makeself'),
         "'The full stack of #{@name}'",
       ]
-      command_and_opts << './makeselfinst' if File.exists?("#{package_scripts_path}/makeselfinst")
+      command_and_opts << './makeselfinst' if File.exist?("#{package_scripts_path}/makeselfinst")
       command_and_opts
     end
 
@@ -729,7 +729,7 @@ module Omnibus
     def run_makeself
       package_commands = []
       # copy the makeself installer into package
-      if File.exists?("#{package_scripts_path}/makeselfinst")
+      if File.exist?("#{package_scripts_path}/makeselfinst")
         package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
       end
 

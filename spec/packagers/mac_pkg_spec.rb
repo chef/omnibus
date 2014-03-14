@@ -64,16 +64,16 @@ EOH
   let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac-pkg/Distribution' }
 
   let(:productbuild_argv) do
-    %W[
+    %W(
       productbuild
       --distribution #{expected_distribution_path}
       --resources /omnibus/project/root/files/mac_pkg/Resources
-      /home/someuser/omnibus-myproject/pkg/myproject.pkg
-    ]
+      /home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg
+    )
   end
 
   let(:pkgbuild_argv) do
-    %w[
+    %w(
       pkgbuild
       --identifier com.mycorp.myproject
       --version 23.4.2
@@ -81,7 +81,7 @@ EOH
       --root /opt/myproject
       --install-location /opt/myproject
       myproject-core.pkg
-    ]
+    )
   end
 
   let(:shellout_opts) do
@@ -95,6 +95,7 @@ EOH
     double Omnibus::Project,
            name: project_name,
            build_version: '23.4.2',
+           iteration: 4,
            maintainer: "Joe's Software",
            install_path: '/opt/myproject',
            package_scripts_path: scripts_path,
@@ -135,8 +136,8 @@ EOH
   it 'names the product package PROJECT_NAME.pkg' do
     # NOTE: #package_name is used by Project, so it's part of the **PUBLIC**
     # API.
-    expect(packager.package_name).to eq('myproject.pkg')
-    expect(packager.product_pkg_name).to eq('myproject.pkg')
+    expect(packager.package_name).to eq('myproject-23.4.2-4.pkg')
+    expect(packager.product_pkg_name).to eq('myproject-23.4.2-4.pkg')
   end
 
   it "use's the project's package_scripts_path" do
@@ -145,7 +146,7 @@ EOH
 
   it "makes a list of required files to generate the 'product' pkg file" do
     project_file_path = '/omnibus/project/root/files/mac_pkg/Resources'
-    required_files = %w[background.png welcome.html license.html].map do |basename|
+    required_files = %w(background.png welcome.html license.html).map do |basename|
       File.join(project_file_path, basename)
     end
 
@@ -246,7 +247,7 @@ E
 
     before do
       project_file_path = '/omnibus/project/root/files/mac_pkg/Resources'
-      %w[background.png welcome.html license.html].each do |basename|
+      %w(background.png welcome.html license.html).each do |basename|
         path = File.join(project_file_path, basename)
         File.stub(:exist?).with(path).and_return(true)
       end
