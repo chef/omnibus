@@ -130,7 +130,7 @@ module Omnibus
         File.expand_path("#{root}/config/patches/#{name}/#{args[:source]}")
       end
 
-      source = candidate_paths.find { |path| File.exists?(path) }
+      source = candidate_paths.find { |path| File.exist?(path) }
 
       unless source
         fail MissingPatch.new(args[:source], candidate_paths)
@@ -152,7 +152,7 @@ module Omnibus
 
       source_path = File.expand_path("#{Omnibus.project_root}/config/templates/#{name}/#{args[:source]}")
 
-      unless File.exists?(source_path)
+      unless File.exist?(source_path)
         fail MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
       end
 
@@ -331,7 +331,7 @@ module Omnibus
       hash.reduce([]) do |kv_pair_strs, (k, v)|
         val_str = case v
                   when Hash
-                    %Q["#{to_kv_str(v, " ") }"]
+                    %Q("#{to_kv_str(v, " ") }")
                   else
                     v.to_s
                   end

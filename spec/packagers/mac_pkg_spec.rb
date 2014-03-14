@@ -64,16 +64,16 @@ EOH
   let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac-pkg/Distribution' }
 
   let(:productbuild_argv) do
-    %W[
+    %W(
       productbuild
       --distribution #{expected_distribution_path}
       --resources /omnibus/project/root/files/mac_pkg/Resources
       /home/someuser/omnibus-myproject/pkg/myproject.pkg
-    ]
+    )
   end
 
   let(:pkgbuild_argv) do
-    %w[
+    %w(
       pkgbuild
       --identifier com.mycorp.myproject
       --version 23.4.2
@@ -81,7 +81,7 @@ EOH
       --root /opt/myproject
       --install-location /opt/myproject
       myproject-core.pkg
-    ]
+    )
   end
 
   let(:shellout_opts) do
@@ -145,7 +145,7 @@ EOH
 
   it "makes a list of required files to generate the 'product' pkg file" do
     project_file_path = '/omnibus/project/root/files/mac_pkg/Resources'
-    required_files = %w[background.png welcome.html license.html].map do |basename|
+    required_files = %w(background.png welcome.html license.html).map do |basename|
       File.join(project_file_path, basename)
     end
 
@@ -246,7 +246,7 @@ E
 
     before do
       project_file_path = '/omnibus/project/root/files/mac_pkg/Resources'
-      %w[background.png welcome.html license.html].each do |basename|
+      %w(background.png welcome.html license.html).each do |basename|
         path = File.join(project_file_path, basename)
         File.stub(:exist?).with(path).and_return(true)
       end

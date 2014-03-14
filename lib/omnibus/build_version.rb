@@ -230,7 +230,11 @@ module Omnibus
     # @return [Boolean]
     # @see #prerelease_tag
     def prerelease_version?
-      !!(prerelease_tag)
+      if prerelease_tag
+        true
+      else
+        false
+      end
     end
 
     private
