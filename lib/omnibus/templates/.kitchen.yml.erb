@@ -1,0 +1,26 @@
+driver:
+  name: vagrant
+  customize:
+    cpus: 2
+    memory: 2048
+  synced_folders:
+    - ['.', '/home/vagrant/<%= config[:name] %>']
+
+provisioner:
+  require_chef_omnibus: 11.8.0
+
+platforms:
+  - name: ubuntu-12.04
+  - name: ubuntu-11.04
+  - name: ubuntu-10.04
+  - name: centos-5.10
+  - name: centos-6.5
+
+suites:
+  - name: default
+    run_list: omnibus::default
+    attributes:
+      omnibus:
+        build_user:  vagrant
+        build_dir:   /home/vagrant/<%= config[:name] %>
+        install_dir: /opt/<%= config[:name] %>

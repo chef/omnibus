@@ -76,9 +76,10 @@ module Omnibus
         template(File.join('software', 'erlang-example.rb.erb'), File.join(config_software, 'erlang-example.rb'), opts)
         template(File.join('software', 'ruby-example.rb.erb'), File.join(config_software, 'ruby-example.rb'), opts)
 
-        # Vagrant build lab
+        # Kitchen build environment
+        template(File.join('.kitchen.local.yml.erb'), File.join(target, '.kitchen.local.yml'), opts)
+        template(File.join('.kitchen.yml.erb'), File.join(target, '.kitchen.yml'), opts)
         template(File.join('Berksfile.erb'), File.join(target, 'Berksfile'), opts)
-        template(File.join('Vagrantfile.erb'), File.join(target, 'Vagrantfile'), opts)
 
         # render out stub packge scripts
         %w(makeselfinst preinst prerm postinst postrm).each do |package_script|
