@@ -1,6 +1,13 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+v2.0.1 (March 18, 2014)
+-----------------------
+- Fix the name of the `pkg` artifact created on OSX
+- Fix new Rubocop warnings
+- Update generated `Gemfile` to use Omnibus 2.0
+- Switch to using Test Kitchen for generated build labs
+
 v2.0.0 (March, 12, 2014)
 ------------------------
 Major changes:
