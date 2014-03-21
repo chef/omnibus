@@ -127,6 +127,24 @@ module Omnibus
 
     # @!endgroup
 
+    # @!group DMG configuration options
+
+    # @!attribute [rw] dmg_window_bounds
+    #   Indicate the starting x,y and ending x,y positions for the created DMG
+    #   window.
+    #
+    # @return [String]
+    default :dmg_window_bounds, '100, 100, 500, 500'
+
+    # @!attribute [rw] dmg_pkg_position
+    #   Indicate the starting x,y position where the .pkg file should live in
+    #   the DMG window.
+    #
+    # @return [String]
+    default :dmg_pkg_position, '207, 187'
+
+    # @!endgroup
+
     # @!group S3 Caching Configuration Parameters
 
     # @!attribute [rw] use_s3_caching
