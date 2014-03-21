@@ -319,7 +319,7 @@ module Omnibus
       #
       # @return [string]
       def product_dmg_name
-        "#{name}.dmg"
+        product_pkg_name.gsub('.pkg', '.dmg')
       end
 
       # The full path where the dmg package was/will be written.
