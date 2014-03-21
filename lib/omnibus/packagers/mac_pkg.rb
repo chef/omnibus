@@ -92,6 +92,9 @@ module Omnibus
 
         # build the product package
         build_product_pkg
+
+        # build dmg
+        build_dmg if ENV['BUILD_DMG']
       end
 
       # Verifies that the #required_files are present in the
@@ -121,6 +124,124 @@ module Omnibus
       def build_product_pkg
         generate_distribution
         shellout!(*productbuild_command, shellout_opts)
+      end
+
+      def build_dmg
+        # Create a temporary directory to stage the files for our dmg
+        dmg_stage = File.join(staging_dir, 'dmg')
+        FileUtils.mkdir_p(dmg_stage)
+
+        # Store our custom dmg
+        tmp_dmg  = File.join(staging_dir, "temp-#{Time.now.to_i}.dmg")
+        pkg_name = "#{project.name}.pkg"
+
+        # Copy the compiled pkg into the dmg stage
+        FileUtils.cp(product_pkg_path, File.join(dmg_stage, pkg_name))
+
+        # Copy over any support files
+        support = File.join(dmg_stage, '.support')
+        FileUtils.mkdir_p(support)
+        FileUtils.cp(File.join(mac_dmg_files_path, 'background.png'), File.join(support, 'background.png'))
+
+        # Create the writable dmg
+        shellout!(<<-EOH.gsub(/^ {10}/, ''), shellout_opts)
+          hdiutil create \
+            -srcfolder "#{dmg_stage}" \
+            -volname "#{project.name}" \
+            -fs HFS+ \
+            -fsargs "-c c=64,a=16,e=16" \
+            -format UDRW \
+            -size 102400k \
+            "#{tmp_dmg}"
+        EOH
+
+        # Attach it
+        device = shellout!(<<-EOH.gsub(/^ {10}/, ''), shellout_opts).stdout.strip
+          hdiutil attach \
+            -readwrite \
+            -noverify \
+            -noautoopen \
+            "#{tmp_dmg}" | egrep '^/dev/' | sed 1q | awk '{print $1}'
+        EOH
+
+        # Set the Volume icon
+        shellout!(<<-EOH.gsub(/^ {10}/, ''), shellout_opts)
+          # Generate the icns
+          mkdir tmp.iconset
+          sips -z 16 16     #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_16x16.png
+          sips -z 32 32     #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_16x16@2x.png
+          sips -z 32 32     #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_32x32.png
+          sips -z 64 64     #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_32x32@2x.png
+          sips -z 128 128   #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_128x128.png
+          sips -z 256 256   #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_128x128@2x.png
+          sips -z 256 256   #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_256x256.png
+          sips -z 512 512   #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_256x256@2x.png
+          sips -z 512 512   #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_512x512.png
+          sips -z 1024 1024 #{mac_dmg_files_path}/icon.png --out tmp.iconset/icon_512x512@2x.png
+          iconutil -c icns tmp.iconset
+
+          # Copy it over
+          cp tmp.icns "/Volumes/#{project.name}/.VolumeIcon.icns"
+
+          # Source the icon
+          SetFile -a C "/Volumes/#{project.name}"
+
+          # Cleanup
+          rm tmp.icns
+        EOH
+
+        # Use Applescript to setup the DMG
+        shellout!(<<-EOH.gsub(/ ^{10}/, ''), shellout_opts)
+          echo '
+             tell application "Finder"
+               tell disk "'#{project.name}'"
+                 open
+                 set current view of container window to icon view
+                 set toolbar visible of container window to false
+                 set statusbar visible of container window to false
+                 set the bounds of container window to {#{project.config[:dmg_window_bounds]}}
+                 set theViewOptions to the icon view options of container window
+                 set arrangement of theViewOptions to not arranged
+                 set icon size of theViewOptions to 72
+                 set background picture of theViewOptions to file ".support:'background.png'"
+                 delay 5
+                 set position of item "'#{pkg_name}'" of container window to {#{project.config[:dmg_pkg_position]}}
+                 update without registering applications
+                 delay 5
+               end tell
+             end tell
+          ' | osascript
+        EOH
+
+        shellout!(<<-EOH.gsub(/ ^{10}/, ''), shellout_opts)
+          chmod -Rf go-w /Volumes/#{project.name}
+          sync
+          hdiutil detach "#{device}"
+          hdiutil convert \
+            "#{tmp_dmg}" \
+            -format UDZO \
+            -imagekey zlib-level=9 \
+            -o "#{product_dmg_path}"
+          rm -rf "#{tmp_dmg}"
+        EOH
+
+        # Set the dmg icon
+        shellout!(<<-EOH.gsub(/^ {10}/, ''), shellout_opts)
+          # Convert the png to an icon
+          sips -i "#{mac_dmg_files_path}/icon.png"
+
+          # Extract the icon into its own resource
+          DeRez -only icns "#{mac_dmg_files_path}/icon.png" > tmp.rsrc
+
+          # Append the icon reosurce to the DMG
+          Rez -append tmp.rsrc -o "#{product_dmg_path}"
+
+          # Source the icon
+          SetFile -a C "#{product_dmg_path}"
+
+          # Cleanup
+          rm tmp.rsrc
+        EOH
       end
 
       # The argv for a pkgbuild command that will build the component package.
@@ -194,6 +315,20 @@ module Omnibus
         File.join(package_dir, product_pkg_name)
       end
 
+      # The basename of the end-result dmg (that will be distributed to users).
+      #
+      # @return [string]
+      def product_dmg_name
+        "#{name}.dmg"
+      end
+
+      # The full path where the dmg package was/will be written.
+      #
+      # @return [String]
+      def product_dmg_path
+        File.join(package_dir, product_dmg_name)
+      end
+
       # @return [String] Filesystem path where the Distribution file is written.
       def distribution_staging_path
         File.join(staging_dir, 'Distribution')
@@ -259,6 +394,13 @@ module Omnibus
       # @return [String] path to the Resources directory
       def mac_pkg_files_path
         File.join(files_path, 'mac_pkg', 'Resources')
+      end
+
+      # The path to the directory inside the omnibus project's repo where the
+      # dmg resource files are.
+      # @return [String]
+      def mac_dmg_files_path
+        File.join(files_path, 'mac_dmg', 'Resources')
       end
 
       # @return [String] path to the license file
