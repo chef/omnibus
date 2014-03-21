@@ -26,6 +26,8 @@ module Omnibus
     include_examples 'a configurable', :package_tmp, '/var/cache/omnibus/pkg-tmp'
     include_examples 'a configurable', :project_root, Dir.pwd
     include_examples 'a configurable', :install_dir, '/opt/chef'
+    include_examples 'a configurable', :dmg_window_bounds, '100, 100, 500, 500'
+    include_examples 'a configurable', :dmg_pkg_position, '207, 187'
     include_examples 'a configurable', :use_s3_caching, false
     include_examples 'a configurable', :s3_bucket, nil
     include_examples 'a configurable', :s3_access_key, nil
