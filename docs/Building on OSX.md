@@ -49,3 +49,11 @@ create an icns and scale to smaller sizes
 
 You should use these stock files and templates as a starting point for building
 your custom dmg.
+
+### "Activating" dmg building
+DMG creation is disabled by default. You can activate DMG creation by setting
+the `BUILD_DMG` environment variable:
+
+```bash
+$ BUILD_DMG=1 ./bin/omnibus build project <name>
+```
