@@ -94,7 +94,7 @@ module Omnibus
         build_product_pkg
 
         # build dmg
-        build_dmg if ENV['BUILD_DMG']
+        build_dmg if build_dmg?
       end
 
       # Verifies that the #required_files are present in the
@@ -374,11 +374,18 @@ module Omnibus
       # A list of the files that will be used to customize the "product" package.P
       # @return [Array<String>] paths to the required files.
       def required_files
-        [
+        files = [
           background_png_path,
           license_file_path,
           welcome_file_path,
         ]
+
+        files + [
+          File.join(mac_dmg_files_path, 'background.png'),
+          File.join(mac_dmg_files_path, 'icon.png'),
+        ] if build_dmg?
+
+        files
       end
 
       def sanitized_name
@@ -425,6 +432,10 @@ module Omnibus
           timeout: 3600,
           cwd: staging_dir,
         }
+      end
+
+      def build_dmg?
+        ENV['BUILD_DMG']
       end
     end
   end
