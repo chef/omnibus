@@ -77,9 +77,9 @@ module Omnibus
         template(File.join('software', 'ruby-example.rb.erb'), File.join(config_software, 'ruby-example.rb'), opts)
 
         # Kitchen build environment
-        template(File.join('.kitchen.local.yml.erb'), File.join(target, '.kitchen.local.yml'), opts)
-        template(File.join('.kitchen.yml.erb'), File.join(target, '.kitchen.yml'), opts)
-        template(File.join('Berksfile.erb'), File.join(target, 'Berksfile'), opts)
+        template('.kitchen.local.yml.erb', File.join(target, '.kitchen.local.yml'), opts)
+        template('.kitchen.yml.erb', File.join(target, '.kitchen.yml'), opts)
+        template('Berksfile.erb', File.join(target, 'Berksfile'), opts)
 
         # render out stub packge scripts
         %w(makeselfinst preinst prerm postinst postrm).each do |package_script|
@@ -88,8 +88,21 @@ module Omnibus
           # render the package script
           template(template_path, script_path, opts)
           # ensure the package script is executable
-          FileUtils.chmod(0755, script_path)
+          chmod(script_path, 0755)
         end
+
+        # mac pkg stock assets
+        mac_pkg_resources = File.expand_path("#{target}/files/mac_pkg/Resources")
+        empty_directory(mac_pkg_resources)
+        template(File.join('mac_pkg', 'license.html.erb'), File.join("#{mac_pkg_resources}", 'license.html'))
+        template(File.join('mac_pkg', 'welcome.html.erb'), File.join("#{mac_pkg_resources}", 'welcome.html'))
+        copy_file(File.join('mac_pkg', 'background.png'), File.join("#{mac_pkg_resources}", 'background.png'))
+
+        # mac dmg stock assets
+        mac_dmg_resources = File.expand_path("#{target}/files/mac_dmg/Resources")
+        empty_directory(mac_dmg_resources)
+        copy_file(File.join('mac_dmg', 'background.png'), File.join("#{mac_dmg_resources}", 'background.png'))
+        copy_file(File.join('mac_dmg', 'icon.png'), File.join("#{mac_dmg_resources}", 'icon.png'))
       end
 
       desc 'version', 'Display version information'

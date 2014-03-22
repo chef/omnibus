@@ -134,14 +134,14 @@ module Omnibus
     #   window.
     #
     # @return [String]
-    default :dmg_window_bounds, '100, 100, 500, 500'
+    default :dmg_window_bounds, '100, 100, 750, 600'
 
     # @!attribute [rw] dmg_pkg_position
     #   Indicate the starting x,y position where the .pkg file should live in
     #   the DMG window.
     #
     # @return [String]
-    default :dmg_pkg_position, '207, 187'
+    default :dmg_pkg_position, '535, 50'
 
     # @!endgroup
 
