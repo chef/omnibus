@@ -701,12 +701,15 @@ module Omnibus
       end
 
       command_and_opts << " --replaces #{@replaces}" if @replaces
-      command_and_opts << install_path
 
+      # All project files must be appended to the command "last", but before
+      # the final install path
       @extra_package_files.each do |files|
         command_and_opts << files
       end
 
+      # Install path must be the final entry in the command
+      command_and_opts << install_path
       command_and_opts
     end
 
