@@ -85,11 +85,11 @@ module Omnibus
 
     def restore
       create_cache_path
-      cmd = shellout("git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l")
+      cmd = shellout("git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l #{tag}")
 
       restore_me = false
       cmd.stdout.each_line do |line|
-        restore_me = true if line =~ /^#{tag}$/
+        restore_me = true if tag == line.chomp
       end
 
       if restore_me

@@ -127,7 +127,7 @@ EOH
   end
 
   describe '#restore' do
-    let(:git_tag_output) { "bread-1.2.2-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ncoffee-1.2.2-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855-\n#{ipc.tag}\n" }
+    let(:git_tag_output) { "#{ipc.tag}\n" }
 
     let(:tag_cmd) do
       cmd_double = double(Mixlib::ShellOut)
@@ -137,7 +137,7 @@ EOH
     end
 
     before(:each) do
-      allow(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l").and_return(tag_cmd)
+      allow(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
       allow(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
       allow(ipc).to receive(:create_cache_path)
     end
@@ -148,16 +148,16 @@ EOH
     end
 
     it 'checks for a tag with the software and version, and if it finds it, checks it out' do
-      expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l").and_return(tag_cmd)
+      expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
       expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
       ipc.restore
     end
 
     describe 'if the tag does not exist' do
-      let(:git_tag_output) { "bread-1.2.2\ncoffee-1.2.2\n" }
+      let(:git_tag_output) { "\n" }
 
       it 'does nothing' do
-        expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l").and_return(tag_cmd)
+        expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
         expect(ipc).to_not receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
         ipc.restore
       end
