@@ -53,6 +53,8 @@ module Omnibus
 
     attr_reader :whitelist_files
 
+    attr_reader :source_config
+
     def self.load(filename, project, repo_overrides = {})
       new(IO.read(filename), filename, project, repo_overrides)
     end

@@ -65,6 +65,9 @@ module Omnibus
         end
       end
       dep_string = dep_list.map { |i| "#{i.name}-#{i.version}" }.join('-')
+      # digest the content of the software's config so that changes to
+      # build params invalidate cache.
+      dep_string = IO.read(@software.source_config) + dep_string
       digest = Digest::SHA256.hexdigest(dep_string)
       "#{name}-#{version}-#{digest}"
     end
