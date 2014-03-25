@@ -116,7 +116,7 @@ EOH
     end
 
     it 'commits the backup for the software' do
-      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} commit -m 'Backup of #{ipc.tag}'")
+      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} commit -q -m 'Backup of #{ipc.tag}'")
       ipc.incremental
     end
 

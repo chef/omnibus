@@ -74,7 +74,7 @@ module Omnibus
       create_cache_path
       shellout!("git --git-dir=#{cache_path} --work-tree=#{@install_path} add -A -f")
       begin
-        shellout!("git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -m 'Backup of #{tag}'")
+        shellout!("git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -q -m 'Backup of #{tag}'")
       rescue Mixlib::ShellOut::ShellCommandFailed => e
         if e.message !~ /nothing to commit/
           raise
