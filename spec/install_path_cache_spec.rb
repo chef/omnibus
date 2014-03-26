@@ -20,8 +20,12 @@ EOH
     project
   end
 
+  let(:fake_software_config_file) do
+    File.join(Omnibus::RSpec::SPEC_DATA, 'software', 'zlib.rb')
+  end
+
   let(:zlib) do
-    software = Omnibus::Software.new('', 'zlib.rb', project)
+    software = Omnibus::Software.new('', fake_software_config_file, project)
     software.name('zlib')
     software.default_version('1.7.2')
     software
@@ -64,11 +68,14 @@ EOH
   end
 
   describe '#tag' do
-    # 9664a7dd4f27909a38769faef7ec739a4d6934f1c2cf95d3112e064682f6a91a
+    # 13b3f7f2653e40b9d5b393659210775ac5b56f7e0009f82f85b83f5132409362
     #
-    # Is the sha256sum of 'preparation-1.0.0-snoopy-1.0.0'
+    # Is the sha256sum of:
+    # cat spec/data/software/zlib.rb > t
+    # echo -n 'preparation-1.0.0-snoopy-1.0.0' >> t
+    # sha256sum t
     it 'returns a tag with the softwares name, version, and hash of deps name+version' do
-      expect(ipc.tag).to eql('zlib-1.7.2-9664a7dd4f27909a38769faef7ec739a4d6934f1c2cf95d3112e064682f6a91a')
+      expect(ipc.tag).to eql('zlib-1.7.2-13b3f7f2653e40b9d5b393659210775ac5b56f7e0009f82f85b83f5132409362')
     end
 
     describe 'with no deps' do
@@ -76,8 +83,10 @@ EOH
         Omnibus::InstallPathCache.new(install_path, zlib)
       end
 
-      it 'uses the shasum of an empty string' do
-        expect(ipc.tag).to eql('zlib-1.7.2-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
+      it 'uses the shasum of the software config file' do
+        # gsha256sum spec/data/software/zlib.rb
+        # 363e6cc2475fcdd6e18b2dc10f6022d1cab498b9961e8225d8a309d18ed3c94b  spec/data/software/zlib.rb
+        expect(ipc.tag).to eql('zlib-1.7.2-363e6cc2475fcdd6e18b2dc10f6022d1cab498b9961e8225d8a309d18ed3c94b')
       end
     end
   end
@@ -116,7 +125,7 @@ EOH
     end
 
     it 'commits the backup for the software' do
-      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} commit -m 'Backup of #{ipc.tag}'")
+      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} commit -q -m 'Backup of #{ipc.tag}'")
       ipc.incremental
     end
 
@@ -127,7 +136,7 @@ EOH
   end
 
   describe '#restore' do
-    let(:git_tag_output) { "bread-1.2.2-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\ncoffee-1.2.2-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855-\n#{ipc.tag}\n" }
+    let(:git_tag_output) { "#{ipc.tag}\n" }
 
     let(:tag_cmd) do
       cmd_double = double(Mixlib::ShellOut)
@@ -137,7 +146,7 @@ EOH
     end
 
     before(:each) do
-      allow(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l").and_return(tag_cmd)
+      allow(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
       allow(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
       allow(ipc).to receive(:create_cache_path)
     end
@@ -148,16 +157,16 @@ EOH
     end
 
     it 'checks for a tag with the software and version, and if it finds it, checks it out' do
-      expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l").and_return(tag_cmd)
+      expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
       expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
       ipc.restore
     end
 
     describe 'if the tag does not exist' do
-      let(:git_tag_output) { "bread-1.2.2\ncoffee-1.2.2\n" }
+      let(:git_tag_output) { "\n" }
 
       it 'does nothing' do
-        expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l").and_return(tag_cmd)
+        expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
         expect(ipc).to_not receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
         ipc.restore
       end
