@@ -16,10 +16,9 @@
 #
 
 require 'stringio'
-require 'omnibus/packagers/mac_pkg'
 require 'spec_helper'
 
-describe Omnibus::Packagers::MacPkg do
+describe Omnibus::Packager::MacPkg do
 
   let(:mac_pkg_identifier) { 'test.pkg.functional-test-project' }
 
@@ -58,7 +57,7 @@ describe Omnibus::Packagers::MacPkg do
     end
   end
 
-  # This will run the Omnibus::Packagers::MacPkg code without any stubs to
+  # This will run the Omnibus::Packager::MacPkg code without any stubs to
   # verify it works.  In order for this test to run correctly, you have to run
   # as root or manually create the /opt/functional-test-project directory.
   #

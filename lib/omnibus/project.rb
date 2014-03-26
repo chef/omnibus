@@ -19,7 +19,6 @@ require 'omnibus/artifact'
 require 'omnibus/exceptions'
 require 'omnibus/library'
 require 'omnibus/util'
-require 'omnibus/packagers/mac_pkg'
 require 'time'
 
 module Omnibus
@@ -517,7 +516,7 @@ module Omnibus
     end
 
     # The directory where packages are written when created. Delegates to
-    # #config. The delegation allows Packagers (like Packagers::MacPkg) to
+    # #config. The delegation allows Packagers (like Packager::MacPkg) to
     # define the implementation rather than using the global config everywhere.
     #
     # @return [String] path to the package directory.
@@ -637,7 +636,7 @@ module Omnibus
       when 'pkgmk'
         "#{package_name}-#{build_version}-#{iteration}.solaris"
       when 'mac_pkg'
-        Packagers::MacPkg.new(self).package_name
+        Packager::MacPkg.new(self).package_name
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
@@ -892,7 +891,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
     end
 
     def run_mac_package_build
-      Packagers::MacPkg.new(self).build
+      Packager::MacPkg.new(self).run!
     end
 
     # Runs the necessary command to make a package with fpm. As a side-effect,

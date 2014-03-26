@@ -40,6 +40,12 @@ require 'pathname'
 module Omnibus
   DEFAULT_CONFIG_FILENAME = 'omnibus.rb'.freeze
 
+  module Packager
+    autoload :Base,   'omnibus/packagers/base'
+    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
+    autoload :MacPkg, 'omnibus/packagers/mac_pkg'
+  end
+
   # Configure Omnibus.
   #
   # After this has been called, the {Omnibus::Config} object is
