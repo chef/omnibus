@@ -52,8 +52,15 @@ your custom dmg.
 
 ### "Activating" dmg building
 DMG creation is disabled by default. You can activate DMG creation by setting
-the `BUILD_DMG` environment variable:
+the `build_dmg` omnibus configuration option
+
+```ruby
+# omnibus.rb
+build_dmg true
+```
+
+And run as you normally would:
 
 ```bash
-$ BUILD_DMG=1 ./bin/omnibus build project <name>
+$ ./bin/omnibus build project <name>
 ```

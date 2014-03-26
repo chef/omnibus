@@ -129,6 +129,13 @@ module Omnibus
 
     # @!group DMG configuration options
 
+    # @!attribute [rw] build_dmg
+    #   Indicate the starting x,y and ending x,y positions for the created DMG
+    #   window.
+    #
+    # @return [Boolean]
+    default :build_dmg, false
+
     # @!attribute [rw] dmg_window_bounds
     #   Indicate the starting x,y and ending x,y positions for the created DMG
     #   window.

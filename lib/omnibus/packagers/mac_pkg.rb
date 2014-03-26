@@ -42,8 +42,7 @@ module Omnibus
       generate_distribution
       build_product_pkg
 
-      # TODO: Make this a configuration CLI option
-      if ENV['BUILD_DMG']
+      if project.config[:build_dmg]
         Packager::MacDmg.new(self).run!
       end
     end
