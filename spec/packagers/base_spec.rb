@@ -19,15 +19,15 @@ module Omnibus
   describe Packager::Base do
     let(:project) do
       double('project',
-        name: 'hamlet',
-        build_version: '1.0.0',
-        iteration: '12902349',
-        mac_pkg_identifier: 'com.chef.hamlet',
-        install_path: '/opt/hamlet',
-        package_scripts_path: 'package-scripts',
-        files_path: 'files',
-        package_dir: 'pkg',
-        package_tmp: 'pkg-tmp',
+             name: 'hamlet',
+             build_version: '1.0.0',
+             iteration: '12902349',
+             mac_pkg_identifier: 'com.chef.hamlet',
+             install_path: '/opt/hamlet',
+             package_scripts_path: 'package-scripts',
+             files_path: 'files',
+             package_dir: 'pkg',
+             package_tmp: 'pkg-tmp',
       )
     end
 
@@ -75,7 +75,7 @@ module Omnibus
 
     describe '.setup' do
       it 'sets the value of the block' do
-        block = Proc.new {}
+        block = proc {}
         described_class.setup(&block)
 
         expect(described_class.setup).to eq(block)
@@ -84,7 +84,7 @@ module Omnibus
 
     describe '.validate' do
       it 'sets the value of the block' do
-        block = Proc.new {}
+        block = proc {}
         described_class.validate(&block)
 
         expect(described_class.validate).to eq(block)
@@ -93,7 +93,7 @@ module Omnibus
 
     describe '.build' do
       it 'sets the value of the block' do
-        block = Proc.new {}
+        block = proc {}
         described_class.build(&block)
 
         expect(described_class.build).to eq(block)
@@ -107,7 +107,7 @@ module Omnibus
 
     describe '.clean' do
       it 'sets the value of the block' do
-        block = Proc.new {}
+        block = proc {}
         described_class.clean(&block)
 
         expect(described_class.clean).to eq(block)
@@ -175,9 +175,8 @@ module Omnibus
       before { subject.stub(:shellout!) }
 
       it 'shellsout' do
-        expect(subject).to receive(:shellout!).with('echo "hello"',
-          timeout: 3600, cwd: anything
-        )
+        expect(subject).to receive(:shellout!)
+          .with('echo "hello"', timeout: 3600, cwd: anything)
         subject.execute('echo "hello"')
       end
     end
@@ -191,10 +190,10 @@ module Omnibus
 
     describe '#run!' do
       before do
-        described_class.stub(:validate).and_return(Proc.new {})
-        described_class.stub(:setup).and_return(Proc.new {})
-        described_class.stub(:build).and_return(Proc.new {})
-        described_class.stub(:clean).and_return(Proc.new {})
+        described_class.stub(:validate).and_return(proc {})
+        described_class.stub(:setup).and_return(proc {})
+        described_class.stub(:build).and_return(proc {})
+        described_class.stub(:clean).and_return(proc {})
       end
 
       it 'calls the methods in order' do

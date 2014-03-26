@@ -87,7 +87,7 @@ module Omnibus
       if block_given?
         @build = block
       else
-        @build || raise(AbstractMethod.new("#{self.class.name}.build"))
+        @build || fail(AbstractMethod.new("#{self.class.name}.build"))
       end
     end
 
@@ -154,7 +154,7 @@ module Omnibus
     #
     # @param [String] command
     def execute(command)
-      shellout!(command, { timeout: 3600, cwd: staging_dir })
+      shellout!(command,  timeout: 3600, cwd: staging_dir)
     end
 
     #
@@ -165,7 +165,7 @@ module Omnibus
     #
     # @param [String] path
     def assert_presence!(path)
-      raise MissingAsset.new(path) unless File.exist?(path)
+      fail MissingAsset.new(path) unless File.exist?(path)
     end
 
     # Execute this packager by running the following phases in order:
@@ -215,8 +215,8 @@ module Omnibus
       @underscore_name ||= self.class.name
         .split('::')
         .last
-        .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
-        .gsub(/([a-z\d])([A-Z])/,'\1_\2')
+        .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+        .gsub(/([a-z\d])([A-Z])/, '\1_\2')
         .tr('-', '_')
         .downcase
     end
