@@ -100,7 +100,7 @@ module Omnibus
       end
 
       it 'is a required phase' do
-        described_class.remove_instance_variable(:@build)
+        described_class.instance_variable_set(:@build, nil)
         expect { described_class.build }.to raise_error(AbstractMethod)
       end
     end
