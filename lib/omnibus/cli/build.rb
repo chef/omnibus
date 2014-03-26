@@ -38,24 +38,26 @@ module Omnibus
       desc 'project PROJECT', 'Build the given Omnibus project'
       def project(project_name)
         project = load_project!(project_name)
-        project_task_name = "projects:#{project.name}"
 
         unless options[:timestamp]
           say("I won't append a timestamp to the version identifier.", :yellow)
         end
         say("Building #{project.name} #{project.build_version}", :green)
 
-        Rake::Task[project_task_name].invoke
+        project.build_me
       end
 
       desc 'software PROJECT SOFTWARE', 'Build the given software component'
       def software(project_name, software_name)
         project = load_project!(project_name)
-        software_task_name = "projects:#{project.name}:software:#{software_name}"
+
+        software = project.library.components.find do |s|
+          s.name == software_name
+        end
 
         say("Building #{software_name} for #{project.name} project", :green)
 
-        Rake::Task[software_task_name].invoke
+        software.build_me
       end
     end
   end

@@ -32,12 +32,12 @@ module Omnibus
   # @todo: Reorder DSL methods to fit in the same YARD group
   # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
-    include Rake::DSL
     include Util
 
     NULL_ARG = Object.new
 
     attr_reader :library
+    attr_accessor :dirty_cache
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -71,11 +71,69 @@ module Omnibus
       @extra_package_files = []
       @dependencies = []
       @runtime_dependencies = []
+      @dirty_cache = false
       instance_eval(io, filename)
       validate
 
       @library = Omnibus::Library.new(self)
-      render_tasks
+    end
+
+    def build_me
+      FileUtils.mkdir_p(config.package_dir)
+      FileUtils.mkdir_p('pkg')
+
+      if OHAI.platform == 'windows'
+        shellout!("rmdir #{install_path} /s /q")
+      else
+        shellout!("rm -rf #{install_path}/*")
+      end
+
+      library.build_order.each do |software|
+        software.build_me
+      end
+      health_check_me
+      package_me
+    end
+
+    def health_check_me
+      if OHAI.platform == 'windows'
+        puts 'Skipping health check on windows...'
+      else
+        # build a list of all whitelist files from all project dependencies
+        whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
+        Omnibus::HealthCheck.run(install_path, whitelist_files)
+      end
+    end
+
+    def package_me
+      package_types.each do |pkg_type|
+        if pkg_type == 'makeself'
+          run_makeself
+        elsif pkg_type == 'msi'
+          run_msi
+        elsif pkg_type == 'bff'
+          run_bff
+        elsif pkg_type == 'pkgmk'
+          run_pkgmk
+        elsif pkg_type == 'mac_pkg'
+          run_mac_package_build
+        else # pkg_type == "fpm"
+          run_fpm(pkg_type)
+        end
+
+        render_metadata(pkg_type)
+
+        if OHAI.platform == 'windows'
+          cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
+        elsif OHAI.platform == 'aix'
+          cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
+        else
+          cp_cmd = "cp #{config.package_dir}/* pkg/"
+        end
+        shell = Mixlib::ShellOut.new(cp_cmd)
+        shell.run_command
+        shell.error!
+      end
     end
 
     # Ensures that certain project information has been set
@@ -861,75 +919,6 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       end
 
       shellout!(command, cmd_options)
-    end
-
-    # Dynamically generate Rake tasks to build projects and all the software they depend on.
-    #
-    # @note Much Rake magic ahead!
-    #
-    # @return void
-    def render_tasks
-      directory config.package_dir
-      directory 'pkg'
-
-      namespace :projects do
-        namespace @name do
-
-          package_types.each do |pkg_type|
-            dep_tasks = @dependencies.map { |dep| "software:#{dep}" }
-            dep_tasks << config.package_dir
-            dep_tasks << 'health_check'
-
-            desc "package #{@name} into a #{pkg_type}"
-            task pkg_type => dep_tasks do
-              if pkg_type == 'makeself'
-                run_makeself
-              elsif pkg_type == 'msi'
-                run_msi
-              elsif pkg_type == 'bff'
-                run_bff
-              elsif pkg_type == 'pkgmk'
-                run_pkgmk
-              elsif pkg_type == 'mac_pkg'
-                run_mac_package_build
-              else # pkg_type == "fpm"
-                run_fpm(pkg_type)
-              end
-
-              render_metadata(pkg_type)
-
-            end
-          end
-
-          task 'copy' => package_types do
-            if OHAI.platform == 'windows'
-              cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
-            elsif OHAI.platform == 'aix'
-              cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
-            else
-              cp_cmd = "cp #{config.package_dir}/* pkg/"
-            end
-            shell = Mixlib::ShellOut.new(cp_cmd)
-            shell.run_command
-            shell.error!
-          end
-          task 'copy' => 'pkg'
-
-          desc "run the health check on the #{@name} install path"
-          task 'health_check' do
-            if OHAI.platform == 'windows'
-              puts 'Skipping health check on windows...'
-            else
-              # build a list of all whitelist files from all project dependencies
-              whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
-              Omnibus::HealthCheck.run(install_path, whitelist_files)
-            end
-          end
-        end
-
-        desc "package #{@name}"
-        task @name => "#{@name}:copy"
-      end
     end
   end
 end

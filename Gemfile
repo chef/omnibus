@@ -10,3 +10,10 @@ end
 group :test do
   gem 'fauxhai'
 end
+
+group :local do
+  gem 'guard'
+  gem 'guard-rspec'
+  gem 'guard-rubocop'
+  gem 'ruby_gntp'
+end

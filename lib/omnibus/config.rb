@@ -40,6 +40,15 @@ module Omnibus
     #   @return [String]
     default :cache_dir, '/var/cache/omnibus/cache'
 
+    # @!attribute [rw] install_path_cache_dir
+    #   The absolute path to the directory on the virtual machine where
+    #   install paths will be progressively cached.
+    #
+    #   Defaults to `"/var/cache/omnibus/cache/install_path"`.
+    #
+    #   @return [String]
+    default :install_path_cache_dir, '/var/cache/omnibus/cache/install_path'
+
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where
     #   source code will be downloaded.

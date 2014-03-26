@@ -1,4 +1,3 @@
-require 'rake/dsl_definition'
 require 'omnibus/software'
 
 require 'spec_helper'

@@ -1,6 +1,3 @@
-# Why isn't this already required in omnibus?
-require 'rake/dsl_definition'
-
 require 'omnibus'
 require 'fauxhai'
 
