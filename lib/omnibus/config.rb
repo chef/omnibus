@@ -130,8 +130,7 @@ module Omnibus
     # @!group DMG configuration options
 
     # @!attribute [rw] build_dmg
-    #   Indicate the starting x,y and ending x,y positions for the created DMG
-    #   window.
+    #   Package OSX pkg files inside a DMG
     #
     # @return [Boolean]
     default :build_dmg, false
