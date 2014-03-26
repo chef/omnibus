@@ -65,6 +65,9 @@ module Omnibus
         end
       end
       dep_string = dep_list.map { |i| "#{i.name}-#{i.version}" }.join('-')
+      # digest the content of the software's config so that changes to
+      # build params invalidate cache.
+      dep_string = IO.read(@software.source_config) + dep_string
       digest = Digest::SHA256.hexdigest(dep_string)
       "#{name}-#{version}-#{digest}"
     end
@@ -74,7 +77,7 @@ module Omnibus
       create_cache_path
       shellout!("git --git-dir=#{cache_path} --work-tree=#{@install_path} add -A -f")
       begin
-        shellout!("git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -m 'Backup of #{tag}'")
+        shellout!("git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -q -m 'Backup of #{tag}'")
       rescue Mixlib::ShellOut::ShellCommandFailed => e
         if e.message !~ /nothing to commit/
           raise
@@ -85,11 +88,11 @@ module Omnibus
 
     def restore
       create_cache_path
-      cmd = shellout("git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l")
+      cmd = shellout("git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l #{tag}")
 
       restore_me = false
       cmd.stdout.each_line do |line|
-        restore_me = true if line =~ /^#{tag}$/
+        restore_me = true if tag == line.chomp
       end
 
       if restore_me
