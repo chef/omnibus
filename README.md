@@ -1,4 +1,4 @@
-## Omnibus
+## ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 
 [![Build Status](https://travis-ci.org/opscode/omnibus-ruby.png?branch=master)](https://travis-ci.org/opscode/omnibus-ruby)
 [![Code Climate](https://codeclimate.com/github/opscode/omnibus-ruby.png)](https://codeclimate.com/github/opscode/omnibus-ruby)
@@ -238,6 +238,15 @@ dependency "chef"
 
 There is no checking that the version override that you supply has been
 provided in a version override block in the software definition.
+
+## Git caching
+As of Omnibus 3.0.0, projects are no longer built using rake. Instead, we have
+rewritten the software dependencies to leverage git caching. This means we
+cache compiled software definitions, so future Omnibus project builds are much
+faster.
+
+For more information on potential breaking changes, please see the CHANGELOG
+entry for Omnibus 3.0.0.
 
 ## License
 
