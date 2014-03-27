@@ -1,6 +1,32 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+v3.0.0 (TBD)
+------------
+### New Features
+
+- **No more rake!** Software definitions are incrementally built and cached using git instead. Software dependency build has been rewritten to leverage git caching. This means compiled software definitions are cached, so future Omnibus project builds are much faster. However, this does introduce some potential breaking changes.
+
+  - Project-level software dependencies are built **last**.
+  - it is assumed that project-level software dependencies are most frequently changed, and thus Omnibus optimize for such a case.
+  - If you have software definitions that hard code `always_build`, you will probably want to turn that off now.
+  - Blank directories are not cached. If you would like a blank directory to be cached, add a `.gitkeep` file to the folder.
+  - The build order is compiled in a different way, which might result in a different ordered-installation than previous versions of omnibus.
+  - For an example of you you might need to update your project, please see [opscode/omnibus-software@02d06a](https://github.com/opscode/omnibus-software/commit/02d06a74c02340b592e1864e7ab843bc14fa352a)
+
+- Support for building DMGs (OSX Disk Images)
+- Update generator to create assets for pkg/dmg resources
+- There's a fancy new logo
+- Improved documentation
+- Improved test coverage
+
+### Bug fixes
+
+- Project generators now include apt/yum as development cookbooks
+- Added libc++.1.dylib as a whitelist healthcheck
+- Added libgcc_s.so,1 as a whitelist healthcheck on Solaris
+- Fix a bug where `extra_package_files` would break FPM
+
 v2.0.1 (March 18, 2014)
 -----------------------
 - Fix the name of the `pkg` artifact created on OSX

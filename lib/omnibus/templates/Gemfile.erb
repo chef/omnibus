@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'berkshelf', '~> 3.0.0.beta'
 
 # Install omnibus software
-gem 'omnibus', '~> 2.0'
+gem 'omnibus', '~> <%= Omnibus::VERSION.split('.')[0...-1].join('.') %>'
 gem 'omnibus-software', github: 'opscode/omnibus-software'
 
 # Use Test Kitchen with Vagrant for convering the build environment

@@ -50,13 +50,13 @@ create an icns and scale to smaller sizes
 You should use these stock files and templates as a starting point for building
 your custom dmg.
 
-### "Activating" dmg building
-DMG creation is disabled by default. You can activate DMG creation by setting
-the `build_dmg` omnibus configuration option
+### Disabling dmg building
+DMG creation is enabled by default, but you can disable DMG creation by setting
+the `build_dmg` omnibus configuration option to false:
 
 ```ruby
 # omnibus.rb
-build_dmg true
+build_dmg false
 ```
 
 And run as you normally would:
