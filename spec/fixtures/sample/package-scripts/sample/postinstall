@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "INSTALL WORKED"
+exit 0

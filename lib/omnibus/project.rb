@@ -19,7 +19,6 @@ require 'omnibus/artifact'
 require 'omnibus/exceptions'
 require 'omnibus/library'
 require 'omnibus/util'
-require 'omnibus/packagers/mac_pkg'
 require 'time'
 
 module Omnibus
@@ -117,6 +116,8 @@ module Omnibus
           run_pkgmk
         elsif pkg_type == 'mac_pkg'
           run_mac_package_build
+        elsif pkg_type == 'mac_dmg'
+          # noop, since the dmg creation is handled by the packager
         else # pkg_type == "fpm"
           run_fpm(pkg_type)
         end
@@ -181,7 +182,7 @@ module Omnibus
     #   before being subsequently retrieved (i.e., an install_path
     #   must be set in order to build a project)
     def install_path(val = NULL_ARG)
-      @install_path = val unless val.equal?(NULL_ARG)
+      @install_path = File.expand_path(val) unless val.equal?(NULL_ARG)
       @install_path || fail(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
 
@@ -517,7 +518,7 @@ module Omnibus
     end
 
     # The directory where packages are written when created. Delegates to
-    # #config. The delegation allows Packagers (like Packagers::MacPkg) to
+    # #config. The delegation allows Packagers (like Packager::MacPkg) to
     # define the implementation rather than using the global config everywhere.
     #
     # @return [String] path to the package directory.
@@ -540,25 +541,22 @@ module Omnibus
     # If specific types cannot be determined, default to `["makeself"]`.
     #
     # @return [Array<(String)>]
-    #
-    # @todo Why does this only ever return a single-element array,
-    #   instead of just a string, or symbol?
     def package_types
       case platform_family
       when 'debian'
-        ['deb']
+        %w(deb)
       when 'fedora', 'rhel'
-        ['rpm']
+        %w(rpm)
       when 'aix'
-        ['bff']
+        %w(bff)
       when 'solaris2'
-        ['pkgmk']
+        %w(pkgmk)
       when 'windows'
-        ['msi']
+        %w(msi)
       when 'mac_os_x'
-        ['mac_pkg']
+        %w(mac_pkg mac_dmg)
       else
-        ['makeself']
+        %w(makeself)
       end
     end
 
@@ -617,6 +615,11 @@ module Omnibus
     def render_metadata(pkg_type)
       basename = output_package(pkg_type)
       pkg_path = "#{config.package_dir}/#{basename}"
+
+      # Don't generate metadata for packages that haven't been created.
+      # TODO: Fix this and make it betterer
+      return unless File.exist?(pkg_path)
+
       artifact = Artifact.new(pkg_path, [platform_tuple], version: build_version)
       metadata = artifact.flat_metadata
       File.open("#{pkg_path}.metadata.json", 'w+') do |f|
@@ -637,7 +640,10 @@ module Omnibus
       when 'pkgmk'
         "#{package_name}-#{build_version}-#{iteration}.solaris"
       when 'mac_pkg'
-        Packagers::MacPkg.new(self).package_name
+        Packager::MacPkg.new(self).package_name
+      when 'mac_dmg'
+        pkg = Packager::MacPkg.new(self)
+        Packager::MacDmg.new(pkg).package_name
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
@@ -892,7 +898,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
     end
 
     def run_mac_package_build
-      Packagers::MacPkg.new(self).build
+      Packager::MacPkg.new(self).run!
     end
 
     # Runs the necessary command to make a package with fpm. As a side-effect,

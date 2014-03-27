@@ -127,6 +127,30 @@ module Omnibus
 
     # @!endgroup
 
+    # @!group DMG configuration options
+
+    # @!attribute [rw] build_dmg
+    #   Package OSX pkg files inside a DMG
+    #
+    # @return [Boolean]
+    default :build_dmg, false
+
+    # @!attribute [rw] dmg_window_bounds
+    #   Indicate the starting x,y and ending x,y positions for the created DMG
+    #   window.
+    #
+    # @return [String]
+    default :dmg_window_bounds, '100, 100, 750, 600'
+
+    # @!attribute [rw] dmg_pkg_position
+    #   Indicate the starting x,y position where the .pkg file should live in
+    #   the DMG window.
+    #
+    # @return [String]
+    default :dmg_pkg_position, '535, 50'
+
+    # @!endgroup
+
     # @!group S3 Caching Configuration Parameters
 
     # @!attribute [rw] use_s3_caching

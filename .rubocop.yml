@@ -1,3 +1,5 @@
+ClassAndModuleChildren:
+  Enabled: false
 ClassLength:
   Enabled: false
 CyclomaticComplexity:
