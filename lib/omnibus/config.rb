@@ -133,7 +133,7 @@ module Omnibus
     #   Package OSX pkg files inside a DMG
     #
     # @return [Boolean]
-    default :build_dmg, false
+    default :build_dmg, true
 
     # @!attribute [rw] dmg_window_bounds
     #   Indicate the starting x,y and ending x,y positions for the created DMG
