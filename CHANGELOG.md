@@ -17,6 +17,7 @@ v3.0.0 (TBD)
 - Support for building DMGs (OSX Disk Images)
 - Update generator to create assets for pkg/dmg resources
 - There's a fancy new logo
+- Added Chef Sugar integration
 - Improved documentation
 - Improved test coverage
 
