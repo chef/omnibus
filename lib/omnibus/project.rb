@@ -544,19 +544,19 @@ module Omnibus
     def package_types
       case platform_family
       when 'debian'
-        ['deb']
+        %w(deb)
       when 'fedora', 'rhel'
-        ['rpm']
+        %w(rpm)
       when 'aix'
-        ['bff']
+        %w(bff)
       when 'solaris2'
-        ['pkgmk']
+        %w(pkgmk)
       when 'windows'
-        ['msi']
+        %w(msi)
       when 'mac_os_x'
-        ['mac_pkg', 'mac_dmg']
+        %w(mac_pkg mac_dmg)
       else
-        ['makeself']
+        %w(makeself)
       end
     end
 
