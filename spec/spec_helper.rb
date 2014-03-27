@@ -33,11 +33,6 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.treat_symbols_as_metadata_keys_with_true_values = true
 
-  # Don't run functional tests on Travis
-  if ENV['TRAVIS']
-    config.filter_run_excluding functional: true
-  end
-
   # Clear the tmp_path on each run
   config.before(:each) do
     FileUtils.rm_rf(tmp_path)
