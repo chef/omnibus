@@ -186,6 +186,11 @@ module Omnibus
       EOH
     end
 
+    # @see Base#package_name
+    def package_name
+      "#{name}-#{version}-#{iteration}.dmg"
+    end
+
     # The path to the folder that we should stage.
     #
     # @return [String]

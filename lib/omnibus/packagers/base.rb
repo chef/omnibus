@@ -178,6 +178,14 @@ module Omnibus
       instance_eval(&self.class.clean)    if self.class.clean
     end
 
+    # The ending name of this package on disk. +Omnibus::Project+ uses this to
+    # generate metadata about the package after it is built.
+    #
+    # @return [String]
+    def package_name
+      fail AbstractMethod.new("#{self.class.name}#package_name")
+    end
+
     private
 
     # The path to the directory where we can throw staged files.

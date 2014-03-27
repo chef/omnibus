@@ -52,12 +52,7 @@ module Omnibus
       # There is nothing to cleanup
     end
 
-    # The basename of the end-result package (that will be distributed to
-    # users).
-    #
-    # Project uses this to generate metadata about the package after it's built.
-    #
-    # @return [String] the basename of the package file
+    # @see Base#package_name
     def package_name
       "#{name}-#{version}-#{iteration}.pkg"
     end
