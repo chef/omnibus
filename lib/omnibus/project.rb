@@ -180,7 +180,7 @@ module Omnibus
     #   before being subsequently retrieved (i.e., an install_path
     #   must be set in order to build a project)
     def install_path(val = NULL_ARG)
-      @install_path = val unless val.equal?(NULL_ARG)
+      @install_path = File.expand_path(val) unless val.equal?(NULL_ARG)
       @install_path || fail(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
 
