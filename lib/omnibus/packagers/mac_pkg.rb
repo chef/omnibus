@@ -33,6 +33,7 @@ module Omnibus
     end
 
     setup do
+      purge_directory(install_path)
       purge_directory(staging_dir)
       purge_directory(project.package_dir)
     end
@@ -79,8 +80,8 @@ module Omnibus
           --identifier "#{identifier}" \\
           --version "#{version}" \\
           --scripts "#{scripts}" \\
-          --root "#{pkg_root}" \\
-          --install-location "#{install_location}" \\
+          --root "#{install_path}" \\
+          --install-location "#{install_path}" \\
           "#{component_pkg}"
       EOH
     end

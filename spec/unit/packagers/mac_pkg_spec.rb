@@ -92,14 +92,6 @@ EOH
     expect(packager.identifier).to eq(mac_pkg_identifier)
   end
 
-  it "uses the project's install_path as the package root" do
-    expect(packager.pkg_root).to eq(project.install_path)
-  end
-
-  it "uses the project's install_path as the package install location" do
-    expect(packager.install_location).to eq(project.install_path)
-  end
-
   it 'names the component package PROJECT_NAME-core.pkg' do
     expect(packager.component_pkg).to eq('myproject-core.pkg')
   end

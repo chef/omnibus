@@ -44,13 +44,9 @@ module Omnibus
     #   @return (see Project#mac_pkg_identifier)
     def_delegator :@project, :mac_pkg_identifier, :identifier
 
-    # !@method pkg_root
+    # !@method install_path
     #   @return (see Project#install_path)
-    def_delegator :@project, :install_path, :pkg_root
-
-    # !@method install_location
-    #   @return (see Project#install_path)
-    def_delegator :@project, :install_path, :install_location
+    def_delegator :@project, :install_path, :install_path
 
     # !@method scripts
     #   @return (see Project#package_scripts_path)
