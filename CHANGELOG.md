@@ -18,14 +18,14 @@ v3.0.0 (TBD)
 - Update generator to create assets for pkg/dmg resources
 - There's a fancy new logo
 - Improved documentation
+- Improved test coverage
 
 ### Bug fixes
 
-  - Project generators now include apt/yum as development cookbooks
-  - Added libc++.1.dylib as a whitelist healthcheck
-  - Added libgcc_s.so,1 as a whitelist healthcheck on Solaris
-  - Fix a bug where `extra_package_files` would break FPM
-  - Improved test coverage
+- Project generators now include apt/yum as development cookbooks
+- Added libc++.1.dylib as a whitelist healthcheck
+- Added libgcc_s.so,1 as a whitelist healthcheck on Solaris
+- Fix a bug where `extra_package_files` would break FPM
 
 v2.0.1 (March 18, 2014)
 -----------------------
