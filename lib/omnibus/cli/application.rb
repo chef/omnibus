@@ -94,8 +94,8 @@ module Omnibus
         # mac pkg stock assets
         mac_pkg_resources = File.expand_path("#{target}/files/mac_pkg/Resources")
         empty_directory(mac_pkg_resources)
-        template(File.join('mac_pkg', 'license.html.erb'), File.join("#{mac_pkg_resources}", 'license.html'))
-        template(File.join('mac_pkg', 'welcome.html.erb'), File.join("#{mac_pkg_resources}", 'welcome.html'))
+        template(File.join('mac_pkg', 'license.html.erb'), File.join("#{mac_pkg_resources}", 'license.html'), opts)
+        template(File.join('mac_pkg', 'welcome.html.erb'), File.join("#{mac_pkg_resources}", 'welcome.html'), opts)
         copy_file(File.join('mac_pkg', 'background.png'), File.join("#{mac_pkg_resources}", 'background.png'))
 
         # mac dmg stock assets
