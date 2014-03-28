@@ -180,7 +180,7 @@ module Omnibus
     def install_path(val = NULL_ARG)
       unless val.equal?(NULL_ARG)
         @install_path = File.expand_path(val)
-        @install_path.gsub!(File::SEPARATOR, File::ALT_SEPARATOR) if windows?
+        windows_safe_path!(@install_path)
       end
       @install_path || fail(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
