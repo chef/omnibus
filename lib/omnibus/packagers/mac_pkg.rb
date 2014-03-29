@@ -33,7 +33,6 @@ module Omnibus
     end
 
     setup do
-      purge_directory(install_path)
       purge_directory(staging_dir)
       purge_directory(project.package_dir)
     end

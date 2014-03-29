@@ -69,5 +69,14 @@ module Omnibus
       cmd.error!
       cmd
     end
+
+    # Replaces path separators with alternative ones when needed.
+    #
+    # @param path [String]
+    # @return [String] given path with applied changes.
+    #
+    def windows_safe_path!(path)
+      path.gsub!(File::SEPARATOR, File::ALT_SEPARATOR) if File::ALT_SEPARATOR
+    end
   end
 end

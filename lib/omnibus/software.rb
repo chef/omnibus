@@ -222,7 +222,7 @@ module Omnibus
         end
       else
         unless val.equal?(NULL_ARG)
-          $stderr.puts "Setting the version via 'version' is DEPRECATED, please use 'default_version'"
+          $stderr.puts "Software '#{name}': Setting the version via 'version' is DEPRECATED, please use 'default_version'"
           @version = val
         end
       end

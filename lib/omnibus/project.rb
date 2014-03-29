@@ -80,12 +80,8 @@ module Omnibus
     def build_me
       FileUtils.mkdir_p(config.package_dir)
       FileUtils.mkdir_p('pkg')
-
-      if OHAI.platform == 'windows'
-        shellout!("rmdir #{install_path} /s /q")
-      else
-        shellout!("rm -rf #{install_path}/*")
-      end
+      FileUtils.rm_rf(install_path)
+      FileUtils.mkdir_p(install_path)
 
       library.build_order.each do |software|
         software.build_me
@@ -182,7 +178,10 @@ module Omnibus
     #   before being subsequently retrieved (i.e., an install_path
     #   must be set in order to build a project)
     def install_path(val = NULL_ARG)
-      @install_path = File.expand_path(val) unless val.equal?(NULL_ARG)
+      unless val.equal?(NULL_ARG)
+        @install_path = File.expand_path(val)
+        windows_safe_path!(@install_path)
+      end
       @install_path || fail(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
 

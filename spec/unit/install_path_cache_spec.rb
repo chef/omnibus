@@ -125,12 +125,12 @@ EOH
     end
 
     it 'commits the backup for the software' do
-      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} commit -q -m 'Backup of #{ipc.tag}'")
+      expect(ipc).to receive(:shellout!).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} commit -q -m "Backup of #{ipc.tag}"))
       ipc.incremental
     end
 
     it 'tags the software backup' do
-      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -f '#{ipc.tag}'")
+      expect(ipc).to receive(:shellout!).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -f "#{ipc.tag}"))
       ipc.incremental
     end
   end
@@ -146,8 +146,8 @@ EOH
     end
 
     before(:each) do
-      allow(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
-      allow(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
+      allow(ipc).to receive(:shellout).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l "#{ipc.tag}")).and_return(tag_cmd)
+      allow(ipc).to receive(:shellout!).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f "#{ipc.tag}"))
       allow(ipc).to receive(:create_cache_path)
     end
 
@@ -157,8 +157,8 @@ EOH
     end
 
     it 'checks for a tag with the software and version, and if it finds it, checks it out' do
-      expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
-      expect(ipc).to receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
+      expect(ipc).to receive(:shellout).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l "#{ipc.tag}")).and_return(tag_cmd)
+      expect(ipc).to receive(:shellout!).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f "#{ipc.tag}"))
       ipc.restore
     end
 
@@ -166,8 +166,8 @@ EOH
       let(:git_tag_output) { "\n" }
 
       it 'does nothing' do
-        expect(ipc).to receive(:shellout).with("git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l #{ipc.tag}").and_return(tag_cmd)
-        expect(ipc).to_not receive(:shellout!).with("git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f '#{ipc.tag}'")
+        expect(ipc).to receive(:shellout).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l "#{ipc.tag}")).and_return(tag_cmd)
+        expect(ipc).to_not receive(:shellout!).with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f "#{ipc.tag}"))
         ipc.restore
       end
     end

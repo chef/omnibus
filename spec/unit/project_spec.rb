@@ -91,6 +91,9 @@ describe Omnibus::Project do
 
     context 'when on Windows' do
       let(:fauxhai_options) { { platform: 'windows', version: '2008R2' } }
+      before do
+        stub_const('File::ALT_SEPARATOR', '\\')
+      end
       it 'should return a Windows iteration' do
         expect(project.iteration).to eq('1.windows')
       end
