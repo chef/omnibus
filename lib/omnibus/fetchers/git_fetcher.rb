@@ -84,6 +84,14 @@ E
       end
     end
 
+    # Return the target sha to be used during build caching
+    # This overrides the cases where software.version is similar to
+    # master, 11-stable etc..
+    def version_for_cache
+      target_revision
+    end
+
+
     private
 
     def clone

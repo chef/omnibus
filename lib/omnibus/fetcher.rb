@@ -175,6 +175,12 @@ module Omnibus
     def version_guid
     end
 
+    # Returns the version to be used during build caching.
+    # By default fetchers don't override the versions.
+    def version_for_cache
+      nil
+    end
+
     # !@endgroup
   end
 end
