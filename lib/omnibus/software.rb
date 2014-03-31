@@ -55,8 +55,8 @@ module Omnibus
 
     attr_reader :source_config
 
-    def self.load(filename, project, repo_overrides = {})
-      new(IO.read(filename), filename, project, repo_overrides)
+    def self.load(filename, project, repo_overrides = {}, name = nil)
+      new(IO.read(filename), filename, project, repo_overrides, name)
     end
 
     # @param io [String]
@@ -72,10 +72,10 @@ module Omnibus
     #   project, and override hash directly?  That is, why io AND a
     #   filename, if the filename can always get you the contents you
     #   need anyway?
-    def initialize(io, filename, project, repo_overrides = {})
+    def initialize(io, filename, project, repo_overrides = {}, name = nil)
       @version          = nil
       @overrides        = UNINITIALIZED
-      @name             = nil
+      @name             = name
       @description      = nil
       @source           = nil
       @relative_path    = nil
