@@ -49,7 +49,6 @@ module Omnibus
     # Computes the tag for this cache entry
     def tag
       name = @software.name
-      version = @software.version
 
       # Accumulate an array of all the software projects that come before
       # the name and version we are tagging. So if you have
@@ -69,6 +68,9 @@ module Omnibus
       # build params invalidate cache.
       dep_string = IO.read(@software.source_config) + dep_string
       digest = Digest::SHA256.hexdigest(dep_string)
+
+      version = @software.version_for_cache
+
       "#{name}-#{version}-#{digest}"
     end
 

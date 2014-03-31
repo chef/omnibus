@@ -257,6 +257,15 @@ module Omnibus
       @project.build_version
     end
 
+    # Returns the version to be used in cache.
+    def version_for_cache
+      if fetcher
+        fetcher.version_for_cache || version
+      else
+        version
+      end
+    end
+
     # @todo Judging by existing usage, this should sensibly default to
     #   the name of the software, since that's what it effectively does down in #project_dir
     def relative_path(val)
@@ -421,7 +430,7 @@ module Omnibus
     # Actually build the software package
     def build_me
       # Fetch the source
-      fetcher = fetch_me
+      @fetcher = fetch_me
 
       # Build if we need to
       if always_build?
