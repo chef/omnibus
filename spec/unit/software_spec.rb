@@ -102,4 +102,42 @@ describe Omnibus::Software do
     end
 
   end
+
+  context 'while getting version_for_cache' do
+    let(:fetcher) { nil }
+    let(:software_name) { 'zlib' }
+    let(:default_version) { '1.2.6' }
+
+    def get_version_for_cache(expected_version)
+      software.stub(:fetcher).and_return(fetcher)
+      expect(software.version_for_cache).to eq(expected_version)
+    end
+
+    context 'without a fetcher' do
+      it 'should return the default version' do
+        get_version_for_cache('1.2.6')
+      end
+    end
+
+    context 'with a NetFetcher' do
+      let(:fetcher) { Omnibus::NetFetcher.new(software) }
+
+      it 'should return the default version' do
+        get_version_for_cache('1.2.6')
+      end
+    end
+
+    context 'with a GitFetcher' do
+      let(:fetcher) do
+        a = Omnibus::GitFetcher.new(software)
+        a.stub(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
+        a
+      end
+
+      it 'should return the git sha' do
+        get_version_for_cache('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
+      end
+    end
+
+  end
 end
