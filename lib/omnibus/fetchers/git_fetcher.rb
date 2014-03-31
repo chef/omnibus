@@ -91,7 +91,6 @@ E
       target_revision
     end
 
-
     private
 
     def clone

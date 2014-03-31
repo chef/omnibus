@@ -259,7 +259,11 @@ module Omnibus
 
     # Returns the version to be used in cache.
     def version_for_cache
-      fetcher.version_for_cache || version
+      if fetcher
+        fetcher.version_for_cache || version
+      else
+        version
+      end
     end
 
     # @todo Judging by existing usage, this should sensibly default to
