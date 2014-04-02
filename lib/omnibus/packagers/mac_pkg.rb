@@ -121,12 +121,16 @@ module Omnibus
     # product that is shipped to end users.
     #
     def build_product_pkg
-      execute <<-EOH.gsub(/^ {8}/, '')
-        productbuild \\
-          --distribution "#{distribution_file}" \\
-          --resources "#{resources_path}" \\
-          "#{final_pkg}"
-      EOH
+      build_command = [
+        'productbuild',
+        %Q(--distribution "#{distribution_file}"),
+        %Q(--resources "#{resources_path}"),
+      ]
+
+      build_command << %Q(--sign "#{project.config[:signing_identity]}") if project.config[:sign_pkg]
+      build_command << final_pkg
+
+      execute build_command.join(' ')
     end
 
     # The identifier for this mac package (the com.whatever.thing.whatever).

@@ -62,6 +62,13 @@ EOH
 
   let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution' }
 
+  let(:pkg_signing_config) do
+    {
+      sign_pkg: false,
+      signing_identity: nil,
+    }
+  end
+
   let(:project) do
     double Omnibus::Project,
            name: project_name,
@@ -73,7 +80,8 @@ EOH
            files_path: files_path,
            package_dir: package_dir,
            package_tmp: package_tmp,
-           mac_pkg_identifier: mac_pkg_identifier
+           mac_pkg_identifier: mac_pkg_identifier,
+           config: pkg_signing_config
   end
 
   let(:packager) do
@@ -142,13 +150,32 @@ EOH
 
   describe 'building the product package' do
     it 'generates the distribution and runs productbuild' do
-      expect(packager).to receive(:execute).with <<-EOH.gsub(/^ {8}/, '')
-        productbuild \\
-          --distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution" \\
-          --resources "/omnibus/project/root/files/mac_pkg/Resources" \\
-          "/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg"
-      EOH
+      expect(packager).to receive(:execute).with ['productbuild',
+        %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
+        %Q(--resources "/omnibus/project/root/files/mac_pkg/Resources"),
+        '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
+      ].join(' ')
       packager.build_product_pkg
+    end
+  end
+
+  context 'when pkg signing is enabled' do
+    let(:pkg_signing_config) do
+      {
+        sign_pkg: true,
+        signing_identity: 'My Special Identity'
+      }
+    end
+
+    it 'includes the signing parameters in the product build command' do
+      expect(packager).to receive(:execute).with ['productbuild',
+        %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
+        %Q(--resources "/omnibus/project/root/files/mac_pkg/Resources"),
+        %Q(--sign "My Special Identity"),
+        '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
+      ].join(' ')
+      packager.build_product_pkg
+
     end
   end
 
