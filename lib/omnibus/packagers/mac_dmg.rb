@@ -25,8 +25,9 @@ module Omnibus
     end
 
     setup do
+      clean_disks
       create_directory(dmg_stage)
-      copy_assets_to_dmg
+      remove_file(writable_dmg)
     end
 
     build do
@@ -52,6 +53,18 @@ module Omnibus
     def initialize(mac_packager)
       @packager = mac_packager
       super(mac_packager.project)
+    end
+
+    #
+    # Cleans any previously left over mounted disks
+    #
+    def clean_disks
+      existing_disks = execute "mount | grep /Volumes/#{project.name} | awk '{print $1}'"
+      existing_disks.stdout.lines.each do |existing_disk|
+        existing_disk.chomp!
+        puts "Detaching disk '#{existing_disk}' before starting dmg packaging."
+        execute "hdiutil detach #{existing_disk}"
+      end
     end
 
     #
