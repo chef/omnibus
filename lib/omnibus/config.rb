@@ -162,7 +162,7 @@ module Omnibus
     #
     #   Default is nil. Required if sign_pkg is set.
     #
-    #   @return [Boolean]
+    #   @return [String]
     default :signing_identity, nil
 
     # @!endgroup
