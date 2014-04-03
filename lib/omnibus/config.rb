@@ -29,6 +29,16 @@ module Omnibus
   class Config
     extend Mixlib::Config
 
+    # Converts a given path to a platform specific path based on windows or
+    # linux.
+    def self.platformize_omnibus_path(path)
+      if OHAI.platform == 'windows'
+        File.join('C:\\omnibus-ruby', path).gsub(File::SEPARATOR, File::ALT_SEPARATOR)
+      else
+        File.join('/var/cache/omnibus', path)
+      end
+    end
+
     # @!group Directory Configuration Parameters
 
     # @!attribute [rw] cache_dir
@@ -38,7 +48,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache"`.
     #
     #   @return [String]
-    default :cache_dir, '/var/cache/omnibus/cache'
+    default :cache_dir, platformize_omnibus_path('cache')
 
     # @!attribute [rw] install_path_cache_dir
     #   The absolute path to the directory on the virtual machine where
@@ -47,7 +57,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache/install_path"`.
     #
     #   @return [String]
-    default :install_path_cache_dir, '/var/cache/omnibus/cache/install_path'
+    default :install_path_cache_dir, platformize_omnibus_path('cache/install_path')
 
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where
@@ -56,7 +66,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/src"`.
     #
     #   @return [String]
-    default :source_dir, '/var/cache/omnibus/src'
+    default :source_dir, platformize_omnibus_path('src')
 
     # @!attribute [rw] build_dir
     #   The absolute path to the directory on the virtual machine where
@@ -65,7 +75,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/build"`.
     #
     #   @return [String]
-    default :build_dir, '/var/cache/omnibus/build'
+    default :build_dir, platformize_omnibus_path('build')
 
     # @!attribute [rw] package_dir
     #   The absolute path to the directory on the virtual machine where
@@ -74,7 +84,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg"`.
     #
     #   @return [String]
-    default :package_dir, '/var/cache/omnibus/pkg'
+    default :package_dir, platformize_omnibus_path('pkg')
 
     # @!attribute [rw] package_tmp
     #   The absolute path to the directory on the virtual machine where
@@ -85,7 +95,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg-tmp"`.
     #
     #   @return [String]
-    default :package_tmp, '/var/cache/omnibus/pkg-tmp'
+    default :package_tmp, platformize_omnibus_path('pkg-tmp')
 
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
