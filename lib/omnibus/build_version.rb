@@ -244,7 +244,7 @@ module Omnibus
     # same build will share the same timestamp.
     def build_start_time
       @build_start_time ||= begin
-                              if !ENV['BUILD_ID'].nil?
+                              if ENV['BUILD_ID']
                                 begin
                                   Time.strptime(ENV['BUILD_ID'], '%Y-%m-%d_%H-%M-%S')
                                 rescue ArgumentError

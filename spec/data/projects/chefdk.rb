@@ -15,12 +15,12 @@
 # limitations under the License.
 #
 
-name       'chefdk'
+name 'chefdk'
 maintainer 'Chef Software, Inc.'
-homepage   'http://www.getchef.com'
+homepage 'http://www.getchef.com'
 
-install_path    '/opt/chefdk'
-build_version   Omnibus::BuildVersion.full
+install_path '/opt/chefdk'
+build_version Omnibus::BuildVersion.full
 build_iteration 4
 
 override :berkshelf, version: '3.0.0.beta6'

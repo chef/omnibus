@@ -151,9 +151,9 @@ EOH
   describe 'building the product package' do
     it 'generates the distribution and runs productbuild' do
       expect(packager).to receive(:execute).with ['productbuild',
-        %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
-        %Q(--resources "/omnibus/project/root/files/mac_pkg/Resources"),
-        '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
+                                                  %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
+                                                  %Q(--resources "/omnibus/project/root/files/mac_pkg/Resources"),
+                                                  '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
       ].join(' ')
       packager.build_product_pkg
     end
@@ -163,19 +163,18 @@ EOH
     let(:pkg_signing_config) do
       {
         sign_pkg: true,
-        signing_identity: 'My Special Identity'
+        signing_identity: 'My Special Identity',
       }
     end
 
     it 'includes the signing parameters in the product build command' do
       expect(packager).to receive(:execute).with ['productbuild',
-        %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
-        %Q(--resources "/omnibus/project/root/files/mac_pkg/Resources"),
-        %Q(--sign "My Special Identity"),
-        '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
+                                                  %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
+                                                  %Q(--resources "/omnibus/project/root/files/mac_pkg/Resources"),
+                                                  %Q(--sign "My Special Identity"),
+                                                  '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
       ].join(' ')
       packager.build_product_pkg
-
     end
   end
 

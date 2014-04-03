@@ -181,7 +181,7 @@ E
     rescue Exception => e
       if retries >= 3
         ErrorReporter.new(e, self).explain("Failed to find any commits for the ref '#{ref}'")
-        fail
+        raise
       else
         # Deal with github failing all the time :(
         time_to_sleep = 5 * (2**retries)
