@@ -127,7 +127,7 @@ module Omnibus
 
     # @!endgroup
 
-    # @!group DMG configuration options
+    # @!group DMG / PKG configuration options
 
     # @!attribute [rw] build_dmg
     #   Package OSX pkg files inside a DMG
@@ -148,6 +148,22 @@ module Omnibus
     #
     # @return [String]
     default :dmg_pkg_position, '535, 50'
+
+    # @!attribute [rw] sign_pkg
+    #   Sign the pkg package.
+    #
+    #   Default is false.
+    #
+    #   @return [Boolean]
+    default :sign_pkg, false
+
+    # @!attribute [rw] signing_identity
+    #   The identity to sign the pkg with.
+    #
+    #   Default is nil. Required if sign_pkg is set.
+    #
+    #   @return [String]
+    default :signing_identity, nil
 
     # @!endgroup
 
