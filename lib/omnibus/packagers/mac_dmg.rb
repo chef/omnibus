@@ -59,6 +59,9 @@ module Omnibus
     # Cleans any previously left over mounted disks
     #
     def clean_disks
+      # We're trying to detach disks that look like below:
+      # /dev/disk1s1 on /Volumes/chef (hfs, local, nodev, nosuid, read-only, noowners, quarantine, mounted by serdar)
+      # /dev/disk2s1 on /Volumes/chef 1 (hfs, local, nodev, nosuid, read-only, noowners, quarantine, mounted by serdar)
       existing_disks = execute "mount | grep /Volumes/#{project.name} | awk '{print $1}'"
       existing_disks.stdout.lines.each do |existing_disk|
         existing_disk.chomp!
