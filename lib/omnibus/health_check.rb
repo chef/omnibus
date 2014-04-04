@@ -113,6 +113,7 @@ module Omnibus
       /libobjc\.A\.dylib/,
       /libSystem\.B\.dylib/,
       /CoreFoundation/,
+      /CoreServices/,
       /Tcl$/,
       /Cocoa$/,
       /Carbon$/,
