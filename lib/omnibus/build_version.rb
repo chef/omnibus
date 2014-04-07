@@ -129,7 +129,7 @@ module Omnibus
     # @return [String]
     def git_describe
       @git_describe ||= begin
-                          git_cmd = 'git describe'
+                          git_cmd = 'git describe --tags'
                           cmd = shellout(git_cmd, live_stream: nil, cwd: @path)
                           if cmd.exitstatus == 0
                             cmd.stdout.chomp
