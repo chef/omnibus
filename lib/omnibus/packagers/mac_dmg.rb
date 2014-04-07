@@ -25,9 +25,9 @@ module Omnibus
     end
 
     setup do
-      clean_disks
       create_directory(dmg_stage)
       remove_file(writable_dmg)
+      clean_disks
     end
 
     build do
