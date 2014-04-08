@@ -37,6 +37,7 @@ module Omnibus
 
     attr_reader :library
     attr_accessor :dirty_cache
+    attr_reader :resources_path
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -58,6 +59,7 @@ module Omnibus
       @name = nil
       @package_name = nil
       @install_path = nil
+      @resources_path = nil
       @homepage = nil
       @description = nil
       @replaces = nil
@@ -343,6 +345,15 @@ module Omnibus
     def package_group(val = NULL_ARG)
       @pkg_group = val unless val.equal?(NULL_ARG)
       @pkg_group
+    end
+
+    # Set or retrieve the resources path to be used by packagers.
+    #
+    # @param val [String]
+    # @return [String]
+    def resources_path(val = NULL_ARG)
+      @resources_path = val unless val.equal?(NULL_ARG)
+      @resources_path
     end
 
     # Add an Omnibus software dependency.

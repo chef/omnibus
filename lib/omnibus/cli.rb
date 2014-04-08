@@ -18,6 +18,7 @@
 require 'omnibus/cli/application'
 require 'omnibus/cli/base'
 require 'omnibus/cli/build'
+require 'pry-debugger'
 
 module Omnibus
   module CLI

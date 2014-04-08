@@ -35,6 +35,14 @@ module Omnibus
     setup do
       purge_directory(staging_dir)
       purge_directory(project.package_dir)
+      purge_directory(staging_resources_path)
+      copy_directory(resources_path, staging_resources_path)
+
+      # Render resource templates if needed
+      [ 'License.html.erb', 'welcome.html.erb'].each do |res|
+        res_path = resource(res)
+        render_template(res_path) if File.exists?(res_path)
+      end
     end
 
     build do
@@ -124,7 +132,7 @@ module Omnibus
       build_command = [
         'productbuild',
         %Q(--distribution "#{distribution_file}"),
-        %Q(--resources "#{resources_path}"),
+        %Q(--resources "#{staging_resources_path}"),
       ]
 
       build_command << %Q(--sign "#{project.config[:signing_identity]}") if project.config[:sign_pkg]
