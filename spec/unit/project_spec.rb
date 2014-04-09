@@ -54,6 +54,14 @@ describe Omnibus::Project do
     it 'should return an array of files and dirs' do
       expect(project.extra_package_files).to eq(['/path/to/sample_dir', '/path/to/file.conf'])
     end
+
+    it 'should return friendly_name' do
+      expect(project.friendly_name).to eq('Sample Project')
+    end
+
+    it 'should return friendly_name' do
+      expect(project.resources_path).to eq('sample/project/resources')
+    end
   end
 
   describe '#iteration' do
