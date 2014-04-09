@@ -57,6 +57,7 @@ module Omnibus
     def initialize(io, filename)
       @output_package = nil
       @name = nil
+      @friendly_name = nil
       @package_name = nil
       @install_path = nil
       @resources_path = nil
@@ -158,6 +159,16 @@ module Omnibus
     def name(val = NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
       @name || fail(MissingProjectConfiguration.new('name', 'my_project'))
+    end
+
+    # Set or retrieve a friendly name for the project
+    #
+    # @param val [String] the name to set
+    # @return [String]
+    #
+    def friendly_name(val = NULL_ARG)
+      @friendly_name = val unless val.equal?(NULL_ARG)
+      @friendly_name || @name.capitalize
     end
 
     # Set or retrieve the package name of the project.  Unless

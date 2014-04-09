@@ -37,6 +37,7 @@ module Omnibus
       copy_assets_to_dmg
       create_writable_dmg
       attach_dmg
+      # Give some time to the system so attached dmg shows up in Finder
       sleep 5
       set_volume_icon
       prettify_dmg

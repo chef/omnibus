@@ -33,6 +33,10 @@ module Omnibus
     #   @return (see Project#name)
     def_delegator :@project, :name
 
+    # !@method friendly_name
+    #   @return (see Project#friendly_name)
+    def_delegator :@project, :friendly_name
+
     # !@method version
     #   @return (see Project#build_version)
     def_delegator :@project, :build_version, :version

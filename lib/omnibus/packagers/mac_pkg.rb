@@ -101,7 +101,7 @@ module Omnibus
         file.puts <<-EOH.gsub(/^ {10}/, '')
           <?xml version="1.0" standalone="no"?>
           <installer-gui-script minSpecVersion="1">
-              <title>#{name.capitalize}</title>
+              <title>#{friendly_name}</title>
               <background file="background.png" alignment="bottomleft" mime-type="image/png"/>
               <welcome file="welcome.html" mime-type="text/html"/>
               <license file="license.html" mime-type="text/html"/>
