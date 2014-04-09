@@ -156,7 +156,7 @@ module Omnibus
     # @param [String] source
     # @param [String] destination
     def copy_directory(source, destination)
-      FileUtils.cp_r(Dir["#{source}/*"],destination)
+      FileUtils.cp_r(Dir["#{source}/*"], destination)
     end
 
     # Execute the command using shellout!
@@ -179,7 +179,7 @@ module Omnibus
 
       File.open(source_path) do |file|
         erb = ERB.new(file.read)
-        File.open(destination_path, "w") do |out|
+        File.open(destination_path, 'w') do |out|
           out.write(erb.result(binding))
         end
 
@@ -258,7 +258,7 @@ module Omnibus
                     files_path
                   end
 
-      File.join(base_path, underscore_name, 'Resources')
+      File.expand_path(File.join(base_path, underscore_name, 'Resources'))
     end
 
     # The underscored equivalent of this class. This is mostly used by file

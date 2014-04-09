@@ -28,6 +28,8 @@ module Omnibus
              files_path: 'files',
              package_dir: 'pkg',
              package_tmp: 'pkg-tmp',
+             resources_path: nil,
+             friendly_name: nil,
       )
     end
 
@@ -189,8 +191,8 @@ module Omnibus
       end
 
       it 'calls the methods in order' do
-        expect(described_class).to receive(:validate).ordered
         expect(described_class).to receive(:setup).ordered
+        expect(described_class).to receive(:validate).ordered
         expect(described_class).to receive(:build).ordered
         expect(described_class).to receive(:clean).ordered
         subject.run!
@@ -206,7 +208,7 @@ module Omnibus
 
     describe '#resource' do
       it 'prefixes to the resources_path' do
-        path = 'files/base/Resources/icon.png'
+        path = 'pkg-tmp/base/Resources/icon.png'
         expect(subject.send(:resource, 'icon.png')).to eq(File.expand_path(path))
       end
     end
