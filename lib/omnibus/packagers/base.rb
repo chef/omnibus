@@ -243,7 +243,7 @@ module Omnibus
     #   the name or path of the resource
     # @return [String]
     def resource(path)
-      File.join(staging_resources_path, path)
+      File.expand_path(File.join(staging_resources_path, path))
     end
 
     # The path to all the resources on the packager source.
