@@ -110,7 +110,7 @@ describe Omnibus::Project do
     context 'when on OS X' do
       let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
       it 'should return a generic iteration' do
-        expect(project.iteration).to eq('1.mac_os_x.10.8.2')
+        expect(project.iteration).to eq('1')
       end
     end
   end

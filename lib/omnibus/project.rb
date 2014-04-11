@@ -243,7 +243,7 @@ module Omnibus
         "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
-      when 'aix', 'debian'
+      when 'aix', 'debian', 'mac_os_x'
         "#{build_iteration}"
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
