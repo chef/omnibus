@@ -54,6 +54,14 @@ describe Omnibus::Project do
     it 'should return an array of files and dirs' do
       expect(project.extra_package_files).to eq(['/path/to/sample_dir', '/path/to/file.conf'])
     end
+
+    it 'should return friendly_name' do
+      expect(project.friendly_name).to eq('Sample Project')
+    end
+
+    it 'should return friendly_name' do
+      expect(project.resources_path).to eq('sample/project/resources')
+    end
   end
 
   describe '#iteration' do
@@ -102,7 +110,7 @@ describe Omnibus::Project do
     context 'when on OS X' do
       let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
       it 'should return a generic iteration' do
-        expect(project.iteration).to eq('1.mac_os_x.10.8.2')
+        expect(project.iteration).to eq('1')
       end
     end
   end

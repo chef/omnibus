@@ -37,6 +37,7 @@ module Omnibus
 
     attr_reader :library
     attr_accessor :dirty_cache
+    attr_reader :resources_path
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -56,8 +57,10 @@ module Omnibus
     def initialize(io, filename)
       @output_package = nil
       @name = nil
+      @friendly_name = nil
       @package_name = nil
       @install_path = nil
+      @resources_path = nil
       @homepage = nil
       @description = nil
       @replaces = nil
@@ -158,6 +161,16 @@ module Omnibus
       @name || fail(MissingProjectConfiguration.new('name', 'my_project'))
     end
 
+    # Set or retrieve a friendly name for the project
+    #
+    # @param val [String] the name to set
+    # @return [String]
+    #
+    def friendly_name(val = NULL_ARG)
+      @friendly_name = val unless val.equal?(NULL_ARG)
+      @friendly_name || @name.capitalize
+    end
+
     # Set or retrieve the package name of the project.  Unless
     # explicitly set, the package name defaults to the project name
     #
@@ -230,7 +243,7 @@ module Omnibus
         "#{build_iteration}.#{platform}.#{maj}.#{machine}"
       when 'windows'
         "#{build_iteration}.windows"
-      when 'aix', 'debian'
+      when 'aix', 'debian', 'mac_os_x'
         "#{build_iteration}"
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
@@ -343,6 +356,15 @@ module Omnibus
     def package_group(val = NULL_ARG)
       @pkg_group = val unless val.equal?(NULL_ARG)
       @pkg_group
+    end
+
+    # Set or retrieve the resources path to be used by packagers.
+    #
+    # @param val [String]
+    # @return [String]
+    def resources_path(val = NULL_ARG)
+      @resources_path = val unless val.equal?(NULL_ARG)
+      @resources_path
     end
 
     # Add an Omnibus software dependency.

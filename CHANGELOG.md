@@ -1,7 +1,13 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v3.0.0 (TBD)
+Unreleased
+----------
+
+- `friendly_name` is added to project DSL to be able to configure the name on packagers.
+- `resources_path` is added to project DSL to be able to specify project specific resource files for packagers.
+
+v3.0.0 (March 27, 2014)
 ------------
 ### New Features
 

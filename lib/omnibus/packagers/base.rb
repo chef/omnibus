@@ -18,6 +18,7 @@
 require 'fileutils'
 require 'forwardable'
 require 'omnibus/util'
+require 'erb'
 
 module Omnibus
   class Packager::Base
@@ -31,6 +32,10 @@ module Omnibus
     # !@method name
     #   @return (see Project#name)
     def_delegator :@project, :name
+
+    # !@method friendly_name
+    #   @return (see Project#friendly_name)
+    def_delegator :@project, :friendly_name
 
     # !@method version
     #   @return (see Project#build_version)
@@ -146,11 +151,40 @@ module Omnibus
       FileUtils.rm_f(path)
     end
 
+    # Copy the +source+ directory to the +destination+.
+    #
+    # @param [String] source
+    # @param [String] destination
+    def copy_directory(source, destination)
+      FileUtils.cp_r(Dir["#{source}/*"], destination)
+    end
+
     # Execute the command using shellout!
     #
     # @param [String] command
     def execute(command)
       shellout!(command,  timeout: 3600, cwd: staging_dir)
+    end
+
+    # Render an erb template at +source_path+ to +destination_path+ if
+    # given. Otherwise template is rendered next to +source_path+
+    # by removing the 'erb' extension of the template
+    #
+    # @param [String] source_path
+    # @param [String] destination_path
+    def render_template(source_path, destination_path = nil)
+      return unless source_path.end_with?('.erb')
+
+      destination_path = source_path.chomp('.erb') if destination_path.nil?
+
+      File.open(source_path) do |file|
+        erb = ERB.new(file.read)
+        File.open(destination_path, 'w') do |out|
+          out.write(erb.result(binding))
+        end
+
+        remove_file(source_path)
+      end
     end
 
     #
@@ -172,8 +206,8 @@ module Omnibus
     #   - clean
     #
     def run!
-      instance_eval(&self.class.validate) if self.class.validate
       instance_eval(&self.class.setup)    if self.class.setup
+      instance_eval(&self.class.validate) if self.class.validate
       instance_eval(&self.class.build)    if self.class.build
       instance_eval(&self.class.clean)    if self.class.clean
     end
@@ -195,20 +229,36 @@ module Omnibus
       File.expand_path("#{project.package_tmp}/#{underscore_name}")
     end
 
-    # The path to a local resource on disk.
+    # The path to the directory where the packager resources are
+    # copied into from source.
+    #
+    # @return [String]
+    def staging_resources_path
+      File.expand_path("#{staging_dir}/Resources")
+    end
+
+    # The path to a resource in staging directory.
     #
     # @param [String]
     #   the name or path of the resource
     # @return [String]
     def resource(path)
-      File.expand_path("#{resources_path}/#{path}")
+      File.expand_path(File.join(staging_resources_path, path))
     end
 
-    # The path to all the resources on the local file system.
+    # The path to all the resources on the packager source.
+    # Uses `resources_path` if specified in the project otherwise
+    # uses the project root set in global config.
     #
     # @return [String]
     def resources_path
-      File.expand_path("#{project.files_path}/#{underscore_name}/Resources")
+      base_path = if project.resources_path
+                    project.resources_path
+                  else
+                    files_path
+                  end
+
+      File.expand_path(File.join(base_path, underscore_name, 'Resources'))
     end
 
     # The underscored equivalent of this class. This is mostly used by file

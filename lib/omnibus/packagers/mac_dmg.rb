@@ -26,6 +26,9 @@ module Omnibus
 
     setup do
       create_directory(dmg_stage)
+      purge_directory(staging_resources_path)
+      copy_directory(resources_path, staging_resources_path)
+
       remove_file(writable_dmg)
       clean_disks
     end
@@ -34,6 +37,8 @@ module Omnibus
       copy_assets_to_dmg
       create_writable_dmg
       attach_dmg
+      # Give some time to the system so attached dmg shows up in Finder
+      sleep 5
       set_volume_icon
       prettify_dmg
       compress_dmg

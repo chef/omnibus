@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+require 'stringio'
+
 module Omnibus
   describe Packager::Base do
     let(:project) do
@@ -28,6 +30,8 @@ module Omnibus
              files_path: 'files',
              package_dir: 'pkg',
              package_tmp: 'pkg-tmp',
+             resources_path: nil,
+             friendly_name: 'HAMLET',
       )
     end
 
@@ -39,6 +43,10 @@ module Omnibus
 
     it 'delegates #name to @project' do
       expect(subject.name).to eq(project.name)
+    end
+
+    it 'delegates #friendly_name to @project' do
+      expect(subject.friendly_name).to eq(project.friendly_name)
     end
 
     it 'delegates #version to @project' do
@@ -154,6 +162,61 @@ module Omnibus
       end
     end
 
+    describe '#copy_directory' do
+      before do
+        FileUtils.stub(:cp_r)
+        Dir.stub(:[]).and_return(['baz/file'])
+      end
+
+      it 'copies the directory' do
+        expect(FileUtils).to receive(:cp_r).with(['baz/file'], 'bar')
+        subject.copy_directory('baz', 'bar')
+      end
+    end
+
+    describe '#render_template' do
+      it 'return when source is not an erb template' do
+        expect(File).not_to receive(:open)
+        subject.render_template('source.txt')
+      end
+
+      shared_examples_for 'render_template' do
+        let(:output) { StringIO.new }
+
+        before do
+          input = StringIO.new
+          input.write('<%= friendly_name %>')
+          input.rewind
+
+          File.stub(:open).with(source_path).and_yield(input)
+          File.stub(:open).with(expected_destination_path, 'w').and_yield(output)
+
+          expect(subject).to receive(:remove_file).with(source_path)
+        end
+
+        it 'should render correctly' do
+          subject.render_template(source_path, destination_path)
+          expect(output.string).to eq('HAMLET')
+        end
+      end
+
+      context 'when destination is specified' do
+        let(:source_path) { 'source.txt.erb' }
+        let(:destination_path) { 'destination.txt' }
+        let(:expected_destination_path) { destination_path }
+
+        include_examples 'render_template'
+      end
+
+      context 'when destination is not specified' do
+        let(:source_path) { 'source.txt.erb' }
+        let(:destination_path) { nil }
+        let(:expected_destination_path) { 'source.txt' }
+
+        include_examples 'render_template'
+      end
+    end
+
     describe '#remove_file' do
       before { FileUtils.stub(:rm_f) }
 
@@ -189,8 +252,8 @@ module Omnibus
       end
 
       it 'calls the methods in order' do
-        expect(described_class).to receive(:validate).ordered
         expect(described_class).to receive(:setup).ordered
+        expect(described_class).to receive(:validate).ordered
         expect(described_class).to receive(:build).ordered
         expect(described_class).to receive(:clean).ordered
         subject.run!
@@ -204,17 +267,34 @@ module Omnibus
       end
     end
 
+    describe '#staging_resources_path' do
+      it 'is base/Resources under package temp' do
+        name = "#{project.package_tmp}/base/Resources"
+        expect(subject.send(:staging_resources_path)).to eq(File.expand_path(name))
+      end
+    end
+
     describe '#resource' do
       it 'prefixes to the resources_path' do
-        path = 'files/base/Resources/icon.png'
+        path = 'pkg-tmp/base/Resources/icon.png'
         expect(subject.send(:resource, 'icon.png')).to eq(File.expand_path(path))
       end
     end
 
     describe '#resoures_path' do
-      it 'is the files_path, underscored_name, and Resources' do
-        path = "#{project.files_path}/base/Resources"
-        expect(subject.send(:resources_path)).to eq(File.expand_path(path))
+      context 'when project does not define resources_path' do
+        it 'is the files_path, underscored_name, and Resources' do
+          path = "#{project.files_path}/base/Resources"
+          expect(subject.send(:resources_path)).to eq(File.expand_path(path))
+        end
+      end
+
+      context 'when project defines resources_path' do
+        before { project.stub(:resources_path).and_return('project/specific') }
+        it 'is the project resources_path, underscored_name, and Resources' do
+          path = 'project/specific/base/Resources'
+          expect(subject.send(:resources_path)).to eq(File.expand_path(path))
+        end
       end
     end
   end
