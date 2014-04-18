@@ -58,12 +58,20 @@ describe Omnibus::Software do
         expect(software.override_version).to eq(expected_override_version)
       end
 
-      it 'should have the md5 of the default version' do
+      it 'should have the right source md5' do
         expect(software.source[:md5]).to eq(expected_md5)
       end
 
-      it 'should have the url of the default version' do
+      it 'should have the right source url' do
         expect(software.source[:url]).to eq(expected_url)
+      end
+
+      it 'should have the right checksum' do
+        expect(software.checksum).to eq(expected_md5)
+      end
+
+      it 'should have the right source_uri' do
+        expect(software.source_uri).to eq(URI.parse(expected_url))
       end
     end
 
@@ -99,6 +107,16 @@ describe Omnibus::Software do
       let(:expected_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz' }
 
       it_behaves_like 'a software definition'
+
+      context 'with the source overridden' do
+        let(:expected_md5) { '1234567890' }
+        let(:expected_url) { 'http://foo.bar/zlib-1.2.8.tar.gz' }
+        let(:project) do
+          double(Omnibus::Project, install_path: 'monkeys', overrides: { zlib: { version: '1.2.8', source: { url: expected_url, md5: expected_md5 } } })
+        end
+
+        it_behaves_like 'a software definition'
+      end
     end
 
   end
