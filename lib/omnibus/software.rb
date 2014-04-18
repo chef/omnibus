@@ -279,7 +279,7 @@ module Omnibus
     #   implementation
     # @todo Why the caching of the URI?
     def source_uri
-      @source_uri ||= URI(@source[:url])
+      @source_uri ||= URI(source[:url])
     end
 
     # @param val [Boolean]
@@ -304,7 +304,7 @@ module Omnibus
     #   across two classes, one of which is a specific interface
     #   implementation
     def checksum
-      @source[:md5]
+      source[:md5]
     end
 
     # @todo Should this ever be legitimately used in the DSL?  It
