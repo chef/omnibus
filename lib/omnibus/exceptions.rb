@@ -51,6 +51,27 @@ module Omnibus
     end
   end
 
+  class BadReplacesLine < RuntimeError
+    def to_s
+      """
+      The `replaces` project DSL statement should never equal the `package_name`
+      or `name` of a project.  The `replaces` option should only be used when
+      you have published an artifact under one name and then later renamed the
+      packages that you are publishing and you must obsolete the old package
+      name.  For example this is used, correctly, in chef-client builds:
+
+      name "chef"
+      replaces "chef-full"
+
+      The RPMs and debs which were originally published were named "chef-full" and
+      this was later renamed, and in order to upgrade the (very old) "chef-full"
+      packages the new "chef" packages needed to know to uninstall any "chef-full"
+      packages that were found.  Projects which have never been renamed, however, should
+      never use the replaces line.
+      """
+    end
+  end
+
   class NoPackageFile < RuntimeError
     def initialize(package_path)
       @package_path = package_path

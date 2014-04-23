@@ -143,6 +143,9 @@ module Omnibus
     # @return [void]
     def validate
       name && install_path && maintainer && homepage
+      if package_name == replaces
+        fail(BadReplacesLine.new)
+      end
     end
 
     # @!group DSL methods
@@ -270,11 +273,12 @@ module Omnibus
     # Ultimately used as the value for the `--replaces` flag in
     # {https://github.com/jordansissel/fpm fpm}.
     #
+    # This should only be used when renaming a package and obsoleting the old
+    # name of the package.  Setting this to the same name as package_name will
+    # cause RPM upgrades to fail.
+    #
     # @param val [String] the name of the package to replace
     # @return [String]
-    #
-    # @todo Consider having this default to {#package_name}; many uses of this
-    #   method effectively do this already.
     def replaces(val = NULL_ARG)
       @replaces = val unless val.equal?(NULL_ARG)
       @replaces
