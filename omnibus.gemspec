@@ -30,7 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'thor',            '>= 0.16.0'
 
   gem.add_development_dependency 'rspec',   '~> 2.14'
-  gem.add_development_dependency 'rubocop', '~> 0.18'
+  gem.add_development_dependency 'rubocop', '~> 0.17.0'
   gem.add_development_dependency 'rake'
 
   gem.add_development_dependency 'bundler'
