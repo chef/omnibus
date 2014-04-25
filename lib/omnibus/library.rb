@@ -38,7 +38,7 @@ module Omnibus
       @components.each do |component|
         if head.length == 0
           head << component
-        elsif @project.dependencies.include?(component.name)
+        elsif @project.dependencies.include?(component.name) && @components.none? { |c| c.dependencies.include?(component.name) }
           tail << component
         else
           head << component

@@ -31,6 +31,7 @@ maintainer 'Chef Software, Inc'
 homepage 'http://getchef.com'
 dependency 'preparation'
 dependency 'erchef'
+dependency 'postgresql'
 dependency 'chef'
 EOH
       Omnibus::Project.new(raw_project, 'chef-server.rb')
@@ -40,6 +41,7 @@ EOH
       library = Omnibus::Library.new(project)
       library.component_added(preparation)
       library.component_added(erlang)
+      library.component_added(postgresql) # as a skitch trans dep
       library.component_added(skitch)
       library.component_added(erchef)
       library.component_added(ruby)
@@ -47,7 +49,7 @@ EOH
       library
     end
 
-    project_deps = [:preparation, :erchef, :chef]
+    project_deps = [:preparation, :erchef, :postgresql, :chef]
     erchef_deps = [:erlang, :skitch]
     chef_deps = [:ruby]
 
@@ -55,12 +57,14 @@ EOH
       let(dep) do
         software = Omnibus::Software.new('', "#{dep}.rb", 'chef-server')
         software.name(dep.to_s)
+        software.dependency('postgresql') if dep == :skitch
         software
       end
     end
 
-    it 'returns an array of software descriptions, with all non top level deps first' do
-      expect(library.build_order).to eql([preparation, erlang, skitch, ruby, erchef, chef])
+    it 'returns an array of software descriptions, with all top level deps first, assuming they are not themselves transitive deps' do
+      library.build_order.map { |m| m.name.to_s }
+      expect(library.build_order).to eql([preparation, erlang, postgresql, skitch, ruby, erchef, chef])
     end
   end
 
