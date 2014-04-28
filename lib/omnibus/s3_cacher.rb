@@ -122,12 +122,12 @@ module Omnibus
 
     def bucket
       @bucket ||= begin
-        if !@client.exists?('/')
+        if @client.exists?('/')
+          @client.bucket
+        else
           @client.connection.put('/')
         end
-          @client.bucket
       end
     end
-
   end
 end
