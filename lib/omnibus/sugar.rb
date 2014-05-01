@@ -29,6 +29,7 @@ require 'chef/sugar/shell'
 require 'chef/sugar/vagrant'
 
 require 'omnibus/project'
+require 'omnibus/software'
 
 module Omnibus
   class Project

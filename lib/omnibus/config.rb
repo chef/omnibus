@@ -16,6 +16,7 @@
 #
 
 require 'mixlib/config'
+require 'omnibus/ohai'
 require 'omnibus/exceptions'
 require 'json'
 
