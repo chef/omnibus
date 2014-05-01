@@ -58,7 +58,7 @@ module Omnibus
       @output_package = nil
       @name = nil
       @friendly_name = nil
-      @msi_parameters = { }
+      @msi_parameters = {}
       @package_name = nil
       @install_path = nil
       @resources_path = nil
@@ -186,7 +186,7 @@ module Omnibus
 
         @msi_parameters = block
       else
-        unless val.equal?(NULL_ARG)
+        if !val.equal?(NULL_ARG)
           @msi_parameters = val
         else
           # Return the value of msi_parameters

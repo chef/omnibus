@@ -166,7 +166,7 @@ module Omnibus
     # Execute the command using shellout!
     #
     # @param [String] command
-    def execute(command, options = { })
+    def execute(command, options = {})
       options.merge! timeout: 3600, cwd: staging_dir
       shellout!(command,  options)
     end

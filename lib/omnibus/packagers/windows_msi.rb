@@ -36,7 +36,7 @@ module Omnibus
       purge_directory(staging_resources_path)
       copy_directory(resources_path, staging_resources_path)
 
-      [ 'localization-en-us.wxl.erb', 'parameters.wxi.erb', 'source.wxs.erb' ].each do |res|
+      ['localization-en-us.wxl.erb', 'parameters.wxi.erb', 'source.wxs.erb'].each do |res|
         res_path = resource(res)
         render_template(res_path) if File.exist?(res_path)
       end
@@ -47,27 +47,27 @@ module Omnibus
       # recursively generate fragment for project directory
       execute [
         "heat.exe dir \"#{install_path}\"",
-        "-nologo -srd -gg -cg ProjectDir",
-        "-dr PROJECTLOCATION -var var.ProjectSourceDir",
-        "-out project-files.wxs"
-      ].join(" ")
+        '-nologo -srd -gg -cg ProjectDir',
+        '-dr PROJECTLOCATION -var var.ProjectSourceDir',
+        '-out project-files.wxs',
+      ].join(' ')
 
       # compile with candle.exe
       execute [
-        "candle.exe -nologo",
+        'candle.exe -nologo',
         "-dProjectSourceDir=\"#{install_path}\" project-files.wxs",
-        "\"#{resource('source.wxs')}\""
-      ].join(" ")
+        "\"#{resource('source.wxs')}\"",
+      ].join(' ')
 
       # create the msi
       # Don't care about the 204 return code from light.exe since it's
       # about some expected warnings...
       execute [
-        "light.exe -nologo -ext WixUIExtension -cultures:en-us",
+        'light.exe -nologo -ext WixUIExtension -cultures:en-us',
         "-loc #{resource('localization-en-us.wxl')}",
-        "project-files.wixobj source.wixobj",
-        "-out \"#{final_pkg}\""
-      ].join(" "), returns: [0, 204]
+        'project-files.wixobj source.wixobj',
+        "-out \"#{final_pkg}\"",
+      ].join(' '), returns: [0, 204]
     end
 
     clean do
