@@ -463,6 +463,26 @@ module Omnibus
       fetcher
     end
 
+    # A PATH variable format string representing the current PATH with the
+    # project's embedded/bin directory prepended. The correct path separator
+    # for the platform is used to join the paths.
+    #
+    # @return [String]
+    def path_with_embedded
+      prepend_path("#{install_dir}/embedded/bin")
+    end
+
+    # A PATH variable format string representing the current PATH with the
+    # given path prepended. The correct path separator
+    # for the platform is used to join the paths.
+    #
+    # @param path [String]
+    # @return [String]
+    def prepend_path(path)
+      separator = File::PATH_SEPARATOR || ':'
+      "#{path}#{separator}#{ENV['PATH']}"
+    end
+
     private
 
     # Apply overrides in the @overrides hash that mask instance variables
