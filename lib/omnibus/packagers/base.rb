@@ -37,6 +37,10 @@ module Omnibus
     #   @return (see Project#friendly_name)
     def_delegator :@project, :friendly_name
 
+    # !@method maintainer
+    #   @return (see Project#maintainer)
+    def_delegator :@project, :maintainer
+
     # !@method version
     #   @return (see Project#build_version)
     def_delegator :@project, :build_version, :version
@@ -162,8 +166,9 @@ module Omnibus
     # Execute the command using shellout!
     #
     # @param [String] command
-    def execute(command)
-      shellout!(command,  timeout: 3600, cwd: staging_dir)
+    def execute(command, options = { })
+      options.merge! timeout: 3600, cwd: staging_dir
+      shellout!(command,  options)
     end
 
     # Render an erb template at +source_path+ to +destination_path+ if

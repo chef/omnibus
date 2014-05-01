@@ -42,9 +42,10 @@ module Omnibus
   DEFAULT_CONFIG_FILENAME = 'omnibus.rb'.freeze
 
   module Packager
-    autoload :Base,   'omnibus/packagers/base'
-    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
-    autoload :MacPkg, 'omnibus/packagers/mac_pkg'
+    autoload :Base,       'omnibus/packagers/base'
+    autoload :MacDmg,     'omnibus/packagers/mac_dmg'
+    autoload :MacPkg,     'omnibus/packagers/mac_pkg'
+    autoload :WindowsMsi, 'omnibus/packagers/windows_msi'
   end
 
   # Configure Omnibus.
