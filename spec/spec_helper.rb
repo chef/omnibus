@@ -27,11 +27,22 @@ module Omnibus
   end
 end
 
+def windows?
+  !!(RUBY_PLATFORM =~ /mswin|mingw|windows/)
+end
+
+def mac?
+  !!(RUBY_PLATFORM =~ /darwin/)
+end
+
 RSpec.configure do |config|
   config.include Omnibus::RSpec
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
   config.treat_symbols_as_metadata_keys_with_true_values = true
+
+  config.filter_run_excluding windows_only: true unless windows?
+  config.filter_run_excluding mac_only: true unless mac?
 
   # Clear the tmp_path on each run
   config.before(:each) do

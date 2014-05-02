@@ -18,7 +18,7 @@
 require 'spec_helper'
 
 module Omnibus
-  describe Packager::MacDmg, :functional do
+  describe Packager::MacDmg, :functional, :mac_only do
     let(:name) { 'sample' }
     let(:version) { '12.4.0' }
 
@@ -64,8 +64,8 @@ module Omnibus
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{project.package_dir}/#{name}-#{version}-1.mac_os_x.10.9.2.pkg"
-      dmg = "#{project.package_dir}/#{name}-#{version}-1.mac_os_x.10.9.2.dmg"
+      pkg = "#{project.package_dir}/#{name}-#{version}-1.pkg"
+      dmg = "#{project.package_dir}/#{name}-#{version}-1.dmg"
 
       expect(File.exist?(pkg)).to be_true
       expect(File.exist?(dmg)).to be_true

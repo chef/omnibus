@@ -18,7 +18,7 @@
 require 'spec_helper'
 
 module Omnibus
-  describe Packager::WindowsMsi, :functional do
+  describe Packager::WindowsMsi, :functional, :windows_only do
     let(:name) { 'sample' }
     let(:version) { '12.4.0' }
 
@@ -29,9 +29,7 @@ module Omnibus
         homepage           'https://getchef.com'
         build_version      '#{version}'
         install_path       '#{tmp_path}\\opt\\#{name}'
-        msi_parameters     {
-          :display_version_number => "12.4"
-        }
+        msi_parameters     display_version_number: "12.4"
       EOH
     end
 
@@ -55,19 +53,18 @@ module Omnibus
 
       # Create the target directory
       FileUtils.mkdir_p(project.install_path)
+
+      # Create a file to be included in the MSI
+      FileUtils.touch(File.join(project.install_path, 'golden_file'))
     end
 
     it 'builds a pkg and a dmg' do
       # Create the pkg resource
-      mac_packager.run!
+      windows_packager.run!
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{project.package_dir}/#{name}-#{version}-1.mac_os_x.10.9.2.pkg"
-      dmg = "#{project.package_dir}/#{name}-#{version}-1.mac_os_x.10.9.2.dmg"
-
-      expect(File.exist?(pkg)).to be_true
-      expect(File.exist?(dmg)).to be_true
+      expect(File.exist?("#{project.package_dir}/#{name}-#{version}-1.windows.msi")).to be_true
     end
   end
 end
