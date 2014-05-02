@@ -103,6 +103,18 @@ module Omnibus
         empty_directory(mac_dmg_resources)
         copy_file(File.join('mac_dmg', 'background.png'), File.join("#{mac_dmg_resources}", 'background.png'))
         copy_file(File.join('mac_dmg', 'icon.png'), File.join("#{mac_dmg_resources}", 'icon.png'))
+
+        # windows msi stock assets
+        windows_msi_resources = File.expand_path("#{target}/files/windows_msi/Resources")
+        empty_directory(windows_msi_resources)
+        empty_directory(File.join(windows_msi_resources, 'assets'))
+        # Parameters are resolved at the build time for localization and parameters files.
+        copy_file(File.join('windows_msi', 'localization-en-us.wxl.erb'), File.join("#{windows_msi_resources}", 'localization-en-us.wxl.erb'), opts)
+        copy_file(File.join('windows_msi', 'parameters.wxi.erb'), File.join("#{windows_msi_resources}", 'parameters.wxi.erb'), opts)
+        template(File.join('windows_msi', 'source.wxs.erb'), File.join("#{windows_msi_resources}", 'source.wxs'), opts)
+        ['LICENSE.rtf', 'banner_background.bmp', 'dialog_background.bmp', 'project.ico', 'project_16x16.ico', 'project_32x32.ico'].each do |res|
+          copy_file(File.join('windows_msi', 'assets', res), File.join("#{windows_msi_resources}", 'assets', res))
+        end
       end
 
       desc 'version', 'Display version information'
