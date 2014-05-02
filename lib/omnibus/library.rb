@@ -33,6 +33,18 @@ module Omnibus
     end
 
     def build_order
+      order = []
+      seen_items = {}
+      #pp :proj_deps => @project.dependencies
+      @project.dependencies.each do |component_name|
+        component = component_by_name(component_name)
+        raise "wtf from PROJECT - no dependency #{component_name}" if component.nil?
+        add_deps_to(order, component, seen_items)
+      end
+      order
+    end
+
+    def old_build_order
       head = []
       tail = []
       @components.each do |component|
@@ -45,6 +57,27 @@ module Omnibus
         end
       end
       [head, tail].flatten
+    end
+
+    private
+
+    def add_deps_to(order, component, seen_items)
+      #pp :adding => component.name
+      return if seen_items.key?(component)
+      seen_items[component] = true
+      component.dependencies.each do |dependency|
+        dependency_component = component_by_name(dependency)
+        raise "wtf from #{component.inspect} - no dependency #{dependency}" if dependency_component.nil?
+        add_deps_to(order, dependency_component, seen_items)
+      end
+      order << component
+      #pp :added => component.name, :order => order.map(&:name)
+    end
+
+    public
+
+    def component_by_name(name)
+      @components.find {|c| c.name.to_s == name.to_s }
     end
 
     def version_map
