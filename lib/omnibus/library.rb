@@ -59,7 +59,7 @@ module Omnibus
     end
 
     def component_by_name(name)
-      @components.find {|c| c.name.to_s == name.to_s }
+      @components.find { |c| c.name.to_s == name.to_s }
     end
 
     def version_map
@@ -102,6 +102,5 @@ module Omnibus
       end
       order << component
     end
-
   end
 end

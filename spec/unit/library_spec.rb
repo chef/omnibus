@@ -156,7 +156,7 @@ EOH
         SoftwareGraph.new(:ohai, [:ruby]),
         SoftwareGraph.new(:bundler, [:ruby]),
         SoftwareGraph.new(:ruby, []),
-        SoftwareGraph.new(:chefdk, [:ruby, :bundler])
+        SoftwareGraph.new(:chefdk, [:ruby, :bundler]),
       ]
 
       graph_nodes.each do |graph|
