@@ -61,6 +61,37 @@ EOH
       end
     end
 
+    context "when a project depends on a non-existent component" do
+      let(:project) do
+        project = basic_project.dup
+        project.dependency(:chefdk)
+        project
+      end
+
+      it "raises an error" do
+        expect { library.build_order }.to raise_error(Omnibus::MissingProjectDependency)
+      end
+
+    end
+
+    context "when a software definition dependends on a non-existent component" do
+      let(:project) do
+        project = basic_project.dup
+        project.dependency(:chefdk)
+        project
+      end
+
+      let!(:chefdk) do
+        graph_node = SoftwareGraph.new(:chefdk, [:nopenopenope])
+        software_defn_from_graph_node(graph_node)
+      end
+
+      it "raises an error" do
+        expect { library.build_order }.to raise_error(Omnibus::MissingSoftwareDependency)
+      end
+
+    end
+
     context "when a software defintion depends on itself" do
       let(:project) do
         project = basic_project.dup
