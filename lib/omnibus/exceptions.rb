@@ -196,6 +196,12 @@ module Omnibus
     end
   end
 
+  # Functionally identical to MissingProjectDependency, but used to indicate
+  # that a software definition has a missing dependency (as opposed to the
+  # project).
+  class MissingSoftwareDependency < MissingProjectDependency
+  end
+
   class UnresolvableGitReference < RuntimeError
   end
 end

@@ -32,19 +32,51 @@ module Omnibus
       end
     end
 
+    # Resorts the component build order given by dependency_order to optimize
+    # the build for git-cacheability. The underlying assumption is that the
+    # software at the top of the stack (e.g., erchef, chef-client, etc.) is
+    # likely to change often, while software at the bottom of the stack (e.g.,
+    # the erlang or ruby VM) will not change often.
+    #
+    # Components are sorted according to the following rules:
+    # 1. The first item in dependency_order is assumed to be a build setup
+    # step, so it is never moved.
+    # 2. If a component is not a dependency of any other component, it is moved
+    # to last in the optimized order.
+    # 3. The order is not changed otherwise.
     def build_order
-      head = []
-      tail = []
-      @components.each do |component|
-        if head.length == 0
-          head << component
-        elsif @project.dependencies.include?(component.name) && @components.none? { |c| c.dependencies.include?(component.name) }
-          tail << component
-        else
-          head << component
+      optimized_order = dependency_order
+      @project.dependencies.each do |component_name|
+        component = component_by_name(component_name)
+        # Assume that the very first dependency is something like the
+        # "preparation" software that *needs* to be first.
+        next if optimized_order.index(component) == 0
+
+        # If nothing else depends on this, we are free to move it to last in
+        # the build order.
+        if not_a_transitive_dep?(component)
+          optimized_order.delete(component)
+          optimized_order << component
         end
       end
-      [head, tail].flatten
+      optimized_order
+    end
+
+    # A depth-first sort of all project dependencies. The sort is
+    # deterministic, uses user-supplied dependency order to break ties.
+    def dependency_order
+      order = []
+      seen_items = {}
+      @project.dependencies.each do |component_name|
+        component = component_by_name(component_name)
+        raise MissingProjectDependency.new(component_name, Omnibus.software_dirs) if component.nil?
+        add_deps_to(order, component, seen_items)
+      end
+      order
+    end
+
+    def component_by_name(name)
+      @components.find { |c| c.name.to_s == name.to_s }
     end
 
     def version_map
@@ -73,6 +105,25 @@ module Omnibus
 
     def select(*args, &block)
       @components.select(*args, &block)
+    end
+
+    private
+
+    def not_a_transitive_dep?(component)
+      @components.none? do |c|
+        c.dependencies.map(&:to_s).include?(component.name.to_s)
+      end
+    end
+
+    def add_deps_to(order, component, seen_items)
+      return if seen_items.key?(component)
+      seen_items[component] = true
+      component.dependencies.each do |dependency|
+        dependency_component = component_by_name(dependency)
+        raise MissingSoftwareDependency.new(dependency, Omnibus.software_dirs) if dependency_component.nil?
+        add_deps_to(order, dependency_component, seen_items)
+      end
+      order << component
     end
   end
 end

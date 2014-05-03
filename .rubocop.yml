@@ -28,3 +28,8 @@ TrailingComma:
   EnforcedStyleForMultiline: comma
 TrivialAccessors:
   Enabled: false
+StringLiterals:
+  Enabled: false
+SignalException:
+  Enabled: false
+

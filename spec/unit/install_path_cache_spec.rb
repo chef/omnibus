@@ -80,6 +80,10 @@ EOH
 
     describe 'with no deps' do
       let(:ipc) do
+        # Ensure zlib is truly first in the build order.
+        project.dependencies.clear
+        project.dependency(:zlib)
+        project.library.component_added(zlib)
         Omnibus::InstallPathCache.new(install_path, zlib)
       end
 
