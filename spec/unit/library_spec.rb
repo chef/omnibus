@@ -168,9 +168,9 @@ EOH
       it 'returns an array of software descriptions, with all top level deps first, assuming they are not themselves transitive deps' do
         names = library.build_order.map { |m| m.name.to_s }
 
-        expect(names).to eq(%w[preparation erlang postgresql skitch erchef ruby bundler chef])
+        expect(names).to eq(%w[preparation erlang postgresql skitch ruby bundler erchef chef])
 
-        expect(library.build_order).to eql([preparation, erlang, postgresql, skitch, erchef, ruby, bundler, chef])
+        expect(library.build_order).to eql([preparation, erlang, postgresql, skitch, ruby, bundler, erchef, chef])
       end
     end
   end
