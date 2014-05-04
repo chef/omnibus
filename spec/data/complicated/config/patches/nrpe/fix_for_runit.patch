@@ -1,0 +1,65 @@
+--- ./nrpe-2.13/src/nrpe.c	2011-11-11 10:45:49.000000000 -0800
++++ ./nrpe-2.13-runit/src/nrpe.c	2012-01-12 17:48:31.511472215 -0800
+@@ -85,6 +85,7 @@
+ int     show_version=FALSE;
+ int     use_inetd=TRUE;
+ int     debug=FALSE;
++int     stay_in_foreground=FALSE;
+ 
+ 
+ 
+@@ -273,26 +274,9 @@
+ 		/* handle the connection */
+ 		handle_connection(0);
+ 	        }
+-
+ 	/* else daemonize and start listening for requests... */
+-	else if(fork()==0){
++	else if(1){
+ 		
+-		/* we're a daemon - set up a new process group */
+-		setsid();
+-
+-		/* close standard file descriptors */
+-		close(0);
+-		close(1);
+-		close(2);
+-
+-		/* redirect standard descriptors to /dev/null */
+-		open("/dev/null",O_RDONLY);
+-		open("/dev/null",O_WRONLY);
+-		open("/dev/null",O_WRONLY);
+-
+-		chdir("/");
+-		/*umask(0);*/
+-
+ 		/* handle signals */
+ 		signal(SIGQUIT,sighandler);
+ 		signal(SIGTERM,sighandler);
+@@ -301,16 +285,6 @@
+ 		/* log info to syslog facility */
+ 		syslog(LOG_NOTICE,"Starting up daemon");
+ 
+-		/* write pid file */
+-		if(write_pid_file()==ERROR)
+-			return STATE_CRITICAL;
+-		
+-		/* drop privileges */
+-		drop_privileges(nrpe_user,nrpe_group);
+-
+-		/* make sure we're not root */
+-		check_privileges();
+-
+ 		do{
+ 
+ 			/* reset flags */
+@@ -337,9 +311,6 @@
+ 	
+ 		        }while(sigrestart==TRUE && sigshutdown==FALSE);
+ 
+-		/* remove pid file */
+-		remove_pid_file();
+-
+ 		syslog(LOG_NOTICE,"Daemon shutdown\n");
+ 	        }
+ 

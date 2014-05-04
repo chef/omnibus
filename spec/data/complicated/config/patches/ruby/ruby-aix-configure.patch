@@ -1,0 +1,10 @@
+--- a/configure	2013-05-14 11:42:05 -0500
++++ b/configure	2013-05-22 14:49:01 -0500
+@@ -16314,6 +16314,7 @@
+   aix*) :
+     	: ${LDSHARED='$(CC)'}
+ 			LDSHARED="$LDSHARED ${linker_flag}-G"
++			DLDFLAGS='-eInit_$(TARGET)'
+ 			EXTDLDFLAGS='-e$(TARGET_ENTRY)'
+ 			XLDFLAGS="${linker_flag}"'-bE:$(ARCHFILE)'" ${linker_flag}-brtl"
+ 			XLDFLAGS="$XLDFLAGS ${linker_flag}-blibpath:${prefix}/lib:${LIBPATH:-/usr/lib:/lib}"

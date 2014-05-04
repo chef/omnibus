@@ -1,0 +1,20 @@
+diff -r -u apache-couchdb-1.0.3/src/couchdb/priv/couch_js/main.c apache-couchdb-1.0.3-couchjs-stack-patch/src/couchdb/priv/couch_js/main.c
+--- apache-couchdb-1.0.3/src/couchdb/priv/couch_js/main.c	2012-07-17 16:09:32.000000000 -0700
++++ apache-couchdb-1.0.3-couchjs-stack-patch/src/couchdb/priv/couch_js/main.c	2012-07-17 16:11:35.000000000 -0700
+@@ -57,6 +57,8 @@
+         return JS_FALSE;
+     }
+ 
++    JS_SetScriptStackQuota(subcx, 0x20000000);
++
+     SETUP_REQUEST(subcx);
+ 
+     src = JS_GetStringChars(str);
+@@ -286,6 +288,7 @@
+     cx = JS_NewContext(rt, 8L * 1024L);
+     if (!cx) return 1;
+ 
++    JS_SetScriptStackQuota(cx, 0x20000000);
+     JS_SetErrorReporter(cx, printerror);
+     JS_ToggleOptions(cx, JSOPTION_XML);
+     

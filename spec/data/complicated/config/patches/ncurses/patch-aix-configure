@@ -1,0 +1,23 @@
+--- configure~	2011-03-31 18:35:51 -0500
++++ configure	2013-05-16 22:50:24 -0500
+@@ -5559,6 +5559,9 @@
+ 		if test "$GCC" = yes; then
+ 			CC_SHARED_OPTS=
+ 			MK_SHARED_LIB='$(CC) -shared'
++		else
++			CC_SHARED_OPTS=
++			MK_SHARED_LIB='$(CC) -qmkshrobj -o $@'
+ 		fi
+ 		;;
+ 	beos*) #(vi
+--- mk-1st.awk~	2010-08-07 15:42:30 -0500
++++ mk-1st.awk	2013-05-16 22:50:24 -0500
+@@ -180,7 +180,7 @@
+ function shlib_build(directory) {
+ 		dst_libs = sprintf("%s/%s", directory, end_name);
+ 		printf "%s : \\\n", dst_libs
+-		printf "\t\t%s \\\n", directory
++#		printf "\t\t%s \\\n", directory
+ 		if (subset ~ /^base/ || subset == "ticlib" ) {
+ 			save_suffix = suffix
+ 			sub(/^[^.]\./,".",suffix)

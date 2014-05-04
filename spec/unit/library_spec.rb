@@ -77,17 +77,18 @@ EOH
     end
 
     context 'with a complex dep tree' do
+      # rubocop:disable all
       [
-        [ 'preparation', [] ],
-        [ 'erchef', [ 'erlang', 'skitch' ] ],
-        [ 'postgresql', [] ],
-        [ 'erlang', [] ],
-        [ 'skitch', ['postgresql'] ],
-        [ 'chef', ['ruby', 'bundler', 'ohai'] ],
-        [ 'ohai', ['ruby'] ],
-        [ 'bundler', ['ruby'] ],
-        [ 'ruby', [] ],
-        [ 'chefdk', ['ruby', 'bundler'] ],
+        ['preparation', []],
+        ['erchef', ['erlang', 'skitch']],
+        ['postgresql', []],
+        ['erlang', []],
+        ['skitch', ['postgresql']],
+        ['chef', ['ruby', 'bundler', 'ohai']],
+        ['ohai', ['ruby']],
+        ['bundler', ['ruby']],
+        ['ruby', []],
+        ['chefdk', ['ruby', 'bundler']],
       ].each do |item|
         name = item[0]
         deps = item[1]
@@ -135,14 +136,60 @@ dependency 'chefdk'
             preparation, # first
             erlang, # via erchef project
             postgresql, # via skitch transitive
-            skitch, #via erchef project
-            ruby, #via bundler transitive
+            skitch, # via erchef project
+            ruby, # via bundler transitive
             bundler, # via chef
-            ohai, #via chef
-            erchef, #project dep
+            ohai, # via chef
+            erchef, # project dep
             chef, # project dep
-            chefdk, #project dep
+            chefdk, # project dep
            ])
+      end
+    end
+
+    context 'with real data' do
+      before :each do
+        allow_any_instance_of(Omnibus::Software).to receive(:platform).and_return('windows')
+        Omnibus.stub(:project_root) do
+          File.expand_path(
+            File.join(
+              File.dirname(__FILE__),
+              '..',
+              'data',
+              'complicated'
+            )
+          )
+        end
+        Omnibus.process_dsl_files
+      end
+
+      after :each do
+        Omnibus.class_eval { @projects = [] }
+        Omnibus.class_eval { @software_dirs = nil }
+      end
+
+      let(:chefdk_windows) do
+        Omnibus.projects.find { |p| p.name.to_s == 'chefdk-windows' }
+      end
+
+      it 'has the right build order for chefdk-windows on windows' do
+        names = chefdk_windows.library.build_order.map { |m| m.name.to_s }
+        expect(names).to eql([
+          'preparation', # via project dep
+          'ruby-windows', # via libyaml-windows trans dep
+          'libyaml-windows', # via ruby-windows trans
+          'ruby-windows-devkit', # via trans dep from chef-windows
+          'bundler', # via trans dep from chef-windows
+          'cacerts', # via chef-windows
+          'chef-windows', # via transitive dep from chefdk
+          'nokogiri', # via test-kitchen
+          'test-kitchen', # via chefdk
+          'appbundler', # via chefdk
+          'berkshelf', # via chefdk
+          'chef-vault', # via chefdk
+          'chefdk', # via project dep
+          'chef-client-msi', # via top level dep
+        ])
       end
     end
   end

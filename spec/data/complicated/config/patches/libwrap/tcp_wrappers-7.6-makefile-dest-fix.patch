@@ -1,0 +1,35 @@
+diff -ur tcp_wrappers_7.6/Makefile tcp_wrappers_7.6.fixed/Makefile
+--- tcp_wrappers_7.6/Makefile	2012-04-10 11:45:38.000000000 -0700
++++ tcp_wrappers_7.6.fixed/Makefile	2012-04-10 14:11:58.000000000 -0700
+@@ -768,9 +768,9 @@
+ install: install-lib install-bin install-dev
+ 
+ install-lib:
+-	install -o root -g root -m 0755 $(SHLIB) ${DESTDIR}/usr/lib/
+-	ln -sf $(notdir $(SHLIB)) ${DESTDIR}/usr/lib/$(notdir $(SHLIBSOMAJ))
+-	ln -sf $(notdir $(SHLIBSOMAJ)) ${DESTDIR}/usr/lib/$(notdir $(SHLIBSO))
++	install -m 0755 $(SHLIB) ${DESTDIR}/lib/
++	ln -sf $(notdir $(SHLIB)) ${DESTDIR}/lib/$(notdir $(SHLIBSOMAJ))
++	ln -sf $(notdir $(SHLIBSOMAJ)) ${DESTDIR}/lib/$(notdir $(SHLIBSO))
+ 
+ install-bin:
+ 	install -o root -g root -m 0755 tcpd ${DESTDIR}/usr/sbin/
+@@ -787,12 +787,12 @@
+ 	install -o root -g root -m 0644 hosts_options.5 ${DESTDIR}/usr/share/man/man5/
+ 
+ install-dev:
+-	install -o root -g root -m 0644 hosts_access.3 ${DESTDIR}/usr/share/man/man3/
+-	install -o root -g root -m 0644 tcpd.h ${DESTDIR}/usr/include/
+-	install -o root -g root -m 0644 $(LIB) ${DESTDIR}/usr/lib/
+-	ln -sf hosts_access.3 ${DESTDIR}/usr/share/man/man3/hosts_ctl.3
+-	ln -sf hosts_access.3 ${DESTDIR}/usr/share/man/man3/request_init.3
+-	ln -sf hosts_access.3 ${DESTDIR}/usr/share/man/man3/request_set.3
++	install -m 0644 hosts_access.3 ${DESTDIR}/share/man/man3/
++	install -m 0644 tcpd.h ${DESTDIR}/include/
++	install -m 0644 $(LIB) ${DESTDIR}/lib/
++	ln -sf hosts_access.3 ${DESTDIR}/share/man/man3/hosts_ctl.3
++	ln -sf hosts_access.3 ${DESTDIR}/share/man/man3/request_init.3
++	ln -sf hosts_access.3 ${DESTDIR}/share/man/man3/request_set.3
+ 
+ shar:	$(KIT)
+ 	@shar $(KIT)
