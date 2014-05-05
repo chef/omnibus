@@ -19,7 +19,6 @@ module Omnibus
   #
   # Used to generate the manifest of all software components with versions
   class Library
-
     # The list of Omnibus::Software definitions. This is populated by calling
     # #component_added during code loading. The list is expected to be sorted
     # in a valid order according to project and software dependencies, but this
