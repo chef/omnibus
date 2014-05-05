@@ -3,7 +3,6 @@ require 'omnibus/software'
 require 'spec_helper'
 
 describe Omnibus::Software do
-
   let(:project) do
     double(Omnibus::Project, install_path: '/monkeys', overrides: {})
   end
@@ -20,7 +19,6 @@ describe Omnibus::Software do
   end
 
   describe "path helpers" do
-
     before do
       stub_const("File::PATH_SEPARATOR", separator)
       ENV.stub(:[]).and_call_original
@@ -28,7 +26,6 @@ describe Omnibus::Software do
     end
 
     context "on *NIX" do
-
       let(:separator) { ":" }
       let(:path) { "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin" }
 
@@ -39,11 +36,9 @@ describe Omnibus::Software do
       it "prepends the embedded bin to PATH" do
         expect(software.path_with_embedded).to eq("/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
       end
-
     end
 
     context "on Windows" do
-
       before do
         project.stub(:install_path).and_return("c:/monkeys")
       end
@@ -58,9 +53,7 @@ describe Omnibus::Software do
       it "prepends the embedded bin to PATH" do
         expect(software.path_with_embedded).to eq("c:/monkeys/embedded/bin;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
       end
-
     end
-
   end
 
   describe '#whitelist_file' do
@@ -162,7 +155,6 @@ describe Omnibus::Software do
         it_behaves_like 'a software definition'
       end
     end
-
   end
 
   context 'while getting version_for_cache' do
@@ -200,6 +192,5 @@ describe Omnibus::Software do
         get_version_for_cache('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
       end
     end
-
   end
 end
