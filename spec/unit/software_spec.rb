@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Omnibus::Software do
 
   let(:project) do
-    double(Omnibus::Project, install_path: 'monkeys', overrides: {})
+    double(Omnibus::Project, install_path: '/monkeys', overrides: {})
   end
 
   let(:software_name) { 'erchef' }
@@ -17,6 +17,50 @@ describe Omnibus::Software do
 
   before do
     allow_any_instance_of(Omnibus::Software).to receive(:render_tasks)
+  end
+
+  describe "path helpers" do
+
+    before do
+      stub_const("File::PATH_SEPARATOR", separator)
+      ENV.stub(:[]).and_call_original
+      ENV.stub(:[]).with("PATH").and_return(path)
+    end
+
+    context "on *NIX" do
+
+      let(:separator) { ":" }
+      let(:path) { "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin" }
+
+      it "prepends a path to PATH" do
+        expect(software.prepend_path("/foo/bar")).to eq("/foo/bar:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+      end
+
+      it "prepends the embedded bin to PATH" do
+        expect(software.path_with_embedded).to eq("/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+      end
+
+    end
+
+    context "on Windows" do
+
+      before do
+        project.stub(:install_path).and_return("c:/monkeys")
+      end
+
+      let(:separator) { ";" }
+      let(:path) { "c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
+
+      it "prepends a path to PATH" do
+        expect(software.prepend_path("c:/foo/bar")).to eq("c:/foo/bar;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+      end
+
+      it "prepends the embedded bin to PATH" do
+        expect(software.path_with_embedded).to eq("c:/monkeys/embedded/bin;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+      end
+
+    end
+
   end
 
   describe '#whitelist_file' do
