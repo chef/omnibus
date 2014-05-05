@@ -15,9 +15,72 @@
 # limitations under the License.
 #
 
-require 'omnibus/cli/application'
-require 'omnibus/cli/base'
-require 'omnibus/cli/build'
+require 'thor'
+require 'omnibus'
+
+module Omnibus
+  class CLITest < Thor
+    map ['-v', '--version'] => 'version'
+
+    class_option :config,
+      desc: 'Path to the Omnibus config file',
+      aliases: ['-c'],
+      type: :string,
+      lazy_default: File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME)
+
+    #
+    # Initialize a new Omnibus project.
+    #
+    #   $ omnibus new PATH
+    #
+    register(Generator, 'new', 'new PATH', 'Initialize a new Omnibus project',
+      Generator.class_options)
+
+    #
+    # Clean the Omnibus project.
+    #
+    #   $ omnibus clean
+    #
+    register(Cleaner, 'clean', 'clean', 'Clean the Omnibus project',
+      Cleaner.class_options)
+
+    #
+    # Display version information.
+    #
+    #   $ omnibus version
+    #
+    desc 'version', 'Display version information', hide: true
+    def version
+      say "Omnibus v#{Omnibus::VERSION}"
+    end
+
+    private
+
+    #
+    #
+    #
+    def load_project!(name)
+      project = Omnibus.project(name)
+
+      unless project
+        error =  "I could not find an Omnibus project named '#{name}'. "
+        error << "Valid project names are:"
+        Omnibus.project_names.sort.each do |project_name|
+          error << "  * #{project_name}"
+        end
+        fail Omnibus::CLI::Error, error
+      end
+
+      project
+    end
+  end
+end
+
+
+
+# require 'omnibus/cli/application'
+# require 'omnibus/cli/base'
+# require 'omnibus/cli/build'
 
 module Omnibus
   module CLI

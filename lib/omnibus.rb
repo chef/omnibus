@@ -35,6 +35,9 @@ require 'pathname'
 module Omnibus
   DEFAULT_CONFIG_FILENAME = 'omnibus.rb'.freeze
 
+  autoload :Cleaner,   'omnibus/cleaner'
+  autoload :Generator, 'omnibus/generator'
+
   module Packager
     autoload :Base,       'omnibus/packagers/base'
     autoload :MacDmg,     'omnibus/packagers/mac_dmg'

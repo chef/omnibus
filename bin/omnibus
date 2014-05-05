@@ -4,8 +4,9 @@
 # https://twitter.com/mitchellh/status/283014103189053442
 Signal.trap('INT') { exit 1 }
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$:.unshift File.join(File.dirname(__FILE__), %w{.. lib})
 
 require 'omnibus/cli'
 
-Omnibus::CLI::Application.start
+Omnibus::CLITest.start
+# Omnibus::CLI::Application.start

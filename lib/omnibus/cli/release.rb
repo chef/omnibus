@@ -25,9 +25,11 @@ module Omnibus
     class Release < Base
       namespace :release
 
-      def initialize(args, options, config)
-        super(args, options, config)
-      end
+      option :target,
+        short: '-t TARGET',
+        long: '--target TARGET',
+        default: 'S3',
+        description: 'The target backend to release the package'
 
       desc 'package PATH', 'Upload a single package to S3'
       option :public, type: :boolean, default: false, desc: 'Make S3 object publicly readable'
