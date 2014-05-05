@@ -19,6 +19,15 @@ module Omnibus
   #
   # Used to generate the manifest of all software components with versions
   class Library
+
+    # The list of Omnibus::Software definitions. This is populated by calling
+    # #component_added during code loading. The list is expected to be sorted
+    # in a valid order according to project and software dependencies, but this
+    # class does not verify that condition.
+    #
+    # @see Omnibus.expand_software
+    # @return [Array<Omnibus::Software>] the software components in optimized
+    #   order.
     attr_reader :components
 
     def initialize(project)
@@ -26,12 +35,32 @@ module Omnibus
       @project = project
     end
 
+    # Callback method that should be called each time an Omnibus::Software
+    # definition file is loaded.
+    #
+    # @param component [Omnibus::Software]
+    # @return [void]
     def component_added(component)
       unless @components.find { |c| c.name == component.name }
         @components << component
       end
     end
 
+    # The order in which each Software component should be built. The order is
+    # based on the order of #components, optimized to move top-level
+    # dependencies later in the build order to make the git caching feature
+    # more effective. It is assumed that #components is already sorted in a
+    # valid dependency order. The optimization works as follows:
+    #
+    # 1. The first component is assumed to be a preparation step that needs to
+    # run first, so it is not moved.
+    # 2. If a component is a top-level dependency of the project AND no other
+    # software depends on it, it is shifted to last in the optimized order.
+    # 3. If none of the above conditions are met, the order of that component
+    # is unchanged.
+    #
+    # @return [Array<Omnibus::Software>] the software components in optimized
+    #   order.
     def build_order
       head = []
       tail = []
