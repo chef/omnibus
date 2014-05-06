@@ -35,7 +35,7 @@ E
     end
 
     def rsync
-      if OHAI.platform == 'windows'
+      if Ohai.platform == 'windows'
         # Robocopy's return code is 1 if it succesfully copies over the
         # files and 0 if the files are already existing at the destination
         sync_cmd = "robocopy #{@source[:path]}\\ #{@project_dir}\\ /MIR /S"

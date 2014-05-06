@@ -16,7 +16,6 @@
 #
 
 require 'mixlib/config'
-require 'omnibus/ohai'
 require 'omnibus/exceptions'
 require 'json'
 
@@ -33,7 +32,7 @@ module Omnibus
     # Converts a given path to a platform specific path based on windows or
     # linux.
     def self.platformize_omnibus_path(path)
-      if OHAI.platform == 'windows'
+      if Ohai.platform == 'windows'
         File.join('C:\\omnibus-ruby', path).gsub(File::SEPARATOR, File::ALT_SEPARATOR)
       else
         File.join('/var/cache/omnibus', path)

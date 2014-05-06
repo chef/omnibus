@@ -16,9 +16,34 @@
 #
 
 require 'ohai'
-o = Ohai::System.new
-o.require_plugin('os')
-o.require_plugin('platform')
-o.require_plugin('linux/cpu') if o.os == 'linux'
-o.require_plugin('kernel')
-OHAI = o
+
+module Omnibus
+  class Ohai
+    class << self
+      def method_missing(m, *args, &block)
+        if respond_to_missing?(m)
+          ohai.send(m, *args, &block)
+        else
+          super
+        end
+      end
+
+      def respond_to_missing?(m, include_private = false)
+        ohai.respond_to?(m, include_private) || ohai.attribute?(m)
+      end
+
+      private
+
+      def ohai
+        return @ohai if @ohai
+
+        @ohai = ::Ohai::System.new
+        @ohai.require_plugin('os')
+        @ohai.require_plugin('platform')
+        @ohai.require_plugin('linux/cpu') if @ohai.os == 'linux'
+        @ohai.require_plugin('kernel')
+        @ohai
+      end
+    end
+  end
+end

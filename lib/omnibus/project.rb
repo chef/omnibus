@@ -96,7 +96,7 @@ module Omnibus
     end
 
     def health_check_me
-      if OHAI.platform == 'windows'
+      if Ohai.platform == 'windows'
         puts 'Skipping health check on windows...'
       else
         # build a list of all whitelist files from all project dependencies
@@ -125,9 +125,9 @@ module Omnibus
 
         render_metadata(pkg_type)
 
-        if OHAI.platform == 'windows'
+        if Ohai.platform == 'windows'
           cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
-        elsif OHAI.platform == 'aix'
+        elsif Ohai.platform == 'aix'
           cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
         else
           cp_cmd = "cp #{config.package_dir}/* pkg/"
@@ -525,7 +525,7 @@ module Omnibus
     #
     # @return [String]
     def platform_version
-      OHAI.platform_version
+      Ohai.platform_version
     end
 
     # Returns the platform of the machine on which Omnibus is running,
@@ -533,7 +533,7 @@ module Omnibus
     #
     # @return [String]
     def platform
-      OHAI.platform
+      Ohai.platform
     end
 
     # Returns the platform family of the machine on which Omnibus is
@@ -541,11 +541,11 @@ module Omnibus
     #
     # @return [String]
     def platform_family
-      OHAI.platform_family
+      Ohai.platform_family
     end
 
     def machine
-      OHAI['kernel']['machine']
+      Ohai['kernel']['machine']
     end
 
     # Convenience method for accessing the global Omnibus configuration object.

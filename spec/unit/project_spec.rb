@@ -67,12 +67,12 @@ describe Omnibus::Project do
   describe '#iteration' do
     let(:fauxhai_options) { Hash.new }
     around(:each) do |example|
-      data = OHAI.data
+      data = Ohai.data
       begin
-        OHAI.data = Mash.new(Fauxhai.mock(fauxhai_options).data)
+        Ohai.data = Mash.new(Fauxhai.mock(fauxhai_options).data)
         example.run
       ensure
-        OHAI.data = data
+        Ohai.data = data
       end
     end
 

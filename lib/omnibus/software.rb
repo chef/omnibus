@@ -344,8 +344,8 @@ module Omnibus
     # @todo It seems like this isn't used, and if it were, it should
     # probably be part of Opscode::Builder instead
     def max_build_jobs
-      if OHAI.cpu && OHAI.cpu[:total] && OHAI.cpu[:total].to_s =~ /^\d+$/
-        OHAI.cpu[:total].to_i + 1
+      if Ohai.cpu && Ohai.cpu[:total] && Ohai.cpu[:total].to_s =~ /^\d+$/
+        Ohai.cpu[:total].to_i + 1
       else
         3
       end
@@ -417,14 +417,14 @@ module Omnibus
     #
     # @return [String]
     def platform
-      OHAI.platform
+      Ohai.platform
     end
 
     # Return the architecture of the machine, as determined by Ohai.
     # @return [String] Either "sparc" or "intel", as appropriate
     # @todo Is this used?  Doesn't appear to be...
     def architecture
-      OHAI.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
+      Ohai.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
     end
 
     # Actually build the software package

@@ -40,7 +40,7 @@ module Omnibus
     # Omnibus project as if it were Chef. Otherwise, we would need to rewrite
     # all the DSL methods.
     def node
-      OHAI
+      Ohai
     end
   end
 end
