@@ -29,7 +29,6 @@ module Omnibus
         homepage           'https://getchef.com'
         build_version      '#{version}'
         install_path       '#{tmp_path}\\opt\\#{name}'
-        msi_parameters     display_version_number: "12.4"
       EOH
     end
 

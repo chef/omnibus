@@ -36,6 +36,9 @@ module Omnibus
       purge_directory(staging_resources_path)
       copy_directory(resources_path, staging_resources_path)
 
+      # Set the MSI version before rendering MSI source files
+      set_msi_version_from_project
+
       ['localization-en-us.wxl.erb', 'parameters.wxi.erb', 'source.wxs.erb'].each do |res|
         res_path = resource(res)
         render_template(res_path) if File.exist?(res_path)
@@ -83,6 +86,24 @@ module Omnibus
     # @return [String] Path to the packge file.
     def final_pkg
       File.expand_path("#{project.package_dir}/#{package_name}")
+    end
+
+    # Helper method to set the msi version for a given project
+    def set_msi_version_from_project
+      # build_version looks something like this:
+      # dev builds => 11.14.0-alpha.1+20140501194641.git.94.561b564
+      #            => 0.0.0+20140506165802.1
+      # rel builds => 11.14.0.alpha.1 || 11.14.0
+      #
+      # MSI version spec expects a version that looks like X.Y.Z.W where
+      # X, Y, Z & W are 32 bit integers.
+      #
+      # MSI source files expect two versions to be set in the msi_parameters:
+      # msi_version & msi_display_version
+
+      versions = version.split(/[.+-]/)
+      @msi_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{@project.build_iteration}"
+      @msi_display_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}"
     end
   end
 end
