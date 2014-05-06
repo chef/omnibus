@@ -20,8 +20,11 @@ module Omnibus
   class Generator < Thor::Group
     include Thor::Actions
 
+    namespace :new
+
     argument :path,
       banner: 'PATH',
+      aliases: '-p',
       desc: 'The path to create the Omnibus project',
       type: :string,
       required: true
