@@ -18,7 +18,7 @@
 require 'spec_helper'
 
 module Omnibus
-  describe Packager::MacDmg, :functional, :mac_only do
+  describe Packager::WindowsMsi, :functional, :windows_only do
     let(:name) { 'sample' }
     let(:version) { '12.4.0' }
 
@@ -28,12 +28,11 @@ module Omnibus
         maintainer         'Chef'
         homepage           'https://getchef.com'
         build_version      '#{version}'
-        install_path       '#{tmp_path}/opt/#{name}'
-        mac_pkg_identifier 'test.pkg.#{name}'
+        install_path       '#{tmp_path}\\opt\\#{name}'
       EOH
     end
 
-    let(:mac_packager) { Packager::MacPkg.new(project) }
+    let(:windows_packager) { Packager::WindowsMsi.new(project) }
 
     before do
       # Reset stale configuration
@@ -48,27 +47,23 @@ module Omnibus
       Omnibus.config.package_dir "#{root}/pkg"
       Omnibus.config.package_tmp "#{root}/pkg-tmp"
 
-      # Enable DMG create
-      Omnibus.config.build_dmg true
-
       # Point at our sample project fixture
       Omnibus.config.project_root "#{fixtures_path}/sample"
 
       # Create the target directory
       FileUtils.mkdir_p(project.install_path)
+
+      # Create a file to be included in the MSI
+      FileUtils.touch(File.join(project.install_path, 'golden_file'))
     end
 
     it 'builds a pkg and a dmg' do
       # Create the pkg resource
-      mac_packager.run!
+      windows_packager.run!
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{project.package_dir}/#{name}-#{version}-1.pkg"
-      dmg = "#{project.package_dir}/#{name}-#{version}-1.dmg"
-
-      expect(File.exist?(pkg)).to be_true
-      expect(File.exist?(dmg)).to be_true
+      expect(File.exist?("#{project.package_dir}/#{name}-#{version}-1.windows.msi")).to be_true
     end
   end
 end
