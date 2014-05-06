@@ -49,7 +49,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache"`.
     #
     #   @return [String]
-    default :cache_dir, platformize_omnibus_path('cache')
+    default(:cache_dir) { platformize_omnibus_path('cache') }
 
     # @!attribute [rw] install_path_cache_dir
     #   The absolute path to the directory on the virtual machine where
@@ -58,7 +58,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache/install_path"`.
     #
     #   @return [String]
-    default :install_path_cache_dir, platformize_omnibus_path('cache/install_path')
+    default(:install_path_cache_dir) { platformize_omnibus_path('cache/install_path') }
 
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where
@@ -67,7 +67,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/src"`.
     #
     #   @return [String]
-    default :source_dir, platformize_omnibus_path('src')
+    default(:source_dir) { platformize_omnibus_path('src') }
 
     # @!attribute [rw] build_dir
     #   The absolute path to the directory on the virtual machine where
@@ -76,7 +76,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/build"`.
     #
     #   @return [String]
-    default :build_dir, platformize_omnibus_path('build')
+    default(:build_dir) { platformize_omnibus_path('build') }
 
     # @!attribute [rw] package_dir
     #   The absolute path to the directory on the virtual machine where
@@ -85,7 +85,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg"`.
     #
     #   @return [String]
-    default :package_dir, platformize_omnibus_path('pkg')
+    default(:package_dir) { platformize_omnibus_path('pkg') }
 
     # @!attribute [rw] package_tmp
     #   The absolute path to the directory on the virtual machine where
@@ -96,7 +96,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg-tmp"`.
     #
     #   @return [String]
-    default :package_tmp, platformize_omnibus_path('pkg-tmp')
+    default(:package_tmp) { platformize_omnibus_path('pkg-tmp') }
 
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
@@ -123,7 +123,7 @@ module Omnibus
     #   Defaults to the current working directory.
     #
     #   @return [String]
-    default :project_root, Dir.pwd
+    default(:project_root) { Dir.pwd }
 
     # @!attribute [rw] install_dir
     #   Installation directory
@@ -272,6 +272,7 @@ module Omnibus
     # @!group Build Version Parameters
 
     # @!attribute [rw] append_timestamp
+    #   Append the current timestamp to the version identifier.
     #
     #   @return [Boolean]
     default :append_timestamp, true
@@ -281,6 +282,7 @@ module Omnibus
     # @!group Build Control Parameters
 
     # @! attribute [rw] build_retries
+    #   The number of times to retry the build before failing.
     #
     #   @return [Integer, nil]
     default :build_retries, 3
