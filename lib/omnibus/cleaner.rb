@@ -21,6 +21,8 @@ module Omnibus
   class Cleaner < Thor::Group
     include Thor::Actions
 
+    namespace :clean
+
     class_option :purge,
       desc: 'Purge the packages and caches',
       type: :boolean,
