@@ -27,7 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'ohai',            '~> 6.12'
   gem.add_dependency 'fpm',             '~> 1.0.0'
   gem.add_dependency 'uber-s3'
-  gem.add_dependency 'thor',            '>= 0.16.0'
+  gem.add_dependency 'thor',            '~> 0.18'
 
   gem.add_development_dependency 'rspec',   '~> 2.14'
   gem.add_development_dependency 'rubocop', '~> 0.17.0'
