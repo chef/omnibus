@@ -469,18 +469,22 @@ module Omnibus
     #
     # @return [String]
     def path_with_embedded
-      prepend_path("#{install_dir}/embedded/bin")
+      prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
     end
 
     # A PATH variable format string representing the current PATH with the
     # given path prepended. The correct path separator
     # for the platform is used to join the paths.
     #
-    # @param path [String]
+    # @param paths [String]
+    # @param paths [Array<String>]
     # @return [String]
-    def prepend_path(path)
+    def prepend_path(*paths)
+      path_values = Array(paths)
+      path_values << ENV['PATH']
+
       separator = File::PATH_SEPARATOR || ':'
-      "#{path}#{separator}#{ENV['PATH']}"
+      path_values.join(separator)
     end
 
     private

@@ -34,7 +34,12 @@ describe Omnibus::Software do
       end
 
       it "prepends the embedded bin to PATH" do
-        expect(software.path_with_embedded).to eq("/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+        expect(software.path_with_embedded).to eq("/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+      end
+
+      it "prepends multiple paths to PATH" do
+        expect(software.prepend_path("/foo/bar", "/foo/baz"))
+          .to eq("/foo/bar:/foo/baz:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
       end
     end
 
@@ -51,7 +56,12 @@ describe Omnibus::Software do
       end
 
       it "prepends the embedded bin to PATH" do
-        expect(software.path_with_embedded).to eq("c:/monkeys/embedded/bin;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+        expect(software.path_with_embedded).to eq("c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+      end
+
+      it "prepends multiple paths to PATH" do
+        expect(software.prepend_path("c:/foo/bar", "c:/foo/baz"))
+          .to eq("c:/foo/bar;c:/foo/baz;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
       end
     end
   end
