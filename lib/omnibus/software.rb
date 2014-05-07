@@ -477,10 +477,10 @@ module Omnibus
     # for the platform is used to join the paths.
     #
     # @param paths [String]
-    # @param paths [Array]
+    # @param paths [Array<String>]
     # @return [String]
     def prepend_path(*paths)
-      path_values = Array(paths).clone
+      path_values = Array(paths)
       path_values << ENV['PATH']
 
       separator = File::PATH_SEPARATOR || ':'
