@@ -35,9 +35,10 @@ module Omnibus
 
     NULL_ARG = Object.new
 
-    attr_reader :library
+    attr_reader   :library
     attr_accessor :dirty_cache
-    attr_reader :resources_path
+    attr_accessor :build_version_dsl
+    attr_reader   :resources_path
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -325,9 +326,16 @@ module Omnibus
     # @return [String]
     #
     # @see Omnibus::BuildVersion
-    def build_version(val = NULL_ARG)
-      @build_version = val unless val.equal?(NULL_ARG)
-      @build_version
+    def build_version(val = NULL_ARG, &block)
+      if block_given?
+        @build_version_dsl =  BuildVersionDsl.new(block)
+      else
+        if !val.equal?(NULL_ARG)
+          @build_version_dsl = BuildVersionDsl.new(val)
+        else
+          @build_version_dsl.build_version
+        end
+      end
     end
 
     # Set or retrieve the build iteration of the project.  Defaults to

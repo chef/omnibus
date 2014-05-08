@@ -42,7 +42,8 @@ module Omnibus
         unless options[:timestamp]
           say("I won't append a timestamp to the version identifier.", :yellow)
         end
-        say("Building #{project.name} #{project.build_version}", :green)
+        say("Building #{project.friendly_name}", :green)
+        say(project.build_version_dsl.explain, :green)
 
         project.build_me
       end
