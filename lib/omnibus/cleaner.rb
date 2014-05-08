@@ -22,10 +22,23 @@ module Omnibus
 
     namespace :clean
 
+    argument :name,
+      banner: 'NAME',
+      desc: 'The name of the Omnibus project',
+      type: :string,
+      required: true
+
     class_option :purge,
       desc: 'Purge the packages and caches',
       type: :boolean,
       default: false
+
+    def initialize(*)
+      super
+
+      @project = Omnibus.project(name)
+      raise ProjectNotFound.new(name) unless @project
+    end
 
     def clean_source_dir
       Dir.glob("#{Omnibus.config.source_dir}/**/*").each(&method(:remove_file))
@@ -47,7 +60,7 @@ module Omnibus
 
     def clean_install_dir
       return unless purge?
-      # remove_file(project.install_path)
+      remove_file(@project.install_path)
     end
 
     private

@@ -38,10 +38,10 @@ module Omnibus
     #
     # Clean the Omnibus project.
     #
-    #   $ omnibus clean
+    #   $ omnibus clean chefdk
     #
-    register(Cleaner, 'clean', 'clean', 'Clean the Omnibus project',
-      Cleaner.class_options)
+    register(Cleaner, 'clean', 'clean PROJECT', 'Clean the Omnibus project')
+    CLI.tasks['clean'].options = Cleaner.class_options
 
     #
     # Display version information.
