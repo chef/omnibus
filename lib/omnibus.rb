@@ -70,6 +70,26 @@ module Omnibus
     autoload :WindowsMsi, 'omnibus/packagers/windows_msi'
   end
 
+  class << self
+    def log
+      return @logger if @logger
+
+      @logger = Logger.new($stdout)
+      @logger.level = Logger::WARN
+      @logger.formatter = ->(severity, timestamp, name, message) do
+        "[#{severity}] #{message}\n"
+      end
+      @logger
+    end
+
+    def log_level=(level)
+      level = level.to_s.upcase
+      log.level = Logger.const_get(level)
+    rescue NameError
+      raise "'#{level}' does not appear to be a valid log level!"
+    end
+  end
+
   # Configure Omnibus.
   #
   # After this has been called, the {Omnibus::Config} object is
