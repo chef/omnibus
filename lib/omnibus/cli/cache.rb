@@ -15,40 +15,92 @@
 #
 
 module Omnibus
-  module CLI
-    class Cache < Base
-      class_option :path,
-                   aliases: [:p],
-                   type: :string,
-                   default: Dir.pwd,
-                   desc: 'Path to the Omnibus project root.'
+  class Command::Cache < Command::Base
+    namespace :cache
 
-      namespace :cache
+    #
+    # List the existing source packages in the cache.
+    #
+    #   $ omnibus cache existing
+    #
+    desc 'existing', 'List source packages which exist in the cache'
+    def existing
+      result = cache.list
 
-      desc 'existing', 'List source packages which exist in the cache'
-      def existing
-        S3Cache.new.list.each { |s| puts s.name }
+      if result.empty?
+        say('There are no packages in the cache!')
+      else
+        say('The following packages are in the cache:')
+        result.each do |source|
+          say("  * #{source.name}")
+        end
       end
+    end
 
-      desc 'list', 'List all cached files (by S3 key)'
-      def list
-        S3Cache.new.list_by_key.each { |k| puts k }
-      end
+    #
+    # List all cached files (by S3 key).
+    #
+    #   $ omnibus cache list
+    #
+    desc 'list', 'List all cached files (by S3 key)'
+    def list
+      result = cache.list_by_key
 
-      desc 'missing', 'Lists source packages that are required but not yet cached'
-      def missing
-        S3Cache.new.missing.each { |s| puts s.name }
+      if result.empty?
+        say('There is nothing in the cache!')
+      else
+        say('Cached files (by S3 key):')
+        result.each do |key|
+          say("  * #{key}")
+        end
       end
+    end
 
-      desc 'fetch', 'Fetches missing source packages to local tmp dir'
-      def fetch
-        S3Cache.new.fetch_missing
-      end
+    #
+    # List missing source packages.
+    #
+    #   $ omnibus cache missing
+    #
+    desc 'missing', 'Lists source packages that are required but not yet cached'
+    def missing
+      result = cache.missing
 
-      desc 'populate', 'Populate the S3 Cache'
-      def populate
-        S3Cache.new.populate
+      if result.empty?
+        say('There are no missing packages in the cache.')
+      else
+        say('The following packages are missing from the cache:')
+        result.each do |source|
+          say(source.name)
+        end
       end
+    end
+
+    #
+    # Fetch missing source packages locally
+    #
+    #   $ omnibus cache fetch
+    #
+    desc 'fetch', 'Fetches missing source packages locally'
+    def fetch
+      say('Fetching missing packages...')
+      cache.fetch_missing
+    end
+
+    #
+    # Populate the remote S3 cache from local.
+    #
+    #   $ omnibus cache populate
+    #
+    desc 'populate', 'Populate the S3 Cache'
+    def populate
+      say('Populating the cache...')
+      cache.populate
+    end
+
+    private
+
+    def cache
+      @cache ||= S3Cache.new
     end
   end
 end
