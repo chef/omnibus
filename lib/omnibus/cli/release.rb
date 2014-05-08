@@ -15,11 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/cli/base'
-require 'omnibus/cli/application'
-require 'omnibus/package_release'
-require 'json'
-
 module Omnibus
   module CLI
     class Release < Base

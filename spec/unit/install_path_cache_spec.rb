@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'omnibus/util'
-require 'omnibus/install_path_cache'
 
 describe Omnibus::InstallPathCache do
   let(:install_path) { '/opt/chef' }

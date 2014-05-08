@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/cli/base'
-require 'omnibus/s3_cacher'
-
 module Omnibus
   module CLI
     class Cache < Base

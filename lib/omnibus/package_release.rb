@@ -15,13 +15,7 @@
 # limitations under the License.
 #
 
-# internal
-require 'omnibus/exceptions'
-
-# stdlib
 require 'json'
-
-# external
 require 'uber-s3'
 
 module Omnibus

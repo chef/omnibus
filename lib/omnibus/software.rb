@@ -22,10 +22,6 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 
-require 'omnibus/fetcher'
-require 'omnibus/builder'
-require 'omnibus/config'
-
 require 'fileutils'
 
 module Omnibus

@@ -1,4 +1,3 @@
-require 'omnibus/overrides'
 require 'spec_helper'
 
 describe Omnibus::Overrides do

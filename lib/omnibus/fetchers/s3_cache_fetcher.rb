@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/fetcher'
-require 'omnibus/s3_cacher'
-
 module Omnibus
   class S3CacheFetcher < NetFetcher
     include SoftwareS3URLs

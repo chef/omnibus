@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require 'omnibus/artifact'
-require 'omnibus/exceptions'
-require 'omnibus/library'
-require 'omnibus/util'
+
 require 'time'
 
 module Omnibus

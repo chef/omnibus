@@ -16,7 +16,6 @@
 #
 
 require 'time'
-require 'omnibus/util'
 
 module Omnibus
   # Provides methods for generating Omnibus project build version

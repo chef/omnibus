@@ -16,7 +16,6 @@
 #
 
 require 'spec_helper'
-require 'omnibus/s3_cacher'
 
 describe Omnibus::S3Cache do
 

@@ -15,8 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/exceptions'
-
 module Omnibus
   # Fetcher implementation for projects in git.
   class GitFetcher < Fetcher

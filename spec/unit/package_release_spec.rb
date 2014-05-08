@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/package_release'
 require 'spec_helper'
 
 describe Omnibus::PackageRelease do

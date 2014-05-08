@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/util'
-require 'thor'
-
 module Omnibus
   module CLI
     class Base < Thor

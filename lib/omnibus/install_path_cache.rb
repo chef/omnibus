@@ -15,8 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/util'
-require 'omnibus/config'
 require 'fileutils'
 require 'digest'
 

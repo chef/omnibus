@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/build_version'
 require 'spec_helper'
 
 describe Omnibus::BuildVersion do

@@ -16,8 +16,6 @@
 #
 
 require 'forwardable'
-require 'omnibus/exceptions'
-require 'omnibus/install_path_cache'
 require 'ostruct'
 
 module Omnibus

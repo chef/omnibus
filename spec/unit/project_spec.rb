@@ -17,7 +17,6 @@
 
 require 'spec_helper'
 
-require 'omnibus/project'
 
 describe Omnibus::Project do
   let(:project) do

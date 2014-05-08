@@ -17,7 +17,6 @@
 
 require 'fileutils'
 require 'forwardable'
-require 'omnibus/util'
 require 'erb'
 
 module Omnibus

@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-require 'omnibus/artifact'
 require 'spec_helper'
 
 describe Omnibus::Artifact do

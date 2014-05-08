@@ -1,5 +1,3 @@
-require 'omnibus/software'
-
 require 'spec_helper'
 
 describe Omnibus::Software do

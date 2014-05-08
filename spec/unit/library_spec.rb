@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'omnibus/library'
-require 'omnibus/project'
 
 describe Omnibus::Library do
   let(:project) { Omnibus::Project.load(project_path('chefdk')) }

@@ -15,28 +15,54 @@
 # limitations under the License.
 #
 
-require 'omnibus/ohai'
-require 'omnibus/library'
-require 'omnibus/reports'
-require 'omnibus/config'
+require 'pathname'
+require 'logger'
+
 require 'omnibus/exceptions'
-require 'omnibus/software'
-require 'omnibus/project'
-require 'omnibus/fetchers'
-require 'omnibus/health_check'
-require 'omnibus/build_version_dsl'
-require 'omnibus/build_version'
-require 'omnibus/sugar'
-require 'omnibus/overrides'
 require 'omnibus/version'
 
-require 'pathname'
-
 module Omnibus
-  DEFAULT_CONFIG_FILENAME = 'omnibus.rb'.freeze
+  #
+  # The path to the default configuration file.
+  #
+  # @return [String]
+  #
+  DEFAULT_CONFIG = 'omnibus.rb'
 
-  autoload :Cleaner,   'omnibus/cleaner'
-  autoload :Generator, 'omnibus/generator'
+  autoload :Artifact,         'omnibus/artifact'
+  autoload :Builder,          'omnibus/builder'
+  autoload :BuildVersion,     'omnibus/build_version'
+  autoload :Cleaner,          'omnibus/cleaner'
+  autoload :Config,           'omnibus/config'
+  autoload :Error,            'omnibus/exceptions'
+  autoload :Fetcher,          'omnibus/fetcher'
+  autoload :Generator,        'omnibus/generator'
+  autoload :HealthCheck,      'omnibus/health_check'
+  autoload :InstallPathCache, 'omnibus/install_path_cache'
+  autoload :Library,          'omnibus/library'
+  autoload :Logging,          'omnibus/logging'
+  autoload :NullBuilder,      'omnibus/null_builder'
+  autoload :Ohai,             'omnibus/ohai'
+  autoload :Overrides,        'omnibus/overrides'
+  autoload :PackageRelease,   'omnibus/package_release'
+  autoload :Project,          'omnibus/project'
+  autoload :Reports,          'omnibus/reports'
+  autoload :S3Cache,          'omnibus/s3_cache'
+  autoload :Software,         'omnibus/software'
+  autoload :SoftwareS3URLs,   'omnibus/software_s3_urls'
+  autoload :Util,             'omnibus/util'
+
+  # @todo Refactor these under a +Fetcher module
+  autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
+  autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
+  autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
+  autoload :S3CacheFetcher, 'omnibus/fetchers/s3_cache_fetcher'
+
+  module Command
+    autoload :Base,    'omnibus/cli/base'
+    autoload :Cache,   'omnibus/cli/cache'
+    autoload :Release, 'omnibus/cli/release'
+  end
 
   module Packager
     autoload :Base,       'omnibus/packagers/base'
@@ -303,3 +329,6 @@ module Omnibus
     project.library.component_added(dep_software)
   end
 end
+
+# Sugars must be loaded after everything else has been registered
+require 'omnibus/sugar'
