@@ -17,31 +17,8 @@
 
 require 'fileutils'
 require 'uber-s3'
-require 'omnibus/fetchers'
 
 module Omnibus
-  module SoftwareS3URLs
-    class InsufficientSpecification < ArgumentError
-    end
-
-    def config
-      Omnibus.config
-    end
-
-    def url_for(software)
-      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software)}"
-    end
-
-    private
-
-    def key_for_package(package)
-      package.name     || fail(InsufficientSpecification, "Software must have a name to cache it in S3 (#{package.inspect})")
-      package.version  || fail(InsufficientSpecification, "Software must set a version to cache it in S3 (#{package.inspect})")
-      package.checksum || fail(InsufficientSpecification, "Software must specify a checksum (md5) to cache it in S3 (#{package.inspect})")
-      "#{package.name}-#{package.version}-#{package.checksum}"
-    end
-  end
-
   class S3Cache
     include SoftwareS3URLs
 
