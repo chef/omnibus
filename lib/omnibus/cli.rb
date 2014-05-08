@@ -18,22 +18,65 @@ require 'thor'
 require 'omnibus'
 
 module Omnibus
-  class CLITest < Thor
+  class CLI < Command::Base
+    # This is the main entry point for the CLI. It exposes the method
+    # {#execute!} to start the CLI.
+    #
+    # @note the arity of {#initialize} and {#execute!} are extremely important
+    # for testing purposes. It is a requirement to perform in-process testing
+    # with Aruba. In process testing is much faster than spawning a new Ruby
+    # process for each test.
+    class Runner
+      def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = Kernel)
+        @argv, @stdin, @stdout, @stderr, @kernel = argv, stdin, stdout, stderr, kernel
+      end
+
+      def execute!
+        begin
+          $stdin  = @stdin
+          $stdout = @stdout
+          $stderr = @stderr
+
+          Omnibus::CLI.start(@argv)
+          @kernel.exit(0)
+        rescue => e
+          Omnibus.log.error { e.message }
+          Omnibus.log.debug { e.backtrace.join("\n\t") }
+
+          if e.respond_to?(:status_code)
+            @kernel.exit(e.status_code)
+          else
+            @kernel.exit(1)
+          end
+        end
+      end
+    end
+
     map ['-v', '--version'] => 'version'
 
-    class_option :config,
-      desc: 'Path to the Omnibus config file',
-      aliases: ['-c'],
-      type: :string,
-      lazy_default: File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME)
+    #
+    # Build an Omnibus project or software definition.
+    #
+    #   $ omnibus build chefdk
+    #
+    # @todo Support regular expressions (+$ omnibus build chef*+)
+    #
+    desc 'build PROJECT', 'Build the given Omnibus project'
+    def build(name)
+      project = Omnibus.project(name)
+      raise ProjectNotFound.new(name) unless project
+
+      say("Building #{project.name} #{project.build_version}...")
+      project.build_me
+    end
 
     #
-    # Initialize a new Omnibus project.
+    # Perform cache management functions.
     #
-    #   $ omnibus new PATH
+    #   $ omnibus cache list
     #
-    register(Generator, 'new', 'new PATH', 'Initialize a new Omnibus project',
-      Generator.class_options)
+    register(Command::Cache, 'cache', 'cache [COMMAND]', 'Manage the cache')
+    CLI.tasks['cache'].options = Command::Cache.class_options
 
     #
     # Clean the Omnibus project.
@@ -44,52 +87,46 @@ module Omnibus
     CLI.tasks['clean'].options = Cleaner.class_options
 
     #
+    # Initialize a new Omnibus project.
+    #
+    #   $ omnibus new NAME
+    #
+    register(Generator, 'new', 'new NAME', 'Initialize a new Omnibus project')
+    CLI.tasks['new'].options = Generator.class_options
+
+    #
+    # List the Omnibus projects available from "here".
+    #
+    #   $ omnibus list
+    #
+    desc 'list', 'List the Omnibus projects'
+    def list
+      if Omnibus.projects.empty?
+        say('There are no Omnibus projects!')
+      else
+        say('Omnibus projects:')
+        Omnibus.projects.sort.each do |project|
+          say("  * #{project.name} (#{project.build_version})")
+        end
+      end
+    end
+
+    #
+    # Publish Omnibus package(s) to a backend.
+    #
+    #   $ omnibus release --project chefdk
+    #
+    register(Command::Release, 'release', 'release', 'Publish Omnibus packages')
+    CLI.tasks['clean'].options = Command::Release.class_options
+
+    #
     # Display version information.
     #
     #   $ omnibus version
     #
     desc 'version', 'Display version information', hide: true
     def version
-      say "Omnibus v#{Omnibus::VERSION}"
-    end
-
-    private
-
-    #
-    #
-    #
-    def load_project!(name)
-      project = Omnibus.project(name)
-
-      unless project
-        error =  "I could not find an Omnibus project named '#{name}'. "
-        error << "Valid project names are:"
-        Omnibus.project_names.sort.each do |project_name|
-          error << "  * #{project_name}"
-        end
-        fail Omnibus::CLI::Error, error
-      end
-
-      project
-    end
-  end
-end
-
-
-
-# require 'omnibus/cli/application'
-# require 'omnibus/cli/base'
-# require 'omnibus/cli/build'
-
-module Omnibus
-  module CLI
-    class Error < StandardError
-      attr_reader :original
-
-      def initialize(msg, original = nil)
-        super(msg)
-        @original = original
-      end
+      say("Omnibus v#{Omnibus::VERSION}")
     end
   end
 end
