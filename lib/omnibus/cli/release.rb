@@ -15,26 +15,26 @@
 #
 
 module Omnibus
-  module CLI
-    class Release < Base
-      namespace :release
+  class Command::Release < Command::Base
+    namespace :release
 
-      option :target,
-        short: '-t TARGET',
-        long: '--target TARGET',
-        default: 'S3',
-        description: 'The target backend to release the package'
+    class_option :target,
+      aliases: '-t',
+      desc: 'The target backend to release the package',
+      default: 'S3'
 
-      desc 'package PATH', 'Upload a single package to S3'
-      option :public, type: :boolean, default: false, desc: 'Make S3 object publicly readable'
-      def package(path)
-        access_policy = options[:public] ? :public_read : :private
+    method_option :public,
+      type: :boolean,
+      desc: 'Make S3 object publicly readable',
+      default: false
+    desc 'package PATH', 'Upload a single package to S3'
+    def package(path)
+      access_policy = options[:public] ? :public_read : :private
 
-        uploader = PackageRelease.new(path, access: access_policy) do |uploaded_item|
-          say("Uploaded #{uploaded_item}", :green)
-        end
-        uploader.release
+      uploader = PackageRelease.new(path, access: access_policy) do |uploaded_item|
+        say("Uploaded #{uploaded_item}", :green)
       end
+      uploader.release
     end
   end
 end
