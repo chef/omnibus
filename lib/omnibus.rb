@@ -71,6 +71,10 @@ module Omnibus
   end
 
   class << self
+    def reset!
+      instance_variables.each(&method(:remove_instance_variable))
+    end
+
     def log
       return @logger if @logger
 
