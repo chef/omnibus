@@ -25,6 +25,23 @@ module Omnibus
     end
   end
 
+  class ProjectNotFound < RuntimeError
+    def initialize(name)
+      @name = name
+    end
+
+    def to_s
+      out = "I could not find an Omnibus project named '#{@name}'! "
+      out << "Valid projects are:\n"
+
+      Omnibus.project_names.sort.each do |project_name|
+        out << "  * #{project_name}\n"
+      end
+
+      out
+    end
+  end
+
   class MissingAsset < RuntimeError
     def initialize(path)
       @path = path
