@@ -340,10 +340,4 @@ module Omnibus
       end.join(join_str)
     end
   end
-
-  class NullBuilder < Builder
-    def build
-      log "Nothing to build for #{name}"
-    end
-  end
 end
