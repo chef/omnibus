@@ -14,98 +14,99 @@
 # limitations under the License.
 #
 
+#
+# This is the base class that all commands and subcommands should extend from.
+# It handles all of the Thor nastiness and method mutating, as well as defining
+# the global configuration options.
+#
 module Omnibus
-  module CLI
-    class Base < Thor
-      include Thor::Actions
-
-      class_option :config,
-                   aliases: [:c],
-                   type: :string,
-                   default: File.join(Dir.pwd, Omnibus::DEFAULT_CONFIG_FILENAME),
-                   desc: 'Path to the Omnibus configuration file to use.'
-
-      def initialize(args, options, config)
-        super(args, options, config)
-        $stdout.sync = true
-
-        # Don't try to initialize the Omnibus project for help commands.#
-        # current_task renamed to current_command in Thor 0.18.0
-        current_command = config[:current_command] ? config[:current_command].name : config[:current_task].name
-        return if current_command == 'help'
-
-        if (config = @options[:config])
-          if config && File.exist?(@options[:config])
-            say("Using Omnibus configuration file #{config}", :green)
-            Omnibus.load_configuration(config)
-          elsif config
-            say("No configuration file `#{config}', using defaults", :yellow)
-          end
+  class Command::Base < Thor
+    class << self
+      def dispatch(m, args, options, config)
+        # Handle the case where Thor thinks a trailing --help is actually an
+        # argument and blows up...
+        if args.length > 1 && !(args & Thor::HELP_MAPPINGS).empty?
+          args.unshift('help')
         end
 
-        if (path = @options[:path])
-          # TODO: merge in all relevant CLI options here, as they should
-          # override anything from a configuration file.
-          Omnibus::Config.project_root(path)
-          Omnibus::Config.append_timestamp(@options[:timestamp]) if @options.key?('timestamp')
+        super
+      end
+    end
 
-          unless Omnibus.project_files.any?
-            fail Omnibus::CLI::Error, "Given path '#{path}' does not appear to be a valid Omnibus project root."
-          end
+    include Logging
 
-          begin
-            Omnibus.process_configuration
-          rescue => e
-            error_msg = 'Could not load the Omnibus projects.'
-            raise Omnibus::CLI::Error.new(error_msg, e)
-          end
+    def initialize(args, options, config)
+      super(args, options, config)
+
+      # Set the log_level
+      if @options[:log_level]
+        Omnibus.log_level = @options[:log_level]
+      end
+
+      # Do not load the Omnibus config if we are asking for help or the version
+      if %w(help version).include?(config[:current_command].name)
+        log.debug { 'Skipping Omnibus loading (detected help or version)' }
+        return
+      end
+
+      if File.exist?(@options[:config])
+        log.info { "Using config from '#{@options[:config]}'" }
+        Omnibus.load_configuration(@options[:config])
+      else
+        if @options[:config] == Omnibus::DEFAULT_CONFIG
+          log.debug { 'Config file not given - using defaults' }
+        else
+          raise "The given config file '#{@options[:config]}' does not exist!"
         end
       end
 
-      ##################################################################
-      # Thor Overrides/Tweaks
-      ##################################################################
-
-      # Used by {Thor::Actions#template} to locate ERB templates
-      # @return [String]
-      def self.source_root
-        File.expand_path(File.join(File.dirname(__FILE__), '..', 'templates'))
-      end
-
-      # Forces command to exit with a 1 on any failure...so raise away.
-      def self.exit_on_failure?
-        true
-      end
-
-      # For some strange reason the +subcommand+ argument is disregarded when
-      # +Thor.banner+ is called by +Thor.command_help+:
-      #
-      #   https://github.com/wycats/thor/blob/master/lib/thor.rb#L163-L164
-      #
-      # We'll override +Thor.banner+ and ensure subcommand is true when called
-      # for subcommands.
-      def self.banner(command, namespace = nil, subcommand = false)
-        # Main commands have an effective namespace of 'application' OR
-        # contain subcommands
-        subcommand = self.namespace.split(':').last != 'application' || subcommands.empty?
-        "#{basename} #{command.formatted_usage(self, $thor_runner, subcommand) }"
-      end
-
-      protected
-
-      ##################################################################
-      # Omnibus Helpers (should these be in Omnibus::Util?)
-      ##################################################################
-
-      def load_project!(project_name)
-        project = Omnibus.project(project_name)
-        unless project
-          error_msg = "I don't know anything about project '#{project_name}'."
-          error_msg << " Valid project names include: #{Omnibus.project_names.join(', ') }"
-          fail Omnibus::CLI::Error, error_msg
+      @options[:override].each do |key, value|
+        if %w(true false nil).include?(value)
+          log.debug { "Detected #{value.inspect} should be an object" }
+          value = eval(value)
         end
-        project
+
+        if value =~ /\A[[:digit:]]+\Z/
+          log.debug { "Detected #{value.inspect} should be an integer" }
+          value = value.to_i
+        end
+
+        if Config.respond_to?(key)
+          log.debug { "Setting Config.#{key} = #{value.inspect}" }
+          Config.send(key, value)
+        else
+          log.debug { "Skipping option '#{key}' - not a config option" }
+        end
       end
+
+      log.debug { 'Processing Omnibus configuration...' }
+      Omnibus.process_configuration
+    end
+
+    class_option :config,
+      desc: 'Path to the Omnibus config file',
+      aliases: '-c',
+      type: :string,
+      default: Omnibus::DEFAULT_CONFIG
+    class_option :log_level,
+      desc: 'The log level',
+      aliases: '-l',
+      type: :string,
+      enum: ['fatal', 'error', 'warn', 'info', 'debug'],
+      lazy_default: 'warn'
+    class_option :override,
+      desc: 'Override one or more Omnibus config options',
+      aliases: '-o',
+      type: :hash,
+      default: {}
+
+    #
+    # Hide the default help task to encourage people to use +-h+ instead of
+    # Thor's dumb way of asking for help.
+    #
+    desc 'help [COMMAND]', 'Show help output', hide: true
+    def help(*)
+      super
     end
   end
 end
