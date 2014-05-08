@@ -22,46 +22,54 @@ module Omnibus
 
     namespace :new
 
-    argument :path,
+    argument :name,
+      banner: 'NAME',
+      desc: 'The name of the Omnibus project',
+      type: :string,
+      required: true
+
+    class_option :path,
       banner: 'PATH',
       aliases: '-p',
       desc: 'The path to create the Omnibus project',
       type: :string,
-      required: true
+      default: '.'
 
-    #
-    # Set the source root for Thor.
-    #
-    def self.source_root
-      File.expand_path('../generator_files', __FILE__)
+    class << self
+      #
+      # Set the source root for Thor.
+      #
+      def source_root
+        File.expand_path('../generator_files', __FILE__)
+      end
     end
 
     def create_project_files
-      template('Gemfile.erb', "#{path}/Gemfile", template_options)
-      template('gitignore.erb', "#{path}/.gitignore", template_options)
-      template('README.md.erb', "#{path}/README.md", template_options)
-      template('omnibus.rb.example.erb', "#{path}/omnibus.rb.example", template_options)
+      template('Gemfile.erb', "#{target}/Gemfile", template_options)
+      template('gitignore.erb', "#{target}/.gitignore", template_options)
+      template('README.md.erb', "#{target}/README.md", template_options)
+      template('omnibus.rb.example.erb', "#{target}/omnibus.rb.example", template_options)
     end
 
     def create_project_definition
-      template('project.rb.erb', "#{path}/config/projects/#{name}.rb", template_options)
+      template('project.rb.erb', "#{target}/config/projects/#{name}.rb", template_options)
     end
 
     def create_example_software_definitions
-      template('software/c-example.rb.erb', "#{path}/config/software/c-example.rb", template_options)
-      template('software/erlang-example.rb.erb', "#{path}/config/software/erlang-example.rb", template_options)
-      template('software/ruby-example.rb.erb', "#{path}/config/software/ruby-example.rb", template_options)
+      template('software/c-example.rb.erb', "#{target}/config/software/c-example.rb", template_options)
+      template('software/erlang-example.rb.erb', "#{target}/config/software/erlang-example.rb", template_options)
+      template('software/ruby-example.rb.erb', "#{target}/config/software/ruby-example.rb", template_options)
     end
 
     def create_kitchen_files
-      template('.kitchen.local.yml.erb', "#{path}/.kitchen.local.yml", template_options)
-      template('.kitchen.yml.erb', "#{path}/.kitchen.yml", template_options)
-      template('Berksfile.erb', "#{path}/Berksfile", template_options)
+      template('.kitchen.local.yml.erb', "#{target}/.kitchen.local.yml", template_options)
+      template('.kitchen.yml.erb', "#{target}/.kitchen.yml", template_options)
+      template('Berksfile.erb', "#{target}/Berksfile", template_options)
     end
 
     def create_package_scripts
       %w[makeselfinst preinst prerm postinst postrm].each do |package_script|
-        script_path = "#{path}/package-scripts/#{name}/#{package_script}"
+        script_path = "#{target}/package-scripts/#{name}/#{package_script}"
         template("package_scripts/#{package_script}.erb", script_path, template_options)
 
         # #nsure the package script is executable
@@ -70,25 +78,25 @@ module Omnibus
     end
 
     def create_pkg_assets
-      template('mac_pkg/license.html.erb', "#{path}/files/mac_pkg/Resources/license.html", template_options)
-      template('mac_pkg/welcome.html.erb', "#{path}/files/mac_pkg/Resources/welcome.html", template_options)
-      copy_file('mac_pkg/background.png', "#{path}/files/mac_pkg/Resources/background.png")
+      template('mac_pkg/license.html.erb', "#{target}/files/mac_pkg/Resources/license.html", template_options)
+      template('mac_pkg/welcome.html.erb', "#{target}/files/mac_pkg/Resources/welcome.html", template_options)
+      copy_file('mac_pkg/background.png', "#{target}/files/mac_pkg/Resources/background.png")
     end
 
     def create_dmg_assets
-      copy_file('mac_dmg/background.png', "#{path}/files/mac_dmg/Resources/background.png")
-      copy_file('mac_dmg/icon.png', "#{path}/files/mac_dmg/Resources/icon.png")
+      copy_file('mac_dmg/background.png', "#{target}/files/mac_dmg/Resources/background.png")
+      copy_file('mac_dmg/icon.png', "#{target}/files/mac_dmg/Resources/icon.png")
     end
 
     private
 
     #
-    # The name of the omnibus project. This is inferred from project path.
+    # The target path to create the Omnibus project.
     #
     # @return [String]
     #
-    def name
-      @name ||= File.basename(File.expand_path(path))
+    def target
+      @target ||= File.join(File.expand_path(@options[:path]), name)
     end
 
     #
