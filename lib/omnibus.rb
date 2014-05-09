@@ -99,7 +99,7 @@ module Omnibus
       @logger = Logger.new($stdout)
       @logger.level = Logger::WARN
       @logger.formatter = lambda do |severity, _timestamp, _name, message|
-        "[#{severity}] #{message}\n"
+        "[#{severity[0]}] #{message}\n"
       end
       @logger
     end
