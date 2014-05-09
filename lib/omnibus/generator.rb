@@ -113,7 +113,7 @@ module Omnibus
     # @return [String]
     #
     def target
-      @target ||= File.join(File.expand_path(@options[:path]), name)
+      @target ||= File.join(File.expand_path(@options[:path]), "omnibus-#{name}")
     end
 
     #

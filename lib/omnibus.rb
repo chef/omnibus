@@ -51,6 +51,9 @@ module Omnibus
   autoload :SoftwareS3URLs,   'omnibus/software_s3_urls'
   autoload :Util,             'omnibus/util'
 
+  # @todo Remove this in the next major release
+  autoload :OHAI, 'omnibus/ohai'
+
   # @todo Refactor these under a +Fetcher module
   autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
   autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
