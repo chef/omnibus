@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'ohai'
 
 module Omnibus
   describe Project do
@@ -49,14 +50,8 @@ module Omnibus
     describe '#iteration' do
       let(:fauxhai_options) { Hash.new }
 
-      around(:each) do |example|
-        data = Ohai.data
-        begin
-          Ohai.data = Mash.new(Fauxhai.mock(fauxhai_options).data)
-          example.run
-        ensure
-          Ohai.data = data
-        end
+      before do
+        stub_ohai(Fauxhai.mock(fauxhai_options).data)
       end
 
       context 'when on RHEL' do

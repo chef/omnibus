@@ -8,7 +8,7 @@ module Omnibus
 
     before do
       described_class.reset
-      Ohai.stub(:platform).and_return('linux')
+      stub_ohai(platform: 'linux')
     end
 
     shared_examples 'a configurable' do |id, default|
@@ -46,7 +46,7 @@ module Omnibus
 
     context 'on Windows' do
       before do
-        Ohai.stub(:platform).and_return('windows')
+        stub_ohai(platform: 'windows')
         stub_const('File::ALT_SEPARATOR', '\\')
       end
 

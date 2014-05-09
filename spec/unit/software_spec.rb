@@ -14,6 +14,7 @@ describe Omnibus::Software do
 
   before do
     allow_any_instance_of(Omnibus::Software).to receive(:render_tasks)
+    stub_ohai(platform: 'linux')
   end
 
   describe "path helpers" do
