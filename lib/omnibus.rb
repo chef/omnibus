@@ -79,10 +79,15 @@ module Omnibus
     # used in testing, but it can also be useful when Omnibus is used as a
     # library.
     #
+    # Note - this persists the +Logger+ object.
+    #
     # @return [void]
     #
     def reset!
-      instance_variables.each(&method(:remove_instance_variable))
+      instance_variables.each do |instance_variable|
+        next if instance_variable == :@logger
+        remove_instance_variable(instance_variable)
+      end
     end
 
     #
