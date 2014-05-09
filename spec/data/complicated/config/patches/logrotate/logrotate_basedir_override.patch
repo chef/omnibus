@@ -1,0 +1,12 @@
+--- Makefile  2013-06-10 08:02:36.000000000 -0400
++++ Makefile  2013-07-01 15:26:41.000000000 -0400
+@@ -90,6 +90,10 @@
+     CFLAGS += -DSTATEFILE=\"$(STATEFILE)\"
+ endif
+
++ifneq ($(BASEDIR),)
++    BASEDIR = $BASEDIR
++endif
++
+ BINDIR = $(BASEDIR)/sbin
+ MANDIR ?= $(BASEDIR)/man
