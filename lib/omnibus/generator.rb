@@ -88,6 +88,23 @@ module Omnibus
       copy_file('mac_dmg/icon.png', "#{target}/files/mac_dmg/Resources/icon.png")
     end
 
+    def create_windows_assets
+      # These ERB files are actually rendered as ERB files on the target system
+      # because the parameters are resolved at the build time for localization
+      # and parameters files.
+      copy_file('windows_msi/localization-en-us.wxl.erb', "#{target}/files/windows_msi/Resources/localization-en-us.wxl.erb")
+      copy_file('windows_msi/parameters.wxi.erb', "#{target}/files/windows_msi/Resources/parameters.wxi.erb")
+
+      template('windows_msi/source.wxs.erb', "#{target}/files/windows_msi/Resources/source.wxs", template_options)
+
+      copy_file('windows_msi/assets/LICENSE.rtf', "#{target}/files/windows_msi/Resources/assets/LICENSE.rtf")
+      copy_file('windows_msi/assets/banner_background.bmp', "#{target}/files/windows_msi/Resources/assets/banner_background.bmp")
+      copy_file('windows_msi/assets/dialog_background.bmp', "#{target}/files/windows_msi/Resources/assets/dialog_background.bmp")
+      copy_file('windows_msi/assets/project.ico', "#{target}/files/windows_msi/Resources/assets/project.ico")
+      copy_file('windows_msi/assets/project_16x16.ico', "#{target}/files/windows_msi/Resources/assets/project_16x16.ico")
+      copy_file('windows_msi/assets/project_32x32.ico', "#{target}/files/windows_msi/Resources/assets/project_32x32.ico")
+    end
+
     private
 
     #
