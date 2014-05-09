@@ -24,10 +24,5 @@ Given /^I have an omnibus project named "(.+)"$/ do |name|
     build_dir              './local/omnibus/build'
     package_dir            './local/omnibus/pkg'
     package_tmp            './local/omnibus/pkg-tmp'
-
-    # S3 Configuration
-    s3_bucket     ENV['S3_BUCKET_NAME']
-    s3_access_key ENV['S3_ACCESS_KEY']
-    s3_secret_key ENV['S3_SECRET_KEY']
   EOH
 end
