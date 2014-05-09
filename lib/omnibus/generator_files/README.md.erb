@@ -19,7 +19,7 @@ Usage
 You create a platform-specific package using the `build project` command:
 
 ```shell
-$ bin/omnibus build project <%= config[:name] %>
+$ bin/omnibus build <%= config[:name] %>
 ```
 
 The platform/architecture type of the package created will match the platform
@@ -33,7 +33,7 @@ You can clean up all temporary files generated during the build process with
 the `clean` command:
 
 ```shell
-$ bin/omnibus clean
+$ bin/omnibus clean <%= config[:name] %>
 ```
 
 Adding the `--purge` purge option removes __ALL__ files generated during the
@@ -41,7 +41,7 @@ build including the project install directory (`/opt/<%= config[:name] %>`) and
 the package cache directory (`/var/cache/omnibus/pkg`):
 
 ```shell
-$ bin/omnibus clean --purge
+$ bin/omnibus clean <%= config[:name] %> --purge
 ```
 
 ### Help
@@ -75,7 +75,7 @@ liking, you can bring up an individual build environment using the `kitchen`
 command.
 
 ```shell
-$ bundle exec kitchen converge ubuntu-12.04
+$ bin/kitchen converge ubuntu-12.04
 ```
 
 Then login to the instance and build the project as described in the Usage
@@ -86,7 +86,7 @@ $ bundle exec kitchen login ubuntu-12.04
 [vagrant@ubuntu...] $ cd <%= config[:name] %>
 [vagrant@ubuntu...] $ bundle install
 [vagrant@ubuntu...] $ ...
-[vagrant@ubuntu...] $ ./bin/omnibus build project <%= config[:name] %>
+[vagrant@ubuntu...] $ bin/omnibus build <%= config[:name] %>
 ```
 
 For a complete list of all commands and platforms, run `kitchen list` or
