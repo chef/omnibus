@@ -13,12 +13,19 @@ Feature: Backwards-compatible deprecated commands
     * I run `omnibus build software preparation`
     * the output should contain:
       """
-      Building an individual software definitions is no longer supported!
+      Building individual software definitions is no longer supported!
       """
     * the exit status should not be 0
 
   Scenario: When --timestamp is given
     * I run `omnibus build hamlet --timestamp`
+    * the output should contain:
+      """
+      The '--timestamp' option has been deprecated! Please use '--override append_timestamp:true' instead.
+      """
+
+  Scenario: When -t is given
+    * I run `omnibus build hamlet -t`
     * the output should contain:
       """
       The '--timestamp' option has been deprecated! Please use '--override append_timestamp:true' instead.
@@ -35,5 +42,5 @@ Feature: Backwards-compatible deprecated commands
     * I run `omnibus project hamlet`
     * the output should contain:
       """
-      The project generator has been renamed to 'omnibus new'. Please use 'omnibus new hamlet' instead.
+      The project generator has been renamed to 'omnibus new'. Please use 'omnibus new' in the future.
       """
