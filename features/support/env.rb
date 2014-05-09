@@ -6,7 +6,7 @@ require 'omnibus/cli'
 
 Before do
   # Reset anything that might have been cached in the Omnibus project
-  Omnibus.reset!
+  Omnibus.reset!(true)
 
   Aruba::InProcess.main_class = Omnibus::CLI::Runner
   Aruba.process = Aruba::InProcess

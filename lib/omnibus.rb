@@ -79,13 +79,19 @@ module Omnibus
     # used in testing, but it can also be useful when Omnibus is used as a
     # library.
     #
-    # Note - this persists the +Logger+ object.
+    # Note - this persists the +Logger+ object by default.
+    #
+    # @param [true, false] include_logger
+    #   whether the logger object should be cleared as well
     #
     # @return [void]
     #
-    def reset!
+    def reset!(include_logger = false)
       instance_variables.each do |instance_variable|
-        next if instance_variable == :@logger
+        unless include_logger
+          next if instance_variable == :@logger
+        end
+
         remove_instance_variable(instance_variable)
       end
 
