@@ -21,7 +21,6 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'aruba',           '~> 0.5'
   gem.add_dependency 'chef-sugar',      '~> 1.2'
   gem.add_dependency 'mixlib-shellout', '~> 1.3'
   gem.add_dependency 'mixlib-config',   '~> 2.1'
@@ -31,6 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'thor',            '~> 0.18'
 
   gem.add_development_dependency 'fauxhai'
+  gem.add_development_dependency 'aruba',   '~> 0.5'
   gem.add_development_dependency 'rspec',   '~> 2.14'
   gem.add_development_dependency 'rubocop', '~> 0.17.0'
   gem.add_development_dependency 'rake'
