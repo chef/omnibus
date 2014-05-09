@@ -28,7 +28,7 @@ module Omnibus
       end
 
       def respond_to_missing?(m, include_private = false)
-        ohai.respond_missing_to?(m, include_private) || ohai.attribute?(m)
+        ohai.respond_to_missing?(m, include_private) || ohai.attribute?(m)
       end
 
       private
