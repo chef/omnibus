@@ -19,7 +19,10 @@ require 'omnibus/build_version_dsl'
 require 'spec_helper'
 
 describe Omnibus::BuildVersionDsl do
-  let(:subject) { Omnibus::BuildVersionDsl.new(description) }
+  let(:subject_with_version) { Omnibus::BuildVersionDsl.new(version_string) }
+  let(:subject_with_description) { Omnibus::BuildVersionDsl.new(&description) }
+
+  let(:version_string) { "1.0.0" }
   let(:description) { nil }
 
   let(:zoo_version) { double("BuildVersion", semver: "5.5.5", custom: "7.7.7") }
@@ -32,10 +35,8 @@ describe Omnibus::BuildVersionDsl do
   end
 
   describe "when given a string" do
-    let(:description) { "1.0.0" }
-
     it "should set the version to the string" do
-      expect(subject.build_version).to eq("1.0.0")
+      expect(subject_with_version.build_version).to eq("1.0.0")
     end
   end
 
@@ -49,22 +50,22 @@ describe Omnibus::BuildVersionDsl do
 
       describe "before resolving version" do
         it "should mention the version is not ready yet" do
-          expect(subject.explain).to match(/will be determined/)
+          expect(subject_with_description.explain).to match(/will be determined/)
         end
 
         it "should include the dependency name in the message" do
-          expect(subject.explain).to match(/zoo/)
+          expect(subject_with_description.explain).to match(/zoo/)
         end
       end
 
       describe "after resolving version" do
         before do
           Omnibus::BuildVersion.should_receive(:new).with("/etc/zoo").and_return(zoo_version)
-          subject.resolve(zoo_software)
+          subject_with_description.resolve(zoo_software)
         end
 
         it "should create the version with path from source with semver" do
-          expect(subject.explain).to eq("Build Version: 5.5.5")
+          expect(subject_with_description.explain).to eq("Build Version: 5.5.5")
         end
       end
     end
@@ -76,7 +77,7 @@ describe Omnibus::BuildVersionDsl do
 
       it "should create the version with default path as semver" do
         Omnibus::BuildVersion.should_receive(:new).with(no_args).and_return(zoo_version)
-        expect(subject.build_version).to eq("5.5.5")
+        expect(subject_with_description.build_version).to eq("5.5.5")
       end
     end
 
@@ -90,7 +91,7 @@ describe Omnibus::BuildVersionDsl do
 
       it "should output the version with given function" do
         Omnibus::BuildVersion.should_receive(:new).with(no_args).and_return(zoo_version)
-        expect(subject.build_version).to eq("7.7.7")
+        expect(subject_with_description.build_version).to eq("7.7.7")
       end
     end
   end
@@ -104,8 +105,8 @@ describe Omnibus::BuildVersionDsl do
       end
 
       it "should create the version with version from source" do
-        subject.resolve(zoo_software)
-        expect(subject.build_version).to eq("6.6.6")
+        subject_with_description.resolve(zoo_software)
+        expect(subject_with_description.build_version).to eq("6.6.6")
       end
     end
 
@@ -117,7 +118,7 @@ describe Omnibus::BuildVersionDsl do
       end
 
       it "should fail" do
-        expect { subject.build_version }.to raise_error
+        expect { subject_with_description.build_version }.to raise_error
       end
     end
   end
@@ -130,7 +131,7 @@ describe Omnibus::BuildVersionDsl do
     end
 
     it "should fail" do
-      expect { subject.build_version }.to raise_error
+      expect { subject_with_description.build_version }.to raise_error
     end
   end
 end
