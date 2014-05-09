@@ -38,3 +38,18 @@ module Omnibus
     end
   end
 end
+
+module Omnibus
+  class OhaiWithWarning
+    class << self
+      def method_missing(m, *args, &block)
+        Omnibus.log.warn { 'The OHAI constant is DEPRECATED. Please use Ohai instead.' }
+      end
+    end
+  end
+end
+
+#
+# @todo remove in the next major release
+#
+OHAI = Omnibus::OhaiWithWarning
