@@ -26,6 +26,18 @@ module Omnibus
     end
 
     #
+    # Stub Ohai with the given data.
+    #
+    # @param [Hash] data
+    #
+    def stub_ohai(data = {})
+      system = ::Ohai::System.new
+      system.data = Mash.new(data)
+
+      Ohai.stub(:ohai).and_return(system)
+    end
+
+    #
     # Grab the result of the log command. Since Omnibus uses the block form of
     # the logger, this method handles both types of logging.
     #
