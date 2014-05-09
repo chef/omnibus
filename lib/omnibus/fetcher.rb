@@ -141,6 +141,7 @@ module Omnibus
     attr_reader :source_timefile
 
     def initialize(software)
+      @software = software
     end
 
     # @!group Methods for Subclasses to Implement

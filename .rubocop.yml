@@ -6,9 +6,13 @@ AlignParameters:
   Enabled: false
 ClassLength:
   Enabled: false
+ClassAndModuleChildren:
+  Enabled: false
 CyclomaticComplexity:
   Max: 20
 Documentation:
+  Enabled: false
+DoubleNegation:
   Enabled: false
 GlobalVars:
   Enabled: false

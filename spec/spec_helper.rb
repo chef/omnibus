@@ -45,7 +45,7 @@ module Omnibus
     #   output = capture_logging { some_command }
     #   expect(output).to include('whatever')
     #
-    def capture_logging(&block)
+    def capture_logging
       Omnibus.log.level = :debug
       original = $stdout
       $stdout = fake = StringIO.new

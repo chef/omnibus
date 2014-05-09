@@ -68,7 +68,7 @@ module Omnibus
     end
 
     def create_package_scripts
-      %w[makeselfinst preinst prerm postinst postrm].each do |package_script|
+      %w(makeselfinst preinst prerm postinst postrm).each do |package_script|
         script_path = "#{target}/package-scripts/#{name}/#{package_script}"
         template("package_scripts/#{package_script}.erb", script_path, template_options)
 

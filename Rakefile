@@ -26,7 +26,7 @@ Rubocop::RakeTask.new(:style)
 
 namespace :travis do
   desc 'Run tests on Travis'
-  task ci: ['unit', 'acceptance', 'style']
+  task ci: %w(unit acceptance style)
 end
 
-task default: ['travis:ci']
+task default: %w(travis:ci)

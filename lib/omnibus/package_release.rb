@@ -36,7 +36,7 @@ module Omnibus
       @after_upload = if block_given?
                         block
                       else
-                        ->(item_key) { nil }
+                        ->(_) { nil }
                       end
 
       # sets @access_policy

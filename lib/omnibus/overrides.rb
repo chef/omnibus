@@ -71,10 +71,10 @@ module Omnibus
       overrides = parse_file(file)
 
       if overrides
-        puts '********************************************************************************'
-        puts "Using Overrides from #{Omnibus::Overrides.resolve_override_file}"
-        pp overrides
-        puts '********************************************************************************'
+        Omnibus.log.info { '*' * 25 }
+        Omnibus.log.info { "Using overrides from #{Omnibus::Overrides.resolve_override_file}" }
+        Omnibus.log.info { overrides.pretty_inspect }
+        Omnibus.log.info { '*' * 25 }
       end
 
       overrides || {}

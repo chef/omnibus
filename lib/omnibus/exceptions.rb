@@ -166,7 +166,7 @@ version control systems.
   # been set.
   class MissingSoftwareConfiguration < RuntimeError
     def initialize(software_name, parameter_name, sample_value)
-      @software_name, @parameter_name, @sample_value = software, parameter_name, sample_value
+      @software_name, @parameter_name, @sample_value = software_name, parameter_name, sample_value
     end
 
     def to_s
