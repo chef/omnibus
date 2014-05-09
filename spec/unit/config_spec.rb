@@ -6,7 +6,10 @@ module Omnibus
       expect(described_class).to be_a(Mixlib::Config)
     end
 
-    before { described_class.reset }
+    before do
+      described_class.reset
+      Ohai.stub(:platform).and_return('linux')
+    end
 
     shared_examples 'a configurable' do |id, default|
       it "responds to .#{id}" do
