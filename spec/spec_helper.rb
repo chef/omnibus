@@ -30,6 +30,17 @@ module Omnibus
     end
 
     #
+    # Stub the given environment key.
+    #
+    # @param [String] key
+    # @param [String] value
+    #
+    def stub_env(key, value)
+      ENV.stub(:[]).and_call_original
+      ENV.stub(:[]).with(key).and_return(value.to_s)
+    end
+
+    #
     # Stub Ohai with the given data.
     #
     # @param [Hash] data
