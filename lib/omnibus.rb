@@ -88,6 +88,8 @@ module Omnibus
         next if instance_variable == :@logger
         remove_instance_variable(instance_variable)
       end
+
+      Config.reset!
     end
 
     #
