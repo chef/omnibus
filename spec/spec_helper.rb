@@ -100,4 +100,7 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  # Run specs in a random order
+  config.order = 'random'
 end
