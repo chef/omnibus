@@ -1,0 +1,13 @@
+diff -ur tcp_wrappers_7.6/scaffold.c tcp_wrappers_7.6.fixed/scaffold.c
+--- tcp_wrappers_7.6/scaffold.c	2012-04-10 11:45:38.000000000 -0700
++++ tcp_wrappers_7.6.fixed/scaffold.c	2012-04-10 12:48:14.000000000 -0700
+@@ -25,7 +25,7 @@
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+ #endif
+ 
+-extern char *malloc();
++/* extern char *malloc(); */
+ 
+ /* Application-specific. */
+ 
+Only in tcp_wrappers_7.6.fixed: scaffold.c-e

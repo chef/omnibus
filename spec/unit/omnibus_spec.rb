@@ -56,4 +56,37 @@ describe Omnibus do
       end
     end
   end
+
+  describe '#process_dsl_files' do
+    before :each do
+      Omnibus.stub(:project_root) do
+        File.expand_path(
+          File.join(
+            File.dirname(__FILE__),
+            '..',
+            'data',
+            'complicated',
+          ),
+        )
+      end
+    end
+
+    after :each do
+      Omnibus.class_eval { @projects = [] }
+      Omnibus.class_eval { @software_dirs = nil }
+    end
+
+    it 'populates the 5 projects' do
+      Omnibus.process_dsl_files
+
+      expect(Omnibus.projects.count).to eq(5)
+
+      names = Omnibus.projects.map { |m| m.name.to_s }
+      # rubocop:disable WordArray
+      ['angrychef', 'chef-windows', 'chef', 'chefdk-windows', 'chefdk'].each do |project|
+        expect(names).to include(project)
+      end
+    end
+
+  end
 end
