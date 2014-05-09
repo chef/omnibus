@@ -271,6 +271,9 @@ module Omnibus
       version_regexp.match(git_describe)[1..3]
     end
 
+    #
+    # @todo Remove this environment variable madness and just use the CLI
+    #
     def append_timestamp?
       if ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/^(false|f|no|n|0)$/i))
         false
