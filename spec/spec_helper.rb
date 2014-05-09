@@ -36,7 +36,11 @@ module Omnibus
     # @param [String] value
     #
     def stub_env(key, value)
-      ENV.stub(:[]).and_call_original
+      unless @__env_already_stubbed__
+        ENV.stub(:[]).and_call_original
+        @__env_already_stubbed__ = true
+      end
+
       ENV.stub(:[]).with(key).and_return(value.to_s)
     end
 
