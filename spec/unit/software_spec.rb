@@ -78,6 +78,42 @@ describe Omnibus::Software do
     end
   end
 
+  describe '#override_version' do
+    it 'returns the override version' do
+      software.stub(:overrides).and_return(version: '1.2.3')
+      expect(software.override_version).to eq('1.2.3')
+    end
+
+    it 'outputs a deprecation message' do
+      output = capture_logging { software.override_version }
+      expect(output).to include('Software#override_version is DEPRECATED.')
+    end
+  end
+
+  describe '#given_version' do
+    it 'returns the version' do
+      software.stub(:default_version).and_return('4.5.6')
+      expect(software.given_version).to eq('4.5.6')
+    end
+
+    it 'outputs a deprecation message' do
+      output = capture_logging { software.given_version }
+      expect(output).to include('Software#given_version is DEPRECATED.')
+    end
+  end
+
+  describe '#version' do
+    it 'sets the given version' do
+      software.version('1.2.3')
+      expect(software.given_version).to eq('1.2.3')
+    end
+
+    it 'outputs a deprecation message' do
+      output = capture_logging { software.version('1.2.3') }
+      expect(output).to include('Software#version is DEPRECATED.')
+    end
+  end
+
   context 'testing repo-level version overrides' do
     let(:software_name) { 'zlib' }
     let(:default_version) { '1.2.6' }

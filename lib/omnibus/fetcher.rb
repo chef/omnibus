@@ -133,16 +133,14 @@ module Omnibus
       @name
     end
 
+    include Logging
+
     attr_reader :name
 
     # @todo What is this?  It doesn't appear to be used anywhere
     attr_reader :source_timefile
 
     def initialize(software)
-    end
-
-    def log(message)
-      puts "[fetcher:#{self.class.name}::#{name}] #{message}"
     end
 
     # @!group Methods for Subclasses to Implement

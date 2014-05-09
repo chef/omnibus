@@ -27,6 +27,7 @@ module Omnibus
   # @todo: Reorder DSL methods to fit in the same YARD group
   # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
+    include Logging
     include Util
 
     NULL_ARG = Object.new
@@ -93,7 +94,7 @@ module Omnibus
 
     def health_check_me
       if Ohai.platform == 'windows'
-        puts 'Skipping health check on windows...'
+        log.info { 'Skipping health check on Windows' }
       else
         # build a list of all whitelist files from all project dependencies
         whitelist_files = library.components.map { |component| component.whitelist_files }.flatten

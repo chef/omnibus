@@ -44,7 +44,7 @@ E
 
     def clean
       if existing_git_clone?
-        log 'cleaning existing build'
+        log.info { 'Cleaning existing build' }
         clean_cmd = 'git clean -fdx'
         shell = Mixlib::ShellOut.new(clean_cmd, live_stream: STDOUT, cwd: project_dir)
         shell.run_command
@@ -75,7 +75,7 @@ E
         # Deal with github failing all the time :(
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log "git clone/fetch failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
+        log.warn { "git clone/fetch failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s" }
         sleep(time_to_sleep)
         retry
       end
@@ -91,7 +91,7 @@ E
     private
 
     def clone
-      puts 'cloning the source from git'
+      log.info { 'Cloning the source from git' }
       clone_cmd = "git clone #{@source[:git]} #{project_dir}"
       shell = Mixlib::ShellOut.new(clone_cmd, live_stream: STDOUT)
       shell.run_command
@@ -108,7 +108,7 @@ E
     end
 
     def fetch_updates
-      puts "fetching updates and resetting to revision #{target_revision}"
+      log.info { "Fetching updates and resetting to revision #{target_revision}" }
       fetch_cmd = "git fetch origin && git fetch origin --tags && git reset --hard #{target_revision}"
       shell = Mixlib::ShellOut.new(fetch_cmd, live_stream: STDOUT, cwd: project_dir)
       shell.run_command
@@ -183,7 +183,7 @@ E
         # Deal with github failing all the time :(
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log "git ls-remote failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
+        log.warn { "git ls-remote failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s" }
         sleep(time_to_sleep)
         retry
       end

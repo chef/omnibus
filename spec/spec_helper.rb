@@ -24,6 +24,37 @@ module Omnibus
     def tmp_path
       File.expand_path('../../tmp', __FILE__)
     end
+
+    #
+    # Grab the result of the log command. Since Omnibus uses the block form of
+    # the logger, this method handles both types of logging.
+    #
+    # @example
+    #   output = capture_logging { some_command }
+    #   expect(output).to include('whatever')
+    #
+    def capture_logging(&block)
+      Omnibus.log.level = :debug
+      original = $stdout
+      $stdout = fake = StringIO.new
+
+      [:fatal, :error, :warn, :info, :debug].each do |level|
+        Omnibus.log.stub(level) do |args, &b|
+          if b
+            fake.puts(b.call)
+          else
+            fake.puts(args.join)
+          end
+        end
+      end
+
+      yield
+
+      fake.string
+    ensure
+      Omnibus.log_level = :unknown
+      $stdout = original
+    end
   end
 end
 
@@ -44,8 +75,11 @@ RSpec.configure do |config|
   config.filter_run_excluding windows_only: true unless windows?
   config.filter_run_excluding mac_only: true unless mac?
 
-  # Clear the tmp_path on each run
   config.before(:each) do
+    # Suppress logging
+    Omnibus.log_level = :unknown
+
+    # Clear the tmp_path on each run
     FileUtils.rm_rf(tmp_path)
     FileUtils.mkdir_p(tmp_path)
   end

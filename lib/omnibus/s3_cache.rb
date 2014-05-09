@@ -19,6 +19,7 @@ require 'uber-s3'
 
 module Omnibus
   class S3Cache
+    include Logging
     include SoftwareS3URLs
 
     def initialize
@@ -31,10 +32,6 @@ module Omnibus
         bucket: config.s3_bucket,
         adapter: :net_http,
       )
-    end
-
-    def log(msg)
-      puts "[S3 Cacher] #{msg}"
     end
 
     def config
@@ -68,7 +65,7 @@ module Omnibus
         key = key_for_package(software)
         content = IO.read(software.project_file)
 
-        log "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
+        log.info { "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}" }
         @client.store(key, content, access: :public_read, content_md5: software.checksum)
       end
     end
@@ -86,13 +83,14 @@ module Omnibus
     end
 
     def fetch(software)
-      log "Fetching #{software.name}"
+      log.info { "Fetching #{software.name}" }
       fetcher = Fetcher.without_caching_for(software)
       if fetcher.fetch_required?
+        log.debug { 'Updating cache' }
         fetcher.download
         fetcher.verify_checksum!
       else
-        log 'Cached copy up to date, skipping.'
+        log.debug { 'Cached copy up to date, skipping.' }
       end
     end
 

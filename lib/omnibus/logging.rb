@@ -16,13 +16,20 @@
 
 module Omnibus
   module Logging
-    #
-    # A helpful DSL method for logging an action.
-    #
-    # @return [Logger]
-    #
-    def log
-      Omnibus.log
+    def self.included(base)
+      base.send(:include, Methods)
+      base.send(:extend,  Methods)
+    end
+
+    module Methods
+      #
+      # A helpful DSL method for logging an action.
+      #
+      # @return [Logger]
+      #
+      def log
+        Omnibus.log
+      end
     end
   end
 end

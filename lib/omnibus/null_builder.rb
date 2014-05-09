@@ -17,7 +17,7 @@
 module Omnibus
   class NullBuilder < Builder
     def build
-      log "Nothing to build for #{name}"
+      log.info { "Nothing to build for #{name}" }
     end
   end
 end

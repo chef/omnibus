@@ -20,7 +20,7 @@ maintainer 'Chef Software, Inc.'
 homepage 'http://www.getchef.com'
 
 install_path '/opt/chefdk'
-build_version Omnibus::BuildVersion.full
+build_version Omnibus::BuildVersion.new.git_describe
 build_iteration 4
 
 override :berkshelf, version: '3.0.0.beta6'

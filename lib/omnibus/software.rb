@@ -26,6 +26,8 @@ require 'fileutils'
 module Omnibus
   # Omnibus software DSL reader
   class Software
+    include Logging
+
     NULL_ARG = Object.new
     UNINITIALIZED = Object.new
 
@@ -95,7 +97,7 @@ module Omnibus
     # @todo: can't we just use #version here or are we testing this against nil? somewhere and
     #        not using #overridden?
     def override_version
-      $stderr.puts 'The #override_version is DEPRECATED, please use #version or test with #overridden?'
+      log.warn { 'Software#override_version is DEPRECATED. Please use #version or test with #overridden?' }
       overrides[:version]
     end
 
@@ -183,7 +185,7 @@ module Omnibus
     #
     # @todo: remove this in favor of default_version
     def given_version
-      $stderr.puts "Getting the default version via #given_version is DEPRECATED, please use 'default_version'"
+      log.warn { 'Software#given_version is DEPRECATED. Please use #default_version instead.' }
       default_version
     end
 
@@ -217,7 +219,7 @@ module Omnibus
         end
       else
         unless val.equal?(NULL_ARG)
-          $stderr.puts "Software '#{name}': Setting the version via 'version' is DEPRECATED, please use 'default_version'"
+          log.warn { 'Software#version is DEPRECATED. Please use #default_version instead.' }
           @version = val
         end
       end

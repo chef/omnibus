@@ -207,8 +207,8 @@ describe Omnibus::BuildVersion do
     end
 
     it 'outputs a deprecation message' do
-      expect(Omnibus::BuildVersion).to receive(:puts).with(/is deprecated/)
-      Omnibus::BuildVersion.full
+      output = capture_logging { Omnibus::BuildVersion.full }
+      expect(output).to include('Omnibus::BuildVersion.full is DEPRECATED.')
     end
   end
 

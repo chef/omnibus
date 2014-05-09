@@ -19,6 +19,8 @@ require 'ostruct'
 
 module Omnibus
   class Builder
+    include Logging
+
     # Proxies method calls to either a Builder object or the Software that the
     # builder belongs to. Provides compatibility with our DSL where we never
     # yield objects to blocks and hopefully hides some of the confusion that
@@ -199,14 +201,10 @@ module Omnibus
       @software.install_dir
     end
 
-    def log(message)
-      puts "[builder:#{name}] #{message}"
-    end
-
     def build
-      log "building #{name}"
-      log "version overridden from #{@software.default_version} to " \
-          "#{@software.version}" if @software.overridden?
+      log.info { "Building #{name}" }
+      log.debug { "Version overridden from #{@software.default_version} to #{@software.version}" } if @software.overridden?
+
       time_it("#{name} build") do
         @build_commands.each do |cmd|
           execute(cmd)
@@ -257,7 +255,7 @@ module Omnibus
       cmd_string = cmd_args[0..-2].join(' ')
       cmd_opts_for_display = to_kv_str(cmd_args.last)
 
-      log "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
+      log.debug { "Executing: `#{cmd_string}` with #{cmd_opts_for_display}" }
 
       shell = Mixlib::ShellOut.new(*cmd)
       shell.environment['HOME'] = '/tmp' unless ENV['HOME']
@@ -278,7 +276,7 @@ module Omnibus
       else
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log "Failed to execute cmd #{cmd} #{retries} time(s). Retrying in #{time_to_sleep}s."
+        log.debug { "Failed to execute cmd #{cmd} #{retries} time(s). Retrying in #{time_to_sleep}s." }
         sleep(time_to_sleep)
         retry
       end
@@ -315,11 +313,11 @@ module Omnibus
       yield
     rescue Exception
       elapsed = Time.now - start
-      log "#{what} failed, #{elapsed.to_f}s"
+      log.warn { "#{what} failed, #{elapsed.to_f}s" }
       raise
     else
       elapsed = Time.now - start
-      log "#{what} succeeded, #{elapsed.to_f}s"
+      log.debug { "#{what} succeeded, #{elapsed.to_f}s" }
     end
 
     # Convert a hash to a string in the form `key=value`. It should work with

@@ -28,7 +28,8 @@ module Omnibus
   # @todo Rename this class to reflect its absolute dependence on running in a
   #   Git repository.
   class BuildVersion
-    include Omnibus::Util
+    include Logging
+    include Util
 
     # Formatting string for the timestamp component of our SemVer build specifier.
     #
@@ -38,8 +39,8 @@ module Omnibus
 
     # @deprecated Use {#semver} or {#git_describe} instead
     def self.full
-      puts "#{name}.full is deprecated. Use #{name}.new.semver or #{name}.new.git_describe."
-      Omnibus::BuildVersion.new.git_describe
+      log.warn { "#{name}.full is DEPRECATED. Please use #{name}.new.semver or #{name}.new.git_describe instead." }
+      new.git_describe
     end
 
     # Create a new BuildVersion
@@ -127,17 +128,16 @@ module Omnibus
     # @return [String]
     def git_describe
       @git_describe ||= begin
-                          git_cmd = 'git describe --tags'
-                          cmd = shellout(git_cmd, live_stream: nil, cwd: @path)
-                          if cmd.exitstatus == 0
-                            cmd.stdout.chomp
-                          else
-                            msg =  'Could not extract version information from `git describe`. '
-                            msg << 'Setting version to 0.0.0'
-                            puts msg
-                            '0.0.0'
-                          end
-                        end
+        git_cmd = 'git describe --tags'
+        cmd = shellout(git_cmd, live_stream: nil, cwd: @path)
+
+        if cmd.exitstatus == 0
+          cmd.stdout.chomp
+        else
+          log.warn { "Could not extract version information from 'git describe'! Setting version to 0.0.0." }
+          '0.0.0'
+        end
+      end
     end
 
     # @!endgroup

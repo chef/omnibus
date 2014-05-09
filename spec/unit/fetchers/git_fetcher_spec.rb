@@ -90,11 +90,17 @@ describe Omnibus::GitFetcher do
 
             expect_git_ls_remote
 
-            expect(subject).to receive(:log).with(/git ls\-remote failed/).at_least(1).times
-            expect(subject).to receive(:log).with(/git clone\/fetch failed/).at_least(1).times
             # Prevent sleeping to run the spec fast
             subject.stub(:sleep)
-            expect { subject.fetch }.to raise_error(Omnibus::UnresolvableGitReference)
+
+            output = capture_logging do
+              expect {
+                subject.fetch
+              }.to raise_error(Omnibus::UnresolvableGitReference)
+            end
+
+            expect(output).to include('git ls-remote failed')
+            expect(output).to include('git clone/fetch failed')
           end
         end
       end
