@@ -3,15 +3,8 @@ require 'spec_helper'
 
 describe Omnibus do
   # evil class variables
-  before :each do
-    Omnibus.class_eval { @omnibus_software_root = nil }
-    Omnibus.class_eval { @software_dirs = nil }
-  end
-
-  after :each do
-    Omnibus.class_eval { @omnibus_software_root = nil }
-    Omnibus.class_eval { @software_dirs = nil }
-  end
+  before { Omnibus.reset! }
+  after  { Omnibus.reset! }
 
   describe '::omnibus_software_root' do
     it 'reads the software_gem out of Omnibus::Config.software_gem' do
@@ -58,34 +51,24 @@ describe Omnibus do
   end
 
   describe '#process_dsl_files' do
-    before :each do
-      Omnibus.stub(:project_root) do
-        File.expand_path(
-          File.join(
-            File.dirname(__FILE__),
-            '..',
-            'data',
-            'complicated',
-          ),
-        )
-      end
+    before do
+      Omnibus.stub(:project_root).and_return(complicated_path)
+      stub_ohai(platform: 'linux')
     end
 
-    after :each do
-      Omnibus.class_eval { @projects = [] }
-      Omnibus.class_eval { @software_dirs = nil }
-    end
+    after { Omnibus.reset! }
 
     it 'populates the 5 projects' do
       Omnibus.process_dsl_files
 
-      expect(Omnibus.projects.count).to eq(5)
+      expect(Omnibus.projects.size).to eq(5)
 
-      names = Omnibus.projects.map { |m| m.name.to_s }
-      # rubocop:disable WordArray
-      ['angrychef', 'chef-windows', 'chef', 'chefdk-windows', 'chefdk'].each do |project|
-        expect(names).to include(project)
-      end
+      names = Omnibus.projects.map(&:name)
+      expect(names).to include('angrychef')
+      expect(names).to include('chef-windows')
+      expect(names).to include('chef')
+      expect(names).to include('chefdk-windows')
+      expect(names).to include('chefdk')
     end
 
   end

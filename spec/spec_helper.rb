@@ -17,6 +17,10 @@ module Omnibus
       File.join(SPEC_DATA, 'projects', "#{name}.rb")
     end
 
+    def complicated_path
+      File.join(SPEC_DATA, 'complicated')
+    end
+
     def fixtures_path
       File.expand_path('../fixtures', __FILE__)
     end
