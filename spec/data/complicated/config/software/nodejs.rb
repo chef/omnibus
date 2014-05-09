@@ -31,7 +31,7 @@ source :url => "http://nodejs.org/dist/v#{version}/node-v#{version}.tar.gz"
 relative_path "node-v#{version}"
 
 # Ensure we run with Python 2.6 on Redhats < 6
-if OHAI['platform_family'] == "rhel" && OHAI['platform_version'].to_f < 6
+if Ohai['platform_family'] == "rhel" && Ohai['platform_version'].to_f < 6
   python = 'python26'
 else
   python = 'python'

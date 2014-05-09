@@ -49,7 +49,7 @@ if platform == "solaris2"
 end
 
 def glibc_dropped_gets?
-  return false unless OHAI["os"] == "linux"
+  return false unless Ohai["os"] == "linux"
 
   output = `/usr/bin/env getconf GNU_LIBC_VERSION`
 
