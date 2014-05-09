@@ -65,6 +65,7 @@ module Omnibus
     end
 
     # @todo code duplication with {Fetcher::ErrorReporter}
+    # @todo make this use the logger
     class ErrorReporter
       # @todo fetcher isn't even used
       def initialize(error, fetcher)

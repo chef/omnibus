@@ -56,6 +56,7 @@ module Omnibus
       # @todo If {Omnibus::Fetcher#description} is meant to show
       #   parameters (presumably the kind of fetcher and the software it
       #   is fetching?),
+      # @todo make this use the logger
       def explain(why)
         $stderr.puts '* ' * 40
         $stderr.puts why

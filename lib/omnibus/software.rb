@@ -512,9 +512,9 @@ module Omnibus
     def execute_build(fetcher)
       fetcher.clean
       @builder.build
-      puts "[software:#{name}] caching build"
+      Omnibus.log.info { "Caching build for #{name}" }
       Omnibus::InstallPathCache.new(install_dir, self).incremental
-      puts "[software:#{name}] has dirtied the cache"
+      Omnibus.log.info { "#{name} has dirtied the cache" }
       project.dirty_cache = true
     end
 
