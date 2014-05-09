@@ -71,10 +71,25 @@ module Omnibus
   end
 
   class << self
+    #
+    # Reset the current Omnibus configuration. This is primary an internal API
+    # used in testing, but it can also be useful when Omnibus is used as a
+    # library.
+    #
+    # @return [void]
+    #
     def reset!
       instance_variables.each(&method(:remove_instance_variable))
     end
 
+    #
+    # The logger for this Omnibus instance.
+    #
+    # @example
+    #   Omnibus.log.debug { 'This is a message!' }
+    #
+    # @return [Logger]
+    #
     def log
       return @logger if @logger
 
@@ -86,6 +101,14 @@ module Omnibus
       @logger
     end
 
+    #
+    # Set the log lever for this logger instance.
+    #
+    # @example
+    #   Omnibus.log_level = :info
+    #
+    # @param [Symbol] level
+    #
     def log_level=(level)
       level = level.to_s.upcase
       log.level = Logger.const_get(level)
