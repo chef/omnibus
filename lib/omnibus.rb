@@ -95,7 +95,7 @@ module Omnibus
 
       @logger = Logger.new($stdout)
       @logger.level = Logger::WARN
-      @logger.formatter = ->(severity, timestamp, name, message) do
+      @logger.formatter = lambda do |severity, timestamp, name, message|
         "[#{severity}] #{message}\n"
       end
       @logger
@@ -272,7 +272,7 @@ module Omnibus
   # @see Omnibus::Overrides#overrides
   def self.expand_software(overrides, software_map)
     unless overrides.is_a? Hash
-      fail ArgumentError, "Overrides argument must be a hash!  You passed #{overrides.inspect}."
+      raise ArgumentError, "Overrides argument must be a hash!  You passed #{overrides.inspect}."
     end
 
     Omnibus.projects.each do |project|
@@ -362,7 +362,7 @@ module Omnibus
     dep_file = software_map[dependency_name]
 
     unless dep_file
-      fail MissingProjectDependency.new(dependency_name, software_dirs)
+      raise MissingProjectDependency.new(dependency_name, software_dirs)
     end
 
     dep_software = Omnibus::Software.load(dep_file, project, overrides)

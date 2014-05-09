@@ -76,7 +76,7 @@ E
     end
 
     def get_with_redirect(url, headers, limit = 10)
-      fail ArgumentError, 'HTTP redirect too deep' if limit == 0
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
       log.info { "Getting from #{url} with #{limit} redirects left" }
 
       url = URI.parse(url) unless url.kind_of?(URI)
@@ -151,7 +151,7 @@ E
             ftp.close
           end
         else
-          fail UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
+          raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
         end
       rescue Exception
         tries -= 1
@@ -173,7 +173,7 @@ E
         log.warn { "Invalid MD5 for #{@name}" }
         log.warn { "Expected: #{@checksum}" }
         log.warn { "Actual:   #{actual_md5}" }
-        fail InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
+        raise InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
       end
     end
 
@@ -188,7 +188,7 @@ E
         shell.run_command
         shell.error!
       else
-        fail "Don't know how to extract command for #{cmd.class} class"
+        raise "Don't know how to extract command for #{cmd.class} class"
       end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to unpack archive at #{project_file} (#{e.class}: #{e.message.strip})")

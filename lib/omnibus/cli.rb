@@ -32,27 +32,25 @@ module Omnibus
       end
 
       def execute!
-        begin
-          $stdin  = @stdin
-          $stdout = @stdout
-          $stderr = @stderr
+        $stdin  = @stdin
+        $stdout = @stdout
+        $stderr = @stderr
 
-          Omnibus::CLI.start(@argv)
-          @kernel.exit(0)
-        rescue => e
-          Omnibus.log.error { e.message }
-          Omnibus.log.debug { e.backtrace.join("\n\t") }
+        Omnibus::CLI.start(@argv)
+        @kernel.exit(0)
+      rescue => e
+        Omnibus.log.error { e.message }
+        Omnibus.log.debug { e.backtrace.join("\n\t") }
 
-          if e.respond_to?(:status_code)
-            @kernel.exit(e.status_code)
-          else
-            @kernel.exit(1)
-          end
+        if e.respond_to?(:status_code)
+          @kernel.exit(e.status_code)
+        else
+          @kernel.exit(1)
         end
       end
     end
 
-    map ['-v', '--version'] => 'version'
+    map %w(-v --version) => 'version'
 
     #
     # Build an Omnibus project or software definition.

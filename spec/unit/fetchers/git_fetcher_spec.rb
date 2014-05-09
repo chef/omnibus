@@ -94,9 +94,7 @@ describe Omnibus::GitFetcher do
             subject.stub(:sleep)
 
             output = capture_logging do
-              expect {
-                subject.fetch
-              }.to raise_error(Omnibus::UnresolvableGitReference)
+              expect { subject.fetch }.to raise_error(Omnibus::UnresolvableGitReference)
             end
 
             expect(output).to include('git ls-remote failed')

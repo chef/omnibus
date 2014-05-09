@@ -1,6 +1,6 @@
 require 'aruba/api'
 
-Given /^I have an omnibus project named "(.+)"$/ do |name|
+Given(/^I have an omnibus project named "(.+)"$/) do |name|
   create_dir(name)
   cd(name)
 

@@ -24,7 +24,7 @@ module Omnibus
 
     def initialize
       unless config.s3_bucket && config.s3_access_key && config.s3_secret_key
-        fail InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
+        raise InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
       end
       @client = UberS3.new(
         access_key: config.s3_access_key,

@@ -39,9 +39,9 @@ module Omnibus
     def key_for_package(package)
       return @key_for_package if @key_for_package
 
-      package.name     || fail(InsufficientSpecification.new(:name, package))
-      package.version  || fail(InsufficientSpecification.new(:version, package))
-      package.checksum || fail(InsufficientSpecification.new(:checksum, package))
+      package.name     || raise(InsufficientSpecification.new(:name, package))
+      package.version  || raise(InsufficientSpecification.new(:version, package))
+      package.checksum || raise(InsufficientSpecification.new(:checksum, package))
 
       @key_for_package = "#{package.name}-#{package.version}-#{package.checksum}"
       @key_for_package

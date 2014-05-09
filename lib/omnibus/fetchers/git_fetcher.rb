@@ -164,7 +164,7 @@ E
       commit_ref = process_remote_list(shell.stdout, ref)
 
       unless commit_ref
-        fail UnresolvableGitReference.new("Could not resolve `#{ref}' to a SHA.")
+        raise UnresolvableGitReference.new("Could not resolve `#{ref}' to a SHA.")
       end
       commit_ref
     rescue UnresolvableGitReference => e # skip retries

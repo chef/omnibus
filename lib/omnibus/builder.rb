@@ -133,7 +133,7 @@ module Omnibus
       source = candidate_paths.find { |path| File.exist?(path) }
 
       unless source
-        fail MissingPatch.new(args[:source], candidate_paths)
+        raise MissingPatch.new(args[:source], candidate_paths)
       end
 
       plevel = args[:plevel] || 1
@@ -153,7 +153,7 @@ module Omnibus
       source_path = File.expand_path("#{Omnibus.project_root}/config/templates/#{name}/#{args[:source]}")
 
       unless File.exist?(source_path)
-        fail MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
+        raise MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
       end
 
       block do
@@ -290,7 +290,7 @@ module Omnibus
         # command as a string w/ opts
         ["#{str} #{cmd_args.first}", cmd_args.last]
       elsif cmd_args.size == 0
-        fail ArgumentError, "I don't even"
+        raise ArgumentError, "I don't even"
       else
         # cmd given as argv array
         cmd_args.dup.unshift(str)

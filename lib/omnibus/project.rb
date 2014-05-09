@@ -157,7 +157,7 @@ module Omnibus
     #   must be set in order to build a project)
     def name(val = NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name || fail(MissingProjectConfiguration.new('name', 'my_project'))
+      @name || raise(MissingProjectConfiguration.new('name', 'my_project'))
     end
 
     # Set or retrieve a friendly name for the project
@@ -179,7 +179,7 @@ module Omnibus
     def msi_parameters(val = NULL_ARG, &block)
       if block_given?
         unless val.equal?(NULL_ARG)
-          fail 'can not specify additional parameters when block is given'
+          raise 'can not specify additional parameters when block is given'
         end
 
         @msi_parameters = block
@@ -221,7 +221,7 @@ module Omnibus
         @install_path = File.expand_path(val)
         windows_safe_path!(@install_path)
       end
-      @install_path || fail(MissingProjectConfiguration.new('install_path', '/opt/chef'))
+      @install_path || raise(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
 
     # Set or retrieve the the package maintainer.
@@ -234,7 +234,7 @@ module Omnibus
     #   be set in order to build a project)
     def maintainer(val = NULL_ARG)
       @maintainer = val unless val.equal?(NULL_ARG)
-      @maintainer || fail(MissingProjectConfiguration.new('maintainer', 'Chef Software, Inc.'))
+      @maintainer || raise(MissingProjectConfiguration.new('maintainer', 'Chef Software, Inc.'))
     end
 
     # Set or retrive the package homepage.
@@ -247,7 +247,7 @@ module Omnibus
     #   set in order to build a project)
     def homepage(val = NULL_ARG)
       @homepage = val unless val.equal?(NULL_ARG)
-      @homepage || fail(MissingProjectConfiguration.new('homepage', 'http://www.getchef.com'))
+      @homepage || raise(MissingProjectConfiguration.new('homepage', 'http://www.getchef.com'))
     end
 
     # Defines the iteration for the package to be generated.  Adheres

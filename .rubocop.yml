@@ -1,6 +1,9 @@
 AllCops:
   Excludes:
     - spec/data/**/*
+
+AlignParameters:
+  Enabled: false
 ClassLength:
   Enabled: false
 CyclomaticComplexity:
@@ -26,6 +29,10 @@ ParameterLists:
 RaiseArgs:
   Enabled: false
 RescueException:
+  Enabled: false
+SignalException:
+  EnforcedStyle: only_raise
+SpecialGlobalVars:
   Enabled: false
 TrailingComma:
   EnforcedStyleForMultiline: comma

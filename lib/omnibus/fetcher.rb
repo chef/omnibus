@@ -124,7 +124,7 @@ module Omnibus
       elsif software.source[:path]
         PathFetcher.new(software)
       else
-        fail UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
+        raise UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
       end
     end
 

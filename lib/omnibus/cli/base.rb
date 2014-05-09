@@ -63,7 +63,7 @@ module Omnibus
       @options[:override].each do |key, value|
         if %w(true false nil).include?(value)
           log.debug { "Detected #{value.inspect} should be an object" }
-          value = eval(value)
+          value = { 'true' => true, 'false' => false, 'nil' => nil }[value]
         end
 
         if value =~ /\A[[:digit:]]+\Z/
@@ -92,7 +92,7 @@ module Omnibus
       desc: 'The log level',
       aliases: '-l',
       type: :string,
-      enum: ['fatal', 'error', 'warn', 'info', 'debug'],
+      enum: %w(fatal error warn info debug),
       lazy_default: 'warn'
     class_option :override,
       desc: 'Override one or more Omnibus config options',

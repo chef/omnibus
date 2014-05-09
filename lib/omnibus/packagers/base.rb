@@ -90,7 +90,7 @@ module Omnibus
       if block_given?
         @build = block
       else
-        @build || fail(AbstractMethod.new("#{self.class.name}.build"))
+        @build || raise(AbstractMethod.new("#{self.class.name}.build"))
       end
     end
 
@@ -198,7 +198,7 @@ module Omnibus
     #
     # @param [String] path
     def assert_presence!(path)
-      fail MissingAsset.new(path) unless File.exist?(path)
+      raise MissingAsset.new(path) unless File.exist?(path)
     end
 
     # Execute this packager by running the following phases in order:
@@ -220,7 +220,7 @@ module Omnibus
     #
     # @return [String]
     def package_name
-      fail AbstractMethod.new("#{self.class.name}#package_name")
+      raise AbstractMethod.new("#{self.class.name}#package_name")
     end
 
     private

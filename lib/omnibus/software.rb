@@ -123,7 +123,7 @@ module Omnibus
     # @return [String]
     def name(val = NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name || fail(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
+      @name || raise(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
     end
 
     # Sets the description of the software
@@ -211,7 +211,7 @@ module Omnibus
     def version(val = NULL_ARG)
       if block_given?
         if val.equal?(NULL_ARG)
-          fail 'block needs a version argument to apply against'
+          raise 'block needs a version argument to apply against'
         else
           if val == apply_overrides(:version)
             yield
@@ -506,7 +506,7 @@ module Omnibus
     # @todo It seems that this is not used... remove it
     # @deprecated Use something else (?)
     def command(*args)
-      fail 'Method Moved.'
+      raise 'Method Moved.'
     end
 
     def execute_build(fetcher)

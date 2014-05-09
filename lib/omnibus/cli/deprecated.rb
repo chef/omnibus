@@ -58,7 +58,7 @@ module Omnibus
         #   $ omnibus build software SOFTWARE
         #
         if args[0..1] == %w(build software)
-          fail 'Building individual software definitions is no longer supported!'
+          raise 'Building individual software definitions is no longer supported!'
         end
 
         #

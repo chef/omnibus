@@ -203,7 +203,7 @@ module Omnibus
           log.warn { "      FAILED BECAUSE: #{reason}" }
         end
 
-        fail 'Health Check Failed'
+        raise 'Health Check Failed'
       end
     end
 

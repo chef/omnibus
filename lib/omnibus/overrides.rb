@@ -37,13 +37,13 @@ module Omnibus
           info = line.split
 
           unless info.count == 2
-            fail ArgumentError, "Invalid overrides line: '#{line.chomp}'"
+            raise ArgumentError, "Invalid overrides line: '#{line.chomp}'"
           end
 
           package, version = info
 
           if acc[package]
-            fail ArgumentError, "Multiple overrides present for '#{package}' in overrides file #{file}!"
+            raise ArgumentError, "Multiple overrides present for '#{package}' in overrides file #{file}!"
           end
 
           acc[package] = version
