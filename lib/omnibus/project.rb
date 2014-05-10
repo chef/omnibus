@@ -16,6 +16,7 @@
 #
 
 require 'time'
+require 'json'
 
 module Omnibus
   # Omnibus project DSL reader
