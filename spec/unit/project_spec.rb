@@ -47,6 +47,16 @@ module Omnibus
       end
     end
 
+    describe '#<=>' do
+      it 'compares projects by name' do
+        list = [
+          project,
+          Omnibus::Project.load(project_path('chefdk')),
+        ]
+        expect(list.sort.map(&:name)).to eq(%w(chefdk sample))
+      end
+    end
+
     describe '#iteration' do
       let(:fauxhai_options) { Hash.new }
 

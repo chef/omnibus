@@ -80,6 +80,10 @@ module Omnibus
       @library = Omnibus::Library.new(self)
     end
 
+    def <=>(other)
+      self.name <=> other.name
+    end
+
     def build_me
       FileUtils.mkdir_p(config.package_dir)
       FileUtils.mkdir_p('pkg')
