@@ -17,18 +17,43 @@
 module Omnibus
   module Logging
     def self.included(base)
-      base.send(:include, Methods)
-      base.send(:extend,  Methods)
+      base.send(:include, InstanceMethods)
+      base.send(:extend,  ClassMethods)
     end
 
-    module Methods
+    module ClassMethods
+      private
+
       #
       # A helpful DSL method for logging an action.
       #
       # @return [Logger]
       #
       def log
-        Omnibus.log
+        Omnibus.logger
+      end
+
+      #
+      # The key to log with.
+      #
+      # @return [String]
+      #
+      def log_key
+        @log_key ||= name.split('::')[1..-1].join('::')
+      end
+    end
+
+    module InstanceMethods
+      private
+
+      # @see (ClassMethods#log)
+      def log
+        self.class.send(:log)
+      end
+
+      # @see (ClassMethods#log_key)
+      def log_key
+        self.class.send(:log_key)
       end
     end
   end
