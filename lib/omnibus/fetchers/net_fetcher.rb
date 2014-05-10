@@ -23,8 +23,6 @@ module Omnibus
 
   # Fetcher Implementation for HTTP and FTP hosted tarballs
   class NetFetcher < Fetcher
-    name :net
-
     attr_reader :name
     attr_reader :project_file
     attr_reader :source

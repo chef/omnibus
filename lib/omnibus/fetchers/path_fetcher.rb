@@ -17,8 +17,6 @@
 module Omnibus
   # Fetcher implementation for projects on the filesystem
   class PathFetcher < Fetcher
-    name :path
-
     def initialize(software)
       @name = software.name
       @source = software.source

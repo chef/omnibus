@@ -129,11 +129,6 @@ module Omnibus
       end
     end
 
-    def self.name(name = NULL_ARG)
-      @name = name unless name.equal?(NULL_ARG)
-      @name
-    end
-
     include Logging
 
     attr_reader :name

@@ -17,8 +17,6 @@
 module Omnibus
   # Fetcher implementation for projects in git.
   class GitFetcher < Fetcher
-    name :git
-
     attr_reader :source
     attr_reader :project_dir
     attr_reader :version

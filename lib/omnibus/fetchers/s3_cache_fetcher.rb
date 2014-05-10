@@ -18,8 +18,6 @@ module Omnibus
   class S3CacheFetcher < NetFetcher
     include SoftwareS3URLs
 
-    name :s3cache
-
     def initialize(software)
       @software = software
       super
