@@ -15,7 +15,6 @@
 #
 
 require 'pathname'
-require 'logger'
 
 require 'omnibus/exceptions'
 require 'omnibus/version'
@@ -39,6 +38,7 @@ module Omnibus
   autoload :HealthCheck,      'omnibus/health_check'
   autoload :InstallPathCache, 'omnibus/install_path_cache'
   autoload :Library,          'omnibus/library'
+  autoload :Logger,           'omnibus/logger'
   autoload :Logging,          'omnibus/logging'
   autoload :NullBuilder,      'omnibus/null_builder'
   autoload :Ohai,             'omnibus/ohai'
@@ -102,34 +102,18 @@ module Omnibus
     # The logger for this Omnibus instance.
     #
     # @example
-    #   Omnibus.log.debug { 'This is a message!' }
+    #   Omnibus.logger.debug { 'This is a message!' }
     #
     # @return [Logger]
     #
-    def log
-      return @logger if @logger
-
-      @logger = Logger.new($stdout)
-      @logger.level = Logger::WARN
-      @logger.formatter = lambda do |severity, _timestamp, _name, message|
-        "[#{severity[0]}] #{message}\n"
-      end
-      @logger
+    def logger
+      @logger ||= Logger.new
     end
 
-    #
-    # Set the log lever for this logger instance.
-    #
-    # @example
-    #   Omnibus.log_level = :info
-    #
-    # @param [Symbol] level
-    #
-    def log_level=(level)
-      level = level.to_s.upcase
-      log.level = Logger.const_get(level)
-    rescue NameError
-      raise "'#{level}' does not appear to be a valid log level!"
+    def logger=(logger)
+      @logger = logger
+    end
+
     end
   end
 
