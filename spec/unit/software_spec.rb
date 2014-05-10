@@ -87,7 +87,7 @@ describe Omnibus::Software do
 
     it 'outputs a deprecation message' do
       output = capture_logging { software.override_version }
-      expect(output).to include('Software#override_version is DEPRECATED.')
+      expect(output).to include('DEPRECATED')
     end
   end
 
@@ -99,7 +99,7 @@ describe Omnibus::Software do
 
     it 'outputs a deprecation message' do
       output = capture_logging { software.given_version }
-      expect(output).to include('Software#given_version is DEPRECATED.')
+      expect(output).to include('DEPRECATED')
     end
   end
 
@@ -111,7 +111,7 @@ describe Omnibus::Software do
 
     it 'outputs a deprecation message' do
       output = capture_logging { software.version('1.2.3') }
-      expect(output).to include('Software#version is DEPRECATED.')
+      expect(output).to include('DEPRECATED')
     end
   end
 

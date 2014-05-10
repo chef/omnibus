@@ -69,7 +69,7 @@ module Omnibus
       existing_disks = execute "mount | grep /Volumes/#{project.name} | awk '{print $1}'"
       existing_disks.stdout.lines.each do |existing_disk|
         existing_disk.chomp!
-        Omnibus.log.debug { "Detaching disk '#{existing_disk}' before starting dmg packaging." }
+        Omnibus.logger.debug { "Detaching disk '#{existing_disk}' before starting dmg packaging." }
         execute "hdiutil detach #{existing_disk}"
       end
     end

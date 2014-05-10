@@ -65,7 +65,10 @@ module Omnibus
         key = key_for_package(software)
         content = IO.read(software.project_file)
 
-        log.info { "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}" }
+        log.info(log_key) do
+          "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
+        end
+
         @client.store(key, content, access: :public_read, content_md5: software.checksum)
       end
     end
@@ -83,14 +86,14 @@ module Omnibus
     end
 
     def fetch(software)
-      log.info { "Fetching #{software.name}" }
+      log.info(log_key) { "Fetching #{software.name}" }
       fetcher = Fetcher.without_caching_for(software)
       if fetcher.fetch_required?
-        log.debug { 'Updating cache' }
+        log.debug(log_key) { 'Updating cache' }
         fetcher.download
         fetcher.verify_checksum!
       else
-        log.debug { 'Cached copy up to date, skipping.' }
+        log.debug(log_key) { 'Cached copy up to date, skipping.' }
       end
     end
 

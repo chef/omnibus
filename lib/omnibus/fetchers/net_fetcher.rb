@@ -58,7 +58,8 @@ E
 
     def clean
       if File.exist?(project_dir)
-        log.info { "Cleaning existing build from #{project_dir}" }
+        log.info(log_key) { "Cleaning existing build from #{project_dir}" }
+
         FileUtils.rm_rf(project_dir)
       end
       extract
@@ -69,13 +70,13 @@ E
         download
         verify_checksum!
       else
-        log.debug { 'Cached copy of source tarball up to date' }
+        log.debug(log_key) { 'Cached copy of source tarball up to date' }
       end
     end
 
     def get_with_redirect(url, headers, limit = 10)
       raise ArgumentError, 'HTTP redirect too deep' if limit == 0
-      log.info { "Getting from #{url} with #{limit} redirects left" }
+      log.info(log_key) { "Getting from #{url} with #{limit} redirects left" }
 
       url = URI.parse(url) unless url.kind_of?(URI)
 
@@ -129,8 +130,8 @@ E
     def download
       tries = 5
       begin
-        log.warn { source[:warning] } if source.key?(:warning)
-        log.info { "Fetching #{project_file} from #{source_uri}" }
+        log.warn(log_key) { source[:warning] } if source.key?(:warning)
+        log.info(log_key) { "Fetching #{project_file} from #{source_uri}" }
 
         case source_uri.scheme
         when /https?/
@@ -154,7 +155,7 @@ E
       rescue Exception
         tries -= 1
         if tries != 0
-          log.debug { 'Retrying failed download...' }
+          log.debug(log_key) { "Retrying failed download (#{tries})..." }
           retry
         else
           raise
@@ -168,15 +169,18 @@ E
     def verify_checksum!
       actual_md5 = Digest::MD5.file(project_file)
       unless actual_md5 == @checksum
-        log.warn { "Invalid MD5 for #{@name}" }
-        log.warn { "Expected: #{@checksum}" }
-        log.warn { "Actual:   #{actual_md5}" }
+        log.warn(log_key) { "Invalid MD5 for #{@name}" }
+        log.warn(log_key) { "Expected: #{@checksum}" }
+        log.warn(log_key) { "Actual:   #{actual_md5}" }
         raise InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
       end
     end
 
     def extract
-      log.info { "Extracting the source in #{project_file} to #{source_dir}" }
+      log.info(log_key) do
+        "Extracting the source in '#{project_file}' to '#{source_dir}'"
+      end
+
       cmd = extract_cmd
       case cmd
       when Proc
@@ -207,7 +211,9 @@ E
       else
         # if we don't recognize the extension, simply copy over the file
         proc do
-          log.debug { "#{project_file} not an archive. Copying to #{project_dir}" }
+          log.debug(log_key) do
+            "'#{project_file}' is not an archive. Copying to '#{project_dir}'..."
+          end
           # WARNING: hack hack hack, no project dir yet
           FileUtils.mkdir_p(project_dir)
           FileUtils.cp(project_file, project_dir)

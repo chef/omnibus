@@ -37,10 +37,16 @@ module Omnibus
     # @see Time#strftime
     TIMESTAMP_FORMAT = '%Y%m%d%H%M%S'
 
-    # @deprecated Use {#semver} or {#git_describe} instead
-    def self.full
-      log.warn { "#{name}.full is DEPRECATED. Please use #{name}.new.semver or #{name}.new.git_describe instead." }
-      new.git_describe
+    class << self
+      # @deprecated Use {#semver} or {#git_describe} instead
+      def full
+        log.deprecated(log_key) do
+          'BuildVersion.full. Please use BuildVersion.semver or ' \
+          'BuildVersion.git_describe instead.'
+        end
+
+        new.git_describe
+      end
 
       # @see (BuildVersion#git_describe)
       def git_describe
@@ -144,7 +150,10 @@ module Omnibus
         if cmd.exitstatus == 0
           cmd.stdout.chomp
         else
-          log.warn { "Could not extract version information from 'git describe'! Setting version to 0.0.0." }
+          log.warn(log_key) do
+            "Could not extract version information from 'git describe'! " \
+            "Setting version to 0.0.0."
+          end
           '0.0.0'
         end
       end

@@ -27,6 +27,8 @@ module Omnibus
     # with Aruba. In process testing is much faster than spawning a new Ruby
     # process for each test.
     class Runner
+      include Logging
+
       def initialize(argv, stdin = STDIN, stdout = STDOUT, stderr = STDERR, kernel = Kernel)
         @argv, @stdin, @stdout, @stderr, @kernel = argv, stdin, stdout, stderr, kernel
       end
@@ -39,8 +41,13 @@ module Omnibus
         Omnibus::CLI.start(@argv)
         @kernel.exit(0)
       rescue => e
-        Omnibus.log.error { e.message }
-        Omnibus.log.debug { e.backtrace.join("\n\t") }
+        error = Omnibus.ui.set_color(e.message, :red)
+        Omnibus.ui.error(error)
+
+        if log.debug?
+          backtrace = Omnibus.ui.set_color("\n" + e.backtrace.join("\n  "), :red)
+          Omnibus.ui.error(backtrace)
+        end
 
         if e.respond_to?(:status_code)
           @kernel.exit(e.status_code)

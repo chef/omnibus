@@ -40,7 +40,7 @@ module Omnibus
 
       # Set the log_level
       if @options[:log_level]
-        Omnibus.log_level = @options[:log_level]
+        Omnibus.logger.level = @options[:log_level]
       end
 
       # Do not load the Omnibus config if we are asking for help or the version

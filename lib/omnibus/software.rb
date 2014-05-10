@@ -97,7 +97,11 @@ module Omnibus
     # @todo: can't we just use #version here or are we testing this against nil? somewhere and
     #        not using #overridden?
     def override_version
-      log.warn { 'Software#override_version is DEPRECATED. Please use #version or test with #overridden?' }
+      log.deprecated(log_key) do
+        'Software#override_version. Please use #version or ' \
+        'test  with #overridden?'
+      end
+
       overrides[:version]
     end
 
@@ -185,7 +189,10 @@ module Omnibus
     #
     # @todo: remove this in favor of default_version
     def given_version
-      log.warn { 'Software#given_version is DEPRECATED. Please use #default_version instead.' }
+      log.deprecated(log_key) do
+        'Software#given_version. Please use #default_version instead.'
+      end
+
       default_version
     end
 
@@ -219,7 +226,9 @@ module Omnibus
         end
       else
         unless val.equal?(NULL_ARG)
-          log.warn { 'Software#version is DEPRECATED. Please use #default_version instead.' }
+          log.deprecated(log_key) do
+            'Software#version. Please use #default_version instead.'
+          end
           @version = val
         end
       end
@@ -514,9 +523,9 @@ module Omnibus
     def execute_build(fetcher)
       fetcher.clean
       @builder.build
-      Omnibus.log.info { "Caching build for #{name}" }
+      log.info(log_key) { 'Caching build' }
       Omnibus::InstallPathCache.new(install_dir, self).incremental
-      Omnibus.log.info { "#{name} has dirtied the cache" }
+      log.info(log_key) { 'Dirtied the cache!' }
       project.dirty_cache = true
     end
 
@@ -524,6 +533,10 @@ module Omnibus
       File.open(file, 'w') do |f|
         f.print ''
       end
+    end
+
+    def log_key
+      @log_key ||= "#{super}: #{name}"
     end
   end
 end

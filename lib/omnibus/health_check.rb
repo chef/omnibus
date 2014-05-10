@@ -165,42 +165,69 @@ module Omnibus
           end
         end
 
-        log.warn { 'Health Check Failed, Summary follows:' }
+        log.warn(log_key) { 'Failed!' }
         bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
 
-        log.warn { 'The following Omnibus-built libraries have unsafe or unmet dependencies:' }
-        bad_omnibus_libs.each do |lib|
-          log.warn { "    --> #{lib}" }
+        log.warn(log_key) do
+          out = "The following libraries have unsafe or unmet dependencies:\n"
+
+          bad_omnibus_libs.each do |lib|
+            out << "    --> #{lib}\n"
+          end
+
+          out
         end
 
-        log.warn { 'The following Omnibus-built binaries have unsafe or unmet dependencies:' }
-        bad_omnibus_bins.each do |bin|
-          log.warn { "    --> #{bin}" }
+        log.warn(log_key) do
+          out = "The following binaries have unsafe or unmet dependencies:\n"
+
+          bad_omnibus_bins.each do |bin|
+            out << "    --> #{bin}\n"
+          end
+
+          out
         end
 
         if unresolved.length > 0
-          log.warn { 'The following requirements could not be resolved:' }
-          unresolved.each do |lib|
-            log.warn { "    --> #{lib}" }
+          log.warn(log_key) do
+            out = "The following requirements could not be resolved:\n"
+
+            unresolved.each do |lib|
+              out << "    --> #{lib}\n"
+            end
+
+            out
           end
         end
 
         if unreliable.length > 0
-          log.warn { 'The following libraries cannot be guaranteed to be on target systems:' }
-          unreliable.each do |lib|
-            log.warn { "    --> #{lib}"  }
+          log.warn(log_key) do
+            out =  "The following libraries cannot be guaranteed to be on "
+            out << "target systems:\n"
+
+            unreliable.each do |lib|
+              out << "    --> #{lib}\n"
+            end
+
+            out
           end
         end
 
-        log.warn { 'The precise failures were:' }
-        detail.each do |line|
-          item, dependency, location, count = line.split('|')
-          reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
-          log.warn { "    --> #{item}" }
-          log.warn { "    DEPENDS ON: #{dependency}" }
-          log.warn { "      COUNT: #{count}" }
-          log.warn { "      PROVIDED BY: #{location}" }
-          log.warn { "      FAILED BECAUSE: #{reason}" }
+        log.warn(log_key) do
+          out = 'The precise failures were:'
+
+          detail.each do |line|
+            item, dependency, location, count = line.split('|')
+            reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
+
+            out << "    --> #{item}\n"
+            out << "    DEPENDS ON: #{dependency}\n"
+            out << "      COUNT: #{count}\n"
+            out << "      PROVIDED BY: #{location}\n"
+            out << "      FAILED BECAUSE: #{reason}\n"
+          end
+
+          out
         end
 
         raise 'Health Check Failed'
@@ -209,7 +236,7 @@ module Omnibus
 
     def self.health_check_otool(install_dir, whitelist_files)
       otool_cmd = "find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L > otool.out 2>/dev/null"
-      log.info { "Executing `#{otool_cmd}`" }
+      log.info(log_key) { "Executing: `#{otool_cmd}`" }
       shell = Mixlib::ShellOut.new(otool_cmd, timeout: 3600)
       shell.run_command
 
@@ -260,11 +287,11 @@ module Omnibus
         safe ||= true if reg.match(current_library)
       end
 
-      log.debug { "  --> Dependency: #{name}" }
-      log.debug { "  --> Provided by: #{linked}" }
+      log.debug(log_key) { "  --> Dependency: #{name}" }
+      log.debug(log_key) { "  --> Provided by: #{linked}" }
 
       if !safe && linked !~ Regexp.new(install_dir)
-        log.debug { "    -> FAILED: #{current_library} has unsafe dependencies" }
+        log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
         bad_libs[current_library] ||= {}
         bad_libs[current_library][name] ||= {}
         if bad_libs[current_library][name].key?(linked)
@@ -273,7 +300,7 @@ module Omnibus
           bad_libs[current_library][name][linked] = 1
         end
       else
-        log.debug { "    -> PASSED: #{name} is either whitelisted or safely provided." }
+        log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
       end
 
       bad_libs
@@ -288,7 +315,7 @@ module Omnibus
       #
       ldd_cmd = "find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd > ldd.out 2>/dev/null"
 
-      log.info { "Executing `#{ldd_cmd}`" }
+      log.info(log_key) { "Executing `#{ldd_cmd}`" }
       shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
       shell.run_command
 
@@ -301,14 +328,14 @@ module Omnibus
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
-          log.debug { "Analyzing dependencies for #{current_library}" }
+          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
         when /^\s+(.+)$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[1]
           bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
         when /File is not an executable XCOFF file/ # ignore non-executable files
         else
-          log.warn { "Line did not match for #{current_library}\n#{line}" }
+          log.warn(log_key) { "Line did not match for #{current_library}\n#{line}" }
         end
       end
 
@@ -325,7 +352,7 @@ module Omnibus
       #
       ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
 
-      log.info { "Executing `#{ldd_cmd}`" }
+      log.info(log_key) { "Executing `#{ldd_cmd}`" }
       shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
       shell.run_command
 
@@ -338,7 +365,7 @@ module Omnibus
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
-          log.debug { "Analyzing dependencies for #{current_library}" }
+          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[2]
@@ -355,7 +382,9 @@ module Omnibus
           next
         when /^\s+not a dynamic executable$/ # ignore non-executable files
         else
-          log.warn { "Line did not match for #{current_library}\n#{line}" }
+          log.warn(log_key) do
+            "Line did not match for #{current_library}\n#{line}"
+          end
         end
       end
 

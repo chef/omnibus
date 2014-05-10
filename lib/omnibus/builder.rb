@@ -203,10 +203,16 @@ module Omnibus
     end
 
     def build
-      log.info { "Building #{name}" }
-      log.debug { "Version overridden from #{@software.default_version} to #{@software.version}" } if @software.overridden?
+      log.info(log_key) { 'Starting...' }
 
-      time_it("#{name} build") do
+      if @software.overridden?
+        log.info(log_key) do
+          "Version overridden from #{@software.default_version} to "\
+          "#{@software.version}"
+        end
+      end
+
+      time_it('Build') do
         @build_commands.each do |cmd|
           execute(cmd)
         end
@@ -256,7 +262,9 @@ module Omnibus
       cmd_string = cmd_args[0..-2].join(' ')
       cmd_opts_for_display = to_kv_str(cmd_args.last)
 
-      log.debug { "Executing: `#{cmd_string}` with #{cmd_opts_for_display}" }
+      log.debug(log_key) do
+        "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
+      end
 
       shell = Mixlib::ShellOut.new(*cmd)
       shell.environment['HOME'] = '/tmp' unless ENV['HOME']
@@ -277,7 +285,10 @@ module Omnibus
       else
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log.debug { "Failed to execute cmd #{cmd} #{retries} time(s). Retrying in #{time_to_sleep}s." }
+        log.debug(log_key) do
+          "Failed to execute cmd `#{cmd}` #{retries} time(s). " \
+          "Retrying in #{time_to_sleep}s."
+        end
         sleep(time_to_sleep)
         retry
       end
@@ -314,11 +325,11 @@ module Omnibus
       yield
     rescue Exception
       elapsed = Time.now - start
-      log.warn { "#{what} failed, #{elapsed.to_f}s" }
+      log.warn(log_key) { "#{what} failed! (#{elapsed.to_f}s)" }
       raise
     else
       elapsed = Time.now - start
-      log.debug { "#{what} succeeded, #{elapsed.to_f}s" }
+      log.info(log_key) { "#{what} succeeded! (#{elapsed.to_f}s)" }
     end
 
     # Convert a hash to a string in the form `key=value`. It should work with
@@ -334,6 +345,10 @@ module Omnibus
                   end
         kv_pair_strs << "#{k}=#{val_str}"
       end.join(join_str)
+    end
+
+    def log_key
+      @log_key ||= "#{super}: #{name}"
     end
   end
 end

@@ -27,7 +27,7 @@ module Omnibus
       def dispatch(m, args, options, config)
         # Handle old --timestamp
         if args.include?('--timestamp') || args.include?('-t')
-          Omnibus.log.warn { "The '--timestamp' option has been deprecated! Please use '--override append_timestamp:true' instead." }
+          warn("The '--timestamp' option has been deprecated! Please use '--override append_timestamp:true' instead.")
           args.delete('--timestamp')
           args.delete('-t')
           args += %w(--override append_timestamp:true)
@@ -35,7 +35,7 @@ module Omnibus
 
         # Handle old --no-timestamp
         if args.include?('--no-timestamp')
-          Omnibus.log.warn { "The '--no-timestamp' option has been deprecated! Please use '--override append_timestamp:false' instead." }
+          warn("The '--no-timestamp' option has been deprecated! Please use '--override append_timestamp:false' instead.")
           args.delete('--no-timestamp')
           args += %w(--override append_timestamp:false)
         end
@@ -46,8 +46,7 @@ module Omnibus
         #   $ omnibus build project PROJECT
         #
         if args[0..1] == %w(build project)
-          Omnibus.log.debug { 'Detected legacy build command' }
-          Omnibus.log.warn  { "The interface for building a project has changed. Please use 'omnibus build hamlet' instead." }
+          warn("The interface for building a project has changed. Please use 'omnibus build hamlet' instead.")
           args.delete_at(1)
           return old_dispatch(m, args, options, config)
         end
@@ -67,7 +66,7 @@ module Omnibus
         #   $ omnibus project PROJECT
         #
         if args[0] == 'project'
-          Omnibus.log.warn { "The project generator has been renamed to 'omnibus new'. Please use 'omnibus new' in the future." }
+          warn("The project generator has been renamed to 'omnibus new'. Please use 'omnibus new' in the future.")
           args[0] = 'new'
           return old_dispatch(m, args, options, config)
         end

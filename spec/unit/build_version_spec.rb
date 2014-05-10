@@ -212,7 +212,7 @@ module Omnibus
 
       it 'outputs a deprecation message' do
         output = capture_logging { BuildVersion.full }
-        expect(output).to include('BuildVersion.full is DEPRECATED.')
+        expect(output).to include('DEPRECATED')
       end
     end
 

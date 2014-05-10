@@ -38,7 +38,7 @@ module Omnibus
         out << "  * #{project_name}\n"
       end
 
-      out
+      out.strip
     end
   end
 
