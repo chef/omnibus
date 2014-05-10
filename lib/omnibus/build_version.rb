@@ -41,6 +41,16 @@ module Omnibus
     def self.full
       log.warn { "#{name}.full is DEPRECATED. Please use #{name}.new.semver or #{name}.new.git_describe instead." }
       new.git_describe
+
+      # @see (BuildVersion#git_describe)
+      def git_describe
+        new.git_describe
+      end
+
+      # @see (BuildVersion#semver)
+      def semver
+        new.semver
+      end
     end
 
     # Create a new BuildVersion
