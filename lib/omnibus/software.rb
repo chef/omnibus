@@ -502,10 +502,12 @@ module Omnibus
       end
     end
 
-    # @todo What?!
-    # @todo It seems that this is not used... remove it
-    # @deprecated Use something else (?)
+    # @todo Remove this in the next major release
     def command(*)
+      log.deprecated(log_key) do
+        'Software#command. Please use something else.'
+      end
+
       raise 'Method Moved.'
     end
 
