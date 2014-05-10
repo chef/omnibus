@@ -45,10 +45,20 @@ module Omnibus
 
     class << self
       def method_missing(m, *args, &block)
-        log.deprecated('OHAI') do
-          'OHAI constant. Please use Ohai instead.'
+        bad_boy = caller[2]
+
+        unless warned[bad_boy]
+          log.deprecated('OHAI') do
+            "OHAI constant. Please use Ohai instead: #{bad_boy}"
+          end
+          warned[bad_boy] = true
         end
+
         Ohai.send(m, *args, &block)
+      end
+
+      def warned
+        @warned ||= {}
       end
     end
   end
