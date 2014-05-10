@@ -65,26 +65,25 @@ module Omnibus
     #   expect(output).to include('whatever')
     #
     def capture_logging
-      Omnibus.log.level = :debug
-      original = $stdout
-      $stdout = fake = StringIO.new
-
-      [:fatal, :error, :warn, :info, :debug].each do |level|
-        Omnibus.log.stub(level) do |args, &b|
-          if b
-            fake.puts(b.call)
-          else
-            fake.puts(args.join)
-          end
-        end
-      end
-
+      original = Omnibus.logger
+      Omnibus.logger = TestLogger.new
       yield
-
-      fake.string
+      Omnibus.logger.output
     ensure
-      Omnibus.log_level = :unknown
-      $stdout = original
+      Omnibus.logger = original
+    end
+  end
+end
+
+module Omnibus
+  class TestLogger < Logger
+    def initialize(*)
+      super(StringIO.new)
+      @level = -1
+    end
+
+    def output
+      @logdev.dev.string
     end
   end
 end
@@ -108,7 +107,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     # Suppress logging
-    Omnibus.log_level = :unknown
+    Omnibus.logger.level = :unknown
 
     # Clear the tmp_path on each run
     FileUtils.rm_rf(tmp_path)
