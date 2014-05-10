@@ -90,6 +90,10 @@ module Omnibus
       instance_eval(io, filename, 0)
     end
 
+    def <=>(other)
+      self.name <=> other.name
+    end
+
     # Retrieves the override_version
     #
     # @return [Hash]

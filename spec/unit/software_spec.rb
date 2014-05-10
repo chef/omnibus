@@ -65,6 +65,16 @@ describe Omnibus::Software do
     end
   end
 
+  describe '#<=>' do
+    it 'compares projects by name' do
+      list = [
+        Omnibus::Software.load(software_path('zlib'), project),
+        Omnibus::Software.load(software_path('erchef'), project),
+      ]
+      expect(list.sort.map(&:name)).to eq(%w(erchef zlib))
+    end
+  end
+
   describe '#whitelist_file' do
     it 'appends to the whitelist_files array' do
       expect(software.whitelist_files.size).to eq(0)
