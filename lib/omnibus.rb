@@ -114,6 +114,8 @@ module Omnibus
       @logger = logger
     end
 
+    def ui
+      @ui ||= Thor::Base.shell.new
     end
   end
 
