@@ -188,9 +188,6 @@ module Omnibus
     # The absolute path to the Omnibus project/repository directory.
     #
     # @return [String]
-    #
-    # @deprecated Call {Omnibus::Config.project_root} instead.  We need
-    #   to be able to easily tweak this at runtime via the CLI tool.
     def project_root
       Config.project_root
     end
