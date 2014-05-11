@@ -32,6 +32,8 @@ ParameterLists:
   Max: 6
 RaiseArgs:
   Enabled: false
+RedundantSelf:
+  Enabled: false
 RescueException:
   Enabled: false
 SignalException:
