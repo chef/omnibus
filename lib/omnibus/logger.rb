@@ -2,20 +2,6 @@ require 'logger'
 
 module Omnibus
   class Logger < ::Logger
-    #
-    # The width of the label on the left
-    #
-    # @return [Fixnum]
-    #
-    LEFT = 40
-
-    #
-    # The width of the output text.
-    #
-    # @return [Fixnum]
-    #
-    RIGHT = 80
-
     def initialize(logdev = $stdout, *)
       super
       @level = Logger::WARN
@@ -49,27 +35,9 @@ module Omnibus
     private
 
     def format_message(severity, _datetime, progname, msg)
-      msg = msg.split("\n").map do |line|
-        if line.length > RIGHT
-          line.gsub(/(.{1,#{RIGHT}})(\s+|$)/, "\\1\n").strip
-        else
-          line
-        end
-      end.join("\n")
-
-      msg = msg.split("\n").collect.with_index do |line, index|
-        if index == 0
-          line
-        else
-          ' ' * LEFT + line
-        end
-      end.join("\n")
-
-      left = "#{severity[0]} | "
-      left = "[#{progname}] #{left}" if progname
-      left = left.rjust(LEFT)
-
-      "#{left}#{msg}\n"
+      out = "#{severity[0]} | #{msg}\n"
+      out = "[#{progname}] #{out}" if progname
+      out
     end
   end
 end
