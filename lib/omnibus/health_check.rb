@@ -214,7 +214,7 @@ module Omnibus
         end
 
         log.warn(log_key) do
-          out = 'The precise failures were:'
+          out = "The precise failures were:\n"
 
           detail.each do |line|
             item, dependency, location, count = line.split('|')
