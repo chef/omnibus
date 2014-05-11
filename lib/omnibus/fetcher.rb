@@ -175,6 +175,12 @@ module Omnibus
       nil
     end
 
+    private
+
+    def log_key
+      @log_key ||= "#{super}: #{@software.name}"
+    end
+
     # !@endgroup
   end
 end
