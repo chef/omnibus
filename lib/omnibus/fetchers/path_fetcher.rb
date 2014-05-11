@@ -25,10 +25,10 @@ module Omnibus
     end
 
     def description
-      <<-E
-source path:    #{@source[:path]}
-local location: #{@project_dir}
-E
+      <<-EOH.gsub(/^ {8}/, '').strip
+        source path:    #{@source[:path]}
+        local location: #{@project_dir}
+      EOH
     end
 
     def rsync

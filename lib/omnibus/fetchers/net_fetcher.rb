@@ -41,11 +41,11 @@ module Omnibus
     end
 
     def description
-      <<-E
-source URI:     #{source_uri}
-checksum:       #{@checksum}
-local location: #{@project_file}
-E
+      <<-EOH.gsub(/^ {8}/, '').strip
+        source URI:     #{source_uri}
+        checksum:       #{@checksum}
+        local location: #{@project_file}
+      EOH
     end
 
     def version_guid

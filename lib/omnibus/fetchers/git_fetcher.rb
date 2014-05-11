@@ -29,10 +29,10 @@ module Omnibus
     end
 
     def description
-      <<-E
-repo URI:       #{@source[:git]}
-local location: #{@project_dir}
-E
+      <<-EOH.gsub(/^ {8}/, '').strip
+        repo URI:       #{@source[:git]}
+        local location: #{@project_dir}
+      EOH
     end
 
     def version_guid
