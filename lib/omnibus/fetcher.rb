@@ -130,6 +130,7 @@ module Omnibus
     end
 
     include Logging
+    include Util
 
     attr_reader :name
 

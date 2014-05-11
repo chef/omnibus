@@ -187,9 +187,7 @@ module Omnibus
       when Proc
         cmd.call
       when String
-        shell = Mixlib::ShellOut.new(cmd, live_stream: STDOUT)
-        shell.run_command
-        shell.error!
+        quiet_shellout!(cmd)
       else
         raise "Don't know how to extract command for #{cmd.class} class"
       end

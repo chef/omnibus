@@ -15,7 +15,6 @@
 #
 
 require 'digest/md5'
-require 'mixlib/shellout'
 require 'net/ftp'
 require 'net/http'
 require 'net/https'
