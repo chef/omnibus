@@ -58,13 +58,13 @@ module Omnibus
       end
 
       context 'when something fails' do
+        let(:error_reporter) { double(Fetcher::ErrorReporter, explain: nil) }
+
         before do
           subject.stub(:existing_git_clone?).and_return(false)
           subject.stub(:clone).and_raise(RuntimeError)
 
-          Fetcher::ErrorReporter.stub(:new).and_return(
-            double(Fetcher::ErrorReporter, explain: nil)
-          )
+          Fetcher::ErrorReporter.stub(:new).and_return(error_reporter)
         end
 
         it 'retries 4 times' do
