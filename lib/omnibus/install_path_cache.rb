@@ -39,7 +39,7 @@ module Omnibus
     # Creates the full path if it does not exist already
     def create_cache_path
       FileUtils.mkdir_p(File.dirname(cache_path))
-      shellout!("git --git-dir=#{cache_path} init -q") unless cache_path_exists?
+      quiet_shellout!("git --git-dir=#{cache_path} init -q") unless cache_path_exists?
       true
     end
 
@@ -74,20 +74,20 @@ module Omnibus
     # Create an incremental install path cache for the software step
     def incremental
       create_cache_path
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} add -A -f))
+      quiet_shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} add -A -f))
       begin
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -q -m "Backup of #{tag}"))
+        quiet_shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -q -m "Backup of #{tag}"))
       rescue Mixlib::ShellOut::ShellCommandFailed => e
         if e.message !~ /nothing to commit/
           raise
         end
       end
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -f "#{tag}"))
+      quiet_shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -f "#{tag}"))
     end
 
     def restore
       create_cache_path
-      cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l "#{tag}"))
+      cmd = quiet_shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l "#{tag}"))
 
       restore_me = false
       cmd.stdout.each_line do |line|
@@ -95,7 +95,7 @@ module Omnibus
       end
 
       if restore_me
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} checkout -f "#{tag}"))
+        quiet_shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} checkout -f "#{tag}"))
         true
       else
         false
