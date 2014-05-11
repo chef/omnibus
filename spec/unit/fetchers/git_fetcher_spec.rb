@@ -7,7 +7,7 @@ module Omnibus
         name: 'project',
         source: { git: 'git@example.com:test/project.git' },
         version: '0.0.1',
-        project_dir: '/tmp/project'
+        project_dir: '/tmp/project',
       )
     end
 
