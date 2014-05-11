@@ -243,9 +243,15 @@ module Omnibus
 
     # Backward compat alias
     #
-    # @todo print a deprecation message
-    class << self
-      alias_method :root, :project_root
+    # @todo Remve this in the next major release (4.0)
+    #
+    # @see (Omnibus.project_root)
+    def root
+      Omnibus.logger.deprecated('Omnibus') do
+        'Omnibus.root. Please use Omnibus.project_root instead.'
+      end
+
+      project_root
     end
 
     private
