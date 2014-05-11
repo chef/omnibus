@@ -251,6 +251,22 @@ module Omnibus
       project_root
     end
 
+    # Processes all configured {Omnibus::Project} and
+    # {Omnibus::Software} DSL files.
+    #
+    # @return [void]
+    def process_dsl_files
+      # Do projects first
+      expand_projects
+
+      # Then do software
+      final_software_map = prefer_local_software(omnibus_software_files, software_files)
+
+      overrides = Config.override_file ? Omnibus::Overrides.overrides : {}
+
+      expand_software(overrides, final_software_map)
+    end
+
     private
 
     # Generates {Omnibus::Project}s for each project DSL file in
@@ -284,22 +300,6 @@ module Omnibus
           recursively_load_dependency(dependency, project, overrides, software_map)
         end
       end
-    end
-
-    # Processes all configured {Omnibus::Project} and
-    # {Omnibus::Software} DSL files.
-    #
-    # @return [void]
-    def process_dsl_files
-      # Do projects first
-      expand_projects
-
-      # Then do software
-      final_software_map = prefer_local_software(omnibus_software_files, software_files)
-
-      overrides = Config.override_file ? Omnibus::Overrides.overrides : {}
-
-      expand_software(overrides, final_software_map)
     end
 
     # Return a list of all the Ruby files (i.e., those with an "rb"
