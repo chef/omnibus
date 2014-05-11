@@ -35,9 +35,13 @@ module Omnibus
     private
 
     def format_message(severity, _datetime, progname, msg)
-      out = "#{severity[0]} | #{msg}\n"
-      out = "[#{progname}] #{out}" if progname
-      out
+      left = if progname
+               "[#{progname}] #{severity[0]} | "
+             else
+               "#{severity[0]} | "
+             end
+
+      "#{left.rjust(30)}#{msg}\n"
     end
   end
 end
