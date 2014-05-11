@@ -38,6 +38,7 @@ module Omnibus
       @source_uri   = software.source_uri
       @source_dir   = software.source_dir
       @project_dir  = software.project_dir
+      super
     end
 
     def description

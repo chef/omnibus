@@ -22,6 +22,7 @@ module Omnibus
       @source = software.source
       @project_dir = software.project_dir
       @version = software.version
+      super
     end
 
     def description
