@@ -442,6 +442,8 @@ module Omnibus
           execute_build(fetcher)
         end
       end
+
+      project.build_version_dsl.resolve(self)
       true
     end
 

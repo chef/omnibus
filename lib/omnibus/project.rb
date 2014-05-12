@@ -35,9 +35,10 @@ module Omnibus
 
     NULL_ARG = Object.new
 
-    attr_reader :library
+    attr_reader   :library
     attr_accessor :dirty_cache
-    attr_reader :resources_path
+    attr_accessor :build_version_dsl
+    attr_reader   :resources_path
 
     # Convenience method to initialize a Project from a DSL file.
     #
@@ -321,13 +322,47 @@ module Omnibus
 
     # Set or retrieve the version of the project.
     #
+    # Options that can be used when constructing a build_version:
+    #
+    # 1. Use a string as version
+    #   build_version "1.0.0"
+    # 2. Get the build_version from git of the omnibus repo
+    #   build version do
+    #     source :git
+    #   end
+    # 3. Get the build_version from git of a dependency
+    #   build version do
+    #     source :git, from_dependency: "chef"
+    #   end
+    # 4. Set the build_version to the version of a dependency
+    #   build version do
+    #     source :version, from_dependency: "chef"
+    #   end
+    #
+    # When using :git source, by default the output format of the build_version
+    # is semver. This can be modified using the :output_format parameter to any
+    # of the methods of Omnibus::BuildVersion. E.g.:
+    #   build version do
+    #     source :git, from_dependency: "chef"
+    #     output_format :git_describe
+    #   end
+    #
     # @param val [String] the version to set
+    # @param block [Proc] block to run when constructing the build_version
     # @return [String]
     #
     # @see Omnibus::BuildVersion
-    def build_version(val = NULL_ARG)
-      @build_version = val unless val.equal?(NULL_ARG)
-      @build_version
+    # @see Omnibus::BuildVersionDsl
+    def build_version(val = NULL_ARG, &block)
+      if block_given?
+        @build_version_dsl =  BuildVersionDsl.new(&block)
+      else
+        if !val.equal?(NULL_ARG)
+          @build_version_dsl = BuildVersionDsl.new(val)
+        else
+          @build_version_dsl.build_version
+        end
+      end
     end
 
     # Set or retrieve the build iteration of the project.  Defaults to
