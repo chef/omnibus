@@ -66,7 +66,6 @@ module Omnibus
       /libcrypto.so/,
       /libcurses\.so/,
       /libdoor\.so/,
-      /libgcc_s\.so\.1/,
       /libgen\.so/,
       /libmd5\.so/,
       /libmd\.so/,
