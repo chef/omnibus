@@ -76,7 +76,6 @@ module Omnibus
       /libssl.so/,
       /libthread.so/,
       /libuutil\.so/,
-      /libz.so/,
       # solaris 11 libraries:
       /libc\.so\.1/,
       /libm\.so\.2/,
