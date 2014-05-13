@@ -90,7 +90,7 @@ module Omnibus
 
       @dependencies = []
       @whitelist_files = []
-      instance_eval(io, filename, 0)
+      instance_eval(io, filename)
     end
 
     # Retrieves the override_version
