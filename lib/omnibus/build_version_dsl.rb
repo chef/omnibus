@@ -17,6 +17,8 @@
 
 module Omnibus
   class BuildVersionDSL
+    include Logging
+
     # DSL to construct a build_version during the build.
     #
     # @see Omnibus::Project#build_version
@@ -67,7 +69,7 @@ module Omnibus
     def resolve(dependency)
       if from_dependency? && version_dependency == dependency.name
         construct_build_version(dependency)
-        puts "Build Version is set to '#{build_version}'"
+        log.info(log_key) { "Build Version is set to '#{build_version}'" }
       end
     end
 
