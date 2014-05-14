@@ -1,6 +1,10 @@
 ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 ===========================================================
-[![Build Status](https://travis-ci.org/opscode/omnibus-ruby.png?branch=master)](https://travis-ci.org/opscode/omnibus-ruby)
+[![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
+[![Build Status](http://img.shields.io/travis/opscode/omnibus-ruby.svg)][travis]
+
+[gem]: https://rubygems.org/gems/omnibus
+[travis]: http://travis-ci.org/opscode/omnibus-ruby
 
 Easily create full-stack installers for your project across a variety of platforms.
 
