@@ -30,6 +30,7 @@ module Omnibus
   autoload :Artifact,         'omnibus/artifact'
   autoload :Builder,          'omnibus/builder'
   autoload :BuildVersion,     'omnibus/build_version'
+  autoload :BuildVersionDSL,  'omnibus/build_version_dsl'
   autoload :Cleaner,          'omnibus/cleaner'
   autoload :Config,           'omnibus/config'
   autoload :Error,            'omnibus/exceptions'

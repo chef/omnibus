@@ -16,7 +16,7 @@
 #
 
 module Omnibus
-  class BuildVersionDsl
+  class BuildVersionDSL
     # DSL to construct a build_version during the build.
     #
     # @see Omnibus::Project#build_version
@@ -37,7 +37,7 @@ module Omnibus
         instance_eval(&block)
         construct_build_version unless from_dependency?
       else
-        fail "Please give me the build_version or tell me how to construct it"
+        raise "Please give me the build_version or tell me how to construct it"
       end
     end
 
@@ -124,10 +124,10 @@ module Omnibus
         if version_source
           @build_version = version_source.version
         else
-          fail "Please tell me the source to get the version from"
+          raise "Please tell me the source to get the version from"
         end
       else
-        fail "I don't know how to construct a build_version using source '#{source_type}'"
+        raise "I don't know how to construct a build_version using source '#{source_type}'"
       end
     end
   end

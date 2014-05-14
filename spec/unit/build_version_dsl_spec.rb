@@ -15,12 +15,11 @@
 # limitations under the License.
 #
 
-require 'omnibus/build_version_dsl'
 require 'spec_helper'
 
-describe Omnibus::BuildVersionDsl do
-  let(:subject_with_version) { Omnibus::BuildVersionDsl.new(version_string) }
-  let(:subject_with_description) { Omnibus::BuildVersionDsl.new(&description) }
+describe Omnibus::BuildVersionDSL do
+  let(:subject_with_version) { Omnibus::BuildVersionDSL.new(version_string) }
+  let(:subject_with_description) { Omnibus::BuildVersionDSL.new(&description) }
 
   let(:version_string) { "1.0.0" }
   let(:description) { nil }
