@@ -50,7 +50,7 @@ More details can be found in the generated project README file.
 
 More documentation
 ------------------
-If you are creating OSX packages, please see the [OSX-specifc documentation](docs/Building on OSX.md).
+If you are creating OSX packages, please see the [OSX-specific documentation](docs/Building on OSX.md).
 
 
 Configuration DSL
