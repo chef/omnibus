@@ -1,11 +1,43 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-Unreleased
-----------
-
+v3.1.0 (May 14, 2014)
+-------------------------
+### New Features
 - `friendly_name` is added to project DSL to be able to configure the name on packagers.
 - `resources_path` is added to project DSL to be able to specify project specific resource files for packagers.
+- Add the ability to "sign" OSX packages
+- Allow packagers to have project-specific resources
+- MSI packager for windows
+- Added helpers for generating platform-specific paths
+- New build_version DSL
+- All new CLI that uses LazyLoading and a much nicer interface (BC-compat)
+- Create a real logger object - Omnibus now supports --log-level
+- Warn when incorrectly using `replaces` in a project
+
+### Bug fixes
+- Fix Windows bugs in the new git caching feature
+- Use the git sha in the git caching so that the software matches "master"
+- Force the detaching of all disks before building an OSX DMG
+- Remove references to now non-existent Vagrantfile
+- Fix an issue where softwares that are both top-level and transitive dependencies were built in the wrong order (see #140 for more information)
+- Use `source` when creating software uris and checksums
+- Fix invalid cache operations by ensuring the bucket exists
+- Add tag output git describe to include lightweight tags
+- Remove explicit instance_eval from line 0
+- Remove libz and libgcc_s from the health check whitelist
+
+### Miscellaneous Changes
+- Add CoreServices to OSX whitelist for healthcheck
+- Bump the version of the generated Gemfile to Berkshelf ~> 3.0
+- Add test coverage for overridding software source
+- Improved test coverage for Omnibus project/software loading
+- Refactor and updated Thor
+- Add cucumber/aruba for testing the CLI
+- Lazy load Ohai and Mixlib::Config default values
+- Consistent deprecation warnings
+- Updated README badges
+
 
 v3.0.0 (March 27, 2014)
 ------------
