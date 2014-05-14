@@ -4,8 +4,8 @@
 # https://twitter.com/mitchellh/status/283014103189053442
 Signal.trap('INT') { exit 1 }
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$:.push File.expand_path('../../lib', __FILE__)
+$stdout.sync = true
 
 require 'omnibus/cli'
-
-Omnibus::CLI::Application.start
+Omnibus::CLI::Runner.new(ARGV.dup).execute!

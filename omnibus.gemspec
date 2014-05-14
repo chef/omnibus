@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.files = `git ls-files`.split($/)
   gem.bindir = 'bin'
   gem.executables = %w(omnibus)
-  gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
+  gem.test_files = gem.files.grep(/^(test|spec|features)\//)
   gem.require_paths = ['lib']
 
   gem.add_dependency 'chef-sugar',      '~> 1.2'
@@ -27,10 +27,12 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'ohai',            '~> 6.12'
   gem.add_dependency 'fpm',             '~> 1.0.0'
   gem.add_dependency 'uber-s3'
-  gem.add_dependency 'thor',            '>= 0.16.0'
+  gem.add_dependency 'thor',            '~> 0.18'
 
+  gem.add_development_dependency 'aruba',   '~> 0.5'
+  gem.add_development_dependency 'fauxhai', '~> 2.1'
   gem.add_development_dependency 'rspec',   '~> 2.14'
-  gem.add_development_dependency 'rubocop', '~> 0.17.0'
+  gem.add_development_dependency 'rubocop', '0.21.0'
   gem.add_development_dependency 'rake'
 
   gem.add_development_dependency 'bundler'

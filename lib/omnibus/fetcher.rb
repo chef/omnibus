@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,6 +56,7 @@ module Omnibus
       # @todo If {Omnibus::Fetcher#description} is meant to show
       #   parameters (presumably the kind of fetcher and the software it
       #   is fetching?),
+      # @todo make this use the logger
       def explain(why)
         $stderr.puts '* ' * 40
         $stderr.puts why
@@ -125,14 +125,12 @@ module Omnibus
       elsif software.source[:path]
         PathFetcher.new(software)
       else
-        fail UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
+        raise UnsupportedSourceLocation, "Don't know how to fetch software project #{software}"
       end
     end
 
-    def self.name(name = NULL_ARG)
-      @name = name unless name.equal?(NULL_ARG)
-      @name
-    end
+    include Logging
+    include Util
 
     attr_reader :name
 
@@ -140,10 +138,7 @@ module Omnibus
     attr_reader :source_timefile
 
     def initialize(software)
-    end
-
-    def log(message)
-      puts "[fetcher:#{self.class.name}::#{name}] #{message}"
+      @software = software
     end
 
     # @!group Methods for Subclasses to Implement
@@ -179,6 +174,12 @@ module Omnibus
     # By default fetchers don't override the versions.
     def version_for_cache
       nil
+    end
+
+    private
+
+    def log_key
+      @log_key ||= "#{super}: #{@software.name}"
     end
 
     # !@endgroup

@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +15,6 @@
 #
 
 require 'mixlib/config'
-require 'omnibus/ohai'
-require 'omnibus/exceptions'
-require 'json'
 
 module Omnibus
   # Global configuration object for Omnibus runs.
@@ -33,7 +29,7 @@ module Omnibus
     # Converts a given path to a platform specific path based on windows or
     # linux.
     def self.platformize_omnibus_path(path)
-      if OHAI.platform == 'windows'
+      if Ohai.platform == 'windows'
         File.join('C:\\omnibus-ruby', path).gsub(File::SEPARATOR, File::ALT_SEPARATOR)
       else
         File.join('/var/cache/omnibus', path)
@@ -49,7 +45,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache"`.
     #
     #   @return [String]
-    default :cache_dir, platformize_omnibus_path('cache')
+    default(:cache_dir) { platformize_omnibus_path('cache') }
 
     # @!attribute [rw] install_path_cache_dir
     #   The absolute path to the directory on the virtual machine where
@@ -58,7 +54,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache/install_path"`.
     #
     #   @return [String]
-    default :install_path_cache_dir, platformize_omnibus_path('cache/install_path')
+    default(:install_path_cache_dir) { platformize_omnibus_path('cache/install_path') }
 
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where
@@ -67,7 +63,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/src"`.
     #
     #   @return [String]
-    default :source_dir, platformize_omnibus_path('src')
+    default(:source_dir) { platformize_omnibus_path('src') }
 
     # @!attribute [rw] build_dir
     #   The absolute path to the directory on the virtual machine where
@@ -76,7 +72,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/build"`.
     #
     #   @return [String]
-    default :build_dir, platformize_omnibus_path('build')
+    default(:build_dir) { platformize_omnibus_path('build') }
 
     # @!attribute [rw] package_dir
     #   The absolute path to the directory on the virtual machine where
@@ -85,7 +81,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg"`.
     #
     #   @return [String]
-    default :package_dir, platformize_omnibus_path('pkg')
+    default(:package_dir) { platformize_omnibus_path('pkg') }
 
     # @!attribute [rw] package_tmp
     #   The absolute path to the directory on the virtual machine where
@@ -96,7 +92,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg-tmp"`.
     #
     #   @return [String]
-    default :package_tmp, platformize_omnibus_path('pkg-tmp')
+    default(:package_tmp) { platformize_omnibus_path('pkg-tmp') }
 
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
@@ -123,7 +119,7 @@ module Omnibus
     #   Defaults to the current working directory.
     #
     #   @return [String]
-    default :project_root, Dir.pwd
+    default(:project_root) { Dir.pwd }
 
     # @!attribute [rw] install_dir
     #   Installation directory
@@ -272,6 +268,7 @@ module Omnibus
     # @!group Build Version Parameters
 
     # @!attribute [rw] append_timestamp
+    #   Append the current timestamp to the version identifier.
     #
     #   @return [Boolean]
     default :append_timestamp, true
@@ -281,6 +278,7 @@ module Omnibus
     # @!group Build Control Parameters
 
     # @! attribute [rw] build_retries
+    #   The number of times to retry the build before failing.
     #
     #   @return [Integer, nil]
     default :build_retries, 3
@@ -301,7 +299,7 @@ module Omnibus
     def self.valid_s3_config?
       if use_s3_caching
         unless s3_bucket
-          fail InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
+          raise InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
         end
       end
     end

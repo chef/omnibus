@@ -32,17 +32,15 @@ $ gem install omnibus
 You can now create an Omnibus project in your current directory by using the project generator feature.
 
 ```bash
-$ omnibus project $MY_PROJECT_NAME
+$ omnibus new $MY_PROJECT_NAME
 ```
 
-This will generate a complete project skeleton in the directory `omnibus-$MY_PROJECT_NAME`
-
-This minimal project will actually build.
+This will generate a complete project skeleton in the directory `$MY_PROJECT_NAME`
 
 ```bash
-$ cd omnibus-$MY_PROJECT_NAME
+$ cd $MY_PROJECT_NAME
 $ bundle install --binstubs
-$ bin/omnibus build project $MY_PROJECT_NAME
+$ bin/omnibus build $MY_PROJECT_NAME
 ```
 
 More details can be found in the generated project README file.
@@ -50,7 +48,7 @@ More details can be found in the generated project README file.
 
 More documentation
 ------------------
-If you are creating OSX packages, please see the [OSX-specifc documentation](docs/Building on OSX.md).
+If you are creating OSX packages, please see the [OSX-specific documentation](docs/Building on OSX.md).
 
 
 Configuration DSL

@@ -1,4 +1,3 @@
-require 'omnibus/overrides'
 require 'spec_helper'
 
 describe Omnibus::Overrides do
@@ -41,20 +40,9 @@ describe Omnibus::Overrides do
   end # parse_file
 
   describe '#resolve_override_file' do
-    before :each do
-      @original = ENV['OMNIBUS_OVERRIDE_FILE']
-      ENV['OMNIBUS_OVERRIDE_FILE'] = env_override_file
-    end
-
-    after :each do
-      ENV['OMNIBUS_OVERRIDE_FILE'] = @original
-    end
-
     subject { Omnibus::Overrides.resolve_override_file }
 
     context 'with no environment variable set' do
-      let(:env_override_file) { nil }
-
       before :each do
         stub_const('Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME', new_default_file)
       end
@@ -72,6 +60,8 @@ describe Omnibus::Overrides do
     end # no environment variable
 
     context 'with OMNIBUS_OVERRIDE_FILE environment variable set' do
+      before { stub_env('OMNIBUS_OVERRIDE_FILE', env_override_file) }
+
       context 'to an existing file' do
         let(:path) { overrides_path('good') }
         let(:env_override_file) { path  }
@@ -91,8 +81,6 @@ describe Omnibus::Overrides do
           stub_const('Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME', new_default_file)
 
           expect(File.exist?(Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME)).to be_true
-          expect(ENV['OMNIBUS_OVERRIDE_FILE']).to_not be_nil
-
           expect(subject).to be_nil
         end
       end

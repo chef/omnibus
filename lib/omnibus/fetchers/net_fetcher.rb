@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +23,6 @@ module Omnibus
 
   # Fetcher Implementation for HTTP and FTP hosted tarballs
   class NetFetcher < Fetcher
-    name :net
-
     attr_reader :name
     attr_reader :project_file
     attr_reader :source
@@ -41,14 +38,15 @@ module Omnibus
       @source_uri   = software.source_uri
       @source_dir   = software.source_dir
       @project_dir  = software.project_dir
+      super
     end
 
     def description
-      <<-E
-source URI:     #{source_uri}
-checksum:       #{@checksum}
-local location: #{@project_file}
-E
+      <<-EOH.gsub(/^ {8}/, '').strip
+        source URI:     #{source_uri}
+        checksum:       #{@checksum}
+        local location: #{@project_file}
+      EOH
     end
 
     def version_guid
@@ -61,7 +59,8 @@ E
 
     def clean
       if File.exist?(project_dir)
-        log "cleaning existing build from #{project_dir}"
+        log.info(log_key) { "Cleaning existing build from #{project_dir}" }
+
         FileUtils.rm_rf(project_dir)
       end
       extract
@@ -72,13 +71,13 @@ E
         download
         verify_checksum!
       else
-        log 'Cached copy of source tarball up to date'
+        log.debug(log_key) { 'Cached copy of source tarball up to date' }
       end
     end
 
     def get_with_redirect(url, headers, limit = 10)
-      fail ArgumentError, 'HTTP redirect too deep' if limit == 0
-      log "getting from #{url} with #{limit} redirects left"
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+      log.info(log_key) { "Getting from #{url} with #{limit} redirects left" }
 
       url = URI.parse(url) unless url.kind_of?(URI)
 
@@ -132,8 +131,8 @@ E
     def download
       tries = 5
       begin
-        log "\033[1;31m#{source[:warning]}\033[0m" if source.key?(:warning)
-        log "fetching #{project_file} from #{source_uri}"
+        log.warn(log_key) { source[:warning] } if source.key?(:warning)
+        log.info(log_key) { "Fetching #{project_file} from #{source_uri}" }
 
         case source_uri.scheme
         when /https?/
@@ -152,12 +151,12 @@ E
             ftp.close
           end
         else
-          fail UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
+          raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
         end
       rescue Exception
         tries -= 1
         if tries != 0
-          log 'retrying failed download...'
+          log.debug(log_key) { "Retrying failed download (#{tries})..." }
           retry
         else
           raise
@@ -171,25 +170,26 @@ E
     def verify_checksum!
       actual_md5 = Digest::MD5.file(project_file)
       unless actual_md5 == @checksum
-        log "Invalid MD5 for #{@name}"
-        log "Expected: #{@checksum}"
-        log "Actual:   #{actual_md5}"
-        fail InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
+        log.warn(log_key) { "Invalid MD5 for #{@name}" }
+        log.warn(log_key) { "Expected: #{@checksum}" }
+        log.warn(log_key) { "Actual:   #{actual_md5}" }
+        raise InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
       end
     end
 
     def extract
-      log "extracting the source in #{project_file} to #{source_dir}"
+      log.info(log_key) do
+        "Extracting the source in '#{project_file}' to '#{source_dir}'"
+      end
+
       cmd = extract_cmd
       case cmd
       when Proc
         cmd.call
       when String
-        shell = Mixlib::ShellOut.new(cmd, live_stream: STDOUT)
-        shell.run_command
-        shell.error!
+        quiet_shellout!(cmd)
       else
-        fail "Don't know how to extract command for #{cmd.class} class"
+        raise "Don't know how to extract command for #{cmd.class} class"
       end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to unpack archive at #{project_file} (#{e.class}: #{e.message.strip})")
@@ -210,7 +210,9 @@ E
       else
         # if we don't recognize the extension, simply copy over the file
         proc do
-          log "#{project_file} not an archive. Copying to #{project_dir}"
+          log.debug(log_key) do
+            "'#{project_file}' is not an archive. Copying to '#{project_dir}'..."
+          end
           # WARNING: hack hack hack, no project dir yet
           FileUtils.mkdir_p(project_dir)
           FileUtils.cp(project_file, project_dir)

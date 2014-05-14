@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +15,12 @@
 #
 
 require 'forwardable'
-require 'omnibus/exceptions'
-require 'omnibus/install_path_cache'
 require 'ostruct'
 
 module Omnibus
   class Builder
+    include Logging
+
     # Proxies method calls to either a Builder object or the Software that the
     # builder belongs to. Provides compatibility with our DSL where we never
     # yield objects to blocks and hopefully hides some of the confusion that
@@ -66,6 +65,7 @@ module Omnibus
     end
 
     # @todo code duplication with {Fetcher::ErrorReporter}
+    # @todo make this use the logger
     class ErrorReporter
       # @todo fetcher isn't even used
       def initialize(error, fetcher)
@@ -134,7 +134,7 @@ module Omnibus
       source = candidate_paths.find { |path| File.exist?(path) }
 
       unless source
-        fail MissingPatch.new(args[:source], candidate_paths)
+        raise MissingPatch.new(args[:source], candidate_paths)
       end
 
       plevel = args[:plevel] || 1
@@ -154,7 +154,7 @@ module Omnibus
       source_path = File.expand_path("#{Omnibus.project_root}/config/templates/#{name}/#{args[:source]}")
 
       unless File.exist?(source_path)
-        fail MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
+        raise MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
       end
 
       block do
@@ -202,15 +202,17 @@ module Omnibus
       @software.install_dir
     end
 
-    def log(message)
-      puts "[builder:#{name}] #{message}"
-    end
-
     def build
-      log "building #{name}"
-      log "version overridden from #{@software.default_version} to " \
-          "#{@software.version}" if @software.overridden?
-      time_it("#{name} build") do
+      log.info(log_key) { 'Starting...' }
+
+      if @software.overridden?
+        log.info(log_key) do
+          "Version overridden from #{@software.default_version} to "\
+          "#{@software.version}"
+        end
+      end
+
+      time_it('Build') do
         @build_commands.each do |cmd|
           execute(cmd)
         end
@@ -260,7 +262,9 @@ module Omnibus
       cmd_string = cmd_args[0..-2].join(' ')
       cmd_opts_for_display = to_kv_str(cmd_args.last)
 
-      log "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
+      log.debug(log_key) do
+        "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
+      end
 
       shell = Mixlib::ShellOut.new(*cmd)
       shell.environment['HOME'] = '/tmp' unless ENV['HOME']
@@ -281,7 +285,10 @@ module Omnibus
       else
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log "Failed to execute cmd #{cmd} #{retries} time(s). Retrying in #{time_to_sleep}s."
+        log.debug(log_key) do
+          "Failed to execute cmd `#{cmd}` #{retries} time(s). " \
+          "Retrying in #{time_to_sleep}s."
+        end
         sleep(time_to_sleep)
         retry
       end
@@ -295,7 +302,7 @@ module Omnibus
         # command as a string w/ opts
         ["#{str} #{cmd_args.first}", cmd_args.last]
       elsif cmd_args.size == 0
-        fail ArgumentError, "I don't even"
+        raise ArgumentError, "I don't even"
       else
         # cmd given as argv array
         cmd_args.dup.unshift(str)
@@ -318,11 +325,11 @@ module Omnibus
       yield
     rescue Exception
       elapsed = Time.now - start
-      log "#{what} failed, #{elapsed.to_f}s"
+      log.warn(log_key) { "#{what} failed! (#{elapsed.to_f}s)" }
       raise
     else
       elapsed = Time.now - start
-      log "#{what} succeeded, #{elapsed.to_f}s"
+      log.info(log_key) { "#{what} succeeded! (#{elapsed.to_f}s)" }
     end
 
     # Convert a hash to a string in the form `key=value`. It should work with
@@ -339,11 +346,9 @@ module Omnibus
         kv_pair_strs << "#{k}=#{val_str}"
       end.join(join_str)
     end
-  end
 
-  class NullBuilder < Builder
-    def build
-      log "Nothing to build for #{name}"
+    def log_key
+      @log_key ||= "#{super}: #{name}"
     end
   end
 end

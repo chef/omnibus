@@ -52,7 +52,7 @@ build do
           :env => env,
           :cwd => working_dir)
 
-  if OHAI.kernel['machine'] =~ /x86_64/
+  if Ohai.kernel['machine'] =~ /x86_64/
     command "mv #{install_dir}/embedded/lib64/libjs.a #{install_dir}/embedded/lib"
     command "mv #{install_dir}/embedded/lib64/libjs.so #{install_dir}/embedded/lib"
   end

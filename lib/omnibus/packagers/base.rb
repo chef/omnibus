@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +16,6 @@
 
 require 'fileutils'
 require 'forwardable'
-require 'omnibus/util'
 require 'erb'
 
 module Omnibus
@@ -92,7 +90,7 @@ module Omnibus
       if block_given?
         @build = block
       else
-        @build || fail(AbstractMethod.new("#{self.class.name}.build"))
+        @build || raise(AbstractMethod.new("#{self.class.name}.build"))
       end
     end
 
@@ -200,7 +198,7 @@ module Omnibus
     #
     # @param [String] path
     def assert_presence!(path)
-      fail MissingAsset.new(path) unless File.exist?(path)
+      raise MissingAsset.new(path) unless File.exist?(path)
     end
 
     # Execute this packager by running the following phases in order:
@@ -222,7 +220,7 @@ module Omnibus
     #
     # @return [String]
     def package_name
-      fail AbstractMethod.new("#{self.class.name}#package_name")
+      raise AbstractMethod.new("#{self.class.name}#package_name")
     end
 
     private

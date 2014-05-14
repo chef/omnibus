@@ -1,11 +1,18 @@
 AllCops:
-  Excludes:
+  Exclude:
     - spec/data/**/*
+
+AlignParameters:
+  Enabled: false
 ClassLength:
+  Enabled: false
+ClassAndModuleChildren:
   Enabled: false
 CyclomaticComplexity:
   Max: 20
 Documentation:
+  Enabled: false
+DoubleNegation:
   Enabled: false
 GlobalVars:
   Enabled: false
@@ -25,7 +32,13 @@ ParameterLists:
   Max: 6
 RaiseArgs:
   Enabled: false
+RedundantSelf:
+  Enabled: false
 RescueException:
+  Enabled: false
+SignalException:
+  EnforcedStyle: only_raise
+SpecialGlobalVars:
   Enabled: false
 TrailingComma:
   EnforcedStyleForMultiline: comma

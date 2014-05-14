@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +15,18 @@
 #
 
 require 'digest/md5'
-require 'mixlib/shellout'
 require 'net/ftp'
 require 'net/http'
 require 'net/https'
 require 'uri'
-
-require 'omnibus/fetcher'
-require 'omnibus/builder'
-require 'omnibus/config'
 
 require 'fileutils'
 
 module Omnibus
   # Omnibus software DSL reader
   class Software
+    include Logging
+
     NULL_ARG = Object.new
     UNINITIALIZED = Object.new
 
@@ -90,7 +86,11 @@ module Omnibus
 
       @dependencies = []
       @whitelist_files = []
-      instance_eval(io, filename, 0)
+      instance_eval(io, filename)
+    end
+
+    def <=>(other)
+      self.name <=> other.name
     end
 
     # Retrieves the override_version
@@ -100,7 +100,11 @@ module Omnibus
     # @todo: can't we just use #version here or are we testing this against nil? somewhere and
     #        not using #overridden?
     def override_version
-      $stderr.puts 'The #override_version is DEPRECATED, please use #version or test with #overridden?'
+      log.deprecated(log_key) do
+        'Software#override_version. Please use #version or ' \
+        'test  with #overridden?'
+      end
+
       overrides[:version]
     end
 
@@ -126,7 +130,7 @@ module Omnibus
     # @return [String]
     def name(val = NULL_ARG)
       @name = val unless val.equal?(NULL_ARG)
-      @name || fail(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
+      @name || raise(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
     end
 
     # Sets the description of the software
@@ -188,7 +192,10 @@ module Omnibus
     #
     # @todo: remove this in favor of default_version
     def given_version
-      $stderr.puts "Getting the default version via #given_version is DEPRECATED, please use 'default_version'"
+      log.deprecated(log_key) do
+        'Software#given_version. Please use #default_version instead.'
+      end
+
       default_version
     end
 
@@ -214,7 +221,7 @@ module Omnibus
     def version(val = NULL_ARG)
       if block_given?
         if val.equal?(NULL_ARG)
-          fail 'block needs a version argument to apply against'
+          raise 'block needs a version argument to apply against'
         else
           if val == apply_overrides(:version)
             yield
@@ -222,7 +229,9 @@ module Omnibus
         end
       else
         unless val.equal?(NULL_ARG)
-          $stderr.puts "Software '#{name}': Setting the version via 'version' is DEPRECATED, please use 'default_version'"
+          log.deprecated(log_key) do
+            'Software#version. Please use #default_version instead.'
+          end
           @version = val
         end
       end
@@ -344,8 +353,8 @@ module Omnibus
     # @todo It seems like this isn't used, and if it were, it should
     # probably be part of Opscode::Builder instead
     def max_build_jobs
-      if OHAI.cpu && OHAI.cpu[:total] && OHAI.cpu[:total].to_s =~ /^\d+$/
-        OHAI.cpu[:total].to_i + 1
+      if Ohai.cpu && Ohai.cpu[:total] && Ohai.cpu[:total].to_s =~ /^\d+$/
+        Ohai.cpu[:total].to_i + 1
       else
         3
       end
@@ -417,14 +426,14 @@ module Omnibus
     #
     # @return [String]
     def platform
-      OHAI.platform
+      Ohai.platform
     end
 
     # Return the architecture of the machine, as determined by Ohai.
     # @return [String] Either "sparc" or "intel", as appropriate
     # @todo Is this used?  Doesn't appear to be...
     def architecture
-      OHAI.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
+      Ohai.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
     end
 
     # Actually build the software package
@@ -505,19 +514,21 @@ module Omnibus
       end
     end
 
-    # @todo What?!
-    # @todo It seems that this is not used... remove it
-    # @deprecated Use something else (?)
-    def command(*args)
-      fail 'Method Moved.'
+    # @todo Remove this in the next major release
+    def command(*)
+      log.deprecated(log_key) do
+        'Software#command. Please use something else.'
+      end
+
+      raise 'Method Moved.'
     end
 
     def execute_build(fetcher)
       fetcher.clean
       @builder.build
-      puts "[software:#{name}] caching build"
+      log.info(log_key) { 'Caching build' }
       Omnibus::InstallPathCache.new(install_dir, self).incremental
-      puts "[software:#{name}] has dirtied the cache"
+      log.info(log_key) { 'Dirtied the cache!' }
       project.dirty_cache = true
     end
 
@@ -525,6 +536,10 @@ module Omnibus
       File.open(file, 'w') do |f|
         f.print ''
       end
+    end
+
+    def log_key
+      @log_key ||= "#{super}: #{name}"
     end
   end
 end

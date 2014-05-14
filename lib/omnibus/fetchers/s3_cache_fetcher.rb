@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2013-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +14,9 @@
 # limitations under the License.
 #
 
-require 'omnibus/fetcher'
-require 'omnibus/s3_cacher'
-
 module Omnibus
   class S3CacheFetcher < NetFetcher
     include SoftwareS3URLs
-
-    name :s3cache
 
     def initialize(software)
       @software = software
@@ -30,7 +24,10 @@ module Omnibus
     end
 
     def fetch
-      log "S3 Cache enabled, #{name} will be fetched from S3 cache"
+      log.info(log_key) do
+        "S3 Cache enabled, '#{name}' will be fetched from S3 cache"
+      end
+
       super
     end
 

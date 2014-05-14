@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'omnibus/library'
-require 'omnibus/project'
 
 describe Omnibus::Library do
   let(:project) { Omnibus::Project.load(project_path('chefdk')) }
@@ -148,25 +146,17 @@ dependency 'chefdk'
     end
 
     context 'with real data' do
-      before :each do
-        allow_any_instance_of(Omnibus::Software).to receive(:platform).and_return('windows')
-        Omnibus.stub(:project_root) do
-          File.expand_path(
-            File.join(
-              File.dirname(__FILE__),
-              '..',
-              'data',
-              'complicated'
-            )
-          )
-        end
+      before do
+        Omnibus.stub(:project_root).and_return(complicated_path)
+
+        # Ohai stuff
+        stub_const('File::ALT_SEPARATOR', '\\')
+        stub_ohai(platform: 'windows')
+
         Omnibus.process_dsl_files
       end
 
-      after :each do
-        Omnibus.class_eval { @projects = [] }
-        Omnibus.class_eval { @software_dirs = nil }
-      end
+      after { Omnibus.reset! }
 
       let(:chefdk_windows) do
         Omnibus.projects.find { |p| p.name.to_s == 'chefdk-windows' }

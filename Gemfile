@@ -7,10 +7,6 @@ group :docs do
   gem 'github-markup', '~> 0.7'
 end
 
-group :test do
-  gem 'fauxhai'
-end
-
 group :local do
   gem 'guard'
   gem 'guard-rspec'

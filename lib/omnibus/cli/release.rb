@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2013-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2013-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,30 +14,27 @@
 # limitations under the License.
 #
 
-require 'omnibus/cli/base'
-require 'omnibus/cli/application'
-require 'omnibus/package_release'
-require 'json'
-
 module Omnibus
-  module CLI
-    class Release < Base
-      namespace :release
+  class Command::Release < Command::Base
+    namespace :release
 
-      def initialize(args, options, config)
-        super(args, options, config)
+    class_option :target,
+      aliases: '-t',
+      desc: 'The target backend to release the package',
+      default: 'S3'
+
+    method_option :public,
+      type: :boolean,
+      desc: 'Make S3 object publicly readable',
+      default: false
+    desc 'package PATH', 'Upload a single package to S3'
+    def package(path)
+      access_policy = options[:public] ? :public_read : :private
+
+      uploader = PackageRelease.new(path, access: access_policy) do |uploaded_item|
+        say("Uploaded #{uploaded_item}", :green)
       end
-
-      desc 'package PATH', 'Upload a single package to S3'
-      option :public, type: :boolean, default: false, desc: 'Make S3 object publicly readable'
-      def package(path)
-        access_policy = options[:public] ? :public_read : :private
-
-        uploader = PackageRelease.new(path, access: access_policy) do |uploaded_item|
-          say("Uploaded #{uploaded_item}", :green)
-        end
-        uploader.release
-      end
+      uploader.release
     end
   end
 end

@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +16,8 @@
 
 module Omnibus
   class HealthCheck
+    include Logging
+
     WHITELIST_LIBS = [
       /ld-linux/,
       /libc\.so/,
@@ -136,12 +137,8 @@ module Omnibus
       /libutil\.so/,
     ]
 
-    def self.log(msg)
-      puts "[health_check] #{msg}"
-    end
-
     def self.run(install_dir, whitelist_files = [])
-      case OHAI.platform
+      case Ohai.platform
       when 'mac_os_x'
         bad_libs = health_check_otool(install_dir, whitelist_files)
       when 'aix'
@@ -167,37 +164,79 @@ module Omnibus
             end
           end
         end
-        log '*** Health Check Failed, Summary follows:'
+
+        log.warn(log_key) { 'Failed!' }
         bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
-        log '*** The following Omnibus-built libraries have unsafe or unmet dependencies:'
-        bad_omnibus_libs.each { |lib| log "    --> #{lib}" }
-        log '*** The following Omnibus-built binaries have unsafe or unmet dependencies:'
-        bad_omnibus_bins.each { |bin| log "    --> #{bin}" }
+
+        log.warn(log_key) do
+          out = "The following libraries have unsafe or unmet dependencies:\n"
+
+          bad_omnibus_libs.each do |lib|
+            out << "    --> #{lib}\n"
+          end
+
+          out
+        end
+
+        log.warn(log_key) do
+          out = "The following binaries have unsafe or unmet dependencies:\n"
+
+          bad_omnibus_bins.each do |bin|
+            out << "    --> #{bin}\n"
+          end
+
+          out
+        end
+
         if unresolved.length > 0
-          log '*** The following requirements could not be resolved:'
-          unresolved.each { |lib| log "    --> #{lib}" }
+          log.warn(log_key) do
+            out = "The following requirements could not be resolved:\n"
+
+            unresolved.each do |lib|
+              out << "    --> #{lib}\n"
+            end
+
+            out
+          end
         end
+
         if unreliable.length > 0
-          log '*** The following libraries cannot be guaranteed to be on target systems:'
-          unreliable.each { |lib| log "    --> #{lib}" }
+          log.warn(log_key) do
+            out =  "The following libraries cannot be guaranteed to be on "
+            out << "target systems:\n"
+
+            unreliable.each do |lib|
+              out << "    --> #{lib}\n"
+            end
+
+            out
+          end
         end
-        log '*** The precise failures were:'
-        detail.each do |line|
-          item, dependency, location, count = line.split('|')
-          reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
-          log "    --> #{item}"
-          log "    DEPENDS ON: #{dependency}"
-          log "      COUNT: #{count}"
-          log "      PROVIDED BY: #{location}"
-          log "      FAILED BECAUSE: #{reason}"
+
+        log.warn(log_key) do
+          out = "The precise failures were:\n"
+
+          detail.each do |line|
+            item, dependency, location, count = line.split('|')
+            reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
+
+            out << "    --> #{item}\n"
+            out << "    DEPENDS ON: #{dependency}\n"
+            out << "      COUNT: #{count}\n"
+            out << "      PROVIDED BY: #{location}\n"
+            out << "      FAILED BECAUSE: #{reason}\n"
+          end
+
+          out
         end
-        fail 'Health Check Failed'
+
+        raise 'Health Check Failed'
       end
     end
 
     def self.health_check_otool(install_dir, whitelist_files)
       otool_cmd = "find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L > otool.out 2>/dev/null"
-      log "Executing `#{otool_cmd}`"
+      log.info(log_key) { "Executing: `#{otool_cmd}`" }
       shell = Mixlib::ShellOut.new(otool_cmd, timeout: 3600)
       shell.run_command
 
@@ -225,7 +264,7 @@ module Omnibus
     def self.check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
       safe = nil
 
-      whitelist_libs = case OHAI.platform
+      whitelist_libs = case Ohai.platform
                        when 'arch'
                          ARCH_WHITELIST_LIBS
                        when 'mac_os_x'
@@ -248,11 +287,11 @@ module Omnibus
         safe ||= true if reg.match(current_library)
       end
 
-      log "  --> Dependency: #{name}" if ARGV[0] == 'verbose'
-      log "  --> Provided by: #{linked}" if ARGV[0] == 'verbose'
+      log.debug(log_key) { "  --> Dependency: #{name}" }
+      log.debug(log_key) { "  --> Provided by: #{linked}" }
 
       if !safe && linked !~ Regexp.new(install_dir)
-        log "    -> FAILED: #{current_library} has unsafe dependencies" if ARGV[0] == 'verbose'
+        log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
         bad_libs[current_library] ||= {}
         bad_libs[current_library][name] ||= {}
         if bad_libs[current_library][name].key?(linked)
@@ -261,7 +300,7 @@ module Omnibus
           bad_libs[current_library][name][linked] = 1
         end
       else
-        log "    -> PASSED: #{name} is either whitelisted or safely provided." if ARGV[0] == 'verbose'
+        log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
       end
 
       bad_libs
@@ -276,7 +315,7 @@ module Omnibus
       #
       ldd_cmd = "find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd > ldd.out 2>/dev/null"
 
-      log "Executing `#{ldd_cmd}`"
+      log.info(log_key) { "Executing `#{ldd_cmd}`" }
       shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
       shell.run_command
 
@@ -289,14 +328,14 @@ module Omnibus
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
-          log "*** Analysing dependencies for #{current_library}" if ARGV[0] == 'verbose'
+          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
         when /^\s+(.+)$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[1]
           bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
         when /File is not an executable XCOFF file/ # ignore non-executable files
         else
-          log "*** Line did not match for #{current_library}\n#{line}"
+          log.warn(log_key) { "Line did not match for #{current_library}\n#{line}" }
         end
       end
 
@@ -313,7 +352,7 @@ module Omnibus
       #
       ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
 
-      log "Executing `#{ldd_cmd}`"
+      log.info(log_key) { "Executing `#{ldd_cmd}`" }
       shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
       shell.run_command
 
@@ -326,7 +365,7 @@ module Omnibus
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
-          log "*** Analysing dependencies for #{current_library}" if ARGV[0] == 'verbose'
+          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[2]
@@ -343,7 +382,9 @@ module Omnibus
           next
         when /^\s+not a dynamic executable$/ # ignore non-executable files
         else
-          log "*** Line did not match for #{current_library}\n#{line}"
+          log.warn(log_key) do
+            "Line did not match for #{current_library}\n#{line}"
+          end
         end
       end
 

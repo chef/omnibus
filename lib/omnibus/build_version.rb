@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +15,6 @@
 #
 
 require 'time'
-require 'omnibus/util'
 
 module Omnibus
   # Provides methods for generating Omnibus project build version
@@ -30,7 +28,8 @@ module Omnibus
   # @todo Rename this class to reflect its absolute dependence on running in a
   #   Git repository.
   class BuildVersion
-    include Omnibus::Util
+    include Logging
+    include Util
 
     # Formatting string for the timestamp component of our SemVer build specifier.
     #
@@ -38,10 +37,26 @@ module Omnibus
     # @see Time#strftime
     TIMESTAMP_FORMAT = '%Y%m%d%H%M%S'
 
-    # @deprecated Use {#semver} or {#git_describe} instead
-    def self.full
-      puts "#{name}.full is deprecated. Use #{name}.new.semver or #{name}.new.git_describe."
-      Omnibus::BuildVersion.new.git_describe
+    class << self
+      # @deprecated Use {#semver} or {#git_describe} instead
+      def full
+        log.deprecated(log_key) do
+          'BuildVersion.full. Please use BuildVersion.semver or ' \
+          'BuildVersion.git_describe instead.'
+        end
+
+        new.git_describe
+      end
+
+      # @see (BuildVersion#git_describe)
+      def git_describe
+        new.git_describe
+      end
+
+      # @see (BuildVersion#semver)
+      def semver
+        new.semver
+      end
     end
 
     # Create a new BuildVersion
@@ -129,17 +144,18 @@ module Omnibus
     # @return [String]
     def git_describe
       @git_describe ||= begin
-                          git_cmd = 'git describe --tags'
-                          cmd = shellout(git_cmd, live_stream: nil, cwd: @path)
-                          if cmd.exitstatus == 0
-                            cmd.stdout.chomp
-                          else
-                            msg =  'Could not extract version information from `git describe`. '
-                            msg << 'Setting version to 0.0.0'
-                            puts msg
-                            '0.0.0'
-                          end
-                        end
+        cmd = quiet_shellout('git describe --tags', cwd: @path)
+
+        if cmd.exitstatus == 0
+          cmd.stdout.chomp
+        else
+          log.warn(log_key) do
+            "Could not extract version information from 'git describe'! " \
+            "Setting version to 0.0.0."
+          end
+          '0.0.0'
+        end
+      end
     end
 
     # @!endgroup
@@ -273,6 +289,9 @@ module Omnibus
       version_regexp.match(git_describe)[1..3]
     end
 
+    #
+    # @todo Remove this environment variable madness and just use the CLI
+    #
     def append_timestamp?
       if ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/^(false|f|no|n|0)$/i))
         false

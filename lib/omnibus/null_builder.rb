@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +14,10 @@
 # limitations under the License.
 #
 
-require 'omnibus/fetcher'
-require 'omnibus/fetchers/net_fetcher'
-require 'omnibus/fetchers/git_fetcher'
-require 'omnibus/fetchers/path_fetcher'
-require 'omnibus/fetchers/s3_cache_fetcher'
+module Omnibus
+  class NullBuilder < Builder
+    def build
+      log.info(log_key) { "Nothing to build for #{name}" }
+    end
+  end
+end

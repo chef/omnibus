@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +14,9 @@
 # limitations under the License.
 #
 
-require 'omnibus/exceptions'
-
 module Omnibus
   # Fetcher implementation for projects in git.
   class GitFetcher < Fetcher
-    name :git
-
     attr_reader :source
     attr_reader :project_dir
     attr_reader :version
@@ -31,13 +26,14 @@ module Omnibus
       @source       = software.source
       @version      = software.version
       @project_dir  = software.project_dir
+      super
     end
 
     def description
-      <<-E
-repo URI:       #{@source[:git]}
-local location: #{@project_dir}
-E
+      <<-EOH.gsub(/^ {8}/, '').strip
+        repo URI:       #{@source[:git]}
+        local location: #{@project_dir}
+      EOH
     end
 
     def version_guid
@@ -47,11 +43,8 @@ E
 
     def clean
       if existing_git_clone?
-        log 'cleaning existing build'
-        clean_cmd = 'git clean -fdx'
-        shell = Mixlib::ShellOut.new(clean_cmd, live_stream: STDOUT, cwd: project_dir)
-        shell.run_command
-        shell.error!
+        log.info(log_key) { 'Cleaning existing build' }
+        quiet_shellout!('git clean -fdx', cwd: project_dir)
       end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to clean git repository '#{@source[:git]}'")
@@ -78,7 +71,10 @@ E
         # Deal with github failing all the time :(
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log "git clone/fetch failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
+        log.warn(log_key) do
+          "git clone/fetch failed for #{@source} #{retries} time(s). " \
+          "Retrying in #{time_to_sleep}s..."
+        end
         sleep(time_to_sleep)
         retry
       end
@@ -94,28 +90,24 @@ E
     private
 
     def clone
-      puts 'cloning the source from git'
-      clone_cmd = "git clone #{@source[:git]} #{project_dir}"
-      shell = Mixlib::ShellOut.new(clone_cmd, live_stream: STDOUT)
-      shell.run_command
-      shell.error!
+      log.info(log_key) { 'Cloning the source from git' }
+      quiet_shellout!("git clone #{@source[:git]} #{project_dir}")
     end
 
     def checkout
       sha_ref = target_revision
-
-      checkout_cmd = "git checkout #{sha_ref}"
-      shell = Mixlib::ShellOut.new(checkout_cmd, live_stream: STDOUT, cwd: project_dir)
-      shell.run_command
-      shell.error!
+      quiet_shellout!("git checkout #{sha_ref}", cwd: project_dir)
     end
 
     def fetch_updates
-      puts "fetching updates and resetting to revision #{target_revision}"
-      fetch_cmd = "git fetch origin && git fetch origin --tags && git reset --hard #{target_revision}"
-      shell = Mixlib::ShellOut.new(fetch_cmd, live_stream: STDOUT, cwd: project_dir)
-      shell.run_command
-      shell.error!
+      log.info(log_key) do
+        "Fetching updates and resetting to revision '#{target_revision}'"
+      end
+
+      fetch_cmd = "git fetch origin && " \
+                  "git fetch origin --tags && " \
+                  "git reset --hard #{target_revision}"
+      quiet_shellout!(fetch_cmd, cwd: project_dir)
     end
 
     def existing_git_clone?
@@ -127,24 +119,20 @@ E
     end
 
     def current_revision
-      @current_rev ||= begin
-                         rev_cmd = 'git rev-parse HEAD'
-                         shell = Mixlib::ShellOut.new(rev_cmd, live_stream: STDOUT, cwd: project_dir)
-                         shell.run_command
-                         shell.error!
-                         output = shell.stdout
+      return @current_rev if @current_rev
 
-                         sha_hash?(output) ? output : nil
-                       end
+      cmd = quiet_shellout!('git rev-parse HEAD', cwd: project_dir)
+      stdout = cmd.stdout
+
+      @current_rev = sha_hash?(stdout) ? stdout : nil
+      @current_rev
     end
 
     def target_revision
-      @target_rev ||= begin
-                        if sha_hash?(version)
-                          version
-                        else
-                          revision_from_remote_reference(version)
-                        end
+      @target_rev ||= if sha_hash?(version)
+                        version
+                      else
+                        revision_from_remote_reference(version)
                       end
     end
 
@@ -160,14 +148,11 @@ E
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      cmd = "git ls-remote origin #{ref}*"
-      shell = Mixlib::ShellOut.new(cmd, live_stream: STDOUT, cwd: project_dir)
-      shell.run_command
-      shell.error!
-      commit_ref = process_remote_list(shell.stdout, ref)
+      cmd = quiet_shellout!("git ls-remote origin #{ref}*", cwd: project_dir)
+      commit_ref = process_remote_list(cmd.stdout, ref)
 
       unless commit_ref
-        fail UnresolvableGitReference.new("Could not resolve `#{ref}' to a SHA.")
+        raise UnresolvableGitReference.new("Could not resolve `#{ref}' to a SHA.")
       end
       commit_ref
     rescue UnresolvableGitReference => e # skip retries
@@ -186,7 +171,10 @@ E
         # Deal with github failing all the time :(
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log "git ls-remote failed for #{@source} #{retries} time(s), retrying in #{time_to_sleep}s"
+        log.warn(log_key) do
+          "git ls-remote failed for #{@source} #{retries} time(s). " \
+          "Retrying in #{time_to_sleep}s..."
+        end
         sleep(time_to_sleep)
         retry
       end

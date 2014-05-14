@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +15,56 @@
 #
 
 require 'ohai'
-o = Ohai::System.new
-o.require_plugin('os')
-o.require_plugin('platform')
-o.require_plugin('linux/cpu') if o.os == 'linux'
-o.require_plugin('kernel')
-OHAI = o
+
+module Omnibus
+  class Ohai
+    class << self
+      def method_missing(m, *args, &block)
+        ohai.send(m, *args, &block)
+      end
+
+      private
+
+      def ohai
+        return @ohai if @ohai
+
+        @ohai = ::Ohai::System.new
+        @ohai.require_plugin('os')
+        @ohai.require_plugin('platform')
+        @ohai.require_plugin('linux/cpu') if @ohai.os == 'linux'
+        @ohai.require_plugin('kernel')
+        @ohai
+      end
+    end
+  end
+end
+
+module Omnibus
+  class OhaiWithWarning < Ohai
+    include Logging
+
+    class << self
+      def method_missing(m, *args, &block)
+        bad_boy = caller[2]
+
+        unless warned[bad_boy]
+          log.deprecated('OHAI') do
+            "OHAI constant. Please use Ohai instead: #{bad_boy}"
+          end
+          warned[bad_boy] = true
+        end
+
+        Ohai.send(m, *args, &block)
+      end
+
+      def warned
+        @warned ||= {}
+      end
+    end
+  end
+end
+
+#
+# @todo remove in the next major release
+#
+OHAI = Omnibus::OhaiWithWarning

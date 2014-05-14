@@ -6,7 +6,10 @@ module Omnibus
       expect(described_class).to be_a(Mixlib::Config)
     end
 
-    before { described_class.reset }
+    before do
+      described_class.reset
+      stub_ohai(platform: 'linux')
+    end
 
     shared_examples 'a configurable' do |id, default|
       it "responds to .#{id}" do
@@ -40,5 +43,19 @@ module Omnibus
     include_examples 'a configurable', :solaris_compiler, nil
     include_examples 'a configurable', :append_timestamp, true
     include_examples 'a configurable', :build_retries, 3
+
+    context 'on Windows' do
+      before do
+        stub_ohai(platform: 'windows')
+        stub_const('File::ALT_SEPARATOR', '\\')
+      end
+
+      include_examples 'a configurable', :cache_dir, 'C:\\omnibus-ruby\\cache'
+      include_examples 'a configurable', :install_path_cache_dir, 'C:\\omnibus-ruby\\cache\\install_path'
+      include_examples 'a configurable', :source_dir, 'C:\\omnibus-ruby\\src'
+      include_examples 'a configurable', :build_dir, 'C:\\omnibus-ruby\\build'
+      include_examples 'a configurable', :package_dir, 'C:\\omnibus-ruby\\pkg'
+      include_examples 'a configurable', :package_tmp, 'C:\\omnibus-ruby\\pkg-tmp'
+    end
   end
 end

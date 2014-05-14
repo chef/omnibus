@@ -49,27 +49,17 @@ describe Omnibus::NetFetcher do
                          source_dir: '/tmp/out',
                          project_dir: '/tmp/project'
       @net_fetcher = Omnibus::NetFetcher.new(software_mock)
-      env_vars = %w(HTTP_PROXY HTTP_PROXY_USER HTTP_PROXY_PASS http_proxy http_proxy_user http_proxy_pass)
-      @orig_env = env_vars.reduce({}) do |h, var|
-        h[var] = ENV.delete(var)
-        h
-      end
-    end
-
-    after(:each) do
-      # restore ENV hash
-      @orig_env.each { |var, val| ENV[var] = val }
     end
 
     describe 'get_env handles upper and lower case env vars' do
       it 'lower via upper' do
-        ENV['lower'] = 'abc'
+        stub_env('lower', 'abc')
         expect(@net_fetcher.get_env('LOWER')).to eq('abc')
         expect(@net_fetcher.get_env('lower')).to eq('abc')
       end
 
       it 'upper via lower' do
-        ENV['UPPER'] = 'abc'
+        stub_env('UPPER', 'abc')
         expect(@net_fetcher.get_env('upper')).to eq('abc')
         expect(@net_fetcher.get_env('UPPER')).to eq('abc')
       end
@@ -80,26 +70,26 @@ describe Omnibus::NetFetcher do
     end
 
     it 'should return a URI object when HTTP_PROXY is set' do
-      ENV['HTTP_PROXY'] = 'http://my.proxy'
+      stub_env('HTTP_PROXY', 'http://my.proxy')
       expect(@net_fetcher.http_proxy).to eq(URI.parse('http://my.proxy'))
     end
 
     it 'sets user and pass from env when set' do
-      ENV['HTTP_PROXY'] = 'my.proxy'
-      ENV['HTTP_PROXY_USER'] = 'alex'
-      ENV['HTTP_PROXY_PASS'] = 'sesame'
+      stub_env('HTTP_PROXY', 'my.proxy')
+      stub_env('HTTP_PROXY_USER', 'alex')
+      stub_env('HTTP_PROXY_PASS', 'sesame')
       expect(@net_fetcher.http_proxy).to eq(URI.parse('http://alex:sesame@my.proxy'))
     end
 
     it 'uses user and pass in URL before those in env' do
-      ENV['HTTP_PROXY'] = 'sally:peanut@my.proxy'
-      ENV['HTTP_PROXY_USER'] = 'alex'
-      ENV['HTTP_PROXY_PASS'] = 'sesame'
+      stub_env('HTTP_PROXY', 'sally:peanut@my.proxy')
+      stub_env('HTTP_PROXY_USER', 'alex')
+      stub_env('HTTP_PROXY_PASS', 'sesame')
       expect(@net_fetcher.http_proxy).to eq(URI.parse('http://sally:peanut@my.proxy'))
     end
 
     it "proxies if host doesn't match exclude list" do
-      ENV['NO_PROXY'] = 'google.com,www.buz.org'
+      stub_env('NO_PROXY', 'google.com,www.buz.org')
       a_url = URI.parse('http://should.proxy.com/123')
       expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_false
 
@@ -108,7 +98,7 @@ describe Omnibus::NetFetcher do
     end
 
     it 'does not proxy if host matches exclude list' do
-      ENV['NO_PROXY'] = 'google.com,www.buz.org'
+      stub_env('NO_PROXY', 'google.com,www.buz.org')
       a_url = URI.parse('http://google.com/hello')
       expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_true
 

@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,33 +17,31 @@
 module Omnibus
   # Fetcher implementation for projects on the filesystem
   class PathFetcher < Fetcher
-    name :path
-
     def initialize(software)
       @name = software.name
       @source = software.source
       @project_dir = software.project_dir
       @version = software.version
+      super
     end
 
     def description
-      <<-E
-source path:    #{@source[:path]}
-local location: #{@project_dir}
-E
+      <<-EOH.gsub(/^ {8}/, '').strip
+        source path:    #{@source[:path]}
+        local location: #{@project_dir}
+      EOH
     end
 
     def rsync
-      if OHAI.platform == 'windows'
+      if Ohai.platform == 'windows'
         # Robocopy's return code is 1 if it succesfully copies over the
         # files and 0 if the files are already existing at the destination
         sync_cmd = "robocopy #{@source[:path]}\\ #{@project_dir}\\ /MIR /S"
-        shell = Mixlib::ShellOut.new(sync_cmd, returns: [0, 1])
+        quiet_shellout!(sync_cmd, returns: [0, 1])
       else
         sync_cmd = "rsync --delete -a #{@source[:path]}/ #{@project_dir}/"
-        shell = Mixlib::ShellOut.new(sync_cmd)
+        quiet_shellout!(sync_cmd)
       end
-      shell.run_command
     end
 
     def clean

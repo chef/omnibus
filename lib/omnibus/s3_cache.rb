@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,37 +16,15 @@
 
 require 'fileutils'
 require 'uber-s3'
-require 'omnibus/fetchers'
 
 module Omnibus
-  module SoftwareS3URLs
-    class InsufficientSpecification < ArgumentError
-    end
-
-    def config
-      Omnibus.config
-    end
-
-    def url_for(software)
-      "http://#{config.s3_bucket}.s3.amazonaws.com/#{key_for_package(software)}"
-    end
-
-    private
-
-    def key_for_package(package)
-      package.name     || fail(InsufficientSpecification, "Software must have a name to cache it in S3 (#{package.inspect})")
-      package.version  || fail(InsufficientSpecification, "Software must set a version to cache it in S3 (#{package.inspect})")
-      package.checksum || fail(InsufficientSpecification, "Software must specify a checksum (md5) to cache it in S3 (#{package.inspect})")
-      "#{package.name}-#{package.version}-#{package.checksum}"
-    end
-  end
-
   class S3Cache
+    include Logging
     include SoftwareS3URLs
 
     def initialize
       unless config.s3_bucket && config.s3_access_key && config.s3_secret_key
-        fail InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
+        raise InvalidS3Configuration.new(config.s3_bucket, config.s3_access_key, config.s3_secret_key)
       end
       @client = UberS3.new(
         access_key: config.s3_access_key,
@@ -55,10 +32,6 @@ module Omnibus
         bucket: config.s3_bucket,
         adapter: :net_http,
       )
-    end
-
-    def log(msg)
-      puts "[S3 Cacher] #{msg}"
     end
 
     def config
@@ -92,7 +65,10 @@ module Omnibus
         key = key_for_package(software)
         content = IO.read(software.project_file)
 
-        log "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
+        log.info(log_key) do
+          "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
+        end
+
         @client.store(key, content, access: :public_read, content_md5: software.checksum)
       end
     end
@@ -110,13 +86,14 @@ module Omnibus
     end
 
     def fetch(software)
-      log "Fetching #{software.name}"
+      log.info(log_key) { "Fetching #{software.name}" }
       fetcher = Fetcher.without_caching_for(software)
       if fetcher.fetch_required?
+        log.debug(log_key) { 'Updating cache' }
         fetcher.download
         fetcher.verify_checksum!
       else
-        log 'Cached copy up to date, skipping.'
+        log.debug(log_key) { 'Cached copy up to date, skipping.' }
       end
     end
 

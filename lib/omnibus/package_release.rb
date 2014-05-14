@@ -1,6 +1,5 @@
 #
-# Copyright:: Copyright (c) 2012-2014 Chef Software, Inc.
-# License:: Apache License, Version 2.0
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +14,7 @@
 # limitations under the License.
 #
 
-# internal
-require 'omnibus/exceptions'
-
-# stdlib
 require 'json'
-
-# external
 require 'uber-s3'
 
 module Omnibus
@@ -43,7 +36,7 @@ module Omnibus
       @after_upload = if block_given?
                         block
                       else
-                        ->(item_key) { nil }
+                        ->(_) { nil }
                       end
 
       # sets @access_policy
@@ -105,9 +98,9 @@ module Omnibus
 
     def validate_package!
       if !File.exist?(package_path)
-        fail NoPackageFile.new(package_path)
+        raise NoPackageFile.new(package_path)
       elsif !File.exist?(package_metadata_path)
-        fail NoPackageMetadataFile.new(package_metadata_path)
+        raise NoPackageMetadataFile.new(package_metadata_path)
       else
         true
       end
@@ -118,7 +111,7 @@ module Omnibus
         true
       else
         err = InvalidS3ReleaseConfiguration.new(s3_bucket, s3_access_key, s3_secret_key)
-        fail err
+        raise err
       end
     end
 
@@ -150,9 +143,9 @@ module Omnibus
     def handle_opts(opts)
       access_policy = opts[:access]
       if access_policy.nil?
-        fail ArgumentError, "options to #{self.class} must specify `:access' (given: #{opts.inspect})"
+        raise ArgumentError, "options to #{self.class} must specify `:access' (given: #{opts.inspect})"
       elsif ![:private, :public_read].include?(access_policy)
-        fail ArgumentError, "option `:access' must be one of `[:private, :public_read]' (given: #{access_policy.inspect})"
+        raise ArgumentError, "option `:access' must be one of `[:private, :public_read]' (given: #{access_policy.inspect})"
       else
         @access_policy = access_policy
       end

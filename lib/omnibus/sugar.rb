@@ -28,9 +28,6 @@ require 'chef/sugar/ruby'
 require 'chef/sugar/shell'
 require 'chef/sugar/vagrant'
 
-require 'omnibus/project'
-require 'omnibus/software'
-
 module Omnibus
   class Project
     private
@@ -40,7 +37,7 @@ module Omnibus
     # Omnibus project as if it were Chef. Otherwise, we would need to rewrite
     # all the DSL methods.
     def node
-      OHAI
+      Ohai
     end
   end
 end

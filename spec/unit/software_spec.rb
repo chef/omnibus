@@ -1,5 +1,3 @@
-require 'omnibus/software'
-
 require 'spec_helper'
 
 describe Omnibus::Software do
@@ -16,6 +14,7 @@ describe Omnibus::Software do
 
   before do
     allow_any_instance_of(Omnibus::Software).to receive(:render_tasks)
+    stub_ohai(platform: 'linux')
   end
 
   describe "path helpers" do
@@ -66,6 +65,16 @@ describe Omnibus::Software do
     end
   end
 
+  describe '#<=>' do
+    it 'compares projects by name' do
+      list = [
+        Omnibus::Software.load(software_path('zlib'), project),
+        Omnibus::Software.load(software_path('erchef'), project),
+      ]
+      expect(list.sort.map(&:name)).to eq(%w(erchef zlib))
+    end
+  end
+
   describe '#whitelist_file' do
     it 'appends to the whitelist_files array' do
       expect(software.whitelist_files.size).to eq(0)
@@ -77,6 +86,42 @@ describe Omnibus::Software do
       software.whitelist_file 'foo/bar'
       expect(software.whitelist_files.size).to eq(1)
       expect(software.whitelist_files.first).to be_kind_of(Regexp)
+    end
+  end
+
+  describe '#override_version' do
+    it 'returns the override version' do
+      software.stub(:overrides).and_return(version: '1.2.3')
+      expect(software.override_version).to eq('1.2.3')
+    end
+
+    it 'outputs a deprecation message' do
+      output = capture_logging { software.override_version }
+      expect(output).to include('DEPRECATED')
+    end
+  end
+
+  describe '#given_version' do
+    it 'returns the version' do
+      software.stub(:default_version).and_return('4.5.6')
+      expect(software.given_version).to eq('4.5.6')
+    end
+
+    it 'outputs a deprecation message' do
+      output = capture_logging { software.given_version }
+      expect(output).to include('DEPRECATED')
+    end
+  end
+
+  describe '#version' do
+    it 'sets the given version' do
+      software.version('1.2.3')
+      expect(software.given_version).to eq('1.2.3')
+    end
+
+    it 'outputs a deprecation message' do
+      output = capture_logging { software.version('1.2.3') }
+      expect(output).to include('DEPRECATED')
     end
   end
 

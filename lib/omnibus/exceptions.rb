@@ -1,3 +1,19 @@
+#
+# Copyright 2014 Chef Software, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 module Omnibus
   class AbstractMethod < RuntimeError
     def initialize(signature)
@@ -6,6 +22,23 @@ module Omnibus
 
     def to_s
       "'#{@signature}' is an abstract method and must be overridden!"
+    end
+  end
+
+  class ProjectNotFound < RuntimeError
+    def initialize(name)
+      @name = name
+    end
+
+    def to_s
+      out = "I could not find an Omnibus project named '#{@name}'! "
+      out << "Valid projects are:\n"
+
+      Omnibus.project_names.sort.each do |project_name|
+        out << "  * #{project_name}\n"
+      end
+
+      out.strip
     end
   end
 
@@ -25,29 +58,27 @@ module Omnibus
     end
 
     def to_s
-      """
-      One or more required S3 configuration values is missing.
+      <<-EOH
+One or more required S3 configuration values is missing.
 
-      Your effective configuration was the following:
+Your effective configuration was the following:
 
-          s3_bucket     => #{@s3_bucket.inspect}
-          s3_access_key => #{@s3_access_key.inspect}
-          s3_secret_key => #{@s3_secret_key.inspect}
+    s3_bucket     #{@s3_bucket.inspect}
+    s3_access_key #{@s3_access_key.inspect}
+    s3_secret_key #{@s3_secret_key.inspect}
 
-      If you truly do want S3 caching, you should add values similar
-      to the following in your Omnibus config file:
+If you truly do want S3 caching, you should add values similar to the following
+in your Omnibus config file:
 
-            s3_bucket      ENV['S3_BUCKET_NAME']
-            s3_access_key  ENV['S3_ACCESS_KEY']
-            s3_secret_key  ENV['S3_SECRET_KEY']
+    s3_bucket     ENV['S3_BUCKET_NAME']
+    s3_access_key ENV['S3_ACCESS_KEY']
+    s3_secret_key ENV['S3_SECRET_KEY']
 
-      Note that you are not required to use environment variables as
-      illustrated (and the ones listed have no special significance in
-      Omnibus), but it is encouraged to prevent spread of sensitive
-      information and inadvertent check-in of same to version control
-      systems.
-
-      """
+Note that you are not required to use environment variables as illustrated (and
+the ones listed have no special significance in Omnibus), but it is encouraged
+to prevent spread of sensitive information and inadvertent check-in of same to
+version control systems.
+      EOH
     end
   end
 
@@ -135,7 +166,7 @@ module Omnibus
   # been set.
   class MissingSoftwareConfiguration < RuntimeError
     def initialize(software_name, parameter_name, sample_value)
-      @software_name, @parameter_name, @sample_value = software, parameter_name, sample_value
+      @software_name, @parameter_name, @sample_value = software_name, parameter_name, sample_value
     end
 
     def to_s
