@@ -67,7 +67,6 @@ module Omnibus
       /libcrypto.so/,
       /libcurses\.so/,
       /libdoor\.so/,
-      /libgcc_s\.so\.1/,
       /libgen\.so/,
       /libmd5\.so/,
       /libmd\.so/,
@@ -78,7 +77,6 @@ module Omnibus
       /libssl.so/,
       /libthread.so/,
       /libuutil\.so/,
-      /libz.so/,
       # solaris 11 libraries:
       /libc\.so\.1/,
       /libm\.so\.2/,
