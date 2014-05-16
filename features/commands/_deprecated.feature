@@ -44,3 +44,23 @@ Feature: Backwards-compatible deprecated commands
       """
       The project generator has been renamed to 'omnibus new'. Please use 'omnibus new' in the future.
       """
+
+  Scenario: When OMNIBUS_APPEND_TIMESTAMP is given (true)
+    * I set the environment variables to:
+      | variable                 | value |
+      | OMNIBUS_APPEND_TIMESTAMP | true  |
+    * I run `omnibus build hamlet`
+    * the output should contain:
+      """
+      The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:true' instead.
+      """
+
+  Scenario: When OMNIBUS_APPEND_TIMESTAMP is given (false)
+    * I set the environment variables to:
+      | variable                 | value |
+      | OMNIBUS_APPEND_TIMESTAMP | false  |
+    * I run `omnibus build hamlet`
+    * the output should contain:
+      """
+      The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:false' instead.
+      """

@@ -139,56 +139,24 @@ module Omnibus
       describe 'appending a timestamp' do
         let(:git_describe) { '11.0.0-alpha-3-207-g694b062' }
 
-        it 'appends a timestamp by default' do
-          expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
-        end
-
-        describe "ENV['OMNIBUS_APPEND_TIMESTAMP'] is set" do
-          ['true', 't', 'yes', 'y', 1].each do |truthy|
-            context "to #{truthy}" do
-              before { stub_env('OMNIBUS_APPEND_TIMESTAMP', truthy) }
-
-              it 'appends a timestamp' do
-                expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
-              end
-            end
-          end
-
-          ['false', 'f', 'no', 'n', 0].each do |falsey|
-            context "to #{falsey}" do
-              before { stub_env('OMNIBUS_APPEND_TIMESTAMP', falsey) }
-
-              it 'does not append a timestamp' do
-                expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
-              end
-            end
+        context 'by default' do
+          it 'appends a timestamp' do
+            expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
           end
         end
 
-        describe 'Config.append_timestamp is set' do
-          context 'is true' do
-            before { Config.stub(:append_timestamp).and_return(true) }
+        context 'when Config.append_timestamp is true' do
+          before { Config.stub(:append_timestamp).and_return(true) }
 
-            it 'appends a timestamp' do
-              expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
-            end
-          end
-
-          context 'is false' do
-            before { Config.stub(:append_timestamp).and_return(false) }
-            it 'does not append a timestamp' do
-              expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
-            end
+          it 'appends a timestamp' do
+            expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
           end
         end
 
-        describe 'both are set' do
-          before do
-            stub_env('OMNIBUS_APPEND_TIMESTAMP', 'false')
-            Config.stub(:append_timestamp).and_return(true)
-          end
+        context 'when Config.append_timestamp is false' do
+          before { Config.stub(:append_timestamp).and_return(false) }
 
-          it "prefers the value from ENV['OMNIBUS_APPEND_TIMESTAMP']" do
+          it 'does not append a timestamp' do
             expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
           end
         end
