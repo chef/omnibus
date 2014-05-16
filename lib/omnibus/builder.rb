@@ -251,7 +251,7 @@ module Omnibus
         cwd: project_dir,
         timeout: 5400,
       }
-      options[:live_stream] = STDOUT if ENV['DEBUG']
+      options[:live_stream] = log.live_stream(:debug)
       if cmd_args.last.is_a? Hash
         cmd_options = cmd_args.last
         cmd_args[cmd_args.size - 1] = options.merge(cmd_options)
