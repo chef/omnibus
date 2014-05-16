@@ -187,7 +187,7 @@ module Omnibus
       when Proc
         cmd.call
       when String
-        quiet_shellout!(cmd)
+        shellout!(cmd)
       else
         raise "Don't know how to extract command for #{cmd.class} class"
       end

@@ -236,7 +236,7 @@ module Omnibus
 
       it 'runs `git describe` at an alternate path' do
         expect(build_version).to receive(:shellout)
-          .with('git describe --tags', live_stream: nil, cwd: path)
+          .with('git describe --tags', cwd: path)
           .and_return(double('ouput', stdout: git_describe, exitstatus: 0))
         build_version.git_describe
       end

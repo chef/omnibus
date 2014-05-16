@@ -44,7 +44,7 @@ module Omnibus
     def clean
       if existing_git_clone?
         log.info(log_key) { 'Cleaning existing build' }
-        quiet_shellout!('git clean -fdx', cwd: project_dir)
+        shellout!('git clean -fdx', cwd: project_dir)
       end
     rescue Exception => e
       ErrorReporter.new(e, self).explain("Failed to clean git repository '#{@source[:git]}'")
@@ -91,12 +91,12 @@ module Omnibus
 
     def clone
       log.info(log_key) { 'Cloning the source from git' }
-      quiet_shellout!("git clone #{@source[:git]} #{project_dir}")
+      shellout!("git clone #{@source[:git]} #{project_dir}")
     end
 
     def checkout
       sha_ref = target_revision
-      quiet_shellout!("git checkout #{sha_ref}", cwd: project_dir)
+      shellout!("git checkout #{sha_ref}", cwd: project_dir)
     end
 
     def fetch_updates
@@ -107,7 +107,7 @@ module Omnibus
       fetch_cmd = "git fetch origin && " \
                   "git fetch origin --tags && " \
                   "git reset --hard #{target_revision}"
-      quiet_shellout!(fetch_cmd, cwd: project_dir)
+      shellout!(fetch_cmd, cwd: project_dir)
     end
 
     def existing_git_clone?
@@ -121,7 +121,7 @@ module Omnibus
     def current_revision
       return @current_rev if @current_rev
 
-      cmd = quiet_shellout!('git rev-parse HEAD', cwd: project_dir)
+      cmd = shellout!('git rev-parse HEAD', cwd: project_dir)
       stdout = cmd.stdout
 
       @current_rev = sha_hash?(stdout) ? stdout : nil
@@ -148,7 +148,7 @@ module Omnibus
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      cmd = quiet_shellout!("git ls-remote origin #{ref}*", cwd: project_dir)
+      cmd = shellout!("git ls-remote origin #{ref}*", cwd: project_dir)
       commit_ref = process_remote_list(cmd.stdout, ref)
 
       unless commit_ref

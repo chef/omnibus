@@ -144,7 +144,7 @@ module Omnibus
     # @return [String]
     def git_describe
       @git_describe ||= begin
-        cmd = quiet_shellout('git describe --tags', cwd: @path)
+        cmd = shellout('git describe --tags', cwd: @path)
 
         if cmd.exitstatus == 0
           cmd.stdout.chomp

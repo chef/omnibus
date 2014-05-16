@@ -17,10 +17,19 @@
 require 'mixlib/shellout'
 
 module Omnibus
-  #
-  # @author Seth Chisamore (<schisamo@getchef.com>)
-  #
   module Util
+    #
+    # The default shellout options.
+    #
+    # @return [Hash]
+    #
+    SHELLOUT_OPTIONS = {
+      live_stream: Omnibus.logger.live_stream(:debug),
+      timeout: 7200, # 2 hours
+      environment: {},
+    }.freeze
+
+    #
     # Shells out and runs +command+.
     #
     # @overload shellout(command, options = {})
@@ -38,13 +47,7 @@ module Omnibus
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
 
-      default_options = {
-        live_stream: STDOUT,
-        timeout: 7200, # 2 hours
-        environment: {},
-      }
-
-      cmd = Mixlib::ShellOut.new(*args, default_options.merge(options))
+      cmd = Mixlib::ShellOut.new(*args, SHELLOUT_OPTIONS.merge(options))
       cmd.run_command
       cmd
     end
@@ -61,31 +64,6 @@ module Omnibus
       cmd = shellout(*args)
       cmd.error!
       cmd
-    end
-
-    #
-    # Run a command in subshell, suppressing any output.
-    #
-    # @see (Util#shellout)
-    #
-    def quiet_shellout(*args)
-      options = args.last.kind_of?(Hash) ? args.pop : {}
-      options[:live_stream] = nil
-      args << options
-      shellout(*args)
-    end
-
-    #
-    # Run a command, suppressing any output, but raising an error if the
-    # command fails.
-    #
-    # @see (Util#shellout!)
-    #
-    def quiet_shellout!(*args)
-      options = args.last.kind_of?(Hash) ? args.pop : {}
-      options[:live_stream] = nil
-      args << options
-      shellout!(*args)
     end
 
     # Replaces path separators with alternative ones when needed.

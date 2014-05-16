@@ -1,6 +1,12 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+Unreleased
+----------
+- Update project generators to use new APIs. The old project generators created a project that issued deprecation warnings!
+- Stream build output to the debug logger. Specifying `--log-level debug` now includes **all** the build output as if you had run the command manually.
+
+
 v3.1.0 (May 14, 2014)
 -------------------------
 ### New Features
