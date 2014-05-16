@@ -23,8 +23,25 @@
 module Omnibus
   class Command::Base
     class << self
+      include Util
+
       alias_method :old_dispatch, :dispatch
       def dispatch(m, args, options, config)
+        # Handle OMNIBUS_APPEND_TIMESTAMP environment
+        if ENV.key?('OMNIBUS_APPEND_TIMESTAMP')
+          value = ENV.delete('OMNIBUS_APPEND_TIMESTAMP')
+
+          if truthy?(value)
+            warn("The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:true' instead.")
+            args += %(--override append_timestamp:true)
+          elsif falsey?(value)
+            warn("The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:false' instead.")
+            args += %(--override append_timestamp:false)
+          else
+            raise "Unknown value for OMNIBUS_APPEND_TIMESTAMP: #{value.inspect}!"
+          end
+        end
+
         # Handle old --timestamp
         if args.include?('--timestamp') || args.include?('-t')
           warn("The '--timestamp' option has been deprecated! Please use '--override append_timestamp:true' instead.")

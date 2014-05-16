@@ -74,5 +74,19 @@ module Omnibus
     def windows_safe_path!(path)
       path.gsub!(File::SEPARATOR, File::ALT_SEPARATOR) if File::ALT_SEPARATOR
     end
+
+    # Return true if the given value appears to be "truthy".
+    #
+    # @param [#to_s] value
+    def truthy?(value)
+      value && value.to_s =~ /^(true|t|yes|y|1)$/i
+    end
+
+    # Return true if the given value appears to be "falsey".
+    #
+    # @param [#to_s] value
+    def falsey?(value)
+      value && value.to_s =~ /^(false|f|no|n|0)$/i
+    end
   end
 end

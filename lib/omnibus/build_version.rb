@@ -79,12 +79,9 @@ module Omnibus
     #
     #     MAJOR.MINOR.PATCH-PRERELEASE+TIMESTAMP.git.COMMITS_SINCE.GIT_SHA
     #
-    # By default, a timestamp is incorporated into the build component
-    # of version string (see
-    # {Omnibus::BuildVersion::TIMESTAMP_FORMAT}).  This can be
-    # disabled by setting the environment variable
-    # `OMNIBUS_APPEND_TIMESTAMP` to a "falsey" value (e.g. "false",
-    # "f", "no", "n", "0")
+    # By default, a timestamp is incorporated into the build component of
+    # version string (see {Omnibus::BuildVersion::TIMESTAMP_FORMAT}). This
+    # option is configurable via the {Omnibus::Config}.
     #
     # @example 11.0.0-alpha.1+20121218164140.git.207.694b062
     # @return [String]
@@ -114,7 +111,9 @@ module Omnibus
       # variable to a 'falsey' value (ie false, f, no, n or 0).
       #
       # format: YYYYMMDDHHMMSS example: 20130131123345
-      build_version_items << build_start_time.strftime(TIMESTAMP_FORMAT) if append_timestamp?
+      if Config.append_timestamp
+        build_version_items << build_start_time.strftime(TIMESTAMP_FORMAT)
+      end
 
       # We'll append the git describe information unless we are sitting right
       # on an annotated tag.
@@ -287,19 +286,6 @@ module Omnibus
     def version_composition
       version_regexp = /^(\d+)\.(\d+)\.(\d+)/
       version_regexp.match(git_describe)[1..3]
-    end
-
-    #
-    # @todo Remove this environment variable madness and just use the CLI
-    #
-    def append_timestamp?
-      if ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/^(false|f|no|n|0)$/i))
-        false
-      elsif ENV['OMNIBUS_APPEND_TIMESTAMP'] && (ENV['OMNIBUS_APPEND_TIMESTAMP'] =~ (/^(true|t|yes|y|1)$/i))
-        true
-      else
-        Omnibus::Config.append_timestamp
-      end
     end
   end
 end
