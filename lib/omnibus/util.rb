@@ -88,5 +88,18 @@ module Omnibus
     def falsey?(value)
       value && value.to_s =~ /^(false|f|no|n|0)$/i
     end
+
+    # @param [String] path
+    #   the path to "Windowize"
+    # @return [String]
+    #   the path with applied changes
+    #
+    def windows_safe_path(path)
+      if File::ALT_SEPARATOR
+        path.gsub(File::SEPARATOR, File::ALT_SEPARATOR)
+      else
+        path
+      end
+    end
   end
 end
