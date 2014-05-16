@@ -57,5 +57,16 @@ module Omnibus
       include_examples 'a configurable', :package_dir, 'C:\\omnibus-ruby\\pkg'
       include_examples 'a configurable', :package_tmp, 'C:\\omnibus-ruby\\pkg-tmp'
     end
+
+    context 'when base_dir is changed', :focus do
+      before { described_class.base_dir = '/foo/bar' }
+
+      include_examples 'a configurable', :cache_dir, '/foo/bar/cache'
+      include_examples 'a configurable', :install_path_cache_dir, '/foo/bar/cache/install_path'
+      include_examples 'a configurable', :source_dir, '/foo/bar/src'
+      include_examples 'a configurable', :build_dir, '/foo/bar/build'
+      include_examples 'a configurable', :package_dir, '/foo/bar/pkg'
+      include_examples 'a configurable', :package_tmp, '/foo/bar/pkg-tmp'
+    end
   end
 end
