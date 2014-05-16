@@ -6,6 +6,8 @@ Unreleased
 - Update project generators to use new APIs. The old project generators created a project that issued deprecation warnings!
 - Stream build output to the debug logger. Specifying `--log-level debug` now includes **all** the build output as if you had run the command manually.
 - Deprecate the `OMNIBUS_APPEND_TIMESTAMP` environment variable in favor of the command line flag. This is only a deprecation, but the `OMNIBUS_APPEND_TIMESTAMP` will be removed in the next major release.
+- Fix a bug in `windows_safe_path` to always return a string
+- Add a `Config.base_dir` configuration value for easy tuning
 
 
 v3.1.0 (May 14, 2014)

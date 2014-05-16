@@ -30,13 +30,29 @@ module Omnibus
     # linux.
     def self.platformize_omnibus_path(path)
       if Ohai.platform == 'windows'
-        File.join('C:\\omnibus-ruby', path).gsub(File::SEPARATOR, File::ALT_SEPARATOR)
+        File.join(base_dir, path).gsub(File::SEPARATOR, File::ALT_SEPARATOR)
       else
-        File.join('/var/cache/omnibus', path)
+        File.join(base_dir, path)
       end
     end
 
     # @!group Directory Configuration Parameters
+
+    # @!attribute [rw] base_dir
+    #   The "base" directory where Omnibus will store it's data. Other paths are
+    #   dynamically constructed from this value.
+    #
+    #   Defaults to `"C:\omnibus-ruby"` on Windows
+    #   Defaults to `"/var/cache/omnibus"` on other platforms
+    #
+    #   @return [String]
+    directory(:base_dir) do
+      if Ohai.platform == 'windows'
+        'C:\\omnibus-ruby'
+      else
+        '/var/cache/omnibus'
+      end
+    end
 
     # @!attribute [rw] cache_dir
     #   The absolute path to the directory on the virtual machine where
@@ -45,7 +61,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache"`.
     #
     #   @return [String]
-    default(:cache_dir) { platformize_omnibus_path('cache') }
+    default(:cache_dir) { windows_safe_path("#{base_dir}/cache") }
 
     # @!attribute [rw] install_path_cache_dir
     #   The absolute path to the directory on the virtual machine where
@@ -54,7 +70,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/cache/install_path"`.
     #
     #   @return [String]
-    default(:install_path_cache_dir) { platformize_omnibus_path('cache/install_path') }
+    default(:install_path_cache_dir) { windows_safe_path("#{cache_dir}/install_path") }
 
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where
@@ -63,7 +79,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/src"`.
     #
     #   @return [String]
-    default(:source_dir) { platformize_omnibus_path('src') }
+    default(:source_dir) { windows_safe_path("#{base_dir}/src") }
 
     # @!attribute [rw] build_dir
     #   The absolute path to the directory on the virtual machine where
@@ -72,7 +88,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/build"`.
     #
     #   @return [String]
-    default(:build_dir) { platformize_omnibus_path('build') }
+    default(:build_dir) { windows_safe_path("#{base_dir}/build") }
 
     # @!attribute [rw] package_dir
     #   The absolute path to the directory on the virtual machine where
@@ -81,7 +97,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg"`.
     #
     #   @return [String]
-    default(:package_dir) { platformize_omnibus_path('pkg') }
+    default(:package_dir) { windows_safe_path("#{base_dir}/pkg") }
 
     # @!attribute [rw] package_tmp
     #   The absolute path to the directory on the virtual machine where
@@ -92,7 +108,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus/pkg-tmp"`.
     #
     #   @return [String]
-    default(:package_tmp) { platformize_omnibus_path('pkg-tmp') }
+    default(:package_tmp) { windows_safe_path("#{base_dir}/pkg-tmp") }
 
     # @!attribute [rw] project_dir
     #   The relative path of the directory containing {Omnibus::Project}
