@@ -44,7 +44,6 @@ module Omnibus
     #   which which has +stdout+, +stderr+, +status+, and +exitstatus+
     #   populated with results of the command.
     #
-    #
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
 
