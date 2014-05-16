@@ -8,6 +8,7 @@ Unreleased
 - Deprecate the `OMNIBUS_APPEND_TIMESTAMP` environment variable in favor of the command line flag. This is only a deprecation, but the `OMNIBUS_APPEND_TIMESTAMP` will be removed in the next major release.
 - Fix a bug in `windows_safe_path` to always return a string
 - Add a `Config.base_dir` configuration value for easy tuning
+- Remove the use of `Omnibus.root` in `BuildVersion#initializer`. This removes the many deprecation warnings that print on each software load.
 
 
 v3.1.0 (May 14, 2014)
