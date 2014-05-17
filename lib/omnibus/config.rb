@@ -35,6 +35,7 @@ module Omnibus
         File.join(base_dir, path)
       end
     end
+    extend Util
 
     # @!group Directory Configuration Parameters
 
