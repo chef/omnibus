@@ -46,10 +46,20 @@ module Omnibus
     #
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
+      options = SHELLOUT_OPTIONS.merge(options)
 
+      # Log any environment options given
+      unless options[:environment].empty?
+        Omnibus.logger.debug { 'Environment:' }
+        options[:environment].each do |key, value|
+          Omnibus.logger.debug { "  #{key.to_s.upcase}=#{value.inspect}" }
+        end
+      end
+
+      # Log the actual command
       Omnibus.logger.debug { "$ #{args.join(' ')}" }
 
-      cmd = Mixlib::ShellOut.new(*args, SHELLOUT_OPTIONS.merge(options))
+      cmd = Mixlib::ShellOut.new(*args, options)
       cmd.run_command
       cmd
     end
