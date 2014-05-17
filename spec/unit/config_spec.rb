@@ -6,9 +6,26 @@ module Omnibus
       expect(described_class).to be_a(Mixlib::Config)
     end
 
+    it 'extends Util' do
+      expect(described_class).to be_a(Util)
+    end
+
     before do
+      # Don't expand paths on the build system. Otherwise, you will end up with
+      # paths like +\\Users\\you\\Development\\omnibus-ruby\\C:\\omnibus-ruby+
+      # when testing on "other" operating systems
+      File.stub(:expand_path) { |arg| arg }
+
+      # Make sure we have a clean config
       described_class.reset
-      stub_ohai(platform: 'linux')
+
+      # Prevent Ohai from running
+      Ohai.stub(:platform).and_return('linux')
+    end
+
+    after do
+      # Make sure future tests are clean
+      described_class.reset
     end
 
     shared_examples 'a configurable' do |id, default|
@@ -21,6 +38,7 @@ module Omnibus
       end
     end
 
+    include_examples 'a configurable', :base_dir, '/var/cache/omnibus'
     include_examples 'a configurable', :cache_dir, '/var/cache/omnibus/cache'
     include_examples 'a configurable', :install_path_cache_dir, '/var/cache/omnibus/cache/install_path'
     include_examples 'a configurable', :source_dir, '/var/cache/omnibus/src'
@@ -46,10 +64,13 @@ module Omnibus
 
     context 'on Windows' do
       before do
-        stub_ohai(platform: 'windows')
+        Ohai.stub(:platform).and_return('windows')
+
+        # This is not defined on Linuxy Rubies
         stub_const('File::ALT_SEPARATOR', '\\')
       end
 
+      include_examples 'a configurable', :base_dir, 'C:\\omnibus-ruby'
       include_examples 'a configurable', :cache_dir, 'C:\\omnibus-ruby\\cache'
       include_examples 'a configurable', :install_path_cache_dir, 'C:\\omnibus-ruby\\cache\\install_path'
       include_examples 'a configurable', :source_dir, 'C:\\omnibus-ruby\\src'
@@ -58,7 +79,7 @@ module Omnibus
       include_examples 'a configurable', :package_tmp, 'C:\\omnibus-ruby\\pkg-tmp'
     end
 
-    context 'when base_dir is changed', :focus do
+    context 'when base_dir is changed' do
       before { described_class.base_dir = '/foo/bar' }
 
       include_examples 'a configurable', :cache_dir, '/foo/bar/cache'
