@@ -66,15 +66,6 @@ module Omnibus
       cmd
     end
 
-    # Replaces path separators with alternative ones when needed.
-    #
-    # @param path [String]
-    # @return [String] given path with applied changes.
-    #
-    def windows_safe_path!(path)
-      path.gsub!(File::SEPARATOR, File::ALT_SEPARATOR) if File::ALT_SEPARATOR
-    end
-
     # Return true if the given value appears to be "truthy".
     #
     # @param [#to_s] value
@@ -89,12 +80,14 @@ module Omnibus
       value && value.to_s =~ /^(false|f|no|n|0)$/i
     end
 
-    # @param [String] path
-    #   the path to "Windowize"
+    # @param [Array<String>] pieces
+    #   the pieces of the path to join and fix
     # @return [String]
     #   the path with applied changes
     #
-    def windows_safe_path(path)
+    def windows_safe_path(*pieces)
+      path = File.expand_path(File.join(*pieces))
+
       if File::ALT_SEPARATOR
         path.gsub(File::SEPARATOR, File::ALT_SEPARATOR)
       else
