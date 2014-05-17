@@ -226,7 +226,7 @@ module Omnibus
     #   must be set in order to build a project)
     def install_path(val = NULL_ARG)
       unless val.equal?(NULL_ARG)
-        @install_path = windows_safe_path(File.expand_path(val))
+        @install_path = windows_safe_path(val)
       end
       @install_path || raise(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
