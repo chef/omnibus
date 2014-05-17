@@ -50,14 +50,14 @@ module Omnibus
 
       # Log any environment options given
       unless options[:environment].empty?
-        Omnibus.logger.debug { 'Environment:' }
+        Omnibus.logger.info { 'Environment:' }
         options[:environment].each do |key, value|
-          Omnibus.logger.debug { "  #{key.to_s.upcase}=#{value.inspect}" }
+          Omnibus.logger.info { "  #{key.to_s.upcase}=#{value.inspect}" }
         end
       end
 
       # Log the actual command
-      Omnibus.logger.debug { "$ #{args.join(' ')}" }
+      Omnibus.logger.info { "$ #{args.join(' ')}" }
 
       cmd = Mixlib::ShellOut.new(*args, options)
       cmd.run_command
