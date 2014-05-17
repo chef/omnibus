@@ -11,6 +11,7 @@ Unreleased
 - Remove the use of `Omnibus.root` in `BuildVersion#initializer`. This removes the many deprecation warnings that print on each software load.
 - Output the current command in debug output when shelling out
 - Output the current environment in debug output when shelling out
+- Change the information that is displayed at different log levels with respect to shelling out. In `warn` mode, Omnibus will only display warnings/deprecations; you will not see any build commands or output. In `info` mode, Omnibus will display the commands and environment that are being used; you will not see the output from the build (unless it fails). In `debug` mode, Omnibus will display the commands, environment, and output (livestream) from commands.
 
 
 v3.1.0 (May 14, 2014)
