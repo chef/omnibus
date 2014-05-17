@@ -25,16 +25,6 @@ module Omnibus
   #   it out twice, which I'm doing now for benefit of viewers of the Yard docs.
   class Config
     extend Mixlib::Config
-
-    # Converts a given path to a platform specific path based on windows or
-    # linux.
-    def self.platformize_omnibus_path(path)
-      if Ohai.platform == 'windows'
-        File.join(base_dir, path).gsub(File::SEPARATOR, File::ALT_SEPARATOR)
-      else
-        File.join(base_dir, path)
-      end
-    end
     extend Util
 
     # @!group Directory Configuration Parameters
