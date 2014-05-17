@@ -47,6 +47,8 @@ module Omnibus
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
 
+      Omnibus.logger.debug { "$ #{args.join(' ')}" }
+
       cmd = Mixlib::ShellOut.new(*args, SHELLOUT_OPTIONS.merge(options))
       cmd.run_command
       cmd
