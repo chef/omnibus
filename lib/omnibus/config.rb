@@ -46,7 +46,7 @@ module Omnibus
     #   Defaults to `"/var/cache/omnibus"` on other platforms
     #
     #   @return [String]
-    directory(:base_dir) do
+    default(:base_dir) do
       if Ohai.platform == 'windows'
         'C:\\omnibus-ruby'
       else
