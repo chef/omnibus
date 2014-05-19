@@ -8,6 +8,7 @@ Unreleased
 
 ### Bug fixes
 - Fix a small typo in the project generator (come -> some)
+- Update sample software definition for libpng to 1.5.18
 
 
 v3.1.1 (May 20, 2014)
