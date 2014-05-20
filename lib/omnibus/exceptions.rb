@@ -15,7 +15,10 @@
 #
 
 module Omnibus
-  class AbstractMethod < RuntimeError
+  class Error < RuntimeError
+  end
+
+  class AbstractMethod < Error
     def initialize(signature)
       @signature = signature
     end
@@ -25,7 +28,7 @@ module Omnibus
     end
   end
 
-  class ProjectNotFound < RuntimeError
+  class ProjectNotFound < Error
     def initialize(name)
       @name = name
     end
@@ -42,7 +45,7 @@ module Omnibus
     end
   end
 
-  class MissingAsset < RuntimeError
+  class MissingAsset < Error
     def initialize(path)
       @path = path
     end
@@ -52,7 +55,7 @@ module Omnibus
     end
   end
 
-  class InvalidS3Configuration < RuntimeError
+  class InvalidS3Configuration < Error
     def initialize(s3_bucket, s3_access_key, s3_secret_key)
       @s3_bucket, @s3_access_key, @s3_secret_key = s3_bucket, s3_access_key, s3_secret_key
     end
@@ -82,7 +85,7 @@ version control systems.
     end
   end
 
-  class BadReplacesLine < RuntimeError
+  class BadReplacesLine < Error
     def to_s
       <<-EOH
 The `replaces` project DSL statement should never equal the `package_name` or
@@ -103,7 +106,7 @@ should never use the replaces line.
     end
   end
 
-  class NoPackageFile < RuntimeError
+  class NoPackageFile < Error
     def initialize(package_path)
       @package_path = package_path
     end
@@ -117,7 +120,7 @@ should never use the replaces line.
     end
   end
 
-  class NoPackageMetadataFile < RuntimeError
+  class NoPackageMetadataFile < Error
     def initialize(package_metadata_path)
       @package_metadata_path = package_metadata_path
     end
@@ -131,7 +134,7 @@ should never use the replaces line.
     end
   end
 
-  class InvalidS3ReleaseConfiguration < RuntimeError
+  class InvalidS3ReleaseConfiguration < Error
     def initialize(s3_bucket, s3_access_key, s3_secret_key)
       @s3_bucket, @s3_access_key, @s3_secret_key = s3_bucket, s3_access_key, s3_secret_key
     end
@@ -165,7 +168,7 @@ should never use the replaces line.
 
   # Raise this error if a needed Project configuration value has not
   # been set.
-  class MissingProjectConfiguration < RuntimeError
+  class MissingProjectConfiguration < Error
     def initialize(parameter_name, sample_value)
       @parameter_name, @sample_value = parameter_name, sample_value
     end
@@ -185,7 +188,7 @@ should never use the replaces line.
 
   # Raise this error if a needed Software configuration value has not
   # been set.
-  class MissingSoftwareConfiguration < RuntimeError
+  class MissingSoftwareConfiguration < Error
     def initialize(software_name, parameter_name, sample_value)
       @software_name, @parameter_name, @sample_value = software_name, parameter_name, sample_value
     end
@@ -203,7 +206,7 @@ should never use the replaces line.
     end
   end
 
-  class MissingPatch < RuntimeError
+  class MissingPatch < Error
     def initialize(patch_name, search_paths)
       @patch_name, @search_paths = patch_name, search_paths
     end
@@ -218,7 +221,7 @@ should never use the replaces line.
     end
   end
 
-  class MissingTemplate < RuntimeError
+  class MissingTemplate < Error
     def initialize(template_name, search_paths)
       @template_name, @search_paths = template_name, search_paths
     end
@@ -233,7 +236,7 @@ should never use the replaces line.
     end
   end
 
-  class MissingProjectDependency < RuntimeError
+  class MissingProjectDependency < Error
     def initialize(dep_name, search_paths)
       @dep_name, @search_paths = dep_name, search_paths
     end
@@ -248,6 +251,6 @@ should never use the replaces line.
     end
   end
 
-  class UnresolvableGitReference < RuntimeError
+  class UnresolvableGitReference < Error
   end
 end
