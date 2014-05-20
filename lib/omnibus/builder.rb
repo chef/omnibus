@@ -262,7 +262,7 @@ module Omnibus
       cmd_string = cmd_args[0..-2].join(' ')
       cmd_opts_for_display = to_kv_str(cmd_args.last)
 
-      log.debug(log_key) do
+      log.info(log_key) do
         "Executing: `#{cmd_string}` with #{cmd_opts_for_display}"
       end
 
@@ -285,7 +285,7 @@ module Omnibus
       else
         time_to_sleep = 5 * (2**retries)
         retries += 1
-        log.debug(log_key) do
+        log.info(log_key) do
           "Failed to execute cmd `#{cmd}` #{retries} time(s). " \
           "Retrying in #{time_to_sleep}s."
         end

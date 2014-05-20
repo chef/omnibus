@@ -1,6 +1,11 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+Unreleased
+----------
+- Make build commands output during `log.info` instead of `log.debug`
+
+
 v3.1.1 (May 20, 2014)
 ---------------------
 - Update project generators to use new APIs. The old project generators created a project that issued deprecation warnings!
