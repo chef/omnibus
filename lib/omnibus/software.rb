@@ -65,7 +65,7 @@ module Omnibus
     #
     # @todo See comment on {Omnibus::NullBuilder}
     # @todo does `filename` need to be absolute, or does it matter?
-    # @ @todo Any reason to not have this just take a filename,
+    # @todo Any reason to not have this just take a filename,
     #   project, and override hash directly?  That is, why io AND a
     #   filename, if the filename can always get you the contents you
     #   need anyway?
