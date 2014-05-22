@@ -50,6 +50,7 @@ module Omnibus
   autoload :S3Cache,          'omnibus/s3_cache'
   autoload :Software,         'omnibus/software'
   autoload :SoftwareS3URLs,   'omnibus/software_s3_urls'
+  autoload :Sugarable,        'omnibus/sugarable'
   autoload :Util,             'omnibus/util'
 
   # @todo Remove this in the next major release
@@ -381,6 +382,3 @@ module Omnibus
     end
   end
 end
-
-# Sugars must be loaded after everything else has been registered
-require 'omnibus/sugar'

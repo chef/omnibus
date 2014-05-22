@@ -29,6 +29,7 @@ module Omnibus
   # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
     include Logging
+    include Sugarable
     include Util
 
     NULL_ARG = Object.new

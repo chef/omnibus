@@ -26,6 +26,7 @@ module Omnibus
   # Omnibus software DSL reader
   class Software
     include Logging
+    include Sugarable
 
     NULL_ARG = Object.new
     UNINITIALIZED = Object.new

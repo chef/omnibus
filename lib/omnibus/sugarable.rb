@@ -29,8 +29,8 @@ require 'chef/sugar/shell'
 require 'chef/sugar/vagrant'
 
 module Omnibus
-  class Project
-    private
+  module Sugarable
+    include Chef::Sugar::DSL
 
     # This method is used by Chef Sugar to easily add the DSL. By mimicing
     # Chef's +node+ object, we can easily include the existing DSL into
@@ -41,7 +41,3 @@ module Omnibus
     end
   end
 end
-
-# Include everything in Omnibus
-Omnibus::Project.send(:include, Chef::Sugar::DSL)
-Omnibus::Software.send(:include, Chef::Sugar::DSL)
