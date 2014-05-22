@@ -26,7 +26,7 @@ module Omnibus
   #
   # @return [String]
   #
-  DEFAULT_CONFIG = 'omnibus.rb'
+  DEFAULT_CONFIG = 'omnibus.rb'.freeze
 
   autoload :Artifact,         'omnibus/artifact'
   autoload :Builder,          'omnibus/builder'
