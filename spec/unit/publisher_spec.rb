@@ -8,12 +8,6 @@ module Omnibus
     it { should be_a_kind_of(Logging) }
 
     describe '.for' do
-      context 'when given a lowercase value' do
-        it 'returns the correct publisher' do
-          expect(described_class.for('fake'))
-        end
-      end
-
       context 'when given a string' do
         it 'returns the correct publisher' do
           expect(described_class.for('fake')).to be(FakePublisher)
