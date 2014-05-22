@@ -233,17 +233,10 @@ module Omnibus
     end
 
     def self.health_check_otool(install_dir, whitelist_files)
-      otool_cmd = "find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L > otool.out 2>/dev/null"
-      log.info(log_key) { "Executing: `#{otool_cmd}`" }
-      shell = Mixlib::ShellOut.new(otool_cmd, timeout: 3600)
-      shell.run_command
-
-      otool_output = File.read('otool.out')
-
       current_library = nil
       bad_libs = {}
 
-      otool_output.each_line do |line|
+      read_shared_libs("find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -253,8 +246,6 @@ module Omnibus
           bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
         end
       end
-
-      File.delete('otool.out')
 
       bad_libs
     end
@@ -305,24 +296,10 @@ module Omnibus
     end
 
     def self.health_check_aix(install_dir, whitelist_files)
-      #
-      # ShellOut has GC turned off during execution, so when we're
-      # executing extremely long commands with lots of output, we
-      # should be mindful that the string concatentation for building
-      # #stdout will hurt memory usage drastically
-      #
-      ldd_cmd = "find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd > ldd.out 2>/dev/null"
-
-      log.info(log_key) { "Executing `#{ldd_cmd}`" }
-      shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
-      shell.run_command
-
-      ldd_output = File.read('ldd.out')
-
       current_library = nil
       bad_libs = {}
 
-      ldd_output.each_line do |line|
+      read_shared_libs("find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -337,29 +314,14 @@ module Omnibus
         end
       end
 
-      File.delete('ldd.out')
       bad_libs
     end
 
     def self.health_check_ldd(install_dir, whitelist_files)
-      #
-      # ShellOut has GC turned off during execution, so when we're
-      # executing extremely long commands with lots of output, we
-      # should be mindful that the string concatentation for building
-      # #stdout will hurt memory usage drastically
-      #
-      ldd_cmd = "find #{install_dir}/ -type f | xargs ldd > ldd.out 2>/dev/null"
-
-      log.info(log_key) { "Executing `#{ldd_cmd}`" }
-      shell = Mixlib::ShellOut.new(ldd_cmd, timeout: 3600)
-      shell.run_command
-
-      ldd_output = File.read('ldd.out')
-
       current_library = nil
       bad_libs = {}
 
-      ldd_output.each_line do |line|
+      read_shared_libs("find #{install_dir}/ -type f | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -386,8 +348,17 @@ module Omnibus
         end
       end
 
-      File.delete('ldd.out')
       bad_libs
+    end
+
+    def self.read_shared_libs(cmd)
+      shell = Mixlib::ShellOut.new(cmd, timeout: 3600)
+      log.info(log_key) { "Executing: `#{cmd}`" }
+      shell.run_command
+
+      shell.stdout.each_line do |line|
+        yield line
+      end
     end
   end
 end
