@@ -119,10 +119,25 @@ module Omnibus
     #
     # Publish Omnibus package(s) to a backend.
     #
-    #   $ omnibus release --project chefdk
+    #   $ omnibus publish pkg/*chef* --backend artifactory
     #
-    register(Command::Release, 'release', 'release', 'Publish Omnibus packages')
-    CLI.tasks['clean'].options = Command::Release.class_options
+    method_option :backend,
+      aliases: '-b',
+      type: :string,
+      desc: 'The backend to publish to',
+      default: 's3'
+    method_option :s3_access,
+      type: :string,
+      desc: 'The accessibility of the uploaded package(s)',
+      enum: %w(public private),
+      default: 'private'
+    desc 'publish PATTERN', 'Publish Omnibus packages to a backend'
+    def publish(pattern)
+      publisher = Publisher.for(options[:backend])
+      publisher.publish(pattern, options) do |package|
+        say("Uploaded '#{package.name}'", :green)
+      end
+    end
 
     #
     # Display version information.

@@ -15,6 +15,7 @@
 #
 
 require 'pathname'
+require 'json'
 
 require 'omnibus/exceptions'
 require 'omnibus/version'
@@ -44,8 +45,9 @@ module Omnibus
   autoload :NullBuilder,      'omnibus/null_builder'
   autoload :Ohai,             'omnibus/ohai'
   autoload :Overrides,        'omnibus/overrides'
-  autoload :PackageRelease,   'omnibus/package_release'
+  autoload :Package,          'omnibus/package'
   autoload :Project,          'omnibus/project'
+  autoload :Publisher,        'omnibus/publisher'
   autoload :Reports,          'omnibus/reports'
   autoload :S3Cache,          'omnibus/s3_cache'
   autoload :Software,         'omnibus/software'
@@ -56,16 +58,17 @@ module Omnibus
   # @todo Remove this in the next major release
   autoload :OHAI, 'omnibus/ohai'
 
-  # @todo Refactor these under a +Fetcher module
   autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
   autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
   autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
   autoload :S3CacheFetcher, 'omnibus/fetchers/s3_cache_fetcher'
 
+  autoload :NullPublisher, 'omnibus/publishers/null_publisher'
+  autoload :S3Publisher,   'omnibus/publishers/s3_publisher'
+
   module Command
     autoload :Base,    'omnibus/cli/base'
     autoload :Cache,   'omnibus/cli/cache'
-    autoload :Release, 'omnibus/cli/release'
   end
 
   module Packager

@@ -135,19 +135,15 @@ should never use the replaces line.
   end
 
   class InvalidS3ReleaseConfiguration < Error
-    def initialize(s3_bucket, s3_access_key, s3_secret_key)
-      @s3_bucket, @s3_access_key, @s3_secret_key = s3_bucket, s3_access_key, s3_secret_key
-    end
-
     def to_s
       """
       One or more required S3 configuration values is missing.
 
       Your effective configuration was the following:
 
-          release_s3_bucket     => #{@s3_bucket.inspect}
-          release_s3_access_key => #{@s3_access_key.inspect}
-          release_s3_secret_key => #{@s3_secret_key.inspect}
+          release_s3_bucket     => #{Config.release_s3_bucket.inspect}
+          release_s3_access_key => #{Config.release_s3_access_key.inspect}
+          release_s3_secret_key => #{Config.release_s3_secret_key.inspect}
 
       To release a package to S3, add the following values to your
       config file:
@@ -252,5 +248,43 @@ should never use the replaces line.
   end
 
   class UnresolvableGitReference < Error
+  end
+
+  class UnknownPublisher < Error
+    def initialize(backend)
+      @backend  = backend
+      @backends = Omnibus.constants
+                    .map(&:to_s)
+                    .select { |const| const.to_s =~ /^(.+)Publisher$/ }
+                    .sort
+    end
+
+    def to_s
+      <<-EOH
+I could not find a publisher named #{@backend}. Valid publishers are:
+
+    #{@backends.join("\n    ")}
+
+Please make sure you have spelled everything correctly and try again. If this
+error persists, please open an issue on GitHub.
+      EOH
+    end
+  end
+
+  class GemNotInstalled < Error
+    def initialize(name)
+      @name = name
+    end
+
+    def to_s
+      <<-EOH
+        I could not load the '#{@name}' gem. Please make sure the gem is
+        installed on your local system by running `gem install #{@name}`,
+        or by adding the following to your Gemfile:
+
+            gem '#{@name}'
+
+      EOH
+    end
   end
 end
