@@ -710,11 +710,13 @@ module Omnibus
       # TODO: Fix this and make it betterer
       return unless File.exist?(pkg_path)
 
-      artifact = Artifact.new(pkg_path, [platform_tuple], version: build_version)
-      metadata = artifact.flat_metadata
-      File.open("#{pkg_path}.metadata.json", 'w+') do |f|
-        f.print(JSON.pretty_generate(metadata))
-      end
+      package = Package.new(pkg_path)
+      Package::Metadata.generate(package,
+        platform:         platform_shortname,
+        platform_version: platform_version_for_package,
+        arch:             machine,
+        version:          build_version,
+      )
     end
 
     # The basename of the resulting package file.

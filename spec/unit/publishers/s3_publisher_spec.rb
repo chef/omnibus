@@ -10,18 +10,21 @@ module Omnibus
 
     let(:package) do
       double(Package,
+        path: '/path/to/files/chef.deb',
         name: 'chef.deb',
         content: 'BINARY',
-        raw_metadata: 'METADATA',
-        metadata_name: 'chef.deb.metadata.json',
-        metadata: {
-          platform: 'ubuntu',
-          platform_version: '14.04',
-          arch: 'x86_64',
-          md5: 'ABCDEF123456',
-        },
         validate!: true,
       )
+    end
+
+    let(:metadata) do
+      Package::Metadata.new(package, {
+        name: 'chef.deb.metadata.json',
+        platform: 'ubuntu',
+        platform_version: '14.04',
+        arch: 'x86_64',
+        md5: 'ABCDEF123456',
+      })
     end
 
     let(:packages) { [package] }
@@ -33,6 +36,8 @@ module Omnibus
       Config.release_s3_access_key = s3_access_key
       Config.release_s3_secret_key = s3_secret_key
       Config.release_s3_bucket     = s3_bucket
+
+      package.stub(:metadata).and_return(metadata)
 
       subject.stub(:client).and_return(client)
     end
@@ -76,7 +81,7 @@ module Omnibus
       it 'uploads the metadata' do
         expect(client).to receive(:store).with(
           'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
-          package.raw_metadata,
+          package.metadata.to_json,
           access: :private,
         ).once
 
@@ -100,7 +105,7 @@ module Omnibus
         it 'sets the access control to public_read' do
           expect(client).to receive(:store).with(
             'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
-            package.raw_metadata,
+            package.metadata.to_json,
             access: :public_read,
           ).once
 
@@ -114,7 +119,7 @@ module Omnibus
         it 'sets the access control to private' do
           expect(client).to receive(:store).with(
             'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
-            package.raw_metadata,
+            package.metadata.to_json,
             access: :private,
           ).once
 

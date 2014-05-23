@@ -14,8 +14,126 @@
 # limitations under the License.
 #
 
+require 'json'
+
 module Omnibus
   class Package
+    class Metadata
+      class << self
+        #
+        # Generate a +metadata.json+ from the given package and data hash.
+        #
+        # @param [Package] package
+        #   the package for this metadata
+        # @param [Hash] data
+        #   the hash of attributes to set in the metadata
+        #
+        # @return [String]
+        #   the path where the metadata was saved on disk
+        #
+        def generate(package, data = {})
+          data = {
+            basename: package.name,
+            md5:      package.md5,
+            sha256:   package.sha256,
+            sha512:   package.sha512,
+          }.merge(data)
+
+          instance = new(package, data)
+          instance.save
+          instance.path
+        end
+
+        #
+        # Load the metadata from disk.
+        #
+        # @param [Package] package
+        #   the package for this metadata
+        #
+        # @return [Metadata]
+        #
+        def for_package(package)
+          data = File.read(path_for(package))
+          hash = JSON.parse(data, symbolize_names: true)
+          new(package, hash)
+        rescue Errno::ENOENT
+          raise NoPackageMetadataFile.new(package.path)
+        end
+
+        #
+        # The metadata path that corresponds to the package.
+        #
+        # @param [Package] package
+        #   the package for this metadata
+        #
+        # @return [String]
+        #
+        def path_for(package)
+          "#{package.path}.metadata.json"
+        end
+      end
+
+      #
+      # Create a new metadata object for the given package and hash data.
+      #
+      # @param [Package] package
+      #   the package for this metadata
+      # @param [Hash] data
+      #   the hash of attributes to set in the metadata
+      #
+      def initialize(package, data = {})
+        @package = package
+        @data    = data.dup.freeze
+      end
+
+      #
+      # Helper for accessing the information inside the metadata hash.
+      #
+      # @return [Object]
+      #
+      def [](key)
+        @data[key]
+      end
+
+      #
+      # The name of this metadata file.
+      #
+      # @return [String]
+      #
+      def name
+        @name ||= File.basename(path)
+      end
+
+      #
+      # @see (Metadata.path_for)
+      #
+      def path
+        @path ||= self.class.path_for(@package)
+      end
+
+      #
+      # Save the file to disk.
+      #
+      # @return [true]
+      #
+      def save
+        File.open(path, 'w+')  do |f|
+          f.write(to_json)
+        end
+
+        true
+      end
+
+      #
+      # The JSON representation of this metadata.
+      #
+      # @return [String]
+      #
+      def to_json
+        JSON.pretty_generate(@data)
+      end
+    end
+
     include Digestable
 
     attr_reader :path
@@ -80,42 +198,13 @@ module Omnibus
     #
     # The parsed contents of the metadata.
     #
-    # @raise [NoPackageMetadataFile] if the {metadata_path} does not exist
+    # @raise [NoPackageMetadataFile] if the {metadata} does not exist
     # @raise [JSON::ParserError] if the JSON is not valid
     #
     # @return [Hash<Symbol, String>]
     #
     def metadata
-      @metadata ||= JSON.parse(raw_metadata, symbolize_names: true)
-    end
-
-    #
-    # The raw file contents of the metadata.
-    #
-    # @return [String]
-    #
-    def raw_metadata
-      @raw_metadata ||= IO.read(metadata_path)
-    rescue Errno::ENOENT
-      raise NoPackageMetadataFile.new(path)
-    end
-
-    #
-    # The path to the metadata JSON for this package.
-    #
-    # @return [String]
-    #
-    def metadata_path
-      @metadata_path ||= "#{path}.metadata.json"
-    end
-
-    #
-    # The shortname of the metadata for this package (the basename of the file).
-    #
-    # @return [String]
-    #
-    def metadata_name
-      @metadata_name ||= File.basename(metadata_path)
+      @metadata ||= Metadata.for_package(self)
     end
 
     #
@@ -131,8 +220,8 @@ module Omnibus
         raise NoPackageFile.new(path)
       end
 
-      unless File.exist?(metadata_path)
-        raise NoPackageMetadataFile.new(metadata_path)
+      unless File.exist?(metadata.path)
+        raise NoPackageMetadataFile.new(metadata.path)
       end
 
       true

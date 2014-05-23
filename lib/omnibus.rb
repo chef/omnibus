@@ -28,7 +28,6 @@ module Omnibus
   #
   DEFAULT_CONFIG = 'omnibus.rb'.freeze
 
-  autoload :Artifact,         'omnibus/artifact'
   autoload :Builder,          'omnibus/builder'
   autoload :BuildVersion,     'omnibus/build_version'
   autoload :BuildVersionDSL,  'omnibus/build_version_dsl'

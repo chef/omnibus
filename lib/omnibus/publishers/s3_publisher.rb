@@ -31,12 +31,12 @@ module Omnibus
         package.validate!
 
         # Upload the metadata first
-        log.debug(log_key) { "Uploading '#{metadata_name}'" }
-        client.store(key_for(package, package.metadata_name), package.raw_metadata,
+        log.debug(log_key) { "Uploading '#{package.metadata.name}'" }
+        client.store(key_for(package, package.metadata.name), package.metadata.to_json,
           access: access_policy,
         )
 
-        # Upload the actual artifact
+        # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
         client.store(key_for(package, package.name), package.content,
           access: access_policy,
