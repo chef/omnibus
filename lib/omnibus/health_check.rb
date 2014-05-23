@@ -278,6 +278,7 @@ module Omnibus
                        else
                          WHITELIST_LIBS
                        end
+      Omnibus.config.ldd_whitelist_override.each { |x| whitelist_libs << x }
       whitelist_libs.each do |reg|
         safe ||= true if reg.match(name)
       end
