@@ -18,6 +18,36 @@ module Omnibus
       end
     end
 
+    describe '#md5' do
+      let(:md5) { 'abcdef123456' }
+
+      before { subject.stub(:digest).with(path, :md5).and_return(md5) }
+
+      it 'returns the md5 of the package at the path' do
+        expect(subject.md5).to eq(md5)
+      end
+    end
+
+    describe '#sha256' do
+      let(:sha256) { 'abcdef123456' }
+
+      before { subject.stub(:digest).with(path, :sha256).and_return(sha256) }
+
+      it 'returns the sha256 of the package at the path' do
+        expect(subject.sha256).to eq(sha256)
+      end
+    end
+
+    describe '#sha512' do
+      let(:sha512) { 'abcdef123456' }
+
+      before { subject.stub(:digest).with(path, :sha512).and_return(sha512) }
+
+      it 'returns the sha512 of the package at the path' do
+        expect(subject.sha512).to eq(sha512)
+      end
+    end
+
     describe '#content' do
       context 'when the file exists' do
         let(:content) { 'BINARY' }

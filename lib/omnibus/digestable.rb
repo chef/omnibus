@@ -33,7 +33,7 @@ module Omnibus
       id = type.to_s.upcase
       instance = Digest.const_get(id).new
 
-      IO.open(path) do |io|
+      File.open(path) do |io|
         while (chunk = io.read(1024 * 8))
           instance.update(chunk)
         end

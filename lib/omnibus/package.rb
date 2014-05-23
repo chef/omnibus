@@ -16,6 +16,8 @@
 
 module Omnibus
   class Package
+    include Digestable
+
     attr_reader :path
 
     #
@@ -35,6 +37,33 @@ module Omnibus
     #
     def name
       @name ||= File.basename(path)
+    end
+
+    #
+    # The MD5 checksum for this file.
+    #
+    # @return [String]
+    #
+    def md5
+      @md5 ||= digest(path, :md5)
+    end
+
+    #
+    # The SHA256 checksum for this file.
+    #
+    # @return [String]
+    #
+    def sha256
+      @sha256 ||= digest(path, :sha256)
+    end
+
+    #
+    # The SHA512 checksum for this file.
+    #
+    # @return [String]
+    #
+    def sha512
+      @sha512 ||= digest(path, :sha512)
     end
 
     #

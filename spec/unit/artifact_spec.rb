@@ -22,16 +22,6 @@ describe Omnibus::Artifact do
     expect(artifact.platforms).to eq(platforms)
   end
 
-  it 'generates a MD5 of an artifact' do
-    expect(File).to receive(:open).with(path).and_return(content)
-    expect(artifact.md5).to eq(md5)
-  end
-
-  it 'generates a SHA256 of an artifact' do
-    expect(File).to receive(:open).with(path).and_return(content)
-    expect(artifact.sha256).to eq(sha256)
-  end
-
   it "generates 'flat' metadata" do
     expect(File).to receive(:open).twice.with(path).and_return(content)
     flat_metadata = artifact.flat_metadata

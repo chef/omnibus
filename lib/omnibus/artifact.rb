@@ -52,8 +52,8 @@ module Omnibus
         'arch' => arch,
         'version' => build_version,
         'basename' => File.basename(path),
-        'md5' => md5,
-        'sha256' => sha256,
+        # 'md5' => md5,
+        # 'sha256' => sha256,
       }
     end
 
@@ -68,28 +68,6 @@ module Omnibus
     # @return [String] build version of the project.
     def build_version
       config[:version]
-    end
-
-    # @return [String] hex encoded MD5 of the package
-    def md5
-      @md5 ||= digest(Digest::MD5)
-    end
-
-    # @return [String] hex encoded SHA2-256 of the package
-    def sha256
-      @sha256 ||= digest(Digest::SHA256)
-    end
-
-    private
-
-    def digest(digest_class)
-      digest = digest_class.new
-      File.open(path) do |io|
-        while (chunk = io.read(1024 * 8))
-          digest.update(chunk)
-        end
-      end
-      digest.hexdigest
     end
   end
 end

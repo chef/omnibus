@@ -34,6 +34,7 @@ module Omnibus
   autoload :BuildVersionDSL,  'omnibus/build_version_dsl'
   autoload :Cleaner,          'omnibus/cleaner'
   autoload :Config,           'omnibus/config'
+  autoload :Digestable,       'omnibus/digestable'
   autoload :Error,            'omnibus/exceptions'
   autoload :Fetcher,          'omnibus/fetcher'
   autoload :Generator,        'omnibus/generator'
