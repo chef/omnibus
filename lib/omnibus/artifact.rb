@@ -32,66 +32,6 @@ module Omnibus
       @config = config
     end
 
-    # Adds this artifact to the `release_manifest`, which is mutated. Intended
-    # to be used in a visitor-pattern fashion over a collection of Artifacts to
-    # generate a final release manifest.
-    #
-    # @param release_manifest [Hash{ String => Hash }] a version 1 style release
-    #   manifest Hash (see example)
-    #
-    # @example Add the package to release_manifest:
-    #   add_to_release_manifest!( {} )
-    #     "el" => {
-    #       "5" => { "x86_64" => { "11.4.0-1" => "/el/5/x86_64/demoproject-11.4.0-1.el5.x86_64.rpm" } }
-    #     }
-    # @return [Hash{String=>Hash}] the updated release manifest.
-    def add_to_release_manifest!(release_manifest)
-      platforms.each do |distro, version, arch|
-        release_manifest[distro] ||= {}
-        release_manifest[distro][version] ||= {}
-        release_manifest[distro][version][arch] = { build_version => relpath }
-        # TODO: when adding checksums, the desired format is like this:
-        # build_support_json[platform][platform_version][machine_architecture][options[:version]]["relpath"] = build_location
-      end
-      release_manifest
-    end
-
-    # Adds this artifact to the `release_manifest`, which is mutated. Intended
-    # to be used in a visitor-pattern fashion over a collection of Artifacts to
-    # generate a final release manifest.
-    #
-    # @param release_manifest [Hash{ String => Hash }] a version 2 style release
-    #   manifest Hash (see example)
-    #
-    # @example Add the package to release_manifest:
-    #   add_to_release_manifest!( {} )
-    #     "el" => {
-    #       "5" => {
-    #         "x86_64" => {
-    #           "11.4.0-1" => {
-    #             "relpath" => "/el/5/x86_64/demoproject-11.4.0-1.el5.x86_64.rpm",
-    #             "md5" => "123f00d...",
-    #             "sha256" => 456beef..."
-    #           }
-    #         }
-    #       }
-    #     }
-    # @return [Hash{String=>Hash}] the updated release manifest.
-    def add_to_v2_release_manifest!(release_manifest)
-      platforms.each do |distro, version, arch|
-        pkg_info = {
-          'relpath' => relpath,
-          'md5'     => md5,
-          'sha256'  => sha256,
-        }
-
-        release_manifest[distro] ||= {}
-        release_manifest[distro][version] ||= {}
-        release_manifest[distro][version][arch] = { build_version => pkg_info  }
-      end
-      release_manifest
-    end
-
     # Metadata about the artifact as a flat Hash.
     #
     # @example For a RHEL/CentOS 6, 64-bit package of project version 11.4.0-1
@@ -128,16 +68,6 @@ module Omnibus
     # @return [String] build version of the project.
     def build_version
       config[:version]
-    end
-
-    # @return [String] relative path at which the artifact should be located
-    #   when uploaded to artifact repo.
-    # @example Chef 11.4.0-1 on 64 bit RHEL 6:
-    #   relpath
-    #     "/el/6/x86_64/chef-11.4.0-1.el5.x86_64.rpm"
-    def relpath
-      # upload build to build platform directory
-      "/#{build_platform.join('/')}/#{path.split('/').last}"
     end
 
     # @return [String] hex encoded MD5 of the package

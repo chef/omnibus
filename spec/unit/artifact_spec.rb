@@ -43,49 +43,4 @@ describe Omnibus::Artifact do
     expect(flat_metadata['md5']).to eq(md5)
     expect(flat_metadata['sha256']).to eq(sha256)
   end
-
-  it 'adds the package to a release manifest' do
-    expected = {
-      'el' => {
-        '5' => { 'x86_64' => { '11.4.0-1' => '/el/5/x86_64/demoproject-11.4.0-1.el5.x86_64.rpm' } },
-      },
-      'sles' => {
-        '11.2' => { 'x86_64' => { '11.4.0-1' => '/el/5/x86_64/demoproject-11.4.0-1.el5.x86_64.rpm' } },
-      },
-    }
-
-    manifest = artifact.add_to_release_manifest!({})
-    expect(manifest).to eq(expected)
-  end
-
-  it 'adds the package to a v2 release manifest' do
-    expect(File).to receive(:open).with(path).twice.and_return(content)
-    expected = {
-      'el' => {
-        '5' => {
-          'x86_64' => {
-            '11.4.0-1' => {
-              'relpath' => '/el/5/x86_64/demoproject-11.4.0-1.el5.x86_64.rpm',
-              'md5' => md5,
-              'sha256' => sha256,
-            },
-          },
-        },
-      },
-      'sles' => {
-        '11.2' => {
-          'x86_64' => {
-            '11.4.0-1' => {
-              'relpath' => '/el/5/x86_64/demoproject-11.4.0-1.el5.x86_64.rpm',
-              'md5' => md5,
-              'sha256' => sha256,
-            },
-          },
-        },
-      },
-    }
-    v2_manifest = artifact.add_to_v2_release_manifest!({})
-    expect(v2_manifest).to eq(expected)
-  end
-
 end
