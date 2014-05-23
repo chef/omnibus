@@ -60,6 +60,7 @@ module Omnibus
     include_examples 'a configurable', :software_gem, 'omnibus-software'
     include_examples 'a configurable', :solaris_compiler, nil
     include_examples 'a configurable', :append_timestamp, true
+    include_examples 'a configurable', :ldd_whitelist_override, []
     include_examples 'a configurable', :build_retries, 3
 
     context 'on Windows' do

@@ -282,6 +282,18 @@ module Omnibus
 
     # # @!endgroup
 
+    # @!group Build Version Parameters
+
+    # @!attribute [rw] ldd_override
+    #   Append the some special override libraries
+    #
+    #   @return [Array]
+    default :ldd_whitelist_override, []
+
+    # # @!endgroup
+
+    # @!group Build Control Parameters
+
     # @!group Build Control Parameters
 
     # @! attribute [rw] build_retries
