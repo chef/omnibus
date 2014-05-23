@@ -104,6 +104,8 @@ module Omnibus
       else
         # build a list of all whitelist files from all project dependencies
         whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
+        # append any overrides from the project conf
+        whitelist_files += Omnibus.config.ldd_whitelist_override
         Omnibus::HealthCheck.run(install_path, whitelist_files)
       end
     end
