@@ -6,6 +6,9 @@ Unreleased
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
 
+### Bug fixes
+- Fix a small typo in the project generator (come -> some)
+
 
 v3.1.1 (May 20, 2014)
 ---------------------
