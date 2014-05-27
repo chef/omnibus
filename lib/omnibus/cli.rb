@@ -132,6 +132,18 @@ module Omnibus
       enum: %w(public private),
       default: 'private'
     desc 'publish PATTERN', 'Publish Omnibus packages to a backend'
+    long_desc <<-DESC
+      Publish (release) one or more omnibus packages to a specific backend. This
+      command accepts the path to a single package or a glob path for a list of
+      packages to publish.
+
+      Depending on the backend, you may need to specify additional configuration
+      options. For example, on the S3 backend, you can specify the access level
+      with which the packages are created. To make published packages publically
+      accessible:
+
+      > $ omnibus publish path/to/*.deb --s3-access public
+    DESC
     def publish(pattern)
       publisher = Publisher.for(options[:backend])
       publisher.publish(pattern, options) do |package|
