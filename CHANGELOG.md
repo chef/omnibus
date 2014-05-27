@@ -5,10 +5,16 @@ Unreleased
 ----------
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
+- Refactor `omnibus release` into a non-S3-specific backend "publisher"
+- Add support for specifying a dir glob to the `publish` command to upload multiple packages
+- "Package" is now a public API
 
 ### Bug fixes
 - Fix a small typo in the project generator (come -> some)
 - Update sample software definition for libpng to 1.5.18
+
+### Potentially breaking changes
+- Merged `Package` and `Artifact` into the same class and updated API - this was considered an **internal** API so it is not a violation of semver
 
 
 v3.1.1 (May 20, 2014)
