@@ -267,7 +267,7 @@ I could not find a publisher named #{@backend}. Valid publishers are:
 
 Please make sure you have spelled everything correctly and try again. If this
 error persists, please open an issue on GitHub.
-      EOH
+EOH
     end
   end
 
@@ -278,13 +278,13 @@ error persists, please open an issue on GitHub.
 
     def to_s
       <<-EOH
-        I could not load the '#{@name}' gem. Please make sure the gem is
-        installed on your local system by running `gem install #{@name}`,
-        or by adding the following to your Gemfile:
+I could not load the '#{@name}' gem. Please make sure the gem is installed on
+your local system by running `gem install #{@name}`, or by adding the following
+to your Gemfile:
 
-            gem '#{@name}'
+    gem '#{@name}'
 
-      EOH
+EOH
     end
   end
 end
