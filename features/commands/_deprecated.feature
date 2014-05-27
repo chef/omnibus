@@ -1,7 +1,4 @@
 Feature: Backwards-compatible deprecated commands
-  Background:
-    * I have an omnibus project named "hamlet"
-
   Scenario: When "build project" is given
     * I run `omnibus build project hamlet`
     * the output should contain:
@@ -63,4 +60,25 @@ Feature: Backwards-compatible deprecated commands
     * the output should contain:
       """
       The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:false' instead.
+      """
+
+  Scenario: When "release package" is given
+    * I run `omnibus release package /path/to/package`
+    * the output should contain:
+      """
+      The interface for releasing a project has changed. Please use 'omnibus publish PATTERN' instead.
+      """
+
+  Scenario: When "release package --public" is given
+    * I run `omnibus release package /path/to/package --public`
+    * the output should contain:
+      """
+      The '--public' option has been deprecated! Please use '--s3-access public' instead.
+      """
+
+  Scenario: When "release package --no-public" is given
+    * I run `omnibus release package /path/to/package --no-public`
+    * the output should contain:
+      """
+      The '--no-public' option has been deprecated! Please use '--s3-access private' instead.
       """

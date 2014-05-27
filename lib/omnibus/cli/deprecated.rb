@@ -88,6 +88,31 @@ module Omnibus
           return old_dispatch(m, args, options, config)
         end
 
+        #
+        # Legacy releaser:
+        #
+        #   $ omnibus release
+        #
+        if args[0..1] == %w(release package)
+          warn("The interface for releasing a project has changed. Please use 'omnibus publish PATTERN' instead.")
+          args[0] = 'publish'
+          args.delete_at(1)
+
+          if args.include?('--public')
+            warn("The '--public' option has been deprecated! Please use '--s3-access public' instead.")
+            args.delete('--public')
+            args += %w(--s3-access public)
+          end
+
+          if args.include?('--no-public')
+            warn("The '--no-public' option has been deprecated! Please use '--s3-access private' instead.")
+            args.delete('--no-public')
+            args += %w(--s3-access private)
+          end
+
+          return old_dispatch(m, args, options, config)
+        end
+
         # Dispatch everything else down the stack
         old_dispatch(m, args, options, config)
       end
