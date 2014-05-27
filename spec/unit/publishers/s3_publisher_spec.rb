@@ -19,11 +19,11 @@ module Omnibus
 
     let(:metadata) do
       Package::Metadata.new(package,
-                              name: 'chef.deb.metadata.json',
-                              platform: 'ubuntu',
-                              platform_version: '14.04',
-                              arch: 'x86_64',
-                              md5: 'ABCDEF123456'
+        name: 'chef.deb.metadata.json',
+        platform: 'ubuntu',
+        platform_version: '14.04',
+        arch: 'x86_64',
+        md5: 'ABCDEF123456',
       )
     end
 

@@ -4,7 +4,7 @@ module Omnibus
   describe Package::Metadata do
     let(:instance) do
       double(Package::Metadata,
-        path: '/path/to/package.deb.metadata.json'
+        path: '/path/to/package.deb.metadata.json',
       )
     end
 
