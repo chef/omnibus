@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require 'omnibus/ohai'
 
 module Omnibus
   class UnsupportedURIScheme < ArgumentError
@@ -197,16 +198,24 @@ module Omnibus
     end
 
     def extract_cmd
-      if project_file.end_with?('.gz') || project_file.end_with?('.tgz')
-        "gzip -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
-      elsif project_file.end_with?('.bz2')
-        "bzip2 -dc  #{project_file} | ( cd #{source_dir} && tar -xf - )"
-      elsif project_file.end_with?('.7z')
+      # Use 7-zip to extract 7z/zip for Windows
+      win_7z_extensions = %w(.7z .zip)
+
+      # tar probably has compression scheme linked in, otherwise for tarballs
+      tar_extensions = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
+
+      if Ohai.platform == 'windows' && project_file.end_with?(*win_7z_extensions)
         "7z.exe x #{project_file} -o#{source_dir} -r -y"
-      elsif project_file.end_with?('.zip')
+      elsif Ohai.platform != 'windows' && project_file.end_with?('.7z')
+        "7z x #{project_file} -o#{source_dir} -r -y"
+      elsif Ohai.platform != 'windows' && project_file.end_with?('.zip')
         "unzip #{project_file} -d #{source_dir}"
-      elsif project_file.end_with?('.xz') || project_file.end_with?('.txz')
-        "xz -dc #{project_file} | ( cd #{source_dir} && tar -xf - )"
+      elsif project_file.end_with?(*tar_extensions)
+        compression_switch = 'z' if project_file.end_with?('gz')
+        compression_switch = 'j' if project_file.end_with?('bz2')
+        compression_switch = 'J' if project_file.end_with?('xz')
+        compression_switch = '' if project_file.end_with?('tar')
+        "tar #{compression_switch}xf #{project_file} -C#{source_dir}"
       else
         # if we don't recognize the extension, simply copy over the file
         proc do
