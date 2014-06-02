@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require 'omnibus/ohai'
-
 module Omnibus
   class UnsupportedURIScheme < ArgumentError
   end
@@ -30,6 +28,12 @@ module Omnibus
     attr_reader :source_uri
     attr_reader :source_dir
     attr_reader :project_dir
+
+    # Use 7-zip to extract 7z/zip for Windows
+    WIN_7Z_EXTENSIONS = %w(.7z .zip)
+
+    # tar probably has compression scheme linked in, otherwise for tarballs
+    TAR_EXTENSIONS = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
 
     def initialize(software)
       @name         = software.name
@@ -198,19 +202,13 @@ module Omnibus
     end
 
     def extract_cmd
-      # Use 7-zip to extract 7z/zip for Windows
-      win_7z_extensions = %w(.7z .zip)
-
-      # tar probably has compression scheme linked in, otherwise for tarballs
-      tar_extensions = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
-
-      if Ohai.platform == 'windows' && project_file.end_with?(*win_7z_extensions)
+      if Ohai.platform == 'windows' && project_file.end_with?(*WIN_7Z_EXTENSIONS)
         "7z.exe x #{project_file} -o#{source_dir} -r -y"
       elsif Ohai.platform != 'windows' && project_file.end_with?('.7z')
         "7z x #{project_file} -o#{source_dir} -r -y"
       elsif Ohai.platform != 'windows' && project_file.end_with?('.zip')
         "unzip #{project_file} -d #{source_dir}"
-      elsif project_file.end_with?(*tar_extensions)
+      elsif project_file.end_with?(*TAR_EXTENSIONS)
         compression_switch = 'z' if project_file.end_with?('gz')
         compression_switch = 'j' if project_file.end_with?('bz2')
         compression_switch = 'J' if project_file.end_with?('xz')
