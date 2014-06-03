@@ -35,6 +35,7 @@ module Omnibus
           data = {
             basename: package.name,
             md5:      package.md5,
+            sha128:   package.sha128,
             sha256:   package.sha256,
             sha512:   package.sha512,
           }.merge(data)
@@ -164,6 +165,15 @@ module Omnibus
     #
     def md5
       @md5 ||= digest(path, :md5)
+    end
+
+    #
+    # The SHA128 checksum for this file.
+    #
+    # @return [String]
+    #
+    def sha128
+      @sha128 ||= digest(path, :sha128)
     end
 
     #

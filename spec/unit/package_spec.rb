@@ -13,6 +13,7 @@ module Omnibus
         name:   'package',
         path:   '/path/to/package.deb',
         md5:    'abc123',
+        sha128: 'abc123',
         sha256: 'abcd1234',
         sha512: 'abcdef123456',
       )
