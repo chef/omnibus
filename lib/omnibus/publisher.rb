@@ -18,21 +18,6 @@ module Omnibus
   class Publisher
     class << self
       #
-      # Get the Publisher class that corresponds to the given backend.
-      #
-      # @param [#to_s] backend
-      #   the backend publisher to use
-      #
-      # @return [~Publisher]
-      #
-      def for(backend)
-        id = backend.to_s.capitalize
-        Omnibus.const_get("#{id}Publisher")
-      rescue NameError
-        raise UnknownPublisher.new(backend)
-      end
-
-      #
       # Shortcut class method for creating a new instance of this class and
       # executing the publishing sequence.
       #

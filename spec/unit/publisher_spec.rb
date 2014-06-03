@@ -7,26 +7,6 @@ module Omnibus
   describe Publisher do
     it { should be_a_kind_of(Logging) }
 
-    describe '.for' do
-      context 'when given a string' do
-        it 'returns the correct publisher' do
-          expect(described_class.for('fake')).to be(FakePublisher)
-        end
-      end
-
-      context 'when given a symbol' do
-        it 'returns the correct publisher' do
-          expect(described_class.for(:fake)).to be(FakePublisher)
-        end
-      end
-
-      context 'when given an invalid backend' do
-        it 'raises an exception' do
-          expect { described_class.for(:hamlet) }.to raise_error(UnknownPublisher)
-        end
-      end
-    end
-
     describe '.publish' do
       let(:publisher) { double(described_class) }
 

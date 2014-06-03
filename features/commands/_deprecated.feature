@@ -66,19 +66,19 @@ Feature: Backwards-compatible deprecated commands
     * I run `omnibus release package /path/to/package`
     * the output should contain:
       """
-      The interface for releasing a project has changed. Please use 'omnibus publish PATTERN' instead.
+      The interface for releasing a project has changed. Please use 'omnibus publish BACKEND [COMAMND]' instead.
       """
 
   Scenario: When "release package --public" is given
     * I run `omnibus release package /path/to/package --public`
     * the output should contain:
       """
-      The '--public' option has been deprecated! Please use '--s3-access public' instead.
+      The '--public' option has been deprecated! Please use '--acl public' instead.
       """
 
   Scenario: When "release package --no-public" is given
     * I run `omnibus release package /path/to/package --no-public`
     * the output should contain:
       """
-      The '--no-public' option has been deprecated! Please use '--s3-access private' instead.
+      The '--no-public' option has been deprecated! Please use '--acl private' instead.
       """

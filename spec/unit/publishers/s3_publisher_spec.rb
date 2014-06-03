@@ -32,13 +32,7 @@ module Omnibus
     let(:client) { double('UberS3', store: nil) }
 
     before do
-      Config.reset!
-      Config.release_s3_access_key = s3_access_key
-      Config.release_s3_secret_key = s3_secret_key
-      Config.release_s3_bucket     = s3_bucket
-
       package.stub(:metadata).and_return(metadata)
-
       subject.stub(:client).and_return(client)
     end
 
@@ -47,22 +41,14 @@ module Omnibus
     subject { described_class.new(path) }
 
     describe '#initialize' do
-      it 'raises an exception when release_s3_access_key is missing' do
-        Config.release_s3_access_key = nil
-        expect { described_class.new(path) }
-          .to raise_error(InvalidS3ReleaseConfiguration)
+      it 'raises an exception when publish_s3_access_key is missing' do
+        expect { Config.publish_s3_access_key }
+          .to raise_error(MissingConfigOption)
       end
 
       it 'raises an exception when release_s3_secret_key is missing' do
-        Config.release_s3_secret_key = nil
-        expect { described_class.new(path) }
-          .to raise_error(InvalidS3ReleaseConfiguration)
-      end
-
-      it 'raises an exception when release_s3_bucket is missing' do
-        Config.release_s3_bucket = nil
-        expect { described_class.new(path) }
-          .to raise_error(InvalidS3ReleaseConfiguration)
+        expect { Config.publish_s3_secret_key }
+          .to raise_error(MissingConfigOption)
       end
 
       it 'does not raise an error when the config is okay' do
@@ -100,7 +86,7 @@ module Omnibus
       end
 
       context 'when the upload is set to public' do
-        subject { described_class.new(path, s3_access: 'public') }
+        subject { described_class.new(path, acl: 'public') }
 
         it 'sets the access control to public_read' do
           expect(client).to receive(:store).with(
@@ -114,7 +100,7 @@ module Omnibus
       end
 
       context 'when the upload is set to a nonsensical value' do
-        subject { described_class.new(path, s3_access: 'baconbits') }
+        subject { described_class.new(path, acl: 'baconbits') }
 
         it 'sets the access control to private' do
           expect(client).to receive(:store).with(

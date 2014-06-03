@@ -69,6 +69,7 @@ module Omnibus
   module Command
     autoload :Base,    'omnibus/cli/base'
     autoload :Cache,   'omnibus/cli/cache'
+    autoload :Publish, 'omnibus/cli/publish'
   end
 
   module Packager

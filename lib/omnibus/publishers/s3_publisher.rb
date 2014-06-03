@@ -52,9 +52,9 @@ module Omnibus
     #
     def client
       @client ||= UberS3.new(
-        access_key:        Config.release_s3_access_key,
-        secret_access_key: Config.release_s3_secret_key,
-        bucket:            Config.release_s3_bucket,
+        access_key:        Config.publish_s3_access_key,
+        secret_access_key: Config.publish_s3_secret_key,
+        bucket:            @options[:bucket],
         adaper:            :net_http,
       )
     end
@@ -89,7 +89,7 @@ module Omnibus
     #   the UberS3-ready access policy
     #
     def access_policy
-      if @options[:s3_access].to_s == 'public'
+      if @options[:acl].to_s == 'public'
         :public_read
       else
         :private

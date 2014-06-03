@@ -42,6 +42,11 @@ module Omnibus
           end
         end
 
+        # Handle old Config.release_s3_bucket
+        if Config.has_key?(:release_s3_bucket)
+          warn("The config variable 'release_s3_bucket' is deprecated. Please remove it from your config.")
+        end
+
         # Handle old --timestamp
         if args.include?('--timestamp') || args.include?('-t')
           warn("The '--timestamp' option has been deprecated! Please use '--override append_timestamp:true' instead.")
@@ -94,20 +99,26 @@ module Omnibus
         #   $ omnibus release
         #
         if args[0..1] == %w(release package)
-          warn("The interface for releasing a project has changed. Please use 'omnibus publish PATTERN' instead.")
+          warn("The interface for releasing a project has changed. Please use 'omnibus publish BACKEND [COMAMND]' instead.")
           args[0] = 'publish'
-          args.delete_at(1)
+          args.delete('package')
+          args.insert(1, 's3')
 
           if args.include?('--public')
-            warn("The '--public' option has been deprecated! Please use '--s3-access public' instead.")
+            warn("The '--public' option has been deprecated! Please use '--acl public' instead.")
             args.delete('--public')
-            args += %w(--s3-access public)
+            args += %w(--acl public)
           end
 
           if args.include?('--no-public')
-            warn("The '--no-public' option has been deprecated! Please use '--s3-access private' instead.")
+            warn("The '--no-public' option has been deprecated! Please use '--acl private' instead.")
             args.delete('--no-public')
-            args += %w(--s3-access private)
+            args += %w(--acl private)
+          end
+
+          if Config.has_key?(:release_s3_bucket)
+            warn("The config variable 'release_s3_bucket' is deprecated. Please use 'omnibus publish s3 #{Config[:release_s3_bucket]}' instead.")
+            args.insert(2, Config[:release_s3_bucket])
           end
 
           return old_dispatch(m, args, options, config)

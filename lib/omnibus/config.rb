@@ -282,25 +282,18 @@ module Omnibus
     # @!group S3 Publisher
     # --------------------------------------------------
 
-    # @!attribute [rw] release_s3_bucket
-    #   The name of the S3 bucket you want to release artifacts to.
-    #   @return [String]
-    default(:release_s3_bucket) do
-      raise MissingConfigOption.new(:release_s3_bucket, "'my_bucket'")
-    end
-
-    # @!attribute [rw] release_s3_access_key
+    # @!attribute [rw] publish_s3_access_key
     #   The S3 access key to use for S3 artifact release.
     #   @return [String]
-    default(:release_s3_access_key) do
-      raise MissingConfigOption.new(:release_s3_access_key, "'ABCD1234'")
+    default(:publish_s3_access_key) do
+      raise MissingConfigOption.new(:publish_s3_access_key, "'ABCD1234'")
     end
 
-    # @!attribute [rw] release_s3_secret_key
+    # @!attribute [rw] publish_s3_secret_key
     #   The S3 secret key to use for S3 artifact release
     #   @return [String]
-    default(:release_s3_secret_key) do
-      raise MissingConfigOption.new(:release_s3_secret_key, "'EFGH5678'")
+    default(:publish_s3_secret_key) do
+      raise MissingConfigOption.new(:publish_s3_secret_key, "'EFGH5678'")
     end
 
     # --------------------------------------------------

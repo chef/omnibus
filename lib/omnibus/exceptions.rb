@@ -130,34 +130,6 @@ should never use the replaces line.
     end
   end
 
-  class InvalidS3ReleaseConfiguration < Error
-    def to_s
-      """
-      One or more required S3 configuration values is missing.
-
-      Your effective configuration was the following:
-
-          release_s3_bucket     => #{Config.release_s3_bucket.inspect}
-          release_s3_access_key => #{Config.release_s3_access_key.inspect}
-          release_s3_secret_key => #{Config.release_s3_secret_key.inspect}
-
-      To release a package to S3, add the following values to your
-      config file:
-
-          release_s3_bucket      ENV['S3_BUCKET_NAME']
-          release_s3_access_key  ENV['S3_ACCESS_KEY']
-          release_s3_secret_key  ENV['S3_SECRET_KEY']
-
-      Note that you are not required to use environment variables as
-      illustrated (and the ones listed have no special significance in
-      Omnibus), but it is encouraged to prevent spread of sensitive
-      information and inadvertent check-in of same to version control
-      systems.
-
-      """
-    end
-  end
-
   # Raise this error if a needed Project configuration value has not
   # been set.
   class MissingProjectConfiguration < Error
@@ -282,20 +254,20 @@ to your Gemfile:
 
 EOH
     end
+  end
 
-    class MissingConfigOption < Error
-      def initialize(key, example_value = "'...'")
-        @key, @example_value = key, example_value
-      end
+  class MissingConfigOption < Error
+    def initialize(key, example_value = "'...'")
+      @key, @example_value = key, example_value
+    end
 
-      def to_s
-        <<-EOH
+    def to_s
+      <<-EOH
 The Omnibus configuration is missing the required configuration option
 '#{@key}'. Please define it in your Omnibus config:
 
-    #{@key} #{@example_value}
+  #{@key} #{@example_value}
 EOH
-      end
     end
   end
 end
