@@ -20,91 +20,177 @@ require 'uber-s3'
 module Omnibus
   class S3Cache
     include Logging
-    include SoftwareS3URLs
 
-    def initialize
-      unless config.s3_bucket && config.s3_access_key && config.s3_secret_key
-        raise InvalidS3Configuration
+    class << self
+      #
+      # List all software in the cache.
+      #
+      # @return [Array<Software>]
+      #
+      def list
+        cached = keys
+        softwares.select do |software|
+          key = key_for(software)
+          cached.include?(key)
+        end
       end
 
-      @client = UberS3.new(
-        access_key: config.s3_access_key,
-        secret_access_key: config.s3_secret_key,
-        bucket: config.s3_bucket,
-        adapter: :net_http,
-      )
-    end
+      #
+      # The list of objects in the cache, by their key.
+      #
+      # @return [Array<String>]
+      #
+      def keys
+        bucket.objects('/').map(&:key)
+      end
 
-    def config
-      Omnibus.config
-    end
+      #
+      # List all software missing from the cache.
+      #
+      # @return [Array<Software>]
+      #
+      def missing
+        cached = keys
+        softwares.select do |software|
+          key = key_for(software)
+          !cached.include?(key)
+        end
+      end
 
-    def list
-      existing_keys = list_by_key
-      tarball_software.select { |s| existing_keys.include?(key_for_package(s)) }
-    end
+      #
+      # Populate the cache with the all the missing software definitions.
+      #
+      # @return [true]
+      #
+      def populate
+        missing.each do |software|
+          fetch(software)
 
-    def list_by_key
-      bucket.objects('/').map(&:key)
-    end
+          key = key_for(software)
+          content = IO.read(software.project_file)
 
-    def missing
-      already_cached = list_by_key
-      tarball_software.delete_if { |s| already_cached.include?(key_for_package(s)) }
-    end
+          log.info(log_key) do
+            "Caching '#{software.project_file}' to '#{Config.s3_bucket}/#{key}'"
+          end
 
-    def tarball_software
-      Omnibus.projects.map do |project|
-        project.library.select { |s| s.source && s.source.key?(:url) }
-      end.flatten
-    end
-
-    def populate
-      missing.each do |software|
-        fetch(software)
-
-        key = key_for_package(software)
-        content = IO.read(software.project_file)
-
-        log.info(log_key) do
-          "Uploading #{software.project_file} as #{config.s3_bucket}/#{key}"
+          client.store(key, content,
+            access: :public_read,
+            content_md5: software.checksum
+          )
         end
 
-        @client.store(key, content, access: :public_read, content_md5: software.checksum)
+        true
       end
-    end
 
-    def fetch_missing
-      missing.each do |software|
-        fetch(software)
+      #
+      # Fetch all source tarballs onto the local machine.
+      #
+      # @return [true]
+      #
+      def fetch_missing
+        missing.each do |software|
+          fetch(software)
+        end
       end
-    end
 
-    private
+      #
+      # @private
+      #
+      # The key with which to cache the package on S3. This is the name of the
+      # package, the version of the package, and its checksum.
+      #
+      # @example
+      #   "zlib-1.2.6-618e944d7c7cd6521551e30b32322f4a"
+      #
+      # @param [Software] software
+      #
+      # @return [String]
+      #
+      def key_for(software)
+        unless software.name
+          raise InsufficientSpecification.new(:name, software)
+        end
 
-    def ensure_cache_dir
-      FileUtils.mkdir_p(config.cache_dir)
-    end
+        unless software.version
+          raise InsufficientSpecification.new(:version, software)
+        end
 
-    def fetch(software)
-      log.info(log_key) { "Fetching #{software.name}" }
-      fetcher = Fetcher.without_caching_for(software)
-      if fetcher.fetch_required?
-        log.debug(log_key) { 'Updating cache' }
-        fetcher.download
-        fetcher.verify_checksum!
-      else
-        log.debug(log_key) { 'Cached copy up to date, skipping.' }
+        unless software.checksum
+          raise InsufficientSpecification.new(:checksum, software)
+        end
+
+        "#{software.name}-#{software.version}-#{software.checksum}"
       end
-    end
 
-    def bucket
-      @bucket ||= begin
-        if @client.exists?('/')
-          @client.bucket
+      private
+
+      #
+      # The client to connect to S3 with.
+      #
+      # @return [UberS3::Client]
+      #
+      def client
+        @client ||= UberS3.new(
+          access_key:        Config.s3_access_key,
+          secret_access_key: Config.s3_secret_key,
+          bucket:            Config.s3_bucket,
+          adapter:           :net_http,
+        )
+      end
+
+      #
+      # The bucket where the objects live.
+      #
+      # @return [UberS3::Bucket]
+      #
+      def bucket
+        @bucket ||= begin
+          if client.exists?('/')
+            client.bucket
+          else
+            client.connection.put('/')
+          end
+        end
+      end
+
+      #
+      # The list of softwares for all Omnibus projects.
+      #
+      # @return [Array<Software>]
+      #
+      def softwares
+        Omnibus.projects.inject({}) do |hash, project|
+          project.library.each do |software|
+            if software.source && software.source.key?(:url)
+              hash[software.name] = software
+            end
+          end
+
+          hash
+        end.values.sort
+      end
+
+      #
+      # Fetch the remote software definition onto disk.
+      #
+      # @param [Software] software
+      #   the software to fetch
+      #
+      # @return [true]
+      #
+      def fetch(software)
+        log.info(log_key) { "Fetching #{software.name}" }
+        fetcher = Fetcher.without_caching_for(software)
+
+        if fetcher.fetch_required?
+          log.debug(log_key) { 'Updating cache' }
+          fetcher.download
+          fetcher.verify_checksum!
         else
-          @client.connection.put('/')
+          log.debug(log_key) { 'Cached copy up to date, skipping.' }
         end
+
+        true
       end
     end
   end

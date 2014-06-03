@@ -18,6 +18,8 @@ module Omnibus
   #
   # Used to generate the manifest of all software components with versions
   class Library
+    include Enumerable
+
     # The list of Omnibus::Software definitions. This is populated by calling
     # #component_added during code loading. The list is expected to be sorted
     # in a valid order according to project and software dependencies, but this
@@ -98,8 +100,8 @@ module Omnibus
       end
     end
 
-    def select(*args, &block)
-      @components.select(*args, &block)
+    def each(&block)
+      @components.each(&block)
     end
   end
 end

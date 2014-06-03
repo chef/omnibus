@@ -19,20 +19,20 @@ module Omnibus
     namespace :cache
 
     #
-    # List the existing source packages in the cache.
+    # List the existing software packages in the cache.
     #
     #   $ omnibus cache existing
     #
-    desc 'existing', 'List source packages which exist in the cache'
+    desc 'existing', 'List software packages which exist in the cache'
     def existing
-      result = cache.list
+      result = S3Cache.list
 
       if result.empty?
         say('There are no packages in the cache!')
       else
         say('The following packages are in the cache:')
-        result.each do |source|
-          say("  * #{source.name}")
+        result.each do |software|
+          say("  * #{software.name}-#{software.version}")
         end
       end
     end
@@ -44,7 +44,7 @@ module Omnibus
     #
     desc 'list', 'List all cached files (by S3 key)'
     def list
-      result = cache.list_by_key
+      result = S3Cache.keys
 
       if result.empty?
         say('There is nothing in the cache!')
@@ -57,33 +57,33 @@ module Omnibus
     end
 
     #
-    # List missing source packages.
+    # List missing software packages.
     #
     #   $ omnibus cache missing
     #
-    desc 'missing', 'Lists source packages that are required but not yet cached'
+    desc 'missing', 'Lists software packages that are required but not yet cached'
     def missing
-      result = cache.missing
+      result = S3Cache.missing
 
       if result.empty?
         say('There are no missing packages in the cache.')
       else
         say('The following packages are missing from the cache:')
-        result.each do |source|
-          say(source.name)
+        result.each do |software|
+          say("  * #{software.name}-#{software.version}")
         end
       end
     end
 
     #
-    # Fetch missing source packages locally
+    # Fetch missing software packages locally
     #
     #   $ omnibus cache fetch
     #
-    desc 'fetch', 'Fetches missing source packages locally'
+    desc 'fetch', 'Fetches missing software packages locally'
     def fetch
       say('Fetching missing packages...')
-      cache.fetch_missing
+      S3Cache.fetch_missing
     end
 
     #
@@ -94,13 +94,7 @@ module Omnibus
     desc 'populate', 'Populate the S3 Cache'
     def populate
       say('Populating the cache...')
-      cache.populate
-    end
-
-    private
-
-    def cache
-      @cache ||= S3Cache.new
+      S3Cache.populate
     end
   end
 end

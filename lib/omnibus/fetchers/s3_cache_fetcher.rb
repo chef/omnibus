@@ -16,13 +16,6 @@
 
 module Omnibus
   class S3CacheFetcher < NetFetcher
-    include SoftwareS3URLs
-
-    def initialize(software)
-      @software = software
-      super
-    end
-
     def fetch
       log.info(log_key) do
         "S3 Cache enabled, '#{name}' will be fetched from S3 cache"
@@ -31,8 +24,24 @@ module Omnibus
       super
     end
 
+    #
+    # The source URI for the software definition that is being fetched.
+    #
+    # @return [URI]
+    #
     def source_uri
       URI.parse(url_for(@software))
+    end
+
+    private
+
+    #
+    # The URL for the cached software.
+    #
+    # @return [String]
+    #
+    def url_for(software)
+      "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(software)}"
     end
   end
 end

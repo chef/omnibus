@@ -181,43 +181,41 @@ module Omnibus
 
     # @!endgroup
 
+    #
     # @!group S3 Caching Configuration Parameters
+    # --------------------------------------------------
 
     # @!attribute [rw] use_s3_caching
     #   Indicate if you wish to cache software artifacts in S3 for
     #   quicker build times.  Requires {#s3_bucket}, {#s3_access_key},
     #   and {#s3_secret_key} to be set if this is set to `true`.
-    #
-    #   Defaults to `false`.
-    #
     #   @return [Boolean]
-    default :use_s3_caching, false
+    default(:use_s3_caching, false)
 
     # @!attribute [rw] s3_bucket
     #   The name of the S3 bucket you want to cache software artifacts in.
-    #
-    #   Defaults to `nil`.  Must be set if {#use_s3_caching} is `true`.
-    #
-    #   @return [String, nil]
-    default :s3_bucket, nil
+    #   @return [String]
+    default(:s3_bucket) do
+      raise MissingConfigOption.new(:s3_bucket, "'my_bucket'")
+    end
 
     # @!attribute [rw] s3_access_key
     #   The S3 access key to use with S3 caching.
-    #
-    #   Defaults to `nil`.  Must be set if {#use_s3_caching} is `true`.
-    #
-    #   @return [String, nil]
-    default :s3_access_key, nil
+    #   @return [String]
+    default(:s3_access_key) do
+      raise MissingConfigOption.new(:s3_access_key, "'ABCD1234'")
+    end
 
     # @!attribute [rw] s3_secret_key
     #   The S3 secret key to use with S3 caching.
-    #
-    #   Defaults to `nil`.  Must be set if {#use_s3_caching} is `true.`
-    #
-    #   @return [String, nil]
-    default :s3_secret_key, nil
+    #   @return [String]
+    default(:s3_secret_key) do
+      raise MissingConfigOption.new(:s3_secret_key, "'EFGH5678'")
+    end
 
+    # --------------------------------------------------
     # @!endgroup
+    #
 
     #
     # @!group Artifactory Publisher
@@ -342,27 +340,5 @@ module Omnibus
     #
     #   @return [Integer, nil]
     default :build_retries, 3
-
-    class << self
-      #
-      # Asserts that the Config object is in a valid state. If invalid for any
-      # reason, an exception will be thrown.
-      #
-      # @return [true]
-      #
-      def validate!
-        validate_s3_config!
-      end
-
-      private
-
-      def validate_s3_config!
-        if use_s3_caching
-          unless s3_bucket
-            raise InvalidS3Configuration
-          end
-        end
-      end
-    end
   end
 end

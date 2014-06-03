@@ -51,7 +51,6 @@ module Omnibus
   autoload :Reports,          'omnibus/reports'
   autoload :S3Cache,          'omnibus/s3_cache'
   autoload :Software,         'omnibus/software'
-  autoload :SoftwareS3URLs,   'omnibus/software_s3_urls'
   autoload :Sugarable,        'omnibus/sugarable'
   autoload :Util,             'omnibus/util'
 
@@ -166,7 +165,6 @@ module Omnibus
     #
     # @return [void]
     def process_configuration
-      Config.validate!
       process_dsl_files
     end
 
