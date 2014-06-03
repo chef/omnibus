@@ -712,6 +712,9 @@ module Omnibus
 
       package = Package.new(pkg_path)
       Package::Metadata.generate(package,
+        name:             name,
+        friendly_name:    friendly_name,
+        homepage:         homepage,
         platform:         platform_shortname,
         platform_version: platform_version_for_package,
         arch:             machine,
