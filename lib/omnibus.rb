@@ -63,8 +63,9 @@ module Omnibus
   autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
   autoload :S3CacheFetcher, 'omnibus/fetchers/s3_cache_fetcher'
 
-  autoload :NullPublisher, 'omnibus/publishers/null_publisher'
-  autoload :S3Publisher,   'omnibus/publishers/s3_publisher'
+  autoload :ArtifactoryPublisher, 'omnibus/publishers/artifactory_publisher'
+  autoload :NullPublisher,        'omnibus/publishers/null_publisher'
+  autoload :S3Publisher,          'omnibus/publishers/s3_publisher'
 
   module Command
     autoload :Base,    'omnibus/cli/base'

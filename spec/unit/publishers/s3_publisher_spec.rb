@@ -4,10 +4,6 @@ module Omnibus
   describe S3Publisher do
     let(:path) { '/path/to/files/*.deb' }
 
-    let(:s3_access_key) { 'ACCESS_KEY' }
-    let(:s3_secret_key) { 'SECRET_KEY' }
-    let(:s3_bucket)     { 'BUCKET' }
-
     let(:package) do
       double(Package,
         path: '/path/to/files/chef.deb',
@@ -19,10 +15,15 @@ module Omnibus
 
     let(:metadata) do
       Package::Metadata.new(package,
-        name: 'chef.deb.metadata.json',
+        name: 'chef',
+        friendly_name: 'Chef',
+        homepage: 'https://getchef.com',
+        version: '11.0.6',
+        basename: 'chef.deb',
         platform: 'ubuntu',
         platform_version: '14.04',
         arch: 'x86_64',
+        sha128: 'SHA128',
         md5: 'ABCDEF123456',
       )
     end
@@ -49,10 +50,6 @@ module Omnibus
       it 'raises an exception when release_s3_secret_key is missing' do
         expect { Config.publish_s3_secret_key }
           .to raise_error(MissingConfigOption)
-      end
-
-      it 'does not raise an error when the config is okay' do
-        expect { described_class.new(path) }.to_not raise_error
       end
     end
 
