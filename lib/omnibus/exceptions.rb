@@ -282,5 +282,20 @@ to your Gemfile:
 
 EOH
     end
+
+    class MissingConfigOption < Error
+      def initialize(key, example_value = "'...'")
+        @key, @example_value = key, example_value
+      end
+
+      def to_s
+        <<-EOH
+The Omnibus configuration is missing the required configuration option
+'#{@key}'. Please define it in your Omnibus config:
+
+    #{@key} #{@example_value}
+EOH
+      end
+    end
   end
 end
