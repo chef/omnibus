@@ -290,27 +290,26 @@ module Omnibus
     #   @return [Integer, nil]
     default :build_retries, 3
 
-    # @!group Validation Methods
+    class << self
+      #
+      # Asserts that the Config object is in a valid state. If invalid for any
+      # reason, an exception will be thrown.
+      #
+      # @return [true]
+      #
+      def validate!
+        validate_s3_config!
+      end
 
-    # Asserts that the Config object is in a valid state.  If invalid
-    # for any reason, an exception will be thrown.
-    #
-    # @raise [RuntimeError]
-    # @return [void]
-    def self.validate
-      valid_s3_config?
-      # add other validation methods as needed
-    end
+      private
 
-    # @raise [InvalidS3Configuration]
-    def self.valid_s3_config?
-      if use_s3_caching
-        unless s3_bucket
-          raise InvalidS3Configuration.new(s3_bucket, s3_access_key, s3_secret_key)
+      def validate_s3_config!
+        if use_s3_caching
+          unless s3_bucket
+            raise InvalidS3Configuration
+          end
         end
       end
     end
-
-    # @!endgroup
-  end # Config
-end # Omnibus
+  end
+end

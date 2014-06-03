@@ -164,7 +164,7 @@ module Omnibus
     #
     # @return [void]
     def process_configuration
-      Config.validate
+      Config.validate!
       process_dsl_files
     end
 
