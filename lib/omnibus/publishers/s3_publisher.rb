@@ -16,11 +16,6 @@
 
 module Omnibus
   class S3Publisher < Publisher
-    def initialize(pattern, options = {})
-      super
-      validate_config!
-    end
-
     def publish(&block)
       log.info(log_key) { 'Starting S3 publisher' }
       safe_require('uber-s3')
@@ -83,21 +78,6 @@ module Omnibus
         package.name,
         *stuff,
       )
-    end
-
-    #
-    # Validate that the configuration includes all the necessary components.
-    #
-    # @raise [InvalidS3ReleaseConfiguration] if the keys are not present
-    #
-    # @return [true]
-    #
-    def validate_config!
-      unless Config.release_s3_access_key && Config.release_s3_secret_key && Config.release_s3_bucket
-        raise InvalidS3ReleaseConfiguration.new
-      end
-
-      true
     end
 
     #
