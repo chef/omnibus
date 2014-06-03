@@ -219,6 +219,64 @@ module Omnibus
 
     # @!endgroup
 
+    #
+    # @!group Artifactory Publisher
+    # --------------------------------------------------
+
+    # @!attribute [rw] artifactory_endpoint
+    #   The full URL where the artifactory instance is accessible.
+    #   @return [String]
+    default(:artifactory_endpoint) do
+      raise MissingConfigOption.new(:artifactory_endpoint, "'https://...'")
+    end
+
+    # @!attribute [rw] artifactory_username
+    #   The username of the artifactory user to authenticate with.
+    #   @return [String]
+    default(:artifactory_username) do
+      raise MissingConfigOption.new(:artifactory_username, "'admin'")
+    end
+
+    # @!attribute [rw] artifactory_password
+    #   The password of the artifactory user to authenticate with.
+    #   @return [String]
+    default(:artifactory_password) do
+      raise MissingConfigOption.new(:artifactory_password, "'password'")
+    end
+
+    # @!attribute [rw] artifactory_ssl_pem_file
+    #   The path on disk to an SSL pem file to sign requests with.
+    #   @return [String, nil]
+    default(:artifactory_ssl_pem_file, nil)
+
+    # @!attribute [rw] artifactory_ssl_verify
+    #   Whether to perform SSL verification when connecting to artifactory.
+    #   @return [true, false]
+    default(:artifactory_ssl_verify, true)
+
+    # @!attribute [rw] artifactory_proxy_username
+    #   The username to use when connecting to artifactory via a proxy.
+    #   @return [String]
+    default(:artifactory_proxy_username, nil)
+
+    # @!attribute [rw] artifactory_proxy_password
+    #   The password to use when connecting to artifactory via a proxy.
+    #   @return [String]
+    default(:artifactory_proxy_password, nil)
+
+    # @!attribute [rw] artifactory_proxy_address
+    #   The address to use when connecting to artifactory via a proxy.
+    #   @return [String]
+    default(:artifactory_proxy_address, nil)
+
+    # @!attribute [rw] artifactory_proxy_port
+    #   The port to use when connecting to artifactory via a proxy.
+    #   @return [String]
+    default(:artifactory_proxy_port, nil)
+
+    # --------------------------------------------------
+    # @!endgroup
+
     # @!group S3 Release Parameters
 
     # @!attribute [rw] release_s3_bucket
