@@ -45,9 +45,9 @@ module Omnibus
     private
 
     #
-    # The actual S3 client object to communicate with the S3 API.
+    # The Artifactory client object to communicate with the Artifactory API.
     #
-    # @return [UberS3]
+    # @return [Artifactory::Client]
     #
     def client
       @client ||= Artifactory::Client.new(
