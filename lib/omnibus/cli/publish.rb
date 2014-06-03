@@ -48,9 +48,9 @@ module Omnibus
     private
 
     #
-    # This method should drive Rubyists nuts.
+    # Shortcut method for executing a publisher.
     #
-    # @return [Proc]
+    # @return [void]
     #
     def publish(klass, pattern, options)
       klass.publish(pattern, options) do |package|
