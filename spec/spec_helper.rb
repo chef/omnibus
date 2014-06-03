@@ -1,3 +1,6 @@
+require 'rspec'
+require 'rspec/its'
+
 require 'omnibus'
 require 'fauxhai'
 

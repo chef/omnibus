@@ -80,7 +80,7 @@ describe Omnibus::Overrides do
         it "should still return 'nil', because environment variable has priority" do
           stub_const('Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME', new_default_file)
 
-          expect(File.exist?(Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME)).to be_true
+          expect(File.exist?(Omnibus::Overrides::DEFAULT_OVERRIDE_FILE_NAME)).to be_truthy
           expect(subject).to be_nil
         end
       end

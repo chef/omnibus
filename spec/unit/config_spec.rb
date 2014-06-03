@@ -30,7 +30,7 @@ module Omnibus
 
     shared_examples 'a configurable' do |id, default|
       it "responds to .#{id}" do
-        expect(described_class).to have_method_defined(id)
+        expect(described_class).to respond_to(id)
       end
 
       it ".#{id} defaults to #{default.inspect}" do
@@ -53,9 +53,6 @@ module Omnibus
     include_examples 'a configurable', :use_s3_caching, false
     include_examples 'a configurable', :s3_bucket, nil
     include_examples 'a configurable', :s3_access_key, nil
-    include_examples 'a configurable', :release_s3_bucket, nil
-    include_examples 'a configurable', :release_s3_access_key, nil
-    include_examples 'a configurable', :release_s3_secret_key, nil
     include_examples 'a configurable', :override_file, nil
     include_examples 'a configurable', :software_gem, 'omnibus-software'
     include_examples 'a configurable', :solaris_compiler, nil

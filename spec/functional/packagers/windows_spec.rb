@@ -63,7 +63,7 @@ module Omnibus
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      expect(File.exist?("#{project.package_dir}/#{name}-#{version}-1.windows.msi")).to be_true
+      expect(File.exist?("#{project.package_dir}/#{name}-#{version}-1.windows.msi")).to be_truthy
     end
   end
 end

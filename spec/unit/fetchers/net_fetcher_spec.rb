@@ -91,19 +91,19 @@ describe Omnibus::NetFetcher do
     it "proxies if host doesn't match exclude list" do
       stub_env('NO_PROXY', 'google.com,www.buz.org')
       a_url = URI.parse('http://should.proxy.com/123')
-      expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_false
+      expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_falsey
 
       b_url = URI.parse('http://buz.org/123')
-      expect(@net_fetcher.excluded_from_proxy?(b_url.host)).to be_false
+      expect(@net_fetcher.excluded_from_proxy?(b_url.host)).to be_falsey
     end
 
     it 'does not proxy if host matches exclude list' do
       stub_env('NO_PROXY', 'google.com,www.buz.org')
       a_url = URI.parse('http://google.com/hello')
-      expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_true
+      expect(@net_fetcher.excluded_from_proxy?(a_url.host)).to be_truthy
 
       b_url = URI.parse('http://www.buz.org/123')
-      expect(@net_fetcher.excluded_from_proxy?(b_url.host)).to be_true
+      expect(@net_fetcher.excluded_from_proxy?(b_url.host)).to be_truthy
     end
   end
 end

@@ -26,8 +26,8 @@ module Omnibus
         its(:prerelease_tag) { should be_nil }
         its(:git_sha_tag) { should be_nil }
         its(:commits_since_tag) { should == 0 }
-        its(:development_version?) { should be_true }
-        its(:prerelease_version?) { should be_false }
+        its(:development_version?) { should be_truthy }
+        its(:prerelease_version?) { should be_falsey }
       end
 
       # SemVer compliant prerelease version
@@ -37,8 +37,8 @@ module Omnibus
         its(:prerelease_tag) { should == 'alpha.2' }
         its(:git_sha_tag) { should be_nil }
         its(:commits_since_tag) { should == 0 }
-        its(:development_version?) { should be_false }
-        its(:prerelease_version?) { should be_true }
+        its(:development_version?) { should be_falsey }
+        its(:prerelease_version?) { should be_truthy }
       end
 
       # full git describe string
@@ -48,8 +48,8 @@ module Omnibus
         its(:prerelease_tag) { should == 'alpha.3' }
         its(:git_sha_tag) { should == 'f55b180' }
         its(:commits_since_tag) { should == 59 }
-        its(:development_version?) { should be_false }
-        its(:prerelease_version?) { should be_true }
+        its(:development_version?) { should be_falsey }
+        its(:prerelease_version?) { should be_truthy }
       end
 
       # Degenerate git tag formats
@@ -61,8 +61,8 @@ module Omnibus
         its(:prerelease_tag) { should == 'rc.0' }
         its(:git_sha_tag) { should be_nil }
         its(:commits_since_tag) { should == 0 }
-        its(:development_version?) { should be_false }
-        its(:prerelease_version?) { should be_true }
+        its(:development_version?) { should be_falsey }
+        its(:prerelease_version?) { should be_truthy }
       end
 
       # dash seperated prerelease
@@ -72,8 +72,8 @@ module Omnibus
         its(:prerelease_tag) { should == 'alpha-2' }
         its(:git_sha_tag) { should be_nil }
         its(:commits_since_tag) { should == 0 }
-        its(:development_version?) { should be_false }
-        its(:prerelease_version?) { should be_true }
+        its(:development_version?) { should be_falsey }
+        its(:prerelease_version?) { should be_truthy }
       end
 
       # dash seperated prerelease full git describe string
@@ -83,8 +83,8 @@ module Omnibus
         its(:prerelease_tag) { should == 'alpha-2' }
         its(:git_sha_tag) { should == 'f55b180' }
         its(:commits_since_tag) { should == 59 }
-        its(:development_version?) { should be_false }
-        its(:prerelease_version?) { should be_true }
+        its(:development_version?) { should be_falsey }
+        its(:prerelease_version?) { should be_truthy }
       end
 
       # WTF git tag
@@ -94,8 +94,8 @@ module Omnibus
         its(:prerelease_tag) { should == 'alpha2' }
         its(:git_sha_tag) { should be_nil }
         its(:commits_since_tag) { should == 0 }
-        its(:development_version?) { should be_false }
-        its(:prerelease_version?) { should be_true }
+        its(:development_version?) { should be_falsey }
+        its(:prerelease_version?) { should be_truthy }
       end
     end
 
