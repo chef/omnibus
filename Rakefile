@@ -20,13 +20,9 @@ Cucumber::Rake::Task.new(:acceptance) do |t|
   end.join(' ')
 end
 
-require 'rubocop/rake_task'
-desc 'Run Ruby style checks'
-Rubocop::RakeTask.new(:style)
-
 namespace :travis do
   desc 'Run tests on Travis'
-  task ci: %w(unit acceptance style)
+  task ci: %w(unit acceptance)
 end
 
 task default: %w(travis:ci)

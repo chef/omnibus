@@ -75,7 +75,6 @@ EOH
     end
 
     context 'with a complex dep tree' do
-      # rubocop:disable all
       [
         ['preparation', []],
         ['erchef', ['erlang', 'skitch']],
