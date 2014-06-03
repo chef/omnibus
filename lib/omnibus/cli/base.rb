@@ -25,7 +25,6 @@ module Omnibus
       def dispatch(m, args, options, config)
         # Handle the case where Thor thinks a trailing --help is actually an
         # argument and blows up...
-
         if args.length > 1 && !(args & Thor::HELP_MAPPINGS).empty?
           args = args - Thor::HELP_MAPPINGS
           args.insert(-2, 'help')
