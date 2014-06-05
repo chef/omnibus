@@ -48,7 +48,7 @@ module Omnibus
       template('Gemfile.erb', "#{target}/Gemfile", template_options)
       template('gitignore.erb', "#{target}/.gitignore", template_options)
       template('README.md.erb', "#{target}/README.md", template_options)
-      template('omnibus.rb.example.erb', "#{target}/omnibus.rb.example", template_options)
+      template('omnibus.rb.erb', "#{target}/omnibus.rb", template_options)
     end
 
     def create_project_definition

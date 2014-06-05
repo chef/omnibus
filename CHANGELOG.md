@@ -8,6 +8,7 @@ Unreleased
 - Refactor `omnibus release` into a non-S3-specific backend "publisher"
 - Add support for specifying a dir glob to the `publish` command to upload multiple packages
 - "Package" is now a public API
+- Generate a real omnibus configuration file (no more `omnibus.rb.example`)
 
 ### Bug fixes
 - Fix a small typo in the project generator (come -> some)
