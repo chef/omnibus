@@ -23,6 +23,9 @@ o.require_plugin('linux/cpu') if o.os == 'linux'
 o.require_plugin('kernel')
 OHAI = o
 
+# Forward-compatability with newer Omnibus definitions
+Ohai = OHAI
+
 require 'omnibus/library'
 require 'omnibus/reports'
 require 'omnibus/config'
