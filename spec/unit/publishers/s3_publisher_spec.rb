@@ -23,7 +23,7 @@ module Omnibus
         platform: 'ubuntu',
         platform_version: '14.04',
         arch: 'x86_64',
-        sha128: 'SHA128',
+        sha1: 'SHA1',
         md5: 'ABCDEF123456',
       )
     end

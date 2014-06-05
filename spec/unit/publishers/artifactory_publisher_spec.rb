@@ -25,7 +25,7 @@ module Omnibus
         platform: 'ubuntu',
         platform_version: '14.04',
         arch: 'x86_64',
-        sha128: 'SHA128',
+        sha1: 'SHA1',
         md5: 'ABCDEF123456',
       )
     end
@@ -56,7 +56,7 @@ module Omnibus
           repository,
           package.path,
           'com/getchef/chef/11.0.6/chef.deb',
-          'SHA128',
+          'SHA1',
           an_instance_of(Hash)
         ).once
 

@@ -79,7 +79,7 @@ module Omnibus
         'omnibus.arch'             => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
         'omnibus.md5'              => package.metadata[:md5],
-        'omnibus.sha128'           => package.metadata[:sha128],
+        'omnibus.sha1'             => package.metadata[:sha1],
         'omnibus.sha256'           => package.metadata[:sha256],
         'omnibus.sha512'           => package.metadata[:sha512],
       }
@@ -94,7 +94,7 @@ module Omnibus
     # @return [String]
     #
     def checksum_for(package)
-      package.metadata[:sha128]
+      package.metadata[:sha1]
     end
 
     #
