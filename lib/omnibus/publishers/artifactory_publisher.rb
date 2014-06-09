@@ -29,8 +29,7 @@ module Omnibus
 
         # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
-        artifact = Artifactory::Resource::Artifact.new(local_path: package.path, client: client)
-        artifact.upload_with_checksum(
+        artifact_for(package).upload_with_checksum(
           repository,
           remote_path_for(package),
           checksum_for(package),
@@ -43,6 +42,18 @@ module Omnibus
     end
 
     private
+
+    #
+    # The artifact object that corresponds to this package.
+    #
+    # @param [Package] package
+    #   the package to create the artifact from
+    #
+    # @return [Artifactory::Resource::Artifact]
+    #
+    def artifact_for(package)
+      Artifactory::Resource::Artifact.new(local_path: package.path, client: client)
+    end
 
     #
     # The Artifactory client object to communicate with the Artifactory API.

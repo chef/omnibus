@@ -31,15 +31,14 @@ module Omnibus
     end
 
     let(:packages) { [package] }
-
-    let(:client) { double('Artifactory', artifact_upload_with_checksum: nil) }
+    let(:client)   { double('Artifactory::Client') }
+    let(:artifact) { double('Artifactory::Resource::Artifact', upload_with_checksum: nil) }
 
     before do
-      package.stub(:metadata).and_return(metadata)
       subject.stub(:client).and_return(client)
+      subject.stub(:artifact_for).and_return(artifact)
+      package.stub(:metadata).and_return(metadata)
     end
-
-    after { Config.reset! }
 
     subject { described_class.new(path, repository: repository) }
 
@@ -52,9 +51,8 @@ module Omnibus
       end
 
       it 'uploads the package' do
-        expect(client).to receive(:artifact_upload_with_checksum).with(
+        expect(artifact).to receive(:upload_with_checksum).with(
           repository,
-          package.path,
           'com/getchef/chef/11.0.6/chef.deb',
           'SHA1',
           an_instance_of(Hash)
