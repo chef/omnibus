@@ -124,7 +124,7 @@ module Omnibus
         raise OldMetadata.new(package.metadata.path)
       end
 
-      domain_parts = URI.parse(package.metadata[:homepage]).host.split('.')
+      domain_parts = parsed_uri_for(package).host.split('.')
       domain_parts.delete('www')
       domain_parts.reverse!
 
@@ -134,6 +134,30 @@ module Omnibus
         package.metadata[:version],
         package.metadata[:basename],
       )
+    end
+
+    #
+    # The parsed domain for this package. Ruby's URI parser does not "assume"
+    # a valid protocol, so passing a URI like "CHANGEME.org" will essentially
+    # result in an unsable object that has no useful, extractable information.
+    #
+    # This method will essentially "force" a default protocol on the +homepage+
+    # attribute of the package, so that it can be parsed like a good little URI.
+    #
+    # @param [Package] package
+    #   the package to generate the remote path for
+    #
+    # @return [URI]
+    #   the parsed URI object
+    #
+    def parsed_uri_for(package)
+      raw = package.metadata[:homepage]
+
+      if raw =~ /\Ahttps?:\/\//
+        URI.parse(raw)
+      else
+        URI.parse("http://#{raw}")
+      end
     end
   end
 end
