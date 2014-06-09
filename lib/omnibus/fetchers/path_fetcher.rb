@@ -17,6 +17,9 @@
 module Omnibus
   # Fetcher implementation for projects on the filesystem
   class PathFetcher < Fetcher
+
+    include Digestable
+
     def initialize(software)
       @name = software.name
       @source = software.source
@@ -51,6 +54,10 @@ module Omnibus
 
     def fetch
       rsync
+    end
+
+    def version_for_cache
+      @version_for_cache ||= digest_directory(@project_dir)
     end
 
     def fetch_required?
