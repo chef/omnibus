@@ -32,14 +32,37 @@ module Omnibus
     def digest(path, type = :md5)
       id = type.to_s.upcase
       instance = Digest.const_get(id).new
+      update_with_file_contents(instance, path)
+      instance.hexdigest
+    end
 
-      File.open(path) do |io|
-        while (chunk = io.read(1024 * 8))
-          instance.update(chunk)
+    def digest_directory(path, type = :md5)
+      id = type.to_s.upcase
+      instance = Digest.const_get(id).new
+
+      glob = Dir.glob("#{path}/**/*")
+      glob.each do |filename|
+        case ftype = File.ftype(filename)
+        when 'file'
+          update_with_file_contents(instance, filename)
+        else
+          update_with_string(instance, "#{ftype} #{path}")
         end
       end
 
       instance.hexdigest
+    end
+
+    def update_with_file_contents(digest, filename)
+      File.open(filename) do |io|
+        while (chunk = io.read(1024 * 8))
+          digest.update(chunk)
+        end
+      end
+    end
+
+    def update_with_string(digest, string)
+      digest.update(string)
     end
   end
 end
