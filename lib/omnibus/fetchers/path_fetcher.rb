@@ -57,7 +57,7 @@ module Omnibus
     end
 
     def version_for_cache
-      @version_for_cache ||= digest_directory(@project_dir)
+      @version_for_cache ||= digest_directory(@project_dir, :sha256)
     end
 
     def fetch_required?
