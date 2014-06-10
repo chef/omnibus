@@ -29,10 +29,9 @@ module Omnibus
 
         # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
-        artifact_for(package).upload_with_checksum(
+        artifact_for(package).upload(
           repository,
           remote_path_for(package),
-          checksum_for(package),
           metadata_for(package),
         )
 
@@ -52,7 +51,14 @@ module Omnibus
     # @return [Artifactory::Resource::Artifact]
     #
     def artifact_for(package)
-      Artifactory::Resource::Artifact.new(local_path: package.path, client: client)
+      Artifactory::Resource::Artifact.new(
+        local_path: package.path,
+        client:     client,
+        checksums: {
+          'md5'  => package.metadata[:md5],
+          'sha1' => package.metadata[:sha1],
+        }
+      )
     end
 
     #
@@ -94,18 +100,6 @@ module Omnibus
         'omnibus.sha256'           => package.metadata[:sha256],
         'omnibus.sha512'           => package.metadata[:sha512],
       }
-    end
-
-    #
-    # The checksum to pass to artifactory to validate the uploaded artifact.
-    #
-    # @param [Package] package
-    #   the package to generate the checksum for
-    #
-    # @return [String]
-    #
-    def checksum_for(package)
-      package.metadata[:sha1]
     end
 
     #
