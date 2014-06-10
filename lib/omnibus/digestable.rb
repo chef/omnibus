@@ -28,20 +28,20 @@ module Omnibus
     #   the type of digest to use
     #
     # @return [String]
+    #   the hexdigest of the file at the path
     #
     def digest(path, type = :md5)
-      id = type.to_s.upcase
-      instance = Digest.const_get(id).new
-      update_with_file_contents(instance, path)
-      instance.hexdigest
+      digest = digest_from_type(type)
+
+      update_with_file_contents(digest, path)
+      digest.hexdigest
     end
 
     #
-    # Calculate the digest of a directory at the given path.
-    # Each file in the directory is read in binary chunks to
-    # prevent excess memory usage. Filesystem entries of all
-    # types are included in the digest,  including directories,
-    # links, and sockets. The contents of non-file entries are
+    # Calculate the digest of a directory at the given path. Each file in the
+    # directory is read in binary chunks to prevent excess memory usage.
+    # Filesystem entries of all types are included in the digest, including
+    # directories, links, and sockets. The contents of non-file entries are
     # represented as:
     #
     #   $type $path
@@ -50,32 +50,61 @@ module Omnibus
     #
     #   file $path
     #
-    # and then appended by the binary contents of the file
+    # and then appended by the binary contents of the file/
     #
     # @param [String] path
     #   the path of the directory to digest
     # @param [Symbol] type
     #   the type of digest to use
+    #
+    # @return [String]
+    #   the hexdigest of the directory
+    #
     def digest_directory(path, type = :md5)
-      id = type.to_s.upcase
-      instance = Digest.const_get(id).new
+      digest = digest_from_type(type)
 
-      glob = Dir.glob("#{path}/**/*")
-      glob.each do |filename|
+      Dir.glob("#{path}/**/*").each do |filename|
         case ftype = File.ftype(filename)
         when 'file'
-          update_with_string(instance, "#{ftype} #{filename}")
-          update_with_file_contents(instance, filename)
+          update_with_string(digest, "#{ftype} #{filename}")
+          update_with_file_contents(digest, filename)
         else
-          update_with_string(instance, "#{ftype} #{filename}")
+          update_with_string(digest, "#{ftype} #{filename}")
         end
       end
 
-      instance.hexdigest
+      digest.hexdigest
     end
 
     private
 
+    #
+    # Create a new instance of the {Digest} class that corresponds to the given
+    # type.
+    #
+    # @param [#to_s] type
+    #   the type of digest to use
+    #
+    # @return [~Digest]
+    #   an instance of the digest class
+    #
+    def digest_from_type(type)
+      id = type.to_s.upcase
+      instance = Digest.const_get(id).new
+    end
+
+    #
+    # Update the digest with the given contents of the file, reading in small
+    # chunks to reduce memory. This method will update the given +digest+
+    # parameter, but returns nothing.
+    #
+    # @param [Digest] digest
+    #   the digest to update
+    # @param [String] filename
+    #   the path to the file on disk to read
+    #
+    # @return [void]
+    #
     def update_with_file_contents(digest, filename)
       File.open(filename) do |io|
         while (chunk = io.read(1024 * 8))
@@ -84,6 +113,17 @@ module Omnibus
       end
     end
 
+    #
+    # Update the digest with the given string. This method will update the given
+    # +digest+ parameter, but returns nothing.
+    #
+    # @param [Digest] digest
+    #   the digest to update
+    # @param [String] string
+    #   the string to read
+    #
+    # @return [void]
+    #
     def update_with_string(digest, string)
       digest.update(string)
     end
