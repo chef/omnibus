@@ -17,6 +17,42 @@ describe Omnibus::Software do
     stub_ohai(platform: 'linux')
   end
 
+  describe "with_standard_compiler_flags helper" do
+    context "on ubuntu" do
+      before do
+        stub_ohai(platform: 'ubuntu')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+      it "should override LDFLAGS" do
+        expect(software.with_standard_compiler_flags("LDFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+      it "should override CFLAGS" do
+        expect(software.with_standard_compiler_flags("CFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+      it "should preserve anything else" do
+        expect(software.with_standard_compiler_flags("numberwang"=>4)).to eq("numberwang"=>4,"LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+    end
+    context "on solaris2" do
+      before do
+        stub_ohai(platform: 'solaris2')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+    end
+    context "on mac_os_x" do
+      before do
+        stub_ohai(platform: 'mac_os_x')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+    end
+  end
+
   describe "path helpers" do
     before do
       stub_const("File::PATH_SEPARATOR", separator)
@@ -56,10 +92,6 @@ describe Omnibus::Software do
       let(:separator) { ";" }
       let(:path) { "c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
       let(:windows_path) { "c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
-
-      it "sets the path key to PATH" do
-        expect(software.path_key).to eq("Path")
-      end
 
       it "prepends a path to PATH" do
         expect(software.prepend_path("c:/foo/bar")).to eq("c:/foo/bar;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
