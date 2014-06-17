@@ -480,8 +480,17 @@ module Omnibus
     # for the platform is used to join the paths.
     #
     # @return [String]
-    def path_with_embedded
-      prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+    def with_embedded_path(env = {})
+      path_value = prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+      env.merge(path_key => path_value)
+    end
+
+    def path_key
+      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
+      # $WINDOWSRAGE, and if you don't set that your native gem compiles
+      # will fail because the magic fixup it does to add the mingw compiler
+      # stuff won't work.
+      platform == "windows" ? "Path" : "PATH"
     end
 
     # A PATH variable format string representing the current PATH with the
@@ -493,7 +502,7 @@ module Omnibus
     # @return [String]
     def prepend_path(*paths)
       path_values = Array(paths)
-      path_values << ENV['PATH']
+      path_values << ENV[path_key]
 
       separator = File::PATH_SEPARATOR || ':'
       path_values.join(separator)
