@@ -485,14 +485,6 @@ module Omnibus
       env.merge(path_key => path_value)
     end
 
-    def path_key
-      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
-      # $WINDOWSRAGE, and if you don't set that your native gem compiles
-      # will fail because the magic fixup it does to add the mingw compiler
-      # stuff won't work.
-      platform == "windows" ? "Path" : "PATH"
-    end
-
     # A PATH variable format string representing the current PATH with the
     # given path prepended. The correct path separator
     # for the platform is used to join the paths.
@@ -509,6 +501,14 @@ module Omnibus
     end
 
     private
+
+    def path_key
+      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
+      # $WINDOWSRAGE, and if you don't set that your native gem compiles
+      # will fail because the magic fixup it does to add the mingw compiler
+      # stuff won't work.
+      platform == "windows" ? "Path" : "PATH"
+    end
 
     # Apply overrides in the @overrides hash that mask instance variables
     # that are set by parsing the DSL
