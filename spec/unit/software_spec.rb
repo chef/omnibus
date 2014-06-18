@@ -17,6 +17,42 @@ describe Omnibus::Software do
     stub_ohai(platform: 'linux')
   end
 
+  describe "with_standard_compiler_flags helper" do
+    context "on ubuntu" do
+      before do
+        stub_ohai(platform: 'ubuntu')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+      it "should override LDFLAGS" do
+        expect(software.with_standard_compiler_flags("LDFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+      it "should override CFLAGS" do
+        expect(software.with_standard_compiler_flags("CFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+      it "should preserve anything else" do
+        expect(software.with_standard_compiler_flags("numberwang"=>4)).to eq("numberwang"=>4,"LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+    end
+    context "on solaris2" do
+      before do
+        stub_ohai(platform: 'solaris2')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+    end
+    context "on mac_os_x" do
+      before do
+        stub_ohai(platform: 'mac_os_x')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+      end
+    end
+  end
+
   describe "path helpers" do
     before do
       stub_const("File::PATH_SEPARATOR", separator)
@@ -33,7 +69,11 @@ describe Omnibus::Software do
       end
 
       it "prepends the embedded bin to PATH" do
-        expect(software.path_with_embedded).to eq("/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+        expect(software.with_embedded_path).to eq("PATH" => "/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+      end
+
+      it "with_embedded_path merges with a hash argument" do
+        expect(software.with_embedded_path("numberwang" => 4)).to eq("numberwang" => 4, "PATH" => "/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
       end
 
       it "prepends multiple paths to PATH" do
@@ -44,23 +84,30 @@ describe Omnibus::Software do
 
     context "on Windows" do
       before do
+        stub_ohai(platform: 'windows')
         project.stub(:install_path).and_return("c:/monkeys")
+        ENV.stub(:[]).with("Path").and_return(windows_path)
       end
 
       let(:separator) { ";" }
       let(:path) { "c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
+      let(:windows_path) { "c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
 
       it "prepends a path to PATH" do
-        expect(software.prepend_path("c:/foo/bar")).to eq("c:/foo/bar;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+        expect(software.prepend_path("c:/foo/bar")).to eq("c:/foo/bar;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
       end
 
       it "prepends the embedded bin to PATH" do
-        expect(software.path_with_embedded).to eq("c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+        expect(software.with_embedded_path).to eq("Path" => "c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+      end
+
+      it "with_embedded_path merges with a hash argument" do
+        expect(software.with_embedded_path("numberwang" => 4)).to eq("numberwang" => 4, "Path" => "c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
       end
 
       it "prepends multiple paths to PATH" do
         expect(software.prepend_path("c:/foo/bar", "c:/foo/baz"))
-          .to eq("c:/foo/bar;c:/foo/baz;c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+          .to eq("c:/foo/bar;c:/foo/baz;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
       end
     end
   end

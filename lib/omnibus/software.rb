@@ -479,9 +479,11 @@ module Omnibus
     # project's embedded/bin directory prepended. The correct path separator
     # for the platform is used to join the paths.
     #
-    # @return [String]
-    def path_with_embedded
-      prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+    # @params env [Hash]
+    # @return [Hash]
+    def with_embedded_path(env = {})
+      path_value = prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+      env.merge(path_key => path_value)
     end
 
     # A PATH variable format string representing the current PATH with the
@@ -493,13 +495,58 @@ module Omnibus
     # @return [String]
     def prepend_path(*paths)
       path_values = Array(paths)
-      path_values << ENV['PATH']
+      path_values << ENV[path_key]
 
       separator = File::PATH_SEPARATOR || ':'
       path_values.join(separator)
     end
 
+    # Add standard compiler flags to the environment hash to produce omnibus
+    # binaries (correct RPATH, etc).
+    #
+    # @params env [Hash]
+    # @return [Hash]
+    def with_standard_compiler_flags(env = {})
+      default_flags =
+        case platform
+        when "aix"
+          {
+            "CC" => "xlc -q64",
+            "CXX" => "xlC -q64",
+            "LD" => "ld -b64",
+            "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+            "OBJECT_MODE" => "64",
+            "ARFLAGS" => "-X64 cru",
+            "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+          }
+        when "mac_os_x"
+          {
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
+            "CFLAGS" => "-I#{install_dir}/embedded/include",
+          }
+        when "solaris2"
+          {
+            "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+            "CFLAGS" => "-I#{install_dir}/embedded/include",
+          }
+        else
+          {
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
+            "CFLAGS" => "-I#{install_dir}/embedded/include",
+          }
+        end
+      env.merge(default_flags)
+    end
+
     private
+
+    def path_key
+      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
+      # $WINDOWSRAGE, and if you don't set that your native gem compiles
+      # will fail because the magic fixup it does to add the mingw compiler
+      # stuff won't work.
+      platform == "windows" ? "Path" : "PATH"
+    end
 
     # Apply overrides in the @overrides hash that mask instance variables
     # that are set by parsing the DSL
