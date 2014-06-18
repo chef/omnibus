@@ -25,7 +25,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'mixlib-config',   '~> 2.1'
   gem.add_dependency 'ohai',            '~> 6.12'
   gem.add_dependency 'rake'
-  gem.add_dependency 'fpm',             '~> 1.0.0'
+  gem.add_dependency 'fpm',             '~> 0.4'
   gem.add_dependency 'uber-s3'
   gem.add_dependency 'thor',            '>= 0.16.0'
 
