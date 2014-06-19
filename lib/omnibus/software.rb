@@ -504,21 +504,37 @@ module Omnibus
     # Add standard compiler flags to the environment hash to produce omnibus
     # binaries (correct RPATH, etc).
     #
+    # Supported options:
+    #    :aix => :use_gcc    force using gcc/g++ compilers on aix
+    #
     # @params env [Hash]
+    # @params opt [Hash]
     # @return [Hash]
-    def with_standard_compiler_flags(env = {})
-      default_flags =
+    def with_standard_compiler_flags(env = {}, *opts = {})
+      compiler_flags =
         case platform
         when "aix"
-          {
-            "CC" => "xlc -q64",
-            "CXX" => "xlC -q64",
+          cc_flags =
+            if opts[:aix] && opts[:aix][:use_gcc]
+              {
+                "CC" => "gcc -maix64",
+                "CXX" => "g++ -maix64",
+                "CFLAGS" => "-maix64 -O -I#{install_dir}/embedded/include",
+                "LDFLAGS" => "-L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+              }
+            else
+              {
+                "CC" => "xlc -q64",
+                "CXX" => "xlC -q64",
+                "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+                "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+              }
+            end
+          cc_flags.merge({
             "LD" => "ld -b64",
-            "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
             "OBJECT_MODE" => "64",
             "ARFLAGS" => "-X64 cru",
-            "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
-          }
+          })
         when "mac_os_x"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
@@ -535,7 +551,11 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include",
           }
         end
-      env.merge(default_flags)
+      env.merge(compiler_flags)
+      # always want to favor pkg-config from embedded location to not hose
+      # configure scripts which try to be too clever and ignore our explicit
+      # CFLAGS and LDFLAGS in favor of pkg-config info
+      env.merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
     end
 
     private
