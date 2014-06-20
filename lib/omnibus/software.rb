@@ -558,11 +558,11 @@ module Omnibus
       # or think it knows better and edit them, and we *really* want the rpath setting and
       # do know better.  in that case LD_RUN_PATH will probably survive whatever edits the
       # configure script does.
-      env.merge({"LD_RUN_PATH" => "#{install_dir}/embedded/lib"})
+        .merge({"LD_RUN_PATH" => "#{install_dir}/embedded/lib"})
       # always want to favor pkg-config from embedded location to not hose
       # configure scripts which try to be too clever and ignore our explicit
       # CFLAGS and LDFLAGS in favor of pkg-config info
-      env.merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
+        .merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
     end
 
     private
