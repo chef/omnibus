@@ -544,18 +544,21 @@ module Omnibus
           {
             "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
-            # We use both -R and LD_RUN_PATH deliberately on Solaris.  LD_RUN_PATH will survive edits to
-            # LDFLAGS that may remove our -R option, but the -R option is higher precedence so we also want that.
-            "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
           }
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
-            "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
           }
         end
       env.merge(compiler_flags)
+      # merge LD_RUN_PATH into the environment.  most unix distros will fall back to
+      # this if there is no LDFLAGS passed to the linker that sets the rpath.  the LDFLAGS
+      # -R or -Wl,-rpath will override this, but in some cases software may drop our LDFLAGS
+      # or think it knows better and edit them, and we *really* want the rpath setting and
+      # do know better.  in that case LD_RUN_PATH will probably survive whatever edits the
+      # configure script does.
+      env.merge({"LD_RUN_PATH" => "#{install_dir}/embedded/lib"})
       # always want to favor pkg-config from embedded location to not hose
       # configure scripts which try to be too clever and ignore our explicit
       # CFLAGS and LDFLAGS in favor of pkg-config info
