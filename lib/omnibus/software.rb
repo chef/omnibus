@@ -544,6 +544,8 @@ module Omnibus
           {
             "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
+            # We use both -R and LD_RUN_PATH deliberately on Solaris.  LD_RUN_PATH will survive edits to
+            # LDFLAGS that may remove our -R option, but the -R option is higher precedence so we also want that.
             "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
           }
         else
