@@ -510,7 +510,7 @@ module Omnibus
     # @params env [Hash]
     # @params opt [Hash]
     # @return [Hash]
-    def with_standard_compiler_flags(env = {}, *opts = {})
+    def with_standard_compiler_flags(env = {}, opts = {})
       compiler_flags =
         case platform
         when "aix"
