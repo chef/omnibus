@@ -544,6 +544,7 @@ module Omnibus
           {
             "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
           }
         else
           {
