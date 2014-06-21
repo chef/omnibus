@@ -559,19 +559,15 @@ module Omnibus
       # and edit them, and we *really* want the rpath setting and do know
       # better.  in that case LD_RUN_PATH will probably survive whatever
       # edits the configure script does
-      extra_linker_flags =
-        case platform
-        when "soalris2"
-          {
-            # solaris linker uses LD_OPTIONS instead
-            "LD_OPTIONS" => "#{install_dir}/embedded/lib"
-          }
-        else
-          {
-            "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
-          }
-        end
-
+      extra_linker_flags = {
+        "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+      }
+      # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against it
+      extra_linker_flags.merge!(
+        {
+          "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
+        }
+      ) if platform == "solaris2"
       env.merge(compiler_flags).
         merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
