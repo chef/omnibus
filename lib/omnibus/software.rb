@@ -551,14 +551,29 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include",
           }
         end
+
+      # merge LD_RUN_PATH into the environment.  most unix distros will fall
+      # back to this if there is no LDFLAGS passed to the linker that sets
+      # the rpath.  the LDFLAGS -R or -Wl,-rpath will override this, but in
+      # some cases software may drop our LDFLAGS or think it knows better
+      # and edit them, and we *really* want the rpath setting and do know
+      # better.  in that case LD_RUN_PATH will probably survive whatever
+      # edits the configure script does
+      extra_linker_flags =
+        case platform
+        when "soalris2"
+          {
+            # solaris linker uses LD_OPTIONS instead
+            "LD_OPTIONS" => "#{install_dir}/embedded/lib"
+          }
+        else
+          {
+            "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+          }
+        end
+
       env.merge(compiler_flags).
-        # merge LD_RUN_PATH into the environment.  most unix distros will fall back to
-        # this if there is no LDFLAGS passed to the linker that sets the rpath.  the LDFLAGS
-        # -R or -Wl,-rpath will override this, but in some cases software may drop our LDFLAGS
-        # or think it knows better and edit them, and we *really* want the rpath setting and
-        # do know better.  in that case LD_RUN_PATH will probably survive whatever edits the
-        # configure script does.
-        merge({"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}).
+        merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
