@@ -551,18 +551,18 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include",
           }
         end
-      env.merge(compiler_flags)
-      # merge LD_RUN_PATH into the environment.  most unix distros will fall back to
-      # this if there is no LDFLAGS passed to the linker that sets the rpath.  the LDFLAGS
-      # -R or -Wl,-rpath will override this, but in some cases software may drop our LDFLAGS
-      # or think it knows better and edit them, and we *really* want the rpath setting and
-      # do know better.  in that case LD_RUN_PATH will probably survive whatever edits the
-      # configure script does.
-        .merge({"LD_RUN_PATH" => "#{install_dir}/embedded/lib"})
-      # always want to favor pkg-config from embedded location to not hose
-      # configure scripts which try to be too clever and ignore our explicit
-      # CFLAGS and LDFLAGS in favor of pkg-config info
-        .merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
+      env.merge(compiler_flags).
+        # merge LD_RUN_PATH into the environment.  most unix distros will fall back to
+        # this if there is no LDFLAGS passed to the linker that sets the rpath.  the LDFLAGS
+        # -R or -Wl,-rpath will override this, but in some cases software may drop our LDFLAGS
+        # or think it knows better and edit them, and we *really* want the rpath setting and
+        # do know better.  in that case LD_RUN_PATH will probably survive whatever edits the
+        # configure script does.
+        merge({"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}).
+        # always want to favor pkg-config from embedded location to not hose
+        # configure scripts which try to be too clever and ignore our explicit
+        # CFLAGS and LDFLAGS in favor of pkg-config info
+        merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
     end
 
     private
