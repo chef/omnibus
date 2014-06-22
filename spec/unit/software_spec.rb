@@ -23,16 +23,16 @@ describe Omnibus::Software do
         stub_ohai(platform: 'ubuntu')
       end
       it "should set the defaults" do
-        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
       end
       it "should override LDFLAGS" do
-        expect(software.with_standard_compiler_flags("LDFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+        expect(software.with_standard_compiler_flags("LDFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
       end
       it "should override CFLAGS" do
-        expect(software.with_standard_compiler_flags("CFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+        expect(software.with_standard_compiler_flags("CFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
       end
       it "should preserve anything else" do
-        expect(software.with_standard_compiler_flags("numberwang"=>4)).to eq("numberwang"=>4,"LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+        expect(software.with_standard_compiler_flags("numberwang"=>4)).to eq("numberwang"=>4,"LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
       end
     end
     context "on solaris2" do
@@ -40,7 +40,7 @@ describe Omnibus::Software do
         stub_ohai(platform: 'solaris2')
       end
       it "should set the defaults" do
-        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc", "CFLAGS"=>"-I/monkeys/embedded/include")
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "LD_OPTIONS"=>"-R/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
       end
     end
     context "on mac_os_x" do
@@ -48,7 +48,23 @@ describe Omnibus::Software do
         stub_ohai(platform: 'mac_os_x')
       end
       it "should set the defaults" do
-        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include")
+        expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
+      end
+    end
+    context "on aix" do
+      before do
+        stub_ohai(platform: 'aix')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags).to eq("CC"=>"xlc -q64", "CXX"=>"xlC -q64", "CFLAGS"=>"-q64 -I/monkeys/embedded/include -O", "LDFLAGS"=>"-q64 -L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib", "LD"=>"ld -b64", "OBJECT_MODE"=>"64", "ARFLAGS"=>"-X64 cru", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
+      end
+    end
+    context "on aix with gcc" do
+      before do
+        stub_ohai(platform: 'aix')
+      end
+      it "should set the defaults" do
+        expect(software.with_standard_compiler_flags(nil, :aix => { :use_gcc => true })).to eq("CC"=>"gcc -maix64", "CXX"=>"g++ -maix64", "CFLAGS"=>"-maix64 -O -I/monkeys/embedded/include", "LDFLAGS"=>"-L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib", "LD"=>"ld -b64", "OBJECT_MODE"=>"64", "ARFLAGS"=>"-X64 cru", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
       end
     end
   end

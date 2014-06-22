@@ -511,6 +511,8 @@ module Omnibus
     # @params opt [Hash]
     # @return [Hash]
     def with_standard_compiler_flags(env = {}, opts = {})
+      env ||= {}
+      opts ||= {}
       compiler_flags =
         case platform
         when "aix"
@@ -562,7 +564,8 @@ module Omnibus
       extra_linker_flags = {
         "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
       }
-      # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against it
+      # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
+      # the linker, to find every way to make it use our rpath.
       extra_linker_flags.merge!(
         {
           "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
