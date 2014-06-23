@@ -127,6 +127,11 @@ module Omnibus
       @logger = logger
     end
 
+    #
+    # The UI class for Omnibus.
+    #
+    # @return [Thor::Shell]
+    #
     def ui
       @ui ||= Thor::Base.shell.new
     end
