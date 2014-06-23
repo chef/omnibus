@@ -124,20 +124,6 @@ module Omnibus
       @ui ||= Thor::Base.shell.new
     end
 
-    # Configure Omnibus.
-    #
-    # After this has been called, the {Omnibus::Config} object is
-    # available as `Omnibus.config`.
-    #
-    # @return [void]
-    #
-    # @deprecated Use {#load_configuration} if you need to process a
-    #   config file, followed by {#process_configuration} to act upon it.
-    def configure
-      load_configuration
-      process_configuration
-    end
-
     # Convenience method for access to the Omnibus::Config object.
     # Provided for backward compatibility.
     #
