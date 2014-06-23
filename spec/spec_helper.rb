@@ -112,9 +112,17 @@ RSpec.configure do |config|
     # Suppress logging
     Omnibus.logger.level = :unknown
 
+    # Reset config
+    Omnibus.reset!
+
     # Clear the tmp_path on each run
     FileUtils.rm_rf(tmp_path)
     FileUtils.mkdir_p(tmp_path)
+  end
+
+  config.after(:each) do
+    # Reset config
+    Omnibus.reset!
   end
 
   # Force the expect syntax

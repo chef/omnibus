@@ -11,8 +11,6 @@ module Omnibus
     before do
       described_class.any_instance.stub(:shellout)
         .and_return(double('ouput', stdout: git_describe, exitstatus: 0))
-
-      Omnibus.reset!
     end
 
     describe 'git describe parsing' do

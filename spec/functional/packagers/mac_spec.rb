@@ -19,9 +19,6 @@ module Omnibus
     let(:mac_packager) { Packager::MacPkg.new(project) }
 
     before do
-      # Reset stale configuration
-      Config.reset!
-
       # Tell things to install into the cache directory
       root = "#{tmp_path}/var/omnibus"
       Config.cache_dir "#{root}/cache"

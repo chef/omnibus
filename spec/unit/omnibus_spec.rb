@@ -2,10 +2,6 @@ require 'omnibus'
 require 'spec_helper'
 
 describe Omnibus do
-  # evil class variables
-  before { Omnibus.reset! }
-  after  { Omnibus.reset! }
-
   describe '::omnibus_software_root' do
     it 'reads the software_gem out of Omnibus::Config.software_gem' do
       spec_array = [double(Gem::Specification, gem_dir: '/data')]
@@ -55,8 +51,6 @@ describe Omnibus do
       Omnibus.stub(:project_root).and_return(complicated_path)
       stub_ohai(platform: 'linux')
     end
-
-    after { Omnibus.reset! }
 
     it 'populates the 5 projects' do
       Omnibus.process_dsl_files

@@ -37,8 +37,6 @@ module Omnibus
       subject.stub(:client).and_return(client)
     end
 
-    after { Config.reset! }
-
     subject { described_class.new(path) }
 
     describe '#initialize' do
