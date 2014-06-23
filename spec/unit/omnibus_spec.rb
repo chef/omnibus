@@ -48,7 +48,7 @@ describe Omnibus do
 
   describe '#process_dsl_files' do
     before do
-      Omnibus.stub(:project_root).and_return(complicated_path)
+      Omnibus::Config.project_root(complicated_path)
       stub_ohai(platform: 'linux')
     end
 
