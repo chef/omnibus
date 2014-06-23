@@ -153,10 +153,10 @@ module Omnibus
     # Load in an Omnibus configuration file.  Values will be merged with
     # and override the defaults defined in {Omnibus::Config}.
     #
-    # @param file [String] path to a configuration file to load
+    # @param [String] file path to a configuration file to load
     #
     # @return [void]
-    def load_configuration
+    def load_configuration(file)
       Config.from_file(file)
     end
 
