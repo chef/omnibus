@@ -42,12 +42,9 @@ module Omnibus
         @kernel.exit(0)
       rescue => e
         error = Omnibus.ui.set_color(e.message, :red)
+        backtrace = Omnibus.ui.set_color("\n" + e.backtrace.join("\n  "), :red)
         Omnibus.ui.error(error)
-
-        if log.debug?
-          backtrace = Omnibus.ui.set_color("\n" + e.backtrace.join("\n  "), :red)
-          Omnibus.ui.error(backtrace)
-        end
+        Omnibus.ui.error(backtrace)
 
         if e.respond_to?(:status_code)
           @kernel.exit(e.status_code)
