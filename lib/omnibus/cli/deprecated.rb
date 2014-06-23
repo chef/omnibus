@@ -38,7 +38,7 @@ module Omnibus
             warn("The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:false' instead.")
             args += %w(--override append_timestamp:false)
           else
-            raise "Unknown value for OMNIBUS_APPEND_TIMESTAMP: #{value.inspect}!"
+            raise Omnibus::Error, "Unknown value for OMNIBUS_APPEND_TIMESTAMP: #{value.inspect}!"
           end
         end
 
@@ -79,7 +79,7 @@ module Omnibus
         #   $ omnibus build software SOFTWARE
         #
         if args[0..1] == %w(build software)
-          raise 'Building individual software definitions is no longer supported!'
+          raise Omnibus::Error, 'Building individual software definitions is no longer supported!'
         end
 
         #
