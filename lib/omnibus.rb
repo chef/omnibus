@@ -190,10 +190,33 @@ module Omnibus
       projects.find { |p| p.name == name }
     end
 
-    # The absolute path to the Omnibus project/repository directory.
+    #
+    # The absolute path to the Omnibus project/reository directory.
+    #
+    # @deprecated Use {Config.project_root} instead.
     #
     # @return [String]
+    #
     def project_root
+      Omnibus.logger.deprecated('Omnibus') do
+        'Omnibus.project_root. Please use Config.project_root instead.'
+      end
+
+      Config.project_root
+    end
+
+    #
+    # Backward compat alias.
+    #
+    # @deprecated Use {Config.project_root} instead.
+    #
+    # @see (Omnibus.project_root)
+    #
+    def root
+      Omnibus.logger.deprecated('Omnibus') do
+        'Omnibus.root. Please use Omnibus.project_root instead.'
+      end
+
       Config.project_root
     end
 
@@ -222,14 +245,14 @@ module Omnibus
     #
     # @return [Array<String>]
     def project_files
-      ruby_files(File.join(project_root, Config.project_dir))
+      ruby_files(File.join(Config.project_root, Config.project_dir))
     end
 
     # Return paths to all configured {Omnibus::Software} DSL files.
     #
     # @return [Array<String>]
     def software_files
-      ruby_files(File.join(project_root, Config.software_dir))
+      ruby_files(File.join(Config.project_root, Config.software_dir))
     end
 
     # Return directories to search for {Omnibus::Software} DSL files.
@@ -237,23 +260,10 @@ module Omnibus
     # @return [Array<String>]
     def software_dirs
       @software_dirs ||= begin
-        software_dirs = [File.join(project_root, Config.software_dir)]
+        software_dirs = [File.join(Config.project_root, Config.software_dir)]
         software_dirs << File.join(omnibus_software_root, 'config', 'software') if omnibus_software_root
         software_dirs
       end
-    end
-
-    # Backward compat alias
-    #
-    # @todo Remve this in the next major release (4.0)
-    #
-    # @see (Omnibus.project_root)
-    def root
-      Omnibus.logger.deprecated('Omnibus') do
-        'Omnibus.root. Please use Omnibus.project_root instead.'
-      end
-
-      project_root
     end
 
     # Processes all configured {Omnibus::Project} and

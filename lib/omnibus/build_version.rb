@@ -62,7 +62,7 @@ module Omnibus
     # Create a new BuildVersion
     #
     # @param [String] path      Path from which to read git version information
-    def initialize(path = Omnibus.project_root)
+    def initialize(path = Config.project_root)
       @path = path
     end
 

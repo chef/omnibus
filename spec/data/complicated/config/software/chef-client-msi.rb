@@ -17,7 +17,7 @@
 
 name "chef-client-msi"
 
-source :path => File.expand_path("files/msi", Omnibus.project_root)
+source :path => File.expand_path("files/msi", Config.project_root)
 
 build do
   # harvest with heat.exe

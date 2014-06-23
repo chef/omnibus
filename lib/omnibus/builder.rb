@@ -37,7 +37,6 @@ module Omnibus
       def_delegator :@builder, :rake
       def_delegator :@builder, :block
       def_delegator :@builder, :name
-      def_delegator :@builder, :project_root
 
       def initialize(builder, software)
         @builder, @software = builder, software
@@ -124,7 +123,7 @@ module Omnibus
 
       # we'll search for a patch file in the project root AND
       # the omnibus-software gem
-      candidate_roots = [Omnibus.project_root]
+      candidate_roots = [Config.project_root]
       candidate_roots << Omnibus.omnibus_software_root if Omnibus.omnibus_software_root
 
       candidate_paths = candidate_roots.map do |root|
@@ -151,10 +150,10 @@ module Omnibus
     def erb(*args)
       args = args.dup.pop
 
-      source_path = File.expand_path("#{Omnibus.project_root}/config/templates/#{name}/#{args[:source]}")
+      source_path = File.expand_path("#{Config.project_root}/config/templates/#{name}/#{args[:source]}")
 
       unless File.exist?(source_path)
-        raise MissingTemplate.new(args[:source], "#{Omnibus.project_root}/config/templates/#{name}")
+        raise MissingTemplate.new(args[:source], "#{Config.project_root}/config/templates/#{name}")
       end
 
       block do
@@ -190,8 +189,15 @@ module Omnibus
       @build_commands << rb_block
     end
 
+    #
+    # @deprecated Use {Config.project_root} instead
+    #
     def project_root
-      Omnibus.project_root
+      Omnibus.logger.deprecated(log_key) do
+        'project_root (DSL). Please use Config.project_root instead.'
+      end
+
+      Config.project_root
     end
 
     def project_dir

@@ -595,7 +595,7 @@ module Omnibus
     # @todo This documentation really should be up at a higher level,
     #   particularly since the user has no way to change the path.
     def package_scripts_path
-      "#{Omnibus.project_root}/package-scripts/#{name}"
+      "#{Config.project_root}/package-scripts/#{name}"
     end
 
     # Path to the /files directory in the omnibus project. This directory can
@@ -603,12 +603,12 @@ module Omnibus
     # Windows MSIs can be installed by GUI which can optionally be customized
     # with background images, license agreements, etc.)
     #
-    # This method delegates to the Omnibus.project_root module function so that
+    # This method delegates to the {Config.project_root} module function so that
     # Packagers classes rely only on the Project object for their inputs.
     #
     # @return [String] path to the files directory.
     def files_path
-      "#{Omnibus.project_root}/files"
+      "#{Config.project_root}/files"
     end
 
     # The directory where packages are written when created. Delegates to
