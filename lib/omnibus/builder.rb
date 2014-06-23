@@ -239,10 +239,6 @@ module Omnibus
       raise
     end
 
-    def build_retries
-      Omnibus.config[:build_retries]
-    end
-
     def execute_sh(cmd)
       retries ||= 0
       shell = nil
@@ -275,11 +271,11 @@ module Omnibus
         shell.error!
       end
     rescue Exception => e
-      raise if build_retries.nil? || build_retries == 0
+      raise if Config.build_retries.nil? || Config.build_retries == 0
       # Getting lots of errors from github, particularly with erlang/rebar
       # projects fetching tons of deps via git all the time. This isn't a
       # particularly elegant way to solve that problem. But it should work.
-      if retries >= build_retries
+      if retries >= Config.build_retries
         ErrorReporter.new(e, self).explain("Failed to build #{name} while running `#{cmd_string}` with #{cmd_opts_for_display}")
         raise
       else

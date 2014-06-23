@@ -95,7 +95,7 @@ module Omnibus
     # @return [Omnibus::Fetcher]
     def self.for(software)
       if software.source
-        if software.source[:url] && Omnibus.config.use_s3_caching
+        if software.source[:url] && Config.use_s3_caching
           S3CacheFetcher.new(software)
         else
           without_caching_for(software)

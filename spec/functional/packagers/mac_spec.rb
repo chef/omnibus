@@ -20,22 +20,22 @@ module Omnibus
 
     before do
       # Reset stale configuration
-      Omnibus.config.reset!
+      Config.reset!
 
       # Tell things to install into the cache directory
       root = "#{tmp_path}/var/omnibus"
-      Omnibus.config.cache_dir "#{root}/cache"
-      Omnibus.config.install_path_cache_dir "#{root}/cache/install_path"
-      Omnibus.config.source_dir "#{root}/src"
-      Omnibus.config.build_dir "#{root}/build"
-      Omnibus.config.package_dir "#{root}/pkg"
-      Omnibus.config.package_tmp "#{root}/pkg-tmp"
+      Config.cache_dir "#{root}/cache"
+      Config.install_path_cache_dir "#{root}/cache/install_path"
+      Config.source_dir "#{root}/src"
+      Config.build_dir "#{root}/build"
+      Config.package_dir "#{root}/pkg"
+      Config.package_tmp "#{root}/pkg-tmp"
 
       # Enable DMG create
-      Omnibus.config.build_dmg true
+      Config.build_dmg true
 
       # Point at our sample project fixture
-      Omnibus.config.project_root "#{fixtures_path}/sample"
+      Config.project_root "#{fixtures_path}/sample"
 
       # Create the target directory
       FileUtils.mkdir_p(project.install_path)

@@ -34,7 +34,7 @@ build do
     # fix worked. Rather than trying to fix this now, we're filing a bug and copying the cacert.pem
     # directly from the cache instead.
 
-    FileUtils.cp(File.expand_path("cacert.pem", Omnibus.config.cache_dir),
+    FileUtils.cp(File.expand_path("cacert.pem", Config.cache_dir),
                  File.expand_path("embedded/ssl/certs/cacert.pem", install_dir))
   end
 

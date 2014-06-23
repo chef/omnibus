@@ -105,7 +105,7 @@ build do
                          "-R#{install_dir}/embedded/lib",
                         "-static-libgcc"].join(" ")
                       when "solaris2"
-                        if Omnibus.config.solaris_compiler == "gcc"
+                        if Config.solaris_compiler == "gcc"
                           if architecture == "sparc"
                             ["/bin/sh ./Configure",
                              "solaris-sparcv9-gcc",

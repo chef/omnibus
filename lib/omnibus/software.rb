@@ -322,7 +322,11 @@ module Omnibus
     #   should be made a private function (if it even really needs to
     #   exist at all).
     def config
-      Omnibus.config
+      log.deprecated(log_key) do
+        'config (DSL). Please use Config.(thing) instead (capital C).'
+      end
+
+      Config
     end
 
     # @!group Directory Accessors

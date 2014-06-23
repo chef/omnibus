@@ -560,7 +560,11 @@ module Omnibus
     #
     # @see Omnibus::Config
     def config
-      Omnibus.config
+      log.deprecated(log_key) do
+        'config (DSL). Please use Config.(thing) instead (capital C).'
+      end
+
+      Config
     end
 
     # The path to the package scripts directory for this project.
