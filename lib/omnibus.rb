@@ -116,6 +116,13 @@ module Omnibus
       @logger ||= Logger.new
     end
 
+    #
+    # @api private
+    #
+    # Programatically set the logger for Omnibus.
+    #
+    # @param [Logger] logger
+    #
     def logger=(logger)
       @logger = logger
     end
