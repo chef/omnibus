@@ -127,10 +127,14 @@ module Omnibus
     # Convenience method for access to the Omnibus::Config object.
     # Provided for backward compatibility.
     #
-    # @ return [Omnibus::Config]
+    # @return [Config]
     #
-    # @deprecated Just refer to {Omnibus::Config} directly.
+    # @deprecated Just refer to {Config} directly.
     def config
+      Omnibus.logger.deprecated('Omnibus') do
+        'Omnibus.config. Please use Config.(thing) instead.'
+      end
+
       Config
     end
 
