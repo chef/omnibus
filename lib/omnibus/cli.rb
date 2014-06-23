@@ -40,7 +40,7 @@ module Omnibus
 
         Omnibus::CLI.start(@argv)
         @kernel.exit(0)
-      rescue => e
+      rescue Omnibus::Error => e
         error = Omnibus.ui.set_color(e.message, :red)
         backtrace = Omnibus.ui.set_color("\n" + e.backtrace.join("\n  "), :red)
         Omnibus.ui.error(error)
