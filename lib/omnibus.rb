@@ -140,10 +140,8 @@ module Omnibus
     # @param file [String] path to a configuration file to load
     #
     # @return [void]
-    def load_configuration(file = nil)
-      if file
-        Config.from_file(file)
-      end
+    def load_configuration
+      Config.from_file(file)
     end
 
     # Processes the configuration to construct the dependency tree of
