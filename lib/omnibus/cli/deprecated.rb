@@ -33,10 +33,10 @@ module Omnibus
 
           if truthy?(value)
             warn("The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:true' instead.")
-            args += %(--override append_timestamp:true)
+            args += %w(--override append_timestamp:true)
           elsif falsey?(value)
             warn("The environment variable 'OMNIBUS_APPEND_TIMESTAMP' is deprecated. Please use '--override append_timestamp:false' instead.")
-            args += %(--override append_timestamp:false)
+            args += %w(--override append_timestamp:false)
           else
             raise "Unknown value for OMNIBUS_APPEND_TIMESTAMP: #{value.inspect}!"
           end
