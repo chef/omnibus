@@ -220,9 +220,11 @@ module Omnibus
       Config.project_root
     end
 
+    #
     # The source root is the path to the root directory of the `omnibus` gem.
     #
     # @return [Pathname]
+    #
     def source_root
       @source_root ||= Pathname.new(File.expand_path('../..', __FILE__))
     end

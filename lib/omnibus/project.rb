@@ -847,7 +847,7 @@ module Omnibus
     # TODO: what's this do?
     def makeself_command
       command_and_opts = [
-        File.expand_path(File.join(Omnibus.source_root, 'bin', 'makeself.sh')),
+        Omnibus.source_root.join('bin', 'makeself.sh'),
         '--gzip',
         install_path,
         output_package('makeself'),
