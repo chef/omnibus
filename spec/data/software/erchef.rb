@@ -27,16 +27,16 @@ source git: 'git://github.com/opscode/erchef'
 relative_path 'erchef'
 
 env = {
-  'PATH' => "#{install_dir}/embedded/bin:#{ENV["PATH"]}",
-  'LDFLAGS' => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  'CFLAGS' => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  'LD_RUN_PATH' => "#{install_dir}/embedded/lib",
+  'PATH' => "#{install_path}/embedded/bin:#{ENV["PATH"]}",
+  'LDFLAGS' => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  'CFLAGS' => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  'LD_RUN_PATH' => "#{install_path}/embedded/lib",
 }
 
 build do
   command 'make distclean', env: env
   command 'make rel', env: env
-  command "mkdir -p #{install_dir}/embedded/service/erchef"
-  command "#{install_dir}/embedded/bin/rsync -a --delete --exclude=.git/*** --exclude=.gitignore ./rel/erchef/ #{install_dir}/embedded/service/erchef/"
-  command "rm -rf #{install_dir}/embedded/service/erchef/log"
+  command "mkdir -p #{install_path}/embedded/service/erchef"
+  command "#{install_path}/embedded/bin/rsync -a --delete --exclude=.git/*** --exclude=.gitignore ./rel/erchef/ #{install_path}/embedded/service/erchef/"
+  command "rm -rf #{install_path}/embedded/service/erchef/log"
 end

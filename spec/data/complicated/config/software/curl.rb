@@ -28,7 +28,7 @@ relative_path "curl-#{version}"
 
 build do
   command ["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--disable-debug",
            "--enable-optimize",
            "--disable-ldap",
@@ -40,9 +40,9 @@ build do
            "--without-libidn",
            "--without-gnutls",
            "--without-librtmp",
-           "--with-ssl=#{install_dir}/embedded",
-           "--with-zlib=#{install_dir}/embedded"].join(" ")
+           "--with-ssl=#{install_path}/embedded",
+           "--with-zlib=#{install_path}/embedded"].join(" ")
 
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
   command "make install"
 end

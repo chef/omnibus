@@ -24,12 +24,12 @@ source :url => "http://ftp.gnu.org/gnu/autoconf/autoconf-2.68.tar.gz",
 relative_path "autoconf-2.68"
 
 env = {
-  "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
+  "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include"
 }
 
 build do
-  command "./configure --prefix=#{install_dir}/embedded", :env => env
+  command "./configure --prefix=#{install_path}/embedded", :env => env
   command "make -j #{max_build_jobs}"
   command "make install"
 end

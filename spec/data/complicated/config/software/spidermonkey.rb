@@ -23,7 +23,7 @@ source :url => "http://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz",
 
 relative_path "js"
 
-env = {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+env = {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
 working_dir = "#{project_dir}/src"
 
 # == Build Notes ==
@@ -38,14 +38,14 @@ working_dir = "#{project_dir}/src"
 build do
   command(["make",
            "BUILD_OPT=1",
-           "XCFLAGS=-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+           "XCFLAGS=-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
            "-f",
            "Makefile.ref"].join(" "),
           :env => env,
           :cwd => working_dir)
   command(["make",
            "BUILD_OPT=1",
-           "JS_DIST=#{install_dir}/embedded",
+           "JS_DIST=#{install_path}/embedded",
            "-f",
            "Makefile.ref",
            "export"].join(" "),
@@ -53,8 +53,8 @@ build do
           :cwd => working_dir)
 
   if Ohai.kernel['machine'] =~ /x86_64/
-    command "mv #{install_dir}/embedded/lib64/libjs.a #{install_dir}/embedded/lib"
-    command "mv #{install_dir}/embedded/lib64/libjs.so #{install_dir}/embedded/lib"
+    command "mv #{install_path}/embedded/lib64/libjs.a #{install_path}/embedded/lib"
+    command "mv #{install_path}/embedded/lib64/libjs.so #{install_path}/embedded/lib"
   end
-  command "rm -rf #{install_dir}/embedded/lib64"
+  command "rm -rf #{install_path}/embedded/lib64"
 end

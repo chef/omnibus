@@ -49,14 +49,14 @@ env =
       # would be harmless, except that autoconf treats any output to stderr as
       # a failure when it makes a test program to check your CFLAGS (regardless
       # of the actual exit code from the compiler).
-      "CFLAGS" => "-arch x86_64 -m64 -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -I#{install_dir}/embedded/include/ncurses -O3 -g -pipe -Qunused-arguments",
-      "LDFLAGS" => "-arch x86_64 -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -I#{install_dir}/embedded/include/ncurses"
+      "CFLAGS" => "-arch x86_64 -m64 -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -I#{install_path}/embedded/include/ncurses -O3 -g -pipe -Qunused-arguments",
+      "LDFLAGS" => "-arch x86_64 -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -I#{install_path}/embedded/include/ncurses"
     }
   when "solaris2"
     {
-      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -O3 -g -pipe",
-      "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -static-libgcc",
-      "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
+      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include -O3 -g -pipe",
+      "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -static-libgcc",
+      "LD_OPTIONS" => "-R#{install_path}/embedded/lib"
     }
   when "aix"
     {
@@ -86,9 +86,9 @@ env =
       "CC" => "xlc -q64",
       "CXX" => "xlC -q64",
       "LD" => "ld -b64",
-      "CFLAGS" => "-q64 -O -qhot -I#{install_dir}/embedded/include",
-      "CXXFLAGS" => "-q64 -O -qhot -I#{install_dir}/embedded/include",
-      "LDFLAGS" => "-q64  -L#{install_dir}/embedded/lib -Wl,-brtl -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+      "CFLAGS" => "-q64 -O -qhot -I#{install_path}/embedded/include",
+      "CXXFLAGS" => "-q64 -O -qhot -I#{install_path}/embedded/include",
+      "LDFLAGS" => "-q64  -L#{install_path}/embedded/lib -Wl,-brtl -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
       "OBJECT_MODE" => "64",
       "ARFLAGS" => "-X64 cru",
       "M4" => "/opt/freeware/bin/m4",
@@ -96,14 +96,14 @@ env =
     }
   else
     {
-      "CFLAGS" => "-I#{install_dir}/embedded/include -O3 -g -pipe",
-      "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib"
+      "CFLAGS" => "-I#{install_path}/embedded/include -O3 -g -pipe",
+      "LDFLAGS" => "-Wl,-rpath,#{install_path}/embedded/lib -L#{install_path}/embedded/lib"
     }
   end
 
 build do
   configure_command = ["./configure",
-                       "--prefix=#{install_dir}/embedded",
+                       "--prefix=#{install_path}/embedded",
                        "--with-out-ext=fiddle,dbm",
                        "--enable-shared",
                        "--enable-libedit",
@@ -117,7 +117,7 @@ build do
     # --with-opt-dir causes ruby to send bogus commands to the AIX linker
   when "freebsd"
     configure_command << "--without-execinfo"
-    configure_command << "--with-opt-dir=#{install_dir}/embedded"
+    configure_command << "--with-opt-dir=#{install_path}/embedded"
   when "smartos"
     # Opscode patch - someara@opscode.com
     # GCC 4.7.0 chokes on mismatched function types between OpenSSL 1.0.1c and Ruby 1.9.3-p286
@@ -132,9 +132,9 @@ build do
     # From RVM forum
     # https://github.com/wayneeseguin/rvm/commit/86766534fcc26f4582f23842a4d3789707ce6b96
     configure_command << "ac_cv_func_dl_iterate_phdr=no"
-    configure_command << "--with-opt-dir=#{install_dir}/embedded"
+    configure_command << "--with-opt-dir=#{install_path}/embedded"
   else
-    configure_command << "--with-opt-dir=#{install_dir}/embedded"
+    configure_command << "--with-opt-dir=#{install_path}/embedded"
   end
 
   # @todo expose bundle_bust() in the DSL

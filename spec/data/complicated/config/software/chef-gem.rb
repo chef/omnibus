@@ -22,5 +22,5 @@ dependency "ruby"
 dependency "rubygems"
 
 build do
-  gem "install chef -n #{install_dir}/embedded/bin --no-rdoc --no-ri -v #{version}"
+  gem "install chef -n #{install_path}/embedded/bin --no-rdoc --no-ri -v #{version}"
 end

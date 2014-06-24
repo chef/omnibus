@@ -27,9 +27,9 @@ source :url => "http://www.keepalived.org/software/keepalived-1.2.9.tar.gz",
 relative_path "keepalived-1.2.9"
 
 env = {
-  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -static-libgcc",
-  "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include -static-libgcc",
+  "LD_RUN_PATH" => "#{install_path}/embedded/lib"
 }
 
 build do
@@ -37,7 +37,7 @@ build do
   # d384ce8b3492b9d76af23e621a20bed8da9c6016 of keepalived, (master
   # branch), and should be no longer necessary after 1.2.9.
   patch :source => "keepalived-1.2.9_opscode_centos_5.patch"
-  command "./configure --prefix=#{install_dir}/embedded --disable-iconv", :env => env
+  command "./configure --prefix=#{install_path}/embedded --disable-iconv", :env => env
   command "make -j #{max_build_jobs}", :env => env
   command "make install"
 end

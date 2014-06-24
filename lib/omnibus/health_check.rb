@@ -135,14 +135,14 @@ module Omnibus
       /libutil\.so/,
     ]
 
-    def self.run(install_dir, whitelist_files = [])
+    def self.run(install_path, whitelist_files = [])
       case Ohai['platform']
       when 'mac_os_x'
-        bad_libs = health_check_otool(install_dir, whitelist_files)
+        bad_libs = health_check_otool(install_path, whitelist_files)
       when 'aix'
-        bad_libs = health_check_aix(install_dir, whitelist_files)
+        bad_libs = health_check_aix(install_path, whitelist_files)
       else
-        bad_libs = health_check_ldd(install_dir, whitelist_files)
+        bad_libs = health_check_ldd(install_path, whitelist_files)
       end
 
       unresolved = []
@@ -232,25 +232,25 @@ module Omnibus
       end
     end
 
-    def self.health_check_otool(install_dir, whitelist_files)
+    def self.health_check_otool(install_path, whitelist_files)
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      read_shared_libs("find #{install_path}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
         when /^\s+(.+) \(.+\)$/
           linked = Regexp.last_match[1]
           name = File.basename(linked)
-          bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+          bad_libs = check_for_bad_library(install_path, bad_libs, whitelist_files, current_library, name, linked)
         end
       end
 
       bad_libs
     end
 
-    def self.check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+    def self.check_for_bad_library(install_path, bad_libs, whitelist_files, current_library, name, linked)
       safe = nil
 
       whitelist_libs = case Ohai.platform
@@ -279,7 +279,7 @@ module Omnibus
       log.debug(log_key) { "  --> Dependency: #{name}" }
       log.debug(log_key) { "  --> Provided by: #{linked}" }
 
-      if !safe && linked !~ Regexp.new(install_dir)
+      if !safe && linked !~ Regexp.new(install_path)
         log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
         bad_libs[current_library] ||= {}
         bad_libs[current_library][name] ||= {}
@@ -295,11 +295,11 @@ module Omnibus
       bad_libs
     end
 
-    def self.health_check_aix(install_dir, whitelist_files)
+    def self.health_check_aix(install_path, whitelist_files)
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
+      read_shared_libs("find #{install_path}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -307,7 +307,7 @@ module Omnibus
         when /^\s+(.+)$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[1]
-          bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+          bad_libs = check_for_bad_library(install_path, bad_libs, whitelist_files, current_library, name, linked)
         when /File is not an executable XCOFF file/ # ignore non-executable files
         else
           log.warn(log_key) { "Line did not match for #{current_library}\n#{line}" }
@@ -317,11 +317,11 @@ module Omnibus
       bad_libs
     end
 
-    def self.health_check_ldd(install_dir, whitelist_files)
+    def self.health_check_ldd(install_path, whitelist_files)
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{install_dir}/ -type f | xargs ldd") do |line|
+      read_shared_libs("find #{install_path}/ -type f | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -329,7 +329,7 @@ module Omnibus
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[2]
-          bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+          bad_libs = check_for_bad_library(install_path, bad_libs, whitelist_files, current_library, name, linked)
         when /^\s+(.+) \(.+\)$/
           next
         when /^\s+statically linked$/

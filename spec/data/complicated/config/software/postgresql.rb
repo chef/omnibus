@@ -35,17 +35,17 @@ source :url => "http://ftp.postgresql.org/pub/source/v#{version}/postgresql-#{ve
 relative_path "postgresql-#{version}"
 
 configure_env = {
-  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "LD_RUN_PATH" => "#{install_path}/embedded/lib"
 }
 
 build do
   command ["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--with-libedit-preferred",
-           "--with-openssl --with-includes=#{install_dir}/embedded/include",
-           "--with-libraries=#{install_dir}/embedded/lib"].join(" "), :env => configure_env
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+           "--with-openssl --with-includes=#{install_path}/embedded/include",
+           "--with-libraries=#{install_path}/embedded/lib"].join(" "), :env => configure_env
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
   command "make install"
 end

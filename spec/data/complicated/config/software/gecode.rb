@@ -34,7 +34,7 @@ configure_env = if test.exitstatus == 0
 
 build do
   command(["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--disable-doc-dot",
            "--disable-doc-search",
            "--disable-doc-tagfile",
@@ -43,6 +43,6 @@ build do
            "--disable-qt",
            "--disable-examples"].join(" "),
           :env => configure_env)
-  command "make -j #{max_build_jobs}", :env => { "LD_RUN_PATH" => "#{install_dir}/embedded/lib" }
+  command "make -j #{max_build_jobs}", :env => { "LD_RUN_PATH" => "#{install_path}/embedded/lib" }
   command "make install"
 end

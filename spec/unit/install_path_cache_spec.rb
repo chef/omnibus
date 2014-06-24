@@ -75,14 +75,14 @@ module Omnibus
     end
 
     describe '#tag' do
-      # 13b3f7f2653e40b9d5b393659210775ac5b56f7e0009f82f85b83f5132409362
+      # f979612e7e06b77900d904d77a6389ac296107db7014714ce8c0a9681bd40635
       #
       # Is the sha256sum of:
       # cat spec/data/software/zlib.rb > t
       # echo -n 'preparation-1.0.0-snoopy-1.0.0' >> t
       # sha256sum t
       it 'returns a tag with the softwares name, version, and hash of deps name+version' do
-        expect(ipc.tag).to eql('zlib-1.7.2-13b3f7f2653e40b9d5b393659210775ac5b56f7e0009f82f85b83f5132409362')
+        expect(ipc.tag).to eql('zlib-1.7.2-f979612e7e06b77900d904d77a6389ac296107db7014714ce8c0a9681bd40635')
       end
 
       describe 'with no deps' do
@@ -92,8 +92,8 @@ module Omnibus
 
         it 'uses the shasum of the software config file' do
           # gsha256sum spec/data/software/zlib.rb
-          # 363e6cc2475fcdd6e18b2dc10f6022d1cab498b9961e8225d8a309d18ed3c94b  spec/data/software/zlib.rb
-          expect(ipc.tag).to eql('zlib-1.7.2-363e6cc2475fcdd6e18b2dc10f6022d1cab498b9961e8225d8a309d18ed3c94b')
+          # 89fd92f3ca6edc60691c10a308296926de2eaa89fa888719dc37615bcf886b8f  spec/data/software/zlib.rb
+          expect(ipc.tag).to eql('zlib-1.7.2-89fd92f3ca6edc60691c10a308296926de2eaa89fa888719dc37615bcf886b8f')
         end
       end
     end

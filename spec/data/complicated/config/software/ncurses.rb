@@ -29,33 +29,33 @@ relative_path "ncurses-5.9"
 env = case platform
       when "aix"
         {
-          "PATH" => "#{install_dir}/embedded/bin:" + ENV['PATH'],
-          "LDFLAGS" => "-Wl,-brtl -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib -L#{install_dir}/embedded/lib",
-          "CXXFLAGS" => "-O -I#{install_dir}/embedded/include",
-          "CFLAGS" => "-O -I#{install_dir}/embedded/include",
+          "PATH" => "#{install_path}/embedded/bin:" + ENV['PATH'],
+          "LDFLAGS" => "-Wl,-brtl -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib -L#{install_path}/embedded/lib",
+          "CXXFLAGS" => "-O -I#{install_path}/embedded/include",
+          "CFLAGS" => "-O -I#{install_path}/embedded/include",
           "OBJECT_MODE" => "64",
           "CC" => "gcc -maix64",
           "CXX" => "g++ -maix64",
-          "CFLAGS" => "-maix64 -I#{install_dir}/embedded/include",
+          "CFLAGS" => "-maix64 -I#{install_path}/embedded/include",
           "ARFLAGS" => "-X64 cru"
         }
       else
         {
-          "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
-          "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-          "LDFLAGS" => "-L#{install_dir}/embedded/lib"
+          "LD_RUN_PATH" => "#{install_path}/embedded/lib",
+          "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+          "LDFLAGS" => "-L#{install_path}/embedded/lib"
         }
       end
 
 if platform == "solaris2"
-  env.merge!({"LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -static-libgcc"})
-  env.merge!({"LD_OPTIONS" => "-R#{install_dir}/embedded/lib"})
+  env.merge!({"LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -static-libgcc"})
+  env.merge!({"LD_OPTIONS" => "-R#{install_path}/embedded/lib"})
   # gcc4 from opencsw fails to compile ncurses
   env.merge!({"PATH" => "/opt/csw/gcc3/bin:/opt/csw/bin:/usr/local/bin:/usr/sfw/bin:/usr/ccs/bin:/usr/sbin:/usr/bin"})
   env.merge!({"CC" => "/opt/csw/gcc3/bin/gcc"})
   env.merge!({"CXX" => "/opt/csw/gcc3/bin/g++"})
 elsif platform == "smartos"
-  env.merge!({"LD_OPTIONS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib "})
+  env.merge!({"LD_OPTIONS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib "})
 end
 
 ########################################################################
@@ -109,7 +109,7 @@ build do
 
   # build wide-character libraries
   cmd_array = ["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--with-shared",
            "--with-termlib",
            "--without-debug",
@@ -126,7 +126,7 @@ build do
   # build non-wide-character libraries
   command "make distclean"
   cmd_array = ["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--with-shared",
            "--with-termlib",
            "--without-debug",
@@ -144,6 +144,6 @@ build do
 
   # Ensure embedded ncurses wins in the LD search path
   if platform == "smartos"
-    command "ln -sf #{install_dir}/embedded/lib/libcurses.so #{install_dir}/embedded/lib/libcurses.so.1"
+    command "ln -sf #{install_path}/embedded/lib/libcurses.so #{install_path}/embedded/lib/libcurses.so.1"
   end
 end

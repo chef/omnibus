@@ -29,7 +29,7 @@ source :url => "http://www.bzip.org/#{version}/#{name}-#{version}.tar.gz",
 
 relative_path "#{name}-#{version}"
 
-prefix="#{install_dir}/embedded"
+prefix="#{install_path}/embedded"
 libdir="#{prefix}/lib"
 
 env = {

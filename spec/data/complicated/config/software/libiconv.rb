@@ -31,21 +31,21 @@ env = case platform
           "CC" => "xlc -q64",
           "CXX" => "xlC -q64",
           "LDFLAGS" => "-q64 -Wl,-blibpath:/usr/lib:/lib",
-          "CFLAGS" => "-O -q64 -I#{install_dir}/embedded/include",
-          "CXXFLAGS" => "-O -q64 -I#{install_dir}/embedded/include",
+          "CFLAGS" => "-O -q64 -I#{install_path}/embedded/include",
+          "CXXFLAGS" => "-O -q64 -I#{install_path}/embedded/include",
           "LD" => "ld -b64",
           "OBJECT_MODE" => "64",
           "ARFLAGS" => "-X64 cru "
         }
       else
         {
-          "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-          "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+          "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+          "LD_RUN_PATH" => "#{install_path}/embedded/lib"
         }
       end
 
 if platform == "solaris2"
-  env.merge!({"LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -static-libgcc", "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"})
+  env.merge!({"LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -static-libgcc", "LD_OPTIONS" => "-R#{install_path}/embedded/lib"})
 end
 
 build do
@@ -60,7 +60,7 @@ build do
   end
 
   patch :source => 'libiconv-1.14_srclib_stdio.in.h-remove-gets-declarations.patch' if glibc_dropped_gets?
-  command "./configure --prefix=#{install_dir}/embedded", :env => env
+  command "./configure --prefix=#{install_path}/embedded", :env => env
   command "make -j #{max_build_jobs}", :env => env
-  command "make -j #{max_build_jobs} install-lib libdir=#{install_dir}/embedded/lib includedir=#{install_dir}/embedded/include", :env => env
+  command "make -j #{max_build_jobs} install-lib libdir=#{install_path}/embedded/lib includedir=#{install_path}/embedded/include", :env => env
 end

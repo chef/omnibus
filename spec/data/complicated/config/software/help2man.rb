@@ -24,7 +24,7 @@ source :url => "http://ftp.gnu.org/gnu/help2man/help2man-1.40.5.tar.gz",
 relative_path "help2man-1.40.5"
 
 build do
-  command "./configure --prefix=#{install_dir}/embedded"
+  command "./configure --prefix=#{install_path}/embedded"
   command "make"
   command "make install"
 end

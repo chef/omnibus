@@ -25,12 +25,12 @@ source :git => "https://github.com/basho/rebar.git"
 relative_path "rebar"
 
 env = {
-  "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}",
-  "LD_FLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+  "PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}",
+  "LD_FLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "LD_RUN_PATH" => "#{install_path}/embedded/lib"
 }
 
 build do
   command "./bootstrap", :env => env
-  command "cp ./rebar #{install_dir}/embedded/bin/"
+  command "cp ./rebar #{install_path}/embedded/bin/"
 end

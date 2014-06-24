@@ -7,16 +7,16 @@ source :url => "http://www.cpan.org/src/5.0/perl-#{version}.tar.gz",
 relative_path "perl-#{version}"
 
 env = {
-  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "LD_RUN_PATH" => "#{install_path}/embedded/lib"
 }
 
 build do
   command [
             "sh Configure",
             "-de",
-            "-Dprefix=#{install_dir}/embedded",
+            "-Dprefix=#{install_path}/embedded",
             "-Duseshrplib", ## Compile shared libperl
             "-Dusethreads", ## Compile ithread support
             "-Dnoextensions='DB_File GDBM_File NDBM_File ODBM_File'"

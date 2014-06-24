@@ -29,22 +29,22 @@ relative_path "ngx_openresty-#{version}"
 
 build do
   env = {
-    "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-    "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-    "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+    "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+    "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+    "LD_RUN_PATH" => "#{install_path}/embedded/lib"
   }
 
   command ["./configure",
-           "--prefix=#{install_dir}/embedded",
-           "--sbin-path=#{install_dir}/embedded/sbin/nginx",
-           "--conf-path=#{install_dir}/embedded/conf/nginx.conf",
+           "--prefix=#{install_path}/embedded",
+           "--sbin-path=#{install_path}/embedded/sbin/nginx",
+           "--conf-path=#{install_path}/embedded/conf/nginx.conf",
            "--with-http_ssl_module",
            "--with-debug",
            "--with-http_stub_status_module",
            # Building Nginx with non-system OpenSSL
            # http://www.ruby-forum.com/topic/207287#902308
-           "--with-ld-opt=\"-L#{install_dir}/embedded/lib -Wl,-rpath,#{install_dir}/embedded/lib -lssl -lcrypto -ldl -lz\"",
-           "--with-cc-opt=\"-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include\"",
+           "--with-ld-opt=\"-L#{install_path}/embedded/lib -Wl,-rpath,#{install_path}/embedded/lib -lssl -lcrypto -ldl -lz\"",
+           "--with-cc-opt=\"-L#{install_path}/embedded/lib -I#{install_path}/embedded/include\"",
            # Options inspired by the OpenResty Cookbook
            '--with-md5-asm',
            '--with-sha1-asm',

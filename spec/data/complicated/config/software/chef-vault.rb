@@ -33,7 +33,7 @@ else
 end
 
 
-build_env = {'PATH' => "#{install_dir}/embedded/bin:#{ENV['PATH']}"}
+build_env = {'PATH' => "#{install_path}/embedded/bin:#{ENV['PATH']}"}
 
 build do
   bundle 'install --no-cache', :env => build_env

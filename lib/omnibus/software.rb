@@ -392,7 +392,7 @@ module Omnibus
     # The path where this software is installed on disk.
     #
     # @example
-    #   { 'PATH' => "#{install_dir}/embedded/bin:#{ENV["PATH"]}", }
+    #   { 'PATH' => "#{install_path}/embedded/bin:#{ENV["PATH"]}", }
     #
     # @see Project#install_path
     #
@@ -658,7 +658,7 @@ module Omnibus
       if always_build?
         execute_build(@fetcher)
       else
-        if Omnibus::InstallPathCache.new(install_dir, self).restore
+        if Omnibus::InstallPathCache.new(install_path, self).restore
           true
         else
           execute_build(@fetcher)
@@ -694,7 +694,7 @@ module Omnibus
     # @params env [Hash]
     # @return [Hash]
     def with_embedded_path(env = {})
-      path_value = prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+      path_value = prepend_path("#{install_path}/bin", "#{install_path}/embedded/bin")
       env.merge(path_key => path_value)
     end
 
@@ -733,15 +733,15 @@ module Omnibus
               {
                 "CC" => "gcc -maix64",
                 "CXX" => "g++ -maix64",
-                "CFLAGS" => "-maix64 -O -I#{install_dir}/embedded/include",
-                "LDFLAGS" => "-L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+                "CFLAGS" => "-maix64 -O -I#{install_path}/embedded/include",
+                "LDFLAGS" => "-L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
               }
             else
               {
                 "CC" => "xlc -q64",
                 "CXX" => "xlC -q64",
-                "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
-                "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+                "CFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
+                "LDFLAGS" => "-q64 -L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
               }
             end
           cc_flags.merge({
@@ -751,18 +751,18 @@ module Omnibus
           })
         when "mac_os_x"
           {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "LDFLAGS" => "-L#{install_path}/embedded/lib",
+            "CFLAGS" => "-I#{install_path}/embedded/include",
           }
         when "solaris2"
           {
-            "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -static-libgcc",
+            "CFLAGS" => "-I#{install_path}/embedded/include",
           }
         else
           {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "LDFLAGS" => "-Wl,-rpath,#{install_path}/embedded/lib -L#{install_path}/embedded/lib",
+            "CFLAGS" => "-I#{install_path}/embedded/include",
           }
         end
 
@@ -774,13 +774,13 @@ module Omnibus
       # better.  in that case LD_RUN_PATH will probably survive whatever
       # edits the configure script does
       extra_linker_flags = {
-        "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+        "LD_RUN_PATH" => "#{install_path}/embedded/lib"
       }
       # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
       # the linker, to find every way to make it use our rpath.
       extra_linker_flags.merge!(
         {
-          "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
+          "LD_OPTIONS" => "-R#{install_path}/embedded/lib"
         }
       ) if platform == "solaris2"
       env.merge(compiler_flags).
@@ -788,7 +788,7 @@ module Omnibus
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
-        merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
+        merge({"PKG_CONFIG_PATH" => "#{install_path}/embedded/lib/pkgconfig"})
     end
 
     private
@@ -844,7 +844,7 @@ module Omnibus
       fetcher.clean
       @builder.build
       log.info(log_key) { 'Caching build' }
-      Omnibus::InstallPathCache.new(install_dir, self).incremental
+      Omnibus::InstallPathCache.new(install_path, self).incremental
       log.info(log_key) { 'Dirtied the cache!' }
       project.dirty!
     end

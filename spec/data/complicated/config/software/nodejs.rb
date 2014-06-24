@@ -38,7 +38,7 @@ else
 end
 
 build do
-  command "#{python} ./configure --prefix=#{install_dir}/embedded"
+  command "#{python} ./configure --prefix=#{install_path}/embedded"
   command "make -j #{max_build_jobs}"
   command "make install"
 end

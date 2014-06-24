@@ -30,13 +30,13 @@ source :url => "http://python.org/ftp/python/#{version}/Python-#{version}.tgz",
 relative_path "Python-#{version}"
 
 env = {
-  "CFLAGS" => "-I#{install_dir}/embedded/include -O3 -g -pipe",
-  "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib"
+  "CFLAGS" => "-I#{install_path}/embedded/include -O3 -g -pipe",
+  "LDFLAGS" => "-Wl,-rpath,#{install_path}/embedded/lib -L#{install_path}/embedded/lib"
 }
 
 build do
   command ["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--enable-shared",
            "--with-dbmliborder=gdbm"].join(" "), :env => env
   command "make", :env => env
@@ -44,6 +44,6 @@ build do
 
   # There exists no configure flag to tell Python to not compile readline support :(
   block do
-    FileUtils.rm_f(Dir.glob("#{install_dir}/embedded/lib/python2.7/lib-dynload/readline.*"))
+    FileUtils.rm_f(Dir.glob("#{install_path}/embedded/lib/python2.7/lib-dynload/readline.*"))
   end
 end

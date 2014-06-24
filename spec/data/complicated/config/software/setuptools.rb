@@ -26,5 +26,5 @@ source :url => "https://pypi.python.org/packages/source/s/setuptools/setuptools-
 relative_path "setuptools-#{version}"
 
 build do
-  command "#{install_dir}/embedded/bin/python setup.py install --prefix=#{install_dir}/embedded"
+  command "#{install_path}/embedded/bin/python setup.py install --prefix=#{install_path}/embedded"
 end

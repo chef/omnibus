@@ -27,13 +27,13 @@ source :url => "http://fastcgi.com/dist/fcgi-2.4.0.tar.gz",
 
 relative_path "fcgi-2.4.0"
 
-reconf_env = {"PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}"}
+reconf_env = {"PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}"}
 
 configure_env = {
-  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -L/lib -L/usr/lib",
-  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-  "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
-  "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}"
+  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include -L/lib -L/usr/lib",
+  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "LD_RUN_PATH" => "#{install_path}/embedded/lib",
+  "PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}"
 }
 
 build do
@@ -50,7 +50,7 @@ D
   command "libtoolize", :env => reconf_env
 
   # configure and build
-  command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+  command "./configure --prefix=#{install_path}/embedded", :env => configure_env
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
   command "make install"
 end

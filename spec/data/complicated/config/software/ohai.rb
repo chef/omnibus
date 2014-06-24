@@ -37,28 +37,28 @@ env =
   case platform
   when "solaris2"
     {
-      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-      "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
+      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+      "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include"
     }
   when "aix"
     {
-      "LDFLAGS" => "-Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib -L#{install_dir}/embedded/lib",
-      "CFLAGS" => "-I#{install_dir}/embedded/include"
+      "LDFLAGS" => "-Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib -L#{install_path}/embedded/lib",
+      "CFLAGS" => "-I#{install_path}/embedded/include"
     }
   else
     {
-      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-      "LDFLAGS" => "-Wl,-rpath #{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
+      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+      "LDFLAGS" => "-Wl,-rpath #{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include"
     }
   end
 
 build do
 
   # install chef first so that ohai gets installed into /opt/chef/bin/ohai
-  rake "gem", :env => env.merge({"PATH" => "#{install_dir}/embedded/bin:#{ENV['PATH']}"})
+  rake "gem", :env => env.merge({"PATH" => "#{install_path}/embedded/bin:#{ENV['PATH']}"})
 
   gem ["install pkg/ohai*.gem",
-      "-n #{install_dir}/bin",
-      "--no-rdoc --no-ri"].join(" "), :env => env.merge({"PATH" => "#{install_dir}/embedded/bin:#{ENV['PATH']}"})
+      "-n #{install_path}/bin",
+      "--no-rdoc --no-ri"].join(" "), :env => env.merge({"PATH" => "#{install_path}/embedded/bin:#{ENV['PATH']}"})
 
 end

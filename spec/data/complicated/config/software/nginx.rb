@@ -28,13 +28,13 @@ relative_path "nginx-#{version}"
 
 build do
   command ["./configure",
-           "--prefix=#{install_dir}/embedded",
+           "--prefix=#{install_path}/embedded",
            "--with-http_ssl_module",
            "--with-http_stub_status_module",
            "--with-ipv6",
            "--with-debug",
-           "--with-ld-opt=-L#{install_dir}/embedded/lib",
-           "--with-cc-opt=\"-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include\""].join(" ")
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+           "--with-ld-opt=-L#{install_path}/embedded/lib",
+           "--with-cc-opt=\"-L#{install_path}/embedded/lib -I#{install_path}/embedded/include\""].join(" ")
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
   command "make install"
 end

@@ -29,6 +29,6 @@ relative_path "omnibus-ctl"
 build do
   gem "build omnibus-ctl.gemspec"
   gem "install omnibus-ctl-#{version}.gem"
-  command "mkdir -p #{install_dir}/embedded/service/omnibus-ctl"
-  command "touch #{install_dir}/embedded/service/omnibus-ctl/.gitkeep"
+  command "mkdir -p #{install_path}/embedded/service/omnibus-ctl"
+  command "touch #{install_path}/embedded/service/omnibus-ctl/.gitkeep"
 end

@@ -25,6 +25,6 @@ relative_path "yajl-ruby"
 build do
   gem ["install yajl-ruby",
        "-v #{version}",
-       "-n #{install_dir}/bin",
+       "-n #{install_path}/bin",
        "--no-rdoc --no-ri"].join(" ")
 end

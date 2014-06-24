@@ -1231,13 +1231,13 @@ module Omnibus
     end
 
     def run_pkgmk
-      install_dirname = File.dirname(install_path)
+      install_pathname = File.dirname(install_path)
       install_basename = File.basename(install_path)
 
       system 'sudo rm -rf /tmp/pkgmk'
       FileUtils.mkdir '/tmp/pkgmk'
 
-      system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
+      system "cd #{install_pathname} && find #{install_basename} -print > /tmp/pkgmk/files"
 
       prototype_content = <<-EOF
 i pkginfo
@@ -1250,7 +1250,7 @@ i postremove
       end
 
       # generate the prototype's file list
-      system "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
+      system "cd #{install_pathname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
 
       # fix up the user and group in the file list to root
       system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
@@ -1259,7 +1259,7 @@ i postremove
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_dirname}
+BASEDIR=#{install_pathname}
 PKG=#{package_name}
 NAME=#{package_name}
 ARCH=#{`uname -p`.chomp}
@@ -1278,7 +1278,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       FileUtils.cp "#{package_scripts_path}/postinst", '/tmp/pkgmk/postinstall'
       FileUtils.cp "#{package_scripts_path}/postrm", '/tmp/pkgmk/postremove'
 
-      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
+      shellout!("pkgmk -o -r #{install_pathname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
 
       system 'pkgchk -vd /tmp/pkgmk chef'
 

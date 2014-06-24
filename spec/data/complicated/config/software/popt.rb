@@ -27,21 +27,21 @@ env =
   case platform
   when "solaris2"
     {
-      "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-      "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+      "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+      "LD_RUN_PATH" => "#{install_path}/embedded/lib"
     }
   else
     {
-      "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
-      "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+      "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+      "LD_RUN_PATH" => "#{install_path}/embedded/lib"
     }
   end
 
 build do
   # --disable-nls => Disable localization support.
-  command "./configure --prefix=#{install_dir}/embedded --disable-nls", :env => env
+  command "./configure --prefix=#{install_path}/embedded --disable-nls", :env => env
   command "make -j #{max_build_jobs}", :env => env
   command "make install"
 end

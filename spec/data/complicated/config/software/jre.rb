@@ -40,9 +40,9 @@ end
 
 relative_path "jre1.7.0_03"
 
-jre_dir = "#{install_dir}/embedded/jre"
+jre_dir = "#{install_path}/embedded/jre"
 
 build do
   command "mkdir -p #{jre_dir}"
-  command "#{install_dir}/embedded/bin/rsync -a . #{jre_dir}/"
+  command "#{install_path}/embedded/bin/rsync -a . #{jre_dir}/"
 end

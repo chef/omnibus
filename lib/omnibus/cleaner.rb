@@ -58,7 +58,7 @@ module Omnibus
       Dir.glob("#{Config.cache_dir}/**/*").each(&method(:remove_file))
     end
 
-    def clean_install_dir
+    def clean_install_path
       return unless purge?
       remove_file(@project.install_path)
     end

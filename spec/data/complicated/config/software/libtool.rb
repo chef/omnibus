@@ -34,18 +34,18 @@ build do
   env = case platform
         when "aix"
         {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
-            "CFLAGS" => "-maix64 -O -I#{install_dir}/embedded/include",
+            "LDFLAGS" => "-L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
+            "CFLAGS" => "-maix64 -O -I#{install_path}/embedded/include",
             "OBJECT_MODE" => "64",
             "CC" => "gcc -maix64",
             "CXX" => "g++ -maix64",
         }
   end
   if platform == "aix"
-    command "./configure --prefix=#{install_dir}/embedded --with-gcc", :env => env
+    command "./configure --prefix=#{install_path}/embedded --with-gcc", :env => env
     command "make", :env => env
   else
-    command "./configure --prefix=#{install_dir}/embedded"
+    command "./configure --prefix=#{install_path}/embedded"
     command "make"
   end
   command "make install"

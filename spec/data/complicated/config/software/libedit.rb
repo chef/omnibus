@@ -39,19 +39,19 @@ env = case platform
           "CC" => "xlc -q64",
           "CXX" => "xlC -q64",
           "LD" => "ld -b64",
-          "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
-          "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+          "CFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
+          "CXXFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
           "OBJECT_MODE" => "64",
           "ARFLAGS" => "-X64 cru",
           "M4" => "/opt/freeware/bin/m4",
-          "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+          "LDFLAGS" => "-q64 -L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
         }
       else
         {
-          "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -I#{install_dir}/embedded/include/ncurses",
-          "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -I#{install_dir}/embedded/include/ncurses",
-          "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
-          "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
+          "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include -I#{install_path}/embedded/include/ncurses",
+          "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include -I#{install_path}/embedded/include/ncurses",
+          "LD_RUN_PATH" => "#{install_path}/embedded/lib",
+          "LD_OPTIONS" => "-R#{install_path}/embedded/lib"
         }
       end
 
@@ -62,7 +62,7 @@ build do
     patch :source => "freebsd-vi-fix.patch"
   end
   command ["./configure",
-           "--prefix=#{install_dir}/embedded"
+           "--prefix=#{install_path}/embedded"
            ].join(" "), :env => env
   command "make -j #{max_build_jobs}", :env => env
   command "make -j #{max_build_jobs} install"
