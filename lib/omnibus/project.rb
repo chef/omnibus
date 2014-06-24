@@ -48,21 +48,15 @@ module Omnibus
     include Sugarable
     include Util
 
-    attr_reader :library
     attr_accessor :build_version_dsl
 
     #
-    # Create a new Project from the contents of a DSL file.  Prefer
-    # calling {Omnibus::Project#load} instead of using this method
-    # directly.
+    # The library for this Omnibus project.
     #
-    # @see Omnibus::Project#load
+    # @return [Library]
     #
-    def initialize
-      # TODO: validate right before building instead
-      # validate
-
-      @library = Library.new(self)
+    def library
+      @library ||= Library.new(self)
     end
 
     #
