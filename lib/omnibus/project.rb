@@ -724,6 +724,91 @@ module Omnibus
     expose :extra_package_file
 
     #
+    # The platform version of the machine on which Omnibus is running, as
+    # determined by Ohai.
+    #
+    # @deprecated Use {Ohai.platform_version} instead.
+    #
+    # @return [String]
+    #
+    def platform_version
+      log.deprecated(log_key) do
+        'platform_version (DSL). Please use Ohai.platform_version instead.'
+      end
+
+      Ohai.platform_version
+    end
+    expose :platform_version
+
+    #
+    # The platform of the machine on which Omnibus is running, as determined
+    # by Ohai.
+    #
+    # @deprecated Use {Ohai.platform} instead.
+    #
+    # @return [String]
+    #
+    def platform
+      log.deprecated(log_key) do
+        'platform (DSL). Please use Ohai.platform instead.'
+      end
+
+      Ohai.platform
+    end
+    expose :platform
+
+    #
+    # The platform family of the machine on which Omnibus is running, as
+    # determined by Ohai.
+    #
+    # @deprecated Use {Ohai.platform_family} instead.
+    #
+    # @return [String]
+    #
+    def platform_family
+      log.deprecated(log_key) do
+        'platform_family (DSL). Please use Ohai.platform_family instead.'
+      end
+
+      Ohai.platform_family
+    end
+    expose :platform_family
+
+    #
+    # The machine which this project is running on.
+    #
+    # @deprecated Use {Ohai.kernel.machine} instead.
+    #
+    # @return [String]
+    #
+    def machine
+      log.deprecated(log_key) do
+        'machine (DSL). Please use Ohai.kernel.machine instead.'
+      end
+
+      Ohai['kernel']['machine']
+    end
+    expose :machine
+
+    #
+    # Convenience method for accessing the global Omnibus configuration object.
+    #
+    # @deprecated Use {Config} instead
+    #
+    # @return Config
+    #
+    # @see Config
+    #
+    def config
+      log.deprecated(log_key) do
+        'config (DSL). Please use Config.(thing) instead (capital C).'
+      end
+
+      Config
+    end
+    expose :config
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -819,47 +904,6 @@ module Omnibus
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
       end
-    end
-
-    # Returns the platform version of the machine on which Omnibus is
-    # running, as determined by Ohai.
-    #
-    # @return [String]
-    def platform_version
-      Ohai.platform_version
-    end
-
-    # Returns the platform of the machine on which Omnibus is running,
-    # as determined by Ohai.
-    #
-    # @return [String]
-    def platform
-      Ohai.platform
-    end
-
-    # Returns the platform family of the machine on which Omnibus is
-    # running, as determined by Ohai.
-    #
-    # @return [String]
-    def platform_family
-      Ohai.platform_family
-    end
-
-    def machine
-      Ohai['kernel']['machine']
-    end
-
-    # Convenience method for accessing the global Omnibus configuration object.
-    #
-    # @return Config
-    #
-    # @see Config
-    def config
-      log.deprecated(log_key) do
-        'config (DSL). Please use Config.(thing) instead (capital C).'
-      end
-
-      Config
     end
 
     # The path to the package scripts directory for this project.
