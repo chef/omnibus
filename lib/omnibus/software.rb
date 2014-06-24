@@ -43,9 +43,6 @@ module Omnibus
     include Nullable
     include Sugarable
 
-    # It appears that this is not used
-    attr_reader :fetcher
-
     #
     # Create a new software object.
     #
@@ -538,8 +535,8 @@ module Omnibus
 
     # Returns the version to be used in cache.
     def version_for_cache
-      if fetcher
-        fetcher.version_for_cache || version
+      if @fetcher
+        @fetcher.version_for_cache || version
       else
         version
       end
@@ -661,12 +658,12 @@ module Omnibus
 
       # Build if we need to
       if always_build?
-        execute_build(fetcher)
+        execute_build(@fetcher)
       else
         if Omnibus::InstallPathCache.new(install_dir, self).restore
           true
         else
-          execute_build(fetcher)
+          execute_build(@fetcher)
         end
       end
 
