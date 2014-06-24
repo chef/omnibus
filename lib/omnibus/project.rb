@@ -298,6 +298,26 @@ module Omnibus
     expose :install_path
 
     #
+    # Path to the +/files+ directory in the omnibus project. This directory can
+    # contain assets used for creating packages (e.g., Mac .pkg files and
+    # Windows MSIs can be installed by GUI which can optionally be customized
+    # with background images, license agreements, etc.)
+    #
+    # This method delegates to the {Config.project_root} module function so that
+    # Packagers classes rely only on the Project object for their inputs.
+    #
+    # @example
+    #   patch = File.join(files_path, 'rubygems', 'patch.rb')
+    #
+    # @return [String]
+    #   path to the files directory
+    #
+    def files_path
+      "#{Config.project_root}/files"
+    end
+    expose :files_path
+
+    #
     # **[Required]** Set or retrieve the the package maintainer.
     #
     # @example
@@ -873,19 +893,6 @@ module Omnibus
     #   particularly since the user has no way to change the path.
     def package_scripts_path
       "#{Config.project_root}/package-scripts/#{name}"
-    end
-
-    # Path to the /files directory in the omnibus project. This directory can
-    # contain assets used for creating packages (e.g., Mac .pkg files and
-    # Windows MSIs can be installed by GUI which can optionally be customized
-    # with background images, license agreements, etc.)
-    #
-    # This method delegates to the {Config.project_root} module function so that
-    # Packagers classes rely only on the Project object for their inputs.
-    #
-    # @return [String] path to the files directory.
-    def files_path
-      "#{Config.project_root}/files"
     end
 
     # The directory where packages are written when created. Delegates to
