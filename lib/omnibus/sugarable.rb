@@ -30,7 +30,16 @@ require 'chef/sugar/vagrant'
 
 module Omnibus
   module Sugarable
-    include Chef::Sugar::DSL
+    def self.included(base)
+      base.send(:include, Chef::Sugar::DSL)
+
+      if base < Cleanroom
+        # Make all the "sugars" available in the cleanroom (DSL)
+        Chef::Sugar::DSL.instance_methods.each do |instance_method|
+          base.send(:expose, instance_method)
+        end
+      end
+    end
 
     # This method is used by Chef Sugar to easily add the DSL. By mimicing
     # Chef's +node+ object, we can easily include the existing DSL into
