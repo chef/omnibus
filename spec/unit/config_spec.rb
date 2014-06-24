@@ -20,7 +20,7 @@ module Omnibus
       described_class.reset
 
       # Prevent Ohai from running
-      Ohai.stub(:platform).and_return('linux')
+      stub_ohai(platform: 'linux')
     end
 
     after do
@@ -58,7 +58,7 @@ module Omnibus
 
     context 'on Windows' do
       before do
-        Ohai.stub(:platform).and_return('windows')
+        stub_ohai(platform: 'windows')
 
         # This is not defined on Linuxy Rubies
         stub_const('File::ALT_SEPARATOR', '\\')

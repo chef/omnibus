@@ -136,7 +136,7 @@ module Omnibus
     ]
 
     def self.run(install_dir, whitelist_files = [])
-      case Ohai.platform
+      case Ohai['platform']
       when 'mac_os_x'
         bad_libs = health_check_otool(install_dir, whitelist_files)
       when 'aix'

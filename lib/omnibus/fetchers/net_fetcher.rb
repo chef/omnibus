@@ -203,11 +203,11 @@ module Omnibus
     end
 
     def extract_cmd
-      if Ohai.platform == 'windows' && project_file.end_with?(*WIN_7Z_EXTENSIONS)
+      if Ohai['platform'] == 'windows' && project_file.end_with?(*WIN_7Z_EXTENSIONS)
         "7z.exe x #{project_file} -o#{source_dir} -r -y"
-      elsif Ohai.platform != 'windows' && project_file.end_with?('.7z')
+      elsif Ohai['platform'] != 'windows' && project_file.end_with?('.7z')
         "7z x #{project_file} -o#{source_dir} -r -y"
-      elsif Ohai.platform != 'windows' && project_file.end_with?('.zip')
+      elsif Ohai['platform'] != 'windows' && project_file.end_with?('.zip')
         "unzip #{project_file} -d #{source_dir}"
       elsif project_file.end_with?(*TAR_EXTENSIONS)
         compression_switch = 'z' if project_file.end_with?('gz')

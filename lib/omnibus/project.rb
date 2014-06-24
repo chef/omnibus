@@ -616,16 +616,16 @@ module Omnibus
     # The platform version of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
-    # @deprecated Use +Ohai.platform_version+ instead.
+    # @deprecated Use +Ohai['platform_version']+ instead.
     #
     # @return [String]
     #
     def platform_version
       log.deprecated(log_key) do
-        'platform_version (DSL). Please use Ohai.platform_version instead.'
+        "platform_version (DSL). Please use Ohai['platform_version'] instead."
       end
 
-      Ohai.platform_version
+      Ohai['platform_version']
     end
     expose :platform_version
 
@@ -633,16 +633,16 @@ module Omnibus
     # The platform of the machine on which Omnibus is running, as determined
     # by Ohai.
     #
-    # @deprecated Use +Ohai.platform+ instead.
+    # @deprecated Use +Ohai['platform']+ instead.
     #
     # @return [String]
     #
     def platform
       log.deprecated(log_key) do
-        'platform (DSL). Please use Ohai.platform instead.'
+        "platform (DSL). Please use Ohai['platform'] instead."
       end
 
-      Ohai.platform
+      Ohai['platform']
     end
     expose :platform
 
@@ -650,29 +650,29 @@ module Omnibus
     # The platform family of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
-    # @deprecated Use Ohai.platform_family instead.
+    # @deprecated Use +Ohai['platform_family']+ instead.
     #
     # @return [String]
     #
     def platform_family
       log.deprecated(log_key) do
-        'platform_family (DSL). Please use Ohai.platform_family instead.'
+        "platform_family (DSL). Please use Ohai['platform_family'] instead."
       end
 
-      Ohai.platform_family
+      Ohai['platform_family']
     end
     expose :platform_family
 
     #
     # The machine which this project is running on.
     #
-    # @deprecated Use Ohai.kernel.machine instead.
+    # @deprecated Use +Ohai['kernel']['machine']+ instead.
     #
     # @return [String]
     #
     def machine
       log.deprecated(log_key) do
-        'machine (DSL). Please use Ohai.kernel.machine instead.'
+        "machine (DSL). Please use Ohai['kernel']['machine'] instead."
       end
 
       Ohai['kernel']['machine']
@@ -845,21 +845,21 @@ module Omnibus
     #
     # @return [String]
     def iteration
-      case Ohai.platform_family
+      case Ohai['platform_family']
       when 'rhel'
-        Ohai.platform_version =~ /^(\d+)/
+        Ohai['platform_version'] =~ /^(\d+)/
         maj = Regexp.last_match[1]
         "#{build_iteration}.el#{maj}"
       when 'freebsd'
-        Ohai.platform_version =~ /^(\d+)/
+        Ohai['platform_version'] =~ /^(\d+)/
         maj = Regexp.last_match[1]
-        "#{build_iteration}.#{Ohai.platform}.#{maj}.#{Ohai.kernel.machine}"
+        "#{build_iteration}.#{Ohai['platform']}.#{maj}.#{Ohai['kernel']['machine']}"
       when 'windows'
         "#{build_iteration}.windows"
       when 'aix', 'debian', 'mac_os_x'
         "#{build_iteration}"
       else
-        "#{build_iteration}.#{Ohai.platform}.#{Ohai.platform_version}"
+        "#{build_iteration}.#{Ohai['platform']}.#{Ohai['platform_version']}"
       end
     end
 
@@ -909,7 +909,7 @@ module Omnibus
     end
 
     def health_check_me
-      if Ohai.platform == 'windows'
+      if Ohai['platform'] == 'windows'
         log.info(log_key) { 'Skipping health check on Windows' }
       else
         # build a list of all whitelist files from all project dependencies
@@ -938,9 +938,9 @@ module Omnibus
 
         render_metadata(pkg_type)
 
-        if Ohai.platform == 'windows'
+        if Ohai['platform'] == 'windows'
           cp_cmd = "xcopy #{Config.package_dir}\\*.msi pkg\\ /Y"
-        elsif Ohai.platform == 'aix'
+        elsif Ohai['platform'] == 'aix'
           cp_cmd = "cp #{Config.package_dir}/*.bff pkg/"
         else
           cp_cmd = "cp #{Config.package_dir}/* pkg/"
@@ -978,7 +978,7 @@ module Omnibus
     # @return [Array<(String)>]
     #
     def package_types
-      case Ohai.platform_family
+      case Ohai['platform_family']
       when 'debian'
         %w(deb)
       when 'fedora', 'rhel'
@@ -1005,10 +1005,10 @@ module Omnibus
     #   the platform version
     #
     def platform_version_for_package
-      if Ohai.platform == 'rhel'
-        Ohai.platform_version[/([\d]+)\..+/, 1]
+      if Ohai['platform'] == 'rhel'
+        Ohai['platform_version'][/([\d]+)\..+/, 1]
       else
-        Ohai.platform_version
+        Ohai['platform_version']
       end
     end
 
@@ -1020,10 +1020,10 @@ module Omnibus
     #   the platform family short name
     #
     def platform_shortname
-      if Ohai.platform_family == 'rhel'
+      if Ohai['platform_family'] == 'rhel'
         'el'
       else
-        Ohai.platform
+        Ohai['platform']
       end
     end
 
@@ -1042,7 +1042,7 @@ module Omnibus
         homepage:         homepage,
         platform:         platform_shortname,
         platform_version: platform_version_for_package,
-        arch:             Ohai.kernel.machine,
+        arch:             Ohai['kernel']['machine'],
         version:          build_version,
       )
     end

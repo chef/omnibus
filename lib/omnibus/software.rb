@@ -387,16 +387,16 @@ module Omnibus
     # Returns the platform of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
-    # @deprecated Use {Ohai.platform} instead.
+    # @deprecated Use +Ohai['platform']+ instead.
     #
     # @return [String]
     #
     def platform
       log.deprecated(log_key) do
-        'Software#platform. Please use Ohai.platform instead.'
+        "Software#platform. Please use Ohai['platform'] instead."
       end
 
-      Ohai.platform
+      Ohai['platform']
     end
     expose :platform
 
@@ -410,10 +410,10 @@ module Omnibus
     #
     def architecture
       log.deprecated(log_key) do
-        'Software#architecture. Please use Ohai.kernel.machine instead.'
+        "Software#architecture. Please use Ohai['kernel']['machine'] instead."
       end
 
-      Ohai.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
+      Ohai['kernel']['machine'] =~ /sun/ ? 'sparc' : 'intel'
     end
     expose :architecture
 
@@ -631,8 +631,8 @@ module Omnibus
     # @todo It seems like this isn't used, and if it were, it should
     # probably be part of Opscode::Builder instead
     def max_build_jobs
-      if Ohai.cpu && Ohai.cpu[:total] && Ohai.cpu[:total].to_s =~ /^\d+$/
-        Ohai.cpu[:total].to_i + 1
+      if Ohai['cpu'] && Ohai['cpu']['total'] && Ohai['cpu']['total'].to_s =~ /^\d+$/
+        Ohai['cpu']['total'].to_i + 1
       else
         3
       end
