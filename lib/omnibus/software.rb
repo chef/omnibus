@@ -363,6 +363,16 @@ module Omnibus
     expose :project_dir
 
     #
+    # The path where the software will be built.
+    #
+    # @return [String]
+    #
+    def build_dir
+      "#{Config.build_dir}/#{project.name}"
+    end
+    expose :build_dir
+
+    #
     # The path where this software is installed on disk.
     #
     # @deprecated Use {#install_path} instead
@@ -610,12 +620,6 @@ module Omnibus
       @source_uri ||= URI(source[:url])
     end
 
-    # @return [Boolean]
-    def always_build?
-      return true if project.dirty?
-      !!@always_build
-    end
-
     # @todo Code smell... this only has meaning if the software was
     #   defined with a :uri, and this is only used in
     #   {Omnibus::NetFetcher}.  This responsibility is distributed
@@ -624,17 +628,6 @@ module Omnibus
     def checksum
       source[:md5]
     end
-
-    # @!group Directory Accessors
-
-    # The directory that the software will be built in
-    #
-    # @return [String] an absolute filesystem path
-    def build_dir
-      "#{config.build_dir}/#{@project.name}"
-    end
-
-    # @!endgroup
 
     # @todo It seems like this isn't used, and if it were, it should
     # probably be part of Opscode::Builder instead
