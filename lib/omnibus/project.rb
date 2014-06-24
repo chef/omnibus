@@ -60,26 +60,6 @@ module Omnibus
     # @see Omnibus::Project#load
     #
     def initialize
-      @output_package = nil
-      @name = nil
-      @friendly_name = nil
-      @msi_parameters = {}
-      @package_name = nil
-      @install_path = nil
-      @resources_path = nil
-      @homepage = nil
-      @description = nil
-      @replaces = nil
-      @mac_pkg_identifier = nil
-      @overrides = {}
-
-      @exclusions = []
-      @conflicts = []
-      @config_files = []
-      @extra_package_files = []
-      @dependencies = []
-      @runtime_dependencies = []
-
       # TODO: validate right before building instead
       # validate
 
@@ -258,13 +238,13 @@ module Omnibus
         @msi_parameters = block
       else
         if null?(val)
-          @msi_parameters = val
-        else
           if @msi_parameters.is_a?(Proc)
             @msi_parameters.call
           else
-            @msi_parameters
+            @msi_parameters ||= {}
           end
+        else
+          @msi_parameters = val
         end
       end
     end
@@ -449,8 +429,8 @@ module Omnibus
     #   the list of conflicts
     #
     def conflict(val)
-      @conflicts << val
-      @conflicts.dup
+      conflicts << val
+      conflicts.dup
     end
     expose :conflict
 
@@ -574,28 +554,6 @@ module Omnibus
     expose :package_user
 
     #
-    # Set or retrieve the full overrides hash for all software being overridden.
-    # Calling it as a setter does not merge hash entries and will obliterate any
-    # previous overrides that have been setup.
-    #
-    # @example
-    #   overrides { foo: 'bar' }
-    #
-    # @param [Hash] val
-    #   the list of overrides
-    #
-    # @return [Hash]
-    #
-    def overrides(val = NULL)
-      if null?(val)
-        @overrides
-      else
-        @overrides = val
-      end
-    end
-    expose :overrides
-
-    #
     # Set or retrieve the overrides hash for one piece of software being
     # overridden. Calling it as a setter does not merge hash entries and it will
     # set all the overrides for a given software definition.
@@ -610,9 +568,9 @@ module Omnibus
     #
     def override(name, val = NULL)
       if null?(val)
-        @overrides[name]
+        overrides[name]
       else
-        @overrides[name] = val
+        overrides[name] = val
       end
     end
     expose :override
@@ -675,8 +633,8 @@ module Omnibus
     #   the list of dependencies
     #
     def dependency(val)
-      @dependencies << val
-      @dependencies.dup
+      dependencies << val
+      dependencies.dup
     end
     expose :dependency
 
@@ -699,35 +657,10 @@ module Omnibus
     #   the list of runtime dependencies
     #
     def runtime_dependency(val)
-      @runtime_dependencies << val
-      @runtime_dependencies.dup
+      runtime_dependencies << val
+      runtime_dependencies.dup
     end
     expose :runtime_dependency
-
-    #
-    # Set or retrieve the list of software dependencies for this project. As
-    # this is a DSL method, only pass the names of software components, not
-    # {Software} objects.
-    #
-    # These is the software that comprises your project, and is distinct from
-    # runtime dependencies.
-    #
-    # @note This will reinitialize the internal depdencies Array and overwrite
-    #   any dependencies that may have been set using {#dependency}.
-    #
-    # @param [Array<String>] val
-    #   a list of names of Software components
-    #
-    # @return [Array<String>]
-    #
-    def dependencies(val = NULL)
-      if null?(val)
-        @dependencies
-      else
-        @dependencies = val
-      end
-    end
-    expose :dependencies
 
     #
     # Add a new exclusion pattern.
@@ -745,8 +678,8 @@ module Omnibus
     #   the list of current exclusions
     #
     def exclude(pattern)
-      @exclusions << pattern
-      @exclusions.dup
+      exclusions << pattern
+      exclusions.dup
     end
     expose :exclude
 
@@ -763,8 +696,8 @@ module Omnibus
     #   the list of current config files
     #
     def config_file(val)
-      @config_files << val
-      @config_files.dup
+      config_files << val
+      config_files.dup
     end
     expose :config_file
 
@@ -785,35 +718,82 @@ module Omnibus
     #   the list of current extra package files
     #
     def extra_package_file(val)
-      @extra_package_files << val
-      @extra_package_files.dup
+      extra_package_files << val
+      extra_package_files.dup
     end
     expose :extra_package_file
 
     #
-    # Set or retrieve the array of files and directories used to build this
-    # project. If you use this to write, only pass the full path to the dir or
-    # file you want included in the omnibus package build.
+    # @!endgroup
+    # --------------------------------------------------
+
     #
-    # @note Similar to the depdencies array, this will reinitialize the files#
-    # array and overwrite and dependencies that were set using {#file}.
+    # The list of software dependencies for this project.
     #
-    # @example
-    #   extra_package_files '/path/to/file', '/path/to/another/file'
+    # These is the software that comprises your project, and is distinct from
+    # runtime dependencies.
     #
-    # @param [Array<String>] val
-    #   a list of names of Software components
+    # @return [Array<String>]
+    #
+    def dependencies
+      @dependencies ||= []
+    end
+
+    #
+    # The list of config files for this software.
+    #
+    # @return [Array<String>]
+    #
+    def config_files
+      @config_files ||= []
+    end
+
+    #
+    # The list of files and directories used to build this project.
     #
     # @return [Array<String>]
     #
     def extra_package_files(val = NULL)
-      if null?(val)
-        @extra_package_files
-      else
-        @extra_package_files = val
-      end
+      @extra_package_files ||= []
     end
-    expose :extra_package_files
+
+    #
+    # The list of software dependencies for this project.
+    #
+    # These is the software that is used at runtime for your project.
+    #
+    # @return [Array<String>]
+    #
+    def runtime_dependencies
+      runtime_dependencies ||= []
+    end
+
+    #
+    # The list of things this project conflicts with.
+    #
+    # @return [Array<String>]
+    #
+    def conflicts
+      @conflicts ||= []
+    end
+
+    #
+    # The list of exclusions for this project.
+    #
+    # @return [Array<String>]
+    #
+    def exclusions
+      @exclusions ||= []
+    end
+
+    #
+    # Retrieve the list of overrides for all software being overridden.
+    #
+    # @return [Hash]
+    #
+    def overrides
+      @overrides ||= {}
+    end
 
     # Defines the iteration for the package to be generated.  Adheres
     # to the conventions of the platform for which the package is
@@ -969,7 +949,7 @@ module Omnibus
              else
                software
              end
-      @dependencies.include?(name)
+      dependencies.include?(name)
     end
 
     # @!endgroup
@@ -1105,39 +1085,39 @@ module Omnibus
         command_and_opts << "--after-remove '#{File.join(package_scripts_path, "postrm")}'"
       end
 
-      @exclusions.each do |pattern|
+      exclusions.each do |pattern|
         command_and_opts << "--exclude '#{pattern}'"
       end
 
-      @config_files.each do |config_file|
+      config_files.each do |config_file|
         command_and_opts << "--config-files '#{config_file}'"
       end
 
-      @runtime_dependencies.each do |runtime_dep|
+      runtime_dependencies.each do |runtime_dep|
         command_and_opts << "--depends '#{runtime_dep}'"
       end
 
-      @conflicts.each do |conflict|
+      conflicts.each do |conflict|
         command_and_opts << "--conflicts '#{conflict}'"
       end
 
-      if @pkg_user
+      if package_user
         %w(deb rpm solaris).each do |type|
-          command_and_opts << " --#{type}-user #{@pkg_user}"
+          command_and_opts << " --#{type}-user #{package_user}"
         end
       end
 
-      if @pkg_group
+      if package_group
         %w(deb rpm solaris).each do |type|
-          command_and_opts << " --#{type}-group #{@pkg_group}"
+          command_and_opts << " --#{type}-group #{package_group}"
         end
       end
 
-      command_and_opts << " --replaces #{@replaces}" if @replaces
+      command_and_opts << " --replaces #{replaces}" if replaces
 
       # All project files must be appended to the command "last", but before
       # the final install path
-      @extra_package_files.each do |files|
+      extra_package_files.each do |files|
         command_and_opts << files
       end
 
