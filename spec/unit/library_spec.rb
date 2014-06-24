@@ -2,13 +2,13 @@ require 'spec_helper'
 
 module Omnibus
   describe Library do
-    let(:project) { Omnibus::Project.load(project_path('chefdk')) }
-    let(:library) { Omnibus::Library.new(project) }
-    let(:erchef) { Omnibus::Software.load(software_path('erchef'), project) }
-    let(:zlib) { Omnibus::Software.load(software_path('zlib'), project) }
+    let(:project) { Project.load(project_path('chefdk')) }
+    let(:library) { Library.new(project) }
+    let(:erchef) { Software.load(software_path('erchef'), project) }
+    let(:zlib) { Software.load(software_path('zlib'), project) }
 
     def gen_software(name, deps)
-      software = Omnibus::Software.new('', "#{name}.rb", 'chef-server')
+      software = Software.new('', "#{name}.rb", 'chef-server')
       software.name(name.to_s)
       deps.each do |dep|
         software.dependency(dep)
@@ -31,22 +31,27 @@ module Omnibus
 
     describe '#build_order' do
       let(:project) do
-        raw_project = <<-EOH
-  name "chef-server"
-  install_path "/opt/chef-server"
-  build_version "1.0.0"
-  maintainer 'Chef Software, Inc'
-  homepage 'http://getchef.com'
-  dependency 'preparation'
-  dependency 'erchef'
-  dependency 'postgresql'
-  dependency 'chef'
-  EOH
-        Omnibus::Project.new(raw_project, 'chef-server.rb')
+        allow(IO).to receive(:read)
+          .with('/chef-server.rb')
+          .and_return <<-EOH.gsub(/^ {12}/, '')
+            name          'chef-server'
+            maintainer    'Chef Software, Inc'
+            homepage      'http://getchef.com'
+            build_version '1.0.0'
+
+            install_path '/opt/chef-server'
+
+            dependency 'preparation'
+            dependency 'erchef'
+            dependency 'postgresql'
+            dependency 'chef'
+          EOH
+
+        Project.load('/chef-server.rb')
       end
 
       let(:library) do
-        library = Omnibus::Library.new(project)
+        library = Library.new(project)
         library.component_added(preparation)
         library.component_added(erlang)
         library.component_added(postgresql) # as a skitch trans dep
@@ -63,7 +68,7 @@ module Omnibus
 
       [project_deps, erchef_deps, chef_deps].flatten.each do |dep|
         let(dep) do
-          software = Omnibus::Software.new('', "#{dep}.rb", 'chef-server')
+          software = Software.new('', "#{dep}.rb", 'chef-server')
           software.name(dep.to_s)
           software.dependency('postgresql') if dep == :skitch
           software
@@ -96,25 +101,30 @@ module Omnibus
         end
 
         let(:project) do
-          raw_project = <<-EOH
-  name "chef-dk"
-  install_path "/opt/chefdk"
-  build_version "1.0.0"
-  maintainer 'Chef Software, Inc'
-  homepage 'http://getchef.com'
-  dependency 'preparation'
-  dependency 'erchef'
-  dependency 'postgresql'
-  dependency 'ruby'
-  dependency 'chef'
-  dependency 'chefdk'
-          EOH
-          Omnibus::Project.new(raw_project, 'chefdk.rb')
+          allow(IO).to receive(:read)
+            .with('/chefdk.rb')
+            .and_return <<-EOH.gsub(/^ {12}/, '')
+              name          'chef-dk'
+              maintainer    'Chef Software, Inc'
+              homepage      'http://getchef.com'
+              build_version '1.0.0'
+
+              install_path '/opt/chefdk'
+
+              dependency 'preparation'
+              dependency 'erchef'
+              dependency 'postgresql'
+              dependency 'ruby'
+              dependency 'chef'
+              dependency 'chefdk'
+            EOH
+
+          Project.load('/chefdk.rb')
         end
 
         let(:library) do
         # This is the LOAD ORDER
-          library = Omnibus::Library.new(project)
+          library = Library.new(project)
           library.component_added(preparation) # via project
           library.component_added(erlang) # via erchef
           library.component_added(postgresql) # via skitch

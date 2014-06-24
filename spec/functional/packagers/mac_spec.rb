@@ -6,14 +6,18 @@ module Omnibus
     let(:version) { '12.4.0' }
 
     let(:project) do
-      Project.new(<<-EOH, __FILE__)
-        name               '#{name}'
-        maintainer         'Chef'
-        homepage           'https://getchef.com'
-        build_version      '#{version}'
-        install_path       '#{tmp_path}/opt/#{name}'
-        mac_pkg_identifier 'test.pkg.#{name}'
-      EOH
+      allow(IO).to receive(:read)
+        .with('/project.rb')
+        .and_return <<-EOH.gsub(/^ {10}/, '')
+          name               '#{name}'
+          maintainer         'Chef'
+          homepage           'https://getchef.com'
+          build_version      '#{version}'
+          install_path       '#{tmp_path}/opt/#{name}'
+          mac_pkg_identifier 'test.pkg.#{name}'
+        EOH
+
+      Project.load('/project.rb')
     end
 
     let(:mac_packager) { Packager::MacPkg.new(project) }

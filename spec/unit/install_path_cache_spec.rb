@@ -10,18 +10,23 @@ module Omnibus
     let(:install_path) { '/opt/chef' }
 
     let(:project) do
-      raw_project = <<-EOH
-  name "demo"
-  install_path "/opt/demo"
-  build_version "1.0.0"
-  maintainer 'Chef Software, Inc'
-  homepage 'http://getchef.com'
-  dependency 'preparation'
-  dependency 'snoopy'
-  dependency 'zlib'
-  EOH
-      project = Omnibus::Project.new(raw_project, 'demo.rb')
-      project
+      allow(IO).to receive(:read)
+        .with('/path/to/demo.rb')
+        .and_return <<-EOH.gsub(/^ {10}/, '')
+          name 'demo'
+          install_path '/opt/demo'
+
+          build_version '1.0.0'
+
+          maintainer 'Chef Software, Inc'
+          homepage 'http://getchef.com'
+
+          dependency 'preparation'
+          dependency 'snoopy'
+          dependency 'zlib'
+        EOH
+
+      Project.load('/path/to/demo.rb')
     end
 
     let(:fake_software_config_file) do
