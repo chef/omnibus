@@ -49,7 +49,7 @@ module Omnibus
       # harvest the files with heat.exe
       # recursively generate fragment for project directory
       execute [
-        "heat.exe dir \"#{install_path}\"",
+        "heat.exe dir \"#{project.install_path}\"",
         '-nologo -srd -gg -cg ProjectDir',
         '-dr PROJECTLOCATION -var var.ProjectSourceDir',
         '-out project-files.wxs',
@@ -58,7 +58,7 @@ module Omnibus
       # compile with candle.exe
       execute [
         'candle.exe -nologo',
-        "-dProjectSourceDir=\"#{install_path}\" project-files.wxs",
+        "-dProjectSourceDir=\"#{project.install_path}\" project-files.wxs",
         "\"#{resource('source.wxs')}\"",
       ].join(' ')
 
@@ -78,7 +78,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{name}-#{version}-#{iteration}.msi"
+      "#{project.name}-#{project.build_version}-#{project.iteration}.msi"
     end
 
     # The full path where the product package was/will be written.
@@ -101,8 +101,8 @@ module Omnibus
       # MSI source files expect two versions to be set in the msi_parameters:
       # msi_version & msi_display_version
 
-      versions = version.split(/[.+-]/)
-      @msi_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{@project.build_iteration}"
+      versions = project.build_version.split(/[.+-]/)
+      @msi_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{project.build_iteration}"
       @msi_display_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}"
     end
   end

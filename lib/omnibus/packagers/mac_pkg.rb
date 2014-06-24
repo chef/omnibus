@@ -60,7 +60,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{name}-#{version}-#{iteration}.pkg"
+      "#{project.name}-#{project.build_version}-#{project.iteration}.pkg"
     end
 
     # The full path where the product package was/will be written.
@@ -79,10 +79,10 @@ module Omnibus
       execute <<-EOH.gsub(/^ {8}/, '')
         pkgbuild \\
           --identifier "#{identifier}" \\
-          --version "#{version}" \\
+          --version "#{project.build_version}" \\
           --scripts "#{project.package_scripts_path}" \\
-          --root "#{install_path}" \\
-          --install-location "#{install_path}" \\
+          --root "#{project.install_path}" \\
+          --install-location "#{project.install_path}" \\
           "#{component_pkg}"
       EOH
     end
@@ -100,7 +100,7 @@ module Omnibus
         file.puts <<-EOH.gsub(/^ {10}/, '')
           <?xml version="1.0" standalone="no"?>
           <installer-gui-script minSpecVersion="1">
-              <title>#{friendly_name}</title>
+              <title>#{project.friendly_name}</title>
               <background file="background.png" alignment="bottomleft" mime-type="image/png"/>
               <welcome file="welcome.html" mime-type="text/html"/>
               <license file="license.html" mime-type="text/html"/>
@@ -117,7 +117,7 @@ module Omnibus
               <choice id="#{identifier}" visible="false">
                   <pkg-ref id="#{identifier}"/>
               </choice>
-              <pkg-ref id="#{identifier}" version="#{version}" onConclusion="none">#{component_pkg}</pkg-ref>
+              <pkg-ref id="#{identifier}" version="#{project.build_version}" onConclusion="none">#{component_pkg}</pkg-ref>
           </installer-gui-script>
         EOH
       end
@@ -161,7 +161,7 @@ module Omnibus
     #
     # @return [String] the filename of the component .pkg file to create.
     def component_pkg
-      "#{name}-core.pkg"
+      "#{project.name}-core.pkg"
     end
 
     # Sanitize the given string for the package identifier.

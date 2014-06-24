@@ -27,38 +27,6 @@ module Omnibus
     # The Omnibus::Project instance that we're packaging.
     attr_reader :project
 
-    # !@method name
-    #   @return (see Project#name)
-    def_delegator :@project, :name
-
-    # !@method friendly_name
-    #   @return (see Project#friendly_name)
-    def_delegator :@project, :friendly_name
-
-    # !@method maintainer
-    #   @return (see Project#maintainer)
-    def_delegator :@project, :maintainer
-
-    # !@method version
-    #   @return (see Project#build_version)
-    def_delegator :@project, :build_version, :version
-
-    # !@method iteration
-    #   @return (see Project#iteration)
-    def_delegator :@project, :iteration, :iteration
-
-    # !@method identifier
-    #   @return (see Project#mac_pkg_identifier)
-    def_delegator :@project, :mac_pkg_identifier, :identifier
-
-    # !@method install_path
-    #   @return (see Project#install_path)
-    def_delegator :@project, :install_path, :install_path
-
-    # !@method files_path
-    #   @return (see Project#files_path)
-    def_delegator :@project, :files_path
-
     # The commands/steps to setup the file system.
     def self.setup(&block)
       if block_given?
@@ -250,7 +218,7 @@ module Omnibus
       base_path = if project.resources_path
                     project.resources_path
                   else
-                    files_path
+                    project.files_path
                   end
 
       File.expand_path(File.join(base_path, underscore_name, 'Resources'))

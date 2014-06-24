@@ -26,31 +26,6 @@ module Omnibus
       expect(subject).to be_a(Util)
     end
 
-    it 'delegates #name to @project' do
-      expect(subject.name).to eq(project.name)
-    end
-
-    it 'delegates #friendly_name to @project' do
-      expect(subject.friendly_name).to eq(project.friendly_name)
-    end
-
-    it 'delegates #version to @project' do
-      expect(subject.version).to eq(project.build_version)
-    end
-
-    it 'delegates #iteration to @project' do
-      expect(subject.iteration).to eq(project.iteration)
-    end
-
-    it 'delegates #identifer to @project' do
-      expect(subject.identifier).to eq(project.mac_pkg_identifier)
-    end
-
-    it 'delegates #files_path to @project' do
-      expect(subject.files_path).to eq(project.files_path)
-    end
-
-
     describe '.setup' do
       it 'sets the value of the block' do
         block = proc {}
@@ -163,7 +138,7 @@ module Omnibus
 
         before do
           input = StringIO.new
-          input.write('<%= friendly_name %>')
+          input.write('<%= project.friendly_name %>')
           input.rewind
 
           File.stub(:open).with(source_path).and_yield(input)

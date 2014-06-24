@@ -72,18 +72,6 @@ module Omnibus
       Omnibus::Packager::MacPkg.new(project)
     end
 
-    it "uses the project's version" do
-      expect(packager.version).to eq(project.build_version)
-    end
-
-    it "uses the project's name" do
-      expect(packager.name).to eq(project.name)
-    end
-
-    it "uses the project's mac_pkg_identifier" do
-      expect(packager.identifier).to eq(mac_pkg_identifier)
-    end
-
     it 'names the component package PROJECT_NAME-core.pkg' do
       expect(packager.component_pkg).to eq('myproject-core.pkg')
     end
