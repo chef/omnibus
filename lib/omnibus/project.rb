@@ -990,15 +990,6 @@ module Omnibus
       end
     end
 
-    # An Array of platform data suitable for `Artifact.new`. This will go into
-    # metadata generated for the artifact, and be used for the file hierarchy
-    # of released packages if the default release scripts are used.
-    # @return [Array<String>] platform_shortname, platform_version_for_package,
-    #   machine architecture.
-    def platform_tuple
-      [platform_shortname, platform_version_for_package, machine]
-    end
-
     # Platform version to be used in package metadata. For rhel, the minor
     # version is removed, e.g., "5.6" becomes "5". For all other platforms,
     # this is just the platform_version.
