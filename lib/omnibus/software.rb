@@ -813,14 +813,20 @@ module Omnibus
       !!@always_build
     end
 
+    #
+    # The proper platform-specific "$PATH" key.
+    #
+    # @return [String]
+    #
     def path_key
       # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
       # $WINDOWSRAGE, and if you don't set that your native gem compiles
       # will fail because the magic fixup it does to add the mingw compiler
       # stuff won't work.
-      platform == "windows" ? "Path" : "PATH"
+      Ohai['platform'] == 'windows' ? 'Path' : 'PATH'
     end
 
+    #
     # Apply overrides in the @overrides hash that mask instance variables
     # that are set by parsing the DSL
     #
