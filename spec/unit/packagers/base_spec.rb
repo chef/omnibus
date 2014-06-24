@@ -43,10 +43,6 @@ module Omnibus
       expect(subject.identifier).to eq(project.mac_pkg_identifier)
     end
 
-    it 'delegates #scripts to @project' do
-      expect(subject.scripts).to eq(project.package_scripts_path)
-    end
-
     it 'delegates #files_path to @project' do
       expect(subject.files_path).to eq(project.files_path)
     end

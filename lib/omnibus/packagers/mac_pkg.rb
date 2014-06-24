@@ -80,7 +80,7 @@ module Omnibus
         pkgbuild \\
           --identifier "#{identifier}" \\
           --version "#{version}" \\
-          --scripts "#{scripts}" \\
+          --scripts "#{project.package_scripts_path}" \\
           --root "#{install_path}" \\
           --install-location "#{install_path}" \\
           "#{component_pkg}"

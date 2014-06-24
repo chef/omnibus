@@ -55,18 +55,19 @@ module Omnibus
     end
 
     let(:project) do
-      double Omnibus::Project,
-             name: project_name,
-             build_version: '23.4.2',
-             iteration: 4,
-             maintainer: "Joe's Software",
-             install_path: '/opt/myproject',
-             package_scripts_path: scripts_path,
-             files_path: files_path,
-             package_tmp: package_tmp,
-             mac_pkg_identifier: mac_pkg_identifier,
-             config: pkg_signing_config,
-             friendly_name: 'Myproject'
+      double(Omnibus::Project,
+        name: project_name,
+        build_version: '23.4.2',
+        iteration: 4,
+        maintainer: "Joe's Software",
+        install_path: '/opt/myproject',
+        files_path: files_path,
+        package_tmp: package_tmp,
+        package_scripts_path: scripts_path,
+        mac_pkg_identifier: mac_pkg_identifier,
+        config: pkg_signing_config,
+        friendly_name: 'Myproject'
+      )
     end
 
     let(:packager) do
@@ -91,10 +92,6 @@ module Omnibus
 
     it 'names the product package PROJECT_NAME.pkg' do
       expect(packager.package_name).to eq('myproject-23.4.2-4.pkg')
-    end
-
-    it "use's the project's package_scripts_path" do
-      expect(packager.scripts).to eq(project.package_scripts_path)
     end
 
     it 'runs pkgbuild' do

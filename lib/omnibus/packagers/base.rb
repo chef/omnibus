@@ -55,10 +55,6 @@ module Omnibus
     #   @return (see Project#install_path)
     def_delegator :@project, :install_path, :install_path
 
-    # !@method scripts
-    #   @return (see Project#package_scripts_path)
-    def_delegator :@project, :package_scripts_path, :scripts
-
     # !@method files_path
     #   @return (see Project#files_path)
     def_delegator :@project, :files_path
