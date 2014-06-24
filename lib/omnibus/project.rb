@@ -48,8 +48,6 @@ module Omnibus
     include Sugarable
     include Util
 
-    attr_accessor :build_version_dsl
-
     #
     # @!group DSL methods
     #
@@ -66,7 +64,7 @@ module Omnibus
     # @raise [MissingProjectConfiguration] if a value was not set before being
     #   subsequently retrieved
     #
-    # @param [String] value
+    # @param [String] val
     #   the name to set
     #
     # @return [String]
@@ -254,8 +252,7 @@ module Omnibus
     expose :homepage
 
     #
-    # Set or retrieve the project description.  Defaults to `"The full stack of
-    # #{name}"`
+    # Set or retrieve the project description.
     #
     # @example
     #   description 'This is my description'
@@ -280,7 +277,7 @@ module Omnibus
     #
     # Set or retrieve the name of the package this package will replace.
     #
-    # Ultimately used as the value for the `--replaces` flag in
+    # Ultimately used as the value for the +--replaces+ flag in
     # {https://github.com/jordansissel/fpm fpm}.
     #
     # This should only be used when renaming a package and obsoleting the old
@@ -307,7 +304,7 @@ module Omnibus
     #
     # Add to the list of packages this one conflicts with.
     #
-    # Specifying conflicts is optional.  See the `--conflicts` flag in
+    # Specifying conflicts is optional.  See the +--conflicts+ flag in
     # {https://github.com/jordansissel/fpm fpm}.
     #
     # @example
@@ -426,7 +423,7 @@ module Omnibus
     expose :mac_pkg_identifier
 
     #
-    # Set or retrieve the {deb/rpm/solaris}-user fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument.
     #
     # @example
     #   package_user 'build'
@@ -468,7 +465,7 @@ module Omnibus
     expose :override
 
     #
-    # Set or retrieve the {deb/rpm/solaris}-group fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}+-group fpm argument.
     #
     # @example
     #   package_group 'build'
@@ -536,7 +533,7 @@ module Omnibus
     # This is distinct from a build-time dependency, which should correspond to
     # a software definition.
     #
-    # Corresponds to the `--depends` flag of
+    # Corresponds to the +--depends+ flag of
     # {https://github.com/jordansissel/fpm fpm}.
     #
     # @example
@@ -557,7 +554,7 @@ module Omnibus
     #
     # Add a new exclusion pattern.
     #
-    # Corresponds to the `--exclude` flag of
+    # Corresponds to the +--exclude+ flag of
     # {https://github.com/jordansissel/fpm fpm}.
     #
     # @example
@@ -619,7 +616,7 @@ module Omnibus
     # The platform version of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
-    # @deprecated Use {Ohai.platform_version} instead.
+    # @deprecated Use +Ohai.platform_version+ instead.
     #
     # @return [String]
     #
@@ -636,7 +633,7 @@ module Omnibus
     # The platform of the machine on which Omnibus is running, as determined
     # by Ohai.
     #
-    # @deprecated Use {Ohai.platform} instead.
+    # @deprecated Use +Ohai.platform+ instead.
     #
     # @return [String]
     #
@@ -653,7 +650,7 @@ module Omnibus
     # The platform family of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
-    # @deprecated Use {Ohai.platform_family} instead.
+    # @deprecated Use Ohai.platform_family instead.
     #
     # @return [String]
     #
@@ -669,7 +666,7 @@ module Omnibus
     #
     # The machine which this project is running on.
     #
-    # @deprecated Use {Ohai.kernel.machine} instead.
+    # @deprecated Use Ohai.kernel.machine instead.
     #
     # @return [String]
     #
@@ -780,6 +777,15 @@ module Omnibus
     end
 
     #
+    # The DSL for this build version.
+    #
+    # @return [BuildVersionDSL]
+    #
+    def build_version_dsl
+      @build_version_dsl
+    end
+
+    #
     # Indicates whether the given  +software+ is defined as a software component
     # of this project.
     #
@@ -879,7 +885,7 @@ module Omnibus
     # scripts directory will be incorporated into the package that is
     # built.  This only applies to fpm-built packages.
     #
-    # Additionally, there may be a `makeselfinst` script.
+    # Additionally, there may be a +makeselfinst+ script.
     #
     # @return [String]
     #
@@ -967,7 +973,7 @@ module Omnibus
     # Determine the package type(s) to be built, based on the platform
     # family for which the package is being built.
     #
-    # If specific types cannot be determined, default to `["makeself"]`.
+    # If specific types cannot be determined, default to +["makeself"]+.
     #
     # @return [Array<(String)>]
     #
@@ -1190,7 +1196,7 @@ module Omnibus
       package_commands.each { |cmd| run_package_command(cmd) }
     end
 
-    # Runs the necessary command to make an MSI. As a side-effect, sets `output_package`
+    # Runs the necessary command to make an MSI. As a side-effect, sets +output_package+
     # @return void
     def run_msi
       Packager::WindowsMsi.new(self).run!
@@ -1284,7 +1290,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
     end
 
     # Runs the necessary command to make a package with fpm. As a side-effect,
-    # sets `output_package`
+    # sets +output_package+
     # @return void
     def run_fpm(pkg_type)
       run_package_command(fpm_command(pkg_type).join(' '))
