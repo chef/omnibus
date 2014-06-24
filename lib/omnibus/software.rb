@@ -659,21 +659,6 @@ module Omnibus
       "#{build_dir}/#{@name}.fetch"
     end
 
-    # @todo This is actually "snake case", not camel case
-    # @todo this should be a private method
-    def camel_case_path(project_path)
-      path = project_path.dup
-      # split the path and remmove and empty strings
-      if platform == 'windows'
-        path.sub!(':', '')
-        parts = path.split('\\') - ['']
-        parts.join('_')
-      else
-        parts = path.split('/') - ['']
-        parts.join('_')
-      end
-    end
-
     # Actually build the software package
     def build_me
       # Fetch the source
