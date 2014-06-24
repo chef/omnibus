@@ -50,7 +50,6 @@ module Omnibus
 
     attr_reader :library
     attr_accessor :build_version_dsl
-    attr_reader :resources_path
 
     #
     # Create a new Project from the contents of a DSL file.  Prefer
