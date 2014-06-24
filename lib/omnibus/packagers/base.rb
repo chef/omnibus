@@ -63,10 +63,6 @@ module Omnibus
     #   @return (see Project#files_path)
     def_delegator :@project, :files_path
 
-    # !@method package_dir
-    #   @return (see Project#package_dir)
-    def_delegator :@project, :package_dir
-
     # The commands/steps to setup the file system.
     def self.setup(&block)
       if block_given?

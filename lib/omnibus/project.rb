@@ -84,8 +84,7 @@ module Omnibus
     end
 
     def build_me
-      FileUtils.mkdir_p(config.package_dir)
-      FileUtils.mkdir_p('pkg')
+      FileUtils.mkdir_p(Config.package_dir)
       FileUtils.rm_rf(install_path)
       FileUtils.mkdir_p(install_path)
 
@@ -127,11 +126,11 @@ module Omnibus
         render_metadata(pkg_type)
 
         if Ohai.platform == 'windows'
-          cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
+          cp_cmd = "xcopy #{Config.package_dir}\\*.msi pkg\\ /Y"
         elsif Ohai.platform == 'aix'
-          cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
+          cp_cmd = "cp #{Config.package_dir}/*.bff pkg/"
         else
-          cp_cmd = "cp #{config.package_dir}/* pkg/"
+          cp_cmd = "cp #{Config.package_dir}/* pkg/"
         end
 
         shellout!(cp_cmd)
@@ -930,22 +929,13 @@ module Omnibus
       "#{Config.project_root}/package-scripts/#{name}"
     end
 
-    # The directory where packages are written when created. Delegates to
-    # #config. The delegation allows Packagers (like Packager::MacPkg) to
-    # define the implementation rather than using the global config everywhere.
-    #
-    # @return [String] path to the package directory.
-    def package_dir
-      config.package_dir
-    end
-
     # The directory where intermediate packaging products may be stored.
     # Delegates to Config so that Packagers have a consistent API.
     #
     # @see Config.package_tmp some caveats.
     # @return [String] path to the package temp directory.
     def package_tmp
-      config.package_tmp
+      Config.package_tmp
     end
 
     # Determine the package type(s) to be built, based on the platform
@@ -1027,7 +1017,7 @@ module Omnibus
 
     def render_metadata(pkg_type)
       basename = output_package(pkg_type)
-      pkg_path = "#{config.package_dir}/#{basename}"
+      pkg_path = "#{Config.package_dir}/#{basename}"
 
       # Don't generate metadata for packages that haven't been created.
       # TODO: Fix this and make it betterer
@@ -1305,7 +1295,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
         command = cmd
       end
 
-      shellout!(command, cwd: config.package_dir)
+      shellout!(command, cwd: Config.package_dir)
     end
 
     def log_key

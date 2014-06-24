@@ -11,7 +11,6 @@ module Omnibus
              install_path: '/opt/hamlet',
              package_scripts_path: 'package-scripts',
              files_path: 'files',
-             package_dir: 'pkg',
              package_tmp: 'pkg-tmp',
              resources_path: nil,
              friendly_name: 'HAMLET',
@@ -52,9 +51,6 @@ module Omnibus
       expect(subject.files_path).to eq(project.files_path)
     end
 
-    it 'delegates #package_dir to @project' do
-      expect(subject.package_dir).to eq(project.package_dir)
-    end
 
     describe '.setup' do
       it 'sets the value of the block' do

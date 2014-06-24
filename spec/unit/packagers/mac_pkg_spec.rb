@@ -1,24 +1,26 @@
 require 'stringio'
 require 'spec_helper'
 
-describe Omnibus::Packager::MacPkg do
+module Omnibus
+  describe Packager::MacPkg do
+    before do
+      Config.package_dir('/home/someuser/omnibus-myproject/pkg')
+    end
 
-  let(:project_name) { 'myproject' }
+    let(:project_name) { 'myproject' }
 
-  let(:mac_pkg_identifier) { 'com.mycorp.myproject' }
+    let(:mac_pkg_identifier) { 'com.mycorp.myproject' }
 
-  let(:omnibus_root) { '/omnibus/project/root' }
+    let(:omnibus_root) { '/omnibus/project/root' }
 
-  let(:scripts_path) { "#{omnibus_root}/scripts" }
+    let(:scripts_path) { "#{omnibus_root}/scripts" }
 
-  let(:package_dir) { '/home/someuser/omnibus-myproject/pkg' }
+    let(:package_tmp) { '/var/cache/omnibus/pkg-tmp' }
 
-  let(:package_tmp) { '/var/cache/omnibus/pkg-tmp' }
+    let(:files_path) { "#{omnibus_root}/files" }
 
-  let(:files_path) { "#{omnibus_root}/files" }
-
-  let(:expected_distribution_content) do
-    <<-EOH
+    let(:expected_distribution_content) do
+      <<-EOH
 <?xml version="1.0" standalone="no"?>
 <installer-gui-script minSpecVersion="1">
     <title>Myproject</title>
@@ -40,134 +42,134 @@ describe Omnibus::Packager::MacPkg do
     </choice>
     <pkg-ref id="com.mycorp.myproject" version="23.4.2" onConclusion="none">myproject-core.pkg</pkg-ref>
 </installer-gui-script>
-EOH
-  end
-
-  let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution' }
-
-  let(:pkg_signing_config) do
-    {
-      sign_pkg: false,
-      signing_identity: nil,
-    }
-  end
-
-  let(:project) do
-    double Omnibus::Project,
-           name: project_name,
-           build_version: '23.4.2',
-           iteration: 4,
-           maintainer: "Joe's Software",
-           install_path: '/opt/myproject',
-           package_scripts_path: scripts_path,
-           files_path: files_path,
-           package_dir: package_dir,
-           package_tmp: package_tmp,
-           mac_pkg_identifier: mac_pkg_identifier,
-           config: pkg_signing_config,
-           friendly_name: 'Myproject'
-  end
-
-  let(:packager) do
-    Omnibus::Packager::MacPkg.new(project)
-  end
-
-  it "uses the project's version" do
-    expect(packager.version).to eq(project.build_version)
-  end
-
-  it "uses the project's name" do
-    expect(packager.name).to eq(project.name)
-  end
-
-  it "uses the project's mac_pkg_identifier" do
-    expect(packager.identifier).to eq(mac_pkg_identifier)
-  end
-
-  it 'names the component package PROJECT_NAME-core.pkg' do
-    expect(packager.component_pkg).to eq('myproject-core.pkg')
-  end
-
-  it 'names the product package PROJECT_NAME.pkg' do
-    expect(packager.package_name).to eq('myproject-23.4.2-4.pkg')
-  end
-
-  it "use's the project's package_scripts_path" do
-    expect(packager.scripts).to eq(project.package_scripts_path)
-  end
-
-  it 'runs pkgbuild' do
-    expect(packager).to receive(:execute).with <<-EOH.gsub(/^ {6}/, '')
-      pkgbuild \\
-        --identifier "com.mycorp.myproject" \\
-        --version "23.4.2" \\
-        --scripts "/omnibus/project/root/scripts" \\
-        --root "/opt/myproject" \\
-        --install-location "/opt/myproject" \\
-        "myproject-core.pkg"
-    EOH
-    packager.build_component_pkg
-  end
-
-  it 'generates a Distribution file describing the product package content' do
-    file = StringIO.new
-    File.stub(:open).with(any_args).and_yield(file)
-
-    expect(file).to receive(:puts).with(expected_distribution_content)
-    packager.generate_distribution
-  end
-
-  describe 'generating the distribution file' do
-    let(:distribution_file) { StringIO.new }
-
-    before do
-      expect(File).to receive(:open)
-        .with(expected_distribution_path, 'w', 0600)
-        .and_yield(distribution_file)
+  EOH
     end
 
-    it 'writes the distribution file to the staging directory' do
-      packager.generate_distribution
-      expect(distribution_file.string).to eq(expected_distribution_content)
-    end
-  end
+    let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution' }
 
-  describe 'building the product package' do
-    it 'generates the distribution and runs productbuild' do
-      expect(packager).to receive(:execute).with ['productbuild',
-                                                  %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
-                                                  %Q(--resources "/var/cache/omnibus/pkg-tmp/mac_pkg/Resources"),
-                                                  '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
-      ].join(' ')
-      packager.build_product_pkg
-    end
-  end
-
-  context 'when pkg signing is enabled' do
     let(:pkg_signing_config) do
       {
-        sign_pkg: true,
-        signing_identity: 'My Special Identity',
+        sign_pkg: false,
+        signing_identity: nil,
       }
     end
 
-    it 'includes the signing parameters in the product build command' do
-      expect(packager).to receive(:execute).with ['productbuild',
-                                                  %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
-                                                  %Q(--resources "/var/cache/omnibus/pkg-tmp/mac_pkg/Resources"),
-                                                  %Q(--sign "My Special Identity"),
-                                                  '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
-      ].join(' ')
-      packager.build_product_pkg
+    let(:project) do
+      double Omnibus::Project,
+             name: project_name,
+             build_version: '23.4.2',
+             iteration: 4,
+             maintainer: "Joe's Software",
+             install_path: '/opt/myproject',
+             package_scripts_path: scripts_path,
+             files_path: files_path,
+             package_tmp: package_tmp,
+             mac_pkg_identifier: mac_pkg_identifier,
+             config: pkg_signing_config,
+             friendly_name: 'Myproject'
     end
-  end
 
-  context "when the mac_pkg_identifier isn't specified by the project" do
-    let(:mac_pkg_identifier) { nil }
-    let(:project_name) { 'My $Project' }
+    let(:packager) do
+      Omnibus::Packager::MacPkg.new(project)
+    end
 
-    it 'uses com.example.PROJECT_NAME as the identifier' do
-      expect(packager.identifier).to eq('test.joessoftware.pkg.myproject')
+    it "uses the project's version" do
+      expect(packager.version).to eq(project.build_version)
+    end
+
+    it "uses the project's name" do
+      expect(packager.name).to eq(project.name)
+    end
+
+    it "uses the project's mac_pkg_identifier" do
+      expect(packager.identifier).to eq(mac_pkg_identifier)
+    end
+
+    it 'names the component package PROJECT_NAME-core.pkg' do
+      expect(packager.component_pkg).to eq('myproject-core.pkg')
+    end
+
+    it 'names the product package PROJECT_NAME.pkg' do
+      expect(packager.package_name).to eq('myproject-23.4.2-4.pkg')
+    end
+
+    it "use's the project's package_scripts_path" do
+      expect(packager.scripts).to eq(project.package_scripts_path)
+    end
+
+    it 'runs pkgbuild' do
+      expect(packager).to receive(:execute).with <<-EOH.gsub(/^ {8}/, '')
+        pkgbuild \\
+          --identifier "com.mycorp.myproject" \\
+          --version "23.4.2" \\
+          --scripts "/omnibus/project/root/scripts" \\
+          --root "/opt/myproject" \\
+          --install-location "/opt/myproject" \\
+          "myproject-core.pkg"
+      EOH
+      packager.build_component_pkg
+    end
+
+    it 'generates a Distribution file describing the product package content' do
+      file = StringIO.new
+      File.stub(:open).with(any_args).and_yield(file)
+
+      expect(file).to receive(:puts).with(expected_distribution_content)
+      packager.generate_distribution
+    end
+
+    describe 'generating the distribution file' do
+      let(:distribution_file) { StringIO.new }
+
+      before do
+        expect(File).to receive(:open)
+          .with(expected_distribution_path, 'w', 0600)
+          .and_yield(distribution_file)
+      end
+
+      it 'writes the distribution file to the staging directory' do
+        packager.generate_distribution
+        expect(distribution_file.string).to eq(expected_distribution_content)
+      end
+    end
+
+    describe 'building the product package' do
+      it 'generates the distribution and runs productbuild' do
+        expect(packager).to receive(:execute).with ['productbuild',
+                                                    %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
+                                                    %Q(--resources "/var/cache/omnibus/pkg-tmp/mac_pkg/Resources"),
+                                                    '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
+        ].join(' ')
+        packager.build_product_pkg
+      end
+    end
+
+    context 'when pkg signing is enabled' do
+      let(:pkg_signing_config) do
+        {
+          sign_pkg: true,
+          signing_identity: 'My Special Identity',
+        }
+      end
+
+      it 'includes the signing parameters in the product build command' do
+        expect(packager).to receive(:execute).with ['productbuild',
+                                                    %Q(--distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution"),
+                                                    %Q(--resources "/var/cache/omnibus/pkg-tmp/mac_pkg/Resources"),
+                                                    %Q(--sign "My Special Identity"),
+                                                    '/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg',
+        ].join(' ')
+        packager.build_product_pkg
+      end
+    end
+
+    context "when the mac_pkg_identifier isn't specified by the project" do
+      let(:mac_pkg_identifier) { nil }
+      let(:project_name) { 'My $Project' }
+
+      it 'uses com.example.PROJECT_NAME as the identifier' do
+        expect(packager.identifier).to eq('test.joessoftware.pkg.myproject')
+      end
     end
   end
 end

@@ -48,8 +48,8 @@ module Omnibus
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{project.package_dir}/#{name}-#{version}-1.pkg"
-      dmg = "#{project.package_dir}/#{name}-#{version}-1.dmg"
+      pkg = "#{Config.package_dir}/#{name}-#{version}-1.pkg"
+      dmg = "#{Config.package_dir}/#{name}-#{version}-1.dmg"
 
       expect(File.exist?(pkg)).to be_truthy
       expect(File.exist?(dmg)).to be_truthy

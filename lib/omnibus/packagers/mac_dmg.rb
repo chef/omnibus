@@ -229,7 +229,7 @@ module Omnibus
     #
     # @return [String]
     def final_dmg
-      File.expand_path("#{project.package_dir}/#{name}-#{version}-#{iteration}.dmg")
+      File.expand_path("#{Config.package_dir}/#{name}-#{version}-#{iteration}.dmg")
     end
   end
 end
