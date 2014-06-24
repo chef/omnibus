@@ -629,16 +629,6 @@ module Omnibus
       source[:md5]
     end
 
-    # @todo It seems like this isn't used, and if it were, it should
-    # probably be part of Opscode::Builder instead
-    def max_build_jobs
-      if Ohai['cpu'] && Ohai['cpu']['total'] && Ohai['cpu']['total'].to_s =~ /^\d+$/
-        Ohai['cpu']['total'].to_i + 1
-      else
-        3
-      end
-    end
-
     # @todo See comments for {#source_uri}... same applies here.  If
     #   this is called in a non-source-software context, bad things will
     #   happen.

@@ -37,6 +37,7 @@ module Omnibus
       def_delegator :@builder, :rake
       def_delegator :@builder, :block
       def_delegator :@builder, :name
+      def_delegator :@builder, :max_build_jobs
 
       def initialize(builder, software)
         @builder, @software = builder, software
@@ -231,6 +232,14 @@ module Omnibus
         execute_proc(cmd)
       else
         execute_sh(cmd)
+      end
+    end
+
+    def max_build_jobs
+      if Ohai['cpu'] && Ohai['cpu']['total'] && Ohai['cpu']['total'].to_s =~ /^\d+$/
+        Ohai['cpu']['total'].to_i + 1
+      else
+        3
       end
     end
 
