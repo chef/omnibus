@@ -29,8 +29,7 @@ module Omnibus
     # @param [Object] base
     #
     def self.included(base)
-      base.send(:extend,  ClassMethods)
-      base.send(:include, InstanceMethods)
+      base.extend(ClassMethods)
     end
 
     module ClassMethods
@@ -44,11 +43,9 @@ module Omnibus
       end
     end
 
-    module InstanceMethods
-      # @see (Nullable.null?)
-      def null?(object)
-        self.class.null?(object)
-      end
+    # @see (Nullable.null?)
+    def null?(object)
+      self.class.null?(object)
     end
   end
 end
