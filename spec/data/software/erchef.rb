@@ -18,7 +18,9 @@
 name 'erchef'
 default_version '4b19a96d57bff9bbf4764d7323b92a0944009b9e'
 
-dependencies %w(erlang rsync curl)
+dependency 'erlang'
+dependency 'rsync'
+dependency 'curl'
 
 source git: 'git://github.com/opscode/erchef'
 
