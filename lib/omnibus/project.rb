@@ -19,14 +19,14 @@ require 'time'
 require 'json'
 
 module Omnibus
+  #
   # Omnibus project DSL reader
   #
-  # @todo It seems like there's a bit of a conflation between a
-  #   "project" and a "package" in this class... perhaps the
-  #   package-building portions should be extracted to a separate
-  #   class.
-  # @todo: Reorder DSL methods to fit in the same YARD group
-  # @todo: Generate the DSL methods via metaprogramming... they're all so similar
+  # @todo It seems like there's a bit of a conflation between a "project" and a
+  #   "package" in this class... perhaps the package-building portions should be
+  #   extracted to a separate class.
+  #
+  #
   class Project
     class << self
       #
@@ -49,106 +49,6 @@ module Omnibus
     include Util
 
     attr_accessor :build_version_dsl
-
-    #
-    # The library for this Omnibus project.
-    #
-    # @return [Library]
-    #
-    def library
-      @library ||= Library.new(self)
-    end
-
-    #
-    # Dirty the cache for this project. This can be called by other projects,
-    # install path cache, or software definitions to invalidate the cache for
-    # this project.
-    #
-    # @return [true, false]
-    #
-    def dirty!
-      @dirty = true
-    end
-
-    #
-    # Determine if the cache for this project is dirty.
-    #
-    # @return [true, false]
-    #
-    def dirty?
-      !!@dirty
-    end
-
-    def <=>(other)
-      self.name <=> other.name
-    end
-
-    def build_me
-      FileUtils.mkdir_p(Config.package_dir)
-      FileUtils.rm_rf(install_path)
-      FileUtils.mkdir_p(install_path)
-
-      library.build_order.each do |software|
-        software.build_me
-      end
-      health_check_me
-      package_me
-    end
-
-    def health_check_me
-      if Ohai.platform == 'windows'
-        log.info(log_key) { 'Skipping health check on Windows' }
-      else
-        # build a list of all whitelist files from all project dependencies
-        whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
-        Omnibus::HealthCheck.run(install_path, whitelist_files)
-      end
-    end
-
-    def package_me
-      package_types.each do |pkg_type|
-        if pkg_type == 'makeself'
-          run_makeself
-        elsif pkg_type == 'msi'
-          run_msi
-        elsif pkg_type == 'bff'
-          run_bff
-        elsif pkg_type == 'pkgmk'
-          run_pkgmk
-        elsif pkg_type == 'mac_pkg'
-          run_mac_package_build
-        elsif pkg_type == 'mac_dmg'
-          # noop, since the dmg creation is handled by the packager
-        else # pkg_type == "fpm"
-          run_fpm(pkg_type)
-        end
-
-        render_metadata(pkg_type)
-
-        if Ohai.platform == 'windows'
-          cp_cmd = "xcopy #{Config.package_dir}\\*.msi pkg\\ /Y"
-        elsif Ohai.platform == 'aix'
-          cp_cmd = "cp #{Config.package_dir}/*.bff pkg/"
-        else
-          cp_cmd = "cp #{Config.package_dir}/* pkg/"
-        end
-
-        shellout!(cp_cmd)
-      end
-    end
-
-    # Ensures that certain project information has been set
-    #
-    # @todo raise MissingProjectConfiguration instead of printing the warning
-    #   in the next major release
-    #
-    # @return [void]
-    def validate
-      name && install_path && maintainer && homepage
-      if package_name == replaces
-        log.warn { BadReplacesLine.new.message }
-      end
-    end
 
     #
     # @!group DSL methods
@@ -805,6 +705,13 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # @!group Public API
+    #
+    # In addition to the DSL methods, the following methods are considered to
+    # be the "public API" for a project.
+    # --------------------------------------------------
+
+    #
     # The list of software dependencies for this project.
     #
     # These is the software that comprises your project, and is distinct from
@@ -872,6 +779,58 @@ module Omnibus
       @overrides ||= {}
     end
 
+    #
+    # Indicates whether the given  +software+ is defined as a software component
+    # of this project.
+    #
+    # @param [String, Software] software
+    #   the software or name of the software to find
+    #
+    # @return [true, false]
+    #
+    def dependency?(software)
+      name = software.is_a?(Software) ? software.name : software
+      dependencies.include?(name)
+    end
+
+    #
+    # The library for this Omnibus project.
+    #
+    # @return [Library]
+    #
+    def library
+      @library ||= Library.new(self)
+    end
+
+    #
+    # Dirty the cache for this project. This can be called by other projects,
+    # install path cache, or software definitions to invalidate the cache for
+    # this project.
+    #
+    # @return [true, false]
+    #
+    def dirty!
+      @dirty = true
+    end
+
+    #
+    # Determine if the cache for this project is dirty.
+    #
+    # @return [true, false]
+    #
+    def dirty?
+      !!@dirty
+    end
+
+    #
+    # Comparator for two projects (+name+)
+    #
+    # @return [1, 0, -1]
+    #
+    def <=>(other)
+      self.name <=> other.name
+    end
+
     # Defines the iteration for the package to be generated.  Adheres
     # to the conventions of the platform for which the package is
     # being built.
@@ -898,6 +857,7 @@ module Omnibus
       end
     end
 
+    #
     # The path to the package scripts directory for this project.
     # These are optional scripts that can be bundled into the
     # resulting package for running at various points in the package
@@ -925,27 +885,81 @@ module Omnibus
     #
     # @todo This documentation really should be up at a higher level,
     #   particularly since the user has no way to change the path.
+    #
     def package_scripts_path
       "#{Config.project_root}/package-scripts/#{name}"
     end
 
-    # Indicates whether `software` is defined as a software component
-    # of this project.
-    #
-    # @param software [String, Omnibus::Software, #name]
-    # @return [Boolean]
-    #
-    # @see #dependencies
-    def dependency?(software)
-      name = if software.respond_to?(:name)
-               software.send(:name)
-             else
-               software
-             end
-      dependencies.include?(name)
+    def build_me
+      FileUtils.mkdir_p(Config.package_dir)
+      FileUtils.rm_rf(install_path)
+      FileUtils.mkdir_p(install_path)
+
+      library.build_order.each do |software|
+        software.build_me
+      end
+      health_check_me
+      package_me
     end
 
+    def health_check_me
+      if Ohai.platform == 'windows'
+        log.info(log_key) { 'Skipping health check on Windows' }
+      else
+        # build a list of all whitelist files from all project dependencies
+        whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
+        Omnibus::HealthCheck.run(install_path, whitelist_files)
+      end
+    end
+
+    def package_me
+      package_types.each do |pkg_type|
+        if pkg_type == 'makeself'
+          run_makeself
+        elsif pkg_type == 'msi'
+          run_msi
+        elsif pkg_type == 'bff'
+          run_bff
+        elsif pkg_type == 'pkgmk'
+          run_pkgmk
+        elsif pkg_type == 'mac_pkg'
+          run_mac_package_build
+        elsif pkg_type == 'mac_dmg'
+          # noop, since the dmg creation is handled by the packager
+        else # pkg_type == "fpm"
+          run_fpm(pkg_type)
+        end
+
+        render_metadata(pkg_type)
+
+        if Ohai.platform == 'windows'
+          cp_cmd = "xcopy #{Config.package_dir}\\*.msi pkg\\ /Y"
+        elsif Ohai.platform == 'aix'
+          cp_cmd = "cp #{Config.package_dir}/*.bff pkg/"
+        else
+          cp_cmd = "cp #{Config.package_dir}/* pkg/"
+        end
+
+        shellout!(cp_cmd)
+      end
+    end
+
+    # Ensures that certain project information has been set
+    #
+    # @todo raise MissingProjectConfiguration instead of printing the warning
+    #   in the next major release
+    #
+    # @return [void]
+    def validate
+      name && install_path && maintainer && homepage
+      if package_name == replaces
+        log.warn { BadReplacesLine.new.message }
+      end
+    end
+
+    #
     # @!endgroup
+    # --------------------------------------------------
 
     private
 
