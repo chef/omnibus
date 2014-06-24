@@ -353,6 +353,16 @@ module Omnibus
     expose :relative_path
 
     #
+    # The path where the extracted software lives.
+    #
+    # @return [String]
+    #
+    def project_dir
+      @project_dir ||= File.join(Config.source_dir, relative_path)
+    end
+    expose :project_dir
+
+    #
     # The path where this software is installed on disk.
     #
     # @deprecated Use {#install_path} instead
@@ -529,6 +539,35 @@ module Omnibus
     end
 
     #
+    # The repo-level and project-level overrides for the software.
+    #
+    # @return [Hash]
+    #
+    def overrides
+      if null?(@overrides)
+        # lazily initialized because we need the 'name' to be parsed first
+        @overrides = {}
+        @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
+        if @repo_overrides[name]
+          @overrides[:version] = @repo_overrides[name]
+        end
+      end
+
+      @overrides
+    end
+
+    #
+    # Determine if this software version overridden externally, relative to the
+    # version declared within the software DSL file?
+    #
+    # @return [true, false]
+    #
+    def overridden?
+      # NOTE: using instance variables to bypass accessors that enforce overrides
+      @overrides.key?(:version) && (@overrides[:version] != @version)
+    end
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -545,32 +584,6 @@ module Omnibus
       end
 
       default_version
-    end
-
-    #
-    # Retrieves the repo-level and project-level overrides for the software.
-    #
-    # @return [Hash]
-    #
-    def overrides
-      if null?(@overrides)
-        # lazily initialized because we need the 'name' to be parsed first
-        @overrides = {}
-        @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
-        if @repo_overrides[name]
-          @overrides[:version] = @repo_overrides[name]
-        end
-      end
-      @overrides
-    end
-
-    # Was this software version overridden externally, relative to the
-    # version declared within the software DSL file?
-    #
-    # @return [Boolean]
-    def overridden?
-      # note: using instance variables to bypass accessors that enforce overrides
-      @overrides.key?(:version) && (@overrides[:version] != @version)
     end
 
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
@@ -639,14 +652,6 @@ module Omnibus
     def project_file
       filename = source_uri.path.split('/').last
       "#{Config.cache_dir}/#{filename}"
-    end
-
-    # @todo this would be simplified and clarified if @relative_path
-    #   defaulted to @name... see the @todo tag for #relative_path
-    # @todo Move this up with the other *_dir methods for better
-    #   logical grouping
-    def project_dir
-      @relative_path ? "#{Config.source_dir}/#{@relative_path}" : "#{Config.source_dir}/#{@name}"
     end
 
     # The name of the sentinel file that marks the most recent fetch
