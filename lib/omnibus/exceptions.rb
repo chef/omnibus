@@ -259,7 +259,7 @@ EOH
     end
   end
 
-  class InsufficientSpecification < ArgumentError
+  class InsufficientSpecification < Error
     def initialize(key, package)
       @key, @package = key, package
     end
