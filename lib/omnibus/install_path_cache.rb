@@ -28,7 +28,7 @@ module Omnibus
 
     # The path to the full install_path cache for the project
     def cache_path
-      File.join(Omnibus::Config.install_path_cache_dir, @install_path)
+      File.join(Config.install_path_cache_dir, @install_path)
     end
 
     # Whether the cache_path above exists

@@ -81,7 +81,7 @@ module Omnibus
     #
     # By default, a timestamp is incorporated into the build component of
     # version string (see {Omnibus::BuildVersion::TIMESTAMP_FORMAT}). This
-    # option is configurable via the {Omnibus::Config}.
+    # option is configurable via the {Config}.
     #
     # @example 11.0.0-alpha.1+20121218164140.git.207.694b062
     # @return [String]

@@ -833,9 +833,9 @@ module Omnibus
 
     # Convenience method for accessing the global Omnibus configuration object.
     #
-    # @return Omnibus::Config
+    # @return Config
     #
-    # @see Omnibus::Config
+    # @see Config
     def config
       log.deprecated(log_key) do
         'config (DSL). Please use Config.(thing) instead (capital C).'

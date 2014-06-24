@@ -138,7 +138,7 @@ module Omnibus
       @ui ||= Thor::Base.shell.new
     end
 
-    # Convenience method for access to the Omnibus::Config object.
+    # Convenience method for access to the {Config} object.
     # Provided for backward compatibility.
     #
     # @return [Config]
@@ -153,7 +153,7 @@ module Omnibus
     end
 
     # Load in an Omnibus configuration file.  Values will be merged with
-    # and override the defaults defined in {Omnibus::Config}.
+    # and override the defaults defined in {Config}.
     #
     # @param [String] file path to a configuration file to load
     #
