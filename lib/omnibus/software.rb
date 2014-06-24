@@ -14,13 +14,8 @@
 # limitations under the License.
 #
 
-require 'digest/md5'
-require 'net/ftp'
-require 'net/http'
-require 'net/https'
-require 'uri'
-
 require 'fileutils'
+require 'uri'
 
 module Omnibus
   # Omnibus software DSL reader
