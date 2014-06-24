@@ -53,6 +53,8 @@ module Omnibus
     # @param [Hash] data
     #
     def stub_ohai(data = {})
+      require 'ohai' unless defined?(::Ohai)
+
       system = ::Ohai::System.new
       system.data = Mash.new(data)
 
