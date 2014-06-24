@@ -5,6 +5,7 @@ module Omnibus
   describe Packager::MacPkg do
     before do
       Config.package_dir('/home/someuser/omnibus-myproject/pkg')
+      Config.package_tmp('/var/cache/omnibus/pkg-tmp')
     end
 
     let(:project_name) { 'myproject' }
@@ -14,8 +15,6 @@ module Omnibus
     let(:omnibus_root) { '/omnibus/project/root' }
 
     let(:scripts_path) { "#{omnibus_root}/scripts" }
-
-    let(:package_tmp) { '/var/cache/omnibus/pkg-tmp' }
 
     let(:files_path) { "#{omnibus_root}/files" }
 
@@ -62,7 +61,6 @@ module Omnibus
         maintainer: "Joe's Software",
         install_path: '/opt/myproject',
         files_path: files_path,
-        package_tmp: package_tmp,
         package_scripts_path: scripts_path,
         mac_pkg_identifier: mac_pkg_identifier,
         config: pkg_signing_config,

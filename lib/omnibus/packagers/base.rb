@@ -221,7 +221,7 @@ module Omnibus
     #
     # @return [String]
     def staging_dir
-      File.expand_path("#{project.package_tmp}/#{underscore_name}")
+      File.expand_path("#{Config.package_tmp}/#{underscore_name}")
     end
 
     # The path to the directory where the packager resources are

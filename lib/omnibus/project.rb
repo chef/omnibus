@@ -929,15 +929,6 @@ module Omnibus
       "#{Config.project_root}/package-scripts/#{name}"
     end
 
-    # The directory where intermediate packaging products may be stored.
-    # Delegates to Config so that Packagers have a consistent API.
-    #
-    # @see Config.package_tmp some caveats.
-    # @return [String] path to the package temp directory.
-    def package_tmp
-      Config.package_tmp
-    end
-
     # Determine the package type(s) to be built, based on the platform
     # family for which the package is being built.
     #

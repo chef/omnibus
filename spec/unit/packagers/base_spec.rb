@@ -2,18 +2,21 @@ require 'stringio'
 
 module Omnibus
   describe Packager::Base do
+    before do
+      Config.package_tmp('pkg-tmp')
+    end
+
     let(:project) do
-      double('project',
-             name: 'hamlet',
-             build_version: '1.0.0',
-             iteration: '12902349',
-             mac_pkg_identifier: 'com.chef.hamlet',
-             install_path: '/opt/hamlet',
-             package_scripts_path: 'package-scripts',
-             files_path: 'files',
-             package_tmp: 'pkg-tmp',
-             resources_path: nil,
-             friendly_name: 'HAMLET',
+      double(Project,
+        name: 'hamlet',
+        build_version: '1.0.0',
+        iteration: '12902349',
+        mac_pkg_identifier: 'com.chef.hamlet',
+        install_path: '/opt/hamlet',
+        package_scripts_path: 'package-scripts',
+        files_path: 'files',
+        resources_path: nil,
+        friendly_name: 'HAMLET',
       )
     end
 
@@ -237,14 +240,14 @@ module Omnibus
 
     describe '#staging_dir' do
       it 'is the project package tmp and underscored named' do
-        name = "#{project.package_tmp}/base"
+        name = "#{Config.package_tmp}/base"
         expect(subject.send(:staging_dir)).to eq(File.expand_path(name))
       end
     end
 
     describe '#staging_resources_path' do
       it 'is base/Resources under package temp' do
-        name = "#{project.package_tmp}/base/Resources"
+        name = "#{Config.package_tmp}/base/Resources"
         expect(subject.send(:staging_resources_path)).to eq(File.expand_path(name))
       end
     end
