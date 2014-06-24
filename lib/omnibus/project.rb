@@ -839,21 +839,21 @@ module Omnibus
     #
     # @return [String]
     def iteration
-      case platform_family
+      case Ohai.platform_family
       when 'rhel'
-        platform_version =~ /^(\d+)/
+        Ohai.platform_version =~ /^(\d+)/
         maj = Regexp.last_match[1]
         "#{build_iteration}.el#{maj}"
       when 'freebsd'
-        platform_version =~ /^(\d+)/
+        Ohai.platform_version =~ /^(\d+)/
         maj = Regexp.last_match[1]
-        "#{build_iteration}.#{platform}.#{maj}.#{machine}"
+        "#{build_iteration}.#{Ohai.platform}.#{maj}.#{Ohai.kernel.machine}"
       when 'windows'
         "#{build_iteration}.windows"
       when 'aix', 'debian', 'mac_os_x'
         "#{build_iteration}"
       else
-        "#{build_iteration}.#{platform}.#{platform_version}"
+        "#{build_iteration}.#{Ohai.platform}.#{Ohai.platform_version}"
       end
     end
 
@@ -990,26 +990,34 @@ module Omnibus
       end
     end
 
+    #
     # Platform version to be used in package metadata. For rhel, the minor
     # version is removed, e.g., "5.6" becomes "5". For all other platforms,
     # this is just the platform_version.
-    # @return [String] the platform version
+    #
+    # @return [String]
+    #   the platform version
+    #
     def platform_version_for_package
-      if platform == 'rhel'
-        platform_version[/([\d]+)\..+/, 1]
+      if Ohai.platform == 'rhel'
+        Ohai.platform_version[/([\d]+)\..+/, 1]
       else
-        platform_version
+        Ohai.platform_version
       end
     end
 
+    #
     # Platform name to be used when creating metadata for the artifact.
     # rhel/centos become "el", all others are just platform
-    # @return [String] the platform family short name
+    #
+    # @return [String]
+    #   the platform family short name
+    #
     def platform_shortname
-      if platform_family == 'rhel'
+      if Ohai.platform_family == 'rhel'
         'el'
       else
-        platform
+        Ohai.platform
       end
     end
 
@@ -1028,7 +1036,7 @@ module Omnibus
         homepage:         homepage,
         platform:         platform_shortname,
         platform_version: platform_version_for_package,
-        arch:             machine,
+        arch:             Ohai.kernel.machine,
         version:          build_version,
       )
     end
