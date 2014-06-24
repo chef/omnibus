@@ -63,7 +63,12 @@ module Omnibus
       dep_string = dep_list.map { |i| "#{i.name}-#{i.version}" }.join('-')
       # digest the content of the software's config so that changes to
       # build params invalidate cache.
-      dep_string = IO.read(@software.source_config) + dep_string
+
+      if @software.filepath.nil? || !File.exist?(@software.filepath)
+        raise Error, "`#{@software.name}' does not exist on disk!"
+      end
+
+      dep_string = IO.read(@software.filepath) + dep_string
       digest = Digest::SHA256.hexdigest(dep_string)
 
       version = @software.version_for_cache
