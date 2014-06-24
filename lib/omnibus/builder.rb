@@ -205,6 +205,17 @@ module Omnibus
       @software.project_dir
     end
 
+    #
+    # @deprecated Use {install_path} instead
+    #
+    def install_dir
+      log.deprecated(log_key) do
+        'install_dir (DSL). Please use install_path instead.'
+      end
+
+      install_path
+    end
+
     def install_path
       @software.install_path
     end
