@@ -3,8 +3,8 @@ require 'spec_helper'
 module Omnibus
   describe InstallPathCache do
     before do
-      # Stub to prevent a real Ohai run for faster specs
-      Ohai.stub(:platform).and_return('linux')
+      stub_ohai(platform: 'linux')
+      allow(IO).to receive(:read).and_call_original
     end
 
     let(:install_path) { '/opt/chef' }
@@ -29,26 +29,24 @@ module Omnibus
       Project.load('/path/to/demo.rb')
     end
 
-    let(:fake_software_config_file) do
-      File.join(Omnibus::RSpec::SPEC_DATA, 'software', 'zlib.rb')
-    end
+    let(:zlib_config) { File.join(RSpec::SPEC_DATA, 'software', 'zlib.rb') }
 
     let(:zlib) do
-      software = Omnibus::Software.new('', fake_software_config_file, project)
+      software = Software.new(project, {}, zlib_config)
       software.name('zlib')
       software.default_version('1.7.2')
       software
     end
 
     let(:snoopy) do
-      software = Omnibus::Software.new('', 'snoopy.rb', project)
+      software = Software.new(project, {}, 'snoopy.rb')
       software.name('snoopy')
       software.default_version('1.0.0')
       software
     end
 
     let(:preparation) do
-      software = Omnibus::Software.new('', 'preparation.rb', project)
+      software = Software.new(project, {}, 'preparation.rb')
       software.name('preparation')
       software.default_version('1.0.0')
       software
@@ -60,7 +58,7 @@ module Omnibus
       project.library.component_added(preparation)
       project.library.component_added(snoopy)
       project.library.component_added(zlib)
-      Omnibus::InstallPathCache.new(install_path, zlib)
+      InstallPathCache.new(install_path, zlib)
     end
 
     describe '#cache_path' do
@@ -89,7 +87,7 @@ module Omnibus
 
       describe 'with no deps' do
         let(:ipc) do
-          Omnibus::InstallPathCache.new(install_path, zlib)
+          InstallPathCache.new(install_path, zlib)
         end
 
         it 'uses the shasum of the software config file' do

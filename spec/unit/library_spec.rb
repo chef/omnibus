@@ -4,15 +4,17 @@ module Omnibus
   describe Library do
     let(:project) { Project.load(project_path('chefdk')) }
     let(:library) { Library.new(project) }
-    let(:erchef) { Software.load(software_path('erchef'), project) }
-    let(:zlib) { Software.load(software_path('zlib'), project) }
+    let(:erchef)  { Software.load(project, software_path('erchef')) }
+    let(:zlib)    { Software.load(project, software_path('zlib')) }
 
-    def gen_software(name, deps)
-      software = Software.new('', "#{name}.rb", 'chef-server')
+    def generate_software(name, deps)
+      software = Software.new(project, {}, "#{name}.rb")
       software.name(name.to_s)
+
       deps.each do |dep|
         software.dependency(dep)
       end
+
       software
     end
 
@@ -68,7 +70,7 @@ module Omnibus
 
       [project_deps, erchef_deps, chef_deps].flatten.each do |dep|
         let(dep) do
-          software = Software.new('', "#{dep}.rb", 'chef-server')
+          software = Software.new(project, {}, "#{dep}.rb")
           software.name(dep.to_s)
           software.dependency('postgresql') if dep == :skitch
           software
@@ -96,7 +98,7 @@ module Omnibus
           name = item[0]
           deps = item[1]
           let(name) do
-            gen_software(name, deps)
+            generate_software(name, deps)
           end
         end
 
