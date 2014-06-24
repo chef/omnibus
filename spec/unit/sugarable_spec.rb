@@ -3,13 +3,13 @@ require 'spec_helper'
 module Omnibus
   describe Software do
     it 'is a sugarable' do
-      expect(subject).to be_a(Sugarable)
+      expect(described_class.ancestors).to include(Sugarable)
     end
   end
 
   describe Project do
     it 'is a sugarable' do
-      expect(subject).to be_a(Sugarable)
+      expect(described_class.ancestors).to include(Sugarable)
     end
   end
 
