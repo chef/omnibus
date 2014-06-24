@@ -3,11 +3,47 @@ require 'ohai'
 
 module Omnibus
   describe Project do
-    let(:project) do
-      Omnibus::Project.load(project_path('sample'))
-    end
+    let(:project) { Project.load(project_path('sample')) }
 
     subject { project }
+
+    shared_examples 'a cleanroom setter' do |id, value|
+      it "for `#{id}'" do
+        expect { subject.evaluate("#{id}(#{value.inspect})") }
+          .to_not raise_error
+      end
+    end
+
+    shared_examples 'a cleanroom getter' do |id|
+      it "for `#{id}'" do
+        expect { subject.evaluate("#{id}") }.to_not raise_error
+      end
+    end
+
+    it_behaves_like 'a cleanroom setter', :name, 'chef'
+    it_behaves_like 'a cleanroom setter', :friendly_name, 'Chef'
+    it_behaves_like 'a cleanroom setter', :msi_parameters, { foo: 'bar' }
+    it_behaves_like 'a cleanroom setter', :package_name, 'chef.package'
+    it_behaves_like 'a cleanroom setter', :install_path, '/opt/chef'
+    it_behaves_like 'a cleanroom setter', :maintainer, 'Chef Software, Inc'
+    it_behaves_like 'a cleanroom setter', :homepage, 'https://getchef.com'
+    it_behaves_like 'a cleanroom setter', :description, 'Installs the thing'
+    it_behaves_like 'a cleanroom setter', :replaces, 'old-chef'
+    it_behaves_like 'a cleanroom setter', :conflict, 'puppet'
+    it_behaves_like 'a cleanroom setter', :build_version, '1.2.3'
+    it_behaves_like 'a cleanroom setter', :build_iteration, 1
+    it_behaves_like 'a cleanroom setter', :mac_pkg_identifier, 'com.getchef'
+    it_behaves_like 'a cleanroom setter', :package_user, 'chef'
+    it_behaves_like 'a cleanroom setter', :package_group, 'chef'
+    it_behaves_like 'a cleanroom setter', :override, 'foo'
+    it_behaves_like 'a cleanroom setter', :resources_path, '/path'
+    it_behaves_like 'a cleanroom setter', :dependency, 'libxslt-dev'
+    it_behaves_like 'a cleanroom setter', :runtime_dependency, 'libxslt'
+    it_behaves_like 'a cleanroom setter', :exclude, 'hamlet'
+    it_behaves_like 'a cleanroom setter', :config_file, '/path/to/config.rb'
+    it_behaves_like 'a cleanroom setter', :extra_package_file, '/path/to/asset'
+
+    it_behaves_like 'a cleanroom getter', :files_path
 
     describe 'basics' do
       it 'should return a name' do
