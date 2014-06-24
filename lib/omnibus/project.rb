@@ -929,31 +929,6 @@ module Omnibus
       "#{Config.project_root}/package-scripts/#{name}"
     end
 
-    # Determine the package type(s) to be built, based on the platform
-    # family for which the package is being built.
-    #
-    # If specific types cannot be determined, default to `["makeself"]`.
-    #
-    # @return [Array<(String)>]
-    def package_types
-      case platform_family
-      when 'debian'
-        %w(deb)
-      when 'fedora', 'rhel'
-        %w(rpm)
-      when 'aix'
-        %w(bff)
-      when 'solaris2'
-        %w(pkgmk)
-      when 'windows'
-        %w(msi)
-      when 'mac_os_x'
-        %w(mac_pkg mac_dmg)
-      else
-        %w(makeself)
-      end
-    end
-
     # Indicates whether `software` is defined as a software component
     # of this project.
     #
@@ -973,6 +948,33 @@ module Omnibus
     # @!endgroup
 
     private
+
+    #
+    # Determine the package type(s) to be built, based on the platform
+    # family for which the package is being built.
+    #
+    # If specific types cannot be determined, default to `["makeself"]`.
+    #
+    # @return [Array<(String)>]
+    #
+    def package_types
+      case Ohai.platform_family
+      when 'debian'
+        %w(deb)
+      when 'fedora', 'rhel'
+        %w(rpm)
+      when 'aix'
+        %w(bff)
+      when 'solaris2'
+        %w(pkgmk)
+      when 'windows'
+        %w(msi)
+      when 'mac_os_x'
+        %w(mac_pkg mac_dmg)
+      else
+        %w(makeself)
+      end
+    end
 
     # An Array of platform data suitable for `Artifact.new`. This will go into
     # metadata generated for the artifact, and be used for the file hierarchy
