@@ -270,4 +270,23 @@ Software must specify a #{@key} to cache it in S3 (#{@package})!
 EOH
     end
   end
+
+  class InvalidValue < Error
+    #
+    # @param [Symbol] source
+    #   the source method that received an invalid value
+    # @Param [String] message
+    #   the message about why the value is invalid
+    #
+    def initialize(source, message)
+      @source  = source
+      @message = message
+    end
+
+    def to_s
+      <<-EOH
+Invalid value for #{@source}. Expected #{@source} to #{@message}!
+EOH
+    end
+  end
 end
