@@ -44,7 +44,7 @@ module Omnibus
 
     include Cleanroom
     include Logging
-    include Nullable
+    include NullArgumentable
     include Sugarable
     include Util
 

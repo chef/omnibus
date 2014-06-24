@@ -15,7 +15,7 @@
 #
 
 module Omnibus
-  module Nullable
+  module NullArgumentable
     #
     # The "empty" null object.
     #
@@ -43,7 +43,7 @@ module Omnibus
       end
     end
 
-    # @see (Nullable.null?)
+    # @see (NullArgumentable.null?)
     def null?(object)
       self.class.null?(object)
     end
