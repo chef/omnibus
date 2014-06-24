@@ -90,6 +90,7 @@ module Omnibus
       #
       def cleanroom
         exposed_methods = exposed.keys
+        parent = self.name
 
         Class.new do
           define_method(:initialize) do |instance|
@@ -101,6 +102,11 @@ module Omnibus
               @instance.send(exposed_method, *args, &block)
             end
           end
+
+          define_method(:inspect) do
+            "#<#{parent} (Cleanroom)>"
+          end
+          alias_method :to_s, :inspect
         end
       end
     end
