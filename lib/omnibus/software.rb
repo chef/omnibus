@@ -45,8 +45,6 @@ module Omnibus
 
     # It appears that this is not used
     attr_reader :fetcher
-    attr_reader :whitelist_files
-    attr_reader :filepath
 
     #
     # Create a new software object.
@@ -74,11 +72,6 @@ module Omnibus
       # Overrides
       @overrides      = NULL
       @repo_overrides = repo_overrides
-
-      # Internal data structure that the DSL uses
-      @source = {}
-      @dependencies = []
-      @whitelist_files = []
     end
 
     #
@@ -91,6 +84,11 @@ module Omnibus
       @builder ||= NullBuilder.new(self)
     end
 
+    #
+    # Compare two software projects (by name).
+    #
+    # @return [1, 0, -1]
+    #
     def <=>(other)
       self.name <=> other.name
     end
@@ -195,38 +193,10 @@ module Omnibus
     #   the list of current dependencies
     #
     def dependency(val)
-      @dependencies << val
-      @dependencies.dup
+      dependencies << val
+      dependencies.dup
     end
     expose :dependency
-
-    #
-    # Set or retrieve the list of software dependencies for this project.
-    # As this is a DSL method, only pass the names of software components, not
-    # {Software} objects.
-    #
-    # These is the software that comprises your project, and is distinct from
-    # runtime dependencies.
-    #
-    # @note This will reinitialize the internal depdencies Array and overwrite
-    # any dependencies that may have been set using {#dependency}.
-    #
-    # @example
-    #   dependencies 'libxslt', 'libpng'
-    #
-    # @param [Array<String>] val
-    #   the list of names of software components
-    #
-    # @return [Array<String>]
-    #
-    def dependencies(*args)
-      if args.empty?
-        @dependencies
-      else
-        @dependencies = Array(args).flatten.compact
-      end
-    end
-    expose :dependencies
 
     #
     # Set or retrieve the source for the software.
@@ -276,6 +246,7 @@ module Omnibus
             "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
         end
 
+        @source ||= {}
         @source.merge!(val)
       end
 
@@ -359,8 +330,8 @@ module Omnibus
     #
     def whitelist_file(file)
       file = Regexp.new(file) unless file.kind_of?(Regexp)
-      @whitelist_files << file
-      @whitelist_files.dup
+      whitelist_files << file
+      whitelist_files.dup
     end
     expose :whitelist_file
 
@@ -469,6 +440,46 @@ module Omnibus
       @builder
     end
     expose :build
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
+    # @!group Public API
+    #
+    # In addition to the DSL methods, the following methods are considered to
+    # be the "public API" for a software.
+    # --------------------------------------------------
+
+    #
+    # The list of software dependencies for this project. These is the software
+    # that comprises your project, and is distinct from runtime dependencies.
+    #
+    # @return [Array<String>]
+    #
+    def dependencies
+      @dependencies ||= []
+    end
+
+    #
+    # The list of files to ignore in the healthcheck.
+    #
+    # @return [Array<String>]
+    #
+    def whitelist_files
+      @whitelist_files ||= []
+    end
+
+    #
+    # The path (on disk) where this software came from. Warning: this can be
+    # +nil+ if a software was dynamically created!
+    #
+    # @return [String, nil]
+    #
+    def filepath
+      @filepath
+    end
 
     #
     # @!endgroup
