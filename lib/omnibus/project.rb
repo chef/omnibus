@@ -28,33 +28,39 @@ module Omnibus
   # @todo: Reorder DSL methods to fit in the same YARD group
   # @todo: Generate the DSL methods via metaprogramming... they're all so similar
   class Project
+    class << self
+      #
+      # @param [String] filepath
+      #   the path to the project definition to load from disk
+      #
+      # @return [Software]
+      #
+      def load(filepath)
+        instance = new
+        instance.evaluate_file(filepath)
+        instance
+      end
+    end
+
+    include Cleanroom
     include Logging
+    include Nullable
     include Sugarable
     include Util
-
-    NULL_ARG = Object.new
 
     attr_reader :library
     attr_accessor :dirty_cache
     attr_accessor :build_version_dsl
     attr_reader :resources_path
 
-    # Convenience method to initialize a Project from a DSL file.
     #
-    # @param filename [String] the filename of the Project DSL file to load.
-    def self.load(filename)
-      new(IO.read(filename), filename)
-    end
-
     # Create a new Project from the contents of a DSL file.  Prefer
     # calling {Omnibus::Project#load} instead of using this method
     # directly.
     #
-    # @param io [String] the contents of a Project DSL (_not_ the filename!)
-    # @param filename [String] unused!
-    #
     # @see Omnibus::Project#load
-    def initialize(io, filename)
+    #
+    def initialize
       @output_package = nil
       @name = nil
       @friendly_name = nil
@@ -75,8 +81,9 @@ module Omnibus
       @dependencies = []
       @runtime_dependencies = []
       @dirty_cache = false
-      instance_eval(io, filename)
-      validate
+
+      # TODO: validate right before building instead
+      # validate
 
       @library = Omnibus::Library.new(self)
     end
@@ -153,51 +160,89 @@ module Omnibus
       end
     end
 
+    #
     # @!group DSL methods
-    # Here is some broad documentation for the DSL methods as a whole.
-
-    # Set or retrieve the name of the project
     #
-    # @param val [String] the name to set
+    # The following DSL methods are available from within the project
+    # definitions.
+    # --------------------------------------------------
+
+    #
+    # **[Required]** Set or retrieve the name of the project.
+    #
+    # @example
+    #   name 'chef'
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set before being
+    #   subsequently retrieved
+    #
+    # @param [String] value
+    #   the name to set
+    #
     # @return [String]
     #
-    # @raise [MissingProjectConfiguration] if a value was not set
-    #   before being subsequently retrieved (i.e., a name
-    #   must be set in order to build a project)
-    def name(val = NULL_ARG)
-      @name = val unless val.equal?(NULL_ARG)
-      @name || raise(MissingProjectConfiguration.new('name', 'my_project'))
+    def name(val = NULL)
+      if null?(val)
+        @name || raise(MissingProjectConfiguration.new('name', 'my_project'))
+      else
+        @name = val
+      end
     end
+    expose :name
 
-    # Set or retrieve a friendly name for the project
     #
-    # @param val [String] the name to set
+    # Set or retrieve a friendly name for the project. This defaults to the
+    # capitalized name if not specified.
+    #
+    # @example
+    #   friendly_name 'Chef'
+    #
+    # @param [String] val
+    #   the name to set
+    #
     # @return [String]
     #
-    def friendly_name(val = NULL_ARG)
-      @friendly_name = val unless val.equal?(NULL_ARG)
-      @friendly_name || @name.capitalize
+    def friendly_name(val = NULL)
+      if null?(val)
+        @friendly_name || name.capitalize
+      else
+        @friendly_name = val
+      end
     end
+    expose :friendly_name
 
+    #
     # Set or retrieve the custom msi building parameters
     #
-    # @param val [Hash] the name to set
-    # @param block [Proc] block to run when building the msi that returns a hash
+    # @example Using a hash
+    #   msi_parameters upgrade_code: 'ABCD-1234'
+    #
+    # @example Using a block
+    #   msi_parameters do
+    #     # some complex operation
+    #     { key: value }
+    #   end
+    #
+    # @param [Hash] val
+    #   the parameters to set
+    # @param [Proc] block
+    #   block to run when building the msi that returns a hash
+    #
     # @return [Hash]
     #
-    def msi_parameters(val = NULL_ARG, &block)
-      if block_given?
-        unless val.equal?(NULL_ARG)
-          raise 'can not specify additional parameters when block is given'
-        end
+    def msi_parameters(val = NULL, &block)
+      if block && !null?(val)
+        raise Error, 'You cannot specify additional parameters to ' \
+          '#msi_parameters when a block is given!'
+      end
 
+      if block
         @msi_parameters = block
       else
-        if !val.equal?(NULL_ARG)
+        if null?(val)
           @msi_parameters = val
         else
-          # Return the value of msi_parameters
-          if @msi_parameters.is_a? Proc
+          if @msi_parameters.is_a?(Proc)
             @msi_parameters.call
           else
             @msi_parameters
@@ -205,58 +250,532 @@ module Omnibus
         end
       end
     end
+    expose :msi_parameters
 
-    # Set or retrieve the package name of the project.  Unless
-    # explicitly set, the package name defaults to the project name
     #
-    # @param val [String] the package name to set
+    # Set or retrieve the package name of the project. Defaults to the package
+    # name defaults to the project name.
+    #
+    # @example
+    #   package_name 'com.chef.project'
+    #
+    # @param [String] val
+    #   the package name to set
+    #
     # @return [String]
-    def package_name(val = NULL_ARG)
-      @package_name = val unless val.equal?(NULL_ARG)
-      @package_name.nil? ? @name : @package_name
+    #
+    def package_name(val = NULL)
+      if null?(val)
+        @package_name || name
+      else
+        @package_name = val
+      end
     end
+    expose :package_name
 
-    # Set or retrieve the path at which the project should be
+    #
+    # **[Required]** Set or retrieve the path at which the project should be
     # installed by the generated package.
     #
-    # @param val [String]
+    # @example
+    #   install_path '/opt/chef'
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set before being
+    #   subsequently retrieved
+    #
+    # @param [String] val
+    #   the install path to set
+    #
     # @return [String]
     #
-    # @raise [MissingProjectConfiguration] if a value was not set
-    #   before being subsequently retrieved (i.e., an install_path
-    #   must be set in order to build a project)
-    def install_path(val = NULL_ARG)
-      unless val.equal?(NULL_ARG)
+    def install_path(val = NULL)
+      if null?(val)
+        @install_path || raise(MissingProjectConfiguration.new('install_path', '/opt/chef'))
+      else
         @install_path = windows_safe_path(val)
       end
-      @install_path || raise(MissingProjectConfiguration.new('install_path', '/opt/chef'))
     end
+    expose :install_path
 
-    # Set or retrieve the the package maintainer.
     #
-    # @param val [String]
+    # **[Required]** Set or retrieve the the package maintainer.
+    #
+    # @example
+    #   maintainer 'Chef Software, Inc.'
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set before being
+    #   subsequently retrieved
+    #
+    # @param [String] val
+    #   the name of the maintainer
+    #
     # @return [String]
     #
-    # @raise [MissingProjectConfiguration] if a value was not set
-    #   before being subsequently retrieved (i.e., a maintainer must
-    #   be set in order to build a project)
-    def maintainer(val = NULL_ARG)
-      @maintainer = val unless val.equal?(NULL_ARG)
-      @maintainer || raise(MissingProjectConfiguration.new('maintainer', 'Chef Software, Inc.'))
+    def maintainer(val = NULL)
+      if null?(val)
+        @maintainer || raise(MissingProjectConfiguration.new('maintainer', 'Chef Software, Inc.'))
+      else
+        @maintainer = val
+      end
     end
+    expose :maintainer
 
-    # Set or retrive the package homepage.
     #
-    # @param val [String]
+    # **[Required]** Set or retrive the package homepage.
+    #
+    # @example
+    #   homepage 'https://www.getchef.com'
+    #
+    # @raise [MissingProjectConfiguration] if a value was not set before being
+    #   subsequently retrieved
+    #
+    # @param [String] val
+    #   the homepage for the project
+    #
     # @return [String]
     #
-    # @raise [MissingProjectConfiguration] if a value was not set
-    #   before being subsequently retrieved (i.e., a homepage must be
-    #   set in order to build a project)
-    def homepage(val = NULL_ARG)
-      @homepage = val unless val.equal?(NULL_ARG)
-      @homepage || raise(MissingProjectConfiguration.new('homepage', 'http://www.getchef.com'))
+    def homepage(val = NULL)
+      if null?(val)
+        @homepage || raise(MissingProjectConfiguration.new('homepage', 'http://www.getchef.com'))
+      else
+        @homepage = val
+      end
     end
+    expose :homepage
+
+    #
+    # Set or retrieve the project description.  Defaults to `"The full stack of
+    # #{name}"`
+    #
+    # @example
+    #   description 'This is my description'
+    #
+    # Corresponds to the +--description+ flag of
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @param [String] val
+    #   the project description
+    #
+    # @return [String]
+    #
+    def description(val = NULL)
+      if null?(val)
+        @description ||= "The full stack of #{name}"
+      else
+        @description = val
+      end
+    end
+    expose :description
+
+    #
+    # Set or retrieve the name of the package this package will replace.
+    #
+    # Ultimately used as the value for the `--replaces` flag in
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # This should only be used when renaming a package and obsoleting the old
+    # name of the package. Setting this to the same name as package_name will
+    # cause RPM upgrades to fail.
+    #
+    # @example
+    #   replace 'the-old-package'
+    #
+    # @param [String] val
+    #   the name of the package to replace
+    #
+    # @return [String]
+    #
+    def replaces(val = NULL)
+      if null?(val)
+        @replaces
+      else
+        @replaces = val
+      end
+    end
+    expose :replaces
+
+    #
+    # Add to the list of packages this one conflicts with.
+    #
+    # Specifying conflicts is optional.  See the `--conflicts` flag in
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @example
+    #   conflicts 'foo'
+    #   conflicts 'bar'
+    #
+    # @param [String] val
+    #   the conflict to add
+    #
+    # @return [Array<String>]
+    #   the list of conflicts
+    #
+    def conflict(val)
+      @conflicts << val
+      @conflicts.dup
+    end
+    expose :conflict
+
+    #
+    # Set or retrieve the version of the project.
+    #
+    # @example Using a string
+    #   build_version '1.0.0'
+    #
+    # @example From git
+    #   build_version do
+    #     source :git
+    #   end
+    #
+    # @example From the version of a dependency
+    #   build_version do
+    #     source :version, from_dependency: 'chef'
+    #   end
+    #
+    # @example From git of a dependency
+    #   build_version do
+    #     source :git, from_dependency: 'chef'
+    #   end
+    #
+    # When using the +:git+ source, by default the output format of the
+    # +build_version+ is semver. This can be modified using the +:output_format+
+    # parameter to any of the methods of +BuildVersion+. For example:
+    #
+    #   build version do
+    #     source :git, from_dependency: 'chef'
+    #     output_format :git_describe
+    #   end
+    #
+    # @see Omnibus::BuildVersion
+    # @see Omnibus::BuildVersionDSL
+    #
+    # @param [String] val
+    #   the build version to set
+    # @param [Proc] block
+    #   the block to run when constructing the +build_version+
+    #
+    # @return [String]
+    #
+    def build_version(val = NULL, &block)
+      if block && null?(val)
+        raise Error, 'You cannot specify additional parameters to ' \
+          '#build_version when a block is given!'
+      end
+
+      if block
+        @build_version_dsl = BuildVersionDSL.new(&block)
+      else
+        if null?(val)
+          @build_version_dsl.build_version
+        else
+          @build_version_dsl = BuildVersionDSL.new(val)
+        end
+      end
+    end
+    expose :build_version
+
+    #
+    # Set or retrieve the build iteration of the project. Defaults to +1+ if not
+    # otherwise set.
+    #
+    # @example
+    #   build_iteration 5
+    #
+    # @param [Fixnum] val
+    #   the build iteration number
+    #
+    # @return [Fixnum]
+    #
+    def build_iteration(val = NULL)
+      if null?(val)
+        @build_iteration ||= 1
+      else
+        @build_iteration = val
+      end
+    end
+    expose :build_iteration
+
+    #
+    # The identifer for the mac package.
+    #
+    # @example
+    #   mac_pkg_identifier 'com.getchef.chefdk'
+    #
+    # @param [String] val
+    #   the package identifier
+    #
+    # @return [String]
+    #
+    def mac_pkg_identifier(val = NULL)
+      if null?(val)
+        @mac_pkg_identifier
+      else
+        @mac_pkg_identifier = val
+      end
+    end
+    expose :mac_pkg_identifier
+
+    #
+    # Set or retrieve the {deb/rpm/solaris}-user fpm argument.
+    #
+    # @example
+    #   package_user 'build'
+    #
+    # @param [String] val
+    #   the user to retrive for the fpm build
+    #
+    # @return [String]
+    #
+    def package_user(val = NULL)
+      if null?(val)
+        @package_user
+      else
+        @package_user = val
+      end
+    end
+    expose :package_user
+
+    #
+    # Set or retrieve the full overrides hash for all software being overridden.
+    # Calling it as a setter does not merge hash entries and will obliterate any
+    # previous overrides that have been setup.
+    #
+    # @example
+    #   overrides { foo: 'bar' }
+    #
+    # @param [Hash] val
+    #   the list of overrides
+    #
+    # @return [Hash]
+    #
+    def overrides(val = NULL)
+      if null?(val)
+        @overrides
+      else
+        @overrides = val
+      end
+    end
+    expose :overrides
+
+    #
+    # Set or retrieve the overrides hash for one piece of software being
+    # overridden. Calling it as a setter does not merge hash entries and it will
+    # set all the overrides for a given software definition.
+    #
+    # @example
+    #   override 'chef', version: '1.2.3'
+    #
+    # @param [Hash] val
+    #   the value to override
+    #
+    # @return [Hash]
+    #
+    def override(name, val = NULL)
+      if null?(val)
+        @overrides[name]
+      else
+        @overrides[name] = val
+      end
+    end
+    expose :override
+
+    #
+    # Set or retrieve the {deb/rpm/solaris}-group fpm argument.
+    #
+    # @example
+    #   package_group 'build'
+    #
+    # @param [String] val
+    #   the group to retrive for the fpm build
+    #
+    # @return [String]
+    #
+    def package_group(val = NULL)
+      if null?(val)
+        @package_group
+      else
+        @package_group = val
+      end
+    end
+    expose :package_group
+
+    #
+    # Set or retrieve the resources path to be used by packagers.
+    #
+    # @example
+    #   resources_path '/path/to/resources'
+    #
+    # @param [String] val
+    #   the path where resources live
+    #
+    # @return [String]
+    #
+    def resources_path(val = NULL)
+      if null?(val)
+        @resources_path
+      else
+        @resources_path = val
+      end
+    end
+    expose :resources_path
+
+    #
+    # Add a software dependency.
+    #
+    # Note that this is a *build time* dependency. If you need to specify an
+    # external dependency that is required at runtime, see {#runtime_dependency}
+    # instead.
+    #
+    # @example
+    #   dependency 'foo'
+    #   dependency 'bar'
+    #
+    # @param [String] val
+    #   the name of a Software dependency
+    #
+    # @return [Array<String>]
+    #   the list of dependencies
+    #
+    def dependency(val)
+      @dependencies << val
+      @dependencies.dup
+    end
+    expose :dependency
+
+    #
+    # Add a package that is a runtime dependency of this project.
+    #
+    # This is distinct from a build-time dependency, which should correspond to
+    # a software definition.
+    #
+    # Corresponds to the `--depends` flag of
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @example
+    #   runtime_dependency 'foo'
+    #
+    # @param [String] val
+    #   the name of the runtime dependency
+    #
+    # @return [Array<String>]
+    #   the list of runtime dependencies
+    #
+    def runtime_dependency(val)
+      @runtime_dependencies << val
+      @runtime_dependencies.dup
+    end
+    expose :runtime_dependency
+
+    #
+    # Set or retrieve the list of software dependencies for this project. As
+    # this is a DSL method, only pass the names of software components, not
+    # {Software} objects.
+    #
+    # These is the software that comprises your project, and is distinct from
+    # runtime dependencies.
+    #
+    # @note This will reinitialize the internal depdencies Array and overwrite
+    #   any dependencies that may have been set using {#dependency}.
+    #
+    # @param [Array<String>] val
+    #   a list of names of Software components
+    #
+    # @return [Array<String>]
+    #
+    def dependencies(val = NULL)
+      if null?(val)
+        @dependencies
+      else
+        @dependencies = val
+      end
+    end
+    expose :dependencies
+
+    #
+    # Add a new exclusion pattern.
+    #
+    # Corresponds to the `--exclude` flag of
+    # {https://github.com/jordansissel/fpm fpm}.
+    #
+    # @example
+    #   exclude 'foo'
+    #
+    # @param [String] pattern
+    #   the thing to exclude
+    #
+    # @return [Array<String>]
+    #   the list of current exclusions
+    #
+    def exclude(pattern)
+      @exclusions << pattern
+      @exclusions.dup
+    end
+    expose :exclude
+
+    #
+    # Add a config file.
+    #
+    # @example
+    #   config_file '/path/to/config.rb'
+    #
+    # @param [String] val
+    #   the name of a config file of your software
+    #
+    # @return [Array<String>]
+    #   the list of current config files
+    #
+    def config_file(val)
+      @config_files << val
+      @config_files.dup
+    end
+    expose :config_file
+
+    #
+    # Add other files or dirs outside of +install_path+.
+    #
+    # @note This option is currently only supported with FPM based package
+    # builds such as RPM, DEB and .sh (makeselfinst).  This is not supported
+    # on Mac OSX packages, Windows MSI, AIX and Solaris
+    #
+    # @example
+    #   extra_package_file '/path/to/file'
+    #
+    # @param [String] val
+    #   the name of a dir or file to include in build
+    #
+    # @return [Array<String>]
+    #   the list of current extra package files
+    #
+    def extra_package_file(val)
+      @extra_package_files << val
+      @extra_package_files.dup
+    end
+    expose :extra_package_file
+
+    #
+    # Set or retrieve the array of files and directories used to build this
+    # project. If you use this to write, only pass the full path to the dir or
+    # file you want included in the omnibus package build.
+    #
+    # @note Similar to the depdencies array, this will reinitialize the files#
+    # array and overwrite and dependencies that were set using {#file}.
+    #
+    # @example
+    #   extra_package_files '/path/to/file', '/path/to/another/file'
+    #
+    # @param [Array<String>] val
+    #   a list of names of Software components
+    #
+    # @return [Array<String>]
+    #
+    def extra_package_files(val = NULL)
+      if null?(val)
+        @extra_package_files
+      else
+        @extra_package_files = val
+      end
+    end
+    expose :extra_package_files
 
     # Defines the iteration for the package to be generated.  Adheres
     # to the conventions of the platform for which the package is
@@ -282,248 +801,6 @@ module Omnibus
       else
         "#{build_iteration}.#{platform}.#{platform_version}"
       end
-    end
-
-    # Set or retrieve the project description.  Defaults to `"The full
-    # stack of #{name}"`
-    #
-    # Corresponds to the `--description` flag of
-    # {https://github.com/jordansissel/fpm fpm}.
-    #
-    # @param val [String] the project description
-    # @return [String]
-    #
-    # @see #name
-    def description(val = NULL_ARG)
-      @description = val unless val.equal?(NULL_ARG)
-      @description || "The full stack of #{name}"
-    end
-
-    # Set or retrieve the name of the package this package will replace.
-    #
-    # Ultimately used as the value for the `--replaces` flag in
-    # {https://github.com/jordansissel/fpm fpm}.
-    #
-    # This should only be used when renaming a package and obsoleting the old
-    # name of the package.  Setting this to the same name as package_name will
-    # cause RPM upgrades to fail.
-    #
-    # @param val [String] the name of the package to replace
-    # @return [String]
-    def replaces(val = NULL_ARG)
-      @replaces = val unless val.equal?(NULL_ARG)
-      @replaces
-    end
-
-    # Add to the list of packages this one conflicts with.
-    #
-    # Specifying conflicts is optional.  See the `--conflicts` flag in
-    # {https://github.com/jordansissel/fpm fpm}.
-    #
-    # @param val [String]
-    # @return [void]
-    def conflict(val)
-      @conflicts << val
-    end
-
-    # Set or retrieve the version of the project.
-    #
-    # Options that can be used when constructing a build_version:
-    #
-    # 1. Use a string as version
-    #   build_version "1.0.0"
-    # 2. Get the build_version from git of the omnibus repo
-    #   build version do
-    #     source :git
-    #   end
-    # 3. Get the build_version from git of a dependency
-    #   build version do
-    #     source :git, from_dependency: "chef"
-    #   end
-    # 4. Set the build_version to the version of a dependency
-    #   build version do
-    #     source :version, from_dependency: "chef"
-    #   end
-    #
-    # When using :git source, by default the output format of the build_version
-    # is semver. This can be modified using the :output_format parameter to any
-    # of the methods of Omnibus::BuildVersion. E.g.:
-    #   build version do
-    #     source :git, from_dependency: "chef"
-    #     output_format :git_describe
-    #   end
-    #
-    # @param val [String] the version to set
-    # @param block [Proc] block to run when constructing the build_version
-    # @return [String]
-    #
-    # @see Omnibus::BuildVersion
-    # @see Omnibus::BuildVersionDSL
-    def build_version(val = NULL_ARG, &block)
-      if block_given?
-        @build_version_dsl =  BuildVersionDSL.new(&block)
-      else
-        if !val.equal?(NULL_ARG)
-          @build_version_dsl = BuildVersionDSL.new(val)
-        else
-          @build_version_dsl.build_version
-        end
-      end
-    end
-
-    # Set or retrieve the build iteration of the project.  Defaults to
-    # `1` if not otherwise set.
-    #
-    # @param val [Fixnum]
-    # @return [Fixnum]
-    #
-    # @todo Is there a better name for this than "build_iteration"?
-    #   Would be nice to cut down confusiton with {#iteration}.
-    def build_iteration(val = NULL_ARG)
-      @build_iteration = val unless val.equal?(NULL_ARG)
-      @build_iteration || 1
-    end
-
-    def mac_pkg_identifier(val = NULL_ARG)
-      @mac_pkg_identifier = val unless val.equal?(NULL_ARG)
-      @mac_pkg_identifier
-    end
-
-    # Set or retrieve the {deb/rpm/solaris}-user fpm argument.
-    #
-    # @param val [String]
-    # @return [String]
-    def package_user(val = NULL_ARG)
-      @pkg_user = val unless val.equal?(NULL_ARG)
-      @pkg_user
-    end
-
-    # Set or retrieve the full overrides hash for all software being overridden.  Calling it as
-    # a setter does not merge hash entries and will obliterate any previous overrides that have been setup.
-    #
-    # @param val [Hash]
-    # @return [Hash]
-    def overrides(val = NULL_ARG)
-      @overrides = val unless val.equal?(NULL_ARG)
-      @overrides
-    end
-
-    # Set or retrieve the overrides hash for one piece of software being overridden.  Calling it as a
-    # setter does not merge hash entries and it will set all the overrides for a given software definition.
-    #
-    # @param val [Hash]
-    # @return [Hash]
-    def override(name, val = NULL_ARG)
-      @overrides[name] = val unless val.equal?(NULL_ARG)
-      @overrides[name]
-    end
-
-    # Set or retrieve the {deb/rpm/solaris}-group fpm argument.
-    #
-    # @param val [String]
-    # @return [String]
-    def package_group(val = NULL_ARG)
-      @pkg_group = val unless val.equal?(NULL_ARG)
-      @pkg_group
-    end
-
-    # Set or retrieve the resources path to be used by packagers.
-    #
-    # @param val [String]
-    # @return [String]
-    def resources_path(val = NULL_ARG)
-      @resources_path = val unless val.equal?(NULL_ARG)
-      @resources_path
-    end
-
-    # Add an Omnibus software dependency.
-    #
-    # Note that this is a *build time* dependency.  If you need to
-    # specify an external dependency that is required at runtime, see
-    # {#runtime_dependency} instead.
-    #
-    # @param val [String] the name of a Software dependency
-    # @return [void]
-    def dependency(val)
-      @dependencies << val
-    end
-
-    # Add a package that is a runtime dependency of this
-    # project.
-    #
-    # This is distinct from a build-time dependency, which should
-    # correspond to an Omnibus software definition.
-    #
-    # Corresponds to the `--depends` flag of
-    # {https://github.com/jordansissel/fpm fpm}.
-    #
-    # @param val [String] the name of the runtime dependency
-    # @return [void]
-    def runtime_dependency(val)
-      @runtime_dependencies << val
-    end
-
-    # Set or retrieve the list of software dependencies for this
-    # project.  As this is a DSL method, only pass the names of
-    # software components, not {Omnibus::Software} objects.
-    #
-    # These is the software that comprises your project, and is
-    # distinct from runtime dependencies.
-    #
-    # @note This will reinitialize the internal depdencies Array
-    #   and overwrite any dependencies that may have been set using
-    #   {#dependency}.
-    #
-    # @param val [Array<String>] a list of names of Software components
-    # @return [Array<String>]
-    def dependencies(val = NULL_ARG)
-      @dependencies = val unless val.equal?(NULL_ARG)
-      @dependencies
-    end
-
-    # Add a new exclusion pattern.
-    #
-    # Corresponds to the `--exclude` flag of {https://github.com/jordansissel/fpm fpm}.
-    #
-    # @param pattern [String]
-    # @return void
-    def exclude(pattern)
-      @exclusions << pattern
-    end
-
-    # Add a config file.
-    #
-    # @param val [String] the name of a config file of your software
-    # @return [void]
-    def config_file(val)
-      @config_files << val
-    end
-
-    # Add other files or dirs outside of install_path
-    #
-    # @param val [String] the name of a dir or file to include in build
-    # @return [void]
-    # NOTE: This option is currently only supported with FPM based package
-    # builds such as RPM, DEB and .sh (makeselfinst).  This isn't supported
-    # on Mac OSX packages, Windows MSI, AIX and Solaris
-    def extra_package_file(val)
-      @extra_package_files << val
-    end
-
-    # Set or retrieve the array of files and directories used to
-    # build this project. If you use this to write, only pass the
-    # full path to the dir or file you want included in the omnibus
-    # package build.
-    #
-    # @note - similar to the depdencies array - this will reinitialize
-    # the files array and overwrite and dependencies that were set using
-    # {#file}.
-    #
-    # @param val [Array<String>] a list of names of Software components
-    # @return [Array<String>]
-    def extra_package_files(val = NULL_ARG)
-      @extra_package_files = val unless val.equal?(NULL_ARG)
-      @extra_package_files
     end
 
     # Returns the platform version of the machine on which Omnibus is

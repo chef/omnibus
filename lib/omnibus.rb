@@ -43,6 +43,7 @@ module Omnibus
   autoload :Library,          'omnibus/library'
   autoload :Logger,           'omnibus/logger'
   autoload :Logging,          'omnibus/logging'
+  autoload :Nullable,         'omnibus/nullable'
   autoload :NullBuilder,      'omnibus/null_builder'
   autoload :Ohai,             'omnibus/ohai'
   autoload :Overrides,        'omnibus/overrides'
