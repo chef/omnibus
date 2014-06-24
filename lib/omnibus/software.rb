@@ -20,173 +20,467 @@ require 'uri'
 module Omnibus
   # Omnibus software DSL reader
   class Software
-    include Logging
-    include Sugarable
-
-    NULL_ARG = Object.new
-    UNINITIALIZED = Object.new
-
-    # It appears that this is not used
-    attr_reader :builder
-
-    # @todo Why do we apparently use two different ways of
-    #   implementing what are effectively the same DSL methods?  Compare
-    #   with Omnibus::Project.
-    attr_reader :description
-
-    # @todo This doesn't appear to be used at all
-    attr_reader :fetcher
-
-    attr_reader :project
-
-    attr_reader :version
-
-    attr_reader :overrides
-
-    attr_reader :whitelist_files
-
-    attr_reader :source_config
-
-    def self.load(filename, project, repo_overrides = {})
-      new(IO.read(filename), filename, project, repo_overrides)
+    class << self
+      #
+      # @param [Project] project
+      #   the project that loaded this software definition
+      # @param [String] filepath
+      #   the path to the software definition to load from disk
+      # @param [hash] overrides
+      #   a list of software overrides
+      #
+      # @return [Software]
+      #
+      def load(project, filepath, overrides = {})
+        instance = new(project, overrides, filepath)
+        instance.evaluate_file(filepath)
+        instance
+      end
     end
 
-    # @param io [String]
-    # @param filename [String]
-    # @param project [???] Is this a string or an Omnibus::Project?
-    # @param repo_overrides [Hash]
-    #
-    # @see Omnibus::Overrides
-    #
-    # @todo See comment on {Omnibus::NullBuilder}
-    # @todo does `filename` need to be absolute, or does it matter?
-    # @todo Any reason to not have this just take a filename,
-    #   project, and override hash directly?  That is, why io AND a
-    #   filename, if the filename can always get you the contents you
-    #   need anyway?
-    def initialize(io, filename, project, repo_overrides = {})
-      @version          = nil
-      @overrides        = UNINITIALIZED
-      @name             = nil
-      @description      = nil
-      @source           = nil
-      @relative_path    = nil
-      @source_uri       = nil
-      @source_config    = filename
-      @project          = project
-      @always_build     = false
-      @repo_overrides   = repo_overrides
+    include Cleanroom
+    include Logging
+    include Nullable
+    include Sugarable
 
-      # Seems like this should just be Builder.new(self) instead
-      @builder = NullBuilder.new(self)
+    # It appears that this is not used
+    attr_reader :fetcher
+    attr_reader :whitelist_files
+    attr_reader :filepath
 
+    #
+    # Create a new software object.
+    #
+    # @param [String] NullBuilder.new(self)
+    # @param [Project] project
+    #   the Omnibus project that instantiated this software definition
+    # @param [Hash] repo_overrides
+    #   @see Omnibus::Overrides
+    # @param [String] filepath
+    #   the path to where this software definition lives on disk
+    #
+    # @return [Software]
+    #
+    def initialize(project, repo_overrides = {}, filepath = nil)
+      unless project.is_a?(Project)
+        raise ArgumentError,
+          "`project' must be a kind of `Omnibus::Project', but was `#{project.class.inspect}'!"
+      end
+
+      # Magical methods
+      @filepath = filepath
+      @project  = project
+
+      # Overrides
+      @overrides      = NULL
+      @repo_overrides = repo_overrides
+
+      # Internal data structure that the DSL uses
+      @source = {}
       @dependencies = []
       @whitelist_files = []
-      instance_eval(io, filename)
+    end
+
+    #
+    # The builder for this softare. This defaults to a {NullBuilder}, but
+    # can be specified using the {#build} DSL method.
+    #
+    # @return [Builder]
+    #
+    def builder
+      @builder ||= NullBuilder.new(self)
     end
 
     def <=>(other)
       self.name <=> other.name
     end
 
-    # Retrieves the override_version
+    #
+    # @!group DSL methods
+    #
+    # The following DSL methods are available from within software definitions.
+    # --------------------------------------------------
+
+    #
+    # The project that created this software.
+    #
+    # @return [Project]
+    #
+    def project
+      @project
+    end
+    expose :project
+
+    #
+    # Retrieves the overriden version.
+    #
+    # @deprecated Use {#version} or test with {#overridden?} instead.
     #
     # @return [Hash]
     #
-    # @todo: can't we just use #version here or are we testing this against nil? somewhere and
-    #        not using #overridden?
     def override_version
       log.deprecated(log_key) do
         'Software#override_version. Please use #version or ' \
-        'test  with #overridden?'
+        'test with #overridden?'
       end
 
       overrides[:version]
     end
+    expose :override_version
 
-    # Retrieves the repo-level and project-level overrides for the software.
     #
-    # @return [Hash]
-    def overrides
-      # deliberately not providing a setter since that feels like a shotgun pointed at a foot
-      if @overrides == UNINITIALIZED
-        # lazily initialized because we need the 'name' to be parsed first
-        @overrides = {}
-        @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
-        if @repo_overrides[name]
-          @overrides[:version] = @repo_overrides[name]
-        end
-      end
-      @overrides
-    end
-
-    # Sets or retreives the name of the software
+    # **[Required]** Sets or retreives the name of the software.
     #
-    # @param val [String] name of the Software
+    # @example
+    #   name 'libxslt'
+    #
+    # @param [String] val
+    #   name of the Software
+    #
     # @return [String]
-    def name(val = NULL_ARG)
-      @name = val unless val.equal?(NULL_ARG)
-      @name || raise(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
-    end
-
-    # Sets the description of the software
     #
-    # @param val [String] description of the Software
-    # @return [void]
-    def description(val)
-      @description = val
+    def name(val = NULL)
+      if null?(val)
+        @name || raise(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
+      else
+        @name = val
+      end
     end
+    expose :name
 
-    # Add an Omnibus software dependency.
     #
-    # @param val [String] the name of a Software dependency
-    # @return [void]
+    # Sets the description of the software.
+    #
+    # @example
+    #   description 'Installs libxslt'
+    #
+    # @param [String] val
+    #   the description of the software
+    #
+    # @return [String]
+    #
+    def description(val = NULL)
+      if null?(val)
+        @description
+      else
+        @description = val
+      end
+    end
+    expose :description
+
+    #
+    # Always build the given software definition.
+    #
+    # @param [true, false] val
+    #
+    # @return [true, false]
+    #
+    def always_build(val)
+      @always_build = val
+      @always_build
+    end
+    expose :always_build
+
+    #
+    # Add a software dependency to this software.
+    #
+    # @example
+    #   dependency 'libxml2'
+    #   dependency 'libpng'
+    #
+    # @param [String] val
+    #   the name of a software dependency
+    #
+    # @return [Array<String>]
+    #   the list of current dependencies
+    #
     def dependency(val)
       @dependencies << val
+      @dependencies.dup
     end
+    expose :dependency
 
-    # Set or retrieve the list of software dependencies for this
-    # project.  As this is a DSL method, only pass the names of
-    # software components, not {Omnibus::Software} objects.
     #
-    # These is the software that comprises your project, and is
-    # distinct from runtime dependencies.
+    # Set or retrieve the list of software dependencies for this project.
+    # As this is a DSL method, only pass the names of software components, not
+    # {Software} objects.
     #
-    # @note This will reinitialize the internal depdencies Array
-    #   and overwrite any dependencies that may have been set using
-    #   {#dependency}.
+    # These is the software that comprises your project, and is distinct from
+    # runtime dependencies.
     #
-    # @param val [Array<String>] a list of names of Software components
+    # @note This will reinitialize the internal depdencies Array and overwrite
+    # any dependencies that may have been set using {#dependency}.
+    #
+    # @example
+    #   dependencies 'libxslt', 'libpng'
+    #
+    # @param [Array<String>] val
+    #   the list of names of software components
+    #
     # @return [Array<String>]
-    def dependencies(val = NULL_ARG)
-      @dependencies = val unless val.equal?(NULL_ARG)
-      @dependencies
+    #
+    def dependencies(*args)
+      if args.empty?
+        @dependencies
+      else
+        @dependencies = Array(args).flatten.compact
+      end
     end
+    expose :dependencies
 
-    # Set or retrieve the source for the software
     #
-    # @param val [Hash<Symbol, String>] a single key/pair that defines
-    #   the kind of source and a path specifier
-    # @option val [String] :git (nil) a Git URL
-    # @option val [String] :url (nil) a general URL
-    # @option val [String] :path (nil) a fully-qualified local file system path
+    # Set or retrieve the source for the software.
     #
-    # @todo Consider changing this to accept two arguments instead
-    # @todo This should throw an error if an invalid key is given, or
-    #   if more than one pair is given
-    def source(val = NULL_ARG)
-      unless val.equal?(NULL_ARG)
-        @source ||= {}
+    # @raise [InvalidValue]
+    #   if the parameter is not a Hash
+    # @raise [InvalidValue]
+    #   if the hash includes extraneous keys
+    # @raise [InvalidValue]
+    #   if the hash declares keys that cannot work together
+    #   (like +:git+ and +:path+)
+    #
+    # @example
+    #   source url: 'http://ftp.gnu.org/gnu/autoconf/autoconf-2.68.tar.gz',
+    #          md5: 'c3b5247592ce694f7097873aa07d66fe'
+    #
+    # @param [Hash<Symbol, String>] val
+    #   a single key/pair that defines the kind of source and a path specifier
+    #
+    # @option val [String] :git (nil)
+    #   a git URL
+    # @option val [String] :url (nil)
+    #   general URL
+    # @option val [String] :path (nil)
+    #   a fully-qualified local file system path
+    # @option val [String] :md5 (nil)
+    #   the checksum of the downloaded artifact
+    #
+    # @return [Hash]
+    #
+    def source(val = NULL)
+      unless null?(val)
+        unless val.is_a?(Hash)
+          raise InvalidValue.new(:source,
+            "be a kind of `Hash', but was `#{val.class.inspect}'")
+        end
+
+        extra_keys = val.keys - [:git, :path, :url, :md5]
+        unless extra_keys.empty?
+          raise InvalidValue.new(:source,
+            "only include valid keys. Invalid keys: #{extra_keys.inspect}")
+        end
+
+        duplicate_keys = val.keys & [:git, :path, :url]
+        unless duplicate_keys.size < 2
+          raise InvalidValue.new(:source,
+            "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
+        end
+
         @source.merge!(val)
       end
+
       apply_overrides(:source)
     end
+    expose :source
 
-    # Retieve the default_version of the software
+    #
+    # Set or retieve the {#default_version} of the software to build.
+    #
+    # @example
+    #   default_version '1.2.3'
+    #
+    # @param [String] val
+    #   the default version to set for the software
     #
     # @return [String]
     #
-    # @todo: remove this in favor of default_version
+    def default_version(val = NULL)
+      if null?(val)
+        @version
+      else
+        @version = val
+      end
+    end
+    expose :default_version
+
+    #
+    # Evaluate a block only if the version matches.
+    #
+    # @example
+    #   version '1.2.3' do
+    #     source path: '/local/path/to/software-1.2.3'
+    #   end
+    #
+    # @deprecated passing only a string without a block to set the version is
+    #   deprecated. Please use {#default_version} instead.
+    #
+    # @param [String] val
+    #   the version of the software
+    #
+    # @param [Proc] block
+    #   the block to run if the version we are building matches the argument
+    #
+    # @return [String, Proc]
+    #
+    def version(val = NULL)
+      if block_given?
+        if val.equal?(NULL)
+          raise InvalidValue.new(:version,
+            'pass a block when given a version argument')
+        else
+          if val == apply_overrides(:version)
+            yield
+          end
+        end
+      else
+        unless val.equal?(NULL)
+          log.deprecated(log_key) do
+            'Software#version. Please use #default_version instead.'
+          end
+          @version = val
+        end
+      end
+
+      apply_overrides(:version)
+    end
+    expose :version
+
+    #
+    # Add a file to the healthcheck whitelist.
+    #
+    # @example
+    #   whitelist_file '/path/to/file'
+    #
+    # @param [String, Regexp] file
+    #   the name of a file to ignore in the healthcheck
+    #
+    # @return [Array<String>]
+    #   the list of currently whitelisted files
+    #
+    def whitelist_file(file)
+      file = Regexp.new(file) unless file.kind_of?(Regexp)
+      @whitelist_files << file
+      @whitelist_files.dup
+    end
+    expose :whitelist_file
+
+    #
+    # The relative path inside the extracted tarball.
+    #
+    # @example
+    #   relative_path 'example-1.2.3'
+    #
+    # @param [String] relative_path
+    #   the relative path inside the tarball
+    #
+    # @return [String]
+    #
+    def relative_path(val = NULL)
+      if null?(val)
+        @relative_path ||= name
+      else
+        @relative_path = val
+      end
+    end
+    expose :relative_path
+
+    #
+    # The path where this software is installed on disk.
+    #
+    # @deprecated Use {#install_path} instead
+    #
+    # @return [String]
+    #
+    def install_dir
+      log.deprecated(log_key) do
+        'Software#install_dir. Please use #install_path instead.'
+      end
+
+      install_path
+    end
+    expose :install_dir
+
+    #
+    # The path where this software is installed on disk.
+    #
+    # @example
+    #   { 'PATH' => "#{install_dir}/embedded/bin:#{ENV["PATH"]}", }
+    #
+    # @see Project#install_path
+    #
+    # @return [String]
+    #
+    def install_path
+      @project.install_path
+    end
+    expose :install_path
+
+    #
+    # Returns the platform of the machine on which Omnibus is running, as
+    # determined by Ohai.
+    #
+    # @deprecated Use {Ohai.platform} instead.
+    #
+    # @return [String]
+    #
+    def platform
+      log.deprecated(log_key) do
+        'Software#platform. Please use Ohai.platform instead.'
+      end
+
+      Ohai.platform
+    end
+    expose :platform
+
+    #
+    # Return the architecture of the machine, as determined by Ohai.
+    #
+    # @deprecated Will not be replaced.
+    #
+    # @return [String]
+    #   Either "sparc" or "intel", as appropriate
+    #
+    def architecture
+      log.deprecated(log_key) do
+        'Software#architecture. Please use Ohai.kernel.machine instead.'
+      end
+
+      Ohai.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
+    end
+    expose :architecture
+
+    #
+    # Define a series of {Builder} DSL commands that are required to build the
+    # software.
+    #
+    # @see Builder
+    #
+    # @param [Proc] block
+    #   a block of build commands
+    #
+    # @return [Builder]
+    #   the builder instance
+    #
+    # @todo Seems like this renders the setting of @builder in the initializer
+    #   moot
+    #
+    def build(&block)
+      @builder = Builder.new(self, &block)
+      @builder
+    end
+    expose :build
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
+    # Retieve the {#default_version} of the software.
+    #
+    # @deprecated Use {#default_version} instead.
+    #
+    # @return [String]
+    #
     def given_version
       log.deprecated(log_key) do
         'Software#given_version. Please use #default_version instead.'
@@ -195,52 +489,21 @@ module Omnibus
       default_version
     end
 
-    # Set or retieve the default_version of the software to build
     #
-    # @param val [String]
-    # @return [String]
-    def default_version(val = NULL_ARG)
-      @version = val unless val.equal?(NULL_ARG)
-      @version
-    end
-
-    # Evaluate a block only if the version matches.
+    # Retrieves the repo-level and project-level overrides for the software.
     #
-    # Note that passing only a string without a block will set the default_version but this
-    # behavior is deprecated and will be removed, use the default_version method instead.
+    # @return [Hash]
     #
-    # @param val [String] version of the software.
-    # @param block [Proc] block to run if the version we are building matches the argument.
-    # @return [void]
-    #
-    # @todo remove deprecated setting of version
-    def version(val = NULL_ARG)
-      if block_given?
-        if val.equal?(NULL_ARG)
-          raise 'block needs a version argument to apply against'
-        else
-          if val == apply_overrides(:version)
-            yield
-          end
-        end
-      else
-        unless val.equal?(NULL_ARG)
-          log.deprecated(log_key) do
-            'Software#version. Please use #default_version instead.'
-          end
-          @version = val
+    def overrides
+      if null?(@overrides)
+        # lazily initialized because we need the 'name' to be parsed first
+        @overrides = {}
+        @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
+        if @repo_overrides[name]
+          @overrides[:version] = @repo_overrides[name]
         end
       end
-      apply_overrides(:version)
-    end
-
-    # Add an Omnibus software dependency.
-    #
-    # @param file [String, Regexp] the name of a file to ignore in the healthcheck
-    # @return [void]
-    def whitelist_file(file)
-      file = Regexp.new(file) unless file.kind_of?(Regexp)
-      @whitelist_files << file
+      @overrides
     end
 
     # Was this software version overridden externally, relative to the
@@ -271,12 +534,6 @@ module Omnibus
       end
     end
 
-    # @todo Judging by existing usage, this should sensibly default to
-    #   the name of the software, since that's what it effectively does down in #project_dir
-    def relative_path(val)
-      @relative_path = val
-    end
-
     # @todo Code smell... this only has meaning if the software was
     #   defined with a :uri, and this is only used in
     #   {Omnibus::NetFetcher}.  This responsibility is distributed
@@ -285,15 +542,6 @@ module Omnibus
     # @todo Why the caching of the URI?
     def source_uri
       @source_uri ||= URI(source[:url])
-    end
-
-    # @param val [Boolean]
-    # @return void
-    #
-    # @todo Doesn't necessarily need to be a Boolean if #always_build?
-    #   uses !! operator
-    def always_build(val)
-      @always_build = val
     end
 
     # @return [Boolean]
@@ -339,13 +587,6 @@ module Omnibus
     # @return [String] an absolute filesystem path
     def build_dir
       "#{config.build_dir}/#{@project.name}"
-    end
-
-    # @todo Why the different name (i.e. *_dir instead of *_path, or
-    #   vice versa?)  Given the patterns that are being set up
-    #   elsewhere, this is just confusing inconsistency.
-    def install_dir
-      @project.install_path
     end
 
     # @!endgroup
@@ -401,39 +642,6 @@ module Omnibus
         parts = path.split('/') - ['']
         parts.join('_')
       end
-    end
-
-    # Define a series of {Omnibus::Builder} DSL commands that are
-    # required to successfully build the software.
-    #
-    # @param block [block] a block of build commands
-    # @return void
-    #
-    # @see Omnibus::Builder
-    #
-    # @todo Not quite sure the proper way to document a "block"
-    #   parameter in Yard
-    # @todo Seems like this renders the setting of @builder in the
-    #   initializer moot
-    # @todo Rename this to something like "build_commands", since it
-    #   doesn't actually do any building
-    def build(&block)
-      @builder = Builder.new(self, &block)
-    end
-
-    # Returns the platform of the machine on which Omnibus is running,
-    # as determined by Ohai.
-    #
-    # @return [String]
-    def platform
-      Ohai.platform
-    end
-
-    # Return the architecture of the machine, as determined by Ohai.
-    # @return [String] Either "sparc" or "intel", as appropriate
-    # @todo Is this used?  Doesn't appear to be...
-    def architecture
-      Ohai.kernel['machine'] =~ /sun/ ? 'sparc' : 'intel'
     end
 
     # Actually build the software package
