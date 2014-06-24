@@ -388,7 +388,7 @@ module Omnibus
         raise MissingProjectDependency.new(dependency_name, software_dirs)
       end
 
-      dep_software = Omnibus::Software.load(dep_file, project, overrides)
+      dep_software = Software.load(project, dep_file, overrides)
 
       # load any transitive deps for the component into the library also
       dep_software.dependencies.each do |dep|
