@@ -546,9 +546,8 @@ module Omnibus
 
     # @return [Boolean]
     def always_build?
-      return true if project.dirty_cache
-      # Should do !!(@always_build)
-      @always_build
+      return true if project.dirty?
+      !!@always_build
     end
 
     # @todo Code smell... this only has meaning if the software was
@@ -825,7 +824,7 @@ module Omnibus
       log.info(log_key) { 'Caching build' }
       Omnibus::InstallPathCache.new(install_dir, self).incremental
       log.info(log_key) { 'Dirtied the cache!' }
-      project.dirty_cache = true
+      project.dirty!
     end
 
     def touch(file)

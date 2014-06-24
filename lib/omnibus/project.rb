@@ -49,7 +49,6 @@ module Omnibus
     include Util
 
     attr_reader :library
-    attr_accessor :dirty_cache
     attr_accessor :build_version_dsl
     attr_reader :resources_path
 
@@ -80,12 +79,31 @@ module Omnibus
       @extra_package_files = []
       @dependencies = []
       @runtime_dependencies = []
-      @dirty_cache = false
 
       # TODO: validate right before building instead
       # validate
 
-      @library = Omnibus::Library.new(self)
+      @library = Library.new(self)
+    end
+
+    #
+    # Dirty the cache for this project. This can be called by other projects,
+    # install path cache, or software definitions to invalidate the cache for
+    # this project.
+    #
+    # @return [true, false]
+    #
+    def dirty!
+      @dirty = true
+    end
+
+    #
+    # Determine if the cache for this project is dirty.
+    #
+    # @return [true, false]
+    #
+    def dirty?
+      !!@dirty
     end
 
     def <=>(other)

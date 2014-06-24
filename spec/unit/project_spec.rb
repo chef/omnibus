@@ -47,6 +47,31 @@ module Omnibus
       end
     end
 
+    describe '#dirty!' do
+      it 'dirties the cache' do
+        subject.instance_variable_set(:@dirty, nil)
+        subject.dirty!
+        expect(subject).to be_dirty
+      end
+    end
+
+    describe '#dirty?' do
+      it 'returns true by default' do
+        subject.instance_variable_set(:@dirty, nil)
+        expect(subject).to_not be_dirty
+      end
+
+      it 'returns true when the cache is dirty' do
+        subject.instance_variable_set(:@dirty, true)
+        expect(subject).to be_dirty
+      end
+
+      it 'returns false when the cache is not dirty' do
+        subject.instance_variable_set(:@dirty, false)
+        expect(subject).to_not be_dirty
+      end
+    end
+
     describe '#<=>' do
       it 'compares projects by name' do
         list = [
