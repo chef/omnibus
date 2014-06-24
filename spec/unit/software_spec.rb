@@ -293,7 +293,7 @@ module Omnibus
       let(:default_version) { '1.2.6' }
 
       def get_version_for_cache(expected_version)
-        software.stub(:fetcher).and_return(fetcher)
+        software.instance_variable_set(:@fetcher, fetcher)
         expect(software.version_for_cache).to eq(expected_version)
       end
 
