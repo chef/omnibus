@@ -825,6 +825,16 @@ module Omnibus
 
     private
 
+    #
+    # Determine if this software should always be built.
+    #
+    # @return [true, false]
+    #
+    def always_build?
+      return true if project.dirty?
+      !!@always_build
+    end
+
     def path_key
       # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
       # $WINDOWSRAGE, and if you don't set that your native gem compiles
