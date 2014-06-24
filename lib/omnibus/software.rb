@@ -578,11 +578,6 @@ module Omnibus
       Fetcher.for(self).version_guid
     end
 
-    # @todo Define as a delegator
-    def build_version
-      @project.build_version
-    end
-
     # Returns the version to be used in cache.
     def version_for_cache
       if @fetcher
