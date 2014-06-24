@@ -439,6 +439,56 @@ module Omnibus
     expose :build
 
     #
+    # The source directory.
+    #
+    # @deprecated Use {Config.source_dir} instead
+    #
+    # @return [String]
+    #
+    def source_dir
+      log.deprecated(log_key) do
+        'source_dir (DSL). Please use Config.source_dir instead.'
+      end
+
+      Config.source_dir
+    end
+    expose :source_dir
+
+    #
+    # The cache directory.
+    #
+    # @deprecated Use {Config.cache_dir} instead
+    #
+    # @return [String]
+    #
+    def cache_dir
+      log.deprecated(log_key) do
+        'cache_dir (DSL). Please use Config.cache_dir instead.'
+      end
+
+      Config.cache_dir
+    end
+    expose :cache_dir
+
+    #
+    # Convenience method for accessing the global Omnibus configuration object.
+    #
+    # @deprecated Use {Config} instead
+    #
+    # @return Config
+    #
+    # @see Config
+    #
+    def config
+      log.deprecated(log_key) do
+        'config (DSL). Please use Config.(thing) instead (capital C).'
+      end
+
+      Config
+    end
+    expose :config
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -567,27 +617,7 @@ module Omnibus
       source[:md5]
     end
 
-    # @todo Should this ever be legitimately used in the DSL?  It
-    #   seems that that facility shouldn't be provided, and thus this
-    #   should be made a private function (if it even really needs to
-    #   exist at all).
-    def config
-      log.deprecated(log_key) do
-        'config (DSL). Please use Config.(thing) instead (capital C).'
-      end
-
-      Config
-    end
-
     # @!group Directory Accessors
-
-    def source_dir
-      config.source_dir
-    end
-
-    def cache_dir
-      config.cache_dir
-    end
 
     # The directory that the software will be built in
     #
@@ -613,7 +643,7 @@ module Omnibus
     #   happen.
     def project_file
       filename = source_uri.path.split('/').last
-      "#{cache_dir}/#{filename}"
+      "#{Config.cache_dir}/#{filename}"
     end
 
     # @todo this would be simplified and clarified if @relative_path
@@ -621,7 +651,7 @@ module Omnibus
     # @todo Move this up with the other *_dir methods for better
     #   logical grouping
     def project_dir
-      @relative_path ? "#{source_dir}/#{@relative_path}" : "#{source_dir}/#{@name}"
+      @relative_path ? "#{Config.source_dir}/#{@relative_path}" : "#{Config.source_dir}/#{@name}"
     end
 
     # The name of the sentinel file that marks the most recent fetch
@@ -674,7 +704,7 @@ module Omnibus
     # Fetch the software
     def fetch_me
       # Create the directories we need
-      [build_dir, source_dir, cache_dir, project_dir].each do |dir|
+      [build_dir, Config.source_dir, Config.cache_dir, project_dir].each do |dir|
         FileUtils.mkdir_p dir
       end
 
