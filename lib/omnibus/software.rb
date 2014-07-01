@@ -474,7 +474,7 @@ module Omnibus
       env ||= {}
       opts ||= {}
       compiler_flags =
-        case platform
+        case Ohai['platform']
         when "aix"
           cc_flags =
             if opts[:aix] && opts[:aix][:use_gcc]
@@ -530,7 +530,7 @@ module Omnibus
         {
           "LD_OPTIONS" => "-R#{install_path}/embedded/lib"
         }
-      ) if platform == "solaris2"
+      ) if Ohai['platform'] == "solaris2"
       env.merge(compiler_flags).
         merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
