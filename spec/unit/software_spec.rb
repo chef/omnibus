@@ -7,6 +7,7 @@ module Omnibus
 
     let(:project) {
       project = double(Project,
+        name: 'chef',
         install_path: '/monkeys',
         overrides: {}
       )
@@ -18,180 +19,285 @@ module Omnibus
       project
     }
 
-    let(:software) { Software.load(project, software_file) }
+    subject { Software.load(project, software_file) }
 
     before do
       allow_any_instance_of(Software).to receive(:render_tasks)
-      stub_ohai(platform: 'linux')
     end
+
+    it_behaves_like 'a cleanroom getter', :project
+    it_behaves_like 'a cleanroom getter', :override_version
+    it_behaves_like 'a cleanroom setter', :name, 'libxml2'
+    it_behaves_like 'a cleanroom setter', :description, 'The XML magician'
+    it_behaves_like 'a cleanroom setter', :always_build, true
+    it_behaves_like 'a cleanroom setter', :dependency, 'libxslt'
+    it_behaves_like 'a cleanroom setter', :source, { url: 'https://source.example.com' }
+    it_behaves_like 'a cleanroom setter', :default_version, '1.2.3'
+    it_behaves_like 'a cleanroom setter', :version, '1.2.3'
+    it_behaves_like 'a cleanroom setter', :whitelist_file, '/opt/whatever'
+    it_behaves_like 'a cleanroom setter', :relative_path, '/path/to/extracted'
+    it_behaves_like 'a cleanroom getter', :project_dir
+    it_behaves_like 'a cleanroom getter', :build_dir
+    it_behaves_like 'a cleanroom getter', :install_dir
+    it_behaves_like 'a cleanroom getter', :install_path
+    it_behaves_like 'a cleanroom getter', :platform
+    it_behaves_like 'a cleanroom getter', :architecture
+    it_behaves_like 'a cleanroom getter', :build
+    it_behaves_like 'a cleanroom getter', :with_standard_compiler_flags
+    it_behaves_like 'a cleanroom getter', :source_dir
+    it_behaves_like 'a cleanroom getter', :cache_dir
+    it_behaves_like 'a cleanroom getter', :config
 
     describe "with_standard_compiler_flags helper" do
       context "on ubuntu" do
-        before do
-          stub_ohai(platform: 'ubuntu')
+        before { stub_ohai(platform: 'ubuntu', version: '12.04') }
+
+        it "sets the defaults" do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
+            'CFLAGS'          => '-I/monkeys/embedded/include',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
         end
-        it "should set the defaults" do
-          expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
+        it 'ovesrride LDFLAGS' do
+          expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
+            'CFLAGS'          => '-I/monkeys/embedded/include',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
         end
-        it "should override LDFLAGS" do
-          expect(software.with_standard_compiler_flags("LDFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
+        it 'ovesrride CFLAGS' do
+          expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
+            'CFLAGS'          => '-I/monkeys/embedded/include',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
         end
-        it "should override CFLAGS" do
-          expect(software.with_standard_compiler_flags("CFLAGS"=>"foo")).to eq("LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
-        end
-        it "should preserve anything else" do
-          expect(software.with_standard_compiler_flags("numberwang"=>4)).to eq("numberwang"=>4,"LDFLAGS"=>"-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH" => "/monkeys/embedded/lib", "PKG_CONFIG_PATH" => "/monkeys/embedded/lib/pkgconfig")
-        end
-      end
-      context "on solaris2" do
-        before do
-          stub_ohai(platform: 'solaris2')
-        end
-        it "should set the defaults" do
-          expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "LD_OPTIONS"=>"-R/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
-        end
-      end
-      context "on mac_os_x" do
-        before do
-          stub_ohai(platform: 'mac_os_x')
-        end
-        it "should set the defaults" do
-          expect(software.with_standard_compiler_flags).to eq("LDFLAGS"=>"-L/monkeys/embedded/lib", "CFLAGS"=>"-I/monkeys/embedded/include", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
-        end
-      end
-      context "on aix" do
-        before do
-          stub_ohai(platform: 'aix')
-        end
-        it "should set the defaults" do
-          expect(software.with_standard_compiler_flags).to eq("CC"=>"xlc -q64", "CXX"=>"xlC -q64", "CFLAGS"=>"-q64 -I/monkeys/embedded/include -O", "LDFLAGS"=>"-q64 -L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib", "LD"=>"ld -b64", "OBJECT_MODE"=>"64", "ARFLAGS"=>"-X64 cru", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
+        it 'presserve anything else' do
+          expect(subject.with_standard_compiler_flags('numberwang'=>4)).to eq(
+            'numberwang'      => 4,
+            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
+            'CFLAGS'          => '-I/monkeys/embedded/include',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
         end
       end
-      context "on aix with gcc" do
+
+      context 'on solaris2' do
         before do
-          stub_ohai(platform: 'aix')
+          stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+            # For some reason, this isn't set in Fauxhai
+            data['platform'] = 'solaris2'
+          end
         end
-        it "should set the defaults" do
-          expect(software.with_standard_compiler_flags(nil, :aix => { :use_gcc => true })).to eq("CC"=>"gcc -maix64", "CXX"=>"g++ -maix64", "CFLAGS"=>"-maix64 -O -I/monkeys/embedded/include", "LDFLAGS"=>"-L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib", "LD"=>"ld -b64", "OBJECT_MODE"=>"64", "ARFLAGS"=>"-X64 cru", "LD_RUN_PATH"=>"/monkeys/embedded/lib", "PKG_CONFIG_PATH"=>"/monkeys/embedded/lib/pkgconfig")
+
+        it 'sets the defaults' do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'LDFLAGS'         => '-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc',
+            'CFLAGS'          => '-I/monkeys/embedded/include',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'LD_OPTIONS'      => '-R/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
+        end
+      end
+
+      context 'on mac_os_x' do
+        before { stub_ohai(platform: 'mac_os_x', version: '10.9.2') }
+
+        it 'sets the defaults' do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'LDFLAGS'         => '-L/monkeys/embedded/lib',
+            'CFLAGS'          => '-I/monkeys/embedded/include',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
+        end
+      end
+
+      context 'on aix' do
+        before do
+          # There's no AIX in Fauxhai :(
+          stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+            data['platform'] = 'aix'
+          end
+        end
+
+        it 'sets the defaults' do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'CC'              => 'xlc -q64',
+            'CXX'             => 'xlC -q64',
+            'CFLAGS'          => '-q64 -I/monkeys/embedded/include -O',
+            'LDFLAGS'         => '-q64 -L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib',
+            'LD'              => 'ld -b64',
+            'OBJECT_MODE'     => '64',
+            'ARFLAGS'         => '-X64 cru',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
+        end
+      end
+
+      context 'on aix with gcc' do
+        before do
+          # There's no AIX in Fauxhai :(
+          stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+            data['platform'] = 'aix'
+          end
+        end
+
+        it 'sets the defaults' do
+          expect(subject.with_standard_compiler_flags(nil, aix: { use_gcc: true })).to eq(
+            'CC'              => 'gcc -maix64',
+            'CXX'             => 'g++ -maix64',
+            'CFLAGS'          => '-maix64 -O -I/monkeys/embedded/include',
+            'LDFLAGS'         => '-L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib',
+            'LD'              => 'ld -b64',
+            'OBJECT_MODE'     => '64',
+            'ARFLAGS'         => '-X64 cru',
+            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
+            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+          )
         end
       end
     end
 
-    describe "path helpers" do
+    describe 'path helpers' do
       before do
-        stub_const("File::PATH_SEPARATOR", separator)
-        ENV.stub(:[]).and_call_original
-        ENV.stub(:[]).with("PATH").and_return(path)
+        stub_const('File::PATH_SEPARATOR', separator)
+        stub_env('PATH', path)
       end
 
-      context "on *NIX" do
-        let(:separator) { ":" }
-        let(:path) { "/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin" }
+      context 'on *NIX' do
+        let(:separator) { ':' }
+        let(:path) { '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin' }
 
-        it "prepends a path to PATH" do
-          expect(software.prepend_path("/foo/bar")).to eq("/foo/bar:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+        it 'prepends a path to PATH' do
+          expect(subject.prepend_path('/foo/bar')).to eq(
+            '/foo/bar:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+          )
         end
 
-        it "prepends the embedded bin to PATH" do
-          expect(software.with_embedded_path).to eq("PATH" => "/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+        it 'prepends the embedded bin to PATH' do
+          expect(subject.with_embedded_path).to eq(
+            'PATH' => '/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+          )
         end
 
-        it "with_embedded_path merges with a hash argument" do
-          expect(software.with_embedded_path("numberwang" => 4)).to eq("numberwang" => 4, "PATH" => "/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+        it 'with_embedded_path merges with a hash argument' do
+          expect(subject.with_embedded_path('numberwang' => 4)).to eq(
+            'numberwang' => 4,
+            'PATH' => '/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+          )
         end
 
-        it "prepends multiple paths to PATH" do
-          expect(software.prepend_path("/foo/bar", "/foo/baz"))
-            .to eq("/foo/bar:/foo/baz:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin")
+        it 'prepends multiple paths to PATH' do
+          expect(subject.prepend_path('/foo/bar', '/foo/baz')).to eq(
+            '/foo/bar:/foo/baz:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+          )
         end
       end
 
-      context "on Windows" do
+      context 'on Windows' do
         before do
-          stub_ohai(platform: 'windows')
-          project.stub(:install_path).and_return("c:/monkeys")
-          ENV.stub(:[]).with("Path").and_return(windows_path)
+          stub_ohai(platform: 'windows', version: '2012')
+          project.stub(:install_path).and_return('c:/monkeys')
+          stub_env('Path', windows_path)
         end
 
-        let(:separator) { ";" }
-        let(:path) { "c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
-        let(:windows_path) { "c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
+        let(:separator) { ';' }
+        let(:path) { 'c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem' }
+        let(:windows_path) { 'c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem' }
 
         it "prepends a path to PATH" do
-          expect(software.prepend_path("c:/foo/bar")).to eq("c:/foo/bar;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+          expect(subject.prepend_path('c:/foo/bar')).to eq(
+            'c:/foo/bar;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
+          )
         end
 
-        it "prepends the embedded bin to PATH" do
-          expect(software.with_embedded_path).to eq("Path" => "c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+        it 'prepends the embedded bin to PATH' do
+          expect(subject.with_embedded_path).to eq(
+            'Path' => 'c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
+          )
         end
 
-        it "with_embedded_path merges with a hash argument" do
-          expect(software.with_embedded_path("numberwang" => 4)).to eq("numberwang" => 4, "Path" => "c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+        it 'with_embedded_path merges with a hash argument' do
+          expect(subject.with_embedded_path('numberwang' => 4)).to eq(
+            'numberwang' => 4,
+            'Path' => 'c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
+          )
         end
 
-        it "prepends multiple paths to PATH" do
-          expect(software.prepend_path("c:/foo/bar", "c:/foo/baz"))
-            .to eq("c:/foo/bar;c:/foo/baz;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem")
+        it 'prepends multiple paths to PATH' do
+          expect(subject.prepend_path('c:/foo/bar', 'c:/foo/baz')).to eq(
+            'c:/foo/bar;c:/foo/baz;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
+          )
         end
       end
     end
 
     describe '#<=>' do
+      let(:zlib)   { Software.new(project).tap { |s| s.name('zlib') } }
+      let(:erchef) { Software.new(project).tap { |s| s.name('erchef') } }
+      let(:bacon)  { Software.new(project).tap { |s| s.name('bacon') } }
+
       it 'compares projects by name' do
-        list = [
-          Software.load(project, software_path('zlib')),
-          Software.load(project, software_path('erchef')),
-        ]
-        expect(list.sort.map(&:name)).to eq(%w(erchef zlib))
+        list = [zlib, erchef, bacon]
+
+        expect(list.sort.map(&:name)).to eq(%w(bacon erchef zlib))
       end
     end
 
     describe '#whitelist_file' do
       it 'appends to the whitelist_files array' do
-        expect(software.whitelist_files.size).to eq(0)
-        software.whitelist_file(/foo\/bar/)
-        expect(software.whitelist_files.size).to eq(1)
+        expect(subject.whitelist_files.size).to eq(0)
+        subject.whitelist_file(/foo\/bar/)
+        expect(subject.whitelist_files.size).to eq(1)
       end
 
       it 'converts Strings to Regexp instances' do
-        software.whitelist_file 'foo/bar'
-        expect(software.whitelist_files.size).to eq(1)
-        expect(software.whitelist_files.first).to be_kind_of(Regexp)
+        subject.whitelist_file 'foo/bar'
+        expect(subject.whitelist_files.size).to eq(1)
+        expect(subject.whitelist_files.first).to be_kind_of(Regexp)
       end
     end
 
     describe '#override_version' do
       it 'returns the override version' do
-        software.stub(:overrides).and_return(version: '1.2.3')
-        expect(software.override_version).to eq('1.2.3')
+        subject.stub(:overrides).and_return(version: '1.2.3')
+        expect(subject.override_version).to eq('1.2.3')
       end
 
       it 'outputs a deprecation message' do
-        output = capture_logging { software.override_version }
+        output = capture_logging { subject.override_version }
         expect(output).to include('DEPRECATED')
       end
     end
 
     describe '#given_version' do
       it 'returns the version' do
-        software.stub(:default_version).and_return('4.5.6')
-        expect(software.given_version).to eq('4.5.6')
+        subject.stub(:default_version).and_return('4.5.6')
+        expect(subject.given_version).to eq('4.5.6')
       end
 
       it 'outputs a deprecation message' do
-        output = capture_logging { software.given_version }
+        output = capture_logging { subject.given_version }
         expect(output).to include('DEPRECATED')
       end
     end
 
     describe '#version' do
       it 'sets the given version' do
-        software.version('1.2.3')
-        expect(software.given_version).to eq('1.2.3')
+        subject.version('1.2.3')
+        expect(subject.given_version).to eq('1.2.3')
       end
 
       it 'outputs a deprecation message' do
-        output = capture_logging { software.version('1.2.3') }
+        output = capture_logging { subject.version('1.2.3') }
         expect(output).to include('DEPRECATED')
       end
     end
@@ -206,35 +312,35 @@ module Omnibus
 
       shared_examples_for 'a software definition' do
         it 'should have the same name' do
-          expect(software.name).to eq(software_name)
+          expect(subject.name).to eq(software_name)
         end
 
         it 'should have the same version' do
-          expect(software.version).to eq(expected_version)
+          expect(subject.version).to eq(expected_version)
         end
 
         it 'should have the right default_version' do
-          expect(software.default_version).to eq(default_version)
+          expect(subject.default_version).to eq(default_version)
         end
 
         it 'should have nil for an override_version' do
-          expect(software.override_version).to eq(expected_override_version)
+          expect(subject.override_version).to eq(expected_override_version)
         end
 
         it 'should have the right source md5' do
-          expect(software.source[:md5]).to eq(expected_md5)
+          expect(subject.source[:md5]).to eq(expected_md5)
         end
 
         it 'should have the right source url' do
-          expect(software.source[:url]).to eq(expected_url)
+          expect(subject.source[:url]).to eq(expected_url)
         end
 
         it 'should have the right checksum' do
-          expect(software.checksum).to eq(expected_md5)
+          expect(subject.checksum).to eq(expected_md5)
         end
 
         it 'should have the right source_uri' do
-          expect(software.source_uri).to eq(URI.parse(expected_url))
+          expect(subject.source_uri).to eq(URI.parse(expected_url))
         end
       end
 
@@ -244,7 +350,7 @@ module Omnibus
 
       context 'with overrides for different software' do
         let(:overrides) { { 'chaos_monkey' => '1.2.8' } }
-        let(:software) { Software.load(project, software_file, overrides) }
+        subject { Software.load(project, software_file, overrides) }
 
         it_behaves_like 'a software definition'
       end
@@ -253,9 +359,10 @@ module Omnibus
         let(:expected_version) { '1.2.8' }
         let(:expected_override_version) { '1.2.8' }
         let(:overrides) { { software_name => expected_override_version } }
-        let(:software) { Software.load(project, software_file, overrides) }
         let(:expected_md5) { '44d667c142d7cda120332623eab69f40' }
         let(:expected_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz' }
+
+        subject { Software.load(project, software_file, overrides) }
 
         it_behaves_like 'a software definition'
       end
@@ -293,8 +400,8 @@ module Omnibus
       let(:default_version) { '1.2.6' }
 
       def get_version_for_cache(expected_version)
-        software.instance_variable_set(:@fetcher, fetcher)
-        expect(software.version_for_cache).to eq(expected_version)
+        subject.instance_variable_set(:@fetcher, fetcher)
+        expect(subject.version_for_cache).to eq(expected_version)
       end
 
       context 'without a fetcher' do
@@ -304,7 +411,7 @@ module Omnibus
       end
 
       context 'with a NetFetcher' do
-        let(:fetcher) { NetFetcher.new(software) }
+        let(:fetcher) { NetFetcher.new(subject) }
 
         it 'should return the default version' do
           get_version_for_cache('1.2.6')
@@ -313,7 +420,7 @@ module Omnibus
 
       context 'with a GitFetcher' do
         let(:fetcher) do
-          a = GitFetcher.new(software)
+          a = GitFetcher.new(subject)
           a.stub(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
           a
         end
