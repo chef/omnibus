@@ -9,9 +9,12 @@ module Omnibus
         source: '/tmp/out',
         checksum: 'abc123',
         source_uri: 'http://example.com/file.tar.gz',
-        source_dir: '/tmp/out',
         project_dir: '/tmp/project',
       )
+    end
+
+    before do
+      Config.source_dir('/tmp/out')
     end
 
     shared_examples 'an extractor' do |extension, command|

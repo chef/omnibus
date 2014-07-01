@@ -27,7 +27,6 @@ module Omnibus
     attr_reader :project_file
     attr_reader :source
     attr_reader :source_uri
-    attr_reader :source_dir
     attr_reader :project_dir
 
     # Use 7-zip to extract 7z/zip for Windows
@@ -42,7 +41,6 @@ module Omnibus
       @source       = software.source
       @project_file = software.project_file
       @source_uri   = software.source_uri
-      @source_dir   = software.source_dir
       @project_dir  = software.project_dir
       super
     end
@@ -185,7 +183,7 @@ module Omnibus
 
     def extract
       log.info(log_key) do
-        "Extracting the source in '#{project_file}' to '#{source_dir}'"
+        "Extracting the source in '#{project_file}' to '#{Config.source_dir}'"
       end
 
       cmd = extract_cmd
@@ -204,17 +202,17 @@ module Omnibus
 
     def extract_cmd
       if Ohai['platform'] == 'windows' && project_file.end_with?(*WIN_7Z_EXTENSIONS)
-        "7z.exe x #{project_file} -o#{source_dir} -r -y"
+        "7z.exe x #{project_file} -o#{Config.source_dir} -r -y"
       elsif Ohai['platform'] != 'windows' && project_file.end_with?('.7z')
-        "7z x #{project_file} -o#{source_dir} -r -y"
+        "7z x #{project_file} -o#{Config.source_dir} -r -y"
       elsif Ohai['platform'] != 'windows' && project_file.end_with?('.zip')
-        "unzip #{project_file} -d #{source_dir}"
+        "unzip #{project_file} -d #{Config.source_dir}"
       elsif project_file.end_with?(*TAR_EXTENSIONS)
         compression_switch = 'z' if project_file.end_with?('gz')
         compression_switch = 'j' if project_file.end_with?('bz2')
         compression_switch = 'J' if project_file.end_with?('xz')
         compression_switch = '' if project_file.end_with?('tar')
-        "tar #{compression_switch}xf #{project_file} -C#{source_dir}"
+        "tar #{compression_switch}xf #{project_file} -C#{Config.source_dir}"
       else
         # if we don't recognize the extension, simply copy over the file
         proc do
