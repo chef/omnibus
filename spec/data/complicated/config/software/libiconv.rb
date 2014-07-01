@@ -49,17 +49,6 @@ if platform == "solaris2"
 end
 
 build do
-  def glibc_dropped_gets?
-    return false unless Ohai["os"] == "linux"
-
-    output = `/usr/bin/env getconf GNU_LIBC_VERSION`
-
-    return false unless output =~ /^glibc/
-
-    output.sub(/glibc /, "").to_f >= 2.16
-  end
-
-  patch :source => 'libiconv-1.14_srclib_stdio.in.h-remove-gets-declarations.patch' if glibc_dropped_gets?
   command "./configure --prefix=#{install_path}/embedded", :env => env
   command "make -j #{max_build_jobs}", :env => env
   command "make -j #{max_build_jobs} install-lib libdir=#{install_path}/embedded/lib includedir=#{install_path}/embedded/include", :env => env
