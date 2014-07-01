@@ -541,6 +541,39 @@ module Omnibus
     expose :with_standard_compiler_flags
 
     #
+    # A PATH variable format string representing the current PATH with the
+    # project's embedded/bin directory prepended. The correct path separator
+    # for the platform is used to join the paths.
+    #
+    # @params [Hash] env
+    #
+    # @return [Hash]
+    #
+    def with_embedded_path(env = {})
+      path_value = prepend_path("#{install_path}/bin", "#{install_path}/embedded/bin")
+      env.merge(path_key => path_value)
+    end
+    expose :with_embedded_path
+
+    #
+    # A PATH variable format string representing the current PATH with the
+    # given path prepended. The correct path separator
+    # for the platform is used to join the paths.
+    #
+    # @param [Array<String>] paths
+    #
+    # @return [String]
+    #
+    def prepend_path(*paths)
+      path_values = Array(paths)
+      path_values << ENV[path_key]
+
+      separator = File::PATH_SEPARATOR || ':'
+      path_values.join(separator)
+    end
+    expose :prepend_path
+
+    #
     # The source directory.
     #
     # @deprecated Use {Config.source_dir} instead
@@ -767,32 +800,6 @@ module Omnibus
       end
 
       fetcher
-    end
-
-    # A PATH variable format string representing the current PATH with the
-    # project's embedded/bin directory prepended. The correct path separator
-    # for the platform is used to join the paths.
-    #
-    # @params env [Hash]
-    # @return [Hash]
-    def with_embedded_path(env = {})
-      path_value = prepend_path("#{install_path}/bin", "#{install_path}/embedded/bin")
-      env.merge(path_key => path_value)
-    end
-
-    # A PATH variable format string representing the current PATH with the
-    # given path prepended. The correct path separator
-    # for the platform is used to join the paths.
-    #
-    # @param paths [String]
-    # @param paths [Array<String>]
-    # @return [String]
-    def prepend_path(*paths)
-      path_values = Array(paths)
-      path_values << ENV[path_key]
-
-      separator = File::PATH_SEPARATOR || ':'
-      path_values.join(separator)
     end
 
     private

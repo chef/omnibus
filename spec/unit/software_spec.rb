@@ -44,6 +44,8 @@ module Omnibus
     it_behaves_like 'a cleanroom getter', :architecture
     it_behaves_like 'a cleanroom getter', :build
     it_behaves_like 'a cleanroom getter', :with_standard_compiler_flags
+    it_behaves_like 'a cleanroom setter', :with_embedded_path, { 'foo' => 'bar' }
+    it_behaves_like 'a cleanroom setter', :prepend_path, { 'foo' => 'bar' }
     it_behaves_like 'a cleanroom getter', :source_dir
     it_behaves_like 'a cleanroom getter', :cache_dir
     it_behaves_like 'a cleanroom getter', :config
