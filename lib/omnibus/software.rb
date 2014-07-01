@@ -221,6 +221,10 @@ module Omnibus
     #   a fully-qualified local file system path
     # @option val [String] :md5 (nil)
     #   the checksum of the downloaded artifact
+    # @option val [String] :cookie (nil)
+    #   a cookie to set
+    # @option val [String] :warning (nil)
+    #   a warning message to print when downloading
     #
     # @return [Hash]
     #
@@ -231,7 +235,7 @@ module Omnibus
             "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
-        extra_keys = val.keys - [:git, :path, :url, :md5]
+        extra_keys = val.keys - [:git, :path, :url, :md5, :cookie, :warning]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
