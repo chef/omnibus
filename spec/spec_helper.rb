@@ -118,6 +118,9 @@ RSpec.configure do |config|
     # Clear the tmp_path on each run
     FileUtils.rm_rf(tmp_path)
     FileUtils.mkdir_p(tmp_path)
+
+    # Don't run Ohai - tests can still override this
+    stub_ohai(platform: 'ubuntu', version: '12.04')
   end
 
   config.after(:each) do
