@@ -7,19 +7,6 @@ module Omnibus
 
     subject { project }
 
-    shared_examples 'a cleanroom setter' do |id, value|
-      it "for `#{id}'" do
-        expect { subject.evaluate("#{id}(#{value.inspect})") }
-          .to_not raise_error
-      end
-    end
-
-    shared_examples 'a cleanroom getter' do |id|
-      it "for `#{id}'" do
-        expect { subject.evaluate("#{id}") }.to_not raise_error
-      end
-    end
-
     it_behaves_like 'a cleanroom setter', :name, 'chef'
     it_behaves_like 'a cleanroom setter', :friendly_name, 'Chef'
     it_behaves_like 'a cleanroom setter', :msi_parameters, { foo: 'bar' }

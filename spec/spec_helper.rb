@@ -136,3 +136,28 @@ RSpec.configure do |config|
   # Run specs in a random order
   config.order = 'random'
 end
+
+#
+# Shard example group for asserting a DSL method
+#
+# @example
+#   it_behaves_like 'a cleanroom setter', :name, 'chef'
+#
+RSpec.shared_examples 'a cleanroom setter' do |id, value|
+  it "for `#{id}'" do
+    expect { subject.evaluate("#{id}(#{value.inspect})") }
+      .to_not raise_error
+  end
+end
+
+#
+# Shard example group for asserting a DSL method
+#
+# @example
+#   it_behaves_like 'a cleanroom getter', :name
+#
+RSpec.shared_examples 'a cleanroom getter' do |id|
+  it "for `#{id}'" do
+    expect { subject.evaluate("#{id}") }.to_not raise_error
+  end
+end
