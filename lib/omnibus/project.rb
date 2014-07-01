@@ -129,9 +129,9 @@ module Omnibus
         render_metadata(pkg_type)
 
         if Ohai.platform == 'windows'
-          cp_cmd = "xcopy #{config.package_dir}\\*.msi pkg\\ /Y"
+          cp_cmd = "xcopy #{config.package_dir}\\*.msi* pkg\\ /Y"
         elsif Ohai.platform == 'aix'
-          cp_cmd = "cp #{config.package_dir}/*.bff pkg/"
+          cp_cmd = "cp #{config.package_dir}/*.bff* pkg/"
         else
           cp_cmd = "cp #{config.package_dir}/* pkg/"
         end
