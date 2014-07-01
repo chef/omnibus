@@ -163,7 +163,7 @@ module Omnibus
 
           # Ohai stuff
           stub_const('File::ALT_SEPARATOR', '\\')
-          stub_ohai(platform: 'windows')
+          stub_ohai(platform: 'windows', version: '2012')
 
           Omnibus.process_dsl_files
         end

@@ -108,9 +108,7 @@ module Omnibus
     describe '#iteration' do
       let(:fauxhai_options) { Hash.new }
 
-      before do
-        stub_ohai(Fauxhai.mock(fauxhai_options).data)
-      end
+      before { stub_ohai(fauxhai_options) }
 
       context 'when on RHEL' do
         let(:fauxhai_options) { { platform: 'redhat', version: '6.4' } }

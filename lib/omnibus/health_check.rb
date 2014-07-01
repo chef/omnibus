@@ -253,7 +253,7 @@ module Omnibus
     def self.check_for_bad_library(install_path, bad_libs, whitelist_files, current_library, name, linked)
       safe = nil
 
-      whitelist_libs = case Ohai.platform
+      whitelist_libs = case Ohai['platform']
                        when 'arch'
                          ARCH_WHITELIST_LIBS
                        when 'mac_os_x'

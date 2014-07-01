@@ -49,7 +49,7 @@ describe Omnibus do
   describe '#process_dsl_files' do
     before do
       Omnibus::Config.project_root(complicated_path)
-      stub_ohai(platform: 'linux')
+      stub_ohai(platform: 'ubuntu', version: '12.04')
     end
 
     it 'populates the 5 projects' do

@@ -24,8 +24,6 @@ module Omnibus
 
       let(:instance) { klass.new }
 
-      before { stub_ohai(platform: 'ubuntu') }
-
       it 'includes the DSL methods' do
         expect(klass).to be_method_defined(:windows?)
         expect(klass).to be_method_defined(:vagrant?)

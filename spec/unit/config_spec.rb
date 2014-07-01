@@ -18,9 +18,6 @@ module Omnibus
 
       # Make sure we have a clean config
       described_class.reset
-
-      # Prevent Ohai from running
-      stub_ohai(platform: 'linux')
     end
 
     after do
@@ -58,7 +55,7 @@ module Omnibus
 
     context 'on Windows' do
       before do
-        stub_ohai(platform: 'windows')
+        stub_ohai(platform: 'windows', version: '2012')
 
         # This is not defined on Linuxy Rubies
         stub_const('File::ALT_SEPARATOR', '\\')

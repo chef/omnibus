@@ -3,7 +3,6 @@ require 'spec_helper'
 module Omnibus
   describe InstallPathCache do
     before do
-      stub_ohai(platform: 'linux')
       allow(IO).to receive(:read).and_call_original
     end
 

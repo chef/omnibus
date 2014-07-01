@@ -33,7 +33,7 @@ module Omnibus
 
     describe '#extract_cmd' do
       context 'on Windows' do
-        before { stub_ohai(platform: 'windows') }
+        before { stub_ohai(platform: 'windows', version: '2012') }
 
         it_behaves_like 'an extractor', '7z',      '7z.exe x file.7z -o/tmp/out -r -y'
         it_behaves_like 'an extractor', 'zip',     '7z.exe x file.zip -o/tmp/out -r -y'
@@ -47,7 +47,7 @@ module Omnibus
       end
 
       context 'on Linux' do
-        before { stub_ohai(platform: 'ubuntu') }
+        before { stub_ohai(platform: 'ubuntu', version: '12.04') }
 
         it_behaves_like 'an extractor', '7z',      '7z x file.7z -o/tmp/out -r -y'
         it_behaves_like 'an extractor', 'zip',     'unzip file.zip -d /tmp/out'

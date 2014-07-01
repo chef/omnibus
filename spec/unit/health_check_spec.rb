@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Omnibus::HealthCheck do
   context 'on linux' do
-    before { stub_ohai(platform: 'ubuntu') }
+    before { stub_ohai(platform: 'ubuntu', version: '12.04') }
 
     context 'without external dependencies' do
       it 'should not raise' do
