@@ -459,6 +459,88 @@ module Omnibus
     expose :build
 
     #
+    # Add standard compiler flags to the environment hash to produce omnibus
+    # binaries (correct RPATH, etc).
+    #
+    # Supported options:
+    #    :aix => :use_gcc    force using gcc/g++ compilers on aix
+    #
+    # @params [Hash] env
+    # @params [Hash] opts
+    #
+    # @return [Hash]
+    #
+    def with_standard_compiler_flags(env = {}, opts = {})
+      env ||= {}
+      opts ||= {}
+      compiler_flags =
+        case platform
+        when "aix"
+          cc_flags =
+            if opts[:aix] && opts[:aix][:use_gcc]
+              {
+                "CC" => "gcc -maix64",
+                "CXX" => "g++ -maix64",
+                "CFLAGS" => "-maix64 -O -I#{install_path}/embedded/include",
+                "LDFLAGS" => "-L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
+              }
+            else
+              {
+                "CC" => "xlc -q64",
+                "CXX" => "xlC -q64",
+                "CFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
+                "LDFLAGS" => "-q64 -L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
+              }
+            end
+          cc_flags.merge({
+            "LD" => "ld -b64",
+            "OBJECT_MODE" => "64",
+            "ARFLAGS" => "-X64 cru",
+          })
+        when "mac_os_x"
+          {
+            "LDFLAGS" => "-L#{install_path}/embedded/lib",
+            "CFLAGS" => "-I#{install_path}/embedded/include",
+          }
+        when "solaris2"
+          {
+            "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -static-libgcc",
+            "CFLAGS" => "-I#{install_path}/embedded/include",
+          }
+        else
+          {
+            "LDFLAGS" => "-Wl,-rpath,#{install_path}/embedded/lib -L#{install_path}/embedded/lib",
+            "CFLAGS" => "-I#{install_path}/embedded/include",
+          }
+        end
+
+      # merge LD_RUN_PATH into the environment.  most unix distros will fall
+      # back to this if there is no LDFLAGS passed to the linker that sets
+      # the rpath.  the LDFLAGS -R or -Wl,-rpath will override this, but in
+      # some cases software may drop our LDFLAGS or think it knows better
+      # and edit them, and we *really* want the rpath setting and do know
+      # better.  in that case LD_RUN_PATH will probably survive whatever
+      # edits the configure script does
+      extra_linker_flags = {
+        "LD_RUN_PATH" => "#{install_path}/embedded/lib"
+      }
+      # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
+      # the linker, to find every way to make it use our rpath.
+      extra_linker_flags.merge!(
+        {
+          "LD_OPTIONS" => "-R#{install_path}/embedded/lib"
+        }
+      ) if platform == "solaris2"
+      env.merge(compiler_flags).
+        merge(extra_linker_flags).
+        # always want to favor pkg-config from embedded location to not hose
+        # configure scripts which try to be too clever and ignore our explicit
+        # CFLAGS and LDFLAGS in favor of pkg-config info
+        merge({"PKG_CONFIG_PATH" => "#{install_path}/embedded/lib/pkgconfig"})
+    end
+    expose :with_standard_compiler_flags
+
+    #
     # The source directory.
     #
     # @deprecated Use {Config.source_dir} instead
@@ -711,84 +793,6 @@ module Omnibus
 
       separator = File::PATH_SEPARATOR || ':'
       path_values.join(separator)
-    end
-
-    # Add standard compiler flags to the environment hash to produce omnibus
-    # binaries (correct RPATH, etc).
-    #
-    # Supported options:
-    #    :aix => :use_gcc    force using gcc/g++ compilers on aix
-    #
-    # @params env [Hash]
-    # @params opt [Hash]
-    # @return [Hash]
-    def with_standard_compiler_flags(env = {}, opts = {})
-      env ||= {}
-      opts ||= {}
-      compiler_flags =
-        case platform
-        when "aix"
-          cc_flags =
-            if opts[:aix] && opts[:aix][:use_gcc]
-              {
-                "CC" => "gcc -maix64",
-                "CXX" => "g++ -maix64",
-                "CFLAGS" => "-maix64 -O -I#{install_path}/embedded/include",
-                "LDFLAGS" => "-L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
-              }
-            else
-              {
-                "CC" => "xlc -q64",
-                "CXX" => "xlC -q64",
-                "CFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
-                "LDFLAGS" => "-q64 -L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
-              }
-            end
-          cc_flags.merge({
-            "LD" => "ld -b64",
-            "OBJECT_MODE" => "64",
-            "ARFLAGS" => "-X64 cru",
-          })
-        when "mac_os_x"
-          {
-            "LDFLAGS" => "-L#{install_path}/embedded/lib",
-            "CFLAGS" => "-I#{install_path}/embedded/include",
-          }
-        when "solaris2"
-          {
-            "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -static-libgcc",
-            "CFLAGS" => "-I#{install_path}/embedded/include",
-          }
-        else
-          {
-            "LDFLAGS" => "-Wl,-rpath,#{install_path}/embedded/lib -L#{install_path}/embedded/lib",
-            "CFLAGS" => "-I#{install_path}/embedded/include",
-          }
-        end
-
-      # merge LD_RUN_PATH into the environment.  most unix distros will fall
-      # back to this if there is no LDFLAGS passed to the linker that sets
-      # the rpath.  the LDFLAGS -R or -Wl,-rpath will override this, but in
-      # some cases software may drop our LDFLAGS or think it knows better
-      # and edit them, and we *really* want the rpath setting and do know
-      # better.  in that case LD_RUN_PATH will probably survive whatever
-      # edits the configure script does
-      extra_linker_flags = {
-        "LD_RUN_PATH" => "#{install_path}/embedded/lib"
-      }
-      # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
-      # the linker, to find every way to make it use our rpath.
-      extra_linker_flags.merge!(
-        {
-          "LD_OPTIONS" => "-R#{install_path}/embedded/lib"
-        }
-      ) if platform == "solaris2"
-      env.merge(compiler_flags).
-        merge(extra_linker_flags).
-        # always want to favor pkg-config from embedded location to not hose
-        # configure scripts which try to be too clever and ignore our explicit
-        # CFLAGS and LDFLAGS in favor of pkg-config info
-        merge({"PKG_CONFIG_PATH" => "#{install_path}/embedded/lib/pkgconfig"})
     end
 
     private
