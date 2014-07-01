@@ -52,13 +52,11 @@ module Omnibus
     #
     # @param [Hash] data
     #
-    def stub_ohai(data = {})
-      require 'ohai' unless defined?(::Ohai)
+    def stub_ohai(options = {}, &block)
+      require 'ohai' unless defined?(Mash)
 
-      system = ::Ohai::System.new
-      system.data = Mash.new(data)
-
-      Ohai.stub(:ohai).and_return(system)
+      ohai = Mash.from_hash(Fauxhai.mock(options, &block).data)
+      Ohai.stub(:ohai).and_return(ohai)
     end
 
     #
