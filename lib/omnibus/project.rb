@@ -919,6 +919,13 @@ module Omnibus
     end
 
     def package_me
+      destination = File.expand_path('pkg', Config.project_root)
+
+      # Create the destination directory
+      unless File.directory?(destination)
+        FileUtils.mkdir_p(destination)
+      end
+
       package_types.each do |pkg_type|
         if pkg_type == 'makeself'
           run_makeself
@@ -939,14 +946,12 @@ module Omnibus
         render_metadata(pkg_type)
 
         if Ohai['platform'] == 'windows'
-          cp_cmd = "xcopy #{Config.package_dir}\\*.msi pkg\\ /Y"
+          FileUtils.cp(Dir["#{Config.package_dir}/*.msi*"], destination)
         elsif Ohai['platform'] == 'aix'
-          cp_cmd = "cp #{Config.package_dir}/*.bff pkg/"
+          FileUtils.cp(Dir["#{Config.package_dir}/*.bff*"], destination)
         else
-          cp_cmd = "cp #{Config.package_dir}/* pkg/"
+          FileUtils.cp(Dir["#{Config.package_dir}/*"], destination)
         end
-
-        shellout!(cp_cmd)
       end
     end
 
