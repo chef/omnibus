@@ -289,4 +289,38 @@ Invalid value for #{@source}. Expected #{@source} to #{@message}!
 EOH
     end
   end
+
+  #
+  # Raised when Omnibus encounters a platform_family it does not know how to
+  # build/check/handle.
+  #
+  class UnknownPlatformFamily < Error
+    def initialize(family)
+      @family = family
+    end
+
+    def to_s
+      <<-EOH
+Unknown platform family `#{@family}'!
+I do not know how to proceed!"
+EOH
+    end
+  end
+
+  #
+  # Raised when Omnibus encounters a platform_version it does not know how to
+  # build/check/handle.
+  #
+  class UnknownPlatformVersion < Error
+    def initialize(platform, version)
+      @platform, @version = platform, version
+    end
+
+    def to_s
+      <<-EOH
+Unknown platform version `#{@version}' for #{@platform}!
+I do not know how to proceed!"
+EOH
+    end
+  end
 end

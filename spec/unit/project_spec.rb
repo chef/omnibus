@@ -163,5 +163,79 @@ module Omnibus
         expect(project.override(:thing)[:version]).to eq('6.6.6')
       end
     end
+
+    describe '#platform_version_for_package' do
+      before { described_class.send(:public, :platform_version_for_package) }
+
+      shared_examples 'a version manipulator' do |platform, version, family, expected|
+        context "on #{platform}-#{version} (#{family})" do
+          before do
+            allow(Ohai).to receive(:ohai).and_return(
+              'platform'         => platform,
+              'platform_version' => version,
+              'platform_family'  => family,
+            )
+          end
+
+          it 'returns the correct value' do
+            expect(subject.platform_version_for_package).to eq(expected)
+          end
+        end
+      end
+
+      it_behaves_like 'a version manipulator', 'arch', '2009.02', 'arch', '2009.02'
+      it_behaves_like 'a version manipulator', 'arch', '2014.06.01', 'arch', '2014.06'
+      it_behaves_like 'a version manipulator', 'debian', '7.1', 'debian', '7'
+      it_behaves_like 'a version manipulator', 'debian', '6.9', 'debian', '6'
+      it_behaves_like 'a version manipulator', 'ubuntu', '10.04', 'debian', '10.04'
+      it_behaves_like 'a version manipulator', 'ubuntu', '10.04.04', 'debian', '10.04'
+      it_behaves_like 'a version manipulator', 'fedora', '11.5', 'fedora', '11'
+      it_behaves_like 'a version manipulator', 'freebsd', '10.0', 'fedora', '10'
+      it_behaves_like 'a version manipulator', 'rhel', '6.5', 'rhel', '6'
+      it_behaves_like 'a version manipulator', 'centos', '5.9.6', 'rhel', '5'
+      it_behaves_like 'a version manipulator', 'aix', '7.1', 'aix', '7.1'
+      it_behaves_like 'a version manipulator', 'gentoo', '2004.3', 'aix', '2004.3'
+      it_behaves_like 'a version manipulator', 'mac_os_x', '10.9.1', 'mac_os_x', '10.9'
+      it_behaves_like 'a version manipulator', 'openbsd', '5.4.4', 'openbsd', '5.4'
+      it_behaves_like 'a version manipulator', 'slackware', '12.0.1', 'slackware', '12.0'
+      it_behaves_like 'a version manipulator', 'solaris', '5.9', 'solaris2', '5.9'
+      it_behaves_like 'a version manipulator', 'suse', '5.9', 'suse', '5.9'
+      it_behaves_like 'a version manipulator', 'omnios', 'r151010', 'omnios', 'r151010'
+      it_behaves_like 'a version manipulator', 'smartos', '20120809T221258Z', 'smartos', '20120809T221258Z'
+      it_behaves_like 'a version manipulator', 'windows', '6.1.7600', 'windows', '7'
+      it_behaves_like 'a version manipulator', 'windows', '6.1.7601', 'windows', '2008r2'
+      it_behaves_like 'a version manipulator', 'windows', '6.2.9200', 'windows', '8'
+      it_behaves_like 'a version manipulator', 'windows', '6.3.9200', 'windows', '8.1'
+
+      context 'given an unknown platform' do
+        before do
+          allow(Ohai).to receive(:ohai).and_return(
+            'platform'         => 'bacon',
+            'platform_version' => '1.crispy',
+            'platform_family'  => 'meats',
+          )
+        end
+
+        it 'raises an exception' do
+          expect { subject.platform_version_for_package }
+            .to raise_error(UnknownPlatformFamily)
+        end
+      end
+
+      context 'given an unknown windows platform version' do
+        before do
+          allow(Ohai).to receive(:ohai).and_return(
+            'platform'         => 'windows',
+            'platform_version' => '1.2.3',
+            'platform_family'  => 'windows',
+          )
+        end
+
+        it 'raises an exception' do
+          expect { subject.platform_version_for_package }
+            .to raise_error(UnknownPlatformVersion)
+        end
+      end
+    end
   end
 end
