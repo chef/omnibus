@@ -1010,8 +1010,28 @@ module Omnibus
     #   the platform version
     #
     def platform_version_for_package
-      if Ohai['platform'] == 'rhel'
-        Ohai['platform_version'][/([\d]+)\..+/, 1]
+      case Ohai['platform_family']
+      when 'debian', 'fedora', 'freebsd', 'rhel'
+        if Ohai['platform'] == 'ubuntu'
+          # Only want MAJOR.MINOR (Ubuntu 12.04)
+          Ohai['platform_version'].split('.')[0..-1].join('.')
+        else
+          # Only want MAJOR (Debian 7)
+          Ohai['platform_version'].split('.').first
+        end
+      when 'mac_os_x', 'solaris2', 'suse'
+        # Only want MAJOR.MINOR
+        Ohai['platform_version'].split('.')[0..-1].join('.')
+      when 'windows'
+        # Windows has this really awesome "feature", where their version numbers
+        # internally do not match the "marketing" name. Dear Microsoft, this is
+        # why we cannot have nice things.
+        case Ohai['platform_version']
+        when '6.1.7600' then '7'
+        when '6.1.7601' then '2008r2'
+        when '6.2.9200' then '8'
+        when '6.3.9200' then '8.1'
+        else Ohai['platform_version']
       else
         Ohai['platform_version']
       end
