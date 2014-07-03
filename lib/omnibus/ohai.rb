@@ -30,9 +30,9 @@ module Omnibus
 
         @ohai = ::Ohai::System.new
         @ohai.require_plugin('os')
+        @ohai.require_plugin('kernel')
         @ohai.require_plugin('platform')
         @ohai.require_plugin('linux/cpu') if @ohai.os == 'linux'
-        @ohai.require_plugin('kernel')
         @ohai
       end
     end
