@@ -75,7 +75,7 @@ module Omnibus
     #
     # @deprecated Use +project+ methods instead
     def method_missing(m, *args, &block)
-      if project.respond_to?(m) || project.respond_to_missing?(m)
+      if project.respond_to?(m)
         log.deprecated("#{log_key}##{m}") { "#{m}. Please use project.#{m} instead." }
         project.send(m, *args, &block)
       else
