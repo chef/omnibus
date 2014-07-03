@@ -83,6 +83,12 @@ module Omnibus
       end
     end
 
+    # @deprecated
+    def version
+      log.deprecated("#{log_key}#version") { 'version. Please use project.build_version instead.' }
+      project.build_version
+    end
+
     #
     # Generation methods
     # ------------------------------
