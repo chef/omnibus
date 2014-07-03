@@ -26,14 +26,14 @@ module Omnibus
       private
 
       def ohai
-        return @ohai if @ohai
-
-        @ohai = ::Ohai::System.new
-        @ohai.require_plugin('os')
-        @ohai.require_plugin('kernel')
-        @ohai.require_plugin('platform')
-        @ohai.require_plugin('linux/cpu') if @ohai.os == 'linux'
-        @ohai
+        @ohai ||= ::Ohai::System.new.tap do |o|
+          o.all_plugins([
+            'os',
+            'kernel',
+            'platform',
+            'cpu'
+          ])
+        end
       end
     end
   end
