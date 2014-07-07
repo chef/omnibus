@@ -68,10 +68,6 @@ module Omnibus
       project = Omnibus.project(name)
       raise ProjectNotFound.new(name) unless project
 
-      say("Platform: #{Ohai['platform']}")
-      say("Platform Family: #{Ohai['platform_family']}")
-      say("Platform Version: #{Ohai['platform_version']}")
-
       say("Building #{project.name} #{project.build_version}...")
       project.build_me
     end
