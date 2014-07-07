@@ -103,7 +103,7 @@ module Omnibus
         remove_instance_variable(instance_variable)
       end
 
-      Config.reset!
+      Config.reset
     end
 
     #
