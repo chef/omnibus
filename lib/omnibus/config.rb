@@ -27,6 +27,9 @@ module Omnibus
     extend Mixlib::Config
     extend Util
 
+    # Use strict mode
+    config_strict_mode true
+
     # @!group Directory Configuration Parameters
 
     # @!attribute [rw] base_dir
