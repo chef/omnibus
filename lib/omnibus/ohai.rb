@@ -16,8 +16,36 @@
 
 require 'ohai'
 
+class Mash
+  #
+  # @todo Remove in the next major release
+  #
+  # Ohai 7 removed the ability to access Ohai attributes via dot notation. This
+  # temporary monkey patch provides the ability for users to still use the old
+  # dot notation, while printing out a deprecation error.
+  #
+  def method_missing(m, *args, &block)
+    if key?(m)
+      Omnibus.logger.deprecated('Ohai') do
+        "Ohai.#{m}. Please use Ohai['#{m}'] instead."
+      end
+
+      fetch(m)
+    else
+      super
+    end
+  end
+end
+
 module Omnibus
   class Ohai
+    PLUGINS = [
+      'cpu',
+      'kernel',
+      'os',
+      'platform',
+    ].freeze
+
     class << self
       def method_missing(m, *args, &block)
         ohai.send(m, *args, &block)
@@ -26,14 +54,7 @@ module Omnibus
       private
 
       def ohai
-        @ohai ||= ::Ohai::System.new.tap do |o|
-          o.all_plugins([
-            'os',
-            'kernel',
-            'platform',
-            'cpu'
-          ])
-        end
+        @ohai ||= ::Ohai::System.new.tap { |o| o.all_plugins(PLUGINS) }
       end
     end
   end
