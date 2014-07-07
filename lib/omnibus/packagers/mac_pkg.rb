@@ -49,7 +49,7 @@ module Omnibus
       generate_distribution
       build_product_pkg
 
-      if project.config[:build_dmg]
+      if Config.build_dmg
         Packager::MacDmg.new(self).run!
       end
     end
@@ -128,16 +128,17 @@ module Omnibus
     # product that is shipped to end users.
     #
     def build_product_pkg
-      build_command = [
-        'productbuild',
-        %Q(--distribution "#{distribution_file}"),
-        %Q(--resources "#{staging_resources_path}"),
-      ]
+      command = <<-EOH.gsub(/^ {8}/, '')
+        productbuild \\
+          --distribution "#{distribution_file}" \\
+          --resources "#{staging_resources_path}" \\
+      EOH
 
-      build_command << %Q(--sign "#{project.config[:signing_identity]}") if project.config[:sign_pkg]
-      build_command << final_pkg
+      command << %Q(  --sign "#{Config.signing_identity}" \\\n) if Config.sign_pkg
+      command << %Q(  "#{final_pkg}")
+      command << %Q(\n)
 
-      execute build_command.join(' ')
+      execute(command)
     end
 
     # The identifier for this mac package (the com.whatever.thing.whatever).
