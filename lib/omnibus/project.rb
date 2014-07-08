@@ -872,20 +872,10 @@ module Omnibus
     # @return [String]
     def iteration
       case Ohai['platform_family']
-      when 'rhel'
-        Ohai['platform_version'] =~ /^(\d+)/
-        maj = Regexp.last_match[1]
-        "#{build_iteration}.el#{maj}"
       when 'freebsd'
-        Ohai['platform_version'] =~ /^(\d+)/
-        maj = Regexp.last_match[1]
-        "#{build_iteration}.#{Ohai['platform']}.#{maj}.#{Ohai['kernel']['machine']}"
-      when 'windows'
-        "#{build_iteration}.windows"
-      when 'aix', 'debian', 'mac_os_x'
-        "#{build_iteration}"
+        "#{build_iteration}.#{Ohai['kernel']['machine']}"
       else
-        "#{build_iteration}.#{Ohai['platform']}.#{Ohai['platform_version']}"
+        "#{build_iteration}"
       end
     end
 
