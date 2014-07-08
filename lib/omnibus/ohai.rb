@@ -54,7 +54,7 @@ module Omnibus
       private
 
       def ohai
-        @ohai ||= ::Ohai::System.new.tap { |o| o.all_plugins(PLUGINS) }
+        @ohai ||= ::Ohai::System.new.tap { |o| o.all_plugins(PLUGINS) }.data
       end
     end
   end
