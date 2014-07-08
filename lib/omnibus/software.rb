@@ -478,7 +478,7 @@ module Omnibus
       env ||= {}
       opts ||= {}
       compiler_flags =
-        case Ohai['platform']
+        case Ohai['platform'].chomp
         when "aix"
           cc_flags =
             if opts[:aix] && opts[:aix][:use_gcc]
