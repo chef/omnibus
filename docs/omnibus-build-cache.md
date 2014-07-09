@@ -18,11 +18,11 @@ config/software/$COMPONENT).
 
 The default location of the cache (which is just a bare git
 repository) is
-`/var/cache/omnibus/cache/install_path/$INSTALL_DIR`. You can
+`/var/cache/omnibus/cache/git_cache/$INSTALL_DIR`. You can
 customize the location of the cache in the `omnibus.rb` config file
-using the key `install_path_cache_dir`. For example:
+using the key `git_cache_dir`. For example:
 
-    install_path_cache_dir "/opt/ominbus-caches"
+    git_cache_dir "/opt/ominbus-caches"
 
 ## How It Works ##
 
@@ -44,7 +44,7 @@ component list, you want to have your most frequently changed
 components last to minimize rebuild churn.
 
 Lightweight git tags are used as cache keys. After building a
-component, a tag name is computed in `install_path_cache.rb#tag`. The
+component, a tag name is computed in `GitCache#tag`. The
 tag name has the format `#{name}-#{version}-#{digest}` where name and
 version map to the component that was just built and digest is a
 SHA256 value. The digest is computed by string-ifying the name/version

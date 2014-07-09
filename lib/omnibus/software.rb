@@ -799,7 +799,7 @@ module Omnibus
       if always_build?
         execute_build(@fetcher)
       else
-        if Omnibus::InstallPathCache.new(install_dir, self).restore
+        if GitCache.new(install_dir, self).restore
           true
         else
           execute_build(@fetcher)
@@ -881,7 +881,7 @@ module Omnibus
       fetcher.clean
       @builder.build
       log.info(log_key) { 'Caching build' }
-      Omnibus::InstallPathCache.new(install_dir, self).incremental
+      GitCache.new(install_dir, self).incremental
       log.info(log_key) { 'Dirtied the cache!' }
       project.dirty!
     end

@@ -18,11 +18,11 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
 
   write_file('omnibus.rb', <<-EOH.gsub(/^ {4}/, ''))
     # Build configuration
-    cache_dir              './local/omnibus/cache'
-    install_path_cache_dir './local/omnibus/cache/install_path'
-    source_dir             './local/omnibus/src'
-    build_dir              './local/omnibus/build'
-    package_dir            './local/omnibus/pkg'
-    package_tmp            './local/omnibus/pkg-tmp'
+    cache_dir     './local/omnibus/cache'
+    git_cache_dir './local/omnibus/cache/git_cache'
+    source_dir    './local/omnibus/src'
+    build_dir     './local/omnibus/build'
+    package_dir   './local/omnibus/pkg'
+    package_tmp   './local/omnibus/pkg-tmp'
   EOH
 end

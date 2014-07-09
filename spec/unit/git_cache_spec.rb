@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module Omnibus
-  describe InstallPathCache do
+  describe GitCache do
     before do
       allow(IO).to receive(:read).and_call_original
     end
@@ -51,18 +51,18 @@ module Omnibus
       software
     end
 
-    let(:cache_path) { File.join("/var/cache/omnibus/cache/install_path", install_dir) }
+    let(:cache_path) { File.join("/var/cache/omnibus/cache/git_cache", install_dir) }
 
     let(:ipc) do
       project.library.component_added(preparation)
       project.library.component_added(snoopy)
       project.library.component_added(zlib)
-      InstallPathCache.new(install_dir, zlib)
+      described_class.new(install_dir, zlib)
     end
 
     describe '#cache_path' do
       it 'returns the install path appended to the install_cache path' do
-        expect(ipc.cache_path).to eq('/var/cache/omnibus/cache/install_path/opt/chef')
+        expect(ipc.cache_path).to eq('/var/cache/omnibus/cache/git_cache/opt/chef')
       end
     end
 
@@ -86,7 +86,7 @@ module Omnibus
 
       describe 'with no deps' do
         let(:ipc) do
-          InstallPathCache.new(install_dir, zlib)
+          described_class.new(install_dir, zlib)
         end
 
         it 'uses the shasum of the software config file' do

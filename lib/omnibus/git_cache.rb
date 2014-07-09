@@ -18,7 +18,7 @@ require 'fileutils'
 require 'digest'
 
 module Omnibus
-  class InstallPathCache
+  class GitCache
     include Util
 
     def initialize(install_dir, software)
@@ -28,7 +28,7 @@ module Omnibus
 
     # The path to the full install_dir cache for the project
     def cache_path
-      File.join(Config.install_path_cache_dir, @install_dir)
+      File.join(Config.git_cache_dir, @install_dir)
     end
 
     # Whether the cache_path above exists

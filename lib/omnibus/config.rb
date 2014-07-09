@@ -57,14 +57,14 @@ module Omnibus
     #   @return [String]
     default(:cache_dir) { windows_safe_path(base_dir, 'cache') }
 
-    # @!attribute [rw] install_path_cache_dir
+    # @!attribute [rw] git_cache_dir
     #   The absolute path to the directory on the virtual machine where
-    #   install paths will be progressively cached.
+    #   git caching will occur and software's will be progressively cached.
     #
-    #   Defaults to `"/var/cache/omnibus/cache/install_path"`.
+    #   Defaults to `"/var/cache/omnibus/cache/git_cache"`.
     #
     #   @return [String]
-    default(:install_path_cache_dir) { windows_safe_path(base_dir, 'cache', 'install_path') }
+    default(:git_cache_dir) { windows_safe_path(base_dir, 'cache', 'git_cache') }
 
     # @!attribute [rw] source_dir
     #   The absolute path to the directory on the virtual machine where

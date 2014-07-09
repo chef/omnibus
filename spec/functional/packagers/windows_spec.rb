@@ -42,7 +42,7 @@ module Omnibus
       # Tell things to install into the cache directory
       root = "#{tmp_path}/var/omnibus"
       Config.cache_dir "#{root}/cache"
-      Config.install_path_cache_dir "#{root}/cache/install_path"
+      Config.git_cache_dir "#{root}/cache/git_cache"
       Config.source_dir "#{root}/src"
       Config.build_dir "#{root}/build"
       Config.package_dir "#{root}/pkg"

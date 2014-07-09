@@ -37,7 +37,7 @@ module Omnibus
 
     include_examples 'a configurable', :base_dir, '/var/cache/omnibus'
     include_examples 'a configurable', :cache_dir, '/var/cache/omnibus/cache'
-    include_examples 'a configurable', :install_path_cache_dir, '/var/cache/omnibus/cache/install_path'
+    include_examples 'a configurable', :git_cache_dir, '/var/cache/omnibus/cache/git_cache'
     include_examples 'a configurable', :source_dir, '/var/cache/omnibus/src'
     include_examples 'a configurable', :build_dir, '/var/cache/omnibus/build'
     include_examples 'a configurable', :package_dir, '/var/cache/omnibus/pkg'
@@ -62,7 +62,7 @@ module Omnibus
 
       include_examples 'a configurable', :base_dir, 'C:\\omnibus-ruby'
       include_examples 'a configurable', :cache_dir, 'C:\\omnibus-ruby\\cache'
-      include_examples 'a configurable', :install_path_cache_dir, 'C:\\omnibus-ruby\\cache\\install_path'
+      include_examples 'a configurable', :git_cache_dir, 'C:\\omnibus-ruby\\cache\\git_cache'
       include_examples 'a configurable', :source_dir, 'C:\\omnibus-ruby\\src'
       include_examples 'a configurable', :build_dir, 'C:\\omnibus-ruby\\build'
       include_examples 'a configurable', :package_dir, 'C:\\omnibus-ruby\\pkg'
@@ -73,7 +73,7 @@ module Omnibus
       before { described_class.base_dir = '/foo/bar' }
 
       include_examples 'a configurable', :cache_dir, '/foo/bar/cache'
-      include_examples 'a configurable', :install_path_cache_dir, '/foo/bar/cache/install_path'
+      include_examples 'a configurable', :git_cache_dir, '/foo/bar/cache/git_cache'
       include_examples 'a configurable', :source_dir, '/foo/bar/src'
       include_examples 'a configurable', :build_dir, '/foo/bar/build'
       include_examples 'a configurable', :package_dir, '/foo/bar/pkg'
