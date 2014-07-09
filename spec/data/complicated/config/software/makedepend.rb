@@ -34,7 +34,7 @@ configure_env =
       "CC" => "xlc -q64",
       "CXX" => "xlC -q64",
       "LD" => "ld -b64",
-      "CFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
+      "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
       "LDFLAGS" => "-q64 -Wl,-blibpath:/usr/lib:/lib",
       "OBJECT_MODE" => "64",
       "ARFLAGS" => "-X64 cru",
@@ -44,30 +44,30 @@ configure_env =
     }
   when "mac_os_x"
     {
-      "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib"
+      "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   when "solaris2"
     {
-      "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -static-libgcc",
-      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include"
+      "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -static-libgcc",
+      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
     }
   else
     {
-      "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib"
+      "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   end
 
-configure_env["PKG_CONFIG_PATH"] = "#{install_path}/embedded/lib/pkgconfig" +
+configure_env["PKG_CONFIG_PATH"] = "#{install_dir}/embedded/lib/pkgconfig" +
   File::PATH_SEPARATOR +
-  "#{install_path}/embedded/share/pkgconfig"
+  "#{install_dir}/embedded/share/pkgconfig"
 
 # For pkg-config
-configure_env["PATH"] = "#{install_path}/embedded/bin" + File::PATH_SEPARATOR + ENV["PATH"]
+configure_env["PATH"] = "#{install_dir}/embedded/bin" + File::PATH_SEPARATOR + ENV["PATH"]
 
 build do
-  command "./configure --prefix=#{install_path}/embedded", :env => configure_env
+  command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
   command "make -j #{max_build_jobs}", :env => configure_env
   command "make -j #{max_build_jobs} install", :env => configure_env
 end

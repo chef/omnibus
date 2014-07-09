@@ -8,7 +8,7 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
     name '#{name}'
     maintainer 'Mrs. Maintainer'
     homepage 'https://example.com'
-    install_path './local/build/#{name}'
+    install_dir './local/build/#{name}'
 
     build_version '1.0.0'
 

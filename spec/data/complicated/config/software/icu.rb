@@ -26,14 +26,14 @@ relative_path "icu"
 working_dir = "#{project_dir}/source"
 
 build do
-  command("./configure --prefix=#{install_path}/embedded",
+  command("./configure --prefix=#{install_dir}/embedded",
           :env => {
-            "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include"
+            "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
           },
           :cwd => working_dir)
   command("make -j #{max_build_jobs}",
           :env => {
-            "LD_RUN_PATH" => "#{install_path}/embedded/lib"
+            "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
           },
           :cwd => working_dir)
   command "make install", :cwd => working_dir

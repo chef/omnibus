@@ -6,14 +6,14 @@ module Omnibus
       allow(IO).to receive(:read).and_call_original
     end
 
-    let(:install_path) { '/opt/chef' }
+    let(:install_dir) { '/opt/chef' }
 
     let(:project) do
       allow(IO).to receive(:read)
         .with('/path/to/demo.rb')
         .and_return <<-EOH.gsub(/^ {10}/, '')
           name 'demo'
-          install_path '/opt/demo'
+          install_dir '/opt/demo'
 
           build_version '1.0.0'
 
@@ -51,13 +51,13 @@ module Omnibus
       software
     end
 
-    let(:cache_path) { "/var/cache/omnibus/cache/install_path#{install_path}" }
+    let(:cache_path) { File.join("/var/cache/omnibus/cache/install_path", install_dir) }
 
     let(:ipc) do
       project.library.component_added(preparation)
       project.library.component_added(snoopy)
       project.library.component_added(zlib)
-      InstallPathCache.new(install_path, zlib)
+      InstallPathCache.new(install_dir, zlib)
     end
 
     describe '#cache_path' do
@@ -74,25 +74,25 @@ module Omnibus
     end
 
     describe '#tag' do
-      # f979612e7e06b77900d904d77a6389ac296107db7014714ce8c0a9681bd40635
+      # 13b3f7f2653e40b9d5b393659210775ac5b56f7e0009f82f85b83f5132409362
       #
       # Is the sha256sum of:
       # cat spec/data/software/zlib.rb > t
       # echo -n 'preparation-1.0.0-snoopy-1.0.0' >> t
       # sha256sum t
       it 'returns a tag with the softwares name, version, and hash of deps name+version' do
-        expect(ipc.tag).to eql('zlib-1.7.2-f979612e7e06b77900d904d77a6389ac296107db7014714ce8c0a9681bd40635')
+        expect(ipc.tag).to eql('zlib-1.7.2-13b3f7f2653e40b9d5b393659210775ac5b56f7e0009f82f85b83f5132409362')
       end
 
       describe 'with no deps' do
         let(:ipc) do
-          InstallPathCache.new(install_path, zlib)
+          InstallPathCache.new(install_dir, zlib)
         end
 
         it 'uses the shasum of the software config file' do
           # gsha256sum spec/data/software/zlib.rb
-          # 89fd92f3ca6edc60691c10a308296926de2eaa89fa888719dc37615bcf886b8f  spec/data/software/zlib.rb
-          expect(ipc.tag).to eql('zlib-1.7.2-89fd92f3ca6edc60691c10a308296926de2eaa89fa888719dc37615bcf886b8f')
+          # 363e6cc2475fcdd6e18b2dc10f6022d1cab498b9961e8225d8a309d18ed3c94b  spec/data/software/zlib.rb
+          expect(ipc.tag).to eql('zlib-1.7.2-363e6cc2475fcdd6e18b2dc10f6022d1cab498b9961e8225d8a309d18ed3c94b')
         end
       end
     end
@@ -138,19 +138,19 @@ module Omnibus
 
       it 'adds all the changes to git' do
         expect(ipc).to receive(:shellout!)
-          .with("git --git-dir=#{cache_path} --work-tree=#{install_path} add -A -f")
+          .with("git --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f")
         ipc.incremental
       end
 
       it 'commits the backup for the software' do
         expect(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} commit -q -m "Backup of #{ipc.tag}"))
+          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{ipc.tag}"))
         ipc.incremental
       end
 
       it 'tags the software backup' do
         expect(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -f "#{ipc.tag}"))
+          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{ipc.tag}"))
         ipc.incremental
       end
     end
@@ -167,10 +167,10 @@ module Omnibus
 
       before(:each) do
         allow(ipc).to receive(:shellout)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l "#{ipc.tag}"))
+          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
           .and_return(tag_cmd)
         allow(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f "#{ipc.tag}"))
+          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
         allow(ipc).to receive(:create_cache_path)
       end
 
@@ -181,10 +181,10 @@ module Omnibus
 
       it 'checks for a tag with the software and version, and if it finds it, checks it out' do
         expect(ipc).to receive(:shellout)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l "#{ipc.tag}"))
+          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
           .and_return(tag_cmd)
         expect(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f "#{ipc.tag}"))
+          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
         ipc.restore
       end
 
@@ -193,10 +193,10 @@ module Omnibus
 
         it 'does nothing' do
           expect(ipc).to receive(:shellout)
-            .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} tag -l "#{ipc.tag}"))
+            .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
             .and_return(tag_cmd)
           expect(ipc).to_not receive(:shellout!)
-            .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_path} checkout -f "#{ipc.tag}"))
+            .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
           ipc.restore
         end
       end

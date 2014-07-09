@@ -27,11 +27,11 @@ relative_path "logrotate-#{version}"
 
 env = {
   # Patch allows this to be set manually
-  "BASEDIR" => "#{install_path}/embedded",
+  "BASEDIR" => "#{install_dir}/embedded",
   # These EXTRA_* vars allow us to append to the Makefile's hardcoded LDFLAGS
   # and CFLAGS
-  "EXTRA_LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "EXTRA_CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
+  "EXTRA_LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "EXTRA_CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
 }
 
 build do

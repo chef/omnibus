@@ -21,14 +21,14 @@ module Omnibus
   class InstallPathCache
     include Util
 
-    def initialize(install_path, software)
-      @install_path = install_path.sub(/^([A-Za-z]:)/, '') # strip drive letter on Windows
+    def initialize(install_dir, software)
+      @install_dir = install_dir.sub(/^([A-Za-z]:)/, '') # strip drive letter on Windows
       @software = software
     end
 
-    # The path to the full install_path cache for the project
+    # The path to the full install_dir cache for the project
     def cache_path
-      File.join(Config.install_path_cache_dir, @install_path)
+      File.join(Config.install_path_cache_dir, @install_dir)
     end
 
     # Whether the cache_path above exists
@@ -79,20 +79,20 @@ module Omnibus
     # Create an incremental install path cache for the software step
     def incremental
       create_cache_path
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} add -A -f))
+      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} add -A -f))
       begin
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} commit -q -m "Backup of #{tag}"))
+        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} commit -q -m "Backup of #{tag}"))
       rescue Mixlib::ShellOut::ShellCommandFailed => e
         if e.message !~ /nothing to commit/
           raise
         end
       end
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -f "#{tag}"))
+      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -f "#{tag}"))
     end
 
     def restore
       create_cache_path
-      cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} tag -l "#{tag}"))
+      cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -l "#{tag}"))
 
       restore_me = false
       cmd.stdout.each_line do |line|
@@ -100,7 +100,7 @@ module Omnibus
       end
 
       if restore_me
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_path} checkout -f "#{tag}"))
+        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} checkout -f "#{tag}"))
         true
       else
         false

@@ -81,8 +81,8 @@ module Omnibus
           --identifier "#{identifier}" \\
           --version "#{project.build_version}" \\
           --scripts "#{project.package_scripts_path}" \\
-          --root "#{project.install_path}" \\
-          --install-location "#{project.install_path}" \\
+          --root "#{project.install_dir}" \\
+          --install-location "#{project.install_dir}" \\
           "#{component_pkg}"
       EOH
     end

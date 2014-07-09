@@ -49,7 +49,7 @@ module Omnibus
       # harvest the files with heat.exe
       # recursively generate fragment for project directory
       execute [
-        "heat.exe dir \"#{project.install_path}\"",
+        "heat.exe dir \"#{project.install_dir}\"",
         '-nologo -srd -gg -cg ProjectDir',
         '-dr PROJECTLOCATION -var var.ProjectSourceDir',
         '-out project-files.wxs',
@@ -58,7 +58,7 @@ module Omnibus
       # compile with candle.exe
       execute [
         'candle.exe -nologo',
-        "-dProjectSourceDir=\"#{project.install_path}\" project-files.wxs",
+        "-dProjectSourceDir=\"#{project.install_dir}\" project-files.wxs",
         "\"#{resource('source.wxs')}\"",
       ].join(' ')
 

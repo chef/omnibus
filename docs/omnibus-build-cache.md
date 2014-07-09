@@ -5,7 +5,7 @@ reduces the time it takes to rebuild a project when only a few
 components need to be rebuilt.
 
 The cache uses git to snapshot the project tree after each software
-component build. The entire contents of the project's `install_path`
+component build. The entire contents of the project's `install_dir`
 is included in the snaphot.
 
 When rebuilding, omnibus walks the linearized component list and
@@ -18,7 +18,7 @@ config/software/$COMPONENT).
 
 The default location of the cache (which is just a bare git
 repository) is
-`/var/cache/omnibus/cache/install_path/$INSTALL_PATH`. You can
+`/var/cache/omnibus/cache/install_path/$INSTALL_DIR`. You can
 customize the location of the cache in the `omnibus.rb` config file
 using the key `install_path_cache_dir`. For example:
 

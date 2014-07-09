@@ -35,17 +35,17 @@ relative_path "libxml2-#{version}"
 
 build do
   cmd = ["./configure",
-         "--prefix=#{install_path}/embedded",
-         "--with-zlib=#{install_path}/embedded",
-         "--with-iconv=#{install_path}/embedded",
+         "--prefix=#{install_dir}/embedded",
+         "--with-zlib=#{install_dir}/embedded",
+         "--with-iconv=#{install_dir}/embedded",
          "--without-python",
          "--without-icu"].join(" ")
   env = {
-    "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-    "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-    "LD_RUN_PATH" => "#{install_path}/embedded/lib"
+    "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+    "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+    "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
   }
   command cmd, :env => env
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
-  command "make install", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+  command "make install", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
 end

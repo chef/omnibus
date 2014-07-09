@@ -25,7 +25,7 @@ relative_path "cacerts-#{version}"
 
 build do
   block do
-    FileUtils.mkdir_p(File.expand_path("embedded/ssl/certs", install_path))
+    FileUtils.mkdir_p(File.expand_path("embedded/ssl/certs", install_dir))
 
     # There is a bug in omnibus-ruby that may or may not have been fixed. Since the source url
     # does not point to an archive, omnibus-ruby tries to copy cacert.pem into the project working
@@ -35,10 +35,10 @@ build do
     # directly from the cache instead.
 
     FileUtils.cp(File.expand_path("cacert.pem", Config.cache_dir),
-                 File.expand_path("embedded/ssl/certs/cacert.pem", install_path))
+                 File.expand_path("embedded/ssl/certs/cacert.pem", install_dir))
   end
 
   unless platform == 'windows'
-    command "ln -sf #{install_path}/embedded/ssl/certs/cacert.pem #{install_path}/embedded/ssl/cert.pem"
+    command "ln -sf #{install_dir}/embedded/ssl/certs/cacert.pem #{install_dir}/embedded/ssl/cert.pem"
   end
 end

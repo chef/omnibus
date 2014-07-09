@@ -35,18 +35,18 @@ relative_path "libxslt-#{version}"
 
 build do
   env = {
-    "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-    "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-    "LD_RUN_PATH" => "#{install_path}/embedded/lib"
+    "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+    "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+    "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
   }
   command(["./configure",
-           "--prefix=#{install_path}/embedded",
-           "--with-libxml-prefix=#{install_path}/embedded",
-           "--with-libxml-include-prefix=#{install_path}/embedded/include",
-           "--with-libxml-libs-prefix=#{install_path}/embedded/lib",
+           "--prefix=#{install_dir}/embedded",
+           "--with-libxml-prefix=#{install_dir}/embedded",
+           "--with-libxml-include-prefix=#{install_dir}/embedded/include",
+           "--with-libxml-libs-prefix=#{install_dir}/embedded/lib",
            "--without-python",
            "--without-crypto"].join(" "),
           :env => env)
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/bin"}
-  command "make install", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/bin"}
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
+  command "make install", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
 end

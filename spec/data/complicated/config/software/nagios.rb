@@ -28,24 +28,24 @@ source :url => "http://downloads.sourceforge.net/project/nagios/nagios-3.x/nagio
 relative_path "nagios"
 
 env = {
-  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "LD_RUN_PATH" => "#{install_path}/embedded/lib"
+  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
 }
 
 build do
   # configure it
   command(["./configure",
-           "--prefix=#{install_path}/embedded/nagios",
+           "--prefix=#{install_dir}/embedded/nagios",
            "--with-nagios-user=opscode-nagios",
            "--with-nagios-group=opscode-nagios",
            "--with-command-group=opscode-nagios-cmd",
            "--with-command-user=opscode-nagios-cmd",
-           "--with-gd-lib=#{install_path}/embedded/lib",
-           "--with-gd-inc=#{install_path}/embedded/include",
-           "--with-temp-dir=/var#{install_path}/nagios/tmp",
-           "--with-lockfile=/var#{install_path}/nagios/lock",
-           "--with-checkresult-dir=/var#{install_path}/nagios/checkresult",
+           "--with-gd-lib=#{install_dir}/embedded/lib",
+           "--with-gd-inc=#{install_dir}/embedded/include",
+           "--with-temp-dir=/var#{install_dir}/nagios/tmp",
+           "--with-lockfile=/var#{install_dir}/nagios/lock",
+           "--with-checkresult-dir=/var#{install_dir}/nagios/checkresult",
            "--with-mail=/usr/bin/mail"].join(" "),
           :env => env)
 
@@ -56,11 +56,11 @@ build do
   command "bash -c \"find . -name 'Makefile' | xargs sed -i 's:-o opscode-nagios -g opscode-nagios:-o root -g root:g'\""
 
   # build it
-  command "make -j #{max_build_jobs} all", :env => { "LD_RUN_PATH" => "#{install_path}/embedded/lib" }
+  command "make -j #{max_build_jobs} all", :env => { "LD_RUN_PATH" => "#{install_dir}/embedded/lib" }
   command "sudo make install"
   command "sudo make install-config"
   command "sudo make install-exfoliation"
 
   # clean up the install
-  command "sudo rm -rf #{install_path}/embedded/nagios/etc/*"
+  command "sudo rm -rf #{install_dir}/embedded/nagios/etc/*"
 end

@@ -22,5 +22,5 @@ dependency "pip"
 dependency "pygments"
 
 build do
-  command "#{install_path}/embedded/bin/pip install -I --build #{project_dir} #{name}==#{version}"
+  command "#{install_dir}/embedded/bin/pip install -I --build #{project_dir} #{name}==#{version}"
 end

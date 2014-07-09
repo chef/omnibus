@@ -21,7 +21,7 @@ maintainer "Opscode, Inc."
 homepage "http://www.opscode.com"
 
 replaces        "chef-full"
-install_path    "/opt/chef"
+install_dir     "/opt/chef"
 build_version   '1.0.0'
 build_iteration 4
 mac_pkg_identifier "com.getchef.pkg.chef"

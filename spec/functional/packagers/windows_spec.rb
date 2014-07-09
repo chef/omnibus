@@ -30,7 +30,7 @@ module Omnibus
           maintainer         'Chef'
           homepage           'https://getchef.com'
           build_version      '#{version}'
-          install_path       '#{tmp_path}\\opt\\#{name}'
+          install_dir        '#{tmp_path}\\opt\\#{name}'
         EOH
 
       Project.load('/project.rb')
@@ -52,10 +52,10 @@ module Omnibus
       Config.project_root "#{fixtures_path}/sample"
 
       # Create the target directory
-      FileUtils.mkdir_p(project.install_path)
+      FileUtils.mkdir_p(project.install_dir)
 
       # Create a file to be included in the MSI
-      FileUtils.touch(File.join(project.install_path, 'golden_file'))
+      FileUtils.touch(File.join(project.install_dir, 'golden_file'))
     end
 
     it 'builds a pkg and a dmg' do

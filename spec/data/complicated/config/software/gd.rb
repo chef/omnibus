@@ -32,25 +32,25 @@ relative_path "libgd-gd-libgd-486e81dea984"
 source_dir = "#{project_dir}/src"
 
 configure_env = {
-  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "LD_RUN_PATH" => "#{install_path}/embedded/lib",
+  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
   "LIBS" => "-liconv"
 }
 
 build do
   patch :source => 'gd-2.0.33-configure-libpng.patch'
   command(["./configure",
-           "--prefix=#{install_path}/embedded",
-           "--with-libiconv-prefix=#{install_path}/embedded",
-           "--with-jpeg=#{install_path}/embedded",
-           "--with-png=#{install_path}/embedded",
+           "--prefix=#{install_dir}/embedded",
+           "--with-libiconv-prefix=#{install_dir}/embedded",
+           "--with-jpeg=#{install_dir}/embedded",
+           "--with-png=#{install_dir}/embedded",
            "--without-x", "--without-freetype",
            "--without-fontconfig",
            "--without-xpm"].join(" "),
           :env => configure_env,
           :cwd => source_dir)
 
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/bin", "LIBS" => "-liconv"}, :cwd => source_dir
+  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin", "LIBS" => "-liconv"}, :cwd => source_dir
   command "make install", :cwd => source_dir
 end

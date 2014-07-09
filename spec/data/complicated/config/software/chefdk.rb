@@ -36,12 +36,12 @@ dependency "berkshelf"
 dependency "chef-vault"
 
 sep = File::PATH_SEPARATOR || ":"
-path = "#{install_path}/embedded/bin#{sep}#{ENV['PATH']}"
+path = "#{install_dir}/embedded/bin#{sep}#{ENV['PATH']}"
 
 env = {
   # rubocop pulls in nokogiri 1.5.11, so needs PKG_CONFIG_PATH and
   # NOKOGIRI_USE_SYSTEM_LIBRARIES until rubocop stops doing that
-  "PKG_CONFIG_PATH" => "#{install_path}/embedded/lib/pkgconfig",
+  "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig",
   "NOKOGIRI_USE_SYSTEM_LIBRARIES" => "true",
   "PATH" => path
 }
@@ -58,10 +58,10 @@ build do
 
   def appbuilder(app_path, bin_path)
     sep = File::PATH_SEPARATOR || ":"
-    path = "#{install_path}/embedded/bin#{sep}#{ENV['PATH']}"
+    path = "#{install_dir}/embedded/bin#{sep}#{ENV['PATH']}"
 
     gemfile = File.join(app_path, "Gemfile.lock")
-    command("#{install_path}/embedded/bin/appbundler #{app_path} #{bin_path}",
+    command("#{install_dir}/embedded/bin/appbundler #{app_path} #{bin_path}",
             :env => {
       'RUBYOPT'         => nil,
       'BUNDLE_BIN_PATH' => nil,
@@ -90,14 +90,14 @@ build do
 
   # do multiple gem installs to better isolate/debug failures
   auxiliary_gems.each do |g|
-    gem "install #{g[:name]} -v #{g[:version]} -n #{install_path}/bin --no-rdoc --no-ri --verbose", :env => env
+    gem "install #{g[:name]} -v #{g[:version]} -n #{install_dir}/bin --no-rdoc --no-ri --verbose", :env => env
   end
 
-  block { FileUtils.mkdir_p("#{install_path}/embedded/apps") }
+  block { FileUtils.mkdir_p("#{install_dir}/embedded/apps") }
 
   appbundler_apps = %w[chef berkshelf test-kitchen chef-dk chef-vault]
   appbundler_apps.each do |app_name|
-    block { FileUtils.cp_r("#{source_dir}/#{app_name}", "#{install_path}/embedded/apps/") }
-    appbuilder("#{install_path}/embedded/apps/#{app_name}", "#{install_path}/bin")
+    block { FileUtils.cp_r("#{source_dir}/#{app_name}", "#{install_dir}/embedded/apps/") }
+    appbuilder("#{install_dir}/embedded/apps/#{app_name}", "#{install_dir}/bin")
   end
 end

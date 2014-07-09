@@ -131,17 +131,6 @@ module Omnibus
     #   @return [String]
     default(:project_root) { Dir.pwd }
 
-    # @!attribute [rw] install_dir
-    #   Installation directory
-    #
-    #   Defaults to `"/opt/chef"`.
-    #
-    #   @todo This appears to be unused, and actually conflated with
-    #     {Omnibus::Project#install_path}
-    #
-    #   @return [String]
-    default :install_dir, '/opt/chef'
-
     # @!endgroup
 
     # @!group DMG / PKG configuration options

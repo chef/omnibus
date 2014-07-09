@@ -11,6 +11,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :friendly_name, 'Chef'
     it_behaves_like 'a cleanroom setter', :msi_parameters, { foo: 'bar' }
     it_behaves_like 'a cleanroom setter', :package_name, 'chef.package'
+    it_behaves_like 'a cleanroom setter', :install_dir, '/opt/chef'
     it_behaves_like 'a cleanroom setter', :install_path, '/opt/chef'
     it_behaves_like 'a cleanroom setter', :maintainer, 'Chef Software, Inc'
     it_behaves_like 'a cleanroom setter', :homepage, 'https://getchef.com'
@@ -37,8 +38,8 @@ module Omnibus
         expect(project.name).to eq('sample')
       end
 
-      it 'should return an install path' do
-        expect(project.install_path).to eq('/sample')
+      it 'should return an install_dir' do
+        expect(project.install_dir).to eq('/sample')
       end
 
       it 'should return a maintainer' do

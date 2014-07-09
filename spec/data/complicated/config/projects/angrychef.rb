@@ -23,7 +23,7 @@ maintainer "Opscode, Inc."
 homepage "http://www.opscode.com"
 
 replaces        "angrychef"
-install_path    "/opt/angrychef"
+install_dir     "/opt/angrychef"
 build_version   '1.0.0'
 build_iteration 4
 

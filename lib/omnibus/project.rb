@@ -166,7 +166,7 @@ module Omnibus
     # installed by the generated package.
     #
     # @example
-    #   install_path '/opt/chef'
+    #   install_dir '/opt/chef'
     #
     # @raise [MissingProjectConfiguration] if a value was not set before being
     #   subsequently retrieved
@@ -176,12 +176,29 @@ module Omnibus
     #
     # @return [String]
     #
-    def install_path(val = NULL)
+    def install_dir(val = NULL)
       if null?(val)
-        @install_path || raise(MissingProjectConfiguration.new('install_path', '/opt/chef'))
+        @install_dir || raise(MissingProjectConfiguration.new('install_dir', '/opt/chef'))
       else
-        @install_path = windows_safe_path(val)
+        @install_dir = windows_safe_path(val)
       end
+    end
+    expose :install_dir
+
+    #
+    # @deprecated Use {#install_dir} instead.
+    #
+    # @example (see #install_dir)
+    # @raise (see #install_dir)
+    # @param (see #install_dir)
+    # @return (see #install_dir)
+    #
+    def install_path(val = NULL)
+      log.deprecated(log_key) do
+        "install_path (DSL). Please use install_dir instead."
+      end
+
+      install_dir(val)
     end
     expose :install_path
 
@@ -591,7 +608,7 @@ module Omnibus
     expose :config_file
 
     #
-    # Add other files or dirs outside of +install_path+.
+    # Add other files or dirs outside of +install_dir+.
     #
     # @note This option is currently only supported with FPM based package
     # builds such as RPM, DEB and .sh (makeselfinst).  This is not supported
@@ -898,8 +915,8 @@ module Omnibus
 
     def build_me
       FileUtils.mkdir_p(Config.package_dir)
-      FileUtils.rm_rf(install_path)
-      FileUtils.mkdir_p(install_path)
+      FileUtils.rm_rf(install_dir)
+      FileUtils.mkdir_p(install_dir)
 
       library.build_order.each do |software|
         software.build_me
@@ -914,7 +931,7 @@ module Omnibus
       else
         # build a list of all whitelist files from all project dependencies
         whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
-        Omnibus::HealthCheck.run(install_path, whitelist_files)
+        Omnibus::HealthCheck.run(install_dir, whitelist_files)
       end
     end
 
@@ -962,7 +979,7 @@ module Omnibus
     #
     # @return [void]
     def validate
-      name && install_path && maintainer && homepage
+      name && install_dir && maintainer && homepage
       if package_name == replaces
         log.warn { BadReplacesLine.new.message }
       end
@@ -1191,7 +1208,7 @@ module Omnibus
       end
 
       # Install path must be the final entry in the command
-      command_and_opts << install_path
+      command_and_opts << install_dir
       command_and_opts
     end
 
@@ -1200,7 +1217,7 @@ module Omnibus
       command_and_opts = [
         Omnibus.source_root.join('bin', 'makeself.sh'),
         '--gzip',
-        install_path,
+        install_dir,
         output_package('makeself'),
         "'The full stack of #{@name}'",
       ]
@@ -1215,14 +1232,14 @@ module Omnibus
       package_commands = []
       # copy the makeself installer into package
       if File.exist?("#{package_scripts_path}/makeselfinst")
-        package_commands << "cp #{package_scripts_path}/makeselfinst #{install_path}/"
+        package_commands << "cp #{package_scripts_path}/makeselfinst #{install_dir}/"
       end
 
       # run the makeself program
       package_commands << makeself_command.join(' ')
 
       # rm the makeself installer (for incremental builds)
-      package_commands << "rm -f #{install_path}/makeselfinst"
+      package_commands << "rm -f #{install_dir}/makeselfinst"
       package_commands.each { |cmd| run_package_command(cmd) }
     end
 
@@ -1241,15 +1258,15 @@ module Omnibus
       FileUtils.rm_rf '/tmp/bff'
       FileUtils.mkdir '/tmp/bff'
 
-      system "find #{install_path} -print > /tmp/bff/file.list"
+      system "find #{install_dir} -print > /tmp/bff/file.list"
 
       system "cat #{package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble"
 
       # @todo can we just use an erb template here?
       system "cat /tmp/bff/gen.preamble /tmp/bff/file.list #{package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template"
 
-      FileUtils.cp "#{package_scripts_path}/aix/unpostinstall.sh", "#{install_path}/bin"
-      FileUtils.cp "#{package_scripts_path}/aix/postinstall.sh", "#{install_path}/bin"
+      FileUtils.cp "#{package_scripts_path}/aix/unpostinstall.sh", "#{install_dir}/bin"
+      FileUtils.cp "#{package_scripts_path}/aix/postinstall.sh", "#{install_dir}/bin"
 
       run_package_command(bff_command)
 
@@ -1261,13 +1278,13 @@ module Omnibus
     end
 
     def run_pkgmk
-      install_pathname = File.dirname(install_path)
-      install_basename = File.basename(install_path)
+      install_dirname = File.dirname(install_dir)
+      install_basename = File.basename(install_dir)
 
       system 'sudo rm -rf /tmp/pkgmk'
       FileUtils.mkdir '/tmp/pkgmk'
 
-      system "cd #{install_pathname} && find #{install_basename} -print > /tmp/pkgmk/files"
+      system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
 
       prototype_content = <<-EOF
 i pkginfo
@@ -1280,7 +1297,7 @@ i postremove
       end
 
       # generate the prototype's file list
-      system "cd #{install_pathname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
+      system "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
 
       # fix up the user and group in the file list to root
       system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
@@ -1289,7 +1306,7 @@ i postremove
 CLASSES=none
 TZ=PST
 PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_pathname}
+BASEDIR=#{install_dirname}
 PKG=#{package_name}
 NAME=#{package_name}
 ARCH=#{`uname -p`.chomp}
@@ -1308,7 +1325,7 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       FileUtils.cp "#{package_scripts_path}/postinst", '/tmp/pkgmk/postinstall'
       FileUtils.cp "#{package_scripts_path}/postrm", '/tmp/pkgmk/postremove'
 
-      shellout!("pkgmk -o -r #{install_pathname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
+      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
 
       system 'pkgchk -vd /tmp/pkgmk chef'
 

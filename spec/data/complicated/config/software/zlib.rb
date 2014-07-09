@@ -38,30 +38,30 @@ configure_env =
       "CC" => "xlc -q64",
       "CXX" => "xlC -q64",
       "LD" => "ld -b64",
-      "CFLAGS" => "-q64 -I#{install_path}/embedded/include -O",
+      "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
       "OBJECT_MODE" => "64",
       "ARFLAGS" => "-X64 cru",
-      "LDFLAGS" => "-q64 -L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
+      "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
     }
   when "mac_os_x"
     {
-      "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib"
+      "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   when "solaris2"
     {
-      "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include -static-libgcc",
-      "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include -DNO_VIZ"
+      "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -static-libgcc",
+      "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include -DNO_VIZ"
     }
   else
     {
-      "LDFLAGS" => "-Wl,-rpath #{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib"
+      "LDFLAGS" => "-Wl,-rpath #{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   end
 
 build do
-  command "./configure --prefix=#{install_path}/embedded", :env => configure_env
+  command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
   command "make -j #{max_build_jobs}"
   command "make -j #{max_build_jobs} install"
 end

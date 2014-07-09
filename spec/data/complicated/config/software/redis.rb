@@ -23,9 +23,9 @@ source :url => "http://download.redis.io/releases/redis-#{version}.tar.gz",
 
 relative_path "redis-#{version}"
 
-make_args = ["PREFIX=#{install_path}/embedded",
-             "CFLAGS='-L#{install_path}/embedded/lib -I#{install_path}/embedded/include'",
-             "LD_RUN_PATH=#{install_path}/embedded/lib"].join(" ")
+make_args = ["PREFIX=#{install_dir}/embedded",
+             "CFLAGS='-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include'",
+             "LD_RUN_PATH=#{install_dir}/embedded/lib"].join(" ")
 
 build do
   command ["make -j #{max_build_jobs}", make_args].join(" ")

@@ -26,5 +26,5 @@ source :url => "https://pypi.python.org/packages/source/p/pip/pip-#{version}.tar
 relative_path "pip-#{version}"
 
 build do
-  command "#{install_path}/embedded/bin/python setup.py install --prefix=#{install_path}/embedded"
+  command "#{install_dir}/embedded/bin/python setup.py install --prefix=#{install_dir}/embedded"
 end

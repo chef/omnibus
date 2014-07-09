@@ -99,19 +99,19 @@ build do
     "libbz2-2.dll" => "libbz2-2.dll",
     "libz-1.dll" => "libz-1.dll"
   }.each do |target, to|
-    source = File.expand_path(File.join(install_path, "embedded", "mingw", "bin", to)).gsub(/\//, "\\")
-    target = File.expand_path(File.join(install_path, "bin", target)).gsub(/\//, "\\")
+    source = File.expand_path(File.join(install_dir, "embedded", "mingw", "bin", to)).gsub(/\//, "\\")
+    target = File.expand_path(File.join(install_dir, "bin", target)).gsub(/\//, "\\")
     command "cp #{source}  #{target}"
   end
 
   rake "gem"
 
   gem ["install pkg/chef*mingw32.gem",
-       "-n #{install_path}/bin",
+       "-n #{install_dir}/bin",
        "--no-rdoc --no-ri"].join(" ")
 
   # XXX: doing a normal bundle_bust here results in gems installed into the outer bundle...
-  command "bundle install", :env => { "PATH" => "#{install_path}/embedded/bin;#{install_path}/embedded/mingw/bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem", "BUNDLE_BIN_PATH" => "#{install_path}/embedded/bin/bundle" , "BUNDLE_GEMFILE" => nil, "GEM_HOME" => "#{install_path}/embedded/lib/ruby/gems/1.9.1", "GEM_PATH" => "#{install_path}/embedded/lib/ruby/gems/1.9.1", "RUBYOPT" => nil }
+  command "bundle install", :env => { "PATH" => "#{install_dir}/embedded/bin;#{install_dir}/embedded/mingw/bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem", "BUNDLE_BIN_PATH" => "#{install_dir}/embedded/bin/bundle" , "BUNDLE_GEMFILE" => nil, "GEM_HOME" => "#{install_dir}/embedded/lib/ruby/gems/1.9.1", "GEM_PATH" => "#{install_dir}/embedded/lib/ruby/gems/1.9.1", "RUBYOPT" => nil }
 
   # render batch files
   #
@@ -135,22 +135,22 @@ EOBATCH
 
     gem_executables = []
     %w{chef}.each do |gem|
-      puts "#{install_path.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*mingw32.gem"
+      puts "#{install_dir.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*mingw32.gem"
       require 'pp'
-      pp Dir["#{install_path.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*mingw32.gem"]
-      gem_file = Dir["#{install_path.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*mingw32.gem"].first
+      pp Dir["#{install_dir.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*mingw32.gem"]
+      gem_file = Dir["#{install_dir.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*mingw32.gem"].first
       gem_executables << Gem::Format.from_file_by_path(gem_file).spec.executables
     end
 
     # XXX: need to fix ohai to use own gemspec as well and eliminate copypasta
     %w{ohai}.each do |gem|
-      gem_file = Dir["#{install_path.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*.gem"].first
+      gem_file = Dir["#{install_dir.gsub(/\\/, '/')}/embedded/**/cache/#{gem}*.gem"].first
       gem_executables << Gem::Format.from_file_by_path(gem_file).spec.executables
     end
 
     gem_executables.flatten.each do |bin|
       @bin = bin
-      File.open("#{install_path}/bin/#{@bin}.bat", "w") do |f|
+      File.open("#{install_dir}/bin/#{@bin}.bat", "w") do |f|
         f.puts batch_template.result(binding)
       end
     end

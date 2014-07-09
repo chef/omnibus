@@ -9,7 +9,7 @@ source :url => "http://search.cpan.org/CPAN/authors/id/D/DO/DOUGM/ExtUtils-Embed
 relative_path "ExtUtils-Embed-#{version}"
 
 build do
-    command "#{install_path}/embedded/bin/perl Makefile.PL INSTALL_BASE=#{install_path}/embedded"
+    command "#{install_dir}/embedded/bin/perl Makefile.PL INSTALL_BASE=#{install_dir}/embedded"
     command "make"
     command "make install"
 end

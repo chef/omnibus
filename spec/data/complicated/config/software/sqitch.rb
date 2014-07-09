@@ -9,11 +9,11 @@ source :url => "http://www.cpan.org/authors/id/D/DW/DWHEELER/App-Sqitch-#{versio
 relative_path "App-Sqitch-#{version}"
 
 env = {
-  "PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}"
+  "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}"
 }
 
 # Ensure we install with the properly configured embedded `cpan` client
-omnibus_cpan_client = "#{install_path}/embedded/bin/cpan -j #{cache_dir}/cpan/OmnibusConfig.pm"
+omnibus_cpan_client = "#{install_dir}/embedded/bin/cpan -j #{cache_dir}/cpan/OmnibusConfig.pm"
 
 # See https://github.com/theory/sqitch for more
 build do

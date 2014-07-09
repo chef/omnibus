@@ -12,7 +12,7 @@ module Omnibus
         build_version: '1.0.0',
         iteration: '12902349',
         mac_pkg_identifier: 'com.chef.hamlet',
-        install_path: '/opt/hamlet',
+        install_dir: '/opt/hamlet',
         package_scripts_path: 'package-scripts',
         files_path: 'files',
         resources_path: nil,

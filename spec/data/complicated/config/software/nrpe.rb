@@ -29,10 +29,10 @@ source :url => "http://downloads.sourceforge.net/project/nagios/nrpe-2.x/nrpe-2.
 relative_path "nrpe-2.13"
 
 env = {
-  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "LD_RUN_PATH" => "#{install_path}/embedded/lib",
-  "PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}"
+  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
+  "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}"
 }
 
 build do
@@ -44,18 +44,18 @@ build do
 
   # configure it
   command(["./configure",
-           "--prefix=#{install_path}/embedded",
-           "--with-ssl=#{install_path}/embedded",
-           "--with-ssl-lib=#{install_path}/embedded/lib",
-           "--with-ssl-inc=#{install_path}/embedded/include"].join(" "),
+           "--prefix=#{install_dir}/embedded",
+           "--with-ssl=#{install_dir}/embedded",
+           "--with-ssl-lib=#{install_dir}/embedded/lib",
+           "--with-ssl-inc=#{install_dir}/embedded/include"].join(" "),
           :env => env)
 
   # build it
-  command "make all", :env => {"LD_RUN_PATH" => "#{install_path}/embedded/lib"}
+  command "make all", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
 
   # move it
-  command "mkdir -p #{install_path}/embedded/nagios/libexec"
-  command "mkdir -p #{install_path}/embedded/nagios/bin"
-  command "cp ./src/check_nrpe #{install_path}/embedded/nagios/libexec"
-  command "sudo cp ./src/nrpe #{install_path}/embedded/nagios/bin"
+  command "mkdir -p #{install_dir}/embedded/nagios/libexec"
+  command "mkdir -p #{install_dir}/embedded/nagios/bin"
+  command "cp ./src/check_nrpe #{install_dir}/embedded/nagios/libexec"
+  command "sudo cp ./src/nrpe #{install_dir}/embedded/nagios/bin"
 end

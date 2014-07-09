@@ -32,40 +32,40 @@ configure_env =
   case platform
   when "aix"
     {
-      "LDFLAGS" => "-maix64 -L#{install_path}/embedded/lib -Wl,-blibpath:#{install_path}/embedded/lib:/usr/lib:/lib",
-      "CFLAGS" => "-maix64 -I#{install_path}/embedded/include",
+      "LDFLAGS" => "-maix64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+      "CFLAGS" => "-maix64 -I#{install_dir}/embedded/include",
       "LD" => "ld -b64",
       "OBJECT_MODE" => "64",
       "ARFLAGS" => "-X64 cru "
     }
   when "mac_os_x"
     {
-      "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib"
+      "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   when "solaris2"
     {
-      "LDFLAGS" => "-R#{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib -DNO_VIZ"
+      "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib -DNO_VIZ"
     }
   else
     {
-      "LDFLAGS" => "-Wl,-rpath #{install_path}/embedded/lib -L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-      "CFLAGS" => "-I#{install_path}/embedded/include -L#{install_path}/embedded/lib"
+      "LDFLAGS" => "-Wl,-rpath #{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+      "CFLAGS" => "-I#{install_dir}/embedded/include -L#{install_dir}/embedded/lib"
     }
   end
 
 build do
-  command "./configure --prefix=#{install_path}/embedded", :env => configure_env
+  command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
   command "make -j #{max_build_jobs}"
   command "make -j #{max_build_jobs} install"
   # libffi's default install location of header files is aweful...
-  command "cp -f #{install_path}/embedded/lib/libffi-3.0.13/include/* #{install_path}/embedded/include"
+  command "cp -f #{install_dir}/embedded/lib/libffi-3.0.13/include/* #{install_dir}/embedded/include"
 
   # On centos libffi libraries are places under /embedded/lib64
   # move them over to lib
   if platform == "centos"
-    command "mv #{install_path}/embedded/lib64/* #{install_path}/embedded/lib/"
-    command "rm -rf #{install_path}/embedded/lib64"
+    command "mv #{install_dir}/embedded/lib64/* #{install_dir}/embedded/lib/"
+    command "rm -rf #{install_dir}/embedded/lib64"
   end
 end

@@ -48,7 +48,7 @@ order to build an MSI. You can also create these files as erb templates and
 omnibus will render them before starting building the MSI.
 
 These files are XML files that are created based on Windows WIX Schema. By
-default they will package the files under configured `install_path` and present
+default they will package the files under configured `install_dir` and present
 a UI that lets users to choose an installation location for the packaged files.
 You can modify these XML files based on the documentation
   [here](http://wixtoolset.org/documentation/manual/v3/xsd/).

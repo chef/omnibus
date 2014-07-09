@@ -43,7 +43,6 @@ module Omnibus
     include_examples 'a configurable', :package_dir, '/var/cache/omnibus/pkg'
     include_examples 'a configurable', :package_tmp, '/var/cache/omnibus/pkg-tmp'
     include_examples 'a configurable', :project_root, Dir.pwd
-    include_examples 'a configurable', :install_dir, '/opt/chef'
     include_examples 'a configurable', :build_dmg, true
     include_examples 'a configurable', :dmg_window_bounds, '100, 100, 750, 600'
     include_examples 'a configurable', :dmg_pkg_position, '535, 50'

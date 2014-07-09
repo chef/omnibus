@@ -132,7 +132,7 @@ name            'chef-full'
 maintainer      'YOUR NAME'
 homepage        'http://yoursite.com'
 
-install_path    '/opt/chef'
+install_dir     '/opt/chef'
 build_version   '0.10.8'
 build_iteration 4
 
@@ -144,7 +144,7 @@ Some DSL methods available include:
 | DSL Method        | Description                                 |
 | :---------------: | --------------------------------------------|
 | `name`            | The name of the project                     |
-| `install_path`    | The desired install location of the package |
+| `install_dir`     | The desired install location of the package |
 | `build_version`   | The package version                         |
 | `build_iteration` | The package iteration number                |
 | `dependency`      | An Omnibus software-defined component to include in this package |

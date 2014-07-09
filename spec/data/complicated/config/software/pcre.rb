@@ -27,16 +27,16 @@ source :url => "http://iweb.dl.sourceforge.net/project/pcre/pcre/8.31/pcre-8.31.
 relative_path "pcre-8.31"
 
 configure_env = {
-  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include"
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
 }
 
 build do
   command ["./configure",
-           "--prefix=#{install_path}/embedded",
+           "--prefix=#{install_dir}/embedded",
            "--enable-pcretest-libedit"].join(" "), :env => configure_env
   command("make -j #{max_build_jobs}",
           :env => {
-            "PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}"
+            "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}"
           })
   command "make install"
 end

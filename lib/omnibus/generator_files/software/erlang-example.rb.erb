@@ -17,22 +17,22 @@ source :git => "git://github.com/example/erlang.git"
 relative_path "erlang-example"
 
 env = {
-  "PATH" => "#{install_path}/embedded/bin:#{ENV["PATH"]}",
-  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "LD_RUN_PATH" => "#{install_path}/embedded/lib"
+  "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}",
+  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
 }
 
 build do
   command "make distclean", :env => env
   command "make rel", :env => env
-  command "mkdir -p #{install_path}/embedded/service/example-erlang"
-  command ["#{install_path}/embedded/bin/rsync",
+  command "mkdir -p #{install_dir}/embedded/service/example-erlang"
+  command ["#{install_dir}/embedded/bin/rsync",
            "-a",
            "--delete",
            "--exclude=.git/***",
            "--exclude=.gitignore",
            "./rel/erlang-example/",
-           "#{install_path}/embedded/service/erlang-example/"].join(" ")
-  command "rm -rf #{install_path}/embedded/service/erlang-example/log"
+           "#{install_dir}/embedded/service/erlang-example/"].join(" ")
+  command "rm -rf #{install_dir}/embedded/service/erlang-example/log"
 end

@@ -41,7 +41,7 @@ module Omnibus
             homepage      'http://getchef.com'
             build_version '1.0.0'
 
-            install_path '/opt/chef-server'
+            install_dir '/opt/chef-server'
 
             dependency 'preparation'
             dependency 'erchef'
@@ -111,7 +111,7 @@ module Omnibus
               homepage      'http://getchef.com'
               build_version '1.0.0'
 
-              install_path '/opt/chefdk'
+              install_dir '/opt/chefdk'
 
               dependency 'preparation'
               dependency 'erchef'

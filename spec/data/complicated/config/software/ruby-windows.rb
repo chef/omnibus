@@ -26,5 +26,5 @@ source :url => "http://dl.bintray.com/oneclick/rubyinstaller/ruby-#{version}-i38
 build do
   # Robocopy's return code is 1 if it succesfully copies over the
   # files and 0 if the files are already existing at the destination
-  command "robocopy . #{install_path}\\embedded\\ /MIR", :returns => [0, 1]
+  command "robocopy . #{install_dir}\\embedded\\ /MIR", :returns => [0, 1]
 end

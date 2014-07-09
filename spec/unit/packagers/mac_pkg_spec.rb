@@ -52,7 +52,7 @@ module Omnibus
         build_version: '23.4.2',
         iteration: 4,
         maintainer: "Joe's Software",
-        install_path: '/opt/myproject',
+        install_dir: '/opt/myproject',
         files_path: files_path,
         package_scripts_path: scripts_path,
         mac_pkg_identifier: mac_pkg_identifier,

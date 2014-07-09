@@ -124,7 +124,7 @@ module Omnibus
     def template_options
       @template_options ||= {
         name: name,
-        install_path: "/opt/#{name}",
+        install_dir: "/opt/#{name}",
       }
     end
   end

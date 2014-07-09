@@ -8,7 +8,7 @@ module Omnibus
     let(:project) {
       project = double(Project,
         name: 'chef',
-        install_path: '/monkeys',
+        install_dir: '/monkeys',
         overrides: {}
       )
 
@@ -207,7 +207,7 @@ module Omnibus
       context 'on Windows' do
         before do
           stub_ohai(platform: 'windows', version: '2012')
-          project.stub(:install_path).and_return('c:/monkeys')
+          allow(project).to receive(:install_dir).and_return('c:/monkeys')
           stub_env('Path', windows_path)
         end
 

@@ -1,5 +1,5 @@
 name 'sample'
-install_path '/sample'
+install_dir '/sample'
 maintainer 'Sample Devs'
 homepage 'http://example.com/'
 

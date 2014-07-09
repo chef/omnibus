@@ -36,7 +36,7 @@ end
 # /opt/chef/embedded pkg-configs.  this should probably be done more generally,
 # in core ominbus-ruby.
 env = {
-  "PKG_CONFIG_PATH" => "#{install_path}/embedded/lib/pkgconfig",
+  "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig",
   "NOKOGIRI_USE_SYSTEM_LIBRARIES" => "true",
 }
 
@@ -46,10 +46,10 @@ build do
        "-v #{version}",
        "--",
        "--use-system-libraries",
-       "--with-xml2-lib=#{install_path}/embedded/lib",
-       "--with-xml2-include=#{install_path}/embedded/include/libxml2",
-       "--with-xslt-lib=#{install_path}/embedded/lib",
-       "--with-xslt-include=#{install_path}/embedded/include/libxslt",
-       "--with-iconv-dir=#{install_path}/embedded",
-       "--with-zlib-dir=#{install_path}/embedded"].join(" "), :env => env
+       "--with-xml2-lib=#{install_dir}/embedded/lib",
+       "--with-xml2-include=#{install_dir}/embedded/include/libxml2",
+       "--with-xslt-lib=#{install_dir}/embedded/lib",
+       "--with-xslt-include=#{install_dir}/embedded/include/libxslt",
+       "--with-iconv-dir=#{install_dir}/embedded",
+       "--with-zlib-dir=#{install_dir}/embedded"].join(" "), :env => env
 end

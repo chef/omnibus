@@ -27,12 +27,12 @@ source :url => "http://www.libarchive.org/downloads/libarchive-#{version}.tar.gz
 relative_path "libarchive-#{version}"
 
 env = {
-  "LDFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include",
-  "CFLAGS" => "-L#{install_path}/embedded/lib -I#{install_path}/embedded/include "
+  "LDFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
+  "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include "
 }
 
 build do
-  command "./configure --prefix=#{install_path}/embedded \
+  command "./configure --prefix=#{install_dir}/embedded \
     --without-lzma \
     --without-lzo2 \
     --without-nettle \

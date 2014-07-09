@@ -19,7 +19,7 @@ name 'chefdk'
 maintainer 'Chef Software, Inc.'
 homepage 'http://www.getchef.com'
 
-install_path '/opt/chefdk'
+install_dir '/opt/chefdk'
 build_version Omnibus::BuildVersion.new.git_describe
 build_iteration 4
 

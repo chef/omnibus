@@ -27,7 +27,7 @@ working_dir = "#{project_dir}/runit-2.1.1"
 
 build do
   # put runit where we want it, not where they tell us to
-  command 'sed -i -e "s/^char\ \*varservice\ \=\"\/service\/\";$/char\ \*varservice\ \=\"' + project.install_path.gsub("/", "\\/") + '\/service\/\";/" src/sv.c', :cwd => working_dir
+  command 'sed -i -e "s/^char\ \*varservice\ \=\"\/service\/\";$/char\ \*varservice\ \=\"' + project.install_dir.gsub("/", "\\/") + '\/service\/\";/" src/sv.c', :cwd => working_dir
   # TODO: the following is not idempotent
   command "sed -i -e s:-static:: src/Makefile", :cwd => working_dir
 
@@ -36,7 +36,7 @@ build do
   command "make check", :cwd => "#{working_dir}/src"
 
   # move it
-  command "mkdir -p #{install_path}/embedded/bin"
+  command "mkdir -p #{install_dir}/embedded/bin"
   ["src/chpst",
    "src/runit",
    "src/runit-init",
@@ -46,12 +46,12 @@ build do
    "src/sv",
    "src/svlogd",
    "src/utmpset"].each do |bin|
-    command "cp #{bin} #{install_path}/embedded/bin", :cwd => working_dir
+    command "cp #{bin} #{install_dir}/embedded/bin", :cwd => working_dir
   end
 
   block do
-    install_path = self.project.install_path
-    open("#{install_path}/embedded/bin/runsvdir-start", "w") do |file|
+    install_dir = self.project.install_dir
+    open("#{install_dir}/embedded/bin/runsvdir-start", "w") do |file|
       file.print <<-EOH
 #!/bin/bash
 #
@@ -71,7 +71,7 @@ build do
 # limitations under the License.
 #
 
-PATH=#{install_path}/bin:#{install_path}/embedded/bin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin
+PATH=#{install_dir}/bin:#{install_dir}/embedded/bin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin
 
 # enforce our own ulimits
 
@@ -98,18 +98,18 @@ echo "1000000" > /proc/sys/fs/file-max
 umask 022
 
 exec env - PATH=$PATH \
-runsvdir -P #{install_path}/service 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'
+runsvdir -P #{install_dir}/service 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'
        EOH
     end
   end
 
-  command "chmod 755 #{install_path}/embedded/bin/runsvdir-start"
+  command "chmod 755 #{install_dir}/embedded/bin/runsvdir-start"
 
   # set up service directories
   block do
-    ["#{install_path}/service",
-     "#{install_path}/sv",
-     "#{install_path}/init"].each do |dir|
+    ["#{install_dir}/service",
+     "#{install_dir}/sv",
+     "#{install_dir}/init"].each do |dir|
       FileUtils.mkdir_p(dir)
       # make sure cached builds include this dir
       FileUtils.touch(File.join(dir, '.gitkeep'))

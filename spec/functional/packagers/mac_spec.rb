@@ -13,7 +13,7 @@ module Omnibus
           maintainer         'Chef'
           homepage           'https://getchef.com'
           build_version      '#{version}'
-          install_path       '#{tmp_path}/opt/#{name}'
+          install_dir        '#{tmp_path}/opt/#{name}'
           mac_pkg_identifier 'test.pkg.#{name}'
         EOH
 
@@ -39,7 +39,7 @@ module Omnibus
       Config.project_root "#{fixtures_path}/sample"
 
       # Create the target directory
-      FileUtils.mkdir_p(project.install_path)
+      FileUtils.mkdir_p(project.install_dir)
     end
 
     it 'builds a pkg and a dmg' do

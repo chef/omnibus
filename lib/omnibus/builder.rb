@@ -171,19 +171,19 @@ module Omnibus
     #   all be collapsed into a single underlying implementation, since
     #   they all just differ on the executable being called
     def ruby(*args)
-      @build_commands << bundle_bust(*prepend_cmd("#{install_path}/embedded/bin/ruby", *args))
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/ruby", *args))
     end
 
     def gem(*args)
-      @build_commands << bundle_bust(*prepend_cmd("#{install_path}/embedded/bin/gem", *args))
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/gem", *args))
     end
 
     def bundle(*args)
-      @build_commands << bundle_bust(*prepend_cmd("#{install_path}/embedded/bin/bundle", *args))
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/bundle", *args))
     end
 
     def rake(*args)
-      @build_commands << bundle_bust(*prepend_cmd("#{install_path}/embedded/bin/rake", *args))
+      @build_commands << bundle_bust(*prepend_cmd("#{install_dir}/embedded/bin/rake", *args))
     end
 
     def block(&rb_block)
@@ -208,16 +208,16 @@ module Omnibus
     #
     # @deprecated Use {install_path} instead
     #
-    def install_dir
+    def install_path
       log.deprecated(log_key) do
-        'install_dir (DSL). Please use install_path instead.'
+        'install_path (DSL). Please use install_dir instead.'
       end
 
-      install_path
+      install_dir
     end
 
-    def install_path
-      @software.install_path
+    def install_dir
+      @software.install_dir
     end
 
     def build

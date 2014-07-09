@@ -45,6 +45,6 @@ build do
   patch :source => "tcp_wrappers-7.6-malloc-fix.patch"
   patch :source => "tcp_wrappers-7.6-makefile-dest-fix.patch"
   command "make STYLE=-DPROCESS_OPTIONS linux"
-  command "make DESTDIR=#{install_path}/embedded install-lib"
-  command "make DESTDIR=#{install_path}/embedded install-dev"
+  command "make DESTDIR=#{install_dir}/embedded install-lib"
+  command "make DESTDIR=#{install_dir}/embedded install-dev"
 end
