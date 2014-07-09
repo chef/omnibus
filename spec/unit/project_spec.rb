@@ -30,6 +30,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :exclude, 'hamlet'
     it_behaves_like 'a cleanroom setter', :config_file, '/path/to/config.rb'
     it_behaves_like 'a cleanroom setter', :extra_package_file, '/path/to/asset'
+    it_behaves_like 'a cleanroom setter', :dependencies, 'a', 'b', 'c'
 
     it_behaves_like 'a cleanroom getter', :files_path
 
