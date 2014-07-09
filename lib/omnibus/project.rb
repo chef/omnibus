@@ -867,16 +867,16 @@ module Omnibus
     # to the conventions of the platform for which the package is
     # being built.
     #
-    # All iteration strings begin with the value set in {#build_iteration}
+    # @deprecated Use +build_iteration+ instead.
     #
-    # @return [String]
+    # @return [String] build_iteration
+    #
     def iteration
-      case Ohai['platform_family']
-      when 'freebsd'
-        "#{build_iteration}.#{Ohai['kernel']['machine']}"
-      else
-        "#{build_iteration}"
+      log.deprecated(log_key) do
+        "iteration (DSL). Please use build_iteration instead."
       end
+
+      "#{build_iteration}"
     end
 
     def build_me
@@ -1058,13 +1058,13 @@ module Omnibus
     def output_package(pkg_type)
       case pkg_type
       when 'makeself'
-        "#{package_name}-#{build_version}_#{iteration}.sh"
+        "#{package_name}-#{build_version}_#{iteration}.#{Ohai['kernel']['machine']}.sh"
       when 'msi'
         Packager::WindowsMsi.new(self).package_name
       when 'bff'
-        "#{package_name}.#{bff_version}.bff"
+        "#{package_name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
       when 'pkgmk'
-        "#{package_name}-#{build_version}-#{iteration}.solaris"
+        "#{package_name}-#{build_version}-#{iteration}.#{Ohai['kernel']['machine']}.solaris"
       when 'mac_pkg'
         Packager::MacPkg.new(self).package_name
       when 'mac_dmg'
