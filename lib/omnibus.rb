@@ -103,7 +103,7 @@ module Omnibus
         remove_instance_variable(instance_variable)
       end
 
-      Config.reset
+      Config.reset!
     end
 
     #
@@ -159,7 +159,7 @@ module Omnibus
     #
     # @return [void]
     def load_configuration(file)
-      Config.from_file(file)
+      Config.load(file)
     end
 
     # Processes the configuration to construct the dependency tree of
