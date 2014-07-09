@@ -1064,7 +1064,7 @@ module Omnibus
       when 'bff'
         "#{package_name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
       when 'pkgmk'
-        "#{package_name}-#{build_version}-#{build_iteration}.#{Ohai['kernel']['machine']}.solaris"
+        "#{package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
       when 'mac_pkg'
         Packager::MacPkg.new(self).package_name
       when 'mac_dmg'
