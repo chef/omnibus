@@ -1058,13 +1058,13 @@ module Omnibus
     def output_package(pkg_type)
       case pkg_type
       when 'makeself'
-        "#{package_name}-#{build_version}_#{iteration}.#{Ohai['kernel']['machine']}.sh"
+        "#{package_name}-#{build_version}_#{build_iteration}.#{Ohai['kernel']['machine']}.sh"
       when 'msi'
         Packager::WindowsMsi.new(self).package_name
       when 'bff'
         "#{package_name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
       when 'pkgmk'
-        "#{package_name}-#{build_version}-#{iteration}.#{Ohai['kernel']['machine']}.solaris"
+        "#{package_name}-#{build_version}-#{build_iteration}.#{Ohai['kernel']['machine']}.solaris"
       when 'mac_pkg'
         Packager::MacPkg.new(self).package_name
       when 'mac_dmg'
@@ -1075,7 +1075,7 @@ module Omnibus
         pkg = FPM::Package.types[pkg_type].new
         pkg.version = build_version
         pkg.name = package_name
-        pkg.iteration = iteration
+        pkg.iteration = build_iteration
         if pkg_type == 'solaris'
           pkg.to_s('NAME.FULLVERSION.ARCH.TYPE')
         else
@@ -1108,7 +1108,7 @@ module Omnibus
         "-v #{build_version}",
         "-n #{package_name}",
         "-p #{output_package(pkg_type)}",
-        "--iteration #{iteration}",
+        "--iteration #{build_iteration}",
         "-m '#{maintainer}'",
         "--description '#{description}'",
         "--url #{homepage}",
@@ -1209,7 +1209,7 @@ module Omnibus
     end
 
     def bff_version
-      build_version.split(/[^\d]/)[0..2].join('.') + ".#{iteration}"
+      build_version.split(/[^\d]/)[0..2].join('.') + ".#{build_iteration}"
     end
 
     def run_bff
@@ -1233,7 +1233,7 @@ module Omnibus
     end
 
     def pkgmk_version
-      "#{build_version}-#{iteration}"
+      "#{build_version}-#{build_iteration}"
     end
 
     def run_pkgmk

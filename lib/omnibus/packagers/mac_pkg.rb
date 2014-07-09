@@ -60,7 +60,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}-#{project.iteration}.pkg"
+      "#{project.name}-#{project.build_version}-#{project.build_iteration}.pkg"
     end
 
     # The full path where the product package was/will be written.

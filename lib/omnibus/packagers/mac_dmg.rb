@@ -208,7 +208,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}-#{project.iteration}.dmg"
+      "#{project.name}-#{project.build_version}-#{project.build_iteration}.dmg"
     end
 
     # The path to the folder that we should stage.
@@ -229,7 +229,7 @@ module Omnibus
     #
     # @return [String]
     def final_dmg
-      File.expand_path("#{Config.package_dir}/#{project.name}-#{project.build_version}-#{project.iteration}.dmg")
+      File.expand_path("#{Config.package_dir}/#{project.name}-#{project.build_version}-#{project.build_iteration}.dmg")
     end
   end
 end
