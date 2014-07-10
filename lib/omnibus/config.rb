@@ -74,6 +74,25 @@ module Omnibus
       alias_method :has_key?, :key?
 
       #
+      # Get a value from the config object.
+      #
+      # @deprecated Use direct method instead
+      #
+      # @param [Symbol] key
+      #   the key to fetch
+      #
+      # @return [Object]
+      #
+      def fetch(key)
+        Omnibus.logger.deprecated('Config') do
+          "fetch ([]). Please use `Config.#{key}' instead."
+        end
+
+        public_method_defined?(key.to_sym) && instance.send(key.to_sym)
+      end
+      alias_method :[], :fetch
+
+      #
       # Reset the current configuration values. This method will unset any
       # "stored" or memorized configuration values.
       #
