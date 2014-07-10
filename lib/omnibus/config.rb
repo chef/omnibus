@@ -377,6 +377,13 @@ module Omnibus
     # @return [Integer]
     default(:build_retries, 3)
 
+    # Use the incremental build caching implemented via git. This will
+    # drastically improve build times, but may result in hidden and
+    # unexpected bugs.
+    #
+    # @return [true, false]
+    default(:use_git_caching, true)
+
     # --------------------------------------------------
     # @!endgroup
     #

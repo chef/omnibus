@@ -831,12 +831,21 @@ module Omnibus
     private
 
     #
-    # Determine if this software should always be built.
+    # Determine if this software should always be built. A software should
+    # always be built if git caching is disabled ({Config#use_git_caching}) or
+    # if the parent project has dirtied the cache.
     #
     # @return [true, false]
     #
     def always_build?
-      return true if project.dirty?
+      unless Config.use_git_caching
+        return true
+      end
+
+      if project.dirty?
+        return true
+      end
+
       !!@always_build
     end
 

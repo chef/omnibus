@@ -45,6 +45,7 @@ module Omnibus
     include_examples 'a configurable', :solaris_compiler, nil
     include_examples 'a configurable', :append_timestamp, true
     include_examples 'a configurable', :build_retries, 3
+    include_examples 'a configurable', :use_git_caching, true
 
     context 'on Windows' do
       before do
