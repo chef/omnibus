@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'chef-sugar',      '~> 1.2'
   gem.add_dependency 'mixlib-shellout', '~> 1.4'
-  gem.add_dependency 'ohai',            '~> 7.2.0.rc'
+  gem.add_dependency 'ohai',            '~> 7.2'
   gem.add_dependency 'fpm',             '~> 0.4'
   gem.add_dependency 'uber-s3'
   gem.add_dependency 'thor',            '~> 0.18'
