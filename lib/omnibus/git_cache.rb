@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require 'fileutils'
 require 'digest'
+require 'fileutils'
 
 module Omnibus
   class GitCache
@@ -45,8 +45,6 @@ module Omnibus
 
     # Computes the tag for this cache entry
     def tag
-      name = @software.name
-
       # Accumulate an array of all the software projects that come before
       # the name and version we are tagging. So if you have
       #
@@ -60,20 +58,13 @@ module Omnibus
           true
         end
       end
-      dep_string = dep_list.map { |i| "#{i.name}-#{i.version}" }.join('-')
-      # digest the content of the software's config so that changes to
-      # build params invalidate cache.
 
-      if @software.filepath.nil? || !File.exist?(@software.filepath)
-        raise Error, "`#{@software.name}' does not exist on disk!"
-      end
+      # This is the list of all the unqiue shasums of all the software build
+      # dependencies, including the on currently being acted upon.
+      shasums = [dep_list.map(&:shasum), @software.shasum].flatten
+      suffix  = Digest::SHA256.hexdigest(shasums.join('|'))
 
-      dep_string = IO.read(@software.filepath) + dep_string
-      digest = Digest::SHA256.hexdigest(dep_string)
-
-      version = @software.version_for_cache
-
-      "#{name}-#{version}-#{digest}"
+      "#{@software.name}-#{suffix}"
     end
 
     # Create an incremental install path cache for the software step

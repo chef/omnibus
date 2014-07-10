@@ -36,17 +36,22 @@ module Omnibus
       # @return [Software]
       #
       def load(filepath)
-        instance = new
+        instance = new(filepath)
         instance.evaluate_file(filepath)
         instance
       end
     end
 
     include Cleanroom
+    include Digestable
     include Logging
     include NullArgumentable
     include Sugarable
     include Util
+
+    def initialize(filepath = nil)
+      @filepath = filepath
+    end
 
     #
     # @!group DSL methods
@@ -760,6 +765,16 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # The path (on disk) where this project came from. Warning: this can be
+    # +nil+ if a project was dynamically created!
+    #
+    # @return [String, nil]
+    #
+    def filepath
+      @filepath
+    end
+
+    #
     #
     # The list of config files for this software.
     #
@@ -1006,6 +1021,55 @@ module Omnibus
       if package_name == replaces
         log.warn { BadReplacesLine.new.message }
       end
+    end
+
+    #
+    # The unique "hash" for this project.
+    #
+    # @see (#shasum)
+    #
+    # @return [Fixnum]
+    #
+    def hash
+      shasum.hash
+    end
+
+    #
+    # Determine if two projects are identical.
+    #
+    # @param [Project] other
+    #
+    # @return [true, false]
+    #
+    def ==(other)
+      self.hash == other.hash
+    end
+    alias_method :eql?, :==
+
+    #
+    # The unique SHA256 for this project.
+    #
+    # A project is defined by its name, its build_version, its install_dir,
+    # and any overrides (as JSON). Additionally, if provided, the actual file
+    # contents are included in the SHA to ensure uniqueness.
+    #
+    # @return [String]
+    #
+    def shasum
+      digest = Digest::SHA256.new
+
+      update_with_string(digest, name)
+      update_with_string(digest, build_version)
+      update_with_string(digest, install_dir)
+      update_with_string(digest, JSON.fast_generate(overrides))
+
+      if filepath && File.exist?(filepath)
+        update_with_file_contents(digest, filepath)
+      else
+        update_with_string(digest, '<DYNAMIC>')
+      end
+
+      digest.hexdigest
     end
 
     #

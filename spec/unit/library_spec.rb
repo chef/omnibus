@@ -2,21 +2,41 @@ require 'spec_helper'
 
 module Omnibus
   describe Library do
-    let(:project) { Project.load(project_path('chefdk')) }
-    let(:library) { Library.new(project) }
-    let(:erchef)  { Software.load(project, software_path('erchef')) }
-    let(:zlib)    { Software.load(project, software_path('zlib')) }
-
-    def generate_software(name, deps)
+    #
+    # Helper method for generating a fake software definition.
+    #
+    def generate_software(name, version, dependencies = [])
       software = Software.new(project, {}, "#{name}.rb")
       software.name(name.to_s)
+      software.version(version)
 
-      deps.each do |dep|
-        software.dependency(dep)
+      dependencies.each do |dependency|
+        software.dependency(dependency)
       end
 
       software
     end
+
+    let(:project) { Project.load(project_path('chefdk')) }
+    let(:library) { Library.new(project) }
+
+    let(:bundler)     { generate_software('bundler', '1.5.4') }
+    let(:curl)        { generate_software('curl', '1.5.4', %w(openssl zlib)) }
+    let(:chef)        { generate_software('chef', '1.0.0', %w(bundler ohai ruby)) }
+    let(:erchef)      { generate_software('erchef', '4b19a96d57bff9bbf4764d7323b92a0944009b9e', %w(curl erlang rsync)) }
+    let(:erlang)      { generate_software('erlang', 'R15B03-1', %w(openssl zlib)) }
+    let(:libgcc)      { generate_software('libgcc', '0.0.0') }
+    let(:ncurses)     { generate_software('ncurses', '5.9', %w(libgcc)) }
+    let(:ohai)        { generate_software('ohai', 'master', %w(ruby rubygems yajl)) }
+    let(:openssl)     { generate_software('openssl', '1.0.1g', %w(zlib)) }
+    let(:postgresql)  { generate_software('postgresql', '9.2.8', %w(zlib openssl)) }
+    let(:preparation) { generate_software('preparation', '1.0.0') }
+    let(:rsync)       { generate_software('rsync', '3.0.9') }
+    let(:ruby)        { generate_software('ruby', '1.9.3-p481', %w(zlib ncurses)) }
+    let(:rubygems)    { generate_software('rubygems', '1.8.24', %w(ruby)) }
+    let(:skitch)      { generate_software('skitch', '4.4.1', %w(postgresql)) }
+    let(:yajl)        { generate_software('yajl', '1.1.0', %w(rubygems)) }
+    let(:zlib)        { generate_software('zlib', '1.2.6', %w(libgcc)) }
 
     describe '#component_added' do
       it 'adds the software to the component list' do
@@ -64,43 +84,20 @@ module Omnibus
         library
       end
 
-      project_deps = [:preparation, :erchef, :postgresql, :chef]
-      erchef_deps = [:erlang, :skitch]
-      chef_deps = [:ruby]
-
-      [project_deps, erchef_deps, chef_deps].flatten.each do |dep|
-        let(dep) do
-          software = Software.new(project, {}, "#{dep}.rb")
-          software.name(dep.to_s)
-          software.dependency('postgresql') if dep == :skitch
-          software
-        end
-      end
-
-      it 'returns an array of software descriptions, with all top level deps first, assuming they are not themselves transitive deps' do
-        library.build_order.map { |m| m.name.to_s }
-        expect(library.build_order).to eql([preparation, erlang, postgresql, skitch, ruby, erchef, chef])
+      it 'returns an array of software descriptions, with all top level deps first' do
+        expect(library.build_order).to eq([
+          preparation,
+          erlang,
+          postgresql,
+          skitch,
+          ruby,
+          erchef,
+          chef,
+        ])
       end
 
       context 'with a complex dep tree' do
-        [
-          ['preparation', []],
-          ['erchef', ['erlang', 'skitch']],
-          ['postgresql', []],
-          ['erlang', []],
-          ['skitch', ['postgresql']],
-          ['chef', ['ruby', 'bundler', 'ohai']],
-          ['ohai', ['ruby']],
-          ['bundler', ['ruby']],
-          ['ruby', []],
-          ['chefdk', ['ruby', 'bundler']],
-        ].each do |item|
-          name = item[0]
-          deps = item[1]
-          let(name) do
-            generate_software(name, deps)
-          end
-        end
+        let(:chefdk) { generate_software('chefdk', '1.0.0.alpha', %w(bundler ruby)) }
 
         let(:project) do
           allow(IO).to receive(:read)
@@ -125,7 +122,7 @@ module Omnibus
         end
 
         let(:library) do
-        # This is the LOAD ORDER
+          # This is the LOAD ORDER
           library = Library.new(project)
           library.component_added(preparation) # via project
           library.component_added(erlang) # via erchef

@@ -39,6 +39,7 @@ module Omnibus
     end
 
     include Cleanroom
+    include Digestable
     include Logging
     include NullArgumentable
     include Sugarable
@@ -744,10 +745,18 @@ module Omnibus
 
     # Returns the version to be used in cache.
     def version_for_cache
-      if @fetcher
-        @fetcher.version_for_cache || version
-      else
+      if fetcher.version_for_cache
+        fetcher.version_for_cache
+      elsif version
         version
+      else
+        log.warn(log_key) do
+          "No version given! This is probably a bad thing. I am going to " \
+          "assume the version `0.0.0', but that is most certainly not your " \
+          "desired behavior. If git caching seems off, this is probably why."
+        end
+
+        '0.0.0'
       end
     end
 
@@ -790,19 +799,23 @@ module Omnibus
       "#{build_dir}/#{@name}.fetch"
     end
 
+    # The fetcher for this software.
+    #
+    # @return [Fetcher]
+    def fetcher
+      @fetcher ||= Fetcher.for(self)
+    end
+
     # Actually build the software package
     def build_me
-      # Fetch the source
-      @fetcher = fetch_me
-
       # Build if we need to
       if always_build?
-        execute_build(@fetcher)
+        execute_build(fetcher)
       else
         if GitCache.new(install_dir, self).restore
           true
         else
-          execute_build(@fetcher)
+          execute_build(fetcher)
         end
       end
 
@@ -814,18 +827,63 @@ module Omnibus
     def fetch_me
       # Create the directories we need
       [build_dir, Config.source_dir, Config.cache_dir, project_dir].each do |dir|
-        FileUtils.mkdir_p dir
+        FileUtils.mkdir_p(dir)
       end
-
-      fetcher = Fetcher.for(self)
 
       if !File.exist?(fetch_file) || fetcher.fetch_required?
         # force build to run if we need to do an updated fetch
         fetcher.fetch
         touch fetch_file
       end
+    end
 
-      fetcher
+    #
+    # The unique "hash" for this software.
+    #
+    # @see (#shasum)
+    #
+    # @return [Fixnum]
+    #
+    def hash
+      shasum.hash
+    end
+
+    #
+    # Determine if two softwares are identical.
+    #
+    # @param [Software] other
+    #
+    # @return [true, false]
+    #
+    def ==(other)
+      self.hash == other.hash
+    end
+    alias_method :eql?, :==
+
+    #
+    # The unique SHA256 for this sofware definition.
+    #
+    # A software is defined by its parent project's shasum, its own name, its
+    # version_for_cache, and any overrides (as JSON). Additionally, if provided,
+    # the actual file contents are included in the SHA to ensure uniqueness.
+    #
+    # @return [String]
+    #
+    def shasum
+      digest = Digest::SHA256.new
+
+      update_with_string(digest, project.shasum)
+      update_with_string(digest, name)
+      update_with_string(digest, version_for_cache)
+      update_with_string(digest, JSON.fast_generate(overrides))
+
+      if filepath && File.exist?(filepath)
+        update_with_file_contents(digest, filepath)
+      else
+        update_with_string(digest, '<DYNAMIC>')
+      end
+
+      digest.hexdigest
     end
 
     private

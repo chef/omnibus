@@ -9,6 +9,7 @@ module Omnibus
       project = double(Project,
         name: 'chef',
         install_dir: '/monkeys',
+        shasum: 'ABCD1234',
         overrides: {}
       )
 
@@ -430,6 +431,46 @@ module Omnibus
 
         it 'should return the git sha' do
           get_version_for_cache('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
+        end
+      end
+    end
+
+    describe '#shasum' do
+      context 'when a filepath is given' do
+        let(:path) { '/software.rb' }
+        let(:file) { double(File) }
+
+        subject do
+          software = described_class.new(project, {}, path)
+          software.name('software')
+          software.version('1.0.0')
+          software
+        end
+
+        before do
+          allow(File).to receive(:exist?)
+            .with(path)
+            .and_return(true)
+          allow(File).to receive(:open)
+            .with(path)
+            .and_return(file)
+        end
+
+        it 'returns the correct shasum' do
+          expect(subject.shasum).to eq('f128eaa53ccff2e31d224a0a4a0a80d764298750d20bff22c24402eb046b82c1')
+        end
+      end
+
+      context 'when a filepath is not given' do
+        subject do
+          software = described_class.new(project, {})
+          software.name('software')
+          software.version('1.0.0')
+          software
+        end
+
+        it 'returns the correct shasum' do
+          expect(subject.shasum).to eq('8a3e36a40f75c868de0cda82a8a9df2c86beaf42528d09eabb0b78a398db8678')
         end
       end
     end
