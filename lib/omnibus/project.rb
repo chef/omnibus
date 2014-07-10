@@ -1058,7 +1058,7 @@ module Omnibus
     def output_package(pkg_type)
       case pkg_type
       when 'makeself'
-        "#{package_name}-#{build_version}_#{build_iteration}.#{Ohai['kernel']['machine']}.sh"
+        Packager::Makeself.new(self).package_name
       when 'msi'
         Packager::WindowsMsi.new(self).package_name
       when 'bff'
@@ -1171,35 +1171,11 @@ module Omnibus
       command_and_opts
     end
 
-    # TODO: what's this do?
-    def makeself_command
-      command_and_opts = [
-        Omnibus.source_root.join('bin', 'makeself.sh'),
-        '--gzip',
-        install_dir,
-        output_package('makeself'),
-        "'The full stack of #{@name}'",
-      ]
-      command_and_opts << './makeselfinst' if File.exist?("#{package_scripts_path}/makeselfinst")
-      command_and_opts
-    end
-
     # Runs the makeself commands to make a self extracting archive package.
     # As a (necessary) side-effect, sets
     # @return void
     def run_makeself
-      package_commands = []
-      # copy the makeself installer into package
-      if File.exist?("#{package_scripts_path}/makeselfinst")
-        package_commands << "cp #{package_scripts_path}/makeselfinst #{install_dir}/"
-      end
-
-      # run the makeself program
-      package_commands << makeself_command.join(' ')
-
-      # rm the makeself installer (for incremental builds)
-      package_commands << "rm -f #{install_dir}/makeselfinst"
-      package_commands.each { |cmd| run_package_command(cmd) }
+      Packger::Makeself.new(self).run!
     end
 
     # Runs the necessary command to make an MSI. As a side-effect, sets +output_package+
