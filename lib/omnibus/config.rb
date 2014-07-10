@@ -83,7 +83,7 @@ module Omnibus
       #
       def reset!
         instance.instance_variables.each do |instance_variable|
-          instance.remove_instance_variable(instance_variable)
+          instance.send(:remove_instance_variable, instance_variable)
         end
 
         true
