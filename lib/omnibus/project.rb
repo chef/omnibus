@@ -956,10 +956,23 @@ module Omnibus
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
 
-      library.build_order.each do |software|
+      # Cache the build order so we don't re-compute
+      softwares = library.build_order
+
+      # Download all softwares first
+      softwares.each do |software|
+        software.fetch
+      end
+
+      # Now build each software
+      softwares.each do |software|
         software.build_me
       end
+
+      # Health check
       health_check_me
+
+      # Package
       package_me
     end
 

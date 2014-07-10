@@ -672,6 +672,28 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # Fetch the software definition using the appropriate fetcher. This may
+    # fetch the software from a local path location, git location, or download
+    # the software from a remote URL (HTTP(s)/FTP)
+    #
+    # @return [true, false]
+    #   true if the software was fetched, false if it was cached
+    #
+    def fetch
+      # Create the directories we need
+      [build_dir, Config.source_dir, Config.cache_dir, project_dir].each do |dir|
+        FileUtils.mkdir_p(dir)
+      end
+
+      if fetcher.fetch_required?
+        fetcher.fetch
+        true
+      else
+        false
+      end
+    end
+
+    #
     # The list of files to ignore in the healthcheck.
     #
     # @return [Array<String>]
@@ -787,18 +809,6 @@ module Omnibus
       "#{Config.cache_dir}/#{filename}"
     end
 
-    # The name of the sentinel file that marks the most recent fetch
-    # time of the software
-    #
-    # @return [String] an absolute path
-    #
-    # @see Omnibus::Fetcher
-    # @todo seems like this should be a private
-    #   method, since it's an implementation detail.
-    def fetch_file
-      "#{build_dir}/#{@name}.fetch"
-    end
-
     # The fetcher for this software.
     #
     # @return [Fetcher]
@@ -821,20 +831,6 @@ module Omnibus
 
       project.build_version_dsl.resolve(self)
       true
-    end
-
-    # Fetch the software
-    def fetch_me
-      # Create the directories we need
-      [build_dir, Config.source_dir, Config.cache_dir, project_dir].each do |dir|
-        FileUtils.mkdir_p(dir)
-      end
-
-      if !File.exist?(fetch_file) || fetcher.fetch_required?
-        # force build to run if we need to do an updated fetch
-        fetcher.fetch
-        touch fetch_file
-      end
     end
 
     #
@@ -955,12 +951,6 @@ module Omnibus
       end
 
       project.dirty!
-    end
-
-    def touch(file)
-      File.open(file, 'w') do |f|
-        f.print ''
-      end
     end
 
     def log_key
