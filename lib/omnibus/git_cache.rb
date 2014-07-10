@@ -79,6 +79,8 @@ module Omnibus
     # Create an incremental install path cache for the software step
     def incremental
       create_cache_path
+      remove_git_dirs
+
       shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} add -A -f))
       begin
         shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} commit -q -m "Backup of #{tag}"))
@@ -105,6 +107,25 @@ module Omnibus
       else
         false
       end
+    end
+
+    REQUIRED_GIT_FILES = [
+                          'HEAD',
+                          'description',
+                          'hooks',
+                          'info',
+                          'objects',
+                          'refs',
+                         ].freeze
+
+    def remove_git_dirs
+      Dir.glob("#{@install_dir}/**/config").reject{ |path|
+        REQUIRED_GIT_FILES.any? { |required_file|
+          !File.exists? File.join(File.dirname(path), required_file)
+        }
+      }.each { |path|
+        FileUtils.rm_rf File.dirname(path)
+      }
     end
   end
 end
