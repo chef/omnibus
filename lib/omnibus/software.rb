@@ -889,9 +889,13 @@ module Omnibus
     def execute_build(fetcher)
       fetcher.clean
       @builder.build
-      log.info(log_key) { 'Caching build' }
-      GitCache.new(install_dir, self).incremental
-      log.info(log_key) { 'Dirtied the cache!' }
+
+      if Config.use_git_caching
+        log.info(log_key) { 'Caching build' }
+        GitCache.new(install_dir, self).incremental
+        log.info(log_key) { 'Dirtied the cache!' }
+      end
+
       project.dirty!
     end
 
