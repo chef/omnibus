@@ -32,7 +32,7 @@ module Omnibus
       copy_directory(resources_path, staging_resources_path)
 
       if self_install?
-        copy_file("#{package_scripts_path}/makeselfinst", "#{install_dir}/makeselfinst")
+        copy_file("#{project.package_scripts_path}/makeselfinst", "#{project.install_dir}/makeselfinst")
       end
     end
 
@@ -45,15 +45,13 @@ module Omnibus
     end
 
     clean do
-      execute("rm -f #{install_dir}/makeselfinst")
+      execute("rm -f #{project.install_dir}/makeselfinst")
     end
 
     # @see Base#package_name
     def package_name
       "#{project.package_name}-#{project.build_version}_#{project.build_iteration}.#{Ohai['kernel']['machine']}.sh"
     end
-
-    private
 
     def makeself_script
       Omnibus.source_root.join('bin', 'makeself.sh')
@@ -63,22 +61,14 @@ module Omnibus
       command_and_opts = [
         makeself_script,
         '--gzip',
-        install_dir,
+        project.install_dir,
         package_name,
-        "'The full stack of #{@name}'",
+        "'The full stack of #{project.name}'",
       ].join(' ')
     end
 
-    def package_scripts_path
-      project.package_scripts_path
-    end
-
-    def install_dir
-      project.install_dir
-    end
-
     def self_install?
-      File.exist?("#{package_scripts_path}/makeselfinst")
+      File.exist?("#{project.package_scripts_path}/makeselfinst")
     end
   end
 end
