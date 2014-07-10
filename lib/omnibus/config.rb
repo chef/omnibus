@@ -31,9 +31,7 @@ module Omnibus
       # @return [Config]
       #
       def load(filepath)
-        instance = new
-        instance.evaluate_file(filepath)
-        instance
+        evaluate_file(instance, filepath)
       end
 
       #
