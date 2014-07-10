@@ -159,18 +159,19 @@ module Omnibus
     describe '#remove_git_dirs' do
       let(:git_files) { ['git/HEAD', 'git/description', 'git/hooks', 'git/info', 'git/objects', 'git/refs' ] }
       it 'removes bare git directories' do
-        Dir.stub!(:glob){['git/config']}
-        git_files.each { |git_file|
-          expect(File).to receive(:exists?).with(git_file).and_return(true)
-        }
+        allow(Dir).to receive(:glob).and_return(['git/config'])
+        git_files.each do |git_file|
+          expect(File).to receive(:exist?).with(git_file).and_return(true)
+        end
         allow(File).to receive(:dirname).and_return('git')
         expect(FileUtils).to receive(:rm_rf).with('git')
 
         ipc.remove_git_dirs
       end
+      
       it 'does ignores non git directories' do
-        Dir.stub!(:glob){['not_git/config']}
-        expect(File).to receive(:exists?).with('not_git/HEAD').and_return(false)
+        allow(Dir).to receive(:glob).and_return(['not_git/config'])
+        expect(File).to receive(:exist?).with('not_git/HEAD').and_return(false)
         allow(File).to receive(:dirname).and_return('not_git')
         expect(FileUtils).not_to receive(:rm_rf).with('not_git')
 
