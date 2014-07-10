@@ -651,7 +651,7 @@ module Omnibus
       else
         log.deprecated(log_key) do
           "dependencies (DSL). Please specify each dependency on its own " \
-          "line like `dependency '#{Array(val).first}'`."
+          "line like `dependency '#{flattened_args.first}'`."
         end
 
         @dependencies = flattened_args
