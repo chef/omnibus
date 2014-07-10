@@ -128,7 +128,8 @@ module Omnibus
         ipc.incremental
       end
 
-      it 'adds all the changes to git' do
+      it 'adds all the changes to git removing git directories' do
+        expect(ipc).to receive(:remove_git_dirs)
         expect(ipc).to receive(:shellout!)
           .with("git --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f")
         ipc.incremental
@@ -144,6 +145,29 @@ module Omnibus
         expect(ipc).to receive(:shellout!)
           .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{ipc.tag}"))
         ipc.incremental
+      end
+    end
+
+    describe '#remove_git_dirs' do
+      let(:git_files) { ['git/HEAD', 'git/description', 'git/hooks', 'git/info', 'git/objects', 'git/refs' ] }
+      it 'removes bare git directories' do
+        allow(Dir).to receive(:glob).and_return(['git/config'])
+        git_files.each do |git_file|
+          expect(File).to receive(:exist?).with(git_file).and_return(true)
+        end
+        allow(File).to receive(:dirname).and_return('git')
+        expect(FileUtils).to receive(:rm_rf).with('git')
+
+        ipc.remove_git_dirs
+      end
+      
+      it 'does ignores non git directories' do
+        allow(Dir).to receive(:glob).and_return(['not_git/config'])
+        expect(File).to receive(:exist?).with('not_git/HEAD').and_return(false)
+        allow(File).to receive(:dirname).and_return('not_git')
+        expect(FileUtils).not_to receive(:rm_rf).with('not_git')
+
+        ipc.remove_git_dirs
       end
     end
 

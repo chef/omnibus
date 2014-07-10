@@ -21,6 +21,15 @@ module Omnibus
   class GitCache
     include Util
 
+    REQUIRED_GIT_FILES = [
+      'HEAD',
+      'description',
+      'hooks',
+      'info',
+      'objects',
+      'refs',
+    ].freeze
+
     def initialize(install_dir, software)
       @install_dir = install_dir.sub(/^([A-Za-z]:)/, '') # strip drive letter on Windows
       @software = software
@@ -70,6 +79,8 @@ module Omnibus
     # Create an incremental install path cache for the software step
     def incremental
       create_cache_path
+      remove_git_dirs
+
       shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} add -A -f))
       begin
         shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} commit -q -m "Backup of #{tag}"))
@@ -96,6 +107,24 @@ module Omnibus
       else
         false
       end
+    end
+
+
+    #
+    # Git caching will attempt to version embedded git directories, partially
+    # versioning them. This causes failures on subsequent runs. This method
+    # will find git directories and remove them to prevent those errors.
+    #
+    # @return [true]
+    def remove_git_dirs
+      Dir.glob("#{@install_dir}/**/{,.*}/config").reject do |path|
+        REQUIRED_GIT_FILES.any? do |required_file|
+          !File.exist?(File.join(File.dirname(path), required_file))
+        end
+      end.each do |path|
+        FileUtils.rm_rf(File.dirname(path))
+      end
+      return true
     end
   end
 end
