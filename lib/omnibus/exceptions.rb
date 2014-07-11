@@ -37,8 +37,8 @@ module Omnibus
       out = "I could not find an Omnibus project named '#{@name}'! "
       out << "Valid projects are:\n"
 
-      Omnibus.project_names.sort.each do |project_name|
-        out << "  * #{project_name}\n"
+      Omnibus.projects.sort.each do |project|
+        out << "  * #{project.name}\n"
       end
 
       out.strip
@@ -175,17 +175,16 @@ should never use the replaces line.
   end
 
   class MissingProjectDependency < Error
-    def initialize(dep_name, search_paths)
-      @dep_name, @search_paths = dep_name, search_paths
+    def initialize(name, directories)
+      @name, @directories = name, directories
     end
 
     def to_s
-      """
-      Attempting to load the project dependency '#{@dep_name}', but it was
-      not found at any of the following locations:
+      <<-EOH
+I could not find a software named `#{@name}' in any of the sources:
 
-      #{@search_paths.join("\n      ")}
-      """
+    #{@directories.join("\n      ")}
+EOH
     end
   end
 
