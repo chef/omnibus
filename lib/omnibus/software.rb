@@ -767,7 +767,7 @@ module Omnibus
 
     # Returns the version to be used in cache.
     def version_for_cache
-      if fetcher.version_for_cache
+      @version_for_cache ||= if fetcher.version_for_cache
         fetcher.version_for_cache
       elsif version
         version
