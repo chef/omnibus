@@ -369,7 +369,35 @@ module Omnibus
     # include the gem in your bundle.
     #
     # @return [String]
-    default(:software_gem, 'omnibus-software')
+    default(:software_gem) do
+      Omnibus.logger.deprecated('Config') do
+        'Config.software_gem. Plase use Config.software_gems (plural) and ' \
+        'specify an array of software gems instead.'
+      end
+
+      software_gems
+    end
+
+    # The list of gems to pull software definitions from. The software
+    # definitions from these gems are pulled **in order**, so if multiple gems
+    # have the same software definition, the one that appears **first** in the
+    # list here is chosen.
+    #
+    # - These paths are preceeded by those defined in {#local_software_dirs}.
+    # - These paths are preceeded by local project vendored softwares.
+    #
+    # For these gems, it is assumed that the folder structure is:
+    #
+    #     /GEM_ROOT/config/software/*
+    #
+    # @return [Array<String>]
+    default(:software_gems) do
+      if defined?(@software_gem)
+        Array(@software_gem)
+      else
+        ['omnibus-software']
+      end
+    end
 
     # The solaris compiler to use
     #
