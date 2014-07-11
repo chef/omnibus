@@ -363,10 +363,22 @@ module Omnibus
     # @return [true, false]
     default(:override_file, nil)
 
-    # The gem to pull software definitions from.  This is just the name of the
-    # gem, which is used to find the path to your software definitions, and you
-    # must also specify this gem in the Gemfile of your project repo in order to
-    # include the gem in your bundle.
+    # An array of local disk paths that include software definitions to load
+    # from disk. The software definitions in these paths are pulled
+    # **in order**, so if multiple paths have the same software definition, the
+    # one that appears **first** in the list here is chosen.
+    #
+    # - These paths take precedence over those defined in {#software_gems}.
+    # - These paths are preceeded by local project vendored softwares.
+    #
+    # For these paths, it is assumed that the folder structure is:
+    #
+    #     /PATH/config/software/*
+    #
+    # @return [Array<String>]
+    default(:local_software_dirs) { [] }
+
+    # @deprecated Use {#software_gems} instead
     #
     # @return [String]
     default(:software_gem) do
