@@ -60,6 +60,24 @@ module Omnibus
       @live_streams[level.to_sym] ||= LiveStream.new(self, level)
     end
 
+    #
+    # The string representation of this object.
+    #
+    # @return [String]
+    #
+    def to_s
+      "#<#{self.class.name}>"
+    end
+
+    #
+    # The detailed string representation of this object.
+    #
+    # @return [String]
+    #
+    def inspect
+      "#<#{self.class.name} level: #{@level}>"
+    end
+
     private
 
     def format_message(severity, _datetime, progname, msg)
@@ -98,6 +116,24 @@ module Omnibus
       #
       def <<(data)
         log_lines(data)
+      end
+
+      #
+      # The string representation of this object.
+      #
+      # @return [String]
+      #
+      def to_s
+        "#<#{self.class.name}>"
+      end
+
+      #
+      # The detailed string representation of this object.
+      #
+      # @return [String]
+      #
+      def inspect
+        "#<#{self.class.name} level: #{@level}>"
       end
 
       private
