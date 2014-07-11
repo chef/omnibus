@@ -323,4 +323,12 @@ I do not know how to proceed!"
 EOH
     end
   end
+
+  class HealthCheckFailed < Error
+    def to_s
+      <<-EOH
+The health check failed! Please see above for important information.
+EOH
+    end
+  end
 end

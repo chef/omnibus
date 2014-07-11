@@ -970,20 +970,10 @@ module Omnibus
       end
 
       # Health check
-      health_check_me
+      HealthCheck.run!(self)
 
       # Package
       package_me
-    end
-
-    def health_check_me
-      if Ohai['platform'] == 'windows'
-        log.info(log_key) { 'Skipping health check on Windows' }
-      else
-        # build a list of all whitelist files from all project dependencies
-        whitelist_files = library.components.map { |component| component.whitelist_files }.flatten
-        Omnibus::HealthCheck.run(install_dir, whitelist_files)
-      end
     end
 
     def package_me

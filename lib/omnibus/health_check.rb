@@ -17,6 +17,7 @@
 module Omnibus
   class HealthCheck
     include Logging
+    include Util
 
     WHITELIST_LIBS = [
       /ld-linux/,
@@ -34,7 +35,7 @@ module Omnibus
       /libutil\.so/,
       /linux-vdso.+/,
       /linux-gate\.so/,
-    ]
+    ].freeze
 
     ARCH_WHITELIST_LIBS = [
       /libc\.so/,
@@ -48,7 +49,7 @@ module Omnibus
       /libpthread\.so/,
       /librt\.so/,
       /libutil\.so/,
-    ]
+    ].freeze
 
     AIX_WHITELIST_LIBS = [
       /libpthread\.a/,
@@ -58,7 +59,7 @@ module Omnibus
       /libc\.a/,
       /libcrypt\.a/,
       /unix$/,
-    ]
+    ].freeze
 
     SOLARIS_WHITELIST_LIBS = [
       /libaio\.so/,
@@ -90,7 +91,7 @@ module Omnibus
       /libm\.so\.1/,
       /libc_psr\.so\.1/,
       /s9_preload\.so\.1/,
-    ]
+    ].freeze
 
     SMARTOS_WHITELIST_LIBS = [
       /libm.so/,
@@ -106,7 +107,7 @@ module Omnibus
       /libgcc_s.so/,
       /libstdc\+\+\.so/,
       /libcrypt.so/,
-    ]
+    ].freeze
 
     MAC_WHITELIST_LIBS = [
       /libobjc\.A\.dylib/,
@@ -124,7 +125,7 @@ module Omnibus
       /libiconv/,
       /libstdc\+\+\.6\.dylib/,
       /libc\+\+\.1\.dylib/,
-    ]
+    ].freeze
 
     FREEBSD_WHITELIST_LIBS = [
       /libc\.so/,
@@ -133,17 +134,56 @@ module Omnibus
       /librt\.so/,
       /libthr\.so/,
       /libutil\.so/,
-    ]
+    ].freeze
 
-    def self.run(install_dir, whitelist_files = [])
-      case Ohai['platform']
-      when 'mac_os_x'
-        bad_libs = health_check_otool(install_dir, whitelist_files)
-      when 'aix'
-        bad_libs = health_check_aix(install_dir, whitelist_files)
-      else
-        bad_libs = health_check_ldd(install_dir, whitelist_files)
+    class << self
+      # @see (HealthCheck#new)
+      def run!(project)
+        new(project).run!
       end
+    end
+
+    #
+    # The project to healthcheck.
+    #
+    # @return [Project]
+    #
+    attr_reader :project
+
+    #
+    # Run the healthchecks against the given project. It is assumed that the
+    # project has already been built.
+    #
+    # @param [Project] project
+    #   the project to health check
+    #
+    def initialize(project)
+      @project = project
+    end
+
+    #
+    # Run the given health check. Healthcheks are skipped on Windows.
+    #
+    # @raise [HealthCheckFailed]
+    #   if the health check fails
+    #
+    # @return [true]
+    #   if the healthchecks pass
+    #
+    def run!
+      if Ohai['platform'] == 'windows'
+        log.warn(log_key) { 'Skipping health check on Windows' }
+        return true
+      end
+
+      bad_libs =  case Ohai['platform']
+                  when 'mac_os_x'
+                    health_check_otool
+                  when 'aix'
+                    health_check_aix
+                  else
+                    health_check_ldd
+                  end
 
       unresolved = []
       unreliable = []
@@ -163,10 +203,10 @@ module Omnibus
           end
         end
 
-        log.warn(log_key) { 'Failed!' }
+        log.error(log_key) { 'Failed!' }
         bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
 
-        log.warn(log_key) do
+        log.error(log_key) do
           out = "The following libraries have unsafe or unmet dependencies:\n"
 
           bad_omnibus_libs.each do |lib|
@@ -176,7 +216,7 @@ module Omnibus
           out
         end
 
-        log.warn(log_key) do
+        log.error(log_key) do
           out = "The following binaries have unsafe or unmet dependencies:\n"
 
           bad_omnibus_bins.each do |bin|
@@ -187,7 +227,7 @@ module Omnibus
         end
 
         if unresolved.length > 0
-          log.warn(log_key) do
+          log.error(log_key) do
             out = "The following requirements could not be resolved:\n"
 
             unresolved.each do |lib|
@@ -199,7 +239,7 @@ module Omnibus
         end
 
         if unreliable.length > 0
-          log.warn(log_key) do
+          log.error(log_key) do
             out =  "The following libraries cannot be guaranteed to be on "
             out << "target systems:\n"
 
@@ -211,7 +251,7 @@ module Omnibus
           end
         end
 
-        log.warn(log_key) do
+        log.error(log_key) do
           out = "The precise failures were:\n"
 
           detail.each do |line|
@@ -228,78 +268,47 @@ module Omnibus
           out
         end
 
-        raise 'Health Check Failed'
+        raise HealthCheckFailed
       end
+
+      true
     end
 
-    def self.health_check_otool(install_dir, whitelist_files)
+    #
+    # Run healthchecks against otool.
+    #
+    # @return [Array<String>]
+    #   the bad libraries
+    #
+    def health_check_otool
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
         when /^\s+(.+) \(.+\)$/
           linked = Regexp.last_match[1]
           name = File.basename(linked)
-          bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+          bad_libs = check_for_bad_library(bad_libs, current_library, name, linked)
         end
       end
 
       bad_libs
     end
 
-    def self.check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
-      safe = nil
-
-      whitelist_libs = case Ohai['platform']
-                       when 'arch'
-                         ARCH_WHITELIST_LIBS
-                       when 'mac_os_x'
-                         MAC_WHITELIST_LIBS
-                       when 'solaris2'
-                         SOLARIS_WHITELIST_LIBS
-                       when 'smartos'
-                         SMARTOS_WHITELIST_LIBS
-                       when 'freebsd'
-                         FREEBSD_WHITELIST_LIBS
-                       when 'aix'
-                         AIX_WHITELIST_LIBS
-                       else
-                         WHITELIST_LIBS
-                       end
-      whitelist_libs.each do |reg|
-        safe ||= true if reg.match(name)
-      end
-      whitelist_files.each do |reg|
-        safe ||= true if reg.match(current_library)
-      end
-
-      log.debug(log_key) { "  --> Dependency: #{name}" }
-      log.debug(log_key) { "  --> Provided by: #{linked}" }
-
-      if !safe && linked !~ Regexp.new(install_dir)
-        log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
-        bad_libs[current_library] ||= {}
-        bad_libs[current_library][name] ||= {}
-        if bad_libs[current_library][name].key?(linked)
-          bad_libs[current_library][name][linked] += 1
-        else
-          bad_libs[current_library][name][linked] = 1
-        end
-      else
-        log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
-      end
-
-      bad_libs
-    end
-
-    def self.health_check_aix(install_dir, whitelist_files)
+    #
+    # Run healthchecks against aix.
+    #
+    # @return [Array<String>]
+    #   the bad libraries
+    #
+    def health_check_aix
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -307,7 +316,7 @@ module Omnibus
         when /^\s+(.+)$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[1]
-          bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+          bad_libs = check_for_bad_library(bad_libs, current_library, name, linked)
         when /File is not an executable XCOFF file/ # ignore non-executable files
         else
           log.warn(log_key) { "Line did not match for #{current_library}\n#{line}" }
@@ -317,11 +326,17 @@ module Omnibus
       bad_libs
     end
 
-    def self.health_check_ldd(install_dir, whitelist_files)
+    #
+    # Run healthchecks against ldd.
+    #
+    # @return [Array<String>]
+    #   the bad libraries
+    #
+    def health_check_ldd
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{install_dir}/ -type f | xargs ldd") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -329,7 +344,7 @@ module Omnibus
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[2]
-          bad_libs = check_for_bad_library(install_dir, bad_libs, whitelist_files, current_library, name, linked)
+          bad_libs = check_for_bad_library(bad_libs, current_library, name, linked)
         when /^\s+(.+) \(.+\)$/
           next
         when /^\s+statically linked$/
@@ -351,14 +366,83 @@ module Omnibus
       bad_libs
     end
 
-    def self.read_shared_libs(cmd)
-      shell = Mixlib::ShellOut.new(cmd, timeout: 3600)
-      log.info(log_key) { "Executing: `#{cmd}`" }
-      shell.run_command
+    private
 
-      shell.stdout.each_line do |line|
+    #
+    # The list of whitelisted (ignored) files from the project and softwares.
+    #
+    # @return [Array<String, Regexp>]
+    #
+    def whitelist_files
+      project.library.components.inject([]) do |array, component|
+        array += component.whitelist_files
+        array
+      end
+    end
+
+    #
+    # Execute the given command, yielding each line.
+    #
+    # @param [String] command
+    #   the command to execute
+    # @yield [String]
+    #   each line
+    #
+    def read_shared_libs(command)
+      cmd = shellout(command)
+      cmd.stdout.each_line do |line|
         yield line
       end
+    end
+
+    #
+    # Check the given path and library for "bad" libraries.
+    #
+    def check_for_bad_library(bad_libs, current_library, name, linked)
+      safe = nil
+
+      whitelist_libs = case Ohai['platform']
+                       when 'arch'
+                         ARCH_WHITELIST_LIBS
+                       when 'mac_os_x'
+                         MAC_WHITELIST_LIBS
+                       when 'solaris2'
+                         SOLARIS_WHITELIST_LIBS
+                       when 'smartos'
+                         SMARTOS_WHITELIST_LIBS
+                       when 'freebsd'
+                         FREEBSD_WHITELIST_LIBS
+                       when 'aix'
+                         AIX_WHITELIST_LIBS
+                       else
+                         WHITELIST_LIBS
+                       end
+
+      whitelist_libs.each do |reg|
+        safe ||= true if reg.match(name)
+      end
+
+      whitelist_files.each do |reg|
+        safe ||= true if reg.match(current_library)
+      end
+
+      log.debug(log_key) { "  --> Dependency: #{name}" }
+      log.debug(log_key) { "  --> Provided by: #{linked}" }
+
+      if !safe && linked !~ Regexp.new(project.install_dir)
+        log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
+        bad_libs[current_library] ||= {}
+        bad_libs[current_library][name] ||= {}
+        if bad_libs[current_library][name].key?(linked)
+          bad_libs[current_library][name][linked] += 1
+        else
+          bad_libs[current_library][name][linked] = 1
+        end
+      else
+        log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
+      end
+
+      bad_libs
     end
   end
 end
