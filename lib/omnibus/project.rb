@@ -1062,7 +1062,7 @@ module Omnibus
       when 'msi'
         Packager::WindowsMsi.new(self).package_name
       when 'bff'
-        "#{package_name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
+        Packger::Bff.new(self).package_name
       when 'pkgmk'
         "#{package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
       when 'mac_pkg'
@@ -1082,11 +1082,6 @@ module Omnibus
           pkg.to_s
         end
       end
-    end
-
-    def bff_command
-      bff_command = ['sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template']
-      [bff_command.join(' '), { returns: [0] }]
     end
 
     # The {https://github.com/jordansissel/fpm fpm} command to
@@ -1184,28 +1179,8 @@ module Omnibus
       Packager::WindowsMsi.new(self).run!
     end
 
-    def bff_version
-      build_version.split(/[^\d]/)[0..2].join('.') + ".#{build_iteration}"
-    end
-
     def run_bff
-      FileUtils.rm_rf '/.info/*'
-      FileUtils.rm_rf '/tmp/bff'
-      FileUtils.mkdir '/tmp/bff'
-
-      system "find #{install_dir} -print > /tmp/bff/file.list"
-
-      system "cat #{package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble"
-
-      # @todo can we just use an erb template here?
-      system "cat /tmp/bff/gen.preamble /tmp/bff/file.list #{package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template"
-
-      FileUtils.cp "#{package_scripts_path}/aix/unpostinstall.sh", "#{install_dir}/bin"
-      FileUtils.cp "#{package_scripts_path}/aix/postinstall.sh", "#{install_dir}/bin"
-
-      run_package_command(bff_command)
-
-      FileUtils.cp "/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff"
+      Packger::Bff.new(self).run!
     end
 
     def pkgmk_version
