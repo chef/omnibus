@@ -20,6 +20,7 @@ require 'fileutils'
 module Omnibus
   class GitCache
     include Util
+    include Logging
 
     REQUIRED_GIT_FILES = [
       'HEAD',
@@ -97,10 +98,12 @@ module Omnibus
       cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -l "#{tag}"))
 
       restore_me = false
+      log.info(log_key) { "cmd #{%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -l "#{tag}")}" }
       cmd.stdout.each_line do |line|
+        log.info(log_key) { "line #{line}" }
         restore_me = true if tag == line.chomp
       end
-
+      log.info(log_key) { "restore_me #{restore_me}" }
       if restore_me
         shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} checkout -f "#{tag}"))
         true
@@ -122,6 +125,7 @@ module Omnibus
           !File.exist?(File.join(File.dirname(path), required_file))
         end
       end.each do |path|
+        log.info(log_key) { "Removing git dir #{path}" }
         FileUtils.rm_rf(File.dirname(path))
       end
       return true
