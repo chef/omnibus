@@ -1,21 +1,75 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-Unreleased
-----------
+v3.2.0.rc (July 14, 2014)
+-------------------------
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
 - Refactor `omnibus release` into a non-S3-specific backend "publisher"
 - Add support for specifying a dir glob to the `publish` command to upload multiple packages
 - "Package" is now a public API
 - Generate a real omnibus configuration file (no more `omnibus.rb.example`)
+- Add a releaser for Artifactory
+- Add additional information to package metdata (such as shasums)
+- Remove uses of Omnibus.config and use the Config object directly
+- Add the ability to define multiple `software_gems` in the config
+- Add the ability to define `local_software_paths` in the config
+- Add the ability to disable git caching in the config
+- Omnibus.load_configuration now requires a file path
+- Add new API for loading a project - `Project.load`
+- Add new API for loading a software - `Software.load`
+- Add publish APIs for dirtying the git cache
+- Add test coverage for the "public" API
+- Add validation to `source` in software DSL
+- Update generator templates to use the new APIs
+- Upgrade to Ohai 7.2
+- Improve YARDoc
+
+### Deprecations
+- Remove deprecated `Omnibus.configure` method
+- Deprecate `Omnibus.config.value` in favor of `Config.value` instead
+- Deprecate `Omnibus.project_root` in favor of `Config.project_root`
+- Deprecate [DSL] `platform` in favor of `Ohai['platform']`
+- Deprecate [DSL] `platform_family` in favor of `Ohai['platform_family']`
+- Deprecate [DSL] `platform_version` in favor of `Ohai['platform_version']`
+- Deprecate [DSL] `build_dir` in favor of `Config.build_dir`
+- Deprecate [DSL] `cache_dir` in favor of `Config.cache_dir`
+- Deprecate [DSL] `source_dir` in favor of `Config.source_dir`
+- Deprecate [DSL] `config` in favor of `Config` (capitalized)
+- Deprecate `Ohai.value` in favor of `Ohai['value']`
+- Deprecate `Project#install_path` in favor of `Project.install_dir`
+- Deprecate [DSL] `install_path` in favor of `install_dir`
+- Rename `Config.install_path_cache_dir` to `git_cache_dir`
+
+### DSL Changes
+- Add `with_embedded_path` to software
+- Add `with_standard_compiler_flags` to software
+- Add `package_scripts_path` to project
 
 ### Bug fixes
 - Fix a small typo in the project generator (come -> some)
 - Update sample software definition for libpng to 1.5.18
+- Improved logging output
+- Include Chef Sugar in both software and project DSLs
+- Documentation updates and typographical fixes
+- Change the generated omnibus.rb to use a default homepage that includes the protocol
+- Ensure that software fetched via the PathFetcher are cached correctly
+- Downgrade FPM to ~> 0.4 - newer versions of FPM have an unnecessary dependency on FFI that causes builds to link incorrectly
+- Always print backtraces when errors occur
+- Do not sent ldd/otool to the same file - first steps in allowing parallel builds
+- Only rescue `Omnibus::Error` when invoked through the CLI - this will allow other bugs to actually raise at the Ruby level
+- Refactor the algorithm for git caching to take into account overrides and missing versions
+- Remove nested git directories before incremental caching occurs
+- Intelligently parse the project's homepage because Ruby's native URI implementation is buggy
+- Fetch all software at the start of the build - this fixes a bug where a build would fail halfway through because of a tiny typo of GitHub outage. Now, all required software is downloaded **before** the build starts, lowering the feedback time for a failure due to networking issues
+- Use the fetcher's `version_for_cache` method directly, falling back to `0.0.0` (and a warining) if no version is given
 
 ### Potentially breaking changes
 - Merged `Package` and `Artifact` into the same class and updated API - this was considered an **internal** API so it is not a violation of semver
+- Use a common class for Omnibus exceptions - if you were rescuing Omnibus::Error, you might be rescuing all exceptions now
+- Use a cleanroom object when evaluating the DSL - prior to this release, Omnibus did not declare a public API. Project and software definitions had unrestricted access to the entire project.rb and software.rb methods respectively. This poses two problems - first, it makes it impossible to guarantee a public DSL API over a public (code) API. Second, it permits a developer to change the behavior of project.rb or software.rb accidentially, simply by defining a new method. The introducing of a cleanroom fixes both these bugs, however, it was impossible to know what was formerly considered a public API. Thus, it is possible that a previously-relied-on method is now unavaiable using the cleanroom. Please open an issue if you encounter such a case.
+- Remove mixlib-config - if you were relying on mixlib-config as a transitive dependency, it is no longer available
+- Remove the ability to use an overrides file - this was for internal use only and was never exposed as a public API. However, if you dug into the code and found it, it has now been removed. For BC purposes, the value still exists in the configuration object, but is essentially a no-op
 
 
 v3.1.1 (May 20, 2014)
