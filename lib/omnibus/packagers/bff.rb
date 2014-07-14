@@ -34,10 +34,7 @@ module Omnibus
       purge_directory('/.info')
       purge_directory('/tmp/bff')
 
-      execute("find #{project.install_dir} -print > /tmp/bff/file.list")
-      execute("cat #{project.package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble")
-      # @todo can we just use an erb template here?
-      execute("cat /tmp/bff/gen.preamble /tmp/bff/file.list #{project.package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template")
+      create_gen_template
 
       copy_file("#{project.package_scripts_path}/aix/unpostinstall.sh", "#{project.install_dir}/bin")
       copy_file("#{project.package_scripts_path}/aix/postinstall.sh", "#{project.install_dir}/bin")
@@ -63,6 +60,45 @@ module Omnibus
 
     def bff_command
       'sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template'
+    end
+
+    def create_gen_template
+      preamble = <<-EOF
+Package Name: #{project.package_name}
+Package VRMF: #{bff_version}
+Update: N
+Fileset
+  Fileset Name: #{project.package_name}
+  Fileset VRMF: #{bff_version}
+  Fileset Description: #{project.friendly_name}
+  USRLIBLPPFiles
+  Configuration Script: #{project.install_path}/bin/postinstall.sh
+  Unconfiguration Script: #{project.install_path}/bin/unpostinstall.sh
+  EOUSRLIBLPPFiles
+  Bosboot required: N
+  License agreement acceptance required: N
+  Include license files in this package: N
+  Requisites:
+  ROOT Part: N
+    ROOTFiles
+    EOROOTFiles
+  USRFiles
+      EOF
+      tail = <<-EOF
+EOUSRFiles
+EOFileset
+      EOF
+
+      File.open '/tmp/bff/gen.preamble', 'w+' do |f|
+        f.write preamble
+      end
+
+      File.open '/tmp/bff/gen.tail', 'w+' do |f|
+        f.write tail
+      end
+
+      execute("find #{project.install_dir} -print > /tmp/bff/file.list")
+      execute("cat /tmp/bff/gen.preamble /tmp/bff/file.list /tmp/bff/gen.tail > /tmp/bff/gen.template")
     end
   end
 end
