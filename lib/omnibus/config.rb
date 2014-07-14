@@ -358,10 +358,16 @@ module Omnibus
     # @!group Miscellaneous Configuration Parameters
     # --------------------------------------------------
 
-    # The path to an overrides file.
+    # @deprecated The is no replacement for this configuration item
     #
     # @return [true, false]
-    default(:override_file, nil)
+    default(:override_file) do
+      Omnibus.logger.deprecated('Config') do
+        'Config.override_file. Using an override file is deprecated.'
+      end
+
+      nil
+    end
 
     # An array of local disk paths that include software definitions to load
     # from disk. The software definitions in these paths are pulled

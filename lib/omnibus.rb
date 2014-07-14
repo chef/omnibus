@@ -46,7 +46,6 @@ module Omnibus
   autoload :NullArgumentable, 'omnibus/null_argumentable'
   autoload :NullBuilder,      'omnibus/null_builder'
   autoload :Ohai,             'omnibus/ohai'
-  autoload :Overrides,        'omnibus/overrides'
   autoload :Package,          'omnibus/package'
   autoload :Project,          'omnibus/project'
   autoload :Publisher,        'omnibus/publisher'
@@ -235,8 +234,7 @@ module Omnibus
     #
     # @return [void]
     def process_dsl_files
-      overrides = Config.override_file ? Overrides.overrides : {}
-      expand_software(overrides)
+      expand_software
     end
 
     #
@@ -408,22 +406,12 @@ module Omnibus
     # Generate {Software} objects for all software DSL files in
     # +software_specs+.
     #
-    # @see (Overrides#overrides)
-    #
-    # @param [Hash] overrides
-    #   a hash of version override information
-    #
     # @return [void]
     #
-    def expand_software(overrides)
-      unless overrides.is_a?(Hash)
-        raise ArgumentError,
-          "Expected `overrides' to a hash, but was `#{overrides.class}'!"
-      end
-
+    def expand_software
       Omnibus.projects.each do |project|
         project.dependencies.each do |dependency|
-          recursively_load_dependency(dependency, project, overrides)
+          recursively_load_dependency(dependency, project)
         end
       end
     end
@@ -436,23 +424,21 @@ module Omnibus
     #   the name of the dependency
     # @param [Project] project
     #   the project that loaded the software
-    # @param [Hash] overrides
-    #   a hash of version override information.
     #
     # @return [void]
     #
-    def recursively_load_dependency(dependency, project, overrides)
+    def recursively_load_dependency(dependency, project)
       filepath = software_map[dependency]
 
       if filepath.nil?
         raise MissingProjectDependency.new(dependency, software_dirs)
       end
 
-      software = Software.load(project, filepath, overrides)
+      software = Software.load(project, filepath)
 
       # load any transitive deps for the component into the library also
       software.dependencies.each do |transitive_dependency|
-        recursively_load_dependency(transitive_dependency, project, overrides)
+        recursively_load_dependency(transitive_dependency, project)
       end
 
       project.library.component_added(software)
