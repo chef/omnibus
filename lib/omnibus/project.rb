@@ -914,15 +914,15 @@ module Omnibus
 
       package_types.each do |pkg_type|
         if pkg_type == 'makeself'
-          run_makeself
+          Packger::Makeself.new(self).run!
         elsif pkg_type == 'msi'
-          run_msi
+          Packager::WindowsMsi.new(self).run!
         elsif pkg_type == 'bff'
-          run_bff
+          Packager::Bff.new(self).run!
         elsif pkg_type == 'pkgmk'
-          run_pkgmk
+          Packager::Pkgmk.new(self).run!
         elsif pkg_type == 'mac_pkg'
-          run_mac_package_build
+          Packager::MacPkg.new(self).run!
         elsif pkg_type == 'mac_dmg'
           # noop, since the dmg creation is handled by the packager
         else # pkg_type == "fpm"
@@ -1164,31 +1164,6 @@ module Omnibus
       # Install path must be the final entry in the command
       command_and_opts << install_dir
       command_and_opts
-    end
-
-    # Runs the makeself commands to make a self extracting archive package.
-    # As a (necessary) side-effect, sets
-    # @return void
-    def run_makeself
-      Packger::Makeself.new(self).run!
-    end
-
-    # Runs the necessary command to make an MSI. As a side-effect, sets +output_package+
-    # @return void
-    def run_msi
-      Packager::WindowsMsi.new(self).run!
-    end
-
-    def run_bff
-      Packger::Bff.new(self).run!
-    end
-
-    def run_pkgmk
-      Packager::Pkgmk.new(self).run!
-    end
-
-    def run_mac_package_build
-      Packager::MacPkg.new(self).run!
     end
 
     # Runs the necessary command to make a package with fpm. As a side-effect,
