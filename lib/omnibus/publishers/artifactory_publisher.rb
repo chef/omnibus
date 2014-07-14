@@ -138,6 +138,8 @@ module Omnibus
         *domain_parts,
         package.metadata[:name],
         package.metadata[:version],
+        package.metadata[:platform],
+        package.metadata[:platform_version],
         package.metadata[:basename],
       )
     end

@@ -54,7 +54,7 @@ module Omnibus
       it 'uploads the package' do
         expect(artifact).to receive(:upload).with(
           repository,
-          'com/getchef/chef/11.0.6/chef.deb',
+          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
           an_instance_of(Hash)
         ).once
 
