@@ -1180,6 +1180,7 @@ module Omnibus
         platform_version: platform_version_for_package,
         arch:             Ohai['kernel']['machine'],
         version:          build_version,
+        iteration:        build_iteration,
       )
     end
 
