@@ -34,10 +34,10 @@ module Omnibus
       purge_directory('/.info')
       purge_directory('/tmp/bff')
 
-      system "find #{project.install_dir} -print > /tmp/bff/file.list"
-      system "cat #{project.package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble"
+      execute("find #{project.install_dir} -print > /tmp/bff/file.list")
+      execute("cat #{project.package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble")
       # @todo can we just use an erb template here?
-      system "cat /tmp/bff/gen.preamble /tmp/bff/file.list #{project.package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template"
+      execute("cat /tmp/bff/gen.preamble /tmp/bff/file.list #{project.package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template")
 
       copy_file("#{project.package_scripts_path}/aix/unpostinstall.sh", "#{project.install_dir}/bin")
       copy_file("#{project.package_scripts_path}/aix/postinstall.sh", "#{project.install_dir}/bin")
