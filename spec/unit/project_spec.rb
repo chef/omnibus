@@ -263,7 +263,7 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('13ab37d04ac402aa70fd5de66aecd954f31f8aefa59ed428db6a338469e4c544')
+          expect(subject.shasum).to eq('8270d9078b577d3bedc2353ba3dc33fda1f8e69db3b7c0b449183a3e0e560d09')
         end
       end
 
@@ -277,7 +277,7 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('c12cf48bb846e5e0cfa8d7bd6ec82024de90102ea7e3293e9bccf07647b966e3')
+          expect(subject.shasum).to eq('545571a6041129f1224741a700c776b960cb093d4260ff6ca78b6a34bc130b45')
         end
       end
     end
