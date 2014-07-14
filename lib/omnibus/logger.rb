@@ -18,6 +18,13 @@ require 'logger'
 
 module Omnibus
   class Logger < ::Logger
+    #
+    # The amount of padding on the left column.
+    #
+    # @return [Fixnum]
+    #
+    LEFT = 40
+
     def initialize(logdev = $stdout, *)
       super
       @level = Logger::WARN
@@ -87,7 +94,7 @@ module Omnibus
                "#{severity[0]} | "
              end
 
-      "#{left.rjust(30)}#{msg}\n"
+      "#{left.rjust(LEFT)}#{msg}\n"
     end
 
     #
