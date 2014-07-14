@@ -19,12 +19,16 @@
 #
 # Alternatively you can tune the individual values
 # ------------------------------------------------
-# cache_dir              './local/omnibus/cache'
+# cache_dir     './local/omnibus/cache'
 # git_cache_dir './local/omnibus/cache/install_path'
-# source_dir             './local/omnibus/src'
-# build_dir              './local/omnibus/build'
-# package_dir            './local/omnibus/pkg'
-# package_tmp            './local/omnibus/pkg-tmp'
+# source_dir    './local/omnibus/src'
+# build_dir     './local/omnibus/build'
+# package_dir   './local/omnibus/pkg'
+# package_tmp   './local/omnibus/pkg-tmp'
+
+# Disable git caching
+# ------------------------------
+# use_git_caching false
 
 # Enable S3 asset caching
 # ------------------------------
@@ -37,3 +41,8 @@
 # ------------------------------
 # solaris_compiler 'gcc'
 # build_retries 5
+
+# Load additional software
+# ------------------------------
+# software_gems ['omnibus-software', 'my-company-software']
+# local_software_dirs ['/path/to/local/software']
