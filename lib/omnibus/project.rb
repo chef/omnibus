@@ -1062,7 +1062,6 @@ module Omnibus
       digest = Digest::SHA256.new
 
       update_with_string(digest, name)
-      update_with_string(digest, build_version)
       update_with_string(digest, install_dir)
       update_with_string(digest, JSON.fast_generate(overrides))
 
