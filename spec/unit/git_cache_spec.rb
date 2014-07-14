@@ -6,8 +6,6 @@ module Omnibus
       allow(IO).to receive(:read).and_call_original
     end
 
-    let(:install_dir) { '/opt/chef' }
-
     let(:project) do
       allow(IO).to receive(:read)
         .with('/path/to/demo.rb')
@@ -27,6 +25,8 @@ module Omnibus
 
       Project.load('/path/to/demo.rb')
     end
+
+    let(:install_dir) { project.install_dir }
 
     let(:zlib_config) { File.join(RSpec::SPEC_DATA, 'software', 'zlib.rb') }
 
@@ -51,25 +51,18 @@ module Omnibus
       software
     end
 
-    let(:cache_path) { File.join("/var/cache/omnibus/cache/git_cache", install_dir) }
+    let(:cache_path) { File.join('/var/cache/omnibus/cache/git_cache', install_dir) }
 
     let(:ipc) do
       project.library.component_added(preparation)
       project.library.component_added(snoopy)
       project.library.component_added(zlib)
-      described_class.new(install_dir, zlib)
+      described_class.new(zlib)
     end
 
     describe '#cache_path' do
       it 'returns the install path appended to the install_cache path' do
-        expect(ipc.cache_path).to eq('/var/cache/omnibus/cache/git_cache/opt/chef')
-      end
-    end
-
-    describe '#cache_path_exists?' do
-      it 'checks for existence' do
-        expect(File).to receive(:directory?).with(ipc.cache_path)
-        ipc.cache_path_exists?
+        expect(ipc.cache_path).to eq(cache_path)
       end
     end
 
@@ -80,7 +73,7 @@ module Omnibus
 
       describe 'with no deps' do
         let(:ipc) do
-          described_class.new(install_dir, zlib)
+          described_class.new(zlib)
         end
 
         it 'returns the correct tag' do
@@ -160,7 +153,7 @@ module Omnibus
 
         ipc.remove_git_dirs
       end
-      
+
       it 'does ignores non git directories' do
         allow(Dir).to receive(:glob).and_return(['not_git/config'])
         expect(File).to receive(:exist?).with('not_git/HEAD').and_return(false)

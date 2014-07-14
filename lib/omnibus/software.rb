@@ -822,7 +822,7 @@ module Omnibus
       if always_build?
         execute_build(fetcher)
       else
-        if GitCache.new(install_dir, self).restore
+        if GitCache.new(self).restore
           true
         else
           execute_build(fetcher)
@@ -866,31 +866,31 @@ module Omnibus
     # @return [String]
     #
     def shasum
-      log.debug(log_key) {"begin software shasum"}
       digest = Digest::SHA256.new
-      log.debug(log_key) {"digest #{digest}"}
+
+      log.debug("#{log_key}#shasum") { "project:           #{project.shasum.inspect}" }
+      log.debug("#{log_key}#shasum") { "name:              #{name.inspect}" }
+      log.debug("#{log_key}#shasum") { "version_for_cache: #{version_for_cache.inspect}" }
+      log.debug("#{log_key}#shasum") { "overrides:         #{overrides.inspect}" }
 
       update_with_string(digest, project.shasum)
-      log.debug(log_key) {"project.shasum #{project.shasum}"}
       update_with_string(digest, name)
-      log.debug(log_key) {"name #{name}"}
       update_with_string(digest, version_for_cache)
-      log.debug(log_key) {"version_for_cache #{version_for_cache}"}
-      json = JSON.fast_generate(overrides)
-      update_with_string(digest, json)
-      log.debug(log_key) {"overrides #{overrides}"}
-      log.debug(log_key) {"json #{json}"}
-
+      update_with_string(digest, JSON.fast_generate(overrides))
 
       if filepath && File.exist?(filepath)
+        log.debug("#{log_key}#shasum") { "filepath:          #{filepath.inspect}" }
         update_with_file_contents(digest, filepath)
       else
+        log.debug("#{log_key}#shasum") { "filepath:          <DYNAMIC>" }
         update_with_string(digest, '<DYNAMIC>')
       end
 
-      log.debug(log_key) {"end software shasum"}
+      shasum = digest.hexdigest
 
-      digest.hexdigest
+      log.debug("#{log_key}#shasum") { "shasum:            #{shasum.inspect}" }
+
+      shasum
     end
 
     private
@@ -957,7 +957,7 @@ module Omnibus
 
       if Config.use_git_caching
         log.info(log_key) { 'Caching build' }
-        GitCache.new(install_dir, self).incremental
+        GitCache.new(self).incremental
         log.info(log_key) { 'Dirtied the cache!' }
       end
 

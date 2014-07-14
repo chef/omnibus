@@ -31,87 +31,122 @@ module Omnibus
       'refs',
     ].freeze
 
-    def initialize(install_dir, software)
-      @install_dir = install_dir.sub(/^([A-Za-z]:)/, '') # strip drive letter on Windows
+    #
+    # @return [Software]
+    #
+    attr_reader :software
+
+    #
+    # @param [Software] software
+    #   the software this git cache is for
+    #
+    def initialize(software)
       @software = software
     end
 
-    # The path to the full install_dir cache for the project
+    #
+    # The path to the full install_dir cache for the project.
+    #
+    # @return [String]
+    #
     def cache_path
-      File.join(Config.git_cache_dir, @install_dir)
+      @cache_path ||= File.join(Config.git_cache_dir, install_dir)
     end
 
-    # Whether the cache_path above exists
-    def cache_path_exists?
-      File.directory?(cache_path)
-    end
-
-    # Creates the full path if it does not exist already
+    #
+    # Creates the full path if it does not exist already.
+    #
+    # @return [true, false]
+    #   true if the path was created, false otherwise
+    #
     def create_cache_path
-      FileUtils.mkdir_p(File.dirname(cache_path))
-      shellout!("git --git-dir=#{cache_path} init -q") unless cache_path_exists?
-      true
+      if File.directory?(cache_path)
+        log.info(log_key) { "Cache path `#{cache_path}' exists, skipping creation" }
+        false
+      else
+        log.info(log_key) { "Creating cache path `#{cache_path}'" }
+        FileUtils.mkdir_p(File.dirname(cache_path))
+        shellout!("git --git-dir=#{cache_path} init -q")
+        true
+      end
     end
 
-    # Computes the tag for this cache entry
+    #
+    # Computes the tag for this cache entry.
+    #
+    # @return [String]
+    #
     def tag
+      return @tag if @tag
+
+      log.info(log_key) { "Calculating tag" }
+
       # Accumulate an array of all the software projects that come before
       # the name and version we are tagging. So if you have
       #
       # build_order = [ 1, 2, 3, 4, 5 ]
       #
       # And we are tagging 3, you would get dep_list = [ 1, 2 ]
-      dep_list = @software.project.library.build_order.take_while do |dep|
-        if dep.name == @software.name && dep.version == @software.version
+      dep_list = software.project.library.build_order.take_while do |dep|
+        if dep.name == software.name && dep.version == software.version
           false
         else
           true
         end
       end
 
+      log.debug(log_key) { "dep_list: #{dep_list.inspect}" }
+
       # This is the list of all the unqiue shasums of all the software build
       # dependencies, including the on currently being acted upon.
-      shasums = [dep_list.map(&:shasum), @software.shasum].flatten
+      shasums = [dep_list.map(&:shasum), software.shasum].flatten
       suffix  = Digest::SHA256.hexdigest(shasums.join('|'))
+      @tag    = "#{software.name}-#{suffix}"
 
-      "#{@software.name}-#{suffix}"
+      log.debug(log_key) { "tag: #{@tag}" }
+
+      @tag
     end
 
     # Create an incremental install path cache for the software step
     def incremental
+      log.info(log_key) { 'Performing incremental cache' }
+
       create_cache_path
       remove_git_dirs
 
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} add -A -f))
+      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f))
       begin
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} commit -q -m "Backup of #{tag}"))
+        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{tag}"))
       rescue Mixlib::ShellOut::ShellCommandFailed => e
         if e.message !~ /nothing to commit/
           raise
         end
       end
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -f "#{tag}"))
+      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{tag}"))
     end
 
     def restore
+      log.info(log_key) { 'Performing cache restoration' }
+
       create_cache_path
-      cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -l "#{tag}"))
+
+      cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{tag}"))
 
       restore_me = false
-      log.info(log_key) { "cmd #{%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} tag -l "#{tag}")}" }
       cmd.stdout.each_line do |line|
-        log.info(log_key) { "line #{line}" }
         restore_me = true if tag == line.chomp
       end
-      log.info(log_key) { "restore_me #{restore_me}" }
+
       if restore_me
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{@install_dir} checkout -f "#{tag}"))
+        log.debug(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
+        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{tag}"))
         true
       else
+        log.debug(log_key) { "Could not find tag `#{tag}', skipping restore" }
         false
       end
     end
-
 
     #
     # Git caching will attempt to version embedded git directories, partially
@@ -120,15 +155,38 @@ module Omnibus
     #
     # @return [true]
     def remove_git_dirs
-      Dir.glob("#{@install_dir}/**/{,.*}/config").reject do |path|
+      log.info(log_key) { "Removing git directories" }
+
+      Dir.glob("#{install_dir}/**/{,.*}/config").reject do |path|
         REQUIRED_GIT_FILES.any? do |required_file|
           !File.exist?(File.join(File.dirname(path), required_file))
         end
       end.each do |path|
-        log.info(log_key) { "Removing git dir #{path}" }
+        log.info(log_key) { "Removing git dir `#{path}'" }
         FileUtils.rm_rf(File.dirname(path))
       end
-      return true
+
+      true
+    end
+
+    private
+
+    #
+    #
+    # The installation directory for this software's project. Drive letters are
+    # stripped for Windows.
+    #
+    # @return [String]
+    #
+    def install_dir
+      @install_dir ||= software.project.install_dir.sub(/^([A-Za-z]:)/, '')
+    end
+
+    # Override the log_key for this class to include the software name
+    #
+    # @return [String]
+    def log_key
+      @log_key ||= "#{super}: #{software.name}"
     end
   end
 end
