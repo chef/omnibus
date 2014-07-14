@@ -44,8 +44,8 @@ module Omnibus
       copy_file("#{project.package_scripts_path}/postrm", '/tmp/pkgmk/postremove')
 
       execute("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
-      execute('pkgchk -vd /tmp/pkgmk chef')
-      execute("pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} chef")
+      execute("pkgchk -vd /tmp/pkgmk #{project.package_name}")
+      execute("pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.package_name}")
     end
 
     clean do
