@@ -47,7 +47,9 @@ $ bundle install --binstubs
 $ bin/omnibus build $MY_PROJECT_NAME
 ```
 
-More details can be found in the generated project README file.
+More details can be found in the generated project's README file.
+
+Omnibus determines the platform for which to build an installer based on **the platform it is currently running on**. That is, you can only generate a `.deb` file on a Debian-based system. To alleviate this caveat, the generated project includes a [Test Kitchen](http://kitchen.ci) setup suitable for generating a series of Omnibus projects.
 
 
 More documentation
@@ -56,18 +58,79 @@ If you are creating OSX packages, please see the [OSX-specific documentation](do
 
 
 Configuration DSL
-------------------
-Though the template project will build, it won't do anything exciting. For that, you'll need to use the Omnibus DSL to define the specifics of your own application.
+-----------------
+Though the template project will build, it will not do anything exciting. For that, you need to use the Omnibus DSL to define the specifics of your application.
+
+### Config
+If present, Omnibus will use a top-level configuration file named `omnibus.rb` at the root of your repository. This file is loaded at runtime and includes a number of configuration tunables. Here is an example:
+
+```ruby
+# Build locally (instead of /var)
+# -------------------------------
+base_dir './local'
+
+# Disable git caching
+# ------------------------------
+use_git_caching false
+
+# Enable S3 asset caching
+# ------------------------------
+use_s3_caching true
+s3_access_key  ENV['S3_ACCESS_KEY']
+s3_secret_key  ENV['S3_SECRET_KEY']
+s3_bucket      ENV['S3_BUCKET']
+```
+
+For more information, please see the [`Config` documentation](http://rubydoc.info/github/opscode/omnibus-ruby/Omnibus/Config).
+
+You can tell Omnibus to load a difference configuration file by passing the `--config` option to any command:
+
+```shell
+$ bin/omnibus --config /path/to/config.rb
+```
+
+Finally, you can override a specific configuration option at the command line using the `--override` flag. This takes ultimate precedence over any configuration file values:
+
+```shell
+$ bin/omnibus --override use_git_caching:false
+```
+
+### Projects
+A Project DSL file defines your actual application; this is the thing you are creating a full-stack installer for in the first place. It provides a means to define the dependencies of the project (again, as specified in Software DSL definition files), as well as ways to set installer package metadata.
+
+All project definitions must be in the `config/projects` directory of your Omnibus repository.
+
+```ruby
+name            'chef-full'
+maintainer      'YOUR NAME'
+homepage        'http://yoursite.com'
+
+install_dir     '/opt/chef'
+build_version   '0.10.8'
+build_iteration 4
+
+dependency 'chef'
+```
+
+Some DSL methods available include:
+
+| DSL Method        | Description                                 |
+| :---------------: | --------------------------------------------|
+| `name`            | The name of the project                     |
+| `install_dir`     | The desired install location of the package |
+| `build_version`   | The package version                         |
+| `build_iteration` | The package iteration number                |
+| `dependency`      | An Omnibus software-defined component to include in this package |
+
+For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus-ruby/Omnibus/Project).
+
 
 ### Software
 Omnibus "software" files define individual software components that go into making your overall package. They are the building blocks of your application. The Software DSL provides a way to define where to retrieve the software sources, how to build them, and what dependencies they have. These dependencies are also defined in their own Software DSL files, thus forming the basis for a dependency-aware build ordering.
 
 All Software definitions should go in the `config/software` directory of your Omnibus project repository.
 
-CHEF has created software definitions for a number of commonly-needed components, available in the [omnibus-software](https://github.com/opscode/omnibus-software.git)
-repository. When you create a new project skeleton using Omnibus, this is automatically added to the project's Gemfile, making all these software definitions available to you.  (If you prefer, however, you can write your own versions of these same definitions in your project repository; local copies in `config/software` have precedence over anything from the `omnibus-software` repository.)
-
-An example:
+Here is an example:
 
 ```ruby
 name 'ruby'
@@ -118,48 +181,48 @@ version '2.1.1' do
 end
 ```
 
-Since the software definitions are simply ruby code, you can conditionally execute anything by wrapping it with pure ruby that tests for the version number.
+Since the software definitions are simply ruby code, you can conditionally execute anything by wrapping it with pure Ruby that tests for the version number.
 
-For more DSL methods, please consult the documentation.
+For more DSL methods, please consult the [`Software` documentation](http://rubydoc.info/github/opscode/omnibus-ruby/Omnibus/Software).
 
-### Projects
-A Project DSL file defines your actual application; this is the thing you are creating a full-stack installer for in the first place. It provides a means to define the dependencies of the project (again, as specified in Software DSL definition files), as well as ways to set installer package metadata.
+#### Sharing software definitions
+The easiest way to share organization-wide software is via bundler and Rubygems. For an example software repository, look at Chef's [omnibus-software](https://github.com/opscode/omnibus-software). For more information, please see the [Rubygems documentation](http://guides.rubygems.org/publishing/).
 
-All Project definitions (yes, you can have more than one) should go in the `config/projects` directory of your Omnibus project repository.
+It is recommended you use bundler to pull down these gems (as bundler also permits pulling softare directly from GitHub):
 
 ```ruby
-name            'chef-full'
-maintainer      'YOUR NAME'
-homepage        'http://yoursite.com'
-
-install_dir     '/opt/chef'
-build_version   '0.10.8'
-build_iteration 4
-
-dependency 'chef'
+gem 'my-company-omnibus-software'
+gem 'omnibus-software', github: 'my-company/omnibus-software'
 ```
 
-Some DSL methods available include:
+Then add the name of the software to the list of `software_gems` in your Omnibus config:
 
-| DSL Method        | Description                                 |
-| :---------------: | --------------------------------------------|
-| `name`            | The name of the project                     |
-| `install_dir`     | The desired install location of the package |
-| `build_version`   | The package version                         |
-| `build_iteration` | The package iteration number                |
-| `dependency`      | An Omnibus software-defined component to include in this package |
+```ruby
+software_gems %w(my-company-omnibus-software omnibus-software)
+```
 
-For more information, please see the documentation.
+You may also specify local paths on disk (but be warned this may make sharing the project among teams difficult):
+
+```ruby
+local_software_dirs %w(/path/to/software /other/path/to/software)
+```
+
+For all of these paths, **order matters**, so it is possible to depend on local software version while still retaining a remote software repo. Given the above example, Omnibus will search for a software definition named `foo` in this order:
+
+
+```text
+$PWD/config/software/foo.rb
+/path/to/software/config/software/foo.rb
+/other/path/to/software/config/software/foo.rb
+/Users/sethvargo/.gems/.../my-comany-omnibus-software/config/software/foo.rb
+/Users/sethvargo/.gems/.../omnibus-software/config/software/foo.rb
+```
+
+The first instance of `foo.rb` that is encountered will be used. Please note that **local** (vendored) softare definitions take precedence!
 
 
 Caveats
 -------
-### A note on builds
-As stated above, the generated project skeleton can run "as-is". However, Omnibus determines the platform for which to build an installer based on *the platform it is currently running on*. That is, you can only generate a `.deb` file for Ubuntu if you're actually running Omnibus *on Ubuntu*.
-
-This is currently achieved using [Test Kitchen](http://kitchen.ci), which is included with any newly generated Omnibus project.
-
-
 ### Overrides
 The project definitions can override specific software dependencies by passing in `override` to use the correct version:
 
@@ -173,12 +236,21 @@ override :chef, version: '2.1.1'
 dependency 'chef'
 ```
 
-There is no checking that the version override that you supply has been provided in a version override block in the software definition.
+**The overridden version must be defined in the associated software!**
+
+### Debugging
+By default, Omnibus will log at the `warn` level. You can override this by passing the `--log-level` flag to your Omnibus call:
+
+```shell
+$ bin/omnibus build <project> --log-level info // or 'debug'
+```
 
 ### Git caching
-As of Omnibus 3.0.0, projects are no longer built using rake. Instead, we have rewritten the software dependencies to leverage git caching. This means we cache compiled software definitions, so future Omnibus project builds are much faster.
+by default, Omnibus caches compiled software definitions, so n+1 Omnibus project builds are much faster. This functionality can be disabled by adding the following to your `omnibus.rb`:
 
-For more information on potential breaking changes, please see the CHANGELOG entry for Omnibus 3.0.0.
+```ruby
+use_git_caching false
+```
 
 
 License
