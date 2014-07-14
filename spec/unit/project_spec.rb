@@ -25,6 +25,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :package_group, 'chef'
     it_behaves_like 'a cleanroom setter', :override, 'foo'
     it_behaves_like 'a cleanroom setter', :resources_path, '/path'
+    it_behaves_like 'a cleanroom setter', :package_scripts_path, '/path/scripts'
     it_behaves_like 'a cleanroom setter', :dependency, 'libxslt-dev'
     it_behaves_like 'a cleanroom setter', :runtime_dependency, 'libxslt'
     it_behaves_like 'a cleanroom setter', :exclude, 'hamlet'

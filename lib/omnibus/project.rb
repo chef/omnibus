@@ -527,6 +527,41 @@ module Omnibus
     expose :resources_path
 
     #
+    # The path to the package scripts directory for this project.
+    # These are optional scripts that can be bundled into the
+    # resulting package for running at various points in the package
+    # management lifecycle.
+    #
+    # Currently supported scripts include:
+    #
+    # * postinst
+    #
+    #   A post-install script
+    # * prerm
+    #
+    #   A pre-uninstall script
+    # * postrm
+    #
+    #   A post-uninstall script
+    #
+    # Any scripts with these names that are present in the package
+    # scripts directory will be incorporated into the package that is
+    # built.  This only applies to fpm-built packages.
+    #
+    # Additionally, there may be a +makeselfinst+ script.
+    #
+    # @return [String]
+    #
+    def package_scripts_path(arg = NULL)
+      if null?(arg)
+        @package_scripts_path || "#{Config.project_root}/package-scripts/#{name}"
+      else
+        @package_scripts_path = arg
+      end
+    end
+    expose :package_scripts_path
+
+    #
     # Add a software dependency.
     #
     # Note that this is a *build time* dependency. If you need to specify an
@@ -916,39 +951,6 @@ module Omnibus
       else
         "#{build_iteration}.#{Ohai['platform']}.#{Ohai['platform_version']}"
       end
-    end
-
-    #
-    # The path to the package scripts directory for this project.
-    # These are optional scripts that can be bundled into the
-    # resulting package for running at various points in the package
-    # management lifecycle.
-    #
-    # Currently supported scripts include:
-    #
-    # * postinst
-    #
-    #   A post-install script
-    # * prerm
-    #
-    #   A pre-uninstall script
-    # * postrm
-    #
-    #   A post-uninstall script
-    #
-    # Any scripts with these names that are present in the package
-    # scripts directory will be incorporated into the package that is
-    # built.  This only applies to fpm-built packages.
-    #
-    # Additionally, there may be a +makeselfinst+ script.
-    #
-    # @return [String]
-    #
-    # @todo This documentation really should be up at a higher level,
-    #   particularly since the user has no way to change the path.
-    #
-    def package_scripts_path
-      "#{Config.project_root}/package-scripts/#{name}"
     end
 
     def build_me
