@@ -1059,17 +1059,26 @@ module Omnibus
     # @return [String]
     #
     def shasum
+      log.debug(log_key) {"begin project shasum"}
       digest = Digest::SHA256.new
-
+      log.debug(log_key) {"digest #{digest}"}
+      
       update_with_string(digest, name)
+      log.debug(log_key) {"name #{name}"}
       update_with_string(digest, install_dir)
-      update_with_string(digest, JSON.fast_generate(overrides))
+      log.debug(log_key) {"install_dir #{install_dir}"}
+      json = JSON.fast_generate(overrides)
+      update_with_string(digest, json)
+      log.debug(log_key) {"overrides #{overrides}"}
+      log.debug(log_key) {"json #{json}"}
 
       if filepath && File.exist?(filepath)
         update_with_file_contents(digest, filepath)
       else
         update_with_string(digest, '<DYNAMIC>')
       end
+
+      log.debug(log_key) {"end project shasum"}
 
       digest.hexdigest
     end
