@@ -36,19 +36,9 @@ module Omnibus
     build do
       execute("cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files")
 
-      File.open '/tmp/pkgmk/Prototype', 'w+' do |f|
-        f.write prototype_content
-      end
+      write_prototype_content
 
-      # generate the prototype's file list
-      execute("cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files")
-
-      # fix up the user and group in the file list to root
-      execute("awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype")
-
-      File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
-        f.write pkginfo_content
-      end
+      write_pkginfo_content
 
       copy_file("#{project.package_scripts_path}/postinst", '/tmp/pkgmk/postinstall')
       copy_file("#{project.package_scripts_path}/postrm", '/tmp/pkgmk/postremove')
@@ -79,15 +69,32 @@ module Omnibus
       File.basename(project.install_dir)
     end
 
-    def prototype_content
+    #
+    # Generate a Prototype file for solaris build
+    #
+    def write_prototype_content
       prototype_content = <<-EOF
 i pkginfo
 i postinstall
 i postremove
       EOF
+
+      # generate list of control files
+      File.open '/tmp/pkgmk/Prototype', 'w+' do |f|
+        f.write prototype_content
+      end
+
+      # generate the prototype's file list
+      execute("cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files")
+
+      # fix up the user and group in the file list to root
+      execute("awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype")
     end
 
-    def pkginfo_content
+    #
+    # Generate a pkginfo file for solaris build
+    #
+    def write_pkginfo_content
       pkginfo_content = <<-EOF
 CLASSES=none
 TZ=PST
@@ -103,6 +110,9 @@ VENDOR=#{project.maintainer}
 EMAIL=#{project.maintainer}
 PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       EOF
+      File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
+        f.write pkginfo_content
+      end
     end
   end
 end
