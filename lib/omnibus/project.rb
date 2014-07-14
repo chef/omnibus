@@ -944,11 +944,11 @@ module Omnibus
     #
     # @return [String]
     #
-    # @todo This documentation really should be up at a higher level,
-    #   particularly since the user has no way to change the path.
+    # @todo This documentation really should be up at a higher level
     #
-    def package_scripts_path
-      "#{Config.project_root}/package-scripts/#{name}"
+    def package_scripts_path(val = NULL_ARG)
+      @package_scripts_path = val unless val.equal?(NULL_ARG)
+      @package_scripts_path || "#{Omnibus.project_root}/package-scripts/#{name}"
     end
 
     def build_me
