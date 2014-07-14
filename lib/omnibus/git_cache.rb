@@ -95,7 +95,7 @@ module Omnibus
         end
       end
 
-      log.debug(log_key) { "dep_list: #{dep_list.inspect}" }
+      log.debug(log_key) { "dep_list: #{dep_list.map(&:name).inspect}" }
 
       # This is the list of all the unqiue shasums of all the software build
       # dependencies, including the on currently being acted upon.
