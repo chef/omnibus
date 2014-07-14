@@ -2,47 +2,55 @@ require 'omnibus'
 require 'spec_helper'
 
 describe Omnibus do
-  describe '::omnibus_software_root' do
-    it 'reads the software_gem out of Omnibus::Config.software_gem' do
-      spec_array = [double(Gem::Specification, gem_dir: '/data')]
-      expect(Omnibus::Config).to receive(:software_gem)
-        .and_return('my-omnibus-software-gem')
-      expect(Gem::Specification).to receive(:find_all_by_name)
-        .with('my-omnibus-software-gem')
-        .and_return(spec_array)
+  before do
+    allow(File).to receive(:directory?).and_return(true)
 
-      Omnibus.omnibus_software_root
-    end
+    allow(Gem::Specification).to receive(:find_all_by_name)
+      .with('omnibus-software')
+      .and_return([double(gem_dir: '/gem/omnibus-software')])
 
-    it 'uses the omnibus-software gem as the default' do
-      spec_array = [double(Gem::Specification, gem_dir: '/data')]
-      expect(Gem::Specification).to receive(:find_all_by_name)
-        .with('omnibus-software')
-        .and_return(spec_array)
+    allow(Gem::Specification).to receive(:find_all_by_name)
+      .with('custom-omnibus-software')
+      .and_return([double(gem_dir: '/gem/custom-omnibus-software')])
 
-      Omnibus.omnibus_software_root
-    end
+    Omnibus::Config.project_root('/foo/bar')
+    Omnibus::Config.local_software_dirs(['/local', '/other'])
+    Omnibus::Config.software_gems(['omnibus-software', 'custom-omnibus-software'])
   end
 
   describe '#software_dirs' do
-    context 'omnibus_software_root not nil' do
-      before do
-        Omnibus.stub(:omnibus_software_root) { './data' }
-      end
+    let(:software_dirs) { Omnibus.software_dirs }
 
-      it 'will include list of software from omnibus-software gem' do
-        expect(Omnibus.software_dirs.length).to eq(2)
-      end
+    it 'includes project_root' do
+      expect(software_dirs).to include('/foo/bar/config/software')
     end
 
-    context 'omnibus_software_root nil' do
-      before do
-        Omnibus.stub(:omnibus_software_root) { nil }
-      end
+    it 'includes local_software_dirs dirs' do
+      expect(software_dirs).to include('/local/config/software')
+      expect(software_dirs).to include('/other/config/software')
+    end
 
-      it 'will not include list of software from omnibus-software gem' do
-        expect(Omnibus.software_dirs.length).to eq(1)
-      end
+    it 'includes software_gems dirs' do
+      expect(software_dirs).to include('/gem/omnibus-software/config/software')
+      expect(software_dirs).to include('/gem/custom-omnibus-software/config/software')
+    end
+
+    it 'has the correct precedence order' do
+      expect(software_dirs).to eq([
+        '/foo/bar/config/software',
+        '/local/config/software',
+        '/other/config/software',
+        '/gem/omnibus-software/config/software',
+        '/gem/custom-omnibus-software/config/software',
+      ])
+    end
+  end
+
+  describe '#software_map' do
+    let(:software_map) { Omnibus.send(:software_map) }
+
+    it 'returns a hash' do
+      expect(software_map).to be_a(Hash)
     end
   end
 

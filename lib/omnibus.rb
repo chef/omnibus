@@ -239,39 +239,38 @@ module Omnibus
       expand_software(overrides)
     end
 
-    private
-
     #
-    # @api private
+    # The list of directories to search for {Software} files. These paths are
+    # returned **in order** of specifity.
     #
-    # The list of omnibus projects. This is an internal API that maps a
-    # project's name to the actual project object.
+    # @see (Config#project_root)
+    # @see (Config#software_dir)
+    # @see (Config#software_gems)
+    # @see (Config#local_software_dirs)
     #
-    # @return [Hash<String, Project>]
+    # @return [Array<String>]
     #
-    def _projects
-      return @_projects if @_projects
+    def software_dirs
+      directories = [
+        paths_from_project_root,
+        paths_from_local_software_dirs,
+        paths_from_software_gems,
+      ].flatten
 
-      path = File.expand_path(Config.project_dir, Config.project_root)
-      @_projects = Dir.glob("#{path}/*.rb").inject({}) do |hash, path|
-        name = File.basename(path, '.rb')
+      directories.inject([]) do |array, directory|
+        softwares_path = File.join(directory, Config.software_dir)
 
-        if hash[name].nil?
-          Omnibus.logger.info('Omnibus#projects') do
-            "Using project `#{name}' from `#{path}'."
-          end
-
-          hash[name] = Project.load(path)
+        if File.directory?(softwares_path)
+          array << softwares_path
         else
-          Omnibus.logger.debug('Omnibus#projects') do
-            "Skipping project `#{name}' because it was already loaded."
+          Omnibus.logger.warn('Omnibus') do
+            "`#{directory}' does not contain a valid directory structure. " \
+            "Does it contain a folder at `#{Config.software_dir}'?"
           end
         end
 
-        hash
+        array
       end
-
-      @_projects
     end
 
     #
@@ -308,38 +307,39 @@ module Omnibus
       end
     end
 
-    #
-    # The list of directories to search for {Software} files. These paths are
-    # returned **in order** of specifity.
-    #
-    # @see (Config#project_root)
-    # @see (Config#software_dir)
-    # @see (Config#software_gems)
-    # @see (Config#local_software_dirs)
-    #
-    # @return [Array<String>]
-    #
-    def software_dirs
-      directories = [
-        software_paths_from_project_root,
-        software_paths_from_local_software_dirs,
-        software_paths_from_software_gems,
-      ].flatten
+    private
 
-      directories.inject([]) do |array, directory|
-        softwares_path = File.join(directory, Config.software_dir)
+    #
+    # @api private
+    #
+    # The list of omnibus projects. This is an internal API that maps a
+    # project's name to the actual project object.
+    #
+    # @return [Hash<String, Project>]
+    #
+    def _projects
+      return @_projects if @_projects
 
-        if File.directory?(softwares_path)
-          array << softwares_path
+      path = File.expand_path(Config.project_dir, Config.project_root)
+      @_projects = Dir.glob("#{path}/*.rb").inject({}) do |hash, path|
+        name = File.basename(path, '.rb')
+
+        if hash[name].nil?
+          Omnibus.logger.info('Omnibus#projects') do
+            "Using project `#{name}' from `#{path}'."
+          end
+
+          hash[name] = Project.load(path)
         else
-          Omnibus.logger.warn('Omnibus') do
-            "`#{directory}' does not contain a valid directory structure. " \
-            "Does it contain a folder at `#{Config.software_dir}'?"
+          Omnibus.logger.debug('Omnibus#projects') do
+            "Skipping project `#{name}' because it was already loaded."
           end
         end
 
-        array
+        hash
       end
+
+      @_projects
     end
 
     #
@@ -352,7 +352,7 @@ module Omnibus
     #
     # @return [Array<String>]
     #
-    def software_paths_from_project_root
+    def paths_from_project_root
       [Config.project_root]
     end
 
@@ -364,7 +364,7 @@ module Omnibus
     #
     # @return [Array<String>]
     #
-    def software_paths_from_local_software_dirs
+    def paths_from_local_software_dirs
       Array(Config.local_software_dirs).inject([]) do |array, path|
         fullpath = File.expand_path(path, Config.project_root)
 
@@ -390,7 +390,7 @@ module Omnibus
     #
     # @return [Array<String>]
     #
-    def software_paths_from_software_gems
+    def paths_from_software_gems
       Array(Config.software_gems).inject([]) do |array, name|
         if (spec = Gem::Specification.find_all_by_name(name).first)
           array << File.expand_path(spec.gem_dir)

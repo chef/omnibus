@@ -122,13 +122,10 @@ module Omnibus
     def patch(*args)
       args = args.dup.pop
 
-      # we'll search for a patch file in the project root AND
-      # the omnibus-software gem
-      candidate_roots = [Config.project_root]
-      candidate_roots << Omnibus.omnibus_software_root if Omnibus.omnibus_software_root
-
-      candidate_paths = candidate_roots.map do |root|
-        File.expand_path("#{root}/config/patches/#{name}/#{args[:source]}")
+      # Search for patches just like we search for software
+      candidate_paths = Omnibus.software_dirs.map do |directory|
+        patches = directory.sub(Config.software_dir, 'config/patches')
+        "#{patches}/#{name}/#{args[:source]}"
       end
 
       source = candidate_paths.find { |path| File.exist?(path) }
