@@ -1,8 +1,8 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v3.2.0.rc (July 14, 2014)
--------------------------
+v3.2.0.rc.1 (July 14, 2014)
+-----------==--------------
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
 - Refactor `omnibus release` into a non-S3-specific backend "publisher"
