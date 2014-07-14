@@ -19,7 +19,7 @@ module Omnibus
       Package::Metadata.new(package,
         name: 'chef',
         friendly_name: 'Chef',
-        homepage: 'https://getchef.com',
+        homepage: 'https://www.getchef.com',
         version: '11.0.6',
         iteration: 1,
         basename: 'chef.deb',
