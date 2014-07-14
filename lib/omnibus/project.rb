@@ -1064,7 +1064,7 @@ module Omnibus
       when 'bff'
         Packger::Bff.new(self).package_name
       when 'pkgmk'
-        "#{package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
+        Packager::Pkgmk.new(self).package_name
       when 'mac_pkg'
         Packager::MacPkg.new(self).package_name
       when 'mac_dmg'
@@ -1183,63 +1183,8 @@ module Omnibus
       Packger::Bff.new(self).run!
     end
 
-    def pkgmk_version
-      "#{build_version}-#{build_iteration}"
-    end
-
     def run_pkgmk
-      install_dirname = File.dirname(install_dir)
-      install_basename = File.basename(install_dir)
-
-      system 'sudo rm -rf /tmp/pkgmk'
-      FileUtils.mkdir '/tmp/pkgmk'
-
-      system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
-
-      prototype_content = <<-EOF
-i pkginfo
-i postinstall
-i postremove
-      EOF
-
-      File.open '/tmp/pkgmk/Prototype', 'w+' do |f|
-        f.write prototype_content
-      end
-
-      # generate the prototype's file list
-      system "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
-
-      # fix up the user and group in the file list to root
-      system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
-
-      pkginfo_content = <<-EOF
-CLASSES=none
-TZ=PST
-PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_dirname}
-PKG=#{package_name}
-NAME=#{package_name}
-ARCH=#{`uname -p`.chomp}
-VERSION=#{pkgmk_version}
-CATEGORY=application
-DESC=#{description}
-VENDOR=#{maintainer}
-EMAIL=#{maintainer}
-PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
-      EOF
-
-      File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
-        f.write pkginfo_content
-      end
-
-      FileUtils.cp "#{package_scripts_path}/postinst", '/tmp/pkgmk/postinstall'
-      FileUtils.cp "#{package_scripts_path}/postrm", '/tmp/pkgmk/postremove'
-
-      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
-
-      system 'pkgchk -vd /tmp/pkgmk chef'
-
-      system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
+      Packager::Pkgmk.new(self).run!
     end
 
     def run_mac_package_build
