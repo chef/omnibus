@@ -868,10 +868,10 @@ module Omnibus
     def shasum
       digest = Digest::SHA256.new
 
-      log.debug("#{log_key}#shasum") { "project:           #{project.shasum.inspect}" }
-      log.debug("#{log_key}#shasum") { "name:              #{name.inspect}" }
-      log.debug("#{log_key}#shasum") { "version_for_cache: #{version_for_cache.inspect}" }
-      log.debug("#{log_key}#shasum") { "overrides:         #{overrides.inspect}" }
+      log.debug(log_key) { "project (SHA): #{project.shasum.inspect}" }
+      log.debug(log_key) { "name: #{name.inspect}" }
+      log.debug(log_key) { "version_for_cache: #{version_for_cache.inspect}" }
+      log.debug(log_key) { "overrides: #{overrides.inspect}" }
 
       update_with_string(digest, project.shasum)
       update_with_string(digest, name)
@@ -879,16 +879,16 @@ module Omnibus
       update_with_string(digest, JSON.fast_generate(overrides))
 
       if filepath && File.exist?(filepath)
-        log.debug("#{log_key}#shasum") { "filepath:          #{filepath.inspect}" }
+        log.debug(log_key) { "filepath: #{filepath.inspect}" }
         update_with_file_contents(digest, filepath)
       else
-        log.debug("#{log_key}#shasum") { "filepath:          <DYNAMIC>" }
+        log.debug(log_key) { "filepath: <DYNAMIC>" }
         update_with_string(digest, '<DYNAMIC>')
       end
 
       shasum = digest.hexdigest
 
-      log.debug("#{log_key}#shasum") { "shasum:            #{shasum.inspect}" }
+      log.debug(log_key) { "shasum: #{shasum.inspect}" }
 
       shasum
     end
