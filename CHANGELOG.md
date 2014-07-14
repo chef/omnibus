@@ -54,7 +54,7 @@ v3.2.0.rc (July 14, 2014)
 - Documentation updates and typographical fixes
 - Change the generated omnibus.rb to use a default homepage that includes the protocol
 - Ensure that software fetched via the PathFetcher are cached correctly
-- Downgrade FPM to ~> 0.4 - newer versions of FPM have an unnecessary dependency on FFI that causes builds to link incorrectly
+- Downgrade FPM to ~> 0.4 - FPM 1.0.0+ uses FFI to attach to some libc functions. This fails on RHEL 5 & 6. As we don’t need a bleeding edge FPM the easiest fix is to just downgrade to the most recent pre-1.0.0 version.
 - Always print backtraces when errors occur
 - Do not sent ldd/otool to the same file - first steps in allowing parallel builds
 - Only rescue `Omnibus::Error` when invoked through the CLI - this will allow other bugs to actually raise at the Ruby level
