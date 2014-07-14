@@ -95,6 +95,7 @@ module Omnibus
         'omnibus.platform_version' => package.metadata[:platform_version],
         'omnibus.arch'             => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
+        'omnibus.iteration'        => package.metadata[:iteration],
         'omnibus.md5'              => package.metadata[:md5],
         'omnibus.sha1'             => package.metadata[:sha1],
         'omnibus.sha256'           => package.metadata[:sha256],

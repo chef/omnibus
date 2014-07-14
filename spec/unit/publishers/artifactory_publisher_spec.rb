@@ -21,6 +21,7 @@ module Omnibus
         friendly_name: 'Chef',
         homepage: 'https://getchef.com',
         version: '11.0.6',
+        iteration: 1,
         basename: 'chef.deb',
         platform: 'ubuntu',
         platform_version: '14.04',
