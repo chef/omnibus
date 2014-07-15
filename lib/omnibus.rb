@@ -288,7 +288,7 @@ module Omnibus
           name = File.basename(path, '.rb')
 
           if hash[name].nil?
-            Omnibus.logger.info('Omnibus#software_map') do
+            Omnibus.logger.debug('Omnibus#software_map') do
               "Using software `#{name}' from `#{path}'."
             end
 
@@ -323,7 +323,7 @@ module Omnibus
         name = File.basename(path, '.rb')
 
         if hash[name].nil?
-          Omnibus.logger.info('Omnibus#projects') do
+          Omnibus.logger.debug('Omnibus#projects') do
             "Using project `#{name}' from `#{path}'."
           end
 
