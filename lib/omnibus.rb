@@ -287,7 +287,9 @@ module Omnibus
     # @return [Hash<String, String>]
     #
     def software_map
-      software_dirs.inject({}) do |hash, directory|
+      return @software_map if @software_map
+
+      @software_map = software_dirs.inject({}) do |hash, directory|
         Dir.glob("#{directory}/*.rb").each do |path|
           name = File.basename(path, '.rb')
 
@@ -307,6 +309,8 @@ module Omnibus
 
         hash
       end
+
+      @software_map
     end
 
     private
