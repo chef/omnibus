@@ -249,13 +249,15 @@ module Omnibus
     # @return [Array<String>]
     #
     def software_dirs
+      return @software_dirs if @software_dirs
+
       directories = [
         paths_from_project_root,
         paths_from_local_software_dirs,
         paths_from_software_gems,
       ].flatten
 
-      directories.inject([]) do |array, directory|
+      @software_dirs = directories.inject([]) do |array, directory|
         softwares_path = File.join(directory, Config.software_dir)
 
         if File.directory?(softwares_path)
@@ -269,6 +271,8 @@ module Omnibus
 
         array
       end
+
+      @software_dirs
     end
 
     #
