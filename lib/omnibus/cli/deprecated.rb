@@ -68,7 +68,7 @@ module Omnibus
         #   $ omnibus build project PROJECT
         #
         if args[0..1] == %w(build project)
-          warn("The interface for building a project has changed. Please use 'omnibus build hamlet' instead.")
+          warn("The interface for building a project has changed. Please use 'omnibus build #{args[2]}' instead.")
           args.delete_at(1)
           return old_dispatch(m, args, options, config)
         end
