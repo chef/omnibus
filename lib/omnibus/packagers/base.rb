@@ -20,6 +20,7 @@ require 'erb'
 
 module Omnibus
   class Packager::Base
+    include Logging
     include Util
 
     extend Forwardable
