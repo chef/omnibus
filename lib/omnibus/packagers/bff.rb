@@ -45,10 +45,6 @@ module Omnibus
       copy_file("/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff")
     end
 
-    clean do
-      # none
-    end
-
     # @see Base#package_name
     def package_name
       "#{project.package_name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
@@ -63,30 +59,30 @@ module Omnibus
     end
 
     def create_gen_template
-      preamble = <<-EOF
-Package Name: #{project.package_name}
-Package VRMF: #{bff_version}
-Update: N
-Fileset
-  Fileset Name: #{project.package_name}
-  Fileset VRMF: #{bff_version}
-  Fileset Description: #{project.friendly_name}
-  USRLIBLPPFiles
-  Configuration Script: #{project.install_path}/bin/postinstall.sh
-  Unconfiguration Script: #{project.install_path}/bin/unpostinstall.sh
-  EOUSRLIBLPPFiles
-  Bosboot required: N
-  License agreement acceptance required: N
-  Include license files in this package: N
-  Requisites:
-  ROOT Part: N
-    ROOTFiles
-    EOROOTFiles
-  USRFiles
+      preamble = <<-EOF.gsub(/^ {8}/, '')
+        Package Name: #{project.package_name}
+        Package VRMF: #{bff_version}
+        Update: N
+        Fileset
+          Fileset Name: #{project.package_name}
+          Fileset VRMF: #{bff_version}
+          Fileset Description: #{project.friendly_name}
+          USRLIBLPPFiles
+          Configuration Script: #{project.install_path}/bin/postinstall.sh
+          Unconfiguration Script: #{project.install_path}/bin/unpostinstall.sh
+          EOUSRLIBLPPFiles
+          Bosboot required: N
+          License agreement acceptance required: N
+          Include license files in this package: N
+          Requisites:
+            ROOT Part: N
+            ROOTFiles
+            EOROOTFiles
+          USRFiles
       EOF
-      tail = <<-EOF
-EOUSRFiles
-EOFileset
+      tail = <<-EOF.gsub(/^ {8}/, '')
+        EOUSRFiles
+        EOFileset
       EOF
 
       File.open '/tmp/bff/gen.preamble', 'w+' do |f|

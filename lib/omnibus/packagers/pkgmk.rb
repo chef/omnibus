@@ -21,10 +21,6 @@ module Omnibus
   #
   class Packager::Pkgmk < Packager::Base
 
-    validate do
-      # nothing
-    end
-
     setup do
       purge_directory(staging_dir)
       purge_directory(Config.package_dir)
@@ -48,10 +44,6 @@ module Omnibus
       execute("pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.package_name}")
     end
 
-    clean do
-      # nothing
-    end
-
     # @see Base#package_name
     def package_name
       "#{project.package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
@@ -73,10 +65,10 @@ module Omnibus
     # Generate a Prototype file for solaris build
     #
     def write_prototype_content
-      prototype_content = <<-EOF
-i pkginfo
-i postinstall
-i postremove
+      prototype_content = <<-EOF.gsub(/^ {8}/, '')
+        i pkginfo
+        i postinstall
+        i postremove
       EOF
 
       # generate list of control files
@@ -95,20 +87,20 @@ i postremove
     # Generate a pkginfo file for solaris build
     #
     def write_pkginfo_content
-      pkginfo_content = <<-EOF
-CLASSES=none
-TZ=PST
-PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_dirname}
-PKG=#{project.package_name}
-NAME=#{project.package_name}
-ARCH=#{`uname -p`.chomp}
-VERSION=#{pkgmk_version}
-CATEGORY=application
-DESC=#{project.description}
-VENDOR=#{project.maintainer}
-EMAIL=#{project.maintainer}
-PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
+      pkginfo_content = <<-EOF.gsub(/^ {8}/, '')
+        CLASSES=none
+        TZ=PST
+        PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
+        BASEDIR=#{install_dirname}
+        PKG=#{project.package_name}
+        NAME=#{project.package_name}
+        ARCH=#{`uname -p`.chomp}
+        VERSION=#{pkgmk_version}
+        CATEGORY=application
+        DESC=#{project.description}
+        VENDOR=#{project.maintainer}
+        EMAIL=#{project.maintainer}
+        PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       EOF
       File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
         f.write pkginfo_content
