@@ -456,7 +456,8 @@ module Omnibus
     #   moot
     #
     def build(&block)
-      @builder = Builder.new(self, &block)
+      @builder = Builder.new(self)
+      @builder.evaluate(&block)
       @builder
     end
     expose :build
