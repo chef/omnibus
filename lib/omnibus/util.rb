@@ -93,13 +93,16 @@ module Omnibus
       value && value.to_s =~ /^(false|f|no|n|0)$/i
     end
 
+    #
+    # Convert the given path to be appropiate for shelling out on Windows.
+    #
     # @param [Array<String>] pieces
     #   the pieces of the path to join and fix
     # @return [String]
     #   the path with applied changes
     #
     def windows_safe_path(*pieces)
-      path = File.expand_path(File.join(*pieces))
+      path = File.join(*pieces)
 
       if File::ALT_SEPARATOR
         path.gsub(File::SEPARATOR, File::ALT_SEPARATOR)
