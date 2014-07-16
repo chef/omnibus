@@ -48,6 +48,12 @@ module Omnibus
       options = args.last.kind_of?(Hash) ? args.pop : {}
       options = SHELLOUT_OPTIONS.merge(options)
 
+      # Since Mixlib::ShellOut supports :environment and :env, we want to
+      # standardize here
+      if options[:env]
+        options[:environment] = options.fetch(:environment, {}).merge(options[:env])
+      end
+
       # Log any environment options given
       unless options[:environment].empty?
         Omnibus.logger.info { 'Environment:' }
