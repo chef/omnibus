@@ -290,17 +290,17 @@ EOH
   end
 
   #
-  # Raised when Omnibus encounters a platform_family it does not know how to
+  # Raised when Omnibus encounters a platform it does not know how to
   # build/check/handle.
   #
-  class UnknownPlatformFamily < Error
-    def initialize(family)
-      @family = family
+  class UnknownPlatform < Error
+    def initialize(platform)
+      @platform = platform
     end
 
     def to_s
       <<-EOH
-Unknown platform family `#{@family}'!
+Unknown platform `#{@platform}'!
 I do not know how to proceed!"
 EOH
     end
