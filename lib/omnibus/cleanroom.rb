@@ -68,19 +68,19 @@ module Omnibus
           raise NameError, "undefined method `#{name}' for class `#{self.name}'"
         end
 
-        exposed[name] = true
+        exposed_methods[name] = true
       end
-
-      private
 
       #
       # The list of exposed methods.
       #
       # @return [Hash]
       #
-      def exposed
-        @exposed ||= {}
+      def exposed_methods
+        @exposed_methods ||= {}
       end
+
+      private
 
       #
       # The cleanroom instance for this class. This method is intentionally
@@ -89,7 +89,7 @@ module Omnibus
       # @return [Class]
       #
       def cleanroom
-        exposed_methods = exposed.keys
+        exposed = exposed_methods.keys
         parent = self.name
 
         Class.new do
@@ -97,7 +97,7 @@ module Omnibus
             @instance = instance
           end
 
-          exposed_methods.each do |exposed_method|
+          exposed.each do |exposed_method|
             define_method(exposed_method) do |*args, &block|
               @instance.send(exposed_method, *args, &block)
             end

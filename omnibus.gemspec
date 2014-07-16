@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(/^(test|spec|features)\//)
   gem.require_paths = ['lib']
 
+  gem.add_dependency 'bundler'
   gem.add_dependency 'chef-sugar',      '~> 1.2'
   gem.add_dependency 'mixlib-shellout', '~> 1.4'
   gem.add_dependency 'ohai',            '~> 7.2.0.rc'
@@ -34,6 +35,4 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec',       '~> 2.14'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'rake'
-
-  gem.add_development_dependency 'bundler'
 end

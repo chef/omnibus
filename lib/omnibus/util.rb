@@ -60,6 +60,7 @@ module Omnibus
       Omnibus.logger.info { "$ #{args.join(' ')}" }
 
       cmd = Mixlib::ShellOut.new(*args, options)
+      cmd.environment['HOME'] = '/tmp' unless ENV['HOME']
       cmd.run_command
       cmd
     end
