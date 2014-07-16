@@ -363,7 +363,7 @@ module Omnibus
     # @return [String]
     #
     def project_dir
-      @project_dir ||= File.join(Config.source_dir, relative_path)
+      File.expand_path(File.join(Config.source_dir, relative_path))
     end
     expose :project_dir
 
@@ -373,7 +373,7 @@ module Omnibus
     # @return [String]
     #
     def build_dir
-      "#{Config.build_dir}/#{project.name}"
+      File.expand_path(File.join(Config.build_dir, project.name))
     end
     expose :build_dir
 
@@ -386,7 +386,7 @@ module Omnibus
     # @return [String]
     #
     def install_dir
-      @project.install_dir
+      File.expand_path(@project.install_dir)
     end
     expose :install_dir
 
