@@ -116,13 +116,13 @@ module Omnibus
       remove_git_dirs
 
       shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f))
+
       begin
         shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{tag}"))
       rescue Mixlib::ShellOut::ShellCommandFailed => e
-        if e.message !~ /nothing to commit/
-          raise
-        end
+        raise unless e.message.include?('nothing to commit')
       end
+
       shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{tag}"))
     end
 
