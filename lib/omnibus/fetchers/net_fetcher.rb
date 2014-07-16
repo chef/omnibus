@@ -14,6 +14,10 @@
 # limitations under the License.
 #
 
+require 'net/http'
+require 'net/https'
+require 'net/ftp'
+
 module Omnibus
   class UnsupportedURIScheme < ArgumentError
   end
