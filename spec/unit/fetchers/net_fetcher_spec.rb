@@ -20,13 +20,11 @@ module Omnibus
     shared_examples 'an extractor' do |extension, command|
       context "when the file is a .#{extension}" do
         before do
-          allow(software_mock).to receive(
-            project_file: "file.#{extension}",
-            source_uri: "http://example.com/file.#{extension}",
-          )
+          allow(software_mock).to receive(:project_file).and_return("file.#{extension}")
+          allow(software_mock).to receive(:source_uri).and_return("http://example.com/file.#{extension}")
         end
 
-        it 'downloads and decompresses the archive' do
+        it 'has the correct extract command' do
           expect(subject.extract_cmd).to eq(command)
         end
       end
