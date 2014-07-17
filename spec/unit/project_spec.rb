@@ -7,31 +7,31 @@ module Omnibus
 
     subject { project }
 
-    it_behaves_like 'a cleanroom setter', :name, 'chef'
-    it_behaves_like 'a cleanroom setter', :friendly_name, 'Chef'
-    it_behaves_like 'a cleanroom setter', :msi_parameters, { foo: 'bar' }
-    it_behaves_like 'a cleanroom setter', :package_name, 'chef.package'
-    it_behaves_like 'a cleanroom setter', :install_dir, '/opt/chef'
-    it_behaves_like 'a cleanroom setter', :install_path, '/opt/chef'
-    it_behaves_like 'a cleanroom setter', :maintainer, 'Chef Software, Inc'
-    it_behaves_like 'a cleanroom setter', :homepage, 'https://getchef.com'
-    it_behaves_like 'a cleanroom setter', :description, 'Installs the thing'
-    it_behaves_like 'a cleanroom setter', :replaces, 'old-chef'
-    it_behaves_like 'a cleanroom setter', :conflict, 'puppet'
-    it_behaves_like 'a cleanroom setter', :build_version, '1.2.3'
-    it_behaves_like 'a cleanroom setter', :build_iteration, 1
-    it_behaves_like 'a cleanroom setter', :mac_pkg_identifier, 'com.getchef'
-    it_behaves_like 'a cleanroom setter', :package_user, 'chef'
-    it_behaves_like 'a cleanroom setter', :package_group, 'chef'
-    it_behaves_like 'a cleanroom setter', :override, 'foo'
-    it_behaves_like 'a cleanroom setter', :resources_path, '/path'
-    it_behaves_like 'a cleanroom setter', :package_scripts_path, '/path/scripts'
-    it_behaves_like 'a cleanroom setter', :dependency, 'libxslt-dev'
-    it_behaves_like 'a cleanroom setter', :runtime_dependency, 'libxslt'
-    it_behaves_like 'a cleanroom setter', :exclude, 'hamlet'
-    it_behaves_like 'a cleanroom setter', :config_file, '/path/to/config.rb'
-    it_behaves_like 'a cleanroom setter', :extra_package_file, '/path/to/asset'
-    it_behaves_like 'a cleanroom setter', :dependencies, 'a', 'b', 'c'
+    it_behaves_like 'a cleanroom setter', :name, %|name 'chef'|
+    it_behaves_like 'a cleanroom setter', :friendly_name, %|friendly_name 'Chef'|
+    it_behaves_like 'a cleanroom setter', :msi_parameters, %|msi_parameters {}|
+    it_behaves_like 'a cleanroom setter', :package_name, %|package_name 'chef.package'|
+    it_behaves_like 'a cleanroom setter', :install_dir, %|install_dir '/opt/chef'|
+    it_behaves_like 'a cleanroom setter', :install_path, %|install_path '/opt/chef'|
+    it_behaves_like 'a cleanroom setter', :maintainer, %|maintainer 'Chef Software, Inc'|
+    it_behaves_like 'a cleanroom setter', :homepage, %|homepage 'https://getchef.com'|
+    it_behaves_like 'a cleanroom setter', :description, %|description 'Installs the thing'|
+    it_behaves_like 'a cleanroom setter', :replaces, %|replaces 'old-chef'|
+    it_behaves_like 'a cleanroom setter', :conflict, %|conflict 'puppet'|
+    it_behaves_like 'a cleanroom setter', :build_version, %|build_version '1.2.3'|
+    it_behaves_like 'a cleanroom setter', :build_iteration, %|build_iteration 1|
+    it_behaves_like 'a cleanroom setter', :mac_pkg_identifier, %|mac_pkg_identifier 'com.getchef'|
+    it_behaves_like 'a cleanroom setter', :package_user, %|package_user 'chef'|
+    it_behaves_like 'a cleanroom setter', :package_group, %|package_group 'chef'|
+    it_behaves_like 'a cleanroom setter', :override, %|override :chefdk, source: 'foo.com'|
+    it_behaves_like 'a cleanroom setter', :resources_path, %|resources_path '/path'|
+    it_behaves_like 'a cleanroom setter', :package_scripts_path, %|package_scripts_path '/path/scripts'|
+    it_behaves_like 'a cleanroom setter', :dependency, %|dependency 'libxslt-dev'|
+    it_behaves_like 'a cleanroom setter', :runtime_dependency, %|runtime_dependency 'libxslt'|
+    it_behaves_like 'a cleanroom setter', :exclude, %|exclude 'hamlet'|
+    it_behaves_like 'a cleanroom setter', :config_file, %|config_file '/path/to/config.rb'|
+    it_behaves_like 'a cleanroom setter', :extra_package_file, %|extra_package_file '/path/to/asset'|
+    it_behaves_like 'a cleanroom setter', :dependencies, %|dependencies 'a', 'b', 'c'|
 
     it_behaves_like 'a cleanroom getter', :files_path
 
@@ -68,8 +68,8 @@ module Omnibus
         expect(project.friendly_name).to eq('Sample Project')
       end
 
-      it 'should return friendly_name' do
-        expect(project.resources_path).to eq('sample/project/resources')
+      it 'should return resources_path' do
+        expect(project.resources_path).to include('sample/project/resources')
       end
     end
 
