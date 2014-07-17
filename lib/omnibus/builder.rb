@@ -16,6 +16,7 @@
 
 require 'bundler'
 require 'fileutils'
+require 'ostruct'
 require 'mixlib/shellout'
 
 module Omnibus
@@ -279,19 +280,30 @@ module Omnibus
     # @return (see #command)
     #
     def erb(options = {})
-      locations, source = find_file('config/templates', options[:source])
+      source = options.delete(:source)
+      dest   = options.delete(:dest)
+      mode   = options.delete(:mode) || 0644
+      vars   = options.delete(:vars) || {}
 
-      unless source
-        raise MissingTemplate.new(options[:source], locations)
+      raise "Missing required option `:source'!" unless source
+      raise "Missing required option `:dest'!"   unless dest
+
+      locations, source_path = find_file('config/templates', source)
+
+      unless source_path
+        raise MissingTemplate.new(source, locations)
       end
 
-      block "Render erb `#{options[:source]}'" do
-        template = ERB.new(File.new(source_path).read, nil, '%')
-        File.open(options[:dest], 'w') do |file|
-          file.write(template.result(OpenStruct.new(options[:vars]).instance_eval { binding }))
+      block "Render erb `#{source}'" do
+        template = ERB.new(File.read(source_path), nil, '%')
+        struct   = OpenStruct.new(vars)
+        result   = template.result(struct.instance_eval { binding })
+
+        File.open(dest, 'w') do |file|
+          file.write(result)
         end
 
-        File.chmod(options[:mode], options[:dest])
+        File.chmod(mode, dest)
       end
     end
     expose :erb
