@@ -92,7 +92,7 @@ module Omnibus
       {
         'omnibus.project'          => package.metadata[:name],
         'omnibus.platform'         => package.metadata[:platform],
-        'omnibus.platform_version' => truncate_platform_version(package.metadata[:platform_version], package.metadata[:platform]),
+        'omnibus.platform_version' => package.metadata[:platform_version],
         'omnibus.architecture'     => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
         'omnibus.iteration'        => package.metadata[:iteration],

@@ -19,6 +19,8 @@ require 'json'
 module Omnibus
   class Package
     class Metadata
+      extend Util
+
       class << self
         #
         # Generate a +metadata.json+ from the given package and data hash.
@@ -56,6 +58,12 @@ module Omnibus
         def for_package(package)
           data = File.read(path_for(package))
           hash = JSON.parse(data, symbolize_names: true)
+
+          # Ensure Platform version has been truncated
+          if hash[:platform_version] && hash[:platform]
+            hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
+          end
+
           new(package, hash)
         rescue Errno::ENOENT
           raise NoPackageMetadataFile.new(package.path)

@@ -29,7 +29,6 @@ module Omnibus
     end
 
     include Logging
-    include Util
 
     #
     # Create a new publisher from the given pattern.
