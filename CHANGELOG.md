@@ -1,8 +1,8 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v3.2.0.rc.1 (July 14, 2014)
------------==--------------
+v3.2.0.rc.2 (July 17, 2014)
+---------------------------
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
 - Refactor `omnibus release` into a non-S3-specific backend "publisher"
@@ -21,6 +21,8 @@ v3.2.0.rc.1 (July 14, 2014)
 - Add publish APIs for dirtying the git cache
 - Add test coverage for the "public" API
 - Add validation to `source` in software DSL
+- Add logging to the Packager class
+- Add functional tests for builders
 - Update generator templates to use the new APIs
 - Upgrade to Ohai 7.2
 - Improve YARDoc
@@ -40,11 +42,13 @@ v3.2.0.rc.1 (July 14, 2014)
 - Deprecate `Project#install_path` in favor of `Project.install_dir`
 - Deprecate [DSL] `install_path` in favor of `install_dir`
 - Rename `Config.install_path_cache_dir` to `git_cache_dir`
+- Fix a bug in the deprecations where a hardcoded output was used instead of a dynamic variable
 
 ### DSL Changes
 - Add `with_embedded_path` to software
 - Add `with_standard_compiler_flags` to software
 - Add `package_scripts_path` to project
+- Add builder DSL methods for `mkdir`, `touch`, `delete`, `copy`, `move`, and `link`
 
 ### Bug fixes
 - Fix a small typo in the project generator (come -> some)
@@ -63,6 +67,9 @@ v3.2.0.rc.1 (July 14, 2014)
 - Intelligently parse the project's homepage because Ruby's native URI implementation is buggy
 - Fetch all software at the start of the build - this fixes a bug where a build would fail halfway through because of a tiny typo of GitHub outage. Now, all required software is downloaded **before** the build starts, lowering the feedback time for a failure due to networking issues
 - Use the fetcher's `version_for_cache` method directly, falling back to `0.0.0` (and a warining) if no version is given
+- Require `net/http`, `net/https`, and `net/ftp` in the base fetcher module
+- Use -R, not -W1 on FreeBSD's compile flags
+- Expand all paths relative to the project_root
 
 ### Potentially breaking changes
 - Merged `Package` and `Artifact` into the same class and updated API - this was considered an **internal** API so it is not a violation of semver
@@ -70,6 +77,8 @@ v3.2.0.rc.1 (July 14, 2014)
 - Use a cleanroom object when evaluating the DSL - prior to this release, Omnibus did not declare a public API. Project and software definitions had unrestricted access to the entire project.rb and software.rb methods respectively. This poses two problems - first, it makes it impossible to guarantee a public DSL API over a public (code) API. Second, it permits a developer to change the behavior of project.rb or software.rb accidentially, simply by defining a new method. The introducing of a cleanroom fixes both these bugs, however, it was impossible to know what was formerly considered a public API. Thus, it is possible that a previously-relied-on method is now unavaiable using the cleanroom. Please open an issue if you encounter such a case.
 - Remove mixlib-config - if you were relying on mixlib-config as a transitive dependency, it is no longer available
 - Remove the ability to use an overrides file - this was for internal use only and was never exposed as a public API. However, if you dug into the code and found it, it has now been removed. For BC purposes, the value still exists in the configuration object, but is essentially a no-op
+- Move project loading from INFO to DEBUG
+- Truncate platforms to short versions
 
 
 v3.1.1 (May 20, 2014)
