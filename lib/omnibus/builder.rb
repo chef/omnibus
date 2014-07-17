@@ -116,6 +116,9 @@ module Omnibus
         raise MissingPatch.new(source, locations)
       end
 
+      # Apply patches nicely on Windows
+      patch_path = windows_safe_path(patch_path)
+
       if target
         command = "cat #{patch_path} | patch -p#{plevel} #{target}"
       else
@@ -172,7 +175,8 @@ module Omnibus
     #
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/ruby #{command}", options)
+        bin = windows_safe_path("#{install_dir}/embedded/bin/ruby")
+        _shellout!("#{bin} #{command}", options)
       end
     end
     expose :ruby
@@ -188,7 +192,8 @@ module Omnibus
     #
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/gem #{command}", options)
+        bin = windows_safe_path("#{install_dir}/embedded/bin/gem")
+        _shellout!("#{bin} #{command}", options)
       end
     end
     expose :gem
@@ -207,7 +212,8 @@ module Omnibus
     #
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/bundle #{command}", options)
+        bin = windows_safe_path("#{install_dir}/embedded/bin/bundle")
+        _shellout!("#{bin} #{command}", options)
       end
     end
     expose :bundle
@@ -224,7 +230,8 @@ module Omnibus
     #
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/rake #{command}", options)
+        bin = windows_safe_path("#{install_dir}/embedded/bin/rake")
+        _shellout!("#{bin} #{command}", options)
       end
     end
     expose :rake
@@ -569,14 +576,11 @@ module Omnibus
 
     #
     # This is a helper method that wraps {Util#shellout!} for the purposes of
-    # making path's Windows appropriate and setting the +:cwd+ value.
+    # setting the +:cwd+ value.
     #
     # @see (Util#shellout!)
     #
     def _shellout!(command_string, options = {})
-      # Convert paths to Windows, if necessary
-      command_string = windows_safe_path(command_string)
-
       # Make sure the PWD is set to the correct directory
       options = { cwd: software.project_dir }.merge(options)
 
