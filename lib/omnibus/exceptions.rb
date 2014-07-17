@@ -347,4 +347,18 @@ order to build the software, you must define a build block like:
       EOH
     end
   end
+
+  class MissingSoftwareSourceURI < Error
+    def initialize(software)
+      @software = software
+    end
+
+    def to_s
+      <<-EOH
+The software `#{@software.name}' does not declare a `source' attribute which is
+a URL. This is not a required attribute, but you are attempting to access
+another attribute or method that requires a `source' (URI) is defined.
+EOH
+    end
+  end
 end

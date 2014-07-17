@@ -52,6 +52,14 @@ module Omnibus
     it_behaves_like 'a cleanroom getter', :cache_dir
     it_behaves_like 'a cleanroom getter', :config
 
+    context 'when a source_uri is present' do
+      let(:uri) { URI.parse('http://example.com/foo.tar.gz') }
+      before { allow(subject).to receive(:source_uri).and_return(uri) }
+
+      it_behaves_like 'a cleanroom getter', :downloaded_file
+      it_behaves_like 'a cleanroom getter', :project_file
+    end
+
     describe "with_standard_compiler_flags helper" do
       context "on ubuntu" do
         before { stub_ohai(platform: 'ubuntu', version: '12.04') }

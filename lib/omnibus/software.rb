@@ -448,6 +448,35 @@ module Omnibus
     expose :build
 
     #
+    # The path on disk to the downloaded asset. This method requires the
+    # presence of a +source_uri+.
+    #
+    # @todo This is really a property of the {NetFetcher} and should be
+    #   implemented on that class.
+    #
+    def downloaded_file
+      @downloaded_file ||= begin
+        raise MissingSoftwareSourceURI.new(self) unless source_uri
+
+        filename = source_uri.path.split('/').last
+        "#{Config.cache_dir}/#{filename}"
+      end
+    end
+    expose :downloaded_file
+
+    #
+    # @deprecated Use {#downloaded_file} instead
+    #
+    def project_file
+      log.deprecated(log_key) do
+        "project_file (DSL). Please use `downloaded_file' instead."
+      end
+
+      downloaded_file
+    end
+    expose :project_file
+
+    #
     # Add standard compiler flags to the environment hash to produce omnibus
     # binaries (correct RPATH, etc).
     #
@@ -799,14 +828,6 @@ module Omnibus
     #   implementation
     def checksum
       source[:md5]
-    end
-
-    # @todo See comments for {#source_uri}... same applies here.  If
-    #   this is called in a non-source-software context, bad things will
-    #   happen.
-    def project_file
-      filename = source_uri.path.split('/').last
-      "#{Config.cache_dir}/#{filename}"
     end
 
     # The fetcher for this software.
