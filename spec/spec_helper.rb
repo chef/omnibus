@@ -140,7 +140,9 @@ end
 # Shard example group for asserting a DSL method
 #
 # @example
-#   it_behaves_like 'a cleanroom setter', :name, 'chef'
+#   it_behaves_like 'a cleanroom setter', :name, <<-EOH
+#     name 'foo'
+#   EOH
 #
 RSpec.shared_examples 'a cleanroom setter' do |id, string|
   it "for `#{id}'" do
