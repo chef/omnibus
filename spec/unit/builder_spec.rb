@@ -17,51 +17,29 @@ module Omnibus
         allow(subject).to receive(:find_file).and_return([nil, '/path'])
       end
 
-      it_behaves_like 'a cleanroom setter', :command, <<-EOH
-        command 'echo "hello"'
-      EOH
-      it_behaves_like 'a cleanroom setter', :patch, <<-EOH
-        patch source: 'diff.patch'
-      EOH
+      it_behaves_like 'a cleanroom setter', :command, %|command 'echo "hello"'|
+      it_behaves_like 'a cleanroom setter', :patch, %|patch source: 'diff.patch'|
       it_behaves_like 'a cleanroom getter', :max_build_jobs
-      it_behaves_like 'a cleanroom setter', :ruby, <<-EOH
-        ruby '-e "puts"'
-      EOH
-      it_behaves_like 'a cleanroom setter', :gem, <<-EOH
-        gem 'install bacon'
-      EOH
-      it_behaves_like 'a cleanroom setter', :bundle, <<-EOH
-        bundle 'install'
-      EOH
-      it_behaves_like 'a cleanroom setter', :block, <<-EOH
+      it_behaves_like 'a cleanroom setter', :ruby, %|ruby '-e "puts"'|
+      it_behaves_like 'a cleanroom setter', :gem, %|gem 'install bacon'|
+      it_behaves_like 'a cleanroom setter', :bundle, %|bundle 'install'|
+      it_behaves_like 'a cleanroom setter', :block, <<-EOH.gsub(/^ {8}/, '')
         block 'A named block' do
-          puts "this is a block"
+          # Complex operation
         end
       EOH
-      it_behaves_like 'a cleanroom setter', :erb, <<-EOH
-        erb source: 'template.erb'
+      it_behaves_like 'a cleanroom setter', :erb,  <<-EOH.gsub(/^ {8}/, '')
+        erb source: 'template.erb',
+            dest: '/path/to/file',
+            vars: { a: 'b', c: 'd' }
       EOH
-      it_behaves_like 'a cleanroom setter', :mkdir, <<-EOH
-        mkdir 'path'
-      EOH
-      it_behaves_like 'a cleanroom setter', :touch, <<-EOH
-        touch 'file'
-      EOH
-      it_behaves_like 'a cleanroom setter', :delete, <<-EOH
-        delete 'file'
-      EOH
-      it_behaves_like 'a cleanroom setter', :copy, <<-EOH
-        copy 'file', 'file2'
-      EOH
-      it_behaves_like 'a cleanroom setter', :move, <<-EOH
-        move 'file', 'file2'
-      EOH
-      it_behaves_like 'a cleanroom setter', :link, <<-EOH
-        link 'file', 'file2'
-      EOH
-      it_behaves_like 'a cleanroom getter', :project_root, <<-EOH
-        puts project_root
-      EOH
+      it_behaves_like 'a cleanroom setter', :mkdir, %|mkdir 'path'|
+      it_behaves_like 'a cleanroom setter', :touch, %|touch 'file'|
+      it_behaves_like 'a cleanroom setter', :delete, %|delete 'file'|
+      it_behaves_like 'a cleanroom setter', :copy, %|copy 'file', 'file2'|
+      it_behaves_like 'a cleanroom setter', :move, %|move 'file', 'file2'|
+      it_behaves_like 'a cleanroom setter', :link, %|link 'file', 'file2'|
+      it_behaves_like 'a cleanroom getter', :project_root, %|puts project_root|
 
       # From software
       it_behaves_like 'a cleanroom getter', :project_dir
