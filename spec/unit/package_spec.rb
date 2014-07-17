@@ -57,6 +57,20 @@ module Omnibus
 
         expect(instance[:platform_version]).to eq('5')
       end
+
+      it 'ensures an iteration exists' do
+        allow(File).to receive(:read).and_return('{ "platform": "el", "platform_version": "5.10" }')
+        instance = described_class.for_package(package)
+
+        expect(instance[:iteration]).to eq(1)
+      end
+
+      it 'does not change existing iterations' do
+        allow(File).to receive(:read).and_return('{ "platform": "el", "platform_version": "5.10", "iteration": 4}')
+        instance = described_class.for_package(package)
+
+        expect(instance[:iteration]).to eq(4)
+      end
     end
 
     describe '.path_for' do

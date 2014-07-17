@@ -64,6 +64,9 @@ module Omnibus
             hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
           end
 
+          # Ensure an interation exists
+          hash[:iteration] ||= 1
+
           new(package, hash)
         rescue Errno::ENOENT
           raise NoPackageMetadataFile.new(package.path)
