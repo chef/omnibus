@@ -443,11 +443,7 @@ module Omnibus
     #   the build block
     #
     def build(&block)
-      if block
-        @build_block = block
-      else
-        @build_block || raise(MissingBuildBlock.new(self))
-      end
+      builder.evaluate(&block)
     end
     expose :build
 
@@ -667,6 +663,15 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # The builder object for this software definition.
+    #
+    # @return [Builder]
+    #
+    def builder
+      @builder ||= Builder.new(self)
+    end
+
+    #
     # Fetch the software definition using the appropriate fetcher. This may
     # fetch the software from a local path location, git location, or download
     # the software from a remote URL (HTTP(s)/FTP)
@@ -865,11 +870,13 @@ module Omnibus
         digest = Digest::SHA256.new
 
         log.debug(log_key) { "project (SHA): #{project.shasum.inspect}" }
+        log.debug(log_key) { "builder (SHA): #{builder.shasum.inspect}" }
         log.debug(log_key) { "name: #{name.inspect}" }
         log.debug(log_key) { "version_for_cache: #{version_for_cache.inspect}" }
         log.debug(log_key) { "overrides: #{overrides.inspect}" }
 
         update_with_string(digest, project.shasum)
+        update_with_string(digest, builder.shasum)
         update_with_string(digest, name)
         update_with_string(digest, version_for_cache)
         update_with_string(digest, JSON.fast_generate(overrides))
@@ -950,9 +957,6 @@ module Omnibus
 
     def execute_build(fetcher)
       fetcher.clean
-
-      builder = Builder.new(self)
-      builder.evaluate(&build)
       builder.build
 
       if Config.use_git_caching
