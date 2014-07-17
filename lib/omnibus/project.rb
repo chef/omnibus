@@ -185,7 +185,7 @@ module Omnibus
       if null?(val)
         @install_dir || raise(MissingProjectConfiguration.new('install_dir', '/opt/chef'))
       else
-        @install_dir = windows_safe_path(val)
+        @install_dir = File.expand_path(windows_safe_path(val))
       end
     end
     expose :install_dir
@@ -223,7 +223,7 @@ module Omnibus
     #   path to the files directory
     #
     def files_path
-      "#{Config.project_root}/files"
+      File.expand_path("#{Config.project_root}/files")
     end
     expose :files_path
 
@@ -521,7 +521,7 @@ module Omnibus
       if null?(val)
         @resources_path
       else
-        @resources_path = val
+        @resources_path = File.expand_path(val)
       end
     end
     expose :resources_path
@@ -556,7 +556,7 @@ module Omnibus
       if null?(arg)
         @package_scripts_path || "#{Config.project_root}/package-scripts/#{name}"
       else
-        @package_scripts_path = arg
+        @package_scripts_path = File.expand_path(arg)
       end
     end
     expose :package_scripts_path
