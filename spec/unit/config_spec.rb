@@ -25,7 +25,7 @@ module Omnibus
       end
 
       it_behaves_like 'a cleanroom getter', id, default
-      it_behaves_like 'a cleanroom setter', id, default
+      it_behaves_like 'a cleanroom setter', id, %|#{id}(#{default.inspect})|
     end
 
     include_examples 'a configurable', :base_dir, '/var/cache/omnibus'
