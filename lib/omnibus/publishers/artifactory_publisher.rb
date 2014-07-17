@@ -92,9 +92,10 @@ module Omnibus
       {
         'omnibus.project'          => package.metadata[:name],
         'omnibus.platform'         => package.metadata[:platform],
-        'omnibus.platform_version' => package.metadata[:platform_version],
-        'omnibus.arch'             => package.metadata[:arch],
+        'omnibus.platform_version' => truncate_platform_version(package.metadata[:platform_version], package.metadata[:platform]),
+        'omnibus.architecture'     => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
+        'omnibus.iteration'        => package.metadata[:iteration],
         'omnibus.md5'              => package.metadata[:md5],
         'omnibus.sha1'             => package.metadata[:sha1],
         'omnibus.sha256'           => package.metadata[:sha256],
@@ -137,6 +138,8 @@ module Omnibus
         *domain_parts,
         package.metadata[:name],
         package.metadata[:version],
+        package.metadata[:platform],
+        package.metadata[:platform_version],
         package.metadata[:basename],
       )
     end

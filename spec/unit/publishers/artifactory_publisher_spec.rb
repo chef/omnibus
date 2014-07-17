@@ -19,8 +19,9 @@ module Omnibus
       Package::Metadata.new(package,
         name: 'chef',
         friendly_name: 'Chef',
-        homepage: 'https://getchef.com',
+        homepage: 'https://www.getchef.com',
         version: '11.0.6',
+        iteration: 1,
         basename: 'chef.deb',
         platform: 'ubuntu',
         platform_version: '14.04',
@@ -53,7 +54,7 @@ module Omnibus
       it 'uploads the package' do
         expect(artifact).to receive(:upload).with(
           repository,
-          'com/getchef/chef/11.0.6/chef.deb',
+          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
           an_instance_of(Hash)
         ).once
 
