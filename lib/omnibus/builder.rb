@@ -474,16 +474,6 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # The **in-order** list of commands for this builder. Note that procs have
-    # not been evaluated at this stage.
-    #
-    # @return [Array<BuildCommand>]
-    #
-    def build_commands
-      @build_commands ||= []
-    end
-
-    #
     # Execute all the {BuildCommand} instances, in order, for this builder.
     #
     # @return [void]
@@ -512,6 +502,15 @@ module Omnibus
     # --------------------------------------------------
 
     private
+
+    #
+    # The **in-order** list of {BuildCommand} for this builder.
+    #
+    # @return [Array<BuildCommand>]
+    #
+    def build_commands
+      @build_commands ||= []
+    end
 
     #
     # This is a helper method that wraps {Util#shellout!} for the purposes of
