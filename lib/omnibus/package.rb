@@ -19,8 +19,6 @@ require 'json'
 module Omnibus
   class Package
     class Metadata
-      extend Util
-
       class << self
         #
         # Generate a +metadata.json+ from the given package and data hash.
@@ -35,11 +33,14 @@ module Omnibus
         #
         def generate(package, data = {})
           data = {
-            basename: package.name,
-            md5:      package.md5,
-            sha1:     package.sha1,
-            sha256:   package.sha256,
-            sha512:   package.sha512,
+            basename:         package.name,
+            md5:              package.md5,
+            sha1:             package.sha1,
+            sha256:           package.sha256,
+            sha512:           package.sha512,
+            platform:         platform_shortname,
+            platform_version: platform_version,
+            arch:             arch,
           }.merge(data)
 
           instance = new(package, data)
@@ -59,11 +60,6 @@ module Omnibus
           data = File.read(path_for(package))
           hash = JSON.parse(data, symbolize_names: true)
 
-          # Ensure Platform version has been truncated
-          if hash[:platform_version] && hash[:platform]
-            hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
-          end
-
           # Ensure an interation exists
           hash[:iteration] ||= 1
 
@@ -82,6 +78,92 @@ module Omnibus
         #
         def path_for(package)
           "#{package.path}.metadata.json"
+        end
+
+        #
+        # The architecture for this machine, as reported from Ohai.
+        #
+        # @return [String]
+        #
+        def arch
+          Ohai['kernel']['machine']
+        end
+
+        #
+        # On certain platforms we don't care about the full MAJOR.MINOR.PATCH platform
+        # version. This method will properly truncate the version down to a more human
+        # friendly version. This version can also be thought of as a 'marketing'
+        # version.
+        #
+        # @param [String] platform_version
+        #   the platform version to truncate
+        # @param [String] platform_shortname
+        #   the platform shortname. this might be an Ohai-returned platform or
+        #   platform family but it also might be a shortname like `el`
+        #
+        def platform_version
+          case platform_shortname
+          when 'centos', 'debian', 'fedora', 'freebsd', 'rhel', 'el'
+            # Only want MAJOR (e.g. Debian 7)
+            Ohai['platform_version'].split('.').first
+          when 'aix', 'arch', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'suse', 'ubuntu'
+            # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
+            Ohai['platform_version'].split('.')[0..1].join('.')
+          when 'omnios', 'smartos'
+            # Only want MAJOR (e.g OmniOS r151006, SmartOS 20120809T221258Z)
+            Ohai['platform_version'].split('.').first
+          when 'windows'
+            # Windows has this really awesome "feature", where their version numbers
+            # internally do not match the "marketing" name.
+            #
+            # Definitively computing the Windows marketing name actually takes more
+            # than the platform version. Take a look at the following file for the
+            # details:
+            #
+            #   https://github.com/opscode/chef/blob/master/lib/chef/win32/version.rb
+            #
+            # As we don't need to be exact here the simple mapping below is based on:
+            #
+            #  http://www.jrsoftware.org/ishelp/index.php?topic=winvernotes
+            #
+            case Ohai['platform_version']
+            when '5.0.2195', '2000'   then '2000'
+            when '5.1.2600', 'xp'     then 'xp'
+            when '5.2.3790', '2003r2' then '2003r2'
+            when '6.0.6001', '2008'   then '2008'
+            when '6.1.7600', '7'      then '7'
+            when '6.1.7601', '2008r2' then '2008r2'
+            when '6.2.9200', '8'      then '8'
+            # The following `when` will never match since Windows 2012's platform
+            # version is the same as Windows 8. It's only here for completeness and
+            # documentation.
+            when '6.2.9200', '2012'   then '2012'
+            when '6.3.9200', '8.1'    then '8.1'
+            # The following `when` will never match since Windows 2012R2's platform
+            # version is the same as Windows 8.1. It's only here for completeness
+            # and documentation.
+            when '6.3.9200', '2012r2' then '2012r2'
+            else
+              raise UnknownPlatformVersion.new(platform_shortname, Ohai['platform_version'])
+            end
+          else
+            raise UnknownPlatform.new(platform_shortname)
+          end
+        end
+
+        #
+        # Platform name to be used when creating metadata for the artifact.
+        # rhel/centos become "el", all others are just platform
+        #
+        # @return [String]
+        #   the platform family short name
+        #
+        def platform_shortname
+          if Ohai['platform_family'] == 'rhel'
+            'el'
+          else
+            Ohai['platform']
+          end
         end
       end
 

@@ -1122,33 +1122,6 @@ module Omnibus
       end
     end
 
-    #
-    # Platform version to be used in package metadata. For rhel, the minor
-    # version is removed, e.g., "5.6" becomes "5". For all other platforms,
-    # this is just the platform_version.
-    #
-    # @return [String]
-    #   the platform version
-    #
-    def platform_version_for_package
-      truncate_platform_version(Ohai['platform_version'], platform_shortname)
-    end
-
-    #
-    # Platform name to be used when creating metadata for the artifact.
-    # rhel/centos become "el", all others are just platform
-    #
-    # @return [String]
-    #   the platform family short name
-    #
-    def platform_shortname
-      if Ohai['platform_family'] == 'rhel'
-        'el'
-      else
-        Ohai['platform']
-      end
-    end
-
     def render_metadata(pkg_type)
       basename = output_package(pkg_type)
       pkg_path = "#{Config.package_dir}/#{basename}"
@@ -1162,9 +1135,6 @@ module Omnibus
         name:             name,
         friendly_name:    friendly_name,
         homepage:         homepage,
-        platform:         platform_shortname,
-        platform_version: platform_version_for_package,
-        arch:             Ohai['kernel']['machine'],
         version:          build_version,
         iteration:        build_iteration,
       )
