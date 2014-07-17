@@ -531,7 +531,12 @@ module Omnibus
     end
 
     #
+    # Execute the given command object. This method also wraps the following
+    # operations:
     #
+    #   - Reset bundler's environment using +Bundler.with_clean_env+
+    #   - Instrument (time/measure) the individual command's execution
+    #   - Retry failed commands in accordance with {Config#build_retries}
     #
     def execute(command)
       Bundler.with_clean_env do
