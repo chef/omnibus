@@ -483,6 +483,11 @@ module Omnibus
       @build_commands ||= []
     end
 
+    #
+    # Execute all the {BuildCommand} instances, in order, for this builder.
+    #
+    # @return [void]
+    #
     def build
       log.info(log_key) { 'Starting build' }
 
