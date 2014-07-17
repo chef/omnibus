@@ -168,7 +168,7 @@ module Omnibus
     #
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/ruby/#{command}", options)
+        _shellout!("#{install_dir}/embedded/bin/ruby #{command}", options)
       end
     end
     expose :ruby
@@ -184,7 +184,7 @@ module Omnibus
     #
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/gem/#{command}", options)
+        _shellout!("#{install_dir}/embedded/bin/gem #{command}", options)
       end
     end
     expose :gem
@@ -203,7 +203,7 @@ module Omnibus
     #
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/bundle/#{command}", options)
+        _shellout!("#{install_dir}/embedded/bin/bundle #{command}", options)
       end
     end
     expose :bundle
@@ -220,7 +220,7 @@ module Omnibus
     #
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
-        _shellout!("#{install_dir}/embedded/bin/rake/#{command}", options)
+        _shellout!("#{install_dir}/embedded/bin/rake #{command}", options)
       end
     end
     expose :rake
