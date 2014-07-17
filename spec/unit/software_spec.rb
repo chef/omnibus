@@ -52,16 +52,6 @@ module Omnibus
     it_behaves_like 'a cleanroom getter', :cache_dir
     it_behaves_like 'a cleanroom getter', :config
 
-    describe 'build' do
-      context 'when no value was given' do
-        before { subject.send(:remove_instance_variable, :@build_block) }
-
-        it 'raises an exception' do
-          expect { subject.build }.to raise_error(MissingBuildBlock)
-        end
-      end
-    end
-
     describe "with_standard_compiler_flags helper" do
       context "on ubuntu" do
         before { stub_ohai(platform: 'ubuntu', version: '12.04') }
@@ -467,7 +457,7 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('f128eaa53ccff2e31d224a0a4a0a80d764298750d20bff22c24402eb046b82c1')
+          expect(subject.shasum).to eq('348b605ee8e8325ad32a4837f0784aa2203b19a87a820dd4456dd5a798a62713')
         end
       end
 
@@ -480,7 +470,7 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('8a3e36a40f75c868de0cda82a8a9df2c86beaf42528d09eabb0b78a398db8678')
+          expect(subject.shasum).to eq('333f0052cc38f15e7f6c4d5b3e2a5337a01888f621e162476ecbf5eb91ae8a30')
         end
       end
     end
