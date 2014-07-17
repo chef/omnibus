@@ -28,26 +28,25 @@ module Omnibus
 
     it_behaves_like 'a cleanroom getter', :project
     it_behaves_like 'a cleanroom getter', :override_version
-    it_behaves_like 'a cleanroom setter', :name, 'libxml2'
-    it_behaves_like 'a cleanroom setter', :description, 'The XML magician'
-    it_behaves_like 'a cleanroom setter', :always_build, true
-    it_behaves_like 'a cleanroom setter', :dependency, 'libxslt'
-    it_behaves_like 'a cleanroom setter', :source, { url: 'https://source.example.com' }
-    it_behaves_like 'a cleanroom setter', :default_version, '1.2.3'
-    it_behaves_like 'a cleanroom setter', :version, '1.2.3'
-    it_behaves_like 'a cleanroom setter', :whitelist_file, '/opt/whatever'
-    it_behaves_like 'a cleanroom setter', :relative_path, '/path/to/extracted'
-    it_behaves_like 'a cleanroom setter', :dependencies, 'a', 'b', 'c'
+    it_behaves_like 'a cleanroom setter', :name, %|name 'libxml2'|
+    it_behaves_like 'a cleanroom setter', :description, %|description 'The XML magician'|
+    it_behaves_like 'a cleanroom setter', :always_build, %|always_build true|
+    it_behaves_like 'a cleanroom setter', :dependency, %|dependency 'libxslt'|
+    it_behaves_like 'a cleanroom setter', :source, %|source url: 'https://source.example.com'|
+    it_behaves_like 'a cleanroom setter', :default_version, %|default_version '1.2.3'|
+    it_behaves_like 'a cleanroom setter', :version, %|version '1.2.3'|
+    it_behaves_like 'a cleanroom setter', :whitelist_file, %|whitelist_file '/opt/whatever'|
+    it_behaves_like 'a cleanroom setter', :relative_path, %|relative_path '/path/to/extracted'|
+    it_behaves_like 'a cleanroom setter', :dependencies, %|dependencies 'a', 'b', 'c'|
     it_behaves_like 'a cleanroom getter', :project_dir
     it_behaves_like 'a cleanroom getter', :build_dir
     it_behaves_like 'a cleanroom getter', :install_dir
     it_behaves_like 'a cleanroom getter', :install_path
     it_behaves_like 'a cleanroom getter', :platform
     it_behaves_like 'a cleanroom getter', :architecture
-    it_behaves_like 'a cleanroom getter', :build
     it_behaves_like 'a cleanroom getter', :with_standard_compiler_flags
-    it_behaves_like 'a cleanroom setter', :with_embedded_path, { 'foo' => 'bar' }
-    it_behaves_like 'a cleanroom setter', :prepend_path, { 'foo' => 'bar' }
+    it_behaves_like 'a cleanroom setter', :with_embedded_path, %|with_embedded_path({ 'foo' => 'bar' })|
+    it_behaves_like 'a cleanroom setter', :prepend_path, %|prepend_path({ 'foo' => 'bar' })|
     it_behaves_like 'a cleanroom getter', :source_dir
     it_behaves_like 'a cleanroom getter', :cache_dir
     it_behaves_like 'a cleanroom getter', :config
