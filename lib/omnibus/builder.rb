@@ -622,17 +622,38 @@ module Omnibus
     end
 
     #
-    #
+    # This is an internal wrapper around a command executed on the system. The
+    # block could contain a Ruby command (such as +FileUtils.rm_rf('/')+), or it
+    # could contain a call to shell out to the system.
     #
     class BuildCommand
       attr_reader :description
 
+      #
+      # Create a new BuildCommand object.
+      #
+      # @param [String] description
+      #   a unique identifier for this build command - it will be used for
+      #   logging and timing labels
+      # @param [Proc] block
+      #   the block to capture
+      #
       def initialize(description, &block)
         @description, @block = description, block
       end
 
-      def run(object)
-        object.instance_eval(&@block)
+      #
+      # Execute the build command against the given object. Because BuildCommand
+      # objects could reference internal DSL methods, this method requires you
+      # pass in an object against which to +instance_eval+ the block. Otherwise,
+      # you would be severly restricted in the commands avaiable to you via the
+      # DSL.
+      #
+      # @param [Builder] builder
+      #   the builder to +instance_eval+ against
+      #
+      def run(builder)
+        builder.instance_eval(&@block)
       end
     end
   end
