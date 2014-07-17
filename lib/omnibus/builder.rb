@@ -22,6 +22,7 @@ require 'mixlib/shellout'
 module Omnibus
   class Builder
     include Cleanroom
+    include Digestable
     include Instrumentation
     include Logging
     include Util
@@ -120,6 +121,8 @@ module Omnibus
       else
         command = "patch -d #{software.project_dir} -p#{plevel} -i #{patch_path}"
       end
+
+      patches << patch_path
 
       build_commands << BuildCommand.new("Apply patch `#{source}'") do
         _shellout!(command, options)
@@ -293,6 +296,8 @@ module Omnibus
       unless source_path
         raise MissingTemplate.new(source, locations)
       end
+
+      erbs << source_path
 
       block "Render erb `#{source}'" do
         template = ERB.new(File.read(source_path), nil, '%')
@@ -498,6 +503,36 @@ module Omnibus
     end
 
     #
+    # The shasum for this builder object. The shasum is calculated using the
+    # following:
+    #
+    #   - The descriptions of all {BuildCommand} objects
+    #   - The digest of all patch files on disk
+    #   - The digest of all erb files on disk
+    #
+    # @return [String]
+    #
+    def shasum
+      @shasum ||= begin
+        digest = Digest::SHA256.new
+
+        build_commands.each do |build_command|
+          update_with_string(digest, build_command.description)
+        end
+
+        patches.each do |patch_path|
+          update_with_file_contents(digest, patch_path)
+        end
+
+        erbs.each do |erb_path|
+          update_with_file_contents(digest, erb_path)
+        end
+
+        digest.hexdigest
+      end
+    end
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -510,6 +545,26 @@ module Omnibus
     #
     def build_commands
       @build_commands ||= []
+    end
+
+    #
+    # The list of paths to patch files on disk. This is used in the calculation
+    # of the shasum.
+    #
+    # @return [Array<String>]
+    #
+    def patches
+      @patches ||= []
+    end
+
+    #
+    # The list of paths to erb files on disk. This is used in the calculation
+    # of the shasum.
+    #
+    # @return [Array<String>]
+    #
+    def erbs
+      @erbs ||= []
     end
 
     #
@@ -536,6 +591,9 @@ module Omnibus
     #   - Reset bundler's environment using +Bundler.with_clean_env+
     #   - Instrument (time/measure) the individual command's execution
     #   - Retry failed commands in accordance with {Config#build_retries}
+    #
+    # @param [BuildCommand] command
+    #   the command object to build
     #
     def execute(command)
       Bundler.with_clean_env do
