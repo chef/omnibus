@@ -330,4 +330,21 @@ The health check failed! Please see above for important information.
 EOH
     end
   end
+
+  class MissingBuildBlock < Error
+    def initialize(software)
+      @software = software
+    end
+
+    def to_s
+      <<-EOH
+The software definition `#{@software.name}' does not define a build block. In
+order to build the software, you must define a build block like:
+
+    build do
+      # Build steps here
+    end
+      EOH
+    end
+  end
 end

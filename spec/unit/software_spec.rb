@@ -38,6 +38,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :whitelist_file, %|whitelist_file '/opt/whatever'|
     it_behaves_like 'a cleanroom setter', :relative_path, %|relative_path '/path/to/extracted'|
     it_behaves_like 'a cleanroom setter', :dependencies, %|dependencies 'a', 'b', 'c'|
+    it_behaves_like 'a cleanroom setter', :build, %|build {}|
     it_behaves_like 'a cleanroom getter', :project_dir
     it_behaves_like 'a cleanroom getter', :build_dir
     it_behaves_like 'a cleanroom getter', :install_dir
@@ -50,6 +51,16 @@ module Omnibus
     it_behaves_like 'a cleanroom getter', :source_dir
     it_behaves_like 'a cleanroom getter', :cache_dir
     it_behaves_like 'a cleanroom getter', :config
+
+    describe 'build' do
+      context 'when no value was given' do
+        before { subject.send(:remove_instance_variable, :@build_block) }
+
+        it 'raises an exception' do
+          expect { subject.build }.to raise_error(MissingBuildBlock)
+        end
+      end
+    end
 
     describe "with_standard_compiler_flags helper" do
       context "on ubuntu" do

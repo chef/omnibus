@@ -73,16 +73,6 @@ module Omnibus
     end
 
     #
-    # The builder for this softare. This defaults to a {NullBuilder}, but
-    # can be specified using the {#build} DSL method.
-    #
-    # @return [Builder]
-    #
-    def builder
-      @builder ||= NullBuilder.new(self)
-    end
-
-    #
     # Compare two software projects (by name).
     #
     # @return [1, 0, -1]
@@ -441,7 +431,7 @@ module Omnibus
     expose :architecture
 
     #
-    # Define a series of {Builder} DSL commands that are required to build the
+    # Define a series of {Builder} DSL commands that are executed to build the
     # software.
     #
     # @see Builder
@@ -449,16 +439,15 @@ module Omnibus
     # @param [Proc] block
     #   a block of build commands
     #
-    # @return [Builder]
-    #   the builder instance
-    #
-    # @todo Seems like this renders the setting of @builder in the initializer
-    #   moot
+    # @return [Proc]
+    #   the build block
     #
     def build(&block)
-      @builder = Builder.new(self)
-      @builder.evaluate(&block)
-      @builder
+      if block
+        @build_block = block
+      else
+        @build_block || raise(MissingBuildBlock.new(self))
+      end
     end
     expose :build
 
@@ -961,7 +950,10 @@ module Omnibus
 
     def execute_build(fetcher)
       fetcher.clean
-      @builder.build
+
+      builder = Builder.new(self)
+      builder.evaluate(&build)
+      builder.build
 
       if Config.use_git_caching
         log.info(log_key) { 'Caching build' }
