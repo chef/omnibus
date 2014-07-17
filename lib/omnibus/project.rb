@@ -836,7 +836,7 @@ module Omnibus
     # @return [Array<String>]
     #
     def runtime_dependencies
-      runtime_dependencies ||= []
+      @runtime_dependencies ||= []
     end
 
     #
