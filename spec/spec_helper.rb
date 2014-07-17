@@ -40,11 +40,11 @@ module Omnibus
     #
     def stub_env(key, value)
       unless @__env_already_stubbed__
-        ENV.stub(:[]).and_call_original
+        allow(ENV).to receive(:[]).and_call_original
         @__env_already_stubbed__ = true
       end
 
-      ENV.stub(:[]).with(key).and_return(value.to_s)
+      allow(ENV).to receive(:[]).with(key).and_return(value.to_s)
     end
 
     #
@@ -56,7 +56,7 @@ module Omnibus
       require 'ohai' unless defined?(Mash)
 
       ohai = Mash.from_hash(Fauxhai.mock(options, &block).data)
-      Ohai.stub(:ohai).and_return(ohai)
+      allow(Ohai).to receive(:ohai).and_return(ohai)
     end
 
     #
@@ -103,7 +103,6 @@ RSpec.configure do |config|
   config.include Omnibus::RSpec
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
-  config.treat_symbols_as_metadata_keys_with_true_values = true
 
   config.filter_run_excluding windows_only: true unless windows?
   config.filter_run_excluding mac_only: true unless mac?
@@ -143,9 +142,9 @@ end
 # @example
 #   it_behaves_like 'a cleanroom setter', :name, 'chef'
 #
-RSpec.shared_examples 'a cleanroom setter' do |id, value|
+RSpec.shared_examples 'a cleanroom setter' do |id, string|
   it "for `#{id}'" do
-    expect { subject.evaluate("#{id}(#{value.inspect})") }
+    expect { subject.evaluate(string) }
       .to_not raise_error
   end
 end

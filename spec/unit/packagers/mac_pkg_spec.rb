@@ -85,7 +85,7 @@ module Omnibus
 
     it 'generates a Distribution file describing the product package content' do
       file = StringIO.new
-      File.stub(:open).with(any_args).and_yield(file)
+      allow(File).to receive(:open).with(any_args).and_yield(file)
 
       expect(file).to receive(:puts).with(expected_distribution_content)
       packager.generate_distribution

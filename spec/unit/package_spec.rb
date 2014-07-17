@@ -25,7 +25,7 @@ module Omnibus
 
     describe '.generate' do
       it 'writes out the file' do
-        described_class.stub(:new).and_return(instance)
+        allow(described_class).to receive(:new).and_return(instance)
         expect(instance).to receive(:save).once
 
         described_class.generate(package, data)
@@ -34,18 +34,18 @@ module Omnibus
 
     describe '.for_package' do
       it 'raises an exception when the file does not exist' do
-        File.stub(:read).and_raise(Errno::ENOENT)
+        allow(File).to receive(:read).and_raise(Errno::ENOENT)
         expect { described_class.for_package(package) }
           .to raise_error(NoPackageMetadataFile)
       end
 
       it 'returns a metadata object' do
-        File.stub(:read).and_return('{ "platform": "ubuntu" }')
+        allow(File).to receive(:read).and_return('{ "platform": "ubuntu" }')
         expect(described_class.for_package(package)).to be_a(described_class)
       end
 
       it 'loads the metadata from disk' do
-        File.stub(:read).and_return('{ "platform": "ubuntu" }')
+        allow(File).to receive(:read).and_return('{ "platform": "ubuntu" }')
         instance = described_class.for_package(package)
 
         expect(instance[:platform]).to eq('ubuntu')
@@ -75,7 +75,7 @@ module Omnibus
     describe '#save' do
       let(:file) { double(File) }
 
-      before { File.stub(:open).and_yield(file) }
+      before { allow(File).to receive(:open).and_yield(file) }
 
       it 'saves the file to disk' do
         expect(file).to receive(:write).once
@@ -114,7 +114,7 @@ module Omnibus
     describe '#md5' do
       let(:md5) { 'abcdef123456' }
 
-      before { subject.stub(:digest).with(path, :md5).and_return(md5) }
+      before { allow(subject).to receive(:digest).with(path, :md5).and_return(md5) }
 
       it 'returns the md5 of the package at the path' do
         expect(subject.md5).to eq(md5)
@@ -124,7 +124,7 @@ module Omnibus
     describe '#sha256' do
       let(:sha256) { 'abcdef123456' }
 
-      before { subject.stub(:digest).with(path, :sha256).and_return(sha256) }
+      before { allow(subject).to receive(:digest).with(path, :sha256).and_return(sha256) }
 
       it 'returns the sha256 of the package at the path' do
         expect(subject.sha256).to eq(sha256)
@@ -134,7 +134,7 @@ module Omnibus
     describe '#sha512' do
       let(:sha512) { 'abcdef123456' }
 
-      before { subject.stub(:digest).with(path, :sha512).and_return(sha512) }
+      before { allow(subject).to receive(:digest).with(path, :sha512).and_return(sha512) }
 
       it 'returns the sha512 of the package at the path' do
         expect(subject.sha512).to eq(sha512)
@@ -145,7 +145,7 @@ module Omnibus
       context 'when the file exists' do
         let(:content) { 'BINARY' }
 
-        before { IO.stub(:read).with(path).and_return(content) }
+        before { allow(IO).to receive(:read).with(path).and_return(content) }
 
         it 'reads the file' do
           expect(subject.content).to eq(content)
@@ -153,7 +153,7 @@ module Omnibus
       end
 
       context 'when the file does not exist' do
-        before { IO.stub(:read).and_raise(Errno::ENOENT) }
+        before { allow(IO).to receive(:read).and_raise(Errno::ENOENT) }
 
         it 'raises an exception' do
           expect { subject.content }.to raise_error(NoPackageFile)
@@ -164,7 +164,7 @@ module Omnibus
     describe '#metadata' do
       let(:content) { '{ "platform": "ubuntu" }' }
 
-      before { IO.stub(:read).and_return(content) }
+      before { allow(IO).to receive(:read).and_return(content) }
 
       it 'returns a Metadata object' do
         expect(subject.metadata).to be_a(Package::Metadata)

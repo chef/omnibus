@@ -10,7 +10,7 @@ module Omnibus
     describe '.publish' do
       let(:publisher) { double(described_class) }
 
-      before { described_class.stub(:new).and_return(publisher) }
+      before { allow(described_class).to receive(:new).and_return(publisher) }
 
       it 'creates a new instance of the class' do
         expect(described_class).to receive(:new).once
@@ -29,7 +29,7 @@ module Omnibus
       let(:b) { '/path/to/files/b.deb' }
       let(:glob) { [a, b] }
 
-      before { Dir.stub(:glob).with(pattern).and_return(glob) }
+      before { allow(Dir).to receive(:glob).with(pattern).and_return(glob) }
 
       it 'returns an array' do
         expect(subject.packages).to be_an(Array)

@@ -33,8 +33,8 @@ module Omnibus
     let(:client) { double('UberS3', store: nil) }
 
     before do
-      package.stub(:metadata).and_return(metadata)
-      subject.stub(:client).and_return(client)
+      allow(package).to receive(:metadata).and_return(metadata)
+      allow(subject).to receive(:client).and_return(client)
     end
 
     subject { described_class.new(path) }
@@ -52,7 +52,7 @@ module Omnibus
     end
 
     describe '#publish' do
-      before { subject.stub(:packages).and_return(packages) }
+      before { allow(subject).to receive(:packages).and_return(packages) }
 
       it 'validates the package' do
         expect(package).to receive(:validate!).once

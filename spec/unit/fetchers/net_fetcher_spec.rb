@@ -20,7 +20,7 @@ module Omnibus
     shared_examples 'an extractor' do |extension, command|
       context "when the file is a .#{extension}" do
         before do
-          software_mock.stub(
+          allow(software_mock).to receive(
             project_file: "file.#{extension}",
             source_uri: "http://example.com/file.#{extension}",
           )

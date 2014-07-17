@@ -272,7 +272,7 @@ module Omnibus
 
     describe '#override_version' do
       it 'returns the override version' do
-        subject.stub(:overrides).and_return(version: '1.2.3')
+        allow(subject).to receive(:overrides).and_return(version: '1.2.3')
         expect(subject.override_version).to eq('1.2.3')
       end
 
@@ -284,7 +284,7 @@ module Omnibus
 
     describe '#given_version' do
       it 'returns the version' do
-        subject.stub(:default_version).and_return('4.5.6')
+        allow(subject).to receive(:default_version).and_return('4.5.6')
         expect(subject.given_version).to eq('4.5.6')
       end
 
@@ -425,7 +425,7 @@ module Omnibus
       context 'with a GitFetcher' do
         let(:fetcher) do
           a = GitFetcher.new(subject)
-          a.stub(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
+          allow(a).to receive(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
           a
         end
 

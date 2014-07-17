@@ -23,7 +23,7 @@ module Omnibus
     describe '.keys' do
       let(:bucket) { double(:bucket, objects: []) }
 
-      before { S3Cache.stub(:bucket).and_return(bucket) }
+      before { allow(S3Cache).to receive(:bucket).and_return(bucket) }
 
       it 'lists the keys on the S3 bucket' do
         expect(bucket).to receive(:objects).with('/').once
@@ -53,7 +53,7 @@ module Omnibus
     describe '.fetch_missing' do
       let(:softwares) { [ruby_19, python_27] }
 
-      before { S3Cache.stub(:missing).and_return(softwares) }
+      before { allow(S3Cache).to receive(:missing).and_return(softwares) }
 
       it 'fetches the missing software' do
         expect(S3Cache).to receive(:fetch).with(ruby_19)

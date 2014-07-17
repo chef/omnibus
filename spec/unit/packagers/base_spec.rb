@@ -68,7 +68,7 @@ module Omnibus
     end
 
     describe '#create_directory' do
-      before { FileUtils.stub(:mkdir_p) }
+      before { allow(FileUtils).to receive(:mkdir_p) }
 
       it 'creates the directory' do
         expect(FileUtils).to receive(:mkdir_p).with('/foo/bar')
@@ -81,7 +81,7 @@ module Omnibus
     end
 
     describe '#remove_directory' do
-      before { FileUtils.stub(:rm_rf) }
+      before { allow(FileUtils).to receive(:rm_rf) }
 
       it 'remove the directory' do
         expect(FileUtils).to receive(:rm_rf).with('/foo/bar')
@@ -91,8 +91,8 @@ module Omnibus
 
     describe '#purge_directory' do
       before do
-        subject.stub(:remove_directory)
-        subject.stub(:create_directory)
+        allow(subject).to receive(:remove_directory)
+        allow(subject).to receive(:create_directory)
       end
 
       it 'removes and creates the directory' do
@@ -103,7 +103,7 @@ module Omnibus
     end
 
     describe '#copy_file' do
-      before { FileUtils.stub(:cp) }
+      before { allow(FileUtils).to receive(:cp) }
 
       it 'copies the file' do
         expect(FileUtils).to receive(:cp).with('foo', 'bar')
@@ -117,8 +117,8 @@ module Omnibus
 
     describe '#copy_directory' do
       before do
-        FileUtils.stub(:cp_r)
-        Dir.stub(:[]).and_return(['baz/file'])
+        allow(FileUtils).to receive(:cp_r)
+        allow(Dir).to receive(:[]).and_return(['baz/file'])
       end
 
       it 'copies the directory' do
@@ -141,8 +141,8 @@ module Omnibus
           input.write('<%= project.friendly_name %>')
           input.rewind
 
-          File.stub(:open).with(source_path).and_yield(input)
-          File.stub(:open).with(expected_destination_path, 'w').and_yield(output)
+          allow(File).to receive(:open).with(source_path).and_yield(input)
+          allow(File).to receive(:open).with(expected_destination_path, 'w').and_yield(output)
 
           expect(subject).to receive(:remove_file).with(source_path)
         end
@@ -171,7 +171,7 @@ module Omnibus
     end
 
     describe '#remove_file' do
-      before { FileUtils.stub(:rm_f) }
+      before { allow(FileUtils).to receive(:rm_f) }
 
       it 'removes the file' do
         expect(FileUtils).to receive(:rm_f).with('/foo/bar')
@@ -180,7 +180,7 @@ module Omnibus
     end
 
     describe '#execute' do
-      before { subject.stub(:shellout!) }
+      before { allow(subject).to receive(:shellout!) }
 
       it 'shellsout' do
         expect(subject).to receive(:shellout!)
@@ -191,17 +191,17 @@ module Omnibus
 
     describe '#assert_presence!' do
       it 'raises a MissingAsset exception when the file does not exist' do
-        File.stub(:exist?).and_return(false)
+        allow(File).to receive(:exist?).and_return(false)
         expect { subject.assert_presence!('foo') }.to raise_error(MissingAsset)
       end
     end
 
     describe '#run!' do
       before do
-        described_class.stub(:validate).and_return(proc {})
-        described_class.stub(:setup).and_return(proc {})
-        described_class.stub(:build).and_return(proc {})
-        described_class.stub(:clean).and_return(proc {})
+        allow(described_class).to receive(:validate).and_return(proc {})
+        allow(described_class).to receive(:setup).and_return(proc {})
+        allow(described_class).to receive(:build).and_return(proc {})
+        allow(described_class).to receive(:clean).and_return(proc {})
       end
 
       it 'calls the methods in order' do
@@ -243,7 +243,7 @@ module Omnibus
       end
 
       context 'when project defines resources_path' do
-        before { project.stub(:resources_path).and_return('project/specific') }
+        before { allow(project).to receive(:resources_path).and_return('project/specific') }
         it 'is the project resources_path, underscored_name, and Resources' do
           path = 'project/specific/base/Resources'
           expect(subject.send(:resources_path)).to eq(File.expand_path(path))

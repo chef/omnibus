@@ -9,7 +9,7 @@ module Omnibus
     subject(:build_version) { described_class.new }
 
     before do
-      described_class.any_instance.stub(:shellout)
+      allow_any_instance_of(described_class).to receive(:shellout)
         .and_return(double('ouput', stdout: git_describe, exitstatus: 0))
     end
 
@@ -144,7 +144,7 @@ module Omnibus
         end
 
         context 'when Config.append_timestamp is true' do
-          before { Config.stub(:append_timestamp).and_return(true) }
+          before { Config.append_timestamp(true) }
 
           it 'appends a timestamp' do
             expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
@@ -152,7 +152,7 @@ module Omnibus
         end
 
         context 'when Config.append_timestamp is false' do
-          before { Config.stub(:append_timestamp).and_return(false) }
+          before { Config.append_timestamp(false) }
 
           it 'does not append a timestamp' do
             expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
@@ -188,7 +188,7 @@ module Omnibus
   fatal: No tags can describe '809ea1afcce67e1148c1bf0822d40a7ef12c380e'.
   Try --always, or create some tags.
         STDERR
-        build_version.stub(:shellout)
+        allow(build_version).to receive(:shellout)
           .and_return(double('ouput', stderr: stderr, exitstatus: 128))
       end
       it 'sets the version to 0.0.0' do

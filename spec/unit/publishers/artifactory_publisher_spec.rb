@@ -35,15 +35,15 @@ module Omnibus
     let(:artifact) { double('Artifactory::Resource::Artifact', upload: nil) }
 
     before do
-      subject.stub(:client).and_return(client)
-      subject.stub(:artifact_for).and_return(artifact)
-      package.stub(:metadata).and_return(metadata)
+      allow(subject).to receive(:client).and_return(client)
+      allow(subject).to receive(:artifact_for).and_return(artifact)
+      allow(package).to receive(:metadata).and_return(metadata)
     end
 
     subject { described_class.new(path, repository: repository) }
 
     describe '#publish' do
-      before { subject.stub(:packages).and_return(packages) }
+      before { allow(subject).to receive(:packages).and_return(packages) }
 
       it 'validates the package' do
         expect(package).to receive(:validate!).once
@@ -61,7 +61,7 @@ module Omnibus
       end
 
       context 'when the metadata is from an older version of Omnibus' do
-        before { package.metadata.stub(:[]).with(:homepage).and_return(nil) }
+        before { allow(package.metadata).to receive(:[]).with(:homepage).and_return(nil) }
 
         it 'raises an exception' do
           expect { subject.publish }.to raise_error(OldMetadata)
