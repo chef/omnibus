@@ -298,43 +298,6 @@ module Omnibus
       end
     end
 
-    context 'while getting version_for_cache' do
-      let(:fetcher) { nil }
-      let(:software_name) { 'zlib' }
-      let(:default_version) { '1.2.3' }
-
-      def get_version_for_cache(expected_version)
-        subject.instance_variable_set(:@fetcher, fetcher)
-        expect(subject.version_for_cache).to eq(expected_version)
-      end
-
-      context 'without a fetcher' do
-        it 'should return the default version' do
-          get_version_for_cache('1.2.3')
-        end
-      end
-
-      context 'with a NetFetcher' do
-        let(:fetcher) { NetFetcher.new(subject) }
-
-        it 'should return the default version' do
-          get_version_for_cache('1.2.3')
-        end
-      end
-
-      context 'with a GitFetcher' do
-        let(:fetcher) do
-          a = GitFetcher.new(subject)
-          allow(a).to receive(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
-          a
-        end
-
-        it 'should return the git sha' do
-          get_version_for_cache('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
-        end
-      end
-    end
-
     describe '#shasum' do
       context 'when a filepath is given' do
         let(:path) { '/software.rb' }

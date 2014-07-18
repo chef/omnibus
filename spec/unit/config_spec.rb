@@ -47,12 +47,7 @@ module Omnibus
     include_examples 'a configurable', :use_git_caching, true
 
     context 'on Windows' do
-      before do
-        stub_ohai(platform: 'windows', version: '2012')
-
-        # This is not defined on Linuxy Rubies
-        stub_const('File::ALT_SEPARATOR', '\\')
-      end
+      before { stub_ohai(platform: 'windows', version: '2012') }
 
       include_examples 'a configurable', :base_dir, 'C:/omnibus-ruby'
       include_examples 'a configurable', :cache_dir, 'C:/omnibus-ruby/cache'

@@ -2,116 +2,202 @@ require 'spec_helper'
 
 module Omnibus
   describe NetFetcher do
-    let(:software_mock) do
+    let(:project_dir) { '/tmp/project' }
+
+    let(:software) do
       double(Software,
         downloaded_file: 'file.tar.gz',
         name: 'file',
-        source: '/tmp/out',
+        source: { url: 'https://get.example.com/file.tar.gz', md5: 'abcd1234' },
         checksum: 'abc123',
         source_uri: 'http://example.com/file.tar.gz',
-        project_dir: '/tmp/project',
+        project_dir: project_dir,
       )
     end
 
+    let(:cache_dir) { '/cache' }
+
     before do
-      Config.source_dir('/tmp/out')
+      Config.cache_dir(cache_dir)
+    end
+
+    subject { described_class.new(software) }
+
+    describe '#fetch_required?' do
+      context 'when file is not downloaded' do
+        before { allow(File).to receive(:exist?).and_return(false) }
+
+        it 'returns true' do
+          expect(subject.fetch_required?).to be_truthy
+        end
+      end
+
+      context 'when the file is downloaded' do
+        before { allow(File).to receive(:exist?).and_return(true) }
+
+        context 'when the shasums differ' do
+          before do
+            allow(subject).to receive(:digest).and_return('abcd1234')
+            allow(subject).to receive(:checksum).and_return('efgh5678')
+          end
+
+          it 'returns true' do
+            expect(subject.fetch_required?).to be_truthy
+          end
+        end
+
+        context 'when the shasums are the same' do
+          before do
+            allow(subject).to receive(:digest).and_return('abcd1234')
+            allow(subject).to receive(:checksum).and_return('abcd1234')
+          end
+
+          it 'returns true' do
+            expect(subject.fetch_required?).to be_falsey
+          end
+        end
+      end
+    end
+
+    describe '#version_guid' do
+      it 'returns the shasum' do
+        expect(subject.version_guid).to eq('md5:abcd1234')
+      end
+    end
+
+    describe '#clean' do
+      before do
+        allow(FileUtils).to receive(:rm_rf)
+        allow(subject).to receive(:extract)
+      end
+
+      context 'when the project directory exists' do
+        before { allow(File).to receive(:exist?).and_return(true) }
+
+        it 'extracts the archive' do
+          expect(subject).to receive(:extract)
+          subject.clean
+        end
+
+        it 'returns true' do
+          expect(subject.clean).to be_truthy
+        end
+
+        it 'removes the project directory' do
+          expect(FileUtils).to receive(:rm_rf).with(project_dir)
+          subject.clean
+        end
+      end
+
+      context 'when the project directory does not exist' do
+        before { allow(File).to receive(:exist?).and_return(false) }
+
+        it 'extracts the archive' do
+          expect(subject).to receive(:extract)
+          subject.clean
+        end
+
+        it 'returns false' do
+          expect(subject.clean).to be_falsey
+        end
+      end
+    end
+
+    describe '#version_for_cache' do
+      before do
+        allow(software).to receive(:source).and_return({
+          url: 'https://url',
+          md5: 'abcd1234',
+        })
+      end
+
+      it 'returns the download URL and md5' do
+        expect(subject.version_for_cache).to eq('download_url:https://url|md5:abcd1234')
+      end
     end
 
     shared_examples 'an extractor' do |extension, command|
       context "when the file is a .#{extension}" do
         before do
-          allow(software_mock).to receive(:downloaded_file).and_return("file.#{extension}")
-          allow(software_mock).to receive(:source_uri).and_return("http://example.com/file.#{extension}")
+          software.source[:url] = "https://example.com/file.#{extension}"
         end
 
-        it 'has the correct extract command' do
-          expect(subject.extract_cmd).to eq(command)
+        it 'is the right command' do
+          expect(subject.send(:extract_command)).to eq(command)
         end
       end
     end
 
-    subject { described_class.new(software_mock) }
+    describe '#extract' do
+      before do
+        described_class.send(:public, :extract)
+      end
 
-    describe '#extract_cmd' do
+      context 'when the downloaded file is a folder' do
+        before do
+          allow(FileUtils).to receive(:cp_r)
+          allow(File).to receive(:directory?).and_return(true)
+          allow(subject).to receive(:extract_command)
+          software.source[:url] = 'https://example.com/folder'
+        end
+
+        it 'copies the entire directory to project_dir' do
+          expect(FileUtils).to receive(:cp_r).with("#{cache_dir}/folder", project_dir)
+          subject.extract
+        end
+      end
+
+      context 'when the downloaded file is a regular file' do
+        before do
+          allow(FileUtils).to receive(:mkdir_p)
+          allow(FileUtils).to receive(:cp)
+          allow(File).to receive(:directory?).and_return(false)
+          allow(subject).to receive(:extract_command)
+          software.source[:url] = 'https://example.com/file'
+        end
+
+        it 'copies the file into the project_dir' do
+          expect(FileUtils).to receive(:cp).with("#{cache_dir}/file", "#{project_dir}/")
+          subject.extract
+        end
+      end
+    end
+
+    describe '#extract_command' do
+      before { Config.source_dir('/tmp/out') }
+
       context 'on Windows' do
-        before { stub_ohai(platform: 'windows', version: '2012') }
+        before do
+          Config.cache_dir('C:')
+          stub_ohai(platform: 'windows', version: '2012')
+        end
 
-        it_behaves_like 'an extractor', '7z',      '7z.exe x file.7z -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'zip',     '7z.exe x file.zip -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'tar',     'tar xf file.tar -C/tmp/out'
-        it_behaves_like 'an extractor', 'tgz',     'tar zxf file.tgz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.gz',  'tar zxf file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'bz2',     'tar jxf file.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf file.tar.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'txz',     'tar Jxf file.txz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf file.tar.xz -C/tmp/out'
+        it_behaves_like 'an extractor', '7z',      '7z.exe x C:\\file.7z -o/tmp/out -r -y'
+        it_behaves_like 'an extractor', 'zip',     '7z.exe x C:\\file.zip -o/tmp/out -r -y'
+        it_behaves_like 'an extractor', 'tar',     'tar xf C:\\file.tar -C/tmp/out'
+        it_behaves_like 'an extractor', 'tgz',     'tar zxf C:\\file.tgz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.gz',  'tar zxf C:\\file.tar.gz -C/tmp/out'
+        it_behaves_like 'an extractor', 'bz2',     'tar jxf C:\\file.bz2 -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf C:\\file.tar.bz2 -C/tmp/out'
+        it_behaves_like 'an extractor', 'txz',     'tar Jxf C:\\file.txz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf C:\\file.tar.xz -C/tmp/out'
       end
 
       context 'on Linux' do
-        before { stub_ohai(platform: 'ubuntu', version: '12.04') }
+        before do
+          Config.cache_dir('/')
+          stub_ohai(platform: 'ubuntu', version: '12.04')
+        end
 
-        it_behaves_like 'an extractor', '7z',      '7z x file.7z -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'zip',     'unzip file.zip -d /tmp/out'
-        it_behaves_like 'an extractor', 'tar',     'tar xf file.tar -C/tmp/out'
-        it_behaves_like 'an extractor', 'tgz',     'tar zxf file.tgz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.gz',  'tar zxf file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'bz2',     'tar jxf file.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf file.tar.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'txz',     'tar Jxf file.txz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf file.tar.xz -C/tmp/out'
-      end
-    end
-
-    describe '#get_env' do
-      it 'handles upper via lower' do
-        stub_env('lower', 'abc')
-        expect(subject.get_env('LOWER')).to eq('abc')
-        expect(subject.get_env('lower')).to eq('abc')
-      end
-
-      it 'handles lower via upper' do
-        stub_env('UPPER', 'abc')
-        expect(subject.get_env('upper')).to eq('abc')
-        expect(subject.get_env('UPPER')).to eq('abc')
-      end
-    end
-
-    describe '#http_proxy' do
-      it 'returns nil when no proxy is set in env' do
-        expect(subject.http_proxy).to be_nil
-      end
-
-      it 'returns a URI object when HTTP_PROXY is set' do
-        stub_env('HTTP_PROXY', 'http://my.proxy')
-        expect(subject.http_proxy).to eq(URI.parse('http://my.proxy'))
-      end
-
-      it 'sets user and pass from env when set' do
-        stub_env('HTTP_PROXY', 'my.proxy')
-        stub_env('HTTP_PROXY_USER', 'alex')
-        stub_env('HTTP_PROXY_PASS', 'sesame')
-        expect(subject.http_proxy).to eq(URI.parse('http://alex:sesame@my.proxy'))
-      end
-
-      it 'uses user and pass in URL before those in env' do
-        stub_env('HTTP_PROXY', 'sally:peanut@my.proxy')
-        stub_env('HTTP_PROXY_USER', 'alex')
-        stub_env('HTTP_PROXY_PASS', 'sesame')
-        expect(subject.http_proxy).to eq(URI.parse('http://sally:peanut@my.proxy'))
-      end
-    end
-
-    describe '#excluded_from_proxy?' do
-      it 'proxies if host does not match exclude list' do
-        stub_env('NO_PROXY', 'google.com,www.buz.org')
-        expect(subject.excluded_from_proxy?('should.proxy.com')).to be_falsey
-        expect(subject.excluded_from_proxy?('www.buzz.org')).to be_falsey
-      end
-
-      it 'does not proxy if host matches exclude list' do
-        stub_env('NO_PROXY', 'google.com,www.buz.org')
-        expect(subject.excluded_from_proxy?('http://google.com')).to be_truthy
-        expect(subject.excluded_from_proxy?('www.buz.org')).to be_truthy
+        it_behaves_like 'an extractor', '7z',      '7z x /file.7z -o/tmp/out -r -y'
+        it_behaves_like 'an extractor', 'zip',     'unzip /file.zip -d /tmp/out'
+        it_behaves_like 'an extractor', 'tar',     'tar xf /file.tar -C/tmp/out'
+        it_behaves_like 'an extractor', 'tgz',     'tar zxf /file.tgz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.gz',  'tar zxf /file.tar.gz -C/tmp/out'
+        it_behaves_like 'an extractor', 'bz2',     'tar jxf /file.bz2 -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf /file.tar.bz2 -C/tmp/out'
+        it_behaves_like 'an extractor', 'txz',     'tar Jxf /file.txz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf /file.tar.xz -C/tmp/out'
       end
     end
   end
