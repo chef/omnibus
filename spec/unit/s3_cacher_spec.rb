@@ -2,8 +2,25 @@ require 'spec_helper'
 
 module Omnibus
   describe S3Cache do
-    let(:ruby_19) { double(name: 'ruby', version: '1.9.3', checksum: 'abcd1234') }
-    let(:python_27) { double(name: 'python', version: '2.7', checksum: 'defg5678') }
+    let(:ruby_19) do
+      double('ruby_19',
+        name: 'ruby',
+        version: '1.9.3',
+        fetcher: double(Fetcher,
+          checksum: 'abcd1234',
+        ),
+      )
+    end
+
+    let(:python_27) do
+      double('python',
+        name: 'python',
+        version: '2.7',
+        fetcher: double(Fetcher,
+          checksum: 'defg5678',
+        ),
+      )
+    end
 
     describe '.list' do
       let(:keys) { %w(ruby-1.9.3-abcd1234 python-2.7.defg5678) }
@@ -56,8 +73,8 @@ module Omnibus
       before { allow(S3Cache).to receive(:missing).and_return(softwares) }
 
       it 'fetches the missing software' do
-        expect(S3Cache).to receive(:fetch).with(ruby_19)
-        expect(S3Cache).to receive(:fetch).with(python_27)
+        expect(ruby_19).to receive(:fetch)
+        expect(python_27).to receive(:fetch)
 
         S3Cache.fetch_missing
       end
@@ -80,7 +97,7 @@ module Omnibus
 
       context 'when the package does not have a checksum' do
         it 'raises an exception' do
-          expect { S3Cache.key_for(double(name: 'ruby', version: '1.9.3', checksum: nil)) }
+          expect { S3Cache.key_for(double(name: 'ruby', version: '1.9.3', fetcher: double(Fetcher, checksum: nil))) }
             .to raise_error(InsufficientSpecification)
         end
       end

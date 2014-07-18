@@ -64,18 +64,20 @@ module Omnibus
       #
       def populate
         missing.each do |software|
-          fetch(software)
+          without_caching do
+            software.fetch
+          end
 
           key = key_for(software)
-          content = IO.read(software.project_file)
+          content = IO.read(software.downloaded_file)
 
           log.info(log_key) do
-            "Caching '#{software.project_file}' to '#{Config.s3_bucket}/#{key}'"
+            "Caching '#{software.downloaded_file}' to '#{Config.s3_bucket}/#{key}'"
           end
 
           client.store(key, content,
             access: :public_read,
-            content_md5: software.checksum
+            content_md5: software.fetcher.checksum
           )
         end
 
@@ -89,7 +91,9 @@ module Omnibus
       #
       def fetch_missing
         missing.each do |software|
-          fetch(software)
+          without_caching do
+            software.fetch
+          end
         end
       end
 
@@ -115,11 +119,11 @@ module Omnibus
           raise InsufficientSpecification.new(:version, software)
         end
 
-        unless software.checksum
-          raise InsufficientSpecification.new(:checksum, software)
+        unless software.fetcher.checksum
+          raise InsufficientSpecification.new('source md5 checksum', software)
         end
 
-        "#{software.name}-#{software.version}-#{software.checksum}"
+        "#{software.name}-#{software.version}-#{software.fetcher.checksum}"
       end
 
       private
@@ -161,7 +165,7 @@ module Omnibus
       def softwares
         Omnibus.projects.inject({}) do |hash, project|
           project.library.each do |software|
-            if software.source && software.source.key?(:url)
+            if software.fetcher.is_a?(NetFetcher)
               hash[software.name] = software
             end
           end
@@ -170,27 +174,13 @@ module Omnibus
         end.values.sort
       end
 
-      #
-      # Fetch the remote software definition onto disk.
-      #
-      # @param [Software] software
-      #   the software to fetch
-      #
-      # @return [true]
-      #
-      def fetch(software)
-        log.info(log_key) { "Fetching #{software.name}" }
-        fetcher = Fetcher.without_caching_for(software)
+      def without_caching(&block)
+        original = Config.use_s3_caching
+        Config.use_s3_caching(false)
 
-        if fetcher.fetch_required?
-          log.debug(log_key) { 'Updating cache' }
-          fetcher.download
-          fetcher.verify_checksum!
-        else
-          log.debug(log_key) { 'Cached copy up to date, skipping.' }
-        end
-
-        true
+        yield
+      ensure
+        Config.use_s3_caching(original)
       end
     end
   end

@@ -2,14 +2,7 @@ require 'spec_helper'
 
 module Omnibus
   describe Builder do
-    let(:software) do
-      double(Software,
-        name: 'chefdk',
-        install_dir: File.join(tmp_path, 'chefdk'),
-        project_dir: File.join(tmp_path, 'chefdk', 'cache'),
-        overridden?: false,
-      )
-    end
+    include_examples 'a software'
 
     #
     # Fakes the embedded bin path to whatever exists in bundler. This is useful
@@ -17,27 +10,11 @@ module Omnibus
     # a real Ruby just for functional tests.
     #
     def fake_embedded_bin(name)
-      bin = File.join(software.install_dir, 'embedded', 'bin')
-
-      FileUtils.mkdir_p(bin)
-      FileUtils.ln_s(Bundler.which(name), File.join(bin, name))
+      create_directory(bin_dir)
+      create_link(Bundler.which(name), File.join(bin_dir, name))
     end
 
     subject { described_class.new(software) }
-
-    before do
-      Config.project_root(tmp_path)
-      Config.build_retries(0)
-      Config.use_git_caching(false)
-      Config.software_gems(nil)
-
-      # Make the directories
-      FileUtils.mkdir_p(software.install_dir)
-      FileUtils.mkdir_p(software.project_dir)
-      FileUtils.mkdir_p(File.join(tmp_path, 'config', 'software'))
-      FileUtils.mkdir_p(File.join(tmp_path, 'config', 'patches'))
-      FileUtils.mkdir_p(File.join(tmp_path, 'config', 'templates'))
-    end
 
     describe '#command' do
       it 'executes the command' do
@@ -51,8 +28,7 @@ module Omnibus
 
     describe '#patch' do
       it 'applies the patch' do
-        configure = File.join(tmp_path, 'chefdk', 'cache', 'configure')
-        FileUtils.mkdir_p(File.dirname(configure))
+        configure = File.join(project_dir, 'configure')
         File.open(configure, 'w') do |f|
           f.write <<-EOH.gsub(/^ {12}/, '')
             THING="-e foo"
@@ -60,8 +36,7 @@ module Omnibus
           EOH
         end
 
-        patch = File.join(tmp_path, 'config', 'patches', 'chefdk', 'apply.patch')
-        FileUtils.mkdir_p(File.dirname(patch))
+        patch = File.join(patches_dir, 'apply.patch')
         File.open(patch, 'w') do |f|
           f.write <<-EOH.gsub(/^ {12}/, '')
             --- a/configure
@@ -80,8 +55,7 @@ module Omnibus
 
     describe '#ruby' do
       it 'executes the command as the embdedded ruby' do
-        ruby = File.join(tmp_path, 'chefdk', 'scripts', 'setup.rb')
-        FileUtils.mkdir_p(File.dirname(ruby))
+        ruby = File.join(scripts_dir, 'setup.rb')
         File.open(ruby, 'w') do |f|
           f.write <<-EOH.gsub(/^ {12}/, '')
             File.write("#{software.install_dir}/test.txt", 'This is content!')
@@ -94,7 +68,7 @@ module Omnibus
         subject.build
 
         path = "#{software.install_dir}/test.txt"
-        expect(File.exist?(path)).to be_truthy
+        expect(path).to be_a_file
         expect(File.read(path)).to eq('This is content!')
       end
     end
@@ -118,7 +92,7 @@ module Omnibus
         fake_embedded_bin('gem')
 
         subject.gem("build #{gemspec}")
-        subject.gem("install #{tmp_path}/chefdk/cache/example-1.0.0.gem")
+        subject.gem("install #{project_dir}/example-1.0.0.gem")
         output = capture_logging { subject.build }
 
         expect(output).to include('gem build')
@@ -186,14 +160,13 @@ module Omnibus
         output = capture_logging { subject.build }
 
         expect(output).to include('A complex operation')
-        expect(File.exist?("#{software.project_dir}/bacon")).to be_truthy
+        expect("#{software.project_dir}/bacon").to be_a_file
       end
     end
 
     describe '#erb' do
       it 'renders the erb' do
-        erb = File.join(tmp_path, 'config', 'templates', 'chefdk', 'example.erb')
-        FileUtils.mkdir_p(File.dirname(erb))
+        erb = File.join(templates_dir, 'example.erb')
         File.open(erb, 'w') do |f|
           f.write <<-EOH.gsub(/^ {12}/, '')
             <%= a %>
@@ -210,7 +183,7 @@ module Omnibus
         )
         subject.build
 
-        expect(File.exist?(destination)).to be_truthy
+        expect(destination).to be_a_file
         expect(File.read(destination)).to eq("foo\nbar\n")
       end
     end
@@ -218,24 +191,24 @@ module Omnibus
     describe '#mkdir' do
       it 'creates the directory' do
         path = File.join(tmp_path, 'scratch')
-        FileUtils.rm_rf(path)
+        remove_directory(path)
 
         subject.mkdir(path)
         subject.build
 
-        expect(File.directory?(path)).to be_truthy
+        expect(path).to be_a_directory
       end
     end
 
     describe '#touch' do
       it 'creates the file' do
         path = File.join(tmp_path, 'file')
-        FileUtils.rm_rf(path)
+        remove_file(path)
 
         subject.touch(path)
         subject.build
 
-        expect(File.file?(path)).to be_truthy
+        expect(path).to be_a_file
       end
 
       it 'creates the containing directory' do
@@ -252,22 +225,22 @@ module Omnibus
     describe '#delete' do
       it 'deletes the directory' do
         path = File.join(tmp_path, 'scratch')
-        FileUtils.mkdir_p(path)
+        create_directory(path)
 
         subject.delete(path)
         subject.build
 
-        expect(File.exist?(path)).to be_falsey
+        expect(path).to_not be_a_directory
       end
 
       it 'deletes the file' do
         path = File.join(tmp_path, 'file')
-        FileUtils.touch(path)
+        create_file(path)
 
         subject.delete(path)
         subject.build
 
-        expect(File.exist?(path)).to be_falsey
+        expect(path).to_not be_a_file
       end
 
       it 'accepts a glob pattern' do
@@ -288,12 +261,12 @@ module Omnibus
       it 'copies the file' do
         path_a = File.join(tmp_path, 'file1')
         path_b = File.join(tmp_path, 'file2')
-        FileUtils.touch(path_a)
+        create_file(path_a)
 
         subject.copy(path_a, path_b)
         subject.build
 
-        expect(File.file?(path_b)).to be_truthy
+        expect(path_b).to be_a_file
         expect(File.read(path_b)).to eq(File.read(path_a))
       end
 
@@ -341,13 +314,13 @@ module Omnibus
       it 'moves the file' do
         path_a = File.join(tmp_path, 'file1')
         path_b = File.join(tmp_path, 'file2')
-        FileUtils.touch(path_a)
+        create_file(path_a)
 
         subject.move(path_a, path_b)
         subject.build
 
-        expect(File.file?(path_b)).to be_truthy
-        expect(File.file?(path_a)).to be_falsey
+        expect(path_b).to be_a_file
+        expect(path_a).to_not be_a_file
       end
 
       it 'moves the directory and entries' do
@@ -398,12 +371,12 @@ module Omnibus
       it 'links the file' do
         path_a = File.join(tmp_path, 'file1')
         path_b = File.join(tmp_path, 'file2')
-        FileUtils.touch(path_a)
+        create_file(path_a)
 
         subject.link(path_a, path_b)
         subject.build
 
-        expect(File.symlink?(path_b)).to be_truthy
+        expect(path_b).to be_a_symlink
       end
 
       it 'links the directory' do
