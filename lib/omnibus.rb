@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+require 'omnibus/core_extensions'
+
 require 'pathname'
 require 'json'
 
@@ -61,8 +63,8 @@ module Omnibus
 
   autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
   autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
+  autoload :NullFetcher,    'omnibus/fetchers/null_fetcher'
   autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
-  autoload :S3CacheFetcher, 'omnibus/fetchers/s3_cache_fetcher'
 
   autoload :ArtifactoryPublisher, 'omnibus/publishers/artifactory_publisher'
   autoload :NullPublisher,        'omnibus/publishers/null_publisher'

@@ -14,54 +14,102 @@
 # limitations under the License.
 #
 
-module Omnibus
-  # Fetcher implementation for projects on the filesystem
-  class PathFetcher < Fetcher
+require 'fileutils'
 
+module Omnibus
+  class PathFetcher < Fetcher
     include Digestable
 
-    def initialize(software)
-      @name = software.name
-      @source = software.source
-      @project_dir = software.project_dir
-      @version = software.version
-      super
+    #
+    # Fetch if the local directory checksum is different than the path directory
+    # checksum.
+    #
+    # @return [true, false]
+    #
+    def fetch_required?
+      target_shasum != destination_shasum
     end
 
-    def description
-      <<-EOH.gsub(/^ {8}/, '').strip
-        source path:    #{@source[:path]}
-        local location: #{@project_dir}
-      EOH
+    #
+    # The version identifier for this path. This is computed using the path
+    # on disk to the source and the recursive shasum of that path on disk.
+    #
+    # @return [String]
+    #
+    def version_guid
+      "path:#{source_path}"
     end
 
-    def rsync
-      if Ohai['platform'] == 'windows'
-        # Robocopy's return code is 1 if it succesfully copies over the
-        # files and 0 if the files are already existing at the destination
-        sync_cmd = "robocopy #{@source[:path]}\\ #{@project_dir}\\ /MIR /S"
-        shellout!(sync_cmd, returns: [0, 1])
+    #
+    # Clean the given path by removing the project directory.
+    #
+    # @return [true, false]
+    #   true if the directory was cleaned, false otherwise
+    #
+    def clean
+      if File.exist?(project_dir)
+        log.info(log_key) { "Cleaning project directory `#{project_dir}'" }
+        FileUtils.rm_rf(project_dir)
+        fetch
+        true
       else
-        sync_cmd = "rsync --delete -a #{@source[:path]}/ #{@project_dir}/"
-        shellout!(sync_cmd)
+        false
       end
     end
 
-    def clean
-      # Here, clean will do the same as fetch: reset source to pristine state
-      rsync
-    end
-
+    #
+    # Fetch any new files by copying them to the +project_dir+.
+    #
+    # @return [void]
+    #
     def fetch
-      rsync
+      log.info(log_key) { "Copying from `#{source_path}'" }
+
+      # Ensure the project directory exists
+      unless File.directory?(project_dir)
+        FileUtils.mkdir_p(project_dir)
+      end
+
+      FileUtils.cp_r("#{source_path}/**/{*,.*}", "#{project_dir}/")
     end
 
+    #
+    # The version for this item in the cache. The is the shasum of the directory
+    # on disk.
+    #
+    # @return [String]
+    #
     def version_for_cache
-      @version_for_cache ||= digest_directory(@project_dir, :sha256)
+      "path:#{source_path}|shasum:#{target_shasum}"
     end
 
-    def fetch_required?
-      true
+    private
+
+    #
+    # The path on disk to pull the files from.
+    #
+    # @return [String]
+    #
+    def source_path
+      source[:path]
+    end
+
+    #
+    # The shasum of the directory **inside** the project.
+    #
+    # @return [String]
+    #
+    def target_shasum
+      @target_shasum ||= digest_directory(project_dir, :sha256)
+    end
+
+    #
+    # The shasum of the directory **outside** of the project.
+    #
+    # @return [String]
+    #
+    def destination_shasum
+      @destination_shasum ||= digest_directory(source_path, :sha256)
     end
   end
 end

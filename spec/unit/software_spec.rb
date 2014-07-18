@@ -56,7 +56,6 @@ module Omnibus
       let(:uri) { URI.parse('http://example.com/foo.tar.gz') }
       before { allow(subject).to receive(:source_uri).and_return(uri) }
 
-      it_behaves_like 'a cleanroom getter', :downloaded_file
       it_behaves_like 'a cleanroom getter', :project_file
     end
 
@@ -338,22 +337,6 @@ module Omnibus
         it 'should have nil for an override_version' do
           expect(subject.override_version).to eq(expected_override_version)
         end
-
-        it 'should have the right source md5' do
-          expect(subject.source[:md5]).to eq(expected_md5)
-        end
-
-        it 'should have the right source url' do
-          expect(subject.source[:url]).to eq(expected_url)
-        end
-
-        it 'should have the right checksum' do
-          expect(subject.checksum).to eq(expected_md5)
-        end
-
-        it 'should have the right source_uri' do
-          expect(subject.source_uri).to eq(URI.parse(expected_url))
-        end
       end
 
       context 'without overrides' do
@@ -402,43 +385,6 @@ module Omnibus
           end
 
           it_behaves_like 'a software definition'
-        end
-      end
-    end
-
-    context 'while getting version_for_cache' do
-      let(:fetcher) { nil }
-      let(:software_name) { 'zlib' }
-      let(:default_version) { '1.2.6' }
-
-      def get_version_for_cache(expected_version)
-        subject.instance_variable_set(:@fetcher, fetcher)
-        expect(subject.version_for_cache).to eq(expected_version)
-      end
-
-      context 'without a fetcher' do
-        it 'should return the default version' do
-          get_version_for_cache('1.2.6')
-        end
-      end
-
-      context 'with a NetFetcher' do
-        let(:fetcher) { NetFetcher.new(subject) }
-
-        it 'should return the default version' do
-          get_version_for_cache('1.2.6')
-        end
-      end
-
-      context 'with a GitFetcher' do
-        let(:fetcher) do
-          a = GitFetcher.new(subject)
-          allow(a).to receive(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
-          a
-        end
-
-        it 'should return the git sha' do
-          get_version_for_cache('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
         end
       end
     end

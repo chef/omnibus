@@ -448,31 +448,36 @@ module Omnibus
     expose :build
 
     #
-    # The path on disk to the downloaded asset. This method requires the
-    # presence of a +source_uri+.
+    # The path to the downloaded file from a NetFetcher.
     #
-    # @todo This is really a property of the {NetFetcher} and should be
-    #   implemented on that class.
-    #
-    def downloaded_file
-      @downloaded_file ||= begin
-        raise MissingSoftwareSourceURI.new(self) unless source_uri
-
-        filename = source_uri.path.split('/').last
-        "#{Config.cache_dir}/#{filename}"
-      end
-    end
-    expose :downloaded_file
-
-    #
-    # @deprecated Use {#downloaded_file} instead
+    # @deprecated There is no replacement for this DSL method
     #
     def project_file
-      log.deprecated(log_key) do
-        "project_file (DSL). Please use `downloaded_file' instead."
-      end
+      if fetcher && fetcher.is_a?(NetFetcher)
+        log.deprecated(log_key) do
+          "project_file (DSL). This is a property of the NetFetcher and will " \
+          "not be publically exposed in the next major release. In general, " \
+          "you should not be using this method in your software definitions " \
+          "as it is an internal implementation detail of the NetFetcher. If " \
+          "you disagree with this statement, you should open an issue on the " \
+          "Omnibus repository on GitHub an explain your use case. For now, " \
+          "I will return the path to the downloaded file on disk, but please " \
+          "rethink the problem you are trying to solve :)."
+        end
 
-      downloaded_file
+        fetcher.downloaded_file
+      else
+        log.warn(log_key) do
+          "Cannot retrieve a `project_file' for software `#{name}'. This " \
+          "attribute is actually an internal representation that is unique " \
+          "to the NetFetcher class and requires the use of a `source' " \
+          "attribute that is declared using a `:url' key. For backwards-" \
+          "compatability, I will return `nil', but this is most likely not " \
+          "your desired behavior."
+        end
+
+        nil
+      end
     end
     expose :project_file
 
@@ -791,7 +796,7 @@ module Omnibus
 
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
     def version_guid
-      Fetcher.for(self).version_guid
+      fetcher.version_guid
     end
 
     # Returns the version to be used in cache.
@@ -811,42 +816,39 @@ module Omnibus
       end
     end
 
-    # @todo Code smell... this only has meaning if the software was
-    #   defined with a :uri, and this is only used in
-    #   {Omnibus::NetFetcher}.  This responsibility is distributed
-    #   across two classes, one of which is a specific interface
-    #   implementation
-    # @todo Why the caching of the URI?
-    def source_uri
-      @source_uri ||= URI(source[:url])
-    end
-
-    # @todo Code smell... this only has meaning if the software was
-    #   defined with a :uri, and this is only used in
-    #   {Omnibus::NetFetcher}.  This responsibility is distributed
-    #   across two classes, one of which is a specific interface
-    #   implementation
-    def checksum
-      source[:md5]
-    end
-
-    # The fetcher for this software.
+    #
+    # The fetcher for this software, based off of the +source+ attribute.
+    #
+    # - +:url+ - {NetFetcher}
+    # - +:git+ - {GitFetcher}
+    # - +:path+ - {PathFetcher}
     #
     # @return [Fetcher]
+    #
     def fetcher
-      @fetcher ||= Fetcher.for(self)
+      @fetcher ||= if source
+        if source[:url]
+          NetFetcher.new(self)
+        elsif source[:git]
+          GitFetcher.new(self)
+        elsif source[:path]
+          PathFetcher.new(self)
+        end
+      else
+        NullFetcher.new(self)
+      end
     end
 
     # Actually build the software package
     def build_me
       # Build if we need to
       if always_build?
-        execute_build(fetcher)
+        execute_build
       else
         if GitCache.new(self).restore
           true
         else
-          execute_build(fetcher)
+          execute_build
         end
       end
 
@@ -976,7 +978,7 @@ module Omnibus
       raise 'Method Moved.'
     end
 
-    def execute_build(fetcher)
+    def execute_build
       fetcher.clean
       builder.build
 

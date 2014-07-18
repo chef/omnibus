@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2014 Chef Software, Inc.
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,33 +15,39 @@
 #
 
 module Omnibus
-  class S3CacheFetcher < NetFetcher
+  class NullFetcher < Fetcher
+    #
+    # @return [false]
+    #
+    def fetch_required?
+      false
+    end
+
+    #
+    # @return [nil]
+    #
+    def version_guid
+      nil
+    end
+
+    #
+    # @return [false]
+    #
+    def clean
+      false
+    end
+
+    #
+    # @return [void]
+    #
     def fetch
-      log.info(log_key) do
-        "S3 Cache enabled, '#{name}' will be fetched from S3 cache"
-      end
-
-      super
     end
 
-    #
-    # The source URI for the software definition that is being fetched.
-    #
-    # @return [URI]
-    #
-    def source_uri
-      URI.parse(url_for(@software))
-    end
-
-    private
-
-    #
-    # The URL for the cached software.
     #
     # @return [String]
     #
-    def url_for(software)
-      "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(software)}"
+    def version_for_cache
+      nil
     end
   end
 end
