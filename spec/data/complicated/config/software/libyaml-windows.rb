@@ -35,7 +35,7 @@ source :url => "http://packages.openknapsack.org/libyaml/libyaml-0.1.6-x86-windo
 build do
   temp_directory = File.join(cache_dir, "libyaml-cache")
   # First extract the tar file out of lzma archive.
-  command "7z.exe x #{downloaded_file} -o#{temp_directory} -r -y"
+  command "7z.exe x #{project_file} -o#{temp_directory} -r -y"
   # Now extract the files out of tar archive.
   command "7z.exe x #{File.join(temp_directory, "libyaml-0.1.6-x86-windows.tar")} -o#{temp_directory} -r -y"
   # Now copy over libyaml-0-2.dll to the build dir
