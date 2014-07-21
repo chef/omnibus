@@ -1,7 +1,7 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v3.2.0.rc.2 (July 17, 2014)
+v3.2.0.rc.3 (July 21, 2014)
 ---------------------------
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
@@ -70,6 +70,7 @@ v3.2.0.rc.2 (July 17, 2014)
 - Require `net/http`, `net/https`, and `net/ftp` in the base fetcher module
 - Use -R, not -W1 on FreeBSD's compile flags
 - Expand all paths relative to the project_root
+- Various documentation fixes and updates
 
 ### Potentially breaking changes
 - Merged `Package` and `Artifact` into the same class and updated API - this was considered an **internal** API so it is not a violation of semver
