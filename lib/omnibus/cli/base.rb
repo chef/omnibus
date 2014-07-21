@@ -94,7 +94,7 @@ module Omnibus
       aliases: '-l',
       type: :string,
       enum: %w(fatal error warn info debug),
-      lazy_default: 'warn'
+      lazy_default: 'info'
     class_option :override,
       desc: 'Override one or more Omnibus config options',
       aliases: '-o',
