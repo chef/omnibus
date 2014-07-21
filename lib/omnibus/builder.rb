@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-require 'bundler'
 require 'fileutils'
 require 'ostruct'
 require 'mixlib/shellout'
@@ -592,7 +591,7 @@ module Omnibus
     # Execute the given command object. This method also wraps the following
     # operations:
     #
-    #   - Reset bundler's environment using +Bundler.with_clean_env+
+    #   - Reset bundler's environment using {with_clean_env}
     #   - Instrument (time/measure) the individual command's execution
     #   - Retry failed commands in accordance with {Config#build_retries}
     #
@@ -600,7 +599,7 @@ module Omnibus
     #   the command object to build
     #
     def execute(command)
-      Bundler.with_clean_env do
+      with_clean_env do
         measure(command.description) do
           with_retries do
             command.run(self)
@@ -645,6 +644,35 @@ module Omnibus
           retry
         end
       end
+    end
+
+    #
+    # Execute the given command, removing any Ruby-specific environment
+    # variables. This is an "enhanced" version of +Bundler.with_clean_env+,
+    # which only removes Bundler-specific values. We need to remove all
+    # values, specifically:
+    #
+    # - GEM_PATH
+    # - GEM_HOME
+    # - GEM_ROOT
+    # - BUNDLE_GEMFILE
+    # - RUBYOPT
+    #
+    # The original environment restored at the end of this call.
+    #
+    # @param [Proc] block
+    #   the block to execute with the cleaned environment
+    #
+    def with_clean_env(&block)
+      original = ENV.to_hash
+
+      ENV.delete('RUBYOPT')
+      ENV.delete_if { |k,_| k.start_with?('BUNDLE_') }
+      ENV.delete_if { |k,_| k.start_with?('GEM_') }
+
+      block.call
+    ensure
+      ENV.replace(original.to_hash)
     end
 
     #
