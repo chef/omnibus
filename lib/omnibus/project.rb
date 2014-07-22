@@ -699,6 +699,30 @@ module Omnibus
     end
 
     #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
+    # @!group Public API
+    #
+    # In addition to the DSL methods, the following methods are considered to
+    # be the "public API" for a project.
+    # --------------------------------------------------
+
+    #
+    # Recursively load all the dependencies for this project.
+    #
+    # @return [true]
+    #
+    def load_dependencies
+      dependencies.each do |dependency|
+        Software.load(self, dependency)
+      end
+
+      true
+    end
+
+    #
     # The list of software dependencies for this project. These is the software
     # that comprises your project, and is distinct from runtime dependencies.
     #
@@ -710,6 +734,16 @@ module Omnibus
     #
     def dependencies
       @dependencies ||= []
+    end
+
+    #
+    # The path (on disk) where this project came from. Warning: this can be
+    # +nil+ if a project was dynamically created!
+    #
+    # @return [String, nil]
+    #
+    def filepath
+      @filepath
     end
 
     #
