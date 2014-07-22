@@ -94,6 +94,7 @@ module Omnibus
         it_behaves_like 'a version manipulator', 'windows', '6.1.7601', '2008r2'
         it_behaves_like 'a version manipulator', 'windows', '6.2.9200', '8'
         it_behaves_like 'a version manipulator', 'windows', '6.3.9200', '8.1'
+        it_behaves_like 'a version manipulator', 'windows', '6.3.9600', '8.1'
 
         context 'given an unknown platform' do
           before do

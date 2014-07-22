@@ -170,11 +170,11 @@ module Omnibus
             # version is the same as Windows 8. It's only here for completeness and
             # documentation.
             when '6.2.9200', '2012'   then '2012'
-            when '6.3.9200', '8.1'    then '8.1'
+            when /6\.3\.\d+/, '8.1' then '8.1'
             # The following `when` will never match since Windows 2012R2's platform
             # version is the same as Windows 8.1. It's only here for completeness
             # and documentation.
-            when '6.3.9200', '2012r2' then '2012r2'
+            when /6\.3\.\d+/, '2012r2' then '2012r2'
             else
               raise UnknownPlatformVersion.new(platform, platform_version)
             end
