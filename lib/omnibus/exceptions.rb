@@ -174,16 +174,22 @@ should never use the replaces line.
     end
   end
 
-  class MissingProjectDependency < Error
-    def initialize(name, directories)
-      @name, @directories = name, directories
+  class MissingProject < Error
+    def initialize(name)
+      super <<-EOH
+I could not find a project name `#{name}' in any of the sources:"
+
+    #{Omnibus.project_map.values.join("\n    ")}
+EOH
     end
+  end
 
-    def to_s
-      <<-EOH
-I could not find a software named `#{@name}' in any of the sources:
+  class MissingSoftware < Error
+    def initialize(name)
+      super <<-EOH
+I could not find a software name `#{name}' in any of the sources:"
 
-    #{@directories.join("\n      ")}
+    #{Omnibus.software_map.values.join("\n    ")}
 EOH
     end
   end
