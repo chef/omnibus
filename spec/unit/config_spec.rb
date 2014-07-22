@@ -10,7 +10,7 @@ module Omnibus
 
     before do
       # Don't expand paths on the build system. Otherwise, you will end up with
-      # paths like +\\Users\\you\\Development\\omnibus-ruby\\C:\\omnibus-ruby+
+      # paths like +\\Users\\you\\Development\\omnibus-ruby\\C:/omnibus-ruby+
       # when testing on "other" operating systems
       allow(File).to receive(:expand_path) { |arg| arg }
     end
@@ -57,14 +57,14 @@ module Omnibus
         stub_const('File::ALT_SEPARATOR', '\\')
       end
 
-      include_examples 'a configurable', :base_dir, 'C:\\omnibus-ruby'
-      include_examples 'a configurable', :cache_dir, 'C:\\omnibus-ruby\\cache'
-      include_examples 'a configurable', :git_cache_dir, 'C:\\omnibus-ruby\\cache\\git_cache'
-      include_examples 'a configurable', :install_path_cache_dir, 'C:\\omnibus-ruby\\cache\\git_cache'
-      include_examples 'a configurable', :source_dir, 'C:\\omnibus-ruby\\src'
-      include_examples 'a configurable', :build_dir, 'C:\\omnibus-ruby\\build'
-      include_examples 'a configurable', :package_dir, 'C:\\omnibus-ruby\\pkg'
-      include_examples 'a configurable', :package_tmp, 'C:\\omnibus-ruby\\pkg-tmp'
+      include_examples 'a configurable', :base_dir, 'C:/omnibus-ruby'
+      include_examples 'a configurable', :cache_dir, 'C:/omnibus-ruby/cache'
+      include_examples 'a configurable', :git_cache_dir, 'C:/omnibus-ruby/cache/git_cache'
+      include_examples 'a configurable', :install_path_cache_dir, 'C:/omnibus-ruby/cache/git_cache'
+      include_examples 'a configurable', :source_dir, 'C:/omnibus-ruby/src'
+      include_examples 'a configurable', :build_dir, 'C:/omnibus-ruby/build'
+      include_examples 'a configurable', :package_dir, 'C:/omnibus-ruby/pkg'
+      include_examples 'a configurable', :package_tmp, 'C:/omnibus-ruby/pkg-tmp'
     end
 
     context 'when base_dir is changed' do
