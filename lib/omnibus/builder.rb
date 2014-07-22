@@ -354,7 +354,8 @@ module Omnibus
     expose :mkdir
 
     #
-    # Touch the given filepath at runtime.
+    # Touch the given filepath at runtime. This method will also ensure the
+    # containing directory exists first.
     #
     # @param [String] file
     #   the path of the file to touch
@@ -365,6 +366,9 @@ module Omnibus
     def touch(file, options = {})
       build_commands << BuildCommand.new("touch `#{file}'") do
         Dir.chdir(software.install_dir) do
+          parent = File.dirname(file)
+          FileUtils.mkdir_p(parent) unless File.directory?(parent)
+
           FileUtils.touch(file, options)
         end
       end
