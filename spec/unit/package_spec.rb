@@ -144,6 +144,13 @@ module Omnibus
         expect(instance[:platform]).to eq('ubuntu')
       end
 
+     it 'ensures platform version is properly truncated' do
+        allow(File).to receive(:read).and_return('{ "platform": "el", "platform_version": "5.10" }')
+        instance = described_class.for_package(package)
+
+        expect(instance[:platform_version]).to eq('5')
+      end
+
       it 'ensures an iteration exists' do
         allow(File).to receive(:read).and_return('{}')
         instance = described_class.for_package(package)
