@@ -54,19 +54,11 @@ module Omnibus
       it 'uploads the package' do
         expect(artifact).to receive(:upload).with(
           repository,
-          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
+          'chef/11.0.6/ubuntu/14.04/chef.deb',
           an_instance_of(Hash)
         ).once
 
         subject.publish
-      end
-
-      context 'when the metadata is from an older version of Omnibus' do
-        before { allow(package.metadata).to receive(:[]).with(:homepage).and_return(nil) }
-
-        it 'raises an exception' do
-          expect { subject.publish }.to raise_error(OldMetadata)
-        end
       end
 
       context 'when a block is given' do

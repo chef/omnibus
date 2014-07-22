@@ -60,6 +60,11 @@ module Omnibus
           data = File.read(path_for(package))
           hash = JSON.parse(data, symbolize_names: true)
 
+           # Ensure Platform version has been truncated
+           if hash[:platform_version] && hash[:platform]
+             hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
+           end
+
           # Ensure an interation exists
           hash[:iteration] ||= 1
 
@@ -90,6 +95,33 @@ module Omnibus
         end
 
         #
+        # Platform version to be used in package metadata.
+        #
+        # @return [String]
+        #   the platform version
+        #
+        def platform_version
+          truncate_platform_version(Ohai['platform_version'], platform_shortname)
+        end
+
+        #
+        # Platform name to be used when creating metadata for the artifact.
+        # rhel/centos become "el", all others are just platform
+        #
+        # @return [String]
+        #   the platform family short name
+        #
+        def platform_shortname
+          if Ohai['platform_family'] == 'rhel'
+            'el'
+          else
+            Ohai['platform']
+          end
+        end
+
+        private
+
+        #
         # On certain platforms we don't care about the full MAJOR.MINOR.PATCH platform
         # version. This method will properly truncate the version down to a more human
         # friendly version. This version can also be thought of as a 'marketing'
@@ -101,17 +133,17 @@ module Omnibus
         #   the platform shortname. this might be an Ohai-returned platform or
         #   platform family but it also might be a shortname like `el`
         #
-        def platform_version
-          case platform_shortname
+        def truncate_platform_version(platform_version, platform)
+          case platform
           when 'centos', 'debian', 'fedora', 'freebsd', 'rhel', 'el'
             # Only want MAJOR (e.g. Debian 7)
-            Ohai['platform_version'].split('.').first
+            platform_version.split('.').first
           when 'aix', 'arch', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'suse', 'ubuntu'
             # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
-            Ohai['platform_version'].split('.')[0..1].join('.')
+            platform_version.split('.')[0..1].join('.')
           when 'omnios', 'smartos'
             # Only want MAJOR (e.g OmniOS r151006, SmartOS 20120809T221258Z)
-            Ohai['platform_version'].split('.').first
+            platform_version.split('.').first
           when 'windows'
             # Windows has this really awesome "feature", where their version numbers
             # internally do not match the "marketing" name.
@@ -126,7 +158,7 @@ module Omnibus
             #
             #  http://www.jrsoftware.org/ishelp/index.php?topic=winvernotes
             #
-            case Ohai['platform_version']
+            case platform_version
             when '5.0.2195', '2000'   then '2000'
             when '5.1.2600', 'xp'     then 'xp'
             when '5.2.3790', '2003r2' then '2003r2'
@@ -144,25 +176,10 @@ module Omnibus
             # and documentation.
             when '6.3.9200', '2012r2' then '2012r2'
             else
-              raise UnknownPlatformVersion.new(platform_shortname, Ohai['platform_version'])
+              raise UnknownPlatformVersion.new(platform, platform_version)
             end
           else
-            raise UnknownPlatform.new(platform_shortname)
-          end
-        end
-
-        #
-        # Platform name to be used when creating metadata for the artifact.
-        # rhel/centos become "el", all others are just platform
-        #
-        # @return [String]
-        #   the platform family short name
-        #
-        def platform_shortname
-          if Ohai['platform_family'] == 'rhel'
-            'el'
-          else
-            Ohai['platform']
+            raise UnknownPlatform.new(platform)
           end
         end
       end
