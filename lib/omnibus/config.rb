@@ -120,7 +120,7 @@ module Omnibus
     # @return [String]
     default(:base_dir) do
       if Ohai['platform'] == 'windows'
-        'C:\\omnibus-ruby'
+        'C:/omnibus-ruby'
       else
         '/var/cache/omnibus'
       end
@@ -130,7 +130,7 @@ module Omnibus
     # code will be cached.
     #
     # @return [String]
-    default(:cache_dir) { windows_safe_path(base_dir, 'cache') }
+    default(:cache_dir) { File.join(base_dir, 'cache') }
 
     # The absolute path to the directory on the virtual machine where
     # git caching will occur and software's will be progressively cached.
@@ -140,7 +140,7 @@ module Omnibus
       if defined?(@install_path_cache_dir)
         @install_path_cache_dir
       else
-        windows_safe_path(base_dir, 'cache', 'git_cache')
+        File.join(base_dir, 'cache', 'git_cache')
       end
     end
 
@@ -159,19 +159,19 @@ module Omnibus
     # source code will be downloaded.
     #
     # @return [String]
-    default(:source_dir) { windows_safe_path(base_dir, 'src') }
+    default(:source_dir) { File.join(base_dir, 'src') }
 
     # The absolute path to the directory on the virtual machine where
     # software will be built.
     #
     # @return [String]
-    default(:build_dir) { windows_safe_path(base_dir, 'build') }
+    default(:build_dir) { File.join(base_dir, 'build') }
 
     # The absolute path to the directory on the virtual machine where
     # packages will be constructed.
     #
     # @return [String]
-    default(:package_dir) { windows_safe_path(base_dir, 'pkg') }
+    default(:package_dir) { File.join(base_dir, 'pkg') }
 
     # The absolute path to the directory on the virtual machine where
     # packagers will store intermediate packaging products. Some packaging
@@ -179,7 +179,7 @@ module Omnibus
     # use this setting.
     #
     # @return [String]
-    default(:package_tmp) { windows_safe_path(base_dir, 'pkg-tmp') }
+    default(:package_tmp) { File.join(base_dir, 'pkg-tmp') }
 
     # The relative path of the directory containing {Omnibus::Project}
     # DSL files.  This is relative to {#project_root}.
