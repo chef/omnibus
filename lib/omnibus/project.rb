@@ -185,7 +185,7 @@ module Omnibus
       if null?(val)
         @install_dir || raise(MissingProjectConfiguration.new('install_dir', '/opt/chef'))
       else
-        @install_dir = File.expand_path(windows_safe_path(val))
+        @install_dir = File.expand_path(val, Config.project_root)
       end
     end
     expose :install_dir
