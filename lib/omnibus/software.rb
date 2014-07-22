@@ -538,6 +538,20 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # Recursively load all the dependencies for this software.
+    #
+    # @return [true]
+    #
+    def load_dependencies
+      dependencies.each do |dependency|
+        software = Software.load(project, dependency)
+        project.library.component_added(software)
+      end
+
+      true
+    end
+
+    #
     # The builder object for this software definition.
     #
     # @return [Builder]
