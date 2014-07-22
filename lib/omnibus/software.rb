@@ -24,17 +24,39 @@ module Omnibus
       #
       # @param [Project] project
       #   the project that loaded this software definition
-      # @param [String] filepath
+      # @param [String] name
       #   the path to the software definition to load from disk
-      # @param [hash] overrides
-      #   a list of software overrides
       #
       # @return [Software]
       #
-      def load(project, filepath)
-        instance = new(project, filepath)
-        instance.evaluate_file(filepath)
-        instance
+      def load(project, name)
+        loaded_softwares[name] ||= begin
+          filepath = Omnibus.software_path(name)
+
+          if filepath.nil?
+            raise MissingSoftware.new(name)
+          else
+            log.debug(log_key) do
+              "Loading software `#{name}' from `#{filepath}'."
+            end
+          end
+
+          instance = new(project, filepath)
+          instance.evaluate_file(filepath)
+          instance.load_dependencies
+          instance
+        end
+      end
+
+      private
+
+      #
+      # The list of softwares loaded thus far.
+      #
+      # @return [Hash<String, Software>]
+      #
+      def loaded_softwares
+        @loaded_softwares ||= {}
       end
     end
 
