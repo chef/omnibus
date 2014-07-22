@@ -30,15 +30,40 @@ module Omnibus
   class Project
     class << self
       #
-      # @param [String] filepath
-      #   the path to the project definition to load from disk
+      # @param [String] name
+      #   the name to the project definition to load from disk
       #
-      # @return [Software]
+      # @return [Project]
       #
-      def load(filepath)
-        instance = new(filepath)
-        instance.evaluate_file(filepath)
-        instance
+      def load(name)
+        loaded_projects[name] ||= begin
+          filepath = Omnibus.project_path(name)
+
+          if filepath.nil?
+            raise MissingProject.new(name)
+          else
+            log.debug(log_key) do
+              "Loading project `#{name}' from `#{filepath}'."
+            end
+          end
+
+          instance = new(filepath)
+          instance.evaluate_file(filepath)
+          instance.load_dependencies
+          instance
+        end
+      end
+
+
+      private
+
+      #
+      # The list of projects loaded thus far.
+      #
+      # @return [Hash<String, Project>]
+      #
+      def loaded_projects
+        @loaded_projects ||= {}
       end
     end
 
