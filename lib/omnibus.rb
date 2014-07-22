@@ -165,7 +165,9 @@ module Omnibus
     # @return [Array<:Project>]
     #
     def projects
-      _projects.values
+      project_map.map do |name, _|
+        Project.load(name)
+      end
     end
 
     #
@@ -177,7 +179,7 @@ module Omnibus
     # @return [Project]
     #
     def project(name)
-      _projects[name.to_s]
+      Project.load(name)
     end
 
     #
