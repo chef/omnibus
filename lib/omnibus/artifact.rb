@@ -97,7 +97,9 @@ module Omnibus
         'version' => build_version,
         'basename' => File.basename(path),
         'md5' => md5,
+        'sha1' => sha1,
         'sha256' => sha256,
+        'sha512' => sha512,
       }
     end
 
@@ -129,9 +131,19 @@ module Omnibus
       @md5 ||= digest(Digest::MD5)
     end
 
-    # @return [String] hex encoded SHA2-256 of the package
+    # @return [String] hex encoded SHA1 of the package
+    def sha1
+      @sha1 ||= digest(Digest::SHA1)
+    end
+
+    # @return [String] hex encoded SHA-256 of the package
     def sha256
       @sha256 ||= digest(Digest::SHA256)
+    end
+
+    # @return [String] hex encoded SHA-512 of the package
+    def sha512
+      @sha512 ||= digest(Digest::SHA512)
     end
 
     private
