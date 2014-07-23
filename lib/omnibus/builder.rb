@@ -20,6 +20,9 @@ require 'mixlib/shellout'
 
 module Omnibus
   class Builder
+    # Files to be ignored during a directory globbing
+    IGNORED_FILES = %w(. ..).freeze
+
     include Cleanroom
     include Digestable
     include Instrumentation
@@ -151,6 +154,30 @@ module Omnibus
       end
     end
     expose :max_build_jobs
+
+    #
+    # Convert the given path to be appropiate for shelling out on Windows. Most
+    # internal calls will wrap paths automatically, but the +command+ method is
+    # unable to do so.
+    #
+    # @example
+    #   command "#{windows_safe_path(install_dir)}\\embedded\\bin\\gem"
+    #
+    # @param [String, Array<String>] pieces
+    #   the pieces of the path to join and fix
+    # @return [String]
+    #   the path with applied changes
+    #
+    def windows_safe_path(*pieces)
+      path = File.join(*pieces)
+
+      if File::ALT_SEPARATOR
+        path.gsub(File::SEPARATOR, File::ALT_SEPARATOR)
+      else
+        path
+      end
+    end
+    expose :windows_safe_path
 
     #
     # @!endgroup
@@ -354,7 +381,8 @@ module Omnibus
     expose :mkdir
 
     #
-    # Touch the given filepath at runtime.
+    # Touch the given filepath at runtime. This method will also ensure the
+    # containing directory exists first.
     #
     # @param [String] file
     #   the path of the file to touch
@@ -365,6 +393,9 @@ module Omnibus
     def touch(file, options = {})
       build_commands << BuildCommand.new("touch `#{file}'") do
         Dir.chdir(software.install_dir) do
+          parent = File.dirname(file)
+          FileUtils.mkdir_p(parent) unless File.directory?(parent)
+
           FileUtils.touch(file, options)
         end
       end
@@ -373,7 +404,8 @@ module Omnibus
 
     #
     # Delete the given file or directory on the system. This method uses the
-    # equivalent of +rm -rf+.
+    # equivalent of +rm -rf+, so you may pass in a specific file or a glob of
+    # files.
     #
     # @param [String] path
     #   the path of the file to delete
@@ -384,14 +416,17 @@ module Omnibus
     def delete(path, options = {})
       build_commands << BuildCommand.new("delete `#{path}'") do
         Dir.chdir(software.install_dir) do
-          FileUtils.rm_rf(path, options)
+          glob(path).each do |file|
+            FileUtils.rm_rf(file, options)
+          end
         end
       end
     end
     expose :delete
 
     #
-    # Copy the given source to the destination.
+    # Copy the given source to the destination. This method accepts a single
+    # file or a file pattern to match.
     #
     # @param [String] source
     #   the path on disk to copy from
@@ -404,14 +439,17 @@ module Omnibus
     def copy(source, destination, options = {})
       build_commands << BuildCommand.new("copy `#{source}' to `#{destination}'") do
         Dir.chdir(software.install_dir) do
-          FileUtils.cp_r(source, destination, options)
+          glob(source).each do |file|
+            FileUtils.cp_r(file, destination, options)
+          end
         end
       end
     end
     expose :copy
 
     #
-    # Copy the given source to the destination.
+    # Copy the given source to the destination. This method accepts a single
+    # file or a file pattern to match
     #
     # @param [String] source
     #   the path on disk to move from
@@ -424,14 +462,17 @@ module Omnibus
     def move(source, destination, options = {})
       build_commands << BuildCommand.new("move `#{source}' to `#{destination}'") do
         Dir.chdir(software.install_dir) do
-          FileUtils.mv(source, destination, options)
+          glob(source).each do |file|
+            FileUtils.mv(file, destination, options)
+          end
         end
       end
     end
     expose :move
 
     #
-    # Link the given source to the destination.
+    # Link the given source to the destination. This method accepts a single
+    # file or a file pattern to match
     #
     # @param [String] source
     #   the path on disk to link from
@@ -444,7 +485,9 @@ module Omnibus
     def link(source, destination, options = {})
       build_commands << BuildCommand.new("link `#{source}' to `#{destination}'") do
         Dir.chdir(software.install_dir) do
-          FileUtils.ln_s(source, destination, options)
+          glob(source).each do |file|
+            FileUtils.ln_s(file, destination, options)
+          end
         end
       end
     end
@@ -708,6 +751,23 @@ module Omnibus
     #
     def log_key
       @log_key ||= "#{super}: #{software.name}"
+    end
+
+    #
+    # Glob across the given pattern, accounting for dotfiles, removing Ruby's
+    # dumb idea to include +'.'+ and +'..'+ as entries.
+    #
+    # @param [String] path
+    #   the path to get all files from
+    #
+    # @return [Array<String>]
+    #   the list of all files
+    #
+    def glob(pattern)
+      Dir.glob(pattern, File::FNM_DOTMATCH).reject do |file|
+        basename = File.basename(file)
+        IGNORED_FILES.include?(basename)
+      end
     end
 
     #

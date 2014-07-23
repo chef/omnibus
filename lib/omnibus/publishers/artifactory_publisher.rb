@@ -127,6 +127,7 @@ module Omnibus
     #
     def remote_path_for(package)
       File.join(
+        Config.artifactory_base_path,
         package.metadata[:name],
         package.metadata[:version],
         package.metadata[:platform],

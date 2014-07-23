@@ -237,6 +237,16 @@ module Omnibus
 
         expect(File.file?(path)).to be_truthy
       end
+
+      it 'creates the containing directory' do
+        path = File.join(tmp_path, 'foo', 'bar', 'file')
+        FileUtils.rm_rf(path)
+
+        subject.touch(path)
+        subject.build
+
+        expect(File.file?(path)).to be_truthy
+      end
     end
 
     describe '#delete' do
@@ -259,6 +269,19 @@ module Omnibus
 
         expect(File.exist?(path)).to be_falsey
       end
+
+      it 'accepts a glob pattern' do
+        path_a = File.join(tmp_path, 'file_a')
+        path_b = File.join(tmp_path, 'file_b')
+        FileUtils.touch(path_a)
+        FileUtils.touch(path_b)
+
+        subject.delete("#{tmp_path}/**/file_*")
+        subject.build
+
+        expect(File.exist?(path_a)).to be_falsey
+        expect(File.exist?(path_b)).to be_falsey
+      end
     end
 
     describe '#copy' do
@@ -272,6 +295,45 @@ module Omnibus
 
         expect(File.file?(path_b)).to be_truthy
         expect(File.read(path_b)).to eq(File.read(path_a))
+      end
+
+      it 'copies the directory and entries' do
+        destination = File.join(tmp_path, 'destination')
+
+        directory = File.join(tmp_path, 'scratch')
+        FileUtils.mkdir_p(directory)
+
+        path_a = File.join(directory, 'file_a')
+        path_b = File.join(directory, 'file_b')
+        FileUtils.touch(path_a)
+        FileUtils.touch(path_b)
+
+        subject.copy(directory, destination)
+        subject.build
+
+        expect(File.exist?(destination)).to be_truthy
+        expect(File.exist?("#{destination}/file_a")).to be_truthy
+        expect(File.exist?("#{destination}/file_b")).to be_truthy
+      end
+
+      it 'accepts a glob pattern' do
+        destination = File.join(tmp_path, 'destination')
+        FileUtils.mkdir_p(destination)
+
+        directory = File.join(tmp_path, 'scratch')
+        FileUtils.mkdir_p(directory)
+
+        path_a = File.join(directory, 'file_a')
+        path_b = File.join(directory, 'file_b')
+        FileUtils.touch(path_a)
+        FileUtils.touch(path_b)
+
+        subject.copy("#{directory}/*", destination)
+        subject.build
+
+        expect(File.exist?(destination)).to be_truthy
+        expect(File.exist?("#{destination}/file_a")).to be_truthy
+        expect(File.exist?("#{destination}/file_b")).to be_truthy
       end
     end
 
@@ -287,6 +349,49 @@ module Omnibus
         expect(File.file?(path_b)).to be_truthy
         expect(File.file?(path_a)).to be_falsey
       end
+
+      it 'moves the directory and entries' do
+        destination = File.join(tmp_path, 'destination')
+
+        directory = File.join(tmp_path, 'scratch')
+        FileUtils.mkdir_p(directory)
+
+        path_a = File.join(directory, 'file_a')
+        path_b = File.join(directory, 'file_b')
+        FileUtils.touch(path_a)
+        FileUtils.touch(path_b)
+
+        subject.move(directory, destination)
+        subject.build
+
+        expect(File.exist?(destination)).to be_truthy
+        expect(File.exist?("#{destination}/file_a")).to be_truthy
+        expect(File.exist?("#{destination}/file_b")).to be_truthy
+
+        expect(File.exist?(directory)).to be_falsey
+      end
+
+      it 'accepts a glob pattern' do
+        destination = File.join(tmp_path, 'destination')
+        FileUtils.mkdir_p(destination)
+
+        directory = File.join(tmp_path, 'scratch')
+        FileUtils.mkdir_p(directory)
+
+        path_a = File.join(directory, 'file_a')
+        path_b = File.join(directory, 'file_b')
+        FileUtils.touch(path_a)
+        FileUtils.touch(path_b)
+
+        subject.move("#{directory}/*", destination)
+        subject.build
+
+        expect(File.exist?(destination)).to be_truthy
+        expect(File.exist?("#{destination}/file_a")).to be_truthy
+        expect(File.exist?("#{destination}/file_b")).to be_truthy
+
+        expect(File.exist?(directory)).to be_truthy
+      end
     end
 
     describe '#link' do
@@ -299,6 +404,36 @@ module Omnibus
         subject.build
 
         expect(File.symlink?(path_b)).to be_truthy
+      end
+
+      it 'links the directory' do
+        destination = File.join(tmp_path, 'destination')
+        directory = File.join(tmp_path, 'scratch')
+        FileUtils.mkdir_p(directory)
+
+        subject.link(directory, destination)
+        subject.build
+
+        expect(File.symlink?(destination)).to be_truthy
+      end
+
+      it 'accepts a glob pattern' do
+        destination = File.join(tmp_path, 'destination')
+        FileUtils.mkdir_p(destination)
+
+        directory = File.join(tmp_path, 'scratch')
+        FileUtils.mkdir_p(directory)
+
+        path_a = File.join(directory, 'file_a')
+        path_b = File.join(directory, 'file_b')
+        FileUtils.touch(path_a)
+        FileUtils.touch(path_b)
+
+        subject.link("#{directory}/*", destination)
+        subject.build
+
+        expect(File.symlink?("#{destination}/file_a")).to be_truthy
+        expect(File.symlink?("#{destination}/file_b")).to be_truthy
       end
     end
   end
