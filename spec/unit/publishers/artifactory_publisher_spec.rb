@@ -44,7 +44,10 @@ module Omnibus
     subject { described_class.new(path, repository: repository) }
 
     describe '#publish' do
-      before { allow(subject).to receive(:packages).and_return(packages) }
+      before do
+        allow(subject).to receive(:packages).and_return(packages)
+        Config.artifactory_base_path('com/getchef')
+      end
 
       it 'validates the package' do
         expect(package).to receive(:validate!).once
@@ -54,7 +57,7 @@ module Omnibus
       it 'uploads the package' do
         expect(artifact).to receive(:upload).with(
           repository,
-          'chef/11.0.6/ubuntu/14.04/chef.deb',
+          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
           an_instance_of(Hash)
         ).once
 

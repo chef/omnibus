@@ -298,6 +298,15 @@ module Omnibus
       raise MissingConfigOption.new(:artifactory_password, "'password'")
     end
 
+    # The base path artifacts are published to. This is usually maps to
+    # the artifacts's organization. AKA `orgPath` in the Artifactory
+    # world.
+    #
+    # @return [String]
+    default(:artifactory_base_path) do
+      raise MissingConfigOption.new(:artifactory_base_path, "'com/mycompany'")
+    end
+
     # The path on disk to an SSL pem file to sign requests with.
     #
     # @return [String, nil]
