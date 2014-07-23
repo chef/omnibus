@@ -96,6 +96,26 @@ module Omnibus
         end
       end
 
+      context 'when an alternate platform and platform version are provided' do
+        subject do
+          described_class.new(path,
+            platform: 'debian',
+            platform_version: '7',
+          )
+        end
+
+        it 'overrides the platform and platform version used for publishing' do
+          expect(client).to receive(:store).with(
+            'debian/7/x86_64/chef.deb/chef.deb',
+            package.content,
+            access: :private,
+            content_md5: package.metadata[:md5],
+          ).once
+
+          subject.publish
+        end
+      end
+
       context 'when a block is given' do
         it 'yields the package to the block' do
           block = ->(package) { package.do_something! }
