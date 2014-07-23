@@ -8,10 +8,10 @@ Gem::Specification.new do |gem|
   gem.version        = Omnibus::VERSION
   gem.license        = 'Apache 2.0'
   gem.author         = 'Chef Software, Inc.'
-  gem.email          = 'info@getchef.com'
-  gem.description    = 'Omnibus helps you build self-installing, full-stack software builds.'
-  gem.summary        = gem.description
-  gem.homepage       = 'https://github.com/opscode/omnibus-ruby'
+  gem.email          = 'releng@getchef.com'
+  gem.summary        = 'Omnibus is a framework for building self-installing, full-stack software builds.'
+  gem.description    = gem.summary
+  gem.homepage       = 'https://github.com/opscode/omnibus'
 
   gem.required_ruby_version = '>= 1.9.1'
 

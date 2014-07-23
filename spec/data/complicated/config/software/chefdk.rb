@@ -48,7 +48,7 @@ env = {
 
 build do
   # Nasty hack to set the artifact version until this gets fixed:
-  # https://github.com/opscode/omnibus-ruby/issues/134
+  # https://github.com/opscode/omnibus/issues/134
   block do
     project = self.project
     if project.name == "chefdk"

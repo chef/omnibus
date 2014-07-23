@@ -1,10 +1,10 @@
 ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 ===========================================================
 [![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
-[![Build Status](http://img.shields.io/travis/opscode/omnibus-ruby.svg)][travis]
+[![Build Status](http://img.shields.io/travis/opscode/omnibus.svg)][travis]
 
 [gem]: https://rubygems.org/gems/omnibus
-[travis]: http://travis-ci.org/opscode/omnibus-ruby
+[travis]: http://travis-ci.org/opscode/omnibus
 
 Easily create full-stack installers for your project across a variety of platforms.
 
@@ -81,7 +81,7 @@ s3_secret_key  ENV['S3_SECRET_KEY']
 s3_bucket      ENV['S3_BUCKET']
 ```
 
-For more information, please see the [`Config` documentation](http://rubydoc.info/github/opscode/omnibus-ruby/Omnibus/Config).
+For more information, please see the [`Config` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Config).
 
 You can tell Omnibus to load a difference configuration file by passing the `--config` option to any command:
 
@@ -122,7 +122,7 @@ Some DSL methods available include:
 | `build_iteration` | The package iteration number                |
 | `dependency`      | An Omnibus software-defined component to include in this package |
 
-For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus-ruby/Omnibus/Project).
+For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
 
 
 ### Software
@@ -183,7 +183,7 @@ end
 
 Since the software definitions are simply ruby code, you can conditionally execute anything by wrapping it with pure Ruby that tests for the version number.
 
-For more DSL methods, please consult the [`Software` documentation](http://rubydoc.info/github/opscode/omnibus-ruby/Omnibus/Software).
+For more DSL methods, please consult the [`Software` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Software).
 
 #### Sharing software definitions
 The easiest way to share organization-wide software is via bundler and Rubygems. For an example software repository, look at Chef's [omnibus-software](https://github.com/opscode/omnibus-software). For more information, please see the [Rubygems documentation](http://guides.rubygems.org/publishing/).

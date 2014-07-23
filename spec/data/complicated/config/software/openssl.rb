@@ -140,7 +140,7 @@ build do
   # openssl build process uses a `makedepend` tool that we build inside the bundle.
   env["PATH"] = "#{install_dir}/embedded/bin" + File::PATH_SEPARATOR + ENV["PATH"]
 
-  # @todo: move into omnibus-ruby
+  # @todo: move into omnibus
   has_gmake = system("gmake --version")
 
   if has_gmake

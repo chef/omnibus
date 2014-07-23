@@ -57,11 +57,11 @@ build do
   #
   #####################################################################
   #
-  # since omnibus-ruby is not architected to intentionally let the
+  # since omnibus is not architected to intentionally let the
   # software definitions define the #build_version and
   # #build_iteration of the package artifact, we're going to implement
   # a temporary hack here that lets us do so. this type of use case
-  # will become a feature of omnibus-ruby in the future, but in order
+  # will become a feature of omnibus in the future, but in order
   # to get things shipped, we'll hack it up here.
   #
   # <3 Stephen
