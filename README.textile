@@ -1,0 +1,289 @@
+h1. This project is DEPRECATED
+
+%{color:red}It has been rewritten in Ruby, please see the following projects:%
+
+http://github.com/opscode/omnibus-ruby
+http://github.com/opscode/omnibus-chef
+http://github.com/opscode/omnibus-software
+
+h2. Introduction
+
+omnibus helps you build self-installing, full-stack software builds.  For
+example, we want to distribute the Chef client pre-bundled with its
+dependencies: ruby, required gems, etc.  The result is a single installable
+shell-script that can be executed on the client side, installing Chef, and
+configuring it.
+
+omnibus starts with the idea of a "project", which is comprised of a name,
+version, and a build order.  The build order references various "software"
+packages, which are compiled and installed to a specific path on the
+filesystem. (For the chef-full project, this would be /opt/opscode).
+
+h2. Using omnibus
+
+To start using omnibus, you need a few dependencies:
+
+* Java - either the Sun JDK, or the Open JDK
+* Leiningen
+* Your operating systems base build utilities - gcc, autoconf, etc.
+
+To install Leiningen, follow the instructions here: http://github.com/technomancy/leiningen
+
+Once you have Leiningen installed, run:
+
+$ lein deps
+
+From the top of the omnibus source tree.
+
+To start a build:
+(make sure the project includes the 'prep' step which will create the appropriate directories)
+
+$ lein repl
+omnibus.core=> (build-fat-binary "chef-full")
+
+The results will be in ./pkg when the build is complete.
+
+h2. Adding software to omnibus
+
+To add new software to omnibus, you want to extract it and commit the source in the './source' directory.  Then add a configuration to config/software.  For example, to build gdbm:
+
+  1. Download the source for gdbm-1.8.3
+  2. Unpacked it in ./source
+  3. Removed the tarball
+  4. Added the following configuration in config/software/gdbm.clj
+
+bc. (software "gdbm" :source "gdbm-1.8.3"
+                 :steps [["./configure" "--prefix=/opt/opscode/embedded"]
+                         (if (is-os? "darwin") ["perl" "-pi" "-e" "s/BINOWN = bin/BINOWN = root/g" "Makefile"])
+                         (if (is-os? "darwin") ["perl" "-pi" "-e" "s/BINGRP = bin/BINGRP = wheel/g" "Makefile"])
+                         ["make"]
+                         ["sudo" "make" "install"]])
+
+The :source field should be the name of the directory created by unpacking the tarball.  The steps are a vector of vectors, each of which corresponds to a build step.  These steps are passed directly to clojure.java.sh/sh, which will execute them directly. You can use two handy functions to make the build be different based on operating system or machine architecture: is-os? and is-machine?.
+
+h2. Adding software to a project
+
+In config/projects, you will find the actual project definitions themselves.  These contain a name for the project, a version number, and the build order.  For the chef client:
+
+bc. (project
+  "chef-full"
+  "0.9.8"
+  [ "zlib" "libiconv" "db" "gdbm" "ncurses" "openssl" "libxml2" "libxslt" "ree" "rubygems" "rsync" "chef" ])
+
+The build order will run in order.
+
+Enjoy!
+
+h2. The full build process
+
+If you want to kick off a full build, the easiest way is with:
+
+bc. $ sudo lein run --project-name "chef-full" --bucket-name FULL_STACK --s3-access-key "ACCESS_KEY" --s3-secret-key "SECRET_KEY"
+
+The resulting build artifact will be dropped off in the S3 bucket named above. If you want to submit a build to us, drop it off in your own bucket, and let us know where and how to test the final product.
+
+For Windows the enclosed PowerShell script takes care of writing out the correct chef-solo json file nad executing the build
+via chef-solo.
+
+bc. powershell C:\omnibus\build-omnibus.ps1 "chef-client" "S3_BUCKET_NAME" "ACCESS_KEY" "SECRET_KEY"
+
+h2. Operating System Prep
+
+h3. Fedora 15
+
+bc. yum update -y
+yum install -y gcc gcc-c++ kernel-devel make autoconf flex bison git java-1.6.0-openjdk java-1.6.0-openjdk-devel ruby ruby-libs ruby-devel ruby-docs ruby-ri ruby-irb ruby-rdoc ruby-mode rubygems rpm-build libxml2 libxml2-devel libxslt libxslt-devel wget automake help2man libtool gettext texinfo which
+gem install fpm ohai --no-rdoc --no-ri
+wget https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. SL 6
+
+bc. yum update -y
+yum install -y gcc gcc-c++ kernel-devel make autoconf flex bison git java-1.6.0-openjdk java-1.6.0-openjdk-devel ruby ruby-libs ruby-devel ruby-docs ruby-ri ruby-irb ruby-rdoc ruby-mode rubygems rpm-build libxml2 libxml2-devel libxslt libxslt-devel wget automake help2man libtool gettext texinfo
+gem install fpm ohai --no-rdoc --no-ri
+wget https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. CentOS 5
+
+bc. wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+rpm -Uvh epel-release-5-4.noarch.rpm
+yum update -y
+yum install -y gcc44 gcc-c++44 gcc gcc-c++ kernel-devel make autoconf flex bison git java-1.6.0-openjdk java-1.6.0-openjdk-devel ruby ruby-libs ruby-devel ruby-docs ruby-ri ruby-irb ruby-rdoc ruby-mode rubygems rpm-build libxml2 libxml2-devel libxslt libxslt-devel wget automake help2man libtool gettext texinfo
+gem install fpm ohai --no-rdoc --no-ri
+wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. Debian 6
+
+bc. apt-get update -y
+apt-get -y install build-essential binutils-doc autoconf flex bison git-core openjdk-6-jdk default-jdk ruby ruby1.8 ruby1.8-dev rdoc1.8 irb1.8 ri1.8 libopenssl-ruby1.8 rubygems libtool dpkg-dev libxml2 libxml2-dev libxslt1.1 libxslt1-dev help2man gettext
+update-java-alternatives -s java-6-openjdk
+gem install fpm ohai --no-rdoc --no-ri
+ln -s /var/lib/gems/1.8/bin/* /usr/local/bin
+wget https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. Ubuntu 10.04
+
+bc. apt-get update -y
+apt-get -y install build-essential binutils-doc autoconf flex bison git-core openjdk-6-jdk default-jdk ruby ruby1.8 ruby1.8-dev rdoc1.8 irb1.8 ri1.8 libopenssl-ruby1.8 rubygems libtool dpkg-dev libxml2 libxml2-dev libxslt1.1 libxslt1-dev help2man gettext texinfo
+update-java-alternatives -s java-6-openjdk
+gem install fpm ohai --no-rdoc --no-ri
+ln -s /var/lib/gems/1.8/bin/* /usr/local/bin
+wget https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. Ubuntu 11.04
+
+bc. apt-get update -y
+apt-get -y install build-essential binutils-doc autoconf flex bison git-core openjdk-6-jdk default-jdk ruby ruby1.8 ruby1.8-dev rdoc1.8 irb1.8 ri1.8 libopenssl-ruby1.8 rubygems libtool dpkg-dev libxml2 libxml2-dev libxslt1.1 libxslt1-dev help2man gettext texinfo
+update-java-alternatives -s java-6-openjdk
+gem install fpm ohai --no-rdoc --no-ri
+ln -s /var/lib/gems/1.8/bin/* /usr/local/bin
+wget https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. OS X 10.6 (Snow Leopard)
+
+bc. # install Xcode
+# install Java
+# install git - http://code.google.com/p/git-osx-installer/
+curl https://raw.github.com/technomancy/leiningen/stable/bin/lein > lein
+sudo mkdir /usr/local/bin/lein && sudo mv lein /usr/local/bin && sudo chmod 755 /usr/local/bin/lein
+lein self-install
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. Joyent Smartmachine
+
+bc. pkgin up
+pkgin in autoconf-2.68 gtexinfo bison flex
+wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. OpenIndiana 148
+
+bc. #!/bin/bash
+# Notes
+# pkg:/developer/gcc-3 is required over gcc-43, as Ruby was built with gcc3.
+# Ruby build requires the same compiler to build extensions as was used to build
+# Ruby itself.
+# Need to use /opt/opscode/embedded/bin/autoconf?
+# ln -s /usr/bin/automake-110 /usr/bin/automake
+pkg install pkg:/developer/build/autoconf \
+pkg:/developer/build/automake-110 \
+pkg:/developer/build/gnu-make \
+pkg:/developer/build/libtool \
+pkg:/developer/build/make \
+pkg:/developer/gcc-3
+pkg:/developer/java/jdk \
+pkg:/developer/lexer/flex \
+pkg:/developer/library/lint \
+pkg:/developer/linker \
+pkg:/developer/macro/cpp \
+pkg:/developer/object-file \
+pkg:/developer/parser/bison \
+pkg:/developer/versioning/git \
+pkg:/file/gnu-coreutils \
+pkg:/library/libxml2 \
+pkg:/library/libxslt \
+pkg:/ruby-dev \
+pkg:/runtime/ruby-18 \
+pkg:/system/header \
+pkg:/system/library/math \
+pkg:/system/library/math/header-math \
+pkg:/system/xopen/xcu4 \
+pkg:/text/gnu-gettext \
+pkg:/text/texinfo \
+pkg:/web/wget \
+pkg:/compatibility/ucb \
+pkg:/text/gnu-sed
+gem update
+gem install json_pure
+mv /var/ruby/1.8/gem_home/gems/json-1.4.6 /tmp ; ln -s /var/ruby/1.8/gem_home/gems/json-1.5.1 /var/ruby/1.8/gem_home/gems/json-1.4.6
+gem install ohai -v=0.5.8
+gem install fpm
+
+h3. FreeBSD 8.2
+
+bc. portsnap fetch update
+cd /usr/ports/ports-mgmt/portupgrade && make && make install # Be sure that BATCH=yes
+portupgrade -a -m BATCH=yes # Upgrade all ports
+portinstall lang/python26 devel/autoconf textproc/flex devel/bison devel/git java/openjdk6 lang/ruby19 devel/gmake
+gem update
+gem install ohai
+gem install fpm
+wget --no-check-certificate https://github.com/technomancy/leiningen/raw/stable/bin/lein && mv lein /usr/local/bin && chmod 755 /usr/local/bin/lein
+git clone git://github.com/opscode/omnibus.git
+cd omnibus
+mkdir build
+lein deps
+
+h3. Windows
+
+Run in PowerShell 2.0+.  "*Set-ExecutionPolicy RemoteSigned*" must be set on the target machine if run as a 'ps1' script (vs pasted into PowerShell).
+
+The chef-solo based build process has been tested on under Ruby 1.8.7 and Chef Solo 0.10.4.
+
+bc.. $client = new-object System.Net.WebClient
+
+# download/install Git
+$client.DownloadFile("http://msysgit.googlecode.com/files/Git-1.7.6-preview20110708.exe","$ENV:TEMP\gitinstaller.exe")
+Start-Process -FilePath "$ENV:TEMP\gitinstaller.exe" '/verysilent /dir="C:\git"' -Wait
+[Environment]::SetEnvironmentVariable( "Path", "$ENV:PATH;C:\git\cmd", [System.EnvironmentVariableTarget]::Machine )
+
+# download/install Ruby
+$client.DownloadFile("http://files.rubyforge.vm.bytemark.co.uk/rubyinstaller/rubyinstaller-1.8.7-p334.exe","$ENV:TEMP\rubyinstaller.exe")
+Start-Process -FilePath "$ENV:TEMP\rubyinstaller.exe" '/verysilent /dir="C:\ruby" /tasks="assocfiles,modpath"' -Wait
+
+# add Ruby and Git to the PATH and persist it
+$ENV:PATH = "$ENV:PATH;C:\ruby\bin;C:\git\cmd"
+[Environment]::SetEnvironmentVariable("PATH", $ENV:PATH, "Machine")
+
+# download/install Ruby DevKit
+$client.DownloadFile("http://cloud.github.com/downloads/oneclick/rubyinstaller/DevKit-tdm-32-4.5.1-20101214-1400-sfx.exe","$ENV:TEMP\rubydevkit.exe")
+New-Item C:\DevKit -type directory
+Copy-Item $ENV:TEMP\rubydevkit.exe c:\DevKit
+Start-Process -FilePath "C:\DevKit\rubydevkit.exe" '-y' -Wait
+Start-Process -FilePath "ruby.exe" 'C:\DevKit\dk.rb init' -Wait
+Start-Process -FilePath "ruby.exe" 'C:\DevKit\dk.rb install' -Wait
+
+# install required gems
+Start-Process -FilePath "gem" 'install win32-api win32-service --platform=mswin32 --no-rdoc --no-ri' -Wait
+Start-Process -FilePath "gem" 'install win32-open3 rdp-ruby-wmi windows-api windows-pr win32-process --no-rdoc --no-ri' -Wait
+Start-Process -FilePath "gem" 'install chef -v 0.10.4 --no-rdoc --no-ri --verbose' -Wait
+
+# check out omnibus code
+Start-Process -FilePath "git" 'clone git://github.com/opscode/omnibus.git C:\omnibus' -Wait -NoNewWindow
+
+# this will allow execution of local scripts (.ps1 files)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
+
+h2. Bundled software and licensing
+
+All software under the "source" directory retains the license by which it was originally distributed.

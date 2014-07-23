@@ -1,0 +1,14 @@
+pom.xml
+.lein-deps-sum
+*jar
+/source/chef-server-cookbooks/cache
+/build/
+/classes/
+/lib/
+/pkg/
+/redhat/BUILDROOT/
+/build-output/*
+/chef-repo/build-output/*
+/chef-repo/.chef/cache/*
+/chef-repo/.chef/backup/*
+/chef-repo/.chef/omnibus.json
