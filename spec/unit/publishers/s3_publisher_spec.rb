@@ -39,18 +39,6 @@ module Omnibus
 
     subject { described_class.new(path) }
 
-    describe '#initialize' do
-      it 'raises an exception when publish_s3_access_key is missing' do
-        expect { Config.publish_s3_access_key }
-          .to raise_error(MissingConfigOption)
-      end
-
-      it 'raises an exception when release_s3_secret_key is missing' do
-        expect { Config.publish_s3_secret_key }
-          .to raise_error(MissingConfigOption)
-      end
-    end
-
     describe '#publish' do
       before { allow(subject).to receive(:packages).and_return(packages) }
 
