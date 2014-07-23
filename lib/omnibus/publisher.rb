@@ -41,6 +41,18 @@ module Omnibus
     def initialize(pattern, options = {})
       @pattern = pattern
       @options = options.dup
+
+      if @options[:platform]
+        log.warn(log_key) do
+          "Publishing platform has been overriden to '#{@options[:platform]}'"
+        end
+      end
+
+      if @options[:platform_version]
+        log.warn(log_key) do
+          "Publishing platform version has been overriden to '#{@options[:platform_version]}'"
+        end
+      end
     end
 
     #
@@ -66,6 +78,45 @@ module Omnibus
     end
 
     private
+
+    #
+    # The platform to publish a package for. A publisher can be optionally
+    # initialized with a platform which should be used in all publishing
+    # logic. This allows a package built on one platform to be published
+    # for another platform. For example, one might build on Ubuntu and
+    # test/publish on Ubuntu and Debian.
+    #
+    # @note Even if a glob pattern matches multiple packages (potentially
+    #   across multiple platforms) all packages will be published for the
+    #   same platform.
+    #
+    # @param [Package] package
+    #
+    # @return [String]
+    #
+    def publish_platform(package)
+      @options[:platform] || package.metadata[:platform]
+    end
+
+    #
+    # The platform version to publish a package for. A publisher can be
+    # optionally initialized with a platform version which should be used
+    # in all publishing logic. This allows a package built on one
+    # platform to be published for another platform version. For example,
+    # one might build on Ubuntu 10.04 and test/publish on Ubuntu 10.04
+    # and 12.04.
+    #
+    # @note Even if a glob pattern matches multiple packages (potentially
+    #   across multiple platforms) all packages will be published for the
+    #   same platform version.
+    #
+    # @param [Package] package
+    #
+    # @return [String]
+    #
+    def publish_platform_version(package)
+      @options[:platform_version] || package.metadata[:platform_version]
+    end
 
     def safe_require(name)
       require name
