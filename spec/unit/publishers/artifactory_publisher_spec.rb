@@ -43,8 +43,33 @@ module Omnibus
 
     subject { described_class.new(path, repository: repository) }
 
+    describe '#initialize' do
+      it 'raises an exception when artifactory_endpoint is missing' do
+        expect { Config.artifactory_endpoint }
+          .to raise_error(MissingConfigOption)
+      end
+
+      it 'raises an exception when artifactory_username is missing' do
+        expect { Config.artifactory_username }
+          .to raise_error(MissingConfigOption)
+      end
+
+      it 'raises an exception when artifactory_password is missing' do
+        expect { Config.artifactory_password }
+          .to raise_error(MissingConfigOption)
+      end
+
+      it 'raises an exception when artifactory_base_path is missing' do
+        expect { Config.artifactory_base_path }
+          .to raise_error(MissingConfigOption)
+      end
+    end
+
     describe '#publish' do
-      before { allow(subject).to receive(:packages).and_return(packages) }
+      before do
+        allow(subject).to receive(:packages).and_return(packages)
+        Config.artifactory_base_path('com/getchef')
+      end
 
       it 'validates the package' do
         expect(package).to receive(:validate!).once
@@ -54,7 +79,7 @@ module Omnibus
       it 'uploads the package' do
         expect(artifact).to receive(:upload).with(
           repository,
-          'chef/11.0.6/ubuntu/14.04/chef.deb',
+          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
           an_instance_of(Hash)
         ).once
 
