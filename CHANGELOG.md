@@ -1,8 +1,8 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v3.2.0.rc.3 (July 21, 2014)
----------------------------
+v3.2.0 (July 23, 2014)
+----------------------
 - Make build commands output during `log.info` instead of `log.debug`
 - Refactor Chef Sugar into an includable module, permitting DSL methods in both Software and Project definitions
 - Refactor `omnibus release` into a non-S3-specific backend "publisher"
@@ -48,7 +48,7 @@ v3.2.0.rc.3 (July 21, 2014)
 - Add `with_embedded_path` to software
 - Add `with_standard_compiler_flags` to software
 - Add `package_scripts_path` to project
-- Add builder DSL methods for `mkdir`, `touch`, `delete`, `copy`, `move`, and `link`
+- Add builder DSL methods for `mkdir`, `touch`, `delete`, `copy`, `move`, `link`, and `sync`
 
 ### Bug fixes
 - Fix a small typo in the project generator (come -> some)
@@ -70,6 +70,7 @@ v3.2.0.rc.3 (July 21, 2014)
 - Require `net/http`, `net/https`, and `net/ftp` in the base fetcher module
 - Use -R, not -W1 on FreeBSD's compile flags
 - Expand all paths relative to the project_root
+- Unset all Ruby, Bundler, amd Gem-related environment variables before shelling out
 - Various documentation fixes and updates
 
 ### Potentially breaking changes
@@ -80,6 +81,7 @@ v3.2.0.rc.3 (July 21, 2014)
 - Remove the ability to use an overrides file - this was for internal use only and was never exposed as a public API. However, if you dug into the code and found it, it has now been removed. For BC purposes, the value still exists in the configuration object, but is essentially a no-op
 - Move project loading from INFO to DEBUG
 - Truncate platforms to short versions
+- All paths are represented internally as Unix-style paths - previously Omnibus would try to intelligently build your paths differently on Windows for the purposes of shelling out to the system. This proved to be unmaintainable and makes Ruby very unhappy in most circumsatances. As such, we have exposed the `windows_safe_path` method in the Builder DSL that will convert a string to a "Windows-safe path". This is only needed when shelling out to the system.
 
 
 v3.1.1 (May 20, 2014)
