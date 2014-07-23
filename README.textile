@@ -1,10 +1,8 @@
 h1. This project is DEPRECATED
 
-%{color:red}It has been rewritten in Ruby, please see the following projects:%
-
-http://github.com/opscode/omnibus-ruby
-http://github.com/opscode/omnibus-chef
-http://github.com/opscode/omnibus-software
+This branch and clojure-based implementation is deprecated. Please use the
+master or stable branches of this project. This code is only present for legacy
+purposes and is no longer working, tested, or supported in any way.
 
 h2. Introduction
 
