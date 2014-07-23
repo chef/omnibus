@@ -436,5 +436,108 @@ module Omnibus
         expect(File.symlink?("#{destination}/file_b")).to be_truthy
       end
     end
+
+    describe '#sync' do
+      let(:source) do
+        source = File.join(tmp_path, 'source')
+        FileUtils.mkdir_p(source)
+
+        FileUtils.touch(File.join(source, 'file_a'))
+        FileUtils.touch(File.join(source, 'file_b'))
+        FileUtils.touch(File.join(source, 'file_c'))
+
+        FileUtils.mkdir_p(File.join(source, 'folder'))
+        FileUtils.touch(File.join(source, 'folder', 'file_d'))
+        FileUtils.touch(File.join(source, 'folder', 'file_e'))
+
+        FileUtils.mkdir_p(File.join(source, '.dot_folder'))
+        FileUtils.touch(File.join(source, '.dot_folder', 'file_f'))
+
+        FileUtils.touch(File.join(source, '.file_g'))
+        source
+      end
+
+      let(:destination) { File.join(tmp_path, 'destination') }
+
+      context 'when the destination is empty' do
+        it 'syncs the directories' do
+          subject.sync(source, destination)
+          subject.build
+
+          expect(File.file?("#{destination}/file_a")).to be_truthy
+          expect(File.file?("#{destination}/file_b")).to be_truthy
+          expect(File.file?("#{destination}/file_c")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
+          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_truthy
+          expect(File.file?("#{destination}/.file_g")).to be_truthy
+        end
+      end
+
+      context 'when the directory exists' do
+        before { FileUtils.mkdir_p(destination) }
+
+        it 'deletes existing files and folders' do
+          FileUtils.mkdir_p("#{destination}/existing_folder")
+          FileUtils.mkdir_p("#{destination}/.existing_folder")
+          FileUtils.touch("#{destination}/existing_file")
+          FileUtils.touch("#{destination}/.existing_file")
+
+          subject.sync(source, destination)
+          subject.build
+
+          expect(File.file?("#{destination}/file_a")).to be_truthy
+          expect(File.file?("#{destination}/file_b")).to be_truthy
+          expect(File.file?("#{destination}/file_c")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
+          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_truthy
+          expect(File.file?("#{destination}/.file_g")).to be_truthy
+
+          expect(File.exist?("#{destination}/existing_folder")).to be_falsey
+          expect(File.exist?("#{destination}/.existing_folder")).to be_falsey
+          expect(File.exist?("#{destination}/existing_file")).to be_falsey
+          expect(File.exist?("#{destination}/.existing_file")).to be_falsey
+        end
+      end
+
+      context 'when :exclude is given' do
+        it 'does not copy files and folders that match the pattern' do
+          subject.sync(source, destination, exclude: '.dot_folder')
+          subject.build
+
+          expect(File.file?("#{destination}/file_a")).to be_truthy
+          expect(File.file?("#{destination}/file_b")).to be_truthy
+          expect(File.file?("#{destination}/file_c")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
+          expect(File.exist?("#{destination}/.dot_folder")).to be_falsey
+          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_falsey
+          expect(File.file?("#{destination}/.file_g")).to be_truthy
+        end
+
+        it 'removes existing files and folders in destination' do
+          FileUtils.mkdir_p("#{destination}/existing_folder")
+          FileUtils.touch("#{destination}/existing_file")
+          FileUtils.mkdir_p("#{destination}/.dot_folder")
+          FileUtils.touch("#{destination}/.dot_folder/file_f")
+
+          subject.sync(source, destination, exclude: '.dot_folder')
+          subject.build
+
+          expect(File.file?("#{destination}/file_a")).to be_truthy
+          expect(File.file?("#{destination}/file_b")).to be_truthy
+          expect(File.file?("#{destination}/file_c")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
+          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
+          expect(File.exist?("#{destination}/.dot_folder")).to be_falsey
+          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_falsey
+          expect(File.file?("#{destination}/.file_g")).to be_truthy
+
+          expect(File.exist?("#{destination}/existing_folder")).to be_falsey
+          expect(File.exist?("#{destination}/existing_file")).to be_falsey
+        end
+      end
+    end
   end
 end
