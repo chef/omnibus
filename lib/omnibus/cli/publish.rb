@@ -18,6 +18,21 @@ module Omnibus
   class Command::Publish < Command::Base
     namespace :publish
 
+    # These options are useful for publish packages that were built for a
+    # paticluar platform/version and tested on another platform/version.
+    #
+    # For example, one might build on Ubuntu 10.04 and test/publish on
+    # Ubuntu 11.04, 12.04 and Debian 7.
+    #
+    # If these options are used with the glob pattern support all packages
+    # will be published to the same platform/version.
+    class_option :platform,
+      desc: 'The platform to publish for',
+      type: :string
+    class_option :platform_version,
+      desc: 'The platform version to publish for',
+      type: :string
+
     #
     # Publish to S3.
     #
