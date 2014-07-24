@@ -118,7 +118,7 @@ module Omnibus
     describe '#copy_directory' do
       before do
         allow(FileUtils).to receive(:cp_r)
-        allow(Dir).to receive(:[]).and_return(['baz/file'])
+        allow(FileSyncer).to receive(:glob).and_return(['baz/file'])
       end
 
       it 'copies the directory' do
