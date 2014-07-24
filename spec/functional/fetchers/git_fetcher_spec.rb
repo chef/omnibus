@@ -45,10 +45,8 @@ module Omnibus
     end
 
     describe '#version_guid' do
-      let(:revision) { '744d47c9152f7a06582d2076175bc60a80c9b169' }
-
       it 'includes the current revision' do
-        expect(subject.version_guid).to eq("git:#{revision}")
+        expect(subject.version_guid).to match(/^git:[0-9a-f]{40}/)
       end
     end
 
