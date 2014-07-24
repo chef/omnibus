@@ -83,16 +83,13 @@ module Omnibus
     end
 
     describe '#fetch' do
-      let(:files) { %w(/foo /bar) }
-
       before do
         allow(subject).to receive(:create_required_directories)
-        allow(Dir).to receive(:glob).and_return(files)
+        allow(FileSyncer).to receive(:sync)
       end
 
       it 'copies the new files over' do
-        expect(FileUtils).to receive(:cp_r)
-          .with(files, "#{project_dir}/")
+        expect(FileSyncer).to receive(:sync).with(source_path, project_dir)
         subject.fetch
       end
     end
