@@ -71,19 +71,6 @@ module Omnibus
       @project = project
     end
 
-    # Hacky way to get around the fact that older versions of Omnibus used to
-    # delegate magical methods to this DSL.
-    #
-    # @deprecated Use +project+ methods instead
-    def method_missing(m, *args, &block)
-      if project.respond_to?(m)
-        log.deprecated("#{log_key}##{m}") { "#{m}. Please use project.#{m} instead." }
-        project.send(m, *args, &block)
-      else
-        super
-      end
-    end
-
     # @deprecated
     def version
       log.deprecated("#{log_key}#version") { 'version. Please use project.build_version instead.' }
