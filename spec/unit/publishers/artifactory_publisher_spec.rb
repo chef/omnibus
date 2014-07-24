@@ -58,10 +58,30 @@ module Omnibus
         expect(artifact).to receive(:upload).with(
           repository,
           'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
-          an_instance_of(Hash)
+          an_instance_of(Hash),
         ).once
 
         subject.publish
+      end
+
+      context 'when an alternate platform and platform version are provided' do
+        subject do
+          described_class.new(path,
+            repository: repository,
+            platform: 'debian',
+            platform_version: '7',
+          )
+        end
+
+        it 'overrides the platform and platform version used for publishing' do
+          expect(artifact).to receive(:upload).with(
+            repository,
+            'com/getchef/chef/11.0.6/debian/7/chef.deb',
+            an_instance_of(Hash),
+          ).once
+
+          subject.publish
+        end
       end
 
       context 'when a block is given' do
