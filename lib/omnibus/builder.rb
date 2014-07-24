@@ -140,8 +140,6 @@ module Omnibus
     # The maximum number of build jobs, as computed from Ohai data. If the Ohai
     # data is unavailable, +3+ is used.
     #
-    # @todo Should this be moved to {Software}?
-    #
     # @example
     #   command "make install -j#{max_build_jobs}"
     #
