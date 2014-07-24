@@ -31,8 +31,8 @@ module Omnibus
       #
       # @return [Software]
       #
-      def load(project, filepath, overrides = {})
-        instance = new(project, overrides, filepath)
+      def load(project, filepath)
+        instance = new(project, filepath)
         instance.evaluate_file(filepath)
         instance
       end
@@ -50,14 +50,12 @@ module Omnibus
     # @param [String] NullBuilder.new(self)
     # @param [Project] project
     #   the Omnibus project that instantiated this software definition
-    # @param [Hash] repo_overrides
-    #   @see Omnibus::Overrides
     # @param [String] filepath
     #   the path to where this software definition lives on disk
     #
     # @return [Software]
     #
-    def initialize(project, repo_overrides = {}, filepath = nil)
+    def initialize(project, filepath = nil)
       unless project.is_a?(Project)
         raise ArgumentError,
           "`project' must be a kind of `Omnibus::Project', but was `#{project.class.inspect}'!"
@@ -68,8 +66,7 @@ module Omnibus
       @project  = project
 
       # Overrides
-      @overrides      = NULL
-      @repo_overrides = repo_overrides
+      @overrides = NULL
     end
 
     #
@@ -592,9 +589,6 @@ module Omnibus
         # lazily initialized because we need the 'name' to be parsed first
         @overrides = {}
         @overrides = project.overrides[name.to_sym].dup if project.overrides[name.to_sym]
-        if @repo_overrides[name]
-          @overrides[:version] = @repo_overrides[name]
-        end
       end
 
       @overrides

@@ -2,28 +2,21 @@ require 'spec_helper'
 
 module Omnibus
   describe Software do
-    let(:software_name) { 'erchef' }
-    let(:software_file) { software_path(software_name) }
+    let(:project) do
+      Project.new.evaluate do
+        name 'project'
+        install_dir '/opt/project'
+      end
+    end
 
-    let(:project) {
-      project = double(Project,
-        name: 'chef',
-        install_dir: '/monkeys',
-        shasum: 'ABCD1234',
-        overrides: {}
-      )
+    subject do
+      described_class.new(project).evaluate do
+        name 'software'
+        default_version '1.2.3'
 
-      allow(project).to receive(:is_a?)
-        .with(Project)
-        .and_return(true)
-
-      project
-    }
-
-    subject { Software.load(project, software_file) }
-
-    before do
-      allow_any_instance_of(Software).to receive(:render_tasks)
+        source url: 'http://example.com/',
+               md5: 'abcd1234'
+      end
     end
 
     it_behaves_like 'a cleanroom getter', :project
@@ -57,35 +50,35 @@ module Omnibus
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
-            'CFLAGS'          => '-I/monkeys/embedded/include',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
         it 'ovesrride LDFLAGS' do
           expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
-            'CFLAGS'          => '-I/monkeys/embedded/include',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
         it 'ovesrride CFLAGS' do
           expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
-            'CFLAGS'          => '-I/monkeys/embedded/include',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
         it 'presserve anything else' do
           expect(subject.with_standard_compiler_flags('numberwang'=>4)).to eq(
             'numberwang'      => 4,
-            'LDFLAGS'         => '-Wl,-rpath,/monkeys/embedded/lib -L/monkeys/embedded/lib',
-            'CFLAGS'          => '-I/monkeys/embedded/include',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
       end
@@ -100,11 +93,11 @@ module Omnibus
 
         it 'sets the defaults' do
           expect(subject.with_standard_compiler_flags).to eq(
-            'LDFLAGS'         => '-R/monkeys/embedded/lib -L/monkeys/embedded/lib -static-libgcc',
-            'CFLAGS'          => '-I/monkeys/embedded/include',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'LD_OPTIONS'      => '-R/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'LD_OPTIONS'      => '-R/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
       end
@@ -114,10 +107,10 @@ module Omnibus
 
         it 'sets the defaults' do
           expect(subject.with_standard_compiler_flags).to eq(
-            'LDFLAGS'         => '-L/monkeys/embedded/lib',
-            'CFLAGS'          => '-I/monkeys/embedded/include',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LDFLAGS'         => '-L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
       end
@@ -134,13 +127,13 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'CC'              => 'xlc -q64',
             'CXX'             => 'xlC -q64',
-            'CFLAGS'          => '-q64 -I/monkeys/embedded/include -O',
-            'LDFLAGS'         => '-q64 -L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib',
+            'CFLAGS'          => '-q64 -I/opt/project/embedded/include -O',
+            'LDFLAGS'         => '-q64 -L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
             'ARFLAGS'         => '-X64 cru',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
       end
@@ -157,13 +150,13 @@ module Omnibus
           expect(subject.with_standard_compiler_flags(nil, aix: { use_gcc: true })).to eq(
             'CC'              => 'gcc -maix64',
             'CXX'             => 'g++ -maix64',
-            'CFLAGS'          => '-maix64 -O -I/monkeys/embedded/include',
-            'LDFLAGS'         => '-L/monkeys/embedded/lib -Wl,-blibpath:/monkeys/embedded/lib:/usr/lib:/lib',
+            'CFLAGS'          => '-maix64 -O -I/opt/project/embedded/include',
+            'LDFLAGS'         => '-L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
             'ARFLAGS'         => '-X64 cru',
-            'LD_RUN_PATH'     => '/monkeys/embedded/lib',
-            'PKG_CONFIG_PATH' => '/monkeys/embedded/lib/pkgconfig'
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
       end
@@ -187,14 +180,14 @@ module Omnibus
 
         it 'prepends the embedded bin to PATH' do
           expect(subject.with_embedded_path).to eq(
-            'PATH' => '/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+            'PATH' => '/opt/project/bin:/opt/project/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
           )
         end
 
         it 'with_embedded_path merges with a hash argument' do
           expect(subject.with_embedded_path('numberwang' => 4)).to eq(
             'numberwang' => 4,
-            'PATH' => '/monkeys/bin:/monkeys/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+            'PATH' => '/opt/project/bin:/opt/project/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
           )
         end
 
@@ -208,7 +201,7 @@ module Omnibus
       context 'on Windows' do
         before do
           stub_ohai(platform: 'windows', version: '2012')
-          allow(project).to receive(:install_dir).and_return('c:/monkeys')
+          allow(project).to receive(:install_dir).and_return('c:/opt/project')
           stub_env('Path', windows_path)
         end
 
@@ -224,14 +217,14 @@ module Omnibus
 
         it 'prepends the embedded bin to PATH' do
           expect(subject.with_embedded_path).to eq(
-            'Path' => 'c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
+            'Path' => 'c:/opt/project/bin;c:/opt/project/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
           )
         end
 
         it 'with_embedded_path merges with a hash argument' do
           expect(subject.with_embedded_path('numberwang' => 4)).to eq(
             'numberwang' => 4,
-            'Path' => 'c:/monkeys/bin;c:/monkeys/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
+            'Path' => 'c:/opt/project/bin;c:/opt/project/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
           )
         end
 
@@ -244,13 +237,12 @@ module Omnibus
     end
 
     describe '#<=>' do
-      let(:zlib)   { Software.new(project).tap { |s| s.name('zlib') } }
-      let(:erchef) { Software.new(project).tap { |s| s.name('erchef') } }
-      let(:bacon)  { Software.new(project).tap { |s| s.name('bacon') } }
+      let(:zlib)   { described_class.new(project).tap { |s| s.name('zlib') } }
+      let(:erchef) { described_class.new(project).tap { |s| s.name('erchef') } }
+      let(:bacon)  { described_class.new(project).tap { |s| s.name('bacon') } }
 
       it 'compares projects by name' do
         list = [zlib, erchef, bacon]
-
         expect(list.sort.map(&:name)).to eq(%w(bacon erchef zlib))
       end
     end
@@ -270,93 +262,38 @@ module Omnibus
     end
 
     context 'testing repo-level version overrides' do
-      let(:software_name) { 'zlib' }
-      let(:default_version) { '1.2.6' }
-      let(:expected_version) { '1.2.6' }
-      let(:expected_override_version) { nil }
-      let(:expected_md5) { '618e944d7c7cd6521551e30b32322f4a' }
-      let(:expected_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.6/zlib-1.2.6.tar.gz' }
-
-      shared_examples_for 'a software definition' do
-        it 'should have the same name' do
-          expect(subject.name).to eq(software_name)
-        end
-
-        it 'should have the same version' do
-          expect(subject.version).to eq(expected_version)
-        end
-
-        it 'should have the right default_version' do
-          expect(subject.default_version).to eq(default_version)
-        end
-
-        it 'should have nil for an override_version' do
-          expect(subject.override_version).to eq(expected_override_version)
-        end
-
-        it 'should have the right source md5' do
-          expect(subject.source[:md5]).to eq(expected_md5)
-        end
-
-        it 'should have the right source url' do
-          expect(subject.source[:url]).to eq(expected_url)
-        end
-
-        it 'should have the right checksum' do
-          expect(subject.checksum).to eq(expected_md5)
-        end
-
-        it 'should have the right source_uri' do
-          expect(subject.source_uri).to eq(URI.parse(expected_url))
-        end
-      end
-
       context 'without overrides' do
-        it_behaves_like 'a software definition'
+        it 'returns the original values' do
+          expect(subject.version).to eq('1.2.3')
+          expect(subject.source).to eq(url: 'http://example.com/', md5: 'abcd1234')
+        end
       end
 
       context 'with overrides for different software' do
-        let(:overrides) { { 'chaos_monkey' => '1.2.8' } }
-        subject { Software.load(project, software_file, overrides) }
+        before { project.override(:chaos_monkey, version: '1.2.8') }
 
-        it_behaves_like 'a software definition'
+        it 'does not change the software' do
+          expect(subject.version).to eq('1.2.3')
+        end
       end
 
       context 'with overrides for this software' do
-        let(:expected_version) { '1.2.8' }
-        let(:expected_override_version) { '1.2.8' }
-        let(:overrides) { { software_name => expected_override_version } }
-        let(:expected_md5) { '44d667c142d7cda120332623eab69f40' }
-        let(:expected_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz' }
+        context 'version' do
+          let(:version) { '2.0.0.pre' }
+          before { project.override(:software, version: '2.0.0.pre') }
 
-        subject { Software.load(project, software_file, overrides) }
-
-        it_behaves_like 'a software definition'
-      end
-
-      context 'with an overide in the project' do
-        let(:expected_version) { '1.2.8' }
-        let(:expected_override_version) { '1.2.8' }
-        let(:expected_md5) { '44d667c142d7cda120332623eab69f40' }
-        let(:expected_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz' }
-
-        before do
-          allow(project).to receive(:overrides)
-            .and_return(zlib: { version: '1.2.8' })
+          it 'returns the correct version' do
+            expect(subject.version).to eq(version)
+          end
         end
 
-        it_behaves_like 'a software definition'
+        context 'source' do
+          let(:source) { { url: 'http://new.example.com', md5: 'defg5678' } }
+          before { project.override(:software, source: source) }
 
-        context 'with the source overridden' do
-          let(:expected_md5) { '1234567890' }
-          let(:expected_url) { 'http://foo.bar/zlib-1.2.8.tar.gz' }
-
-          before do
-            allow(project).to receive(:overrides)
-              .and_return(zlib: { version: '1.2.8', source: { url: expected_url, md5: expected_md5 } })
+          it 'returns the correct source' do
+            expect(subject.source).to eq(source)
           end
-
-          it_behaves_like 'a software definition'
         end
       end
     end
@@ -364,7 +301,7 @@ module Omnibus
     context 'while getting version_for_cache' do
       let(:fetcher) { nil }
       let(:software_name) { 'zlib' }
-      let(:default_version) { '1.2.6' }
+      let(:default_version) { '1.2.3' }
 
       def get_version_for_cache(expected_version)
         subject.instance_variable_set(:@fetcher, fetcher)
@@ -373,7 +310,7 @@ module Omnibus
 
       context 'without a fetcher' do
         it 'should return the default version' do
-          get_version_for_cache('1.2.6')
+          get_version_for_cache('1.2.3')
         end
       end
 
@@ -381,7 +318,7 @@ module Omnibus
         let(:fetcher) { NetFetcher.new(subject) }
 
         it 'should return the default version' do
-          get_version_for_cache('1.2.6')
+          get_version_for_cache('1.2.3')
         end
       end
 
@@ -403,12 +340,7 @@ module Omnibus
         let(:path) { '/software.rb' }
         let(:file) { double(File) }
 
-        subject do
-          software = described_class.new(project, {}, path)
-          software.name('software')
-          software.version('1.0.0')
-          software
-        end
+        before { subject.instance_variable_set(:@filepath, path) }
 
         before do
           allow(File).to receive(:exist?)
@@ -420,20 +352,15 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('348b605ee8e8325ad32a4837f0784aa2203b19a87a820dd4456dd5a798a62713')
+          expect(subject.shasum).to eq('3d870ac0c5cfb08f9015c3ad9a5a600b403d5ca421e69fc51a7efd5279b53827')
         end
       end
 
       context 'when a filepath is not given' do
-        subject do
-          software = described_class.new(project, {})
-          software.name('software')
-          software.version('1.0.0')
-          software
-        end
+        before { subject.send(:remove_instance_variable, :@filepath) }
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('333f0052cc38f15e7f6c4d5b3e2a5337a01888f621e162476ecbf5eb91ae8a30')
+          expect(subject.shasum).to eq('f0a5ec68c2cc658a35c5dcf4dc88d6fe1dd8cce9b1649e8d43601d8f1e543598')
         end
       end
     end

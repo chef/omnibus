@@ -43,7 +43,7 @@ module Omnibus
       @name         = software.name
       @checksum     = software.checksum
       @source       = software.source
-      @project_file = software.project_file
+      @project_file = software.downloaded_file
       @source_uri   = software.source_uri
       @project_dir  = software.project_dir
       super
