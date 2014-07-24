@@ -615,21 +615,6 @@ module Omnibus
     # @!endgroup
     # --------------------------------------------------
 
-    #
-    # Retieve the {#default_version} of the software.
-    #
-    # @deprecated Use {#default_version} instead.
-    #
-    # @return [String]
-    #
-    def given_version
-      log.deprecated(log_key) do
-        'Software#given_version. Please use #default_version instead.'
-      end
-
-      default_version
-    end
-
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
     def version_guid
       Fetcher.for(self).version_guid
