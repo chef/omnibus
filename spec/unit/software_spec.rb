@@ -41,7 +41,7 @@ module Omnibus
       let(:uri) { URI.parse('http://example.com/foo.tar.gz') }
       before { allow(subject).to receive(:source_uri).and_return(uri) }
 
-      it_behaves_like 'a cleanroom getter', :downloaded_file
+      it_behaves_like 'a cleanroom getter', :project_file
     end
 
     describe "with_standard_compiler_flags helper" do
