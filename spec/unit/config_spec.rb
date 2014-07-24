@@ -31,7 +31,6 @@ module Omnibus
     include_examples 'a configurable', :base_dir, '/var/cache/omnibus'
     include_examples 'a configurable', :cache_dir, '/var/cache/omnibus/cache'
     include_examples 'a configurable', :git_cache_dir, '/var/cache/omnibus/cache/git_cache'
-    include_examples 'a configurable', :install_path_cache_dir, '/var/cache/omnibus/cache/git_cache'
     include_examples 'a configurable', :source_dir, '/var/cache/omnibus/src'
     include_examples 'a configurable', :build_dir, '/var/cache/omnibus/build'
     include_examples 'a configurable', :package_dir, '/var/cache/omnibus/pkg'
@@ -60,7 +59,6 @@ module Omnibus
       include_examples 'a configurable', :base_dir, 'C:/omnibus-ruby'
       include_examples 'a configurable', :cache_dir, 'C:/omnibus-ruby/cache'
       include_examples 'a configurable', :git_cache_dir, 'C:/omnibus-ruby/cache/git_cache'
-      include_examples 'a configurable', :install_path_cache_dir, 'C:/omnibus-ruby/cache/git_cache'
       include_examples 'a configurable', :source_dir, 'C:/omnibus-ruby/src'
       include_examples 'a configurable', :build_dir, 'C:/omnibus-ruby/build'
       include_examples 'a configurable', :package_dir, 'C:/omnibus-ruby/pkg'
@@ -72,28 +70,10 @@ module Omnibus
 
       include_examples 'a configurable', :cache_dir, '/foo/bar/cache'
       include_examples 'a configurable', :git_cache_dir, '/foo/bar/cache/git_cache'
-      include_examples 'a configurable', :install_path_cache_dir, '/foo/bar/cache/git_cache'
       include_examples 'a configurable', :source_dir, '/foo/bar/src'
       include_examples 'a configurable', :build_dir, '/foo/bar/build'
       include_examples 'a configurable', :package_dir, '/foo/bar/pkg'
       include_examples 'a configurable', :package_tmp, '/foo/bar/pkg-tmp'
-    end
-
-    context '#install_path_cache_dir' do
-      it 'is deprecated' do
-        expect(Omnibus.logger).to receive(:deprecated).with('Config')
-        described_class.install_path_cache_dir
-      end
-
-      it 'defaults to #git_cache_dir' do
-        expect(described_class.install_path_cache_dir).to eq(described_class.git_cache_dir)
-      end
-
-      it 'overrides the value of #git_cache_dir when specified' do
-        path = '/magical/path/with/ponies'
-        described_class.install_path_cache_dir(path)
-        expect(described_class.git_cache_dir).to eq(path)
-      end
     end
   end
 end
