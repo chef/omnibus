@@ -19,8 +19,6 @@ require 'open-uri'
 
 module Omnibus
   class NetFetcher < Fetcher
-    include Digestable
-
     # Use 7-zip to extract 7z/zip for Windows
     WIN_7Z_EXTENSIONS = %w(.7z .zip)
 
@@ -216,6 +214,7 @@ module Omnibus
         "tar #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
       end
     end
+
     #
     #
     #
