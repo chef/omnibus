@@ -47,9 +47,10 @@ module Omnibus
     end
 
     describe '#clean' do
+      before { subject.fetch }
+
       context 'when the project directory exists' do
         before do
-          subject.fetch
           create_file("#{project_dir}/file_a")
         end
 
