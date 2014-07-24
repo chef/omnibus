@@ -782,9 +782,8 @@ module Omnibus
     #
     def find_file(path, source)
       # Search for patches just like we search for software
-      candidate_paths = Omnibus.software_dirs.map do |directory|
-        full_path = directory.sub(Config.software_dir, path)
-        "#{full_path}/#{software.name}/#{source}"
+      candidate_paths = Omnibus.possible_paths_for(path).map do |directory|
+        File.join(directory, software.name, source)
       end
 
       file = candidate_paths.find { |path| File.exist?(path) }

@@ -145,21 +145,15 @@ module Omnibus
       Config.load(file)
     end
 
-    # Processes the configuration to construct the dependency tree of
-    # projects and software.
-    #
-    # @return [void]
-    def process_configuration
-      process_dsl_files
-    end
-
     #
     # All {Project} instances that have been loaded.
     #
     # @return [Array<:Project>]
     #
     def projects
-      _projects.values
+      project_map.map do |name, _|
+        Project.load(name)
+      end
     end
 
     #
@@ -171,7 +165,7 @@ module Omnibus
     # @return [Project]
     #
     def project(name)
-      _projects[name.to_s]
+      Project.load(name)
     end
 
     #
@@ -183,50 +177,80 @@ module Omnibus
       @source_root ||= Pathname.new(File.expand_path('../..', __FILE__))
     end
 
-    # Processes all configured {Omnibus::Project} and
-    # {Omnibus::Software} DSL files.
     #
-    # @return [void]
-    def process_dsl_files
-      expand_software
+    # The preferred filepath to a project with the given name on disk.
+    #
+    # @return [String, nil]
+    #
+    def project_path(name)
+      project_map[name.to_s]
     end
 
     #
-    # The list of directories to search for {Software} files. These paths are
-    # returned **in order** of specifity.
+    # The preferred filepath to a software with the given name on disk.
     #
-    # @see (Config#project_root)
-    # @see (Config#software_dir)
-    # @see (Config#software_gems)
-    # @see (Config#local_software_dirs)
+    # @return [String, nil]
+    #
+    def software_path(name)
+      software_map[name.to_s]
+    end
+
+    #
+    # The list of directories to search for the given +path+. These paths are
+    # returned **in order** of specificity.
+    #
+    # @param [String] path
+    #   the subpath to search for
     #
     # @return [Array<String>]
     #
-    def software_dirs
-      return @software_dirs if @software_dirs
-
-      directories = [
+    def possible_paths_for(path)
+      possible_paths[path] ||= [
         paths_from_project_root,
         paths_from_local_software_dirs,
         paths_from_software_gems,
-      ].flatten
+      ].flatten.inject([]) do |array, directory|
+        destination = File.join(directory, path)
 
-      @software_dirs = directories.inject([]) do |array, directory|
-        softwares_path = File.join(directory, Config.software_dir)
-
-        if File.directory?(softwares_path)
-          array << softwares_path
-        else
-          Omnibus.logger.warn('Omnibus') do
-            "`#{directory}' does not contain a valid directory structure. " \
-            "Does it contain a folder at `#{Config.software_dir}'?"
-          end
+        if File.directory?(destination)
+          array << destination
         end
 
         array
       end
+    end
 
-      @software_dirs
+    private
+
+    #
+    # The list of possible paths, cached as a hash for quick lookup.
+    #
+    # @see {Omnibus.possible_paths_for}
+    #
+    # @return [Hash]
+    #
+    def possible_paths
+      @possible_paths ||= {}
+    end
+
+    #
+    # Map the given file paths to the basename of their file, with the +.rb+
+    # extension removed.
+    #
+    # @example
+    #   { 'foo' => '/path/to/foo' }
+    #
+    # @return [Hash<String, String>]
+    #
+    def basename_map(paths)
+      paths.inject({}) do |hash, directory|
+        Dir.glob("#{directory}/*.rb").each do |path|
+          name = File.basename(path, '.rb')
+          hash[name] ||= path
+        end
+
+        hash
+      end
     end
 
     #
@@ -241,65 +265,22 @@ module Omnibus
     # @return [Hash<String, String>]
     #
     def software_map
-      return @software_map if @software_map
-
-      @software_map = software_dirs.inject({}) do |hash, directory|
-        Dir.glob("#{directory}/*.rb").each do |path|
-          name = File.basename(path, '.rb')
-
-          if hash[name].nil?
-            Omnibus.logger.debug('Omnibus#software_map') do
-              "Using software `#{name}' from `#{path}'."
-            end
-
-            hash[name] = path
-          else
-            Omnibus.logger.debug('Omnibus#software_map') do
-              "Skipping software `#{name}' because it was loaded from an " \
-              "earlier path."
-            end
-          end
-        end
-
-        hash
-      end
-
-      @software_map
+      @software_map ||= basename_map(possible_paths_for(Config.software_dir))
     end
 
-    private
-
     #
-    # @api private
+    # A hash of all projects (by name) and their respective path on disk. These
+    # files are **in order**, meaning the project path is the **first**
+    # occurrence of the project in the list. If the same project is
+    # encountered a second time, it will be skipped.
     #
-    # The list of omnibus projects. This is an internal API that maps a
-    # project's name to the actual project object.
+    # @example
+    #   { 'chefdk' => '/home/omnibus/project/config/projects/chefdk.rb' }
     #
-    # @return [Hash<String, Project>]
+    # @return [Hash<String, String>]
     #
-    def _projects
-      return @_projects if @_projects
-
-      path = File.expand_path(Config.project_dir, Config.project_root)
-      @_projects = Dir.glob("#{path}/*.rb").inject({}) do |hash, path|
-        name = File.basename(path, '.rb')
-
-        if hash[name].nil?
-          Omnibus.logger.debug('Omnibus#projects') do
-            "Using project `#{name}' from `#{path}'."
-          end
-
-          hash[name] = Project.load(path)
-        else
-          Omnibus.logger.debug('Omnibus#projects') do
-            "Skipping project `#{name}' because it was already loaded."
-          end
-        end
-
-        hash
-      end
-
-      @_projects
+    def project_map
+      @project_map ||= basename_map(possible_paths_for(Config.project_dir))
     end
 
     #
@@ -313,7 +294,8 @@ module Omnibus
     # @return [Array<String>]
     #
     def paths_from_project_root
-      [Config.project_root]
+      @paths_from_project_root ||=
+        [Config.project_root]
     end
 
     #
@@ -325,19 +307,16 @@ module Omnibus
     # @return [Array<String>]
     #
     def paths_from_local_software_dirs
-      Array(Config.local_software_dirs).inject([]) do |array, path|
-        fullpath = File.expand_path(path, Config.project_root)
+      @paths_from_local_software_dirs ||=
+        Array(Config.local_software_dirs).inject([]) do |array, path|
+          fullpath = File.expand_path(path, Config.project_root)
 
-        if File.directory?(fullpath)
-          array << fullpath
-        else
-          Omnibus.logger.warn('Omnibus') do
-            "Could not load softwares from path `#{fullpath}'. Does it exist?"
+          if File.directory?(fullpath)
+            array << fullpath
           end
-        end
 
-        array
-      end
+          array
+        end
     end
 
     #
@@ -351,59 +330,14 @@ module Omnibus
     # @return [Array<String>]
     #
     def paths_from_software_gems
-      Array(Config.software_gems).inject([]) do |array, name|
-        if (spec = Gem::Specification.find_all_by_name(name).first)
-          array << File.expand_path(spec.gem_dir)
-        else
-          Omnibus.logger.warn('Omnibus') do
-            "Could not load softwares from gem `#{name}'. Is it installed?"
+      @paths_from_software_gems ||=
+        Array(Config.software_gems).inject([]) do |array, name|
+          if (spec = Gem::Specification.find_all_by_name(name).first)
+            array << File.expand_path(spec.gem_dir)
           end
+
+          array
         end
-
-        array
-      end
-    end
-
-    #
-    # Generate {Software} objects for all software DSL files in
-    # +software_specs+.
-    #
-    # @return [void]
-    #
-    def expand_software
-      Omnibus.projects.each do |project|
-        project.dependencies.each do |dependency|
-          recursively_load_dependency(dependency, project)
-        end
-      end
-    end
-
-    #
-    # Loads a project's dependencies recursively, ensuring all transitive
-    # dependencies are also loaded in the correct order.
-    #
-    # @param [String] dependency
-    #   the name of the dependency
-    # @param [Project] project
-    #   the project that loaded the software
-    #
-    # @return [void]
-    #
-    def recursively_load_dependency(dependency, project)
-      filepath = software_map[dependency]
-
-      if filepath.nil?
-        raise MissingProjectDependency.new(dependency, software_dirs)
-      end
-
-      software = Software.load(project, filepath)
-
-      # load any transitive deps for the component into the library also
-      software.dependencies.each do |transitive_dependency|
-        recursively_load_dependency(transitive_dependency, project)
-      end
-
-      project.library.component_added(software)
     end
   end
 end

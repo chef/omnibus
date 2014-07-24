@@ -4,6 +4,5 @@ Feature: omnibus build
     * I run `omnibus build bacon`
     * the output should contain:
       """
-      I could not find an Omnibus project named 'bacon'! Valid projects are:
-        * hamlet
+      I could not find a project named `bacon' in any of the project locations:
       """

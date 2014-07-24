@@ -18,39 +18,53 @@ describe Omnibus do
     Omnibus::Config.software_gems(['omnibus-software', 'custom-omnibus-software'])
   end
 
-  describe '#software_dirs' do
-    let(:software_dirs) { Omnibus.software_dirs }
-
-    it 'includes project_root' do
-      expect(software_dirs).to include('/foo/bar/config/software')
+  describe '#project_path' do
+    before do
+      allow(Omnibus).to receive(:project_map)
+        .and_return('chef' => '/projects/chef')
     end
 
-    it 'includes local_software_dirs dirs' do
-      expect(software_dirs).to include('/local/config/software')
-      expect(software_dirs).to include('/other/config/software')
+    it 'accepts a string' do
+      expect(subject.project_path('chef')).to eq('/projects/chef')
     end
 
-    it 'includes software_gems dirs' do
-      expect(software_dirs).to include('/gem/omnibus-software/config/software')
-      expect(software_dirs).to include('/gem/custom-omnibus-software/config/software')
+    it 'accepts a symbol' do
+      expect(subject.project_path(:chef)).to eq('/projects/chef')
     end
 
-    it 'has the correct precedence order' do
-      expect(software_dirs).to eq([
-        '/foo/bar/config/software',
-        '/local/config/software',
-        '/other/config/software',
-        '/gem/omnibus-software/config/software',
-        '/gem/custom-omnibus-software/config/software',
-      ])
+    it 'returns nil when the project does not exist' do
+      expect(subject.project_path('bacon')).to be nil
     end
   end
 
-  describe '#software_map' do
-    let(:software_map) { Omnibus.send(:software_map) }
+  describe '#software_path' do
+    before do
+      allow(Omnibus).to receive(:software_map)
+        .and_return('chef' => '/software/chef')
+    end
 
-    it 'returns a hash' do
-      expect(software_map).to be_a(Hash)
+    it 'accepts a string' do
+      expect(subject.software_path('chef')).to eq('/software/chef')
+    end
+
+    it 'accepts a symbol' do
+      expect(subject.software_path(:chef)).to eq('/software/chef')
+    end
+
+    it 'returns nil when the project does not exist' do
+      expect(subject.software_path('bacon')).to be nil
+    end
+  end
+
+  describe '#possible_paths_for' do
+    it 'searches all paths' do
+      expect(subject.possible_paths_for('file')).to eq(%w(
+        /foo/bar/file
+        /local/file
+        /other/file
+        /gem/omnibus-software/file
+        /gem/custom-omnibus-software/file
+      ))
     end
   end
 end

@@ -79,9 +79,6 @@ module Omnibus
           log.debug { "Skipping option '#{key}' - not a config option" }
         end
       end
-
-      log.debug { 'Processing Omnibus configuration...' }
-      Omnibus.process_configuration
     end
 
     class_option :config,
