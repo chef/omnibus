@@ -315,7 +315,7 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('3d870ac0c5cfb08f9015c3ad9a5a600b403d5ca421e69fc51a7efd5279b53827')
+          expect(subject.shasum).to eq('69dcce6da5580abe1da581e3f09d81e13ac676c48790eb0aa44d0ca2f93a16de')
         end
       end
 
@@ -323,7 +323,7 @@ module Omnibus
         before { subject.send(:remove_instance_variable, :@filepath) }
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('f0a5ec68c2cc658a35c5dcf4dc88d6fe1dd8cce9b1649e8d43601d8f1e543598')
+          expect(subject.shasum).to eq('acd88f56f17b7cbc146f351a9265b652bcf96d544821e7bc1e9663c80617276d')
         end
       end
     end
