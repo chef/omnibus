@@ -257,9 +257,6 @@ module Omnibus
     #     source path: '/local/path/to/software-1.2.3'
     #   end
     #
-    # @deprecated passing only a string without a block to set the version is
-    #   deprecated. Please use {#default_version} instead.
-    #
     # @param [String] val
     #   the version of the software
     #
@@ -277,13 +274,6 @@ module Omnibus
           if val == apply_overrides(:version)
             yield
           end
-        end
-      else
-        unless val.equal?(NULL)
-          log.deprecated(log_key) do
-            'Software#version. Please use #default_version instead.'
-          end
-          @version = val
         end
       end
 
