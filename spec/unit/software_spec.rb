@@ -289,18 +289,6 @@ module Omnibus
       end
     end
 
-    describe '#given_version' do
-      it 'returns the version' do
-        allow(subject).to receive(:default_version).and_return('4.5.6')
-        expect(subject.given_version).to eq('4.5.6')
-      end
-
-      it 'outputs a deprecation message' do
-        output = capture_logging { subject.given_version }
-        expect(output).to include('DEPRECATED')
-      end
-    end
-
     describe '#version' do
       it 'sets the given version' do
         subject.version('1.2.3')
