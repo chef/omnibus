@@ -508,40 +508,6 @@ module Omnibus
     expose :prepend_path
 
     #
-    # The list of software dependencies for this software. These is the software
-    # that comprises your software, and is distinct from runtime dependencies.
-    #
-    # @deprecated Use {#dependency} instead (as a setter; the getter will stay)
-    #
-    # @todo Remove the "setter" part of this method and unexpose it as part of
-    # the DSL in the next major release
-    #
-    # @see #dependency
-    #
-    # @param [Array<String>]
-    #
-    # @return [Array<String>]
-    #
-    def dependencies(*args)
-      @dependencies ||= []
-
-      # Handle the case where an array or list of args were given
-      flattened_args = Array(args).flatten
-
-      if flattened_args.empty?
-        @dependencies
-      else
-        log.deprecated(log_key) do
-          "dependencies (DSL). Please specify each dependency on its own " \
-          "line like `dependency '#{flattened_args.first}'`."
-        end
-
-        @dependencies = flattened_args
-      end
-    end
-    expose :dependencies
-
-    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -581,6 +547,20 @@ module Omnibus
       else
         false
       end
+    end
+
+    #
+    # The list of software dependencies for this software. These is the software
+    # that comprises your software, and is distinct from runtime dependencies.
+    #
+    # @see #dependency
+    #
+    # @param [Array<String>]
+    #
+    # @return [Array<String>]
+    #
+    def dependencies
+      @dependencies ||= []
     end
 
     #
