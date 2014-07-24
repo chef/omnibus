@@ -27,7 +27,6 @@ module Omnibus
     end
 
     it_behaves_like 'a cleanroom getter', :project
-    it_behaves_like 'a cleanroom getter', :override_version
     it_behaves_like 'a cleanroom setter', :name, %|name 'libxml2'|
     it_behaves_like 'a cleanroom setter', :description, %|description 'The XML magician'|
     it_behaves_like 'a cleanroom setter', :always_build, %|always_build true|
@@ -274,18 +273,6 @@ module Omnibus
         subject.whitelist_file 'foo/bar'
         expect(subject.whitelist_files.size).to eq(1)
         expect(subject.whitelist_files.first).to be_kind_of(Regexp)
-      end
-    end
-
-    describe '#override_version' do
-      it 'returns the override version' do
-        allow(subject).to receive(:overrides).and_return(version: '1.2.3')
-        expect(subject.override_version).to eq('1.2.3')
-      end
-
-      it 'outputs a deprecation message' do
-        output = capture_logging { subject.override_version }
-        expect(output).to include('DEPRECATED')
       end
     end
 
