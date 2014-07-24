@@ -234,36 +234,6 @@ module Omnibus
       end
     end
 
-    #
-    # A hash of all softwares (by name) and their respective path on disk. These
-    # files are **in order**, meaning the software path is the **first**
-    # occurrence of the software in the list. If the same software is
-    # encountered a second time, it will be skipped.
-    #
-    # @example
-    #   { 'preparation' => '/home/omnibus/project/config/software/preparation.rb' }
-    #
-    # @return [Hash<String, String>]
-    #
-    def software_map
-      @software_map ||= basename_map(possible_paths_for(Config.software_dir))
-    end
-
-    #
-    # A hash of all projects (by name) and their respective path on disk. These
-    # files are **in order**, meaning the project path is the **first**
-    # occurrence of the project in the list. If the same project is
-    # encountered a second time, it will be skipped.
-    #
-    # @example
-    #   { 'chefdk' => '/home/omnibus/project/config/projects/chefdk.rb' }
-    #
-    # @return [Hash<String, String>]
-    #
-    def project_map
-      @project_map ||= basename_map(possible_paths_for(Config.project_dir))
-    end
-
     private
 
     #
@@ -295,6 +265,36 @@ module Omnibus
 
         hash
       end
+    end
+
+    #
+    # A hash of all softwares (by name) and their respective path on disk. These
+    # files are **in order**, meaning the software path is the **first**
+    # occurrence of the software in the list. If the same software is
+    # encountered a second time, it will be skipped.
+    #
+    # @example
+    #   { 'preparation' => '/home/omnibus/project/config/software/preparation.rb' }
+    #
+    # @return [Hash<String, String>]
+    #
+    def software_map
+      @software_map ||= basename_map(possible_paths_for(Config.software_dir))
+    end
+
+    #
+    # A hash of all projects (by name) and their respective path on disk. These
+    # files are **in order**, meaning the project path is the **first**
+    # occurrence of the project in the list. If the same project is
+    # encountered a second time, it will be skipped.
+    #
+    # @example
+    #   { 'chefdk' => '/home/omnibus/project/config/projects/chefdk.rb' }
+    #
+    # @return [Hash<String, String>]
+    #
+    def project_map
+      @project_map ||= basename_map(possible_paths_for(Config.project_dir))
     end
 
     #

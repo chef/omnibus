@@ -177,9 +177,9 @@ should never use the replaces line.
   class MissingProject < Error
     def initialize(name)
       super <<-EOH
-I could not find a project name `#{name}' in any of the sources:"
+I could not find a project named `#{name}' in any of the project locations:"
 
-    #{Omnibus.project_map.values.join("\n    ")}
+    #{Omnibus.possible_paths_for(Config.project_dir).join("\n    ")}
 EOH
     end
   end
@@ -187,9 +187,9 @@ EOH
   class MissingSoftware < Error
     def initialize(name)
       super <<-EOH
-I could not find a software name `#{name}' in any of the sources:"
+I could not find a software named `#{name}' in any of the software locations:"
 
-    #{Omnibus.software_map.values.join("\n    ")}
+    #{Omnibus.possible_paths_for(Config.software_dir).join("\n    ")}
 EOH
     end
   end

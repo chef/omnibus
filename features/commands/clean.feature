@@ -3,7 +3,7 @@ Feature: omnibus clean
     * I run `omnibus clean hamlet`
     * the output should contain:
       """
-      I could not find an Omnibus project named 'hamlet'!
+      I could not find a project named `hamlet' in any of the project locations:
       """
     * the exit status should not be 0
 
