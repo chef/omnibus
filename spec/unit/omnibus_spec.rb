@@ -67,16 +67,4 @@ describe Omnibus do
       ))
     end
   end
-
-  describe '#software_map' do
-    it 'returns a hash' do
-      expect(Omnibus.software_map).to be_a(Hash)
-    end
-  end
-
-  describe '#project_map' do
-    it 'returns a hash' do
-      expect(Omnibus.project_map).to be_a(Hash)
-    end
-  end
 end
