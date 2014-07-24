@@ -18,8 +18,6 @@ require 'fileutils'
 
 module Omnibus
   class PathFetcher < Fetcher
-    include Digestable
-
     #
     # Fetch if the local directory checksum is different than the path directory
     # checksum.
@@ -66,7 +64,7 @@ module Omnibus
       log.info(log_key) { "Copying from `#{source_path}'" }
 
       create_required_directories
-      FileUtils.cp_r(source_path, project_dir)
+      FileSyncer.sync(source_path, project_dir)
     end
 
     #
