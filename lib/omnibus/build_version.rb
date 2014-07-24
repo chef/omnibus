@@ -38,16 +38,6 @@ module Omnibus
     TIMESTAMP_FORMAT = '%Y%m%d%H%M%S'
 
     class << self
-      # @deprecated Use {#semver} or {#git_describe} instead
-      def full
-        log.deprecated(log_key) do
-          'BuildVersion.full. Please use BuildVersion.semver or ' \
-          'BuildVersion.git_describe instead.'
-        end
-
-        new.git_describe
-      end
-
       # @see (BuildVersion#git_describe)
       def git_describe
         new.git_describe
