@@ -87,7 +87,7 @@ module Omnibus
         create_file("#{project_dir}/.file_c")
       end
 
-      let(:sha) { 'e9886eabc1c757bf9b77228f84ce9330a2ecf8b76400509b20a767b0cea2bbc2' }
+      let(:sha) { '69553b23b84e69e095b4a231877b38022b1ffb41ae0ecbba6bb2625410c49f7e' }
 
       it 'includes the source_path and shasum' do
         expect(subject.version_for_cache).to eq("path:#{source_path}|shasum:#{sha}")
