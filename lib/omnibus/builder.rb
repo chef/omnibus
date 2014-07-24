@@ -266,8 +266,6 @@ module Omnibus
     # no validation is performed. As a general rule, you should avoid this
     # method unless you know what you are doing.
     #
-    # TODO: the "name" does nothing right now
-    #
     # @example
     #   block do
     #     # Some complex operation
