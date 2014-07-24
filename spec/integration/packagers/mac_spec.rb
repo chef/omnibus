@@ -2,22 +2,15 @@ require 'spec_helper'
 
 module Omnibus
   describe Packager::MacDmg, :functional, :mac_only do
-    let(:name) { 'sample' }
-    let(:version) { '12.4.0' }
-
     let(:project) do
-      allow(IO).to receive(:read)
-        .with('/project.rb')
-        .and_return <<-EOH.gsub(/^ {10}/, '')
-          name               '#{name}'
-          maintainer         'Chef'
-          homepage           'https://getchef.com'
-          build_version      '#{version}'
-          install_dir        '#{tmp_path}/opt/#{name}'
-          mac_pkg_identifier 'test.pkg.#{name}'
-        EOH
-
-      Project.load('/project.rb')
+      Project.new('/project.rb').evaluate do
+        name               'sample'
+        maintainer         'Chef'
+        homepage           'https://getchef.com'
+        build_version      '12.4.0'
+        install_dir        File.join(tmp_path, 'opt', 'sample')
+        mac_pkg_identifier 'test.pkg.sa,ple'
+      end
     end
 
     let(:mac_packager) { Packager::MacPkg.new(project) }
@@ -48,8 +41,8 @@ module Omnibus
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{Config.package_dir}/#{name}-#{version}-1.pkg"
-      dmg = "#{Config.package_dir}/#{name}-#{version}-1.dmg"
+      pkg = "#{Config.package_dir}/sample-12.4.0-1.pkg"
+      dmg = "#{Config.package_dir}/sample-12.4.0-1.dmg"
 
       expect(pkg).to be_a_file
       expect(dmg).to be_a_file
