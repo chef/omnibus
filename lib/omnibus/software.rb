@@ -98,23 +98,6 @@ module Omnibus
     expose :project
 
     #
-    # Retrieves the overriden version.
-    #
-    # @deprecated Use {#version} or test with {#overridden?} instead.
-    #
-    # @return [Hash]
-    #
-    def override_version
-      log.deprecated(log_key) do
-        'Software#override_version. Please use #version or ' \
-        'test with #overridden?'
-      end
-
-      overrides[:version]
-    end
-    expose :override_version
-
-    #
     # **[Required]** Sets or retreives the name of the software.
     #
     # @example
