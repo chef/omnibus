@@ -354,23 +354,6 @@ module Omnibus
     expose :install_dir
 
     #
-    # Return the architecture of the machine, as determined by Ohai.
-    #
-    # @deprecated Will not be replaced.
-    #
-    # @return [String]
-    #   Either "sparc" or "intel", as appropriate
-    #
-    def architecture
-      log.deprecated(log_key) do
-        "Software#architecture. Please use Ohai['kernel']['machine'] instead."
-      end
-
-      Ohai['kernel']['machine'] =~ /sun/ ? 'sparc' : 'intel'
-    end
-    expose :architecture
-
-    #
     # Define a series of {Builder} DSL commands that are executed to build the
     # software.
     #
