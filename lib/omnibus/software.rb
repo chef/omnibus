@@ -508,22 +508,6 @@ module Omnibus
     expose :prepend_path
 
     #
-    # The cache directory.
-    #
-    # @deprecated Use {Config.cache_dir} instead
-    #
-    # @return [String]
-    #
-    def cache_dir
-      log.deprecated(log_key) do
-        'cache_dir (DSL). Please use Config.cache_dir instead.'
-      end
-
-      Config.cache_dir
-    end
-    expose :cache_dir
-
-    #
     # Convenience method for accessing the global Omnibus configuration object.
     #
     # @deprecated Use {Config} instead
