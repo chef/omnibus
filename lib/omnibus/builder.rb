@@ -573,29 +573,6 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # @!group Deprecated DSL methods
-    #
-    # The following DSL methods are available from within build blocks, but are
-    # deprecated and will be removed in the next major release.
-    # --------------------------------------------------
-
-    #
-    # @deprecated Use {Config.project_root} instead
-    #
-    def project_root
-      Omnibus.logger.deprecated(log_key) do
-        'project_root (DSL). Please use Config.project_root instead.'
-      end
-
-      Config.project_root
-    end
-    expose :project_root
-
-    #
-    # @!endgroup
-    # --------------------------------------------------
-
-    #
     # @!group Public API
     #
     # The following methods are considered part of the public API for a
