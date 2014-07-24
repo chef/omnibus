@@ -23,8 +23,7 @@ module Omnibus
   # @see Omnibus::Project#build_version
   #
   # @note Requires a Git repository
-  # @todo Add class method shortcuts for semver and git_describe
-  #   versions e.g., Omnibus::BuildVersion.semver.
+  #
   # @todo Rename this class to reflect its absolute dependence on running in a
   #   Git repository.
   class BuildVersion
@@ -51,7 +50,8 @@ module Omnibus
 
     # Create a new BuildVersion
     #
-    # @param [String] path      Path from which to read git version information
+    # @param [String] path
+    #   Path from which to read git version information
     def initialize(path = Config.project_root)
       @path = path
     end
@@ -219,13 +219,6 @@ module Omnibus
       commits_regexp = /^.*-(\d+)\-g[0-9a-f]+$/
       match = commits_regexp.match(git_describe)
       match ? match[1].to_i : 0
-    end
-
-    # @todo This method is never called in Omnibus.  Is this even used
-    #   (e.g., in the DSL files)?
-    def development_version?
-      patch = version_composition.last
-      patch.to_i.odd?
     end
 
     # Indicates whether the version represents a pre-release or not, as
