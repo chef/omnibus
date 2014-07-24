@@ -36,7 +36,7 @@ module Omnibus
       Config.build_dmg true
 
       # Point at our sample project fixture
-      Config.project_root "#{fixtures_path}/sample"
+      Config.project_root fixture_path('sample')
 
       # Create the target directory
       FileUtils.mkdir_p(project.install_dir)

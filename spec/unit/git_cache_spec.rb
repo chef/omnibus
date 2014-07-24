@@ -20,8 +20,6 @@ module Omnibus
 
     let(:install_dir) { project.install_dir }
 
-    let(:zlib_config) { software_path('zlib') }
-
     let(:zlib) do
       Software.new(project, 'zlib.rb').evaluate do
         name 'zlib'
