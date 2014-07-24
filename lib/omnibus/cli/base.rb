@@ -111,7 +111,3 @@ module Omnibus
     end
   end
 end
-
-# Include the deprecations from previous versions of Omnibus. This should be
-# removed in the next major version of Omnibus.
-require_relative 'deprecated'
