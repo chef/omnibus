@@ -164,17 +164,6 @@ module Omnibus
       end
     end
 
-    describe 'deprecated full output' do
-      it 'generates a valid git describe version' do
-        expect(BuildVersion.full).to match(valid_git_describe_regex)
-      end
-
-      it 'outputs a deprecation message' do
-        output = capture_logging { BuildVersion.full }
-        expect(output).to include('DEPRECATED')
-      end
-    end
-
     describe '`git describe` command failure' do
       before do
         stderr = <<-STDERR
