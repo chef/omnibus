@@ -893,19 +893,6 @@ module Omnibus
       end
     end
 
-    # Ensures that certain project information has been set
-    #
-    # @todo raise MissingProjectConfiguration instead of printing the warning
-    #   in the next major release
-    #
-    # @return [void]
-    def validate
-      name && install_dir && maintainer && homepage
-      if package_name == replaces
-        log.warn { BadReplacesLine.new.message }
-      end
-    end
-
     #
     # The unique "hash" for this project.
     #
