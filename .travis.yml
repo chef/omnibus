@@ -5,6 +5,8 @@ bundler_args: --jobs 7 --without docs
 
 branches:
   only:
+    - 2.0-stable
+    - 3.0-stable
     - master
 
 script: bundle exec rake travis:ci
