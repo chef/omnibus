@@ -146,20 +146,6 @@ module Omnibus
     end
 
     #
-    # Expand all {Project} and {Software} objects for all DSL files in the
-    # configured paths.
-    #
-    # @return [void]
-    #
-    def process_dsl_files
-      Omnibus.projects.each do |project|
-        project.dependencies.each do |dependency|
-          recursively_load_dependency(dependency, project)
-        end
-      end
-    end
-
-    #
     # All {Project} instances that have been loaded.
     #
     # @return [Array<:Project>]
