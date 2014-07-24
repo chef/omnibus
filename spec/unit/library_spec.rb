@@ -6,8 +6,8 @@ module Omnibus
     # Helper method for generating a fake software definition.
     #
     def generate_software(name, version, dependencies = [])
-      software = Software.new(project, {}, "#{name}.rb")
-      software.name(name.to_s)
+      software = Software.new(project, "#{name}.rb")
+      software.name(name)
       software.version(version)
 
       dependencies.each do |dependency|
@@ -17,7 +17,24 @@ module Omnibus
       software
     end
 
-    let(:project) { Project.load(project_path('chefdk')) }
+    let(:project) do
+      Project.new.evaluate do
+        name          'chef-dk'
+        maintainer    'Chef Software, Inc'
+        homepage      'http://getchef.com'
+        build_version '1.0.0'
+
+        install_dir '/opt/chefdk'
+
+        dependency 'preparation'
+        dependency 'erchef'
+        dependency 'postgresql'
+        dependency 'ruby'
+        dependency 'chef'
+        dependency 'chefdk'
+      end
+    end
+
     let(:library) { Library.new(project) }
 
     let(:bundler)     { generate_software('bundler', '1.5.4') }
@@ -52,26 +69,6 @@ module Omnibus
     end
 
     describe '#build_order' do
-      let(:project) do
-        allow(IO).to receive(:read)
-          .with('/chef-server.rb')
-          .and_return <<-EOH.gsub(/^ {12}/, '')
-            name          'chef-server'
-            maintainer    'Chef Software, Inc'
-            homepage      'http://getchef.com'
-            build_version '1.0.0'
-
-            install_dir '/opt/chef-server'
-
-            dependency 'preparation'
-            dependency 'erchef'
-            dependency 'postgresql'
-            dependency 'chef'
-          EOH
-
-        Project.load('/chef-server.rb')
-      end
-
       let(:library) do
         library = Library.new(project)
         library.component_added(preparation)
@@ -98,28 +95,6 @@ module Omnibus
 
       context 'with a complex dep tree' do
         let(:chefdk) { generate_software('chefdk', '1.0.0.alpha', %w(bundler ruby)) }
-
-        let(:project) do
-          allow(IO).to receive(:read)
-            .with('/chefdk.rb')
-            .and_return <<-EOH.gsub(/^ {12}/, '')
-              name          'chef-dk'
-              maintainer    'Chef Software, Inc'
-              homepage      'http://getchef.com'
-              build_version '1.0.0'
-
-              install_dir '/opt/chefdk'
-
-              dependency 'preparation'
-              dependency 'erchef'
-              dependency 'postgresql'
-              dependency 'ruby'
-              dependency 'chef'
-              dependency 'chefdk'
-            EOH
-
-          Project.load('/chefdk.rb')
-        end
 
         let(:library) do
           # This is the LOAD ORDER
@@ -150,43 +125,7 @@ module Omnibus
               erchef, # project dep
               chef, # project dep
               chefdk, # project dep
-             ])
-        end
-      end
-
-      context 'with real data' do
-        before do
-          Config.project_root(complicated_path)
-
-          # Ohai stuff
-          stub_const('File::ALT_SEPARATOR', '\\')
-          stub_ohai(platform: 'windows', version: '2012')
-
-          Omnibus.process_dsl_files
-        end
-
-        let(:chefdk_windows) do
-          Omnibus.projects.find { |p| p.name.to_s == 'chefdk-windows' }
-        end
-
-        it 'has the right build order for chefdk-windows on windows' do
-          names = chefdk_windows.library.build_order.map { |m| m.name.to_s }
-          expect(names).to eql([
-            'preparation', # via project dep
-            'ruby-windows', # via libyaml-windows trans dep
-            'libyaml-windows', # via ruby-windows trans
-            'ruby-windows-devkit', # via trans dep from chef-windows
-            'bundler', # via trans dep from chef-windows
-            'cacerts', # via chef-windows
-            'chef-windows', # via transitive dep from chefdk
-            'nokogiri', # via test-kitchen
-            'test-kitchen', # via chefdk
-            'appbundler', # via chefdk
-            'berkshelf', # via chefdk
-            'chef-vault', # via chefdk
-            'chefdk', # via project dep
-            'chef-client-msi', # via top level dep
-          ])
+           ])
         end
       end
     end

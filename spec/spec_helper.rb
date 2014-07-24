@@ -6,12 +6,6 @@ require 'fauxhai'
 
 module Omnibus
   module RSpec
-    SPEC_DATA = File.expand_path(File.join(File.dirname(__FILE__), 'data'))
-
-    def complicated_path
-      File.join(SPEC_DATA, 'complicated')
-    end
-
     def fixtures_path
       File.expand_path('../fixtures', __FILE__)
     end

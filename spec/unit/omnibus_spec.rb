@@ -53,25 +53,4 @@ describe Omnibus do
       expect(software_map).to be_a(Hash)
     end
   end
-
-  describe '#process_dsl_files' do
-    before do
-      Omnibus::Config.project_root(complicated_path)
-      stub_ohai(platform: 'ubuntu', version: '12.04')
-    end
-
-    it 'populates the 5 projects' do
-      Omnibus.process_dsl_files
-
-      expect(Omnibus.projects.size).to eq(5)
-
-      names = Omnibus.projects.map(&:name)
-      expect(names).to include('angrychef')
-      expect(names).to include('chef-windows')
-      expect(names).to include('chef')
-      expect(names).to include('chefdk-windows')
-      expect(names).to include('chefdk')
-    end
-
-  end
 end
