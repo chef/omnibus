@@ -2,28 +2,20 @@ require 'spec_helper'
 
 module Omnibus
   describe GitCache do
-    before do
-      allow(IO).to receive(:read).and_call_original
-    end
-
     let(:project) do
-      allow(IO).to receive(:read)
-        .with('/path/to/demo.rb')
-        .and_return <<-EOH.gsub(/^ {10}/, '')
-          name 'demo'
-          install_dir '/opt/demo'
+      Project.new('/path/to/demo.rb').evaluate do
+        name 'demo'
+        install_dir '/opt/demo'
 
-          build_version '1.0.0'
+        build_version '1.0.0'
 
-          maintainer 'Chef Software, Inc'
-          homepage 'http://getchef.com'
+        maintainer 'Chef Software, Inc'
+        homepage 'http://getchef.com'
 
-          dependency 'preparation'
-          dependency 'snoopy'
-          dependency 'zlib'
-        EOH
-
-      Project.load('/path/to/demo.rb')
+        dependency 'preparation'
+        dependency 'snoopy'
+        dependency 'zlib'
+      end
     end
 
     let(:install_dir) { project.install_dir }
@@ -31,24 +23,24 @@ module Omnibus
     let(:zlib_config) { File.join(RSpec::SPEC_DATA, 'software', 'zlib.rb') }
 
     let(:zlib) do
-      software = Software.new(project, {}, zlib_config)
-      software.name('zlib')
-      software.default_version('1.7.2')
-      software
+      Software.new(project, 'zlib.rb').evaluate do
+        name 'zlib'
+        default_version '1.7.2'
+      end
     end
 
     let(:snoopy) do
-      software = Software.new(project, {}, 'snoopy.rb')
-      software.name('snoopy')
-      software.default_version('1.0.0')
-      software
+      Software.new(project, 'snoopy.rb').evaluate do
+        name 'snoopy'
+        default_version '1.0.0'
+      end
     end
 
     let(:preparation) do
-      software = Software.new(project, {}, 'preparation.rb')
-      software.name('preparation')
-      software.default_version('1.0.0')
-      software
+      Software.new(project, 'preparation.rb').evaluate do
+        name 'preparation'
+        default_version '1.0.0'
+      end
     end
 
     let(:cache_path) { File.join('/var/cache/omnibus/cache/git_cache', install_dir) }
@@ -68,7 +60,7 @@ module Omnibus
 
     describe '#tag' do
       it 'returns the correct tag' do
-        expect(ipc.tag).to eql('zlib-25a09c83aca0f38a6e9d0d555358e772cde7ae7c40214edf108f1d1fded96bc7')
+        expect(ipc.tag).to eql('zlib-24a8ec71da04059dcf7ed3c6e8e0fd9d155476abe4b5156d1f13c42e85478c2b')
       end
 
       describe 'with no deps' do
@@ -77,7 +69,7 @@ module Omnibus
         end
 
         it 'returns the correct tag' do
-          expect(ipc.tag).to eql('zlib-4315c8f2f9a0850b6fabeeaffe1f2dde4a3b52a234cc5e9bfaaf37f2280c6829')
+          expect(ipc.tag).to eql('zlib-ee71fc1a512f03b9dd46c1fd9b5ab71fcc51b638857bf328496a31abb2654c2b')
         end
       end
     end
