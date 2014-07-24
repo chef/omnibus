@@ -793,15 +793,6 @@ module Omnibus
       end
     end
 
-    # @todo Remove this in the next major release
-    def command(*)
-      log.deprecated(log_key) do
-        'Software#command. Please use something else.'
-      end
-
-      raise 'Method Moved.'
-    end
-
     def execute_build(fetcher)
       fetcher.clean
       builder.build
