@@ -40,7 +40,6 @@ module Omnibus
       it_behaves_like 'a cleanroom setter', :move, %|move 'file', 'file2'|
       it_behaves_like 'a cleanroom setter', :link, %|link 'file', 'file2'|
       it_behaves_like 'a cleanroom setter', :sync, %|link 'a/', 'b/'|
-      it_behaves_like 'a cleanroom getter', :project_root, %|puts project_root|
       it_behaves_like 'a cleanroom getter', :windows_safe_path, %|puts windows_safe_path('foo')|
 
       # From software
