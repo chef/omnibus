@@ -51,8 +51,8 @@ module Omnibus
       pkg = "#{Config.package_dir}/#{name}-#{version}-1.pkg"
       dmg = "#{Config.package_dir}/#{name}-#{version}-1.dmg"
 
-      expect(File.exist?(pkg)).to be_truthy
-      expect(File.exist?(dmg)).to be_truthy
+      expect(pkg).to be_a_file
+      expect(dmg).to be_a_file
     end
   end
 end

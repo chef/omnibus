@@ -218,7 +218,7 @@ module Omnibus
         subject.touch(path)
         subject.build
 
-        expect(File.file?(path)).to be_truthy
+        expect(path).to be_a_file
       end
     end
 
@@ -252,8 +252,8 @@ module Omnibus
         subject.delete("#{tmp_path}/**/file_*")
         subject.build
 
-        expect(File.exist?(path_a)).to be_falsey
-        expect(File.exist?(path_b)).to be_falsey
+        expect(path_a).to_not be_a_file
+        expect(path_b).to_not be_a_file
       end
     end
 
@@ -284,9 +284,9 @@ module Omnibus
         subject.copy(directory, destination)
         subject.build
 
-        expect(File.exist?(destination)).to be_truthy
-        expect(File.exist?("#{destination}/file_a")).to be_truthy
-        expect(File.exist?("#{destination}/file_b")).to be_truthy
+        expect(destination).to be_a_directory
+        expect("#{destination}/file_a").to be_a_file
+        expect("#{destination}/file_b").to be_a_file
       end
 
       it 'accepts a glob pattern' do
@@ -304,9 +304,9 @@ module Omnibus
         subject.copy("#{directory}/*", destination)
         subject.build
 
-        expect(File.exist?(destination)).to be_truthy
-        expect(File.exist?("#{destination}/file_a")).to be_truthy
-        expect(File.exist?("#{destination}/file_b")).to be_truthy
+        expect(destination).to be_a_directory
+        expect("#{destination}/file_a").to be_a_file
+        expect("#{destination}/file_b").to be_a_file
       end
     end
 
@@ -337,11 +337,11 @@ module Omnibus
         subject.move(directory, destination)
         subject.build
 
-        expect(File.exist?(destination)).to be_truthy
-        expect(File.exist?("#{destination}/file_a")).to be_truthy
-        expect(File.exist?("#{destination}/file_b")).to be_truthy
+        expect(destination).to be_a_directory
+        expect("#{destination}/file_a").to be_a_file
+        expect("#{destination}/file_b").to be_a_file
 
-        expect(File.exist?(directory)).to be_falsey
+        expect(directory).to_not be_a_directory
       end
 
       it 'accepts a glob pattern' do
@@ -359,11 +359,11 @@ module Omnibus
         subject.move("#{directory}/*", destination)
         subject.build
 
-        expect(File.exist?(destination)).to be_truthy
-        expect(File.exist?("#{destination}/file_a")).to be_truthy
-        expect(File.exist?("#{destination}/file_b")).to be_truthy
+        expect(destination).to be_a_directory
+        expect("#{destination}/file_a").to be_a_file
+        expect("#{destination}/file_b").to be_a_file
 
-        expect(File.exist?(directory)).to be_truthy
+        expect(directory).to be_a_directory
       end
     end
 
@@ -387,7 +387,7 @@ module Omnibus
         subject.link(directory, destination)
         subject.build
 
-        expect(File.symlink?(destination)).to be_truthy
+        expect(destination).to be_a_symlink
       end
 
       it 'accepts a glob pattern' do
@@ -405,8 +405,8 @@ module Omnibus
         subject.link("#{directory}/*", destination)
         subject.build
 
-        expect(File.symlink?("#{destination}/file_a")).to be_truthy
-        expect(File.symlink?("#{destination}/file_b")).to be_truthy
+        expect("#{destination}/file_a").to be_a_symlink
+        expect("#{destination}/file_b").to be_a_symlink
       end
     end
 
@@ -437,13 +437,13 @@ module Omnibus
           subject.sync(source, destination)
           subject.build
 
-          expect(File.file?("#{destination}/file_a")).to be_truthy
-          expect(File.file?("#{destination}/file_b")).to be_truthy
-          expect(File.file?("#{destination}/file_c")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
-          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_truthy
-          expect(File.file?("#{destination}/.file_g")).to be_truthy
+          expect("#{destination}/file_a").to be_a_file
+          expect("#{destination}/file_b").to be_a_file
+          expect("#{destination}/file_c").to be_a_file
+          expect("#{destination}/folder/file_d").to be_a_file
+          expect("#{destination}/folder/file_e").to be_a_file
+          expect("#{destination}/.dot_folder/file_f").to be_a_file
+          expect("#{destination}/.file_g").to be_a_file
         end
       end
 
@@ -459,18 +459,18 @@ module Omnibus
           subject.sync(source, destination)
           subject.build
 
-          expect(File.file?("#{destination}/file_a")).to be_truthy
-          expect(File.file?("#{destination}/file_b")).to be_truthy
-          expect(File.file?("#{destination}/file_c")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
-          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_truthy
-          expect(File.file?("#{destination}/.file_g")).to be_truthy
+          expect("#{destination}/file_a").to be_a_file
+          expect("#{destination}/file_b").to be_a_file
+          expect("#{destination}/file_c").to be_a_file
+          expect("#{destination}/folder/file_d").to be_a_file
+          expect("#{destination}/folder/file_e").to be_a_file
+          expect("#{destination}/.dot_folder/file_f").to be_a_file
+          expect("#{destination}/.file_g").to be_a_file
 
-          expect(File.exist?("#{destination}/existing_folder")).to be_falsey
-          expect(File.exist?("#{destination}/.existing_folder")).to be_falsey
-          expect(File.exist?("#{destination}/existing_file")).to be_falsey
-          expect(File.exist?("#{destination}/.existing_file")).to be_falsey
+          expect("#{destination}/existing_folder").to_not be_a_directory
+          expect("#{destination}/.existing_folder").to_not be_a_directory
+          expect("#{destination}/existing_file").to_not be_a_file
+          expect("#{destination}/.existing_file").to_not be_a_file
         end
       end
 
@@ -479,14 +479,14 @@ module Omnibus
           subject.sync(source, destination, exclude: '.dot_folder')
           subject.build
 
-          expect(File.file?("#{destination}/file_a")).to be_truthy
-          expect(File.file?("#{destination}/file_b")).to be_truthy
-          expect(File.file?("#{destination}/file_c")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
-          expect(File.exist?("#{destination}/.dot_folder")).to be_falsey
-          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_falsey
-          expect(File.file?("#{destination}/.file_g")).to be_truthy
+          expect("#{destination}/file_a").to be_a_file
+          expect("#{destination}/file_b").to be_a_file
+          expect("#{destination}/file_c").to be_a_file
+          expect("#{destination}/folder/file_d").to be_a_file
+          expect("#{destination}/folder/file_e").to be_a_file
+          expect("#{destination}/.dot_folder").to_not be_a_directory
+          expect("#{destination}/.dot_folder/file_f").to_not be_a_file
+          expect("#{destination}/.file_g").to be_a_file
         end
 
         it 'removes existing files and folders in destination' do
@@ -498,17 +498,17 @@ module Omnibus
           subject.sync(source, destination, exclude: '.dot_folder')
           subject.build
 
-          expect(File.file?("#{destination}/file_a")).to be_truthy
-          expect(File.file?("#{destination}/file_b")).to be_truthy
-          expect(File.file?("#{destination}/file_c")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_d")).to be_truthy
-          expect(File.file?("#{destination}/folder/file_e")).to be_truthy
-          expect(File.exist?("#{destination}/.dot_folder")).to be_falsey
-          expect(File.file?("#{destination}/.dot_folder/file_f")).to be_falsey
-          expect(File.file?("#{destination}/.file_g")).to be_truthy
+          expect("#{destination}/file_a").to be_a_file
+          expect("#{destination}/file_b").to be_a_file
+          expect("#{destination}/file_c").to be_a_file
+          expect("#{destination}/folder/file_d").to be_a_file
+          expect("#{destination}/folder/file_e").to be_a_file
+          expect("#{destination}/.dot_folder").to_not be_a_directory
+          expect("#{destination}/.dot_folder/file_f").to_not be_a_file
+          expect("#{destination}/.file_g").to be_a_file
 
-          expect(File.exist?("#{destination}/existing_folder")).to be_falsey
-          expect(File.exist?("#{destination}/existing_file")).to be_falsey
+          expect("#{destination}/existing_folder").to_not be_a_directory
+          expect("#{destination}/existing_file").to_not be_a_file
         end
       end
     end
