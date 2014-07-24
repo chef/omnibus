@@ -119,7 +119,7 @@ module Omnibus
     # @param [String] source
     # @param [String] destination
     def copy_directory(source, destination)
-      FileUtils.cp_r(Dir["#{source}/*"], destination)
+      FileUtils.cp_r(FileSyncer.glob("#{source}/*"), destination)
     end
 
     # Execute the command using shellout!

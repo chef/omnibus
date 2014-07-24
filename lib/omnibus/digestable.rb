@@ -64,7 +64,7 @@ module Omnibus
     def digest_directory(path, type = :md5)
       digest = digest_from_type(type)
 
-      Dir.glob("#{path}/**/{*,.*}").each do |filename|
+      FileSyncer.glob("#{path}/**/*").each do |filename|
         # Calculate the filename relative to the given path. Since directories
         # are SHAed according to their filepath, two difference directories on
         # disk would have different SHAs even if they had the same content.

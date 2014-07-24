@@ -39,6 +39,7 @@ module Omnibus
   autoload :Digestable,       'omnibus/digestable'
   autoload :Error,            'omnibus/exceptions'
   autoload :Fetcher,          'omnibus/fetcher'
+  autoload :FileSyncer,       'omnibus/file_syncer'
   autoload :Generator,        'omnibus/generator'
   autoload :GitCache,         'omnibus/git_cache'
   autoload :HealthCheck,      'omnibus/health_check'
