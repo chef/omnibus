@@ -289,18 +289,6 @@ module Omnibus
       end
     end
 
-    describe '#version' do
-      it 'sets the given version' do
-        subject.version('1.2.3')
-        expect(subject.given_version).to eq('1.2.3')
-      end
-
-      it 'outputs a deprecation message' do
-        output = capture_logging { subject.version('1.2.3') }
-        expect(output).to include('DEPRECATED')
-      end
-    end
-
     context 'testing repo-level version overrides' do
       let(:software_name) { 'zlib' }
       let(:default_version) { '1.2.6' }
