@@ -54,7 +54,6 @@ module Omnibus
         end
       end
 
-
       private
 
       #
