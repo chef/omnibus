@@ -116,9 +116,9 @@ module Omnibus
             args += %w(--acl private)
           end
 
-          if Config.has_key?(:release_s3_bucket)
-            warn("The config variable 'release_s3_bucket' is deprecated. Please use 'omnibus publish s3 #{Config[:release_s3_bucket]}' instead.")
-            args.insert(2, Config[:release_s3_bucket])
+          if Config.key?(:release_s3_bucket)
+            warn("The config variable 'release_s3_bucket' is deprecated. Please use 'omnibus publish s3 #{Config.release_s3_bucket}' instead.")
+            args.insert(2, Config.release_s3_bucket)
           end
 
           return old_dispatch(m, args, options, config)
