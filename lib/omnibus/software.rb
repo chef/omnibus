@@ -388,18 +388,6 @@ module Omnibus
     expose :downloaded_file
 
     #
-    # @deprecated Use {#downloaded_file} instead
-    #
-    def project_file
-      log.deprecated(log_key) do
-        "project_file (DSL). Please use `downloaded_file' instead."
-      end
-
-      downloaded_file
-    end
-    expose :project_file
-
-    #
     # Add standard compiler flags to the environment hash to produce omnibus
     # binaries (correct RPATH, etc).
     #
