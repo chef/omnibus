@@ -118,22 +118,7 @@ module Omnibus
     #
     # @return [String]
     default(:git_cache_dir) do
-      if defined?(@install_path_cache_dir)
-        @install_path_cache_dir
-      else
-        File.join(base_dir, 'cache', 'git_cache')
-      end
-    end
-
-    # @deprecated Use {#git_cache_dir} instead.
-    #
-    # @return [String]
-    default(:install_path_cache_dir) do
-      Omnibus.logger.deprecated('Config') do
-        'Config.install_path_cache_dir. Plase use Config.git_cache_dir instead.'
-      end
-
-      git_cache_dir
+      File.join(base_dir, 'cache', 'git_cache')
     end
 
     # The absolute path to the directory on the virtual machine where
