@@ -152,26 +152,16 @@ module Omnibus
     expose :max_build_jobs
 
     #
-    # Convert the given path to be appropiate for shelling out on Windows. Most
-    # internal calls will wrap paths automatically, but the +command+ method is
-    # unable to do so.
+    # (see Util#windows_safe_path)
+    #
+    # Most internal Ruby methods will handle this automatically, but the
+    # +command+ method is unable to do so.
     #
     # @example
     #   command "#{windows_safe_path(install_dir)}\\embedded\\bin\\gem"
     #
-    # @param [String, Array<String>] pieces
-    #   the pieces of the path to join and fix
-    # @return [String]
-    #   the path with applied changes
-    #
     def windows_safe_path(*pieces)
-      path = File.join(*pieces)
-
-      if File::ALT_SEPARATOR
-        path.gsub(File::SEPARATOR, File::ALT_SEPARATOR)
-      else
-        path
-      end
+      super
     end
     expose :windows_safe_path
 
