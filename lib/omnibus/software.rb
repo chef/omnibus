@@ -354,23 +354,6 @@ module Omnibus
     expose :install_dir
 
     #
-    # Returns the platform of the machine on which Omnibus is running, as
-    # determined by Ohai.
-    #
-    # @deprecated Use +Ohai['platform']+ instead.
-    #
-    # @return [String]
-    #
-    def platform
-      log.deprecated(log_key) do
-        "Software#platform. Please use Ohai['platform'] instead."
-      end
-
-      Ohai['platform']
-    end
-    expose :platform
-
-    #
     # Return the architecture of the machine, as determined by Ohai.
     #
     # @deprecated Will not be replaced.
