@@ -508,24 +508,6 @@ module Omnibus
     expose :prepend_path
 
     #
-    # Convenience method for accessing the global Omnibus configuration object.
-    #
-    # @deprecated Use {Config} instead
-    #
-    # @return Config
-    #
-    # @see Config
-    #
-    def config
-      log.deprecated(log_key) do
-        'config (DSL). Please use Config.(thing) instead (capital C).'
-      end
-
-      Config
-    end
-    expose :config
-
-    #
     # The list of software dependencies for this software. These is the software
     # that comprises your software, and is distinct from runtime dependencies.
     #
