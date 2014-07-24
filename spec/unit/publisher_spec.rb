@@ -29,7 +29,11 @@ module Omnibus
       let(:b) { '/path/to/files/b.deb' }
       let(:glob) { [a, b] }
 
-      before { allow(Dir).to receive(:glob).with(pattern).and_return(glob) }
+      before do
+        allow(FileSyncer).to receive(:glob)
+          .with(pattern)
+          .and_return(glob)
+      end
 
       it 'returns an array' do
         expect(subject.packages).to be_an(Array)
