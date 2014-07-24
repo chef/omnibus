@@ -56,9 +56,6 @@ module Omnibus
   autoload :Sugarable,        'omnibus/sugarable'
   autoload :Util,             'omnibus/util'
 
-  # @todo Remove this in the next major release
-  autoload :OHAI, 'omnibus/ohai'
-
   autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
   autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
   autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
