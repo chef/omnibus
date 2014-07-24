@@ -138,20 +138,6 @@ module Omnibus
       @ui ||= Thor::Base.shell.new
     end
 
-    # Convenience method for access to the {Config} object.
-    # Provided for backward compatibility.
-    #
-    # @return [Config]
-    #
-    # @deprecated Just refer to {Config} directly.
-    def config
-      Omnibus.logger.deprecated('Omnibus') do
-        'Omnibus.config. Please use Config.(thing) instead.'
-      end
-
-      Config
-    end
-
     # Load in an Omnibus configuration file.  Values will be merged with
     # and override the defaults defined in {Config}.
     #
