@@ -39,7 +39,6 @@ module Omnibus
     include_examples 'a configurable', :build_dmg, true
     include_examples 'a configurable', :dmg_window_bounds, '100, 100, 750, 600'
     include_examples 'a configurable', :dmg_pkg_position, '535, 50'
-    include_examples 'a configurable', :override_file, nil
     include_examples 'a configurable', :local_software_dirs, []
     include_examples 'a configurable', :software_gems, ['omnibus-software']
     include_examples 'a configurable', :solaris_compiler, nil
