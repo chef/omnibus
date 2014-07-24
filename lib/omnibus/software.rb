@@ -354,22 +354,6 @@ module Omnibus
     expose :install_dir
 
     #
-    # The path where this software is installed on disk.
-    #
-    # @deprecated Use {#install_dir} instead
-    #
-    # @return (see #install_dir)
-    #
-    def install_path
-      log.deprecated(log_key) do
-        'install_path (DSL). Please use install_dir instead.'
-      end
-
-      install_dir
-    end
-    expose :install_path
-
-    #
     # Returns the platform of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
