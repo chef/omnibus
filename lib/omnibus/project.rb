@@ -653,22 +653,6 @@ module Omnibus
     expose :extra_package_file
 
     #
-    # The machine which this project is running on.
-    #
-    # @deprecated Use +Ohai['kernel']['machine']+ instead.
-    #
-    # @return [String]
-    #
-    def machine
-      log.deprecated(log_key) do
-        "machine (DSL). Please use Ohai['kernel']['machine'] instead."
-      end
-
-      Ohai['kernel']['machine']
-    end
-    expose :machine
-
-    #
     # Convenience method for accessing the global Omnibus configuration object.
     #
     # @deprecated Use {Config} instead
