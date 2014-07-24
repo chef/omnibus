@@ -16,6 +16,7 @@
 
 module Omnibus
   class Fetcher
+    include Digestable
     include Logging
     include Util
 
