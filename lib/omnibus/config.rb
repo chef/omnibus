@@ -348,18 +348,6 @@ module Omnibus
     # @return [Array<String>]
     default(:local_software_dirs) { [] }
 
-    # @deprecated Use {#software_gems} instead
-    #
-    # @return [String]
-    default(:software_gem) do
-      Omnibus.logger.deprecated('Config') do
-        'Config.software_gem. Plase use Config.software_gems (plural) and ' \
-        'specify an array of software gems instead.'
-      end
-
-      software_gems
-    end
-
     # The list of gems to pull software definitions from. The software
     # definitions from these gems are pulled **in order**, so if multiple gems
     # have the same software definition, the one that appears **first** in the
@@ -374,11 +362,7 @@ module Omnibus
     #
     # @return [Array<String>]
     default(:software_gems) do
-      if defined?(@software_gem)
-        Array(@software_gem)
-      else
-        ['omnibus-software']
-      end
+      ['omnibus-software']
     end
 
     # The solaris compiler to use
