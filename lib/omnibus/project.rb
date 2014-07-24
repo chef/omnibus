@@ -191,23 +191,6 @@ module Omnibus
     expose :install_dir
 
     #
-    # @deprecated Use {#install_dir} instead.
-    #
-    # @example (see #install_dir)
-    # @raise (see #install_dir)
-    # @param (see #install_dir)
-    # @return (see #install_dir)
-    #
-    def install_path(val = NULL)
-      log.deprecated(log_key) do
-        "install_path (DSL). Please use install_dir instead."
-      end
-
-      install_dir(val)
-    end
-    expose :install_path
-
-    #
     # Path to the +/files+ directory in the omnibus project. This directory can
     # contain assets used for creating packages (e.g., Mac .pkg files and
     # Windows MSIs can be installed by GUI which can optionally be customized
