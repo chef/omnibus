@@ -653,23 +653,6 @@ module Omnibus
     expose :extra_package_file
 
     #
-    # The platform of the machine on which Omnibus is running, as determined
-    # by Ohai.
-    #
-    # @deprecated Use +Ohai['platform']+ instead.
-    #
-    # @return [String]
-    #
-    def platform
-      log.deprecated(log_key) do
-        "platform (DSL). Please use Ohai['platform'] instead."
-      end
-
-      Ohai['platform']
-    end
-    expose :platform
-
-    #
     # The platform family of the machine on which Omnibus is running, as
     # determined by Ohai.
     #
