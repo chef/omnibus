@@ -561,6 +561,8 @@ module Omnibus
       pkg_path = "#{config.package_dir}/#{basename}"
       artifact = Artifact.new(pkg_path, [platform_tuple], version: build_version)
       metadata = artifact.flat_metadata
+      metadata['name'] = name
+      metadata['homepage'] = homepage
       File.open("#{pkg_path}.metadata.json", 'w+') do |f|
         f.print(JSON.pretty_generate(metadata))
       end
