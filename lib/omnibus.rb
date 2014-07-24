@@ -178,21 +178,6 @@ module Omnibus
     end
 
     #
-    # The absolute path to the Omnibus project/reository directory.
-    #
-    # @deprecated Use {Config.project_root} instead.
-    #
-    # @return [String]
-    #
-    def project_root
-      Omnibus.logger.deprecated('Omnibus') do
-        'Omnibus.project_root. Please use Config.project_root instead.'
-      end
-
-      Config.project_root
-    end
-
-    #
     # Backward compat alias.
     #
     # @deprecated Use {Config.project_root} instead.
