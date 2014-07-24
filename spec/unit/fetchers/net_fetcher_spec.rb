@@ -4,7 +4,7 @@ module Omnibus
   describe NetFetcher do
     let(:software_mock) do
       double(Software,
-        project_file: 'file.tar.gz',
+        downloaded_file: 'file.tar.gz',
         name: 'file',
         source: '/tmp/out',
         checksum: 'abc123',
@@ -20,7 +20,7 @@ module Omnibus
     shared_examples 'an extractor' do |extension, command|
       context "when the file is a .#{extension}" do
         before do
-          allow(software_mock).to receive(:project_file).and_return("file.#{extension}")
+          allow(software_mock).to receive(:downloaded_file).and_return("file.#{extension}")
           allow(software_mock).to receive(:source_uri).and_return("http://example.com/file.#{extension}")
         end
 
