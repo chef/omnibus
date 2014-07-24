@@ -178,21 +178,6 @@ module Omnibus
     end
 
     #
-    # Backward compat alias.
-    #
-    # @deprecated Use {Config.project_root} instead.
-    #
-    # @see (Omnibus.project_root)
-    #
-    def root
-      Omnibus.logger.deprecated('Omnibus') do
-        'Omnibus.root. Please use Omnibus.project_root instead.'
-      end
-
-      Config.project_root
-    end
-
-    #
     # The source root is the path to the root directory of the `omnibus` gem.
     #
     # @return [Pathname]
