@@ -59,9 +59,9 @@ module Omnibus
         it 'fetches new files' do
           subject.clean
 
-          expect(File.exist?("#{project_dir}/file_a")).to be_truthy
-          expect(File.exist?("#{project_dir}/file_b")).to be_truthy
-          expect(File.exist?("#{project_dir}/.file_c")).to be_truthy
+          expect("#{project_dir}/file_a").to be_a_file
+          expect("#{project_dir}/file_b").to be_a_file
+          expect("#{project_dir}/.file_c").to be_a_file
         end
 
         it 'returns true' do
