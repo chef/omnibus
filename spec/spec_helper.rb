@@ -16,10 +16,6 @@ module Omnibus
       File.join(SPEC_DATA, 'overrides', "#{name}.overrides")
     end
 
-    def project_path(name)
-      File.join(SPEC_DATA, 'projects', "#{name}.rb")
-    end
-
     def complicated_path
       File.join(SPEC_DATA, 'complicated')
     end

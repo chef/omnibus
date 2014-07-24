@@ -3,9 +3,23 @@ require 'ohai'
 
 module Omnibus
   describe Project do
-    let(:project) { Project.load(project_path('sample')) }
+    subject do
+      described_class.new.evaluate do
+        name 'sample'
+        friendly_name 'Sample Project'
+        install_dir '/sample'
+        maintainer 'Sample Devs'
+        homepage 'http://example.com/'
 
-    subject { project }
+        build_version '1.0'
+        build_iteration 1
+
+        extra_package_file '/path/to/sample_dir'
+        extra_package_file '/path/to/file.conf'
+
+        resources_path 'sample/project/resources'
+      end
+    end
 
     it_behaves_like 'a cleanroom setter', :name, %|name 'chef'|
     it_behaves_like 'a cleanroom setter', :friendly_name, %|friendly_name 'Chef'|
@@ -34,40 +48,40 @@ module Omnibus
     it_behaves_like 'a cleanroom getter', :files_path
 
     describe 'basics' do
-      it 'should return a name' do
-        expect(project.name).to eq('sample')
+      it 'returns a name' do
+        expect(subject.name).to eq('sample')
       end
 
-      it 'should return an install_dir' do
-        expect(project.install_dir).to eq('/sample')
+      it 'returns an install_dir' do
+        expect(subject.install_dir).to eq('/sample')
       end
 
-      it 'should return a maintainer' do
-        expect(project.maintainer).to eq('Sample Devs')
+      it 'returns a maintainer' do
+        expect(subject.maintainer).to eq('Sample Devs')
       end
 
-      it 'should return a homepage' do
-        expect(project.homepage).to eq('http://example.com/')
+      it 'returns a homepage' do
+        expect(subject.homepage).to eq('http://example.com/')
       end
 
-      it 'should return a build version' do
-        expect(project.build_version).to eq('1.0')
+      it 'returns a build version' do
+        expect(subject.build_version).to eq('1.0')
       end
 
-      it 'should return a build iteration' do
-        expect(project.build_iteration).to eq('1')
+      it 'returns a build iteration' do
+        expect(subject.build_iteration).to eq(1)
       end
 
-      it 'should return an array of files and dirs' do
-        expect(project.extra_package_files).to eq(['/path/to/sample_dir', '/path/to/file.conf'])
+      it 'returns an array of files and dirs' do
+        expect(subject.extra_package_files).to eq(['/path/to/sample_dir', '/path/to/file.conf'])
       end
 
-      it 'should return friendly_name' do
-        expect(project.friendly_name).to eq('Sample Project')
+      it 'returns a friendly_name' do
+        expect(subject.friendly_name).to eq('Sample Project')
       end
 
-      it 'should return resources_path' do
-        expect(project.resources_path).to include('sample/project/resources')
+      it 'returns a resources_path' do
+        expect(subject.resources_path).to include('sample/project/resources')
       end
     end
 
@@ -97,71 +111,70 @@ module Omnibus
     end
 
     describe '#<=>' do
+      let(:chefdk) { described_class.new.tap { |p| p.name('chefdk') } }
+      let(:chef)   { described_class.new.tap { |p| p.name('chef') } }
+      let(:ruby)   { described_class.new.tap { |p| p.name('ruby') } }
+
       it 'compares projects by name' do
-        list = [
-          project,
-          Project.load(project_path('chefdk')),
-        ]
-        expect(list.sort.map(&:name)).to eq(%w(chefdk sample))
+        list = [chefdk, chef, ruby]
+        expect(list.sort.map(&:name)).to eq(%w(chef chefdk ruby))
       end
     end
 
     describe '#iteration' do
-      let(:fauxhai_options) { Hash.new }
-
-      before { stub_ohai(fauxhai_options) }
-
       context 'when on RHEL' do
-        let(:fauxhai_options) { { platform: 'redhat', version: '6.4' } }
-        it 'should return a RHEL iteration' do
-          expect(project.iteration).to eq('1.el6')
+        before { stub_ohai(platform: 'redhat', version: '6.4') }
+
+        it 'returns a RHEL iteration' do
+          expect(subject.iteration).to eq('1.el6')
         end
       end
 
       context 'when on Debian' do
-        let(:fauxhai_options) { { platform: 'debian', version: '7.2' } }
-        it 'should return a Debian iteration' do
-          expect(project.iteration).to eq('1')
+        before { stub_ohai(platform: 'debian', version: '7.2') }
+
+        it 'returns a Debian iteration' do
+          expect(subject.iteration).to eq('1')
         end
       end
 
       context 'when on FreeBSD' do
-        let(:fauxhai_options) { { platform: 'freebsd', version: '9.1' } }
-        it 'should return a FreeBSD iteration' do
-          expect(project.iteration).to eq('1.freebsd.9.amd64')
+        before { stub_ohai(platform: 'freebsd', version: '9.1') }
+
+        it 'returns a FreeBSD iteration' do
+          expect(subject.iteration).to eq('1.freebsd.9.amd64')
         end
       end
 
       context 'when on Windows' do
-        let(:fauxhai_options) { { platform: 'windows', version: '2008R2' } }
+        before { stub_ohai(platform: 'windows', version: '2008R2') }
         before { stub_const('File::ALT_SEPARATOR', '\\') }
-        it 'should return a Windows iteration' do
-          expect(project.iteration).to eq('1.windows')
+
+        it 'returns a Windows iteration' do
+          expect(subject.iteration).to eq('1.windows')
         end
       end
 
       context 'when on OS X' do
-        let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
-        it 'should return a generic iteration' do
-          expect(project.iteration).to eq('1')
+        before { stub_ohai(platform: 'mac_os_x', version: '10.8.2') }
+
+        it 'returns a generic iteration' do
+          expect(subject.iteration).to eq('1')
         end
       end
     end
 
     describe '#overrides' do
-      let(:project) { Project.load(project_path('chefdk')) }
+      before { subject.overrides.clear }
 
-      before { project.overrides.clear }
-
-
-      it 'should set all the things through #overrides' do
-        project.override(:thing, version: '6.6.6')
-        expect(project.override(:zlib)).to be_nil
+      it 'sets all the things through #overrides' do
+        subject.override(:thing, version: '6.6.6')
+        expect(subject.override(:zlib)).to be_nil
       end
 
       it 'retrieves the things set through #overrides' do
-        project.override(:thing, version: '6.6.6')
-        expect(project.override(:thing)[:version]).to eq('6.6.6')
+        subject.override(:thing, version: '6.6.6')
+        expect(subject.override(:thing)[:version]).to eq('6.6.6')
       end
     end
 
@@ -170,15 +183,9 @@ module Omnibus
         let(:path) { '/project.rb' }
         let(:file) { double(File) }
 
-        subject do
-          project = described_class.new(path)
-          project.name('project')
-          project.install_dir('/opt/project')
-          project.build_version('1.0.0')
-          project
-        end
-
         before do
+          subject.instance_variable_set(:@filepath, path)
+
           allow(File).to receive(:exist?)
             .with(path)
             .and_return(true)
@@ -188,24 +195,17 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('8270d9078b577d3bedc2353ba3dc33fda1f8e69db3b7c0b449183a3e0e560d09')
+          expect(subject.shasum).to eq('2cb8bdd11c766caa11a37607e84ffb51af3ae3da16931988f12f7fc9de98d68e')
         end
       end
 
       context 'when a filepath is not given' do
-        subject do
-          project = described_class.new
-          project.name('project')
-          project.install_dir('/opt/project')
-          project.build_version('1.0.0')
-          project
-        end
+        before { subject.send(:remove_instance_variable, :@filepath) }
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('545571a6041129f1224741a700c776b960cb093d4260ff6ca78b6a34bc130b45')
+          expect(subject.shasum).to eq('3cc6bd98da4d643b79c71be2c93761a458b442e2931f7d421636f526d0c1e8bf')
         end
       end
     end
-
   end
 end
