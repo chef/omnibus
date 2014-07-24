@@ -508,22 +508,6 @@ module Omnibus
     expose :prepend_path
 
     #
-    # The source directory.
-    #
-    # @deprecated Use {Config.source_dir} instead
-    #
-    # @return [String]
-    #
-    def source_dir
-      log.deprecated(log_key) do
-        'source_dir (DSL). Please use Config.source_dir instead.'
-      end
-
-      Config.source_dir
-    end
-    expose :source_dir
-
-    #
     # The cache directory.
     #
     # @deprecated Use {Config.cache_dir} instead
