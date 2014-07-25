@@ -34,7 +34,7 @@ module Omnibus
     #   the list of all files
     #
     def glob(pattern)
-      Dir.glob(pattern, File::FNM_DOTMATCH).reject do |file|
+      Dir.glob(pattern, File::FNM_DOTMATCH).sort.reject do |file|
         basename = File.basename(file)
         IGNORED_FILES.include?(basename)
       end
