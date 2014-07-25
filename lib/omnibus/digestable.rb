@@ -15,6 +15,7 @@
 #
 
 require 'digest'
+require 'pathname'
 
 module Omnibus
   module Digestable
@@ -63,13 +64,18 @@ module Omnibus
     def digest_directory(path, type = :md5)
       digest = digest_from_type(type)
 
-      Dir.glob("#{path}/**/*").each do |filename|
+      FileSyncer.glob("#{path}/**/*").each do |filename|
+        # Calculate the filename relative to the given path. Since directories
+        # are SHAed according to their filepath, two difference directories on
+        # disk would have different SHAs even if they had the same content.
+        relative = Pathname.new(filename).relative_path_from(Pathname.new(path))
+
         case ftype = File.ftype(filename)
         when 'file'
-          update_with_string(digest, "#{ftype} #{filename}")
+          update_with_string(digest, "#{ftype} #{relative}")
           update_with_file_contents(digest, filename)
         else
-          update_with_string(digest, "#{ftype} #{filename}")
+          update_with_string(digest, "#{ftype} #{relative}")
         end
       end
 

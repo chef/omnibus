@@ -14,219 +14,213 @@
 # limitations under the License.
 #
 
-require 'net/http'
-require 'net/https'
-require 'net/ftp'
+require 'fileutils'
+require 'open-uri'
 
 module Omnibus
-  class UnsupportedURIScheme < ArgumentError
-  end
-
-  class InvalidSourceFile < RuntimeError
-  end
-
-  # Fetcher Implementation for HTTP and FTP hosted tarballs
   class NetFetcher < Fetcher
-    attr_reader :name
-    attr_reader :project_file
-    attr_reader :source
-    attr_reader :source_uri
-    attr_reader :project_dir
-
     # Use 7-zip to extract 7z/zip for Windows
     WIN_7Z_EXTENSIONS = %w(.7z .zip)
 
     # tar probably has compression scheme linked in, otherwise for tarballs
     TAR_EXTENSIONS = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
 
-    def initialize(software)
-      @name         = software.name
-      @checksum     = software.checksum
-      @source       = software.source
-      @project_file = software.downloaded_file
-      @source_uri   = software.source_uri
-      @project_dir  = software.project_dir
-      super
-    end
-
-    def description
-      <<-EOH.gsub(/^ {8}/, '').strip
-        source URI:     #{source_uri}
-        checksum:       #{@checksum}
-        local location: #{@project_file}
-      EOH
-    end
-
-    def version_guid
-      "md5:#{@checksum}"
-    end
-
+    #
+    # A fetch is required if the downloaded_file (such as a tarball) does not
+    # exist on disk, or if the checksum of the downloaded file is different
+    # than the given checksum.
+    #
+    # @return [true, false]
+    #
     def fetch_required?
-      !File.exist?(project_file) || Digest::MD5.file(project_file) != @checksum
+      !(File.exist?(downloaded_file) && digest(downloaded_file, :md5) == checksum)
     end
 
+    #
+    # The version identifier for this remote location. This is computed using
+    # the name of the software, the version of the software, and the checksum.
+    #
+    # @return [String]
+    #
+    def version_guid
+      "md5:#{checksum}"
+    end
+
+    #
+    # Clean the project directory by removing the contents from disk.
+    #
+    # @return [true, false]
+    #   true if the project directory was removed, false otherwise
+    #
     def clean
       if File.exist?(project_dir)
-        log.info(log_key) { "Cleaning existing build from #{project_dir}" }
-
+        log.info(log_key) { "Cleaning project directory `#{project_dir}'" }
         FileUtils.rm_rf(project_dir)
+        extract
+        true
+      else
+        extract
+        false
       end
+    end
+
+    #
+    # Fetch the given software definition. This method **always** fetches the
+    # file, even if it already exists on disk! You should use {fetch_required?}
+    # to guard against this check in your implementation.
+    #
+    # @return [void]
+    #
+    def fetch
+      log.info(log_key) { "Downloading from `#{download_url}'" }
+
+      create_required_directories
+      download
+      verify_checksum!
       extract
     end
 
-    def fetch
-      if fetch_required?
-        download
-        verify_checksum!
+    #
+    # The version for this item in the cache. The is the md5 of downloaded file
+    # and the URL where it was downloaded from.
+    #
+    # @return [String]
+    #
+    def version_for_cache
+      "download_url:#{source[:url]}|md5:#{source[:md5]}"
+    end
+
+    #
+    # The path on disk to the downloaded asset. This method requires the
+    # presence of a +source_uri+.
+    #
+    # @return [String]
+    #
+    def downloaded_file
+      filename = source[:url].split('/')[-1]
+      File.join(Config.cache_dir, filename)
+    end
+
+    #
+    # The checksum (+md5+) as defined by the user in the software definition.
+    #
+    # @return [String]
+    #
+    def checksum
+      source[:md5]
+    end
+
+    private
+
+    #
+    # The URL from which to download the software - this comes from the
+    # software's +source :url+ value.
+    #
+    # If S3 caching is enabled, this is the download URL for the software from
+    # the S3 bucket as defined in the {Config}.
+    #
+    # @return [String]
+    #
+    def download_url
+      if Config.use_s3_caching
+        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(software)}"
       else
-        log.debug(log_key) { 'Cached copy of source tarball up to date' }
+        source[:url]
       end
     end
 
-    def get_with_redirect(url, headers, limit = 10)
-      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
-      log.info(log_key) { "Getting from #{url} with #{limit} redirects left" }
-
-      url = URI.parse(url) unless url.kind_of?(URI)
-
-      req = Net::HTTP::Get.new(url.request_uri, headers)
-
-      http_client = if http_proxy && !excluded_from_proxy?(url.host)
-                      Net::HTTP::Proxy(http_proxy.host, http_proxy.port, http_proxy.user, http_proxy.password).new(url.host, url.port)
-                    else
-                      Net::HTTP.new(url.host, url.port)
-                    end
-      http_client.use_ssl = (url.scheme == 'https')
-
-      response = http_client.start { |http| http.request(req) }
-      case response
-      when Net::HTTPSuccess
-        open(project_file, 'wb') do |f|
-          f.write(response.body)
-        end
-      when Net::HTTPRedirection
-        get_with_redirect(response['location'], headers, limit - 1)
-      else
-        response.error!
-      end
-    end
-
-    # search environment variable as given, all lowercase and all upper case
-    def get_env(name)
-      ENV[name] || ENV[name.downcase] || ENV[name.upcase] || nil
-    end
-
-    # constructs a http_proxy uri from HTTP_PROXY* env vars
-    def http_proxy
-      @http_proxy ||= begin
-        proxy = get_env('HTTP_PROXY') || return
-        proxy = "http://#{proxy}" unless proxy =~ /^https?:/
-        uri = URI.parse(proxy)
-        uri.user ||= get_env('HTTP_PROXY_USER')
-        uri.password ||= get_env('HTTP_PROXY_PASS')
-        uri
-      end
-    end
-
-    # return true if the host is excluded from proxying via the no_proxy directive.
-    # the 'no_proxy' variable contains a list of host suffixes separated by comma
-    # example: example.com,www.examle.org,localhost
-    def excluded_from_proxy?(host)
-      no_proxy = get_env('no_proxy') || ''
-      no_proxy.split(/\s*,\s*/).any? { |pattern| host.end_with? pattern }
-    end
-
+    #
+    # Download the given file using Ruby's +OpenURI+ implementation. This method
+    # may emit warnings as defined in software definitions using the +:warning+
+    # key.
+    #
+    # @return [void]
+    #
     def download
-      tries = 5
-      begin
-        log.warn(log_key) { source[:warning] } if source.key?(:warning)
-        log.info(log_key) { "Fetching #{project_file} from #{source_uri}" }
+      log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
-        case source_uri.scheme
-        when /https?/
-          headers = {
-            'accept-encoding' => '',
-          }
-          if source.key?(:cookie)
-            headers['Cookie'] = source[:cookie]
-          end
-          get_with_redirect(source_uri, headers)
-        when 'ftp'
-          Net::FTP.open(source_uri.host) do |ftp|
-            ftp.passive = true
-            ftp.login
-            ftp.getbinaryfile(source_uri.path, project_file)
-            ftp.close
-          end
-        else
-          raise UnsupportedURIScheme, "Don't know how to download from #{source_uri}"
-        end
-      rescue Exception
-        tries -= 1
-        if tries != 0
-          log.debug(log_key) { "Retrying failed download (#{tries})..." }
-          retry
-        else
-          raise
-        end
-      end
-    rescue Exception => e
-      ErrorReporter.new(e, self).explain("Failed to fetch source from #source_uri (#{e.class}: #{e.message.strip})")
+      file = open(download_url, download_headers)
+      FileUtils.cp(file.path, downloaded_file)
+      file.close
+    rescue SocketError,
+           Errno::ECONNREFUSED,
+           Errno::ECONNRESET,
+           Errno::ENETUNREACH,
+           OpenURI::HTTPError => e
+      log.error(log_key) { "Download failed - #{e.class}!" }
       raise
     end
 
-    def verify_checksum!
-      actual_md5 = Digest::MD5.file(project_file)
-      unless actual_md5 == @checksum
-        log.warn(log_key) { "Invalid MD5 for #{@name}" }
-        log.warn(log_key) { "Expected: #{@checksum}" }
-        log.warn(log_key) { "Actual:   #{actual_md5}" }
-        raise InvalidSourceFile, "Checksum of downloaded file #{project_file} doesn't match expected"
-      end
-    end
-
+    #
+    # Extract the downloaded file, using the magical logic based off of the
+    # ending file extension. In the rare event the file cannot be extracted, it
+    # is copied over as a raw file.
+    #
     def extract
-      log.info(log_key) do
-        "Extracting the source in '#{project_file}' to '#{Config.source_dir}'"
-      end
-
-      cmd = extract_cmd
-      case cmd
-      when Proc
-        cmd.call
-      when String
-        shellout!(cmd)
+      if command = extract_command
+        log.info(log_key) { "Extracting `#{downloaded_file}' to `#{Config.source_dir}'" }
+        shellout!(extract_command)
       else
-        raise "Don't know how to extract command for #{cmd.class} class"
+        log.info(log_key) { "`#{downloaded_file}' is not an archive - copying to `#{project_dir}'" }
+
+        if File.directory?(project_dir)
+          # If the file itself was a directory, copy the whole thing over. This
+          # seems unlikely, because I do not think it is a possible to download
+          # a folder, but better safe than sorry.
+          FileUtils.cp_r(downloaded_file, project_dir)
+        else
+          # In the more likely case that we got a "regular" file, we want that
+          # file to live **inside** the project directory.
+          FileUtils.mkdir_p(project_dir)
+          FileUtils.cp(downloaded_file, "#{project_dir}/")
+        end
       end
-    rescue Exception => e
-      ErrorReporter.new(e, self).explain("Failed to unpack archive at #{project_file} (#{e.class}: #{e.message.strip})")
-      raise
     end
 
-    def extract_cmd
-      if Ohai['platform'] == 'windows' && project_file.end_with?(*WIN_7Z_EXTENSIONS)
-        "7z.exe x #{project_file} -o#{Config.source_dir} -r -y"
-      elsif Ohai['platform'] != 'windows' && project_file.end_with?('.7z')
-        "7z x #{project_file} -o#{Config.source_dir} -r -y"
-      elsif Ohai['platform'] != 'windows' && project_file.end_with?('.zip')
-        "unzip #{project_file} -d #{Config.source_dir}"
-      elsif project_file.end_with?(*TAR_EXTENSIONS)
-        compression_switch = 'z' if project_file.end_with?('gz')
-        compression_switch = 'j' if project_file.end_with?('bz2')
-        compression_switch = 'J' if project_file.end_with?('xz')
-        compression_switch = '' if project_file.end_with?('tar')
-        "tar #{compression_switch}xf #{project_file} -C#{Config.source_dir}"
-      else
-        # if we don't recognize the extension, simply copy over the file
-        proc do
-          log.debug(log_key) do
-            "'#{project_file}' is not an archive. Copying to '#{project_dir}'..."
-          end
-          # WARNING: hack hack hack, no project dir yet
-          FileUtils.mkdir_p(project_dir)
-          FileUtils.cp(project_file, project_dir)
-        end
+    #
+    # Verify the downloaded file has the correct checksum.#
+    #
+    # @raise [ChecksumMismatch]
+    #   if the checksum does not match
+    #
+    def verify_checksum!
+      log.info(log_key) { 'Verifying checksum' }
+
+      expected = checksum
+      actual   = digest(downloaded_file, :md5)
+
+      if expected != actual
+        raise ChecksumMismatch.new(software, expected, actual)
+      end
+    end
+
+    #
+    # The command to use for extracting this piece of software.
+    #
+    # @return [String, nil]
+    #
+    def extract_command
+      if Ohai['platform'] == 'windows' && downloaded_file.end_with?(*WIN_7Z_EXTENSIONS)
+        "7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"
+      elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.7z')
+        "7z x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"
+      elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.zip')
+        "unzip #{windows_safe_path(downloaded_file)} -d #{Config.source_dir}"
+      elsif downloaded_file.end_with?(*TAR_EXTENSIONS)
+        compression_switch = 'z' if downloaded_file.end_with?('gz')
+        compression_switch = 'j' if downloaded_file.end_with?('bz2')
+        compression_switch = 'J' if downloaded_file.end_with?('xz')
+        compression_switch = ''  if downloaded_file.end_with?('tar')
+        "tar #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
+      end
+    end
+
+    #
+    #
+    #
+    def download_headers
+      {}.tap do |h|
+        h['Cookie'] = source[:cookie] if source[:cookie]
       end
     end
   end

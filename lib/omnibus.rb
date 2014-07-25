@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+require 'omnibus/core_extensions'
+
 require 'pathname'
 require 'json'
 
@@ -37,6 +39,7 @@ module Omnibus
   autoload :Digestable,       'omnibus/digestable'
   autoload :Error,            'omnibus/exceptions'
   autoload :Fetcher,          'omnibus/fetcher'
+  autoload :FileSyncer,       'omnibus/file_syncer'
   autoload :Generator,        'omnibus/generator'
   autoload :GitCache,         'omnibus/git_cache'
   autoload :HealthCheck,      'omnibus/health_check'
@@ -45,7 +48,6 @@ module Omnibus
   autoload :Logger,           'omnibus/logger'
   autoload :Logging,          'omnibus/logging'
   autoload :NullArgumentable, 'omnibus/null_argumentable'
-  autoload :NullBuilder,      'omnibus/null_builder'
   autoload :Ohai,             'omnibus/ohai'
   autoload :Package,          'omnibus/package'
   autoload :Project,          'omnibus/project'
@@ -58,8 +60,8 @@ module Omnibus
 
   autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
   autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
+  autoload :NullFetcher,    'omnibus/fetchers/null_fetcher'
   autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
-  autoload :S3CacheFetcher, 'omnibus/fetchers/s3_cache_fetcher'
 
   autoload :ArtifactoryPublisher, 'omnibus/publishers/artifactory_publisher'
   autoload :NullPublisher,        'omnibus/publishers/null_publisher'

@@ -942,11 +942,11 @@ module Omnibus
         render_metadata(pkg_type)
 
         if Ohai['platform'] == 'windows'
-          FileUtils.cp(Dir["#{Config.package_dir}/*.msi*"], destination)
+          FileUtils.cp(FileSyncer.glob("#{Config.package_dir}/*.msi*"), destination)
         elsif Ohai['platform'] == 'aix'
-          FileUtils.cp(Dir["#{Config.package_dir}/*.bff*"], destination)
+          FileUtils.cp(FileSyncer.glob("#{Config.package_dir}/*.bff*"), destination)
         else
-          FileUtils.cp(Dir["#{Config.package_dir}/*"], destination)
+          FileUtils.cp(FileSyncer.glob("#{Config.package_dir}/*"), destination)
         end
       end
     end

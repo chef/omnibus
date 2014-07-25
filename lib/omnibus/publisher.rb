@@ -61,7 +61,7 @@ module Omnibus
     # @return [Array<String>]
     #
     def packages
-      @packages ||= Dir.glob(@pattern).map { |path| Package.new(path) }
+      @packages ||= FileSyncer.glob(@pattern).map { |path| Package.new(path) }
     end
 
     #

@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Chef Software, Inc.
+# Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,43 @@
 #
 
 module Omnibus
-  class NullBuilder < Builder
-    def build
-      log.info(log_key) { "Nothing to build for #{name}" }
+  class NullFetcher < Fetcher
+    #
+    # @return [false]
+    #
+    def fetch_required?
+      true
+    end
+
+    #
+    # @return [nil]
+    #
+    def version_guid
+      nil
+    end
+
+    #
+    # @return [false]
+    #
+    def clean
+      false
+    end
+
+    #
+    # @return [void]
+    #
+    def fetch
+      log.info(log_key) { "Fetching `#{software.name}' (nothing to fetch)" }
+
+      create_required_directories
+      nil
+    end
+
+    #
+    # @return [String]
+    #
+    def version_for_cache
+      nil
     end
   end
 end

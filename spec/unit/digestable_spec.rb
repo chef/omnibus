@@ -22,16 +22,16 @@ module Omnibus
       let(:io)      { StringIO.new }
 
       it 'inspects the file types of glob entries' do
-        expect(Dir).to receive(:glob).with(glob).and_return([subdir])
+        expect(FileSyncer).to receive(:glob).with(glob).and_return([subdir])
         expect(File).to receive(:ftype).with(subdir).and_return('directory')
-        expect(subject.digest_directory(path)).to eq('d4635f6b4c2a85ba603e1f9e6a65bd68')
+        expect(subject.digest_directory(path)).to eq('8b91792e7917b1152d8494670caaeb85')
       end
 
       it 'inspects the contents of the files' do
-        expect(Dir).to receive(:glob).with(glob).and_return([subfile])
+        expect(FileSyncer).to receive(:glob).with(glob).and_return([subfile])
         expect(File).to receive(:ftype).with(subfile).and_return('file')
         expect(File).to receive(:open).with(subfile).and_yield(io)
-        expect(subject.digest_directory(path)).to eq('73d045a78027e674811c36f3dbd09433')
+        expect(subject.digest_directory(path)).to eq('c8f023976b95ace2ae3678540fd3b4f1')
       end
     end
   end

@@ -41,21 +41,21 @@ module Omnibus
     end
 
     def clean_source_dir
-      Dir.glob("#{Config.source_dir}/**/*").each(&method(:remove_file))
+      FileSyncer.glob("#{Config.source_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_build_dir
-      Dir.glob("#{Config.build_dir}/**/*").each(&method(:remove_file))
+      FileSyncer.glob("#{Config.build_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_package_dir
       return unless purge?
-      Dir.glob("#{Config.package_dir}/**/*").each(&method(:remove_file))
+      FileSyncer.glob("#{Config.package_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_cache_dir
       return unless purge?
-      Dir.glob("#{Config.cache_dir}/**/*").each(&method(:remove_file))
+      FileSyncer.glob("#{Config.cache_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_install_dir

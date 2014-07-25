@@ -41,7 +41,7 @@ module Omnibus
       let(:uri) { URI.parse('http://example.com/foo.tar.gz') }
       before { allow(subject).to receive(:source_uri).and_return(uri) }
 
-      it_behaves_like 'a cleanroom getter', :downloaded_file
+      it_behaves_like 'a cleanroom getter', :project_file
     end
 
     describe "with_standard_compiler_flags helper" do
@@ -298,43 +298,6 @@ module Omnibus
       end
     end
 
-    context 'while getting version_for_cache' do
-      let(:fetcher) { nil }
-      let(:software_name) { 'zlib' }
-      let(:default_version) { '1.2.3' }
-
-      def get_version_for_cache(expected_version)
-        subject.instance_variable_set(:@fetcher, fetcher)
-        expect(subject.version_for_cache).to eq(expected_version)
-      end
-
-      context 'without a fetcher' do
-        it 'should return the default version' do
-          get_version_for_cache('1.2.3')
-        end
-      end
-
-      context 'with a NetFetcher' do
-        let(:fetcher) { NetFetcher.new(subject) }
-
-        it 'should return the default version' do
-          get_version_for_cache('1.2.3')
-        end
-      end
-
-      context 'with a GitFetcher' do
-        let(:fetcher) do
-          a = GitFetcher.new(subject)
-          allow(a).to receive(:target_revision).and_return('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
-          a
-        end
-
-        it 'should return the git sha' do
-          get_version_for_cache('4b19a96d57bff9bbf4764d7323b92a0944009b9e')
-        end
-      end
-    end
-
     describe '#shasum' do
       context 'when a filepath is given' do
         let(:path) { '/software.rb' }
@@ -352,7 +315,7 @@ module Omnibus
         end
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('3d870ac0c5cfb08f9015c3ad9a5a600b403d5ca421e69fc51a7efd5279b53827')
+          expect(subject.shasum).to eq('69dcce6da5580abe1da581e3f09d81e13ac676c48790eb0aa44d0ca2f93a16de')
         end
       end
 
@@ -360,7 +323,7 @@ module Omnibus
         before { subject.send(:remove_instance_variable, :@filepath) }
 
         it 'returns the correct shasum' do
-          expect(subject.shasum).to eq('f0a5ec68c2cc658a35c5dcf4dc88d6fe1dd8cce9b1649e8d43601d8f1e543598')
+          expect(subject.shasum).to eq('acd88f56f17b7cbc146f351a9265b652bcf96d544821e7bc1e9663c80617276d')
         end
       end
     end

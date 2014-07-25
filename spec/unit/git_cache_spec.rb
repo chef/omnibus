@@ -20,8 +20,6 @@ module Omnibus
 
     let(:install_dir) { project.install_dir }
 
-    let(:zlib_config) { File.join(RSpec::SPEC_DATA, 'software', 'zlib.rb') }
-
     let(:zlib) do
       Software.new(project, 'zlib.rb').evaluate do
         name 'zlib'

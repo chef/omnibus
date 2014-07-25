@@ -2,76 +2,6 @@ require 'rspec'
 require 'rspec/its'
 
 require 'omnibus'
-require 'fauxhai'
-
-module Omnibus
-  module RSpec
-    def fixtures_path
-      File.expand_path('../fixtures', __FILE__)
-    end
-
-    def tmp_path
-      File.expand_path('../../tmp', __FILE__)
-    end
-
-    #
-    # Stub the given environment key.
-    #
-    # @param [String] key
-    # @param [String] value
-    #
-    def stub_env(key, value)
-      unless @__env_already_stubbed__
-        allow(ENV).to receive(:[]).and_call_original
-        @__env_already_stubbed__ = true
-      end
-
-      allow(ENV).to receive(:[]).with(key).and_return(value.to_s)
-    end
-
-    #
-    # Stub Ohai with the given data.
-    #
-    # @param [Hash] data
-    #
-    def stub_ohai(options = {}, &block)
-      require 'ohai' unless defined?(Mash)
-
-      ohai = Mash.from_hash(Fauxhai.mock(options, &block).data)
-      allow(Ohai).to receive(:ohai).and_return(ohai)
-    end
-
-    #
-    # Grab the result of the log command. Since Omnibus uses the block form of
-    # the logger, this method handles both types of logging.
-    #
-    # @example
-    #   output = capture_logging { some_command }
-    #   expect(output).to include('whatever')
-    #
-    def capture_logging
-      original = Omnibus.logger
-      Omnibus.logger = TestLogger.new
-      yield
-      Omnibus.logger.output
-    ensure
-      Omnibus.logger = original
-    end
-  end
-end
-
-module Omnibus
-  class TestLogger < Logger
-    def initialize(*)
-      super(StringIO.new)
-      @level = -1
-    end
-
-    def output
-      @logdev.dev.string
-    end
-  end
-end
 
 def windows?
   !!(RUBY_PLATFORM =~ /mswin|mingw|windows/)
@@ -82,12 +12,33 @@ def mac?
 end
 
 RSpec.configure do |config|
-  config.include Omnibus::RSpec
-  config.filter_run focus: true
+  # Custom matchers and shared examples
+  require_relative 'support/examples'
+  require_relative 'support/matchers'
+
+  require_relative 'support/env_helpers'
+  config.include(Omnibus::RSpec::EnvHelpers)
+
+  require_relative 'support/file_helpers'
+  config.include(Omnibus::RSpec::FileHelpers)
+
+  require_relative 'support/git_helpers'
+  config.include(Omnibus::RSpec::GitHelpers)
+
+  require_relative 'support/logging_helpers'
+  config.include(Omnibus::RSpec::LoggingHelpers)
+
+  require_relative 'support/ohai_helpers'
+  config.include(Omnibus::RSpec::OhaiHelpers)
+
+  require_relative 'support/path_helpers'
+  config.include(Omnibus::RSpec::PathHelpers)
+
+  config.filter_run(focus: true)
   config.run_all_when_everything_filtered = true
 
-  config.filter_run_excluding windows_only: true unless windows?
-  config.filter_run_excluding mac_only: true unless mac?
+  config.filter_run_excluding(windows_only: true) unless windows?
+  config.filter_run_excluding(mac_only: true) unless mac?
 
   config.before(:each) do
     # Suppress logging
@@ -105,7 +56,6 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    # Reset config
     Omnibus.reset!
   end
 

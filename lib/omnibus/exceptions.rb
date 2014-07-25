@@ -353,4 +353,20 @@ another attribute or method that requires a `source' (URI) is defined.
 EOH
     end
   end
+
+  class ChecksumMismatch < Error
+    def initialize(software, expected, actual)
+      super <<-EOH
+Verification for #{software.name} failed due to a checksum mismatch:
+
+expected: #{expected}
+actual:   #{actual}
+
+This added security check is used to prevent MITM attacks when downloading the
+remote file. If you have updated the version or URL for the download, you will
+also need to update the checksum value. You can find the checksum value on the
+software publisher's website.
+EOH
+    end
+  end
 end
