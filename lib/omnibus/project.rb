@@ -1073,7 +1073,7 @@ module Omnibus
         pkg = Packager::MacPkg.new(self)
         Packager::MacDmg.new(pkg).package_name
       when 'rpm'
-        Packager::Rpm.new(self)
+        Packager::Rpm.new(self).package_name
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
