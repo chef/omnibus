@@ -91,7 +91,7 @@ module Omnibus
         # We need to override some of the variable's git uses for generating
         # the SHASUM for testing purposes
         #
-        time = Time.at(680227200).strftime('%c %z')
+        time = Time.at(680227200).utc.strftime('%c %z')
         env  = {
           'GIT_AUTHOR_NAME'     => 'omnibus',
           'GIT_AUTHOR_EMAIL'    => 'omnibus@getchef.com',
