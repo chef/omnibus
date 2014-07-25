@@ -1316,13 +1316,6 @@ PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
     # @return [Mixlib::ShellOut] returns the underlying Mixlib::ShellOut
     #   object, so the caller can inspect the stdout and stderr.
     def run_package_command(cmd)
-      if cmd.is_a?(Array)
-        command = cmd[0]
-        cmd_options.merge!(cmd[1])
-      else
-        command = cmd
-      end
-
       shellout!(command, cwd: Config.package_dir)
     end
 
