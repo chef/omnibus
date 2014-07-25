@@ -62,7 +62,7 @@ module Omnibus
         scripts[:after_remove] = File.join(package_scripts_path, 'postrm')
       end
 
-      output_check(Dir.pwd)
+      output_check(Config.package_dir)
       %w(BUILD RPMS SRPMS SOURCES SPECS).each { |d| create_directory(build_path(d)) }
     end
 
@@ -294,11 +294,9 @@ module Omnibus
       execute(args.join(' '))
 
       ::Dir["#{build_path}/RPMS/**/*.rpm"].each do |rpmpath|
-        FileUtils.cp(rpmpath, Dir.pwd)
+        FileUtils.cp(rpmpath, Config.package_dir)
       end
     end
-
-    private
 
     def initialize(project)
       super
