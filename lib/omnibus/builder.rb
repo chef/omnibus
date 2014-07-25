@@ -77,6 +77,8 @@ module Omnibus
     # @return [void]
     #
     def command(command, options = {})
+      warn_for_shell_commands(command)
+
       build_commands << BuildCommand.new("Execute: `#{command}'") do
         _shellout!(command, options)
       end
@@ -728,6 +730,32 @@ module Omnibus
     #
     def log_key
       @log_key ||= "#{super}: #{software.name}"
+    end
+
+    #
+    # Inspect the given command and warn if the command "looks" like it is a
+    # shell command that has a DSL method. (like +command 'cp'+ versus +copy+).
+    #
+    # @param [String] command
+    #   the command to check
+    #
+    # @return [void]
+    #
+    def warn_for_shell_commands(command)
+      case command
+      when /^cp/i
+        log.warn(log_key) { "Detected command `cp'. Consider using the `copy' DSL method." }
+      when /^rubocopy/i
+        log.warn(log_key) { "Detected command `rubocopy'. Consider using the `sync' DSL method." }
+      when /^mv/i
+        log.warn(log_key) { "Detected command `mv'. Consider using the `move' DSL method." }
+      when /^rm/i
+        log.warn(log_key) { "Detected command `rm'. Consider using the `delete' DSL method." }
+      when /^remove/i
+        log.warn(log_key) { "Detected command `remove'. Consider using the `delete' DSL method." }
+      when /^rsync/i
+        log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
+      end
     end
 
     #
