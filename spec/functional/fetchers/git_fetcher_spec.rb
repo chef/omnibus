@@ -28,8 +28,8 @@ module Omnibus
             # Dirty the project_dir to differ the revisions
             Dir.chdir(project_dir) do
               FileUtils.touch("file-#{Time.now.to_i}")
-              shellout! %|git add .|
-              shellout! %|git commit -am "Add new file"|
+              git %|add .|
+              git %|commit -am "Add new file"|
             end
 
             expect(subject.fetch_required?).to be_truthy
@@ -94,7 +94,7 @@ module Omnibus
 
         it 'parses the tag' do
           subject.fetch
-          expect(revision).to include('c02a264')
+          expect(revision).to eq('53c72c4abcc961b153996f5b5f402ce715e47146')
         end
       end
 
@@ -104,17 +104,17 @@ module Omnibus
 
         it 'parses the branch' do
           subject.fetch
-          expect(revision).to include('6ba1270')
+          expect(revision).to eq('171a1aec35ac0a050f8dccd9c9ef4609b1d8d8ea')
         end
       end
 
       context 'when the version is a ref' do
-        let(:version) { '68acfe1' }
+        let(:version) { '45ded6d' }
         let(:remote)  { remote_git_repo('zlib') }
 
         it 'parses the ref' do
           subject.fetch
-          expect(revision).to include('68acfe1')
+          expect(revision).to eq('45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
         end
       end
     end
