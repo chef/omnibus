@@ -137,14 +137,34 @@ module Omnibus
       @ui ||= Thor::Base.shell.new
     end
 
+    #
     # Load in an Omnibus configuration file.  Values will be merged with
     # and override the defaults defined in {Config}.
     #
     # @param [String] file path to a configuration file to load
     #
     # @return [void]
+    #
     def load_configuration(file)
       Config.load(file)
+    end
+
+    #
+    # Locate an executable in the current $PATH.
+    #
+    # @return [String, nil]
+    #   the path to the executable, or +nil+ if not present
+    #
+    def which(executable)
+      if File.file?(executable) && File.executable?(executable)
+        executable
+      elsif ENV['PATH']
+        path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |path|
+          File.executable?(File.join(path, executable))
+        end
+
+        path && File.expand_path(executable, path)
+      end
     end
 
     #

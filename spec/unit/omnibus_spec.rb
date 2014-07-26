@@ -18,6 +18,18 @@ describe Omnibus do
     Omnibus::Config.software_gems(['omnibus-software', 'custom-omnibus-software'])
   end
 
+  describe '#which' do
+    it 'returns nil when the file does not exist' do
+      stub_env('PATH', nil)
+      expect(subject.which('not_a_real_executable')).to be nil
+    end
+
+    it 'retusnt the path when the file exists' do
+      ruby = Bundler.which('ruby')
+      expect(subject.which(ruby)).to eq(ruby)
+    end
+  end
+
   describe '#project_path' do
     before do
       allow(Omnibus).to receive(:project_map)
