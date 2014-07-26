@@ -342,7 +342,7 @@ module Omnibus
     # The following DSL methods are available from within build blocks that
     # mutate the file system.
     #
-    # **These commands are run from inside {Software#install_dir}, so exercise
+    # **These commands are run from inside {Software#project_dir}, so exercise
     # good judgement when using relative paths!**
     # --------------------------------------------------
 
@@ -359,7 +359,7 @@ module Omnibus
     #
     def mkdir(directory, options = {})
       build_commands << BuildCommand.new("mkdir `#{directory}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           FileUtils.mkdir_p(directory, options)
         end
       end
@@ -378,7 +378,7 @@ module Omnibus
     #
     def touch(file, options = {})
       build_commands << BuildCommand.new("touch `#{file}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           parent = File.dirname(file)
           FileUtils.mkdir_p(parent) unless File.directory?(parent)
 
@@ -401,7 +401,7 @@ module Omnibus
     #
     def delete(path, options = {})
       build_commands << BuildCommand.new("delete `#{path}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           FileSyncer.glob(path).each do |file|
             FileUtils.rm_rf(file, options)
           end
@@ -424,7 +424,7 @@ module Omnibus
     #
     def copy(source, destination, options = {})
       build_commands << BuildCommand.new("copy `#{source}' to `#{destination}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           FileSyncer.glob(source).each do |file|
             FileUtils.cp_r(file, destination, options)
           end
@@ -447,7 +447,7 @@ module Omnibus
     #
     def move(source, destination, options = {})
       build_commands << BuildCommand.new("move `#{source}' to `#{destination}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           FileSyncer.glob(source).each do |file|
             FileUtils.mv(file, destination, options)
           end
@@ -470,7 +470,7 @@ module Omnibus
     #
     def link(source, destination, options = {})
       build_commands << BuildCommand.new("link `#{source}' to `#{destination}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           FileSyncer.glob(source).each do |file|
             FileUtils.ln_s(file, destination, options)
           end
@@ -490,7 +490,7 @@ module Omnibus
     #
     def sync(source, destination, options = {})
       build_commands << BuildCommand.new("sync `#{source}' to `#{destination}'") do
-        Dir.chdir(software.install_dir) do
+        Dir.chdir(software.project_dir) do
           FileSyncer.sync(source, destination, options)
         end
       end
