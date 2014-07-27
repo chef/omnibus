@@ -744,17 +744,17 @@ module Omnibus
     #
     def warn_for_shell_commands(command)
       case command
-      when /^cp/i
+      when /^cp /i
         log.warn(log_key) { "Detected command `cp'. Consider using the `copy' DSL method." }
-      when /^rubocopy/i
+      when /^rubocopy /i
         log.warn(log_key) { "Detected command `rubocopy'. Consider using the `sync' DSL method." }
-      when /^mv/i
+      when /^mv /i
         log.warn(log_key) { "Detected command `mv'. Consider using the `move' DSL method." }
-      when /^rm/i
+      when /^rm /i
         log.warn(log_key) { "Detected command `rm'. Consider using the `delete' DSL method." }
-      when /^remove/i
+      when /^remove /i
         log.warn(log_key) { "Detected command `remove'. Consider using the `delete' DSL method." }
-      when /^rsync/i
+      when /^rsync /i
         log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
       end
     end
