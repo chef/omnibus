@@ -1,6 +1,12 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+v3.2.1 (July 26, 2014)
+----------------------
+- Add support for overriding publish platform/version
+- Expose platform/version override options on `omnibus publish`
+- Expose the `sync` method in the builder DSL and fix the broken tests
+
 v3.2.0 (July 23, 2014)
 ----------------------
 - Make build commands output during `log.info` instead of `log.debug`
