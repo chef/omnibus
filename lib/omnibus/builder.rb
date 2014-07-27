@@ -567,6 +567,7 @@ module Omnibus
         end
       end
     end
+    expose :sync
 
     #
     # @!endgroup
