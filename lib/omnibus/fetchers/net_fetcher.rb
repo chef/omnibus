@@ -216,10 +216,39 @@ module Omnibus
     end
 
     #
+    # The list of headers to pass to the download.
     #
+    # @return [Hash]
     #
     def download_headers
       {}.tap do |h|
+        # Alright kids, sit down while grandpa tells you a story. Back when the
+        # Internet was just a series of tubes, and you had to "dial in" using
+        # this thing called a "modem", ancient astronaunt theorists (computer
+        # scientists) invented gzip to compress requests sent over said tubes
+        # and make the Internet faster.
+        #
+        # Fast forward to the year of broadband - ungzipping these files was
+        # tedious and hard, so Ruby and other client libraries decided to do it
+        # for you:
+        #
+        #   https://github.com/ruby/ruby/blob/c49ae7/lib/net/http.rb#L1031-L1033
+        #
+        # Meanwhile, software manufacturers began automatically compressing
+        # their software for distribution as a +.tar.gz+, publishing the
+        # appropriate checksums accordingly.
+        #
+        # But consider... If a software manufacturer is publishing the checksum
+        # for a gzipped tarball, and the client is automatically ungzipping its
+        # responses, then checksums can (read: should) never match! Herein lies
+        # the bug that took many hours away from the lives of a once-happy
+        # developer.
+        #
+        # TL;DR - Do not let Ruby ungzip our file
+        #
+        h['Accept-Encoding'] = 'identity'
+
+        # Set the cookie if one was given
         h['Cookie'] = source[:cookie] if source[:cookie]
       end
     end
