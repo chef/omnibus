@@ -173,7 +173,7 @@ module Omnibus
     ### Will need something like this to handle excludes:
     # remove the files during the input phase rather than deleting them here
     def exclude
-      return if project.exclusions == []
+      return if project.exclusions.empty?
 
       Find.find(staging_path) do |path|
         match_path = path.sub("#{staging_path.chomp('/')}/", '')
