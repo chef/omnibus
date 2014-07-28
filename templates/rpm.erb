@@ -38,7 +38,7 @@ Conflicts: <%= project.conflicts %>
 Obsoletes: <%= project.replaces %>
 <%- end -%>
 %description
-<%= description.gsub(/^\s*$/, " .") %>
+<%= project.description.gsub(/^\s*$/, " .") %>
 
 %prep
 # noop
@@ -80,6 +80,6 @@ Obsoletes: <%= project.replaces %>
 <%# list only files, not directories? -%>
 <% files.each do |path| -%>
 <%   path = "/#{path}" -%>
-<%   next if config_files.include?(path)-%>
+<%   next if project.config_files.include?(path)-%>
 <%= rpm_file_entry(path) %>
 <% end -%>
