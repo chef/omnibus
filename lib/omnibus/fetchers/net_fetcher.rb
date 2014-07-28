@@ -139,7 +139,7 @@ module Omnibus
     def download
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
-      file = open(download_url, download_headers)
+      file = open(download_url, 'rb', download_headers)
       FileUtils.cp(file.path, downloaded_file)
       file.close
     rescue SocketError,
