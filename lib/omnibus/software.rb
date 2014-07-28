@@ -44,6 +44,10 @@ module Omnibus
           instance = new(project, filepath)
           instance.evaluate_file(filepath)
           instance.load_dependencies
+
+          # Add the loaded compontent to the library
+          project.library.component_added(instance)
+
           instance
         end
       end
@@ -561,7 +565,6 @@ module Omnibus
     def load_dependencies
       dependencies.each do |dependency|
         software = Software.load(project, dependency)
-        project.library.component_added(software)
       end
 
       true
