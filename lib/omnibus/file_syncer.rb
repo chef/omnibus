@@ -74,7 +74,7 @@ module Omnibus
         [exclude, "#{exclude}/*"]
       end.flatten
 
-      source_files = glob("#{source}/**/*")
+      source_files = glob(File.join(source, '**/*'))
       source_files = source_files.reject do |source_file|
         basename = relative_path_for(source_file, source)
         excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH) }
@@ -84,7 +84,29 @@ module Omnibus
       FileUtils.mkdir_p(destination) unless File.directory?(destination)
 
       # Copy over the filtered source files
-      FileUtils.cp_r(source_files, destination)
+      source_files.each do |source_file|
+        relative_path = relative_path_for(source_file, source)
+
+        # Create the parent directory
+        parent = File.join(destination, File.dirname(relative_path))
+        FileUtils.mkdir_p(parent) unless File.directory?(parent)
+
+        case File.ftype(source_file).to_sym
+        when :directory
+          FileUtils.mkdir_p("#{destination}/#{relative_path}")
+        when :link
+          target = File.readlink(source_file)
+
+          Dir.chdir(destination) do
+            FileUtils.ln_sf(target, "#{destination}/#{relative_path}")
+          end
+        when :file
+          FileUtils.cp(source_file, "#{destination}/#{relative_path}")
+        else
+          raise RuntimeError,
+            "Unknown file type: `File.ftype(source_file)' at `#{source_file}'!"
+        end
+      end
 
       # Remove any files in the destination that are not in the source files
       destination_files = glob("#{destination}/**/*")

@@ -3,24 +3,25 @@ require 'fileutils'
 module Omnibus
   module RSpec
     module FileHelpers
-      def create_directory(path)
-        FileUtils.mkdir_p(path)
+      def create_directory(*paths)
+        FileUtils.mkdir_p(File.join(*paths))
       end
 
-      def remove_directory(path)
-        FileUtils.rm_rf(path)
+      def remove_directory(*paths)
+        FileUtils.rm_rf(File.join(*paths))
       end
       alias_method :remove_file, :remove_directory
 
-      def create_file(path, contents = nil)
+      def create_file(*paths, &block)
+        path = File.join(*paths)
         create_directory(File.dirname(path))
 
-        if contents.nil?
-          FileUtils.touch(path)
-        else
+        if block
           File.open(path, 'wb') do |f|
-            f.write(contents)
+            f.write(block.call)
           end
+        else
+          FileUtils.touch(path)
         end
       end
 

@@ -19,8 +19,8 @@ module Omnibus
     describe '#fetch_required?' do
       context 'when the directories have different files' do
         before do
-          create_file("#{source_path}/directory/file", 'different')
-          create_file("#{project_dir}/directory/file", 'same')
+          create_file("#{source_path}/directory/file") { 'different' }
+          create_file("#{project_dir}/directory/file") { 'same' }
         end
 
         it 'return true' do
@@ -30,8 +30,8 @@ module Omnibus
 
       context 'when the directories have the same files' do
         before do
-          create_file("#{source_path}/directory/file", 'same')
-          create_file("#{project_dir}/directory/file", 'same')
+          create_file("#{source_path}/directory/file") { 'same' }
+          create_file("#{project_dir}/directory/file") { 'same' }
         end
 
         it 'returns false' do

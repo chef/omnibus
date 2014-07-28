@@ -101,6 +101,71 @@ module Omnibus
         end
       end
 
+      context 'with deeply nested paths and symlinks' do
+        let(:source) do
+          source = File.join(tmp_path, 'source')
+          FileUtils.mkdir_p(source)
+
+          create_directory(source, 'bin')
+               create_file(source, 'bin', 'apt')
+               create_file(source, 'bin', 'yum')
+
+          create_file(source, 'LICENSE') { 'MIT' }
+
+          create_directory(source, 'include')
+          create_directory(source, 'include', 'linux')
+               create_file(source, 'include', 'linux', 'init.ini')
+
+          create_directory(source, 'source')
+          create_directory(source, 'source', 'bin')
+               create_file(source, 'source', 'bin', 'apt')
+               create_file(source, 'source', 'bin', 'yum')
+               create_file(source, 'source', 'LICENSE') { 'Apache 2.0' }
+
+          create_directory(source, 'empty_directory')
+
+          create_directory(source, 'links')
+                 create_file(source, 'links', 'home.html')
+                 FileUtils.ln_s("./home.html", "#{source}/links/index.html")
+                 FileUtils.ln_s("./home.html", "#{source}/links/default.html")
+                 FileUtils.ln_s("../source/bin/apt", "#{source}/links/apt")
+
+          FileUtils.ln_s('/foo/bar', "#{source}/root")
+
+          source
+        end
+
+        it 'copies relative and absolute symlinks' do
+          described_class.sync(source, destination)
+
+          expect("#{destination}/bin").to be_a_directory
+          expect("#{destination}/bin/apt").to be_a_file
+          expect("#{destination}/bin/yum").to be_a_file
+
+          expect("#{destination}/LICENSE").to be_a_file
+
+          expect("#{destination}/include").to be_a_directory
+          expect("#{destination}/include/linux").to be_a_directory
+          expect("#{destination}/include/linux/init.ini").to be_a_file
+
+          expect("#{destination}/source").to be_a_directory
+          expect("#{destination}/source/bin").to be_a_directory
+          expect("#{destination}/source/bin/apt").to be_a_file
+          expect("#{destination}/source/bin/yum").to be_a_file
+          expect("#{destination}/source/LICENSE").to be_a_file
+
+          expect("#{destination}/empty_directory").to be_a_directory
+
+          expect("#{destination}/links").to be_a_directory
+          expect("#{destination}/links/home.html").to be_a_file
+          expect("#{destination}/links/index.html").to be_a_symlink_to("./home.html")
+          expect("#{destination}/links/default.html").to be_a_symlink_to("./home.html")
+          expect("#{destination}/links/apt").to be_a_symlink_to("../source/bin/apt")
+
+          expect("#{destination}/root").to be_a_symlink_to('/foo/bar')
+        end
+      end
+
       context 'when :exclude is given' do
         it 'does not copy files and folders that match the pattern' do
           described_class.sync(source, destination, exclude: '.dot_folder')
