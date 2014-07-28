@@ -297,8 +297,6 @@ module Omnibus
         end
         build_cmd = args.join(' ')
         script_cmd = "#{Omnibus.source_root.join('bin', 'sign-rpm')} \"#{build_cmd}\""
-        puts "SCRIPT_CMD is #{script_cmd}"
-        puts "MACROS_HOME is #{macros_home}"
         execute(script_cmd, environment: { 'HOME' => macros_home })
       else
         execute(args.join(' '))
