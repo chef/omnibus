@@ -284,19 +284,22 @@ module Omnibus
       specfile = File.join(build_path("SPECS"), "#{package_name}.spec")
       File.write(specfile, rpmspec)
 
-      blob = `cat #{specfile}`
-      puts "SPECFILE IS #{blob}"
-      puts "END OF SPECFILE"
-
       args << specfile
 
-      puts "ARGS is #{args.inspect}"
-
       if Config.sign_pkg
+        if File.exist?("#{ENV['HOME']}/.rpmmacros")
+          macros_home = ENV['HOME']
+        else
+          rpmmacros = template('rpmmacros.erb').result(binding)
+          macros_file = File.join(staging_path, '.rpmmacros')
+          File.write(macros_file, rpmmacros)
+          macros_home = staging_path
+        end
         build_cmd = args.join(' ')
         script_cmd = "#{Omnibus.source_root.join('bin', 'sign-rpm')} \"#{build_cmd}\""
         puts "SCRIPT_CMD is #{script_cmd}"
-        execute(script_cmd)
+        puts "MACROS_HOME is #{macros_home}"
+        execute(script_cmd, environment: { 'HOME' => macros_home })
       else
         execute(args.join(' '))
       end
