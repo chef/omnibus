@@ -129,21 +129,21 @@ module Omnibus
       context 'when on RHEL' do
         let(:fauxhai_options) { { platform: 'redhat', version: '6.4' } }
         it 'should return a RHEL iteration' do
-          expect(project.build_iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on Debian' do
         let(:fauxhai_options) { { platform: 'debian', version: '7.2' } }
         it 'should return a Debian iteration' do
-          expect(project.build_iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on FreeBSD' do
         let(:fauxhai_options) { { platform: 'freebsd', version: '9.1' } }
         it 'should return a FreeBSD iteration' do
-          expect(project.build_iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
@@ -151,14 +151,14 @@ module Omnibus
         before { stub_ohai(platform: 'windows', version: '2008R2') }
         before { stub_const('File::ALT_SEPARATOR', '\\') }
         it 'returns a Windows iteration' do
-          expect(project.build_iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on OS X' do
         let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
         it 'should return a generic iteration' do
-          expect(project.build_iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
     end
