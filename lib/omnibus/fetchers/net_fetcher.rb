@@ -139,7 +139,14 @@ module Omnibus
     def download
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
-      file = open(download_url, download_headers)
+      headers = download_headers
+
+      if source[:unsafe]
+        log.warn(log_key) { "Permitting unsafe redirects!" }
+        headers[:allow_unsafe_redirects] = true
+      end
+
+      file = open(download_url, headers)
       FileUtils.cp(file.path, downloaded_file)
       file.close
     rescue SocketError,
