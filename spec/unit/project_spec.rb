@@ -128,21 +128,21 @@ module Omnibus
 
       context 'when on RHEL' do
         let(:fauxhai_options) { { platform: 'redhat', version: '6.4' } }
-        it 'should return a RHEL iteration' do
+        it 'returns a RHEL iteration' do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on Debian' do
         let(:fauxhai_options) { { platform: 'debian', version: '7.2' } }
-        it 'should return a Debian iteration' do
+        it 'returns a Debian iteration' do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on FreeBSD' do
         let(:fauxhai_options) { { platform: 'freebsd', version: '9.1' } }
-        it 'should return a FreeBSD iteration' do
+        it 'returns a FreeBSD iteration' do
           expect(subject.build_iteration).to eq(1)
         end
       end
@@ -157,7 +157,7 @@ module Omnibus
 
       context 'when on OS X' do
         let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
-        it 'should return a generic iteration' do
+        it 'returns a generic iteration' do
           expect(subject.build_iteration).to eq(1)
         end
       end
