@@ -245,6 +245,7 @@ module Omnibus
 
     def run_rpm(output_path)
       args = ["rpmbuild", "-bb"]
+      args += ['--sign'] if Config.sign_pkg
       args += [
         "--define", "\'buildroot #{build_path}/BUILD\'",
         "--define", "\'_topdir #{build_path}\'",
@@ -291,7 +292,14 @@ module Omnibus
 
       puts "ARGS is #{args.inspect}"
 
-      execute(args.join(' '))
+      if Config.sign_pkg
+        build_cmd = args.join(' ')
+        script_cmd = "#{Omnibus.source_root.join('bin', 'sign-rpm')} \"#{build_cmd}\""
+        puts "SCRIPT_CMD is #{script_cmd}"
+        execute(script_cmd)
+      else
+        execute(args.join(' '))
+      end
 
       ::Dir["#{build_path}/RPMS/**/*.rpm"].each do |rpmpath|
         FileUtils.cp(rpmpath, Config.package_dir)
