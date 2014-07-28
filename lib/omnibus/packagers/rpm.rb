@@ -54,12 +54,12 @@ module Omnibus
         scripts[:after_install] = File.join(project.package_scripts_path, 'postinst')
       end
 
-      if File.exist?("#{package_scripts_path}/prerm")
-        scripts[:before_remove] = File.join(package_scripts_path, 'prerm')
+      if File.exist?("#{project.package_scripts_path}/prerm")
+        scripts[:before_remove] = File.join(project.package_scripts_path, 'prerm')
       end
 
-      if File.exist?("#{package_scripts_path}/postrm")
-        scripts[:after_remove] = File.join(package_scripts_path, 'postrm')
+      if File.exist?("#{project.package_scripts_path}/postrm")
+        scripts[:after_remove] = File.join(project.package_scripts_path, 'postrm')
       end
 
       output_check(Config.package_dir)
