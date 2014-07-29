@@ -86,13 +86,14 @@ module Omnibus
       version
     end
 
-    ### Will need something like this to generate the file entry in the spec file
+    #
+    # Generate specfile entry for a file
+    #
     def rpm_file_entry(file)
       original_file = file
       file = rpm_fix_name(file)
     end
 
-    ### Will need something like this to straighten out the path names for rpm_file_entry
     # Fix path name
     # Replace [ with [\[] to make rpm not use globs
     # Replace * with [*] to make rpm not use globs
@@ -106,7 +107,9 @@ module Omnibus
       name = name.gsub("%", "[%]")
     end
 
-    ### Will need something like this to create the staging directory
+    #
+    # Create staging directory for building RPMs
+    #
     def staging_path(path=nil)
       @staging_path ||= ::Dir.mktmpdir('package-rpm-staging') #, ::Dir.pwd)
 
@@ -115,9 +118,11 @@ module Omnibus
       else
         return File.join(@staging_path, path)
       end
-    end # def staging_path
+    end
 
-    ### Will need something like this to create the build directory
+    #
+    # Create directory from which RPM will be built
+    #
     def build_path(path=nil)
       @build_path ||= ::Dir.mktmpdir('package-rpm-build') #, ::Dir.pwd)
 
@@ -126,20 +131,24 @@ module Omnibus
       else
         return File.join(@build_path, path)
       end
-    end # def build_path
+    end
 
-    # Does this package have the given script?
+    #
+    # Does the package contain the named script?
+    #
     def script?(name)
       return scripts.include?(name)
-    end # def script?
+    end
 
-    # Get the contents of the script by a given name.
+    #
+    # Get the contents of an RPM package script by name
+    #
     def script(script_name)
       scripts[script_name]
     end
 
-    ### Will need something like this to populate the %files bit of the template
-    # List all files in the staging_path
+    #
+    # List all files in the staging_path (derived from fpm)
     #
     # The paths will all be relative to staging_path and will not include that
     # path.
@@ -168,10 +177,12 @@ module Omnibus
         .select { |path| path != staging_path } \
         .select { |path| is_leaf.call(path) } \
         .collect { |path| path[staging_path.length + 1.. -1] }
-    end # def files
+    end
 
-    ### Will need something like this to handle excludes:
-    # remove the files during the input phase rather than deleting them here
+    #
+    # Remove excluded files
+    # @see {Omnibus::Project.exclude}
+    #
     def exclude
       return if project.exclusions.empty?
 
@@ -187,9 +198,11 @@ module Omnibus
           end
         end
       end
-    end # def exclude
+    end
 
-    ### Will need something like this to generate the template
+    #
+    # Helper method for location of rpm packaging templates.
+    #
     def template_dir
       File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "..", "templates"))
     end
@@ -206,7 +219,6 @@ module Omnibus
       File.write(dest, content)
     end
 
-    ### Will need something like this to verify files; structure is wrong
     def output_check(output_path)
       # we shouldn't have to do the first case because we put the package in Config.package_dir
       # which already gets made because omnibus is opinionated.
@@ -218,6 +230,9 @@ module Omnibus
       end
     end # def output_check
 
+    #
+    # Construct and run the rpmbuild command
+    #
     def run_rpm(output_path)
       args = ["rpmbuild", "-bb"]
       args += ['--sign'] if Config.sign_pkg
