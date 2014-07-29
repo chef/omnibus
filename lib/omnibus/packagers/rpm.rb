@@ -241,12 +241,10 @@ module Omnibus
         cfg_path = File.join(staging_path, path)
         raise "Config file path #{cfg_path} does not exist" unless File.exist?(cfg_path)
         Find.find(cfg_path) do |p|
-          allconfigs << p.gsub("#{staging_path}/", '') if File.file? p
+          allconfigs << Pathname.new(p).relative_path_from(Pathname.new(staging_path)) if File.file? p
         end
       end
       allconfigs.sort!.uniq!
-
-      #project.config_files = allconfigs.map { |x| File.join("/", x) }
 
       # Prune excluded files
       exclude
