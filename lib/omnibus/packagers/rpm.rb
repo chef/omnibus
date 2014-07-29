@@ -21,7 +21,7 @@ module Omnibus
   #
   # Builds an rpm package
   #
-  class Packager::Rpm < Packager::Base
+  class Packager::RPM < Packager::Base
     require 'find'
 
     attr_accessor :scripts

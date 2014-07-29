@@ -80,7 +80,7 @@ module Omnibus
     autoload :MacPkg,     'omnibus/packagers/mac_pkg'
     autoload :Makeself,   'omnibus/packagers/makeself'
     autoload :Pkgmk,      'omnibus/packagers/pkgmk'
-    autoload :Rpm,        'omnibus/packagers/rpm'
+    autoload :RPM,        'omnibus/packagers/rpm'
     autoload :WindowsMsi, 'omnibus/packagers/windows_msi'
   end
 

@@ -926,7 +926,7 @@ module Omnibus
         elsif pkg_type == 'mac_dmg'
           # noop, since the dmg creation is handled by the packager
         elsif pkg_type == 'rpm'
-          Packager::Rpm.new(self).run!
+          Packager::RPM.new(self).run!
         else # pkg_type == "fpm"
           run_fpm(pkg_type)
         end
@@ -1073,7 +1073,7 @@ module Omnibus
         pkg = Packager::MacPkg.new(self)
         Packager::MacDmg.new(pkg).package_name
       when 'rpm'
-        Packager::Rpm.new(self).package_name
+        Packager::RPM.new(self).package_name
       else # fpm
         require "fpm/package/#{pkg_type}"
         pkg = FPM::Package.types[pkg_type].new
