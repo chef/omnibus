@@ -208,6 +208,8 @@ module Omnibus
 
     ### Will need something like this to verify files; structure is wrong
     def output_check(output_path)
+      # we shouldn't have to do the first case because we put the package in Config.package_dir
+      # which already gets made because omnibus is opinionated.
       if !File.directory?(File.dirname(output_path))
         raise ParentDirectoryMissing.new(output_path)
       end
@@ -215,36 +217,6 @@ module Omnibus
         raise "An RPM with the same name already exists at #{output_path}"
       end
     end # def output_check
-
-    # I think we should bail on this in favor of doing a straight copy.
-    # If we have to handle the case of symlinked files, then we can do it then.
-    def copy_entry(src, dst)
-      case File.ftype(src)
-      # Ask SV how to handle this without ffi.
-      # (bail on this for the moment, b/c I think including ffi is a thing)
-      # when 'fifo', 'characterSpecial', 'blockSpecial', 'socket'
-      #  st = File.stat(src)
-      #  rc = mknod_w(dst, st.mode, st.dev)
-      #  raise SystemCallError.new("mknod error", FFI.errno) if rc == -1
-      when 'directory'
-        FileUtils.mkdir(dst) unless File.exists? dst
-      else
-        # if the file with the same dev and inode has been copied already -
-        # hard link it's copy to `dst`, otherwise make an actual copy
-        st = File.lstat(src)
-        known_entry = copied_entries[[st.dev, st.ino]]
-        if known_entry
-          FileUtils.ln(known_entry, dst)
-        else
-          FileUtils.copy_entry(src, dst)
-          copied_entries[[st.dev, st.ino]] = dst
-        end
-      end # else...
-    end # def copy_entry
-
-    def copied_entries
-      return @copied_entries ||= {}
-    end # def copied_entries
 
     def run_rpm(output_path)
       args = ["rpmbuild", "-bb"]
@@ -273,15 +245,9 @@ module Omnibus
       # Prune excluded files
       exclude
 
-      # Copy files from staging directory to build directory.
-      # We might not need to do the additional copy, since
-      # we don't allow templated scripts, we are simplifying assumptions about links
-      # and weird files; the only thing we do to staging is delete the excluded files.
-      Find.find(staging_path) do |path|
-        src = path.gsub(/^#{staging_path}/, '')
-        dst = File.join(build_path, 'BUILD', src)
-        copy_entry(path, dst)
-      end
+      # sync files from staging to build
+      destination = File.join(build_path, 'BUILD')
+      FileSyncer.sync(staging_path, destination)
 
       render_template('rpm.erb', File.join(build_path("SPECS"), "#{package_name}.spec"))
 
