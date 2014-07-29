@@ -72,7 +72,8 @@ module Omnibus
     end
 
     clean do
-      # nothing yet
+      remove_directory(staging_path)
+      remove_directory(build_path)
     end
 
     # @see Base#package_name
