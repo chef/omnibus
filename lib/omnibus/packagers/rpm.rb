@@ -172,10 +172,7 @@ module Omnibus
       # Also trim the leading path such that '#{staging_path}/' is removed from
       # the path before returning.
       #
-      # Wrapping Find.find in an Enumerator is required for sane operation in ruby 1.8.7,
-      # but requires the 'backports' gem (which is used in other places in fpm)
-      # If omnibus does not support ruby 1.8.7, then we can get rid of the backports gem.
-      return Enumerator.new { |y| Find.find(staging_path) { |path| y << path } } \
+      Find.find(staging_path) \
         .select { |path| path != staging_path } \
         .select { |path| is_leaf.call(path) } \
         .collect { |path| path[staging_path.length + 1.. -1] }
