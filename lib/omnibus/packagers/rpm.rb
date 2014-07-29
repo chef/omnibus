@@ -27,6 +27,8 @@ module Omnibus
     attr_accessor :scripts
 
     validate do
+      # Do not build an RPM if one with the same name already exists.
+      !File.exist?(File.join(Config.package_dir, package_name))
     end
 
     setup do
@@ -62,7 +64,6 @@ module Omnibus
         scripts[:after_remove] = File.join(project.package_scripts_path, 'postrm')
       end
 
-      output_check(Config.package_dir)
       %w(BUILD RPMS SRPMS SOURCES SPECS).each { |d| create_directory(build_path(d)) }
     end
 
@@ -218,17 +219,6 @@ module Omnibus
       content = erb.result(binding)
       File.write(dest, content)
     end
-
-    def output_check(output_path)
-      # we shouldn't have to do the first case because we put the package in Config.package_dir
-      # which already gets made because omnibus is opinionated.
-      if !File.directory?(File.dirname(output_path))
-        raise ParentDirectoryMissing.new(output_path)
-      end
-      if File.file?(output_path)
-        raise "An RPM with the same name already exists at #{output_path}"
-      end
-    end # def output_check
 
     #
     # Construct and run the rpmbuild command
