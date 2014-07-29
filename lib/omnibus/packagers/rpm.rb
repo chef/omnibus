@@ -194,13 +194,16 @@ module Omnibus
       File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "..", "templates"))
     end
 
-    ### Can we use our render_template method?
-    def template(path)
-      template_path = File.join(template_dir, path)
+    #
+    # @see {Packager::Base.render_template}
+    #
+    def render_template(src, dest)
+      template_path = File.join(template_dir, src)
       template_code = File.read(template_path)
       erb = ERB.new(template_code, nil, "-")
       erb.filename = template_path
-      return erb
+      content = erb.result(binding)
+      File.write(dest, content)
     end
 
     ### Will need something like this to verify files; structure is wrong
@@ -280,19 +283,15 @@ module Omnibus
         copy_entry(path, dst)
       end
 
-      rpmspec = template("rpm.erb").result(binding)
-      specfile = File.join(build_path("SPECS"), "#{package_name}.spec")
-      File.write(specfile, rpmspec)
+      render_template('rpm.erb', File.join(build_path("SPECS"), "#{package_name}.spec"))
 
-      args << specfile
+      args << File.join(build_path("SPECS"), "#{package_name}.spec")
 
       if Config.sign_pkg
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           macros_home = ENV['HOME']
         else
-          rpmmacros = template('rpmmacros.erb').result(binding)
-          macros_file = File.join(staging_path, '.rpmmacros')
-          File.write(macros_file, rpmmacros)
+          render_template('rpmmacros.erb', File.join(staging_path, '.rpmmacros'))
           macros_home = staging_path
         end
         build_cmd = args.join(' ')
