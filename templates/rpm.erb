@@ -1,0 +1,85 @@
+# Based on fpm's rpm template.
+
+%define __spec_prep_post true
+%define __spec_prep_pre true
+%define __spec_build_post true
+%define __spec_build_pre true
+%define __spec_install_post true
+%define __spec_install_pre true
+%define __spec_clean_post true
+%define __spec_clean_pre true
+
+# Use md5
+%define _binary_filedigest_algorithm 1
+# Use gzip payload compression
+%define _binary_payload w9.gzdio
+
+Name: <%= project.package_name %>
+Version: <%= package_version(project.build_version) %>
+Release: <%= project.iteration or 1 %>
+Summary:  <%= project.description.split("\n").first.empty? ? "_" :  project.description.split("\n").first %>
+BuildArch: <%= Ohai['kernel']['machine'] %>
+AutoReqProv: no
+BuildRoot: %buildroot
+Prefix: /
+Group: <%= project.package_group || 'default' %>
+License: unknown
+Vendor: <%= [ENV["USER"], Socket.gethostname].join("@") %>
+URL: <%= project.homepage %>
+Packager: <%= project.maintainer %>
+<% project.runtime_dependencies.each do |rundep| -%>
+Requires: <%= rundep %>
+<% end -%>
+<% project.conflicts.each do |conflict| -%>
+Conflicts: <%= project.conflicts %>
+<% end -%>
+# Obsoletes is the RPM equivalent of "replaces"
+<%- unless project.replaces.nil? -%>
+Obsoletes: <%= project.replaces %>
+<%- end -%>
+%description
+<%= project.description.gsub(/^\s*$/, " .") %>
+
+%prep
+# noop
+
+%build
+# noop
+
+%install
+# noop
+
+%clean
+# noop
+
+<%
+  scriptmap = {
+    :before_install => "pre",
+    :after_install => "post",
+    :before_remove => "preun",
+    :after_remove => "postun",
+    :rpm_verifyscript => "verifyscript",
+    :rpm_posttrans => "posttrans",
+    :rpm_pretrans => "pretrans"
+  }
+  scriptmap.each do |name, rpmname|
+-%>
+<%   if script?(name) -%>
+%<%= rpmname %>
+<%= script(name) %>
+
+<%   end -%>
+<% end -%>
+
+%files
+%defattr(-,<%= project.package_user || "root" %>,<%= project.package_group || "root" %>,-)
+<%# Output config files and then regular files. -%>
+<% project.config_files.each do |path| -%>
+%config(noreplace) <%= rpm_file_entry(path) %>
+<% end -%>
+<%# list only files, not directories? -%>
+<% files.each do |path| -%>
+<%   path = "/#{path}" -%>
+<%   next if project.config_files.include?(path)-%>
+<%= rpm_file_entry(path) %>
+<% end -%>
