@@ -19,7 +19,7 @@ module Omnibus
   #
   # Builds a Windows MSI package (.msi extension)
   #
-  class Packager::WindowsMsi < Packager::Base
+  class Packager::MSI < Packager::Base
     # !@method msi_parameters
     #   @return (see Project#msi_parameters)
     def_delegator :@project, :msi_parameters, :msi_parameters

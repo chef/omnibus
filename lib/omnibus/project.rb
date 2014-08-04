@@ -916,7 +916,7 @@ module Omnibus
         if pkg_type == 'makeself'
           Packger::Makeself.new(self).run!
         elsif pkg_type == 'msi'
-          Packager::WindowsMsi.new(self).run!
+          Packager::MSI.new(self).run!
         elsif pkg_type == 'bff'
           Packager::BFF.new(self).run!
         elsif pkg_type == 'pkgmk'
@@ -1062,7 +1062,7 @@ module Omnibus
       when 'makeself'
         Packager::Makeself.new(self).package_name
       when 'msi'
-        Packager::WindowsMsi.new(self).package_name
+        Packager::MSI.new(self).package_name
       when 'bff'
         Packger::Bff.new(self).package_name
       when 'pkgmk'
