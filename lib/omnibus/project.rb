@@ -921,8 +921,8 @@ module Omnibus
           Packager::BFF.new(self).run!
         elsif pkg_type == 'pkgmk'
           Packager::Pkgmk.new(self).run!
-        elsif pkg_type == 'mac_pkg'
-          Packager::MacPkg.new(self).run!
+        elsif pkg_type == 'pkg'
+          Packager::PKG.new(self).run!
         elsif pkg_type == 'mac_dmg'
           # noop, since the dmg creation is handled by the packager
         elsif pkg_type == 'rpm'
@@ -1031,7 +1031,7 @@ module Omnibus
       when 'windows'
         %w(msi)
       when 'mac_os_x'
-        %w(mac_pkg mac_dmg)
+        %w(pkg mac_dmg)
       else
         %w(makeself)
       end
@@ -1067,10 +1067,10 @@ module Omnibus
         Packger::Bff.new(self).package_name
       when 'pkgmk'
         Packager::Pkgmk.new(self).package_name
-      when 'mac_pkg'
-        Packager::MacPkg.new(self).package_name
+      when 'pkg'
+        Packager::PKG.new(self).package_name
       when 'mac_dmg'
-        pkg = Packager::MacPkg.new(self)
+        pkg = Packager::PKG.new(self)
         Packager::MacDmg.new(pkg).package_name
       when 'rpm'
         Packager::RPM.new(self).package_name

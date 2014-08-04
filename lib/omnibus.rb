@@ -76,9 +76,9 @@ module Omnibus
   module Packager
     autoload :Base,       'omnibus/packagers/base'
     autoload :BFF,        'omnibus/packagers/bff'
-    autoload :MacPkg,     'omnibus/packagers/mac_pkg'
     autoload :Makeself,   'omnibus/packagers/makeself'
     autoload :MSI,        'omnibus/packagers/msi'
+    autoload :PKG,        'omnibus/packagers/pkg'
     autoload :Pkgmk,      'omnibus/packagers/pkgmk'
     autoload :RPM,        'omnibus/packagers/rpm'
 
