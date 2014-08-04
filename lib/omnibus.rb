@@ -76,12 +76,14 @@ module Omnibus
   module Packager
     autoload :Base,       'omnibus/packagers/base'
     autoload :BFF,        'omnibus/packagers/bff'
-    autoload :MacDmg,     'omnibus/packagers/mac_dmg'
     autoload :MacPkg,     'omnibus/packagers/mac_pkg'
     autoload :Makeself,   'omnibus/packagers/makeself'
     autoload :MSI,        'omnibus/packagers/msi'
     autoload :Pkgmk,      'omnibus/packagers/pkgmk'
     autoload :RPM,        'omnibus/packagers/rpm'
+
+    # TODO - this is really a "compressor"
+    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
   end
 
   class << self
