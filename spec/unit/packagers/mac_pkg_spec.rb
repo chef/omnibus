@@ -50,7 +50,7 @@ module Omnibus
       double(Project,
         name: project_name,
         build_version: '23.4.2',
-        iteration: 4,
+        build_iteration: 4,
         maintainer: "Joe's Software",
         install_dir: '/opt/myproject',
         files_path: files_path,

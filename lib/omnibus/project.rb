@@ -867,26 +867,16 @@ module Omnibus
     # to the conventions of the platform for which the package is
     # being built.
     #
-    # All iteration strings begin with the value set in {#build_iteration}
+    # @deprecated Use +build_iteration+ instead.
     #
-    # @return [String]
+    # @return [String] build_iteration
+    #
     def iteration
-      case Ohai['platform_family']
-      when 'rhel'
-        Ohai['platform_version'] =~ /^(\d+)/
-        maj = Regexp.last_match[1]
-        "#{build_iteration}.el#{maj}"
-      when 'freebsd'
-        Ohai['platform_version'] =~ /^(\d+)/
-        maj = Regexp.last_match[1]
-        "#{build_iteration}.#{Ohai['platform']}.#{maj}.#{Ohai['kernel']['machine']}"
-      when 'windows'
-        "#{build_iteration}.windows"
-      when 'aix', 'debian', 'mac_os_x'
-        "#{build_iteration}"
-      else
-        "#{build_iteration}.#{Ohai['platform']}.#{Ohai['platform_version']}"
+      log.deprecated(log_key) do
+        "iteration (DSL). Please use build_iteration instead."
       end
+
+      build_iteration
     end
 
     def build_me
@@ -924,15 +914,15 @@ module Omnibus
 
       package_types.each do |pkg_type|
         if pkg_type == 'makeself'
-          run_makeself
+          Packger::Makeself.new(self).run!
         elsif pkg_type == 'msi'
-          run_msi
+          Packager::WindowsMsi.new(self).run!
         elsif pkg_type == 'bff'
-          run_bff
+          Packager::Bff.new(self).run!
         elsif pkg_type == 'pkgmk'
-          run_pkgmk
+          Packager::Pkgmk.new(self).run!
         elsif pkg_type == 'mac_pkg'
-          run_mac_package_build
+          Packager::MacPkg.new(self).run!
         elsif pkg_type == 'mac_dmg'
           # noop, since the dmg creation is handled by the packager
         else # pkg_type == "fpm"
@@ -1068,13 +1058,13 @@ module Omnibus
     def output_package(pkg_type)
       case pkg_type
       when 'makeself'
-        "#{package_name}-#{build_version}_#{iteration}.sh"
+        Packager::Makeself.new(self).package_name
       when 'msi'
         Packager::WindowsMsi.new(self).package_name
       when 'bff'
-        "#{package_name}.#{bff_version}.bff"
+        Packger::Bff.new(self).package_name
       when 'pkgmk'
-        "#{package_name}-#{build_version}-#{iteration}.solaris"
+        Packager::Pkgmk.new(self).package_name
       when 'mac_pkg'
         Packager::MacPkg.new(self).package_name
       when 'mac_dmg'
@@ -1085,18 +1075,13 @@ module Omnibus
         pkg = FPM::Package.types[pkg_type].new
         pkg.version = build_version
         pkg.name = package_name
-        pkg.iteration = iteration
+        pkg.iteration = build_iteration
         if pkg_type == 'solaris'
           pkg.to_s('NAME.FULLVERSION.ARCH.TYPE')
         else
           pkg.to_s
         end
       end
-    end
-
-    def bff_command
-      bff_command = ['sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template']
-      [bff_command.join(' '), { returns: [0] }]
     end
 
     # The {https://github.com/jordansissel/fpm fpm} command to
@@ -1118,7 +1103,7 @@ module Omnibus
         "-v #{build_version}",
         "-n #{package_name}",
         "-p #{output_package(pkg_type)}",
-        "--iteration #{iteration}",
+        "--iteration #{build_iteration}",
         "-m '#{maintainer}'",
         "--description '#{description}'",
         "--url #{homepage}",
@@ -1179,130 +1164,6 @@ module Omnibus
       # Install path must be the final entry in the command
       command_and_opts << install_dir
       command_and_opts
-    end
-
-    # TODO: what's this do?
-    def makeself_command
-      command_and_opts = [
-        Omnibus.source_root.join('bin', 'makeself.sh'),
-        '--gzip',
-        install_dir,
-        output_package('makeself'),
-        "'The full stack of #{@name}'",
-      ]
-      command_and_opts << './makeselfinst' if File.exist?("#{package_scripts_path}/makeselfinst")
-      command_and_opts
-    end
-
-    # Runs the makeself commands to make a self extracting archive package.
-    # As a (necessary) side-effect, sets
-    # @return void
-    def run_makeself
-      package_commands = []
-      # copy the makeself installer into package
-      if File.exist?("#{package_scripts_path}/makeselfinst")
-        package_commands << "cp #{package_scripts_path}/makeselfinst #{install_dir}/"
-      end
-
-      # run the makeself program
-      package_commands << makeself_command.join(' ')
-
-      # rm the makeself installer (for incremental builds)
-      package_commands << "rm -f #{install_dir}/makeselfinst"
-      package_commands.each { |cmd| run_package_command(cmd) }
-    end
-
-    # Runs the necessary command to make an MSI. As a side-effect, sets +output_package+
-    # @return void
-    def run_msi
-      Packager::WindowsMsi.new(self).run!
-    end
-
-    def bff_version
-      build_version.split(/[^\d]/)[0..2].join('.') + ".#{iteration}"
-    end
-
-    def run_bff
-      FileUtils.rm_rf '/.info/*'
-      FileUtils.rm_rf '/tmp/bff'
-      FileUtils.mkdir '/tmp/bff'
-
-      system "find #{install_dir} -print > /tmp/bff/file.list"
-
-      system "cat #{package_scripts_path}/aix/opscode.chef.client.template | sed -e 's/TBS/#{bff_version}/' > /tmp/bff/gen.preamble"
-
-      # @todo can we just use an erb template here?
-      system "cat /tmp/bff/gen.preamble /tmp/bff/file.list #{package_scripts_path}/aix/opscode.chef.client.template.last > /tmp/bff/gen.template"
-
-      FileUtils.cp "#{package_scripts_path}/aix/unpostinstall.sh", "#{install_dir}/bin"
-      FileUtils.cp "#{package_scripts_path}/aix/postinstall.sh", "#{install_dir}/bin"
-
-      run_package_command(bff_command)
-
-      FileUtils.cp "/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff"
-    end
-
-    def pkgmk_version
-      "#{build_version}-#{iteration}"
-    end
-
-    def run_pkgmk
-      install_dirname = File.dirname(install_dir)
-      install_basename = File.basename(install_dir)
-
-      system 'sudo rm -rf /tmp/pkgmk'
-      FileUtils.mkdir '/tmp/pkgmk'
-
-      system "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
-
-      prototype_content = <<-EOF
-i pkginfo
-i postinstall
-i postremove
-      EOF
-
-      File.open '/tmp/pkgmk/Prototype', 'w+' do |f|
-        f.write prototype_content
-      end
-
-      # generate the prototype's file list
-      system "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
-
-      # fix up the user and group in the file list to root
-      system "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
-
-      pkginfo_content = <<-EOF
-CLASSES=none
-TZ=PST
-PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
-BASEDIR=#{install_dirname}
-PKG=#{package_name}
-NAME=#{package_name}
-ARCH=#{`uname -p`.chomp}
-VERSION=#{pkgmk_version}
-CATEGORY=application
-DESC=#{description}
-VENDOR=#{maintainer}
-EMAIL=#{maintainer}
-PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
-      EOF
-
-      File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
-        f.write pkginfo_content
-      end
-
-      FileUtils.cp "#{package_scripts_path}/postinst", '/tmp/pkgmk/postinstall'
-      FileUtils.cp "#{package_scripts_path}/postrm", '/tmp/pkgmk/postremove'
-
-      shellout!("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
-
-      system 'pkgchk -vd /tmp/pkgmk chef'
-
-      system "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{output_package("pkgmk")} chef"
-    end
-
-    def run_mac_package_build
-      Packager::MacPkg.new(self).run!
     end
 
     # Runs the necessary command to make a package with fpm. As a side-effect,

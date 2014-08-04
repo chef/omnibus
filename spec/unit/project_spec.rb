@@ -121,45 +121,44 @@ module Omnibus
       end
     end
 
-    describe '#iteration' do
-      context 'when on RHEL' do
-        before { stub_ohai(platform: 'redhat', version: '6.4') }
+    describe '#build_iteration' do
+      let(:fauxhai_options) { Hash.new }
 
+      before { stub_ohai(fauxhai_options) }
+
+      context 'when on RHEL' do
+        let(:fauxhai_options) { { platform: 'redhat', version: '6.4' } }
         it 'returns a RHEL iteration' do
-          expect(subject.iteration).to eq('1.el6')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on Debian' do
-        before { stub_ohai(platform: 'debian', version: '7.2') }
-
+        let(:fauxhai_options) { { platform: 'debian', version: '7.2' } }
         it 'returns a Debian iteration' do
-          expect(subject.iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on FreeBSD' do
-        before { stub_ohai(platform: 'freebsd', version: '9.1') }
-
+        let(:fauxhai_options) { { platform: 'freebsd', version: '9.1' } }
         it 'returns a FreeBSD iteration' do
-          expect(subject.iteration).to eq('1.freebsd.9.amd64')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on Windows' do
         before { stub_ohai(platform: 'windows', version: '2008R2') }
         before { stub_const('File::ALT_SEPARATOR', '\\') }
-
         it 'returns a Windows iteration' do
-          expect(subject.iteration).to eq('1.windows')
+          expect(subject.build_iteration).to eq(1)
         end
       end
 
       context 'when on OS X' do
-        before { stub_ohai(platform: 'mac_os_x', version: '10.8.2') }
-
+        let(:fauxhai_options) { { platform: 'mac_os_x', version: '10.8.2' } }
         it 'returns a generic iteration' do
-          expect(subject.iteration).to eq('1')
+          expect(subject.build_iteration).to eq(1)
         end
       end
     end

@@ -10,7 +10,7 @@ module Omnibus
       double(Project,
         name: 'hamlet',
         build_version: '1.0.0',
-        iteration: '12902349',
+        build_iteration: '12902349',
         mac_pkg_identifier: 'com.chef.hamlet',
         install_dir: '/opt/hamlet',
         package_scripts_path: 'package-scripts',
