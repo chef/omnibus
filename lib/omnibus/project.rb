@@ -918,7 +918,7 @@ module Omnibus
         elsif pkg_type == 'msi'
           Packager::WindowsMsi.new(self).run!
         elsif pkg_type == 'bff'
-          Packager::Bff.new(self).run!
+          Packager::BFF.new(self).run!
         elsif pkg_type == 'pkgmk'
           Packager::Pkgmk.new(self).run!
         elsif pkg_type == 'mac_pkg'
