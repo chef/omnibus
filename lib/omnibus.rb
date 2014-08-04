@@ -79,7 +79,7 @@ module Omnibus
     autoload :Makeself,   'omnibus/packagers/makeself'
     autoload :MSI,        'omnibus/packagers/msi'
     autoload :PKG,        'omnibus/packagers/pkg'
-    autoload :Pkgmk,      'omnibus/packagers/pkgmk'
+    autoload :Solaris,    'omnibus/packagers/solaris'
     autoload :RPM,        'omnibus/packagers/rpm'
 
     # TODO - this is really a "compressor"

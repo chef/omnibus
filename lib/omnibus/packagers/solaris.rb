@@ -19,7 +19,7 @@ module Omnibus
   #
   # Builds a pkgmk package (.solaris extention)
   #
-  class Packager::Pkgmk < Packager::Base
+  class Packager::Solaris < Packager::Base
 
     setup do
       purge_directory(staging_dir)

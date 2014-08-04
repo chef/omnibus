@@ -919,8 +919,8 @@ module Omnibus
           Packager::MSI.new(self).run!
         elsif pkg_type == 'bff'
           Packager::BFF.new(self).run!
-        elsif pkg_type == 'pkgmk'
-          Packager::Pkgmk.new(self).run!
+        elsif pkg_type == 'solaris'
+          Packager::Solaris.new(self).run!
         elsif pkg_type == 'pkg'
           Packager::PKG.new(self).run!
         elsif pkg_type == 'mac_dmg'
@@ -1027,7 +1027,7 @@ module Omnibus
       when 'aix'
         %w(bff)
       when 'solaris2'
-        %w(pkgmk)
+        %w(solaris)
       when 'windows'
         %w(msi)
       when 'mac_os_x'
@@ -1065,8 +1065,8 @@ module Omnibus
         Packager::MSI.new(self).package_name
       when 'bff'
         Packger::Bff.new(self).package_name
-      when 'pkgmk'
-        Packager::Pkgmk.new(self).package_name
+      when 'solaris'
+        Packager::Solaris.new(self).package_name
       when 'pkg'
         Packager::PKG.new(self).package_name
       when 'mac_dmg'
