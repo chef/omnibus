@@ -18,7 +18,7 @@
 require 'spec_helper'
 
 module Omnibus
-  describe Packager::WindowsMsi, :functional, :windows_only do
+  describe Packager::MSI, :functional, :windows_only do
     let(:project) do
       Project.new('/project.rb').evaluate do
         name          'sample'
@@ -29,7 +29,7 @@ module Omnibus
       end
     end
 
-    let(:windows_packager) { Packager::WindowsMsi.new(project) }
+    subject { described_class.new(project) }
 
     before do
       # Tell things to install into the cache directory
@@ -53,7 +53,7 @@ module Omnibus
 
     it 'builds a pkg and a dmg' do
       # Create the pkg resource
-      windows_packager.run!
+      subject.run!
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name

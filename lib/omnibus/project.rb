@@ -916,13 +916,13 @@ module Omnibus
         if pkg_type == 'makeself'
           Packger::Makeself.new(self).run!
         elsif pkg_type == 'msi'
-          Packager::WindowsMsi.new(self).run!
+          Packager::MSI.new(self).run!
         elsif pkg_type == 'bff'
-          Packager::Bff.new(self).run!
-        elsif pkg_type == 'pkgmk'
-          Packager::Pkgmk.new(self).run!
-        elsif pkg_type == 'mac_pkg'
-          Packager::MacPkg.new(self).run!
+          Packager::BFF.new(self).run!
+        elsif pkg_type == 'solaris'
+          Packager::Solaris.new(self).run!
+        elsif pkg_type == 'pkg'
+          Packager::PKG.new(self).run!
         elsif pkg_type == 'mac_dmg'
           # noop, since the dmg creation is handled by the packager
         elsif pkg_type == 'rpm'
@@ -1027,11 +1027,11 @@ module Omnibus
       when 'aix'
         %w(bff)
       when 'solaris2'
-        %w(pkgmk)
+        %w(solaris)
       when 'windows'
         %w(msi)
       when 'mac_os_x'
-        %w(mac_pkg mac_dmg)
+        %w(pkg mac_dmg)
       else
         %w(makeself)
       end
@@ -1062,15 +1062,15 @@ module Omnibus
       when 'makeself'
         Packager::Makeself.new(self).package_name
       when 'msi'
-        Packager::WindowsMsi.new(self).package_name
+        Packager::MSI.new(self).package_name
       when 'bff'
         Packger::Bff.new(self).package_name
-      when 'pkgmk'
-        Packager::Pkgmk.new(self).package_name
-      when 'mac_pkg'
-        Packager::MacPkg.new(self).package_name
+      when 'solaris'
+        Packager::Solaris.new(self).package_name
+      when 'pkg'
+        Packager::PKG.new(self).package_name
       when 'mac_dmg'
-        pkg = Packager::MacPkg.new(self)
+        pkg = Packager::PKG.new(self)
         Packager::MacDmg.new(pkg).package_name
       when 'rpm'
         Packager::RPM.new(self).package_name

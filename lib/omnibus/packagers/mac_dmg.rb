@@ -52,11 +52,11 @@ module Omnibus
     #
     # Create a new DMG packager.
     #
-    # @param [Packager::MacPkg] mac_packager
+    # @param [Packager::PKG] mac_packager
     #
-    def initialize(mac_packager)
-      @packager = mac_packager
-      super(mac_packager.project)
+    def initialize(packager)
+      @packager = packager
+      super(packager.project)
     end
 
     #

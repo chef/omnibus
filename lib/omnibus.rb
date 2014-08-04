@@ -58,10 +58,10 @@ module Omnibus
   autoload :Sugarable,        'omnibus/sugarable'
   autoload :Util,             'omnibus/util'
 
-  autoload :GitFetcher,     'omnibus/fetchers/git_fetcher'
-  autoload :NetFetcher,     'omnibus/fetchers/net_fetcher'
-  autoload :NullFetcher,    'omnibus/fetchers/null_fetcher'
-  autoload :PathFetcher,    'omnibus/fetchers/path_fetcher'
+  autoload :GitFetcher,  'omnibus/fetchers/git_fetcher'
+  autoload :NetFetcher,  'omnibus/fetchers/net_fetcher'
+  autoload :NullFetcher, 'omnibus/fetchers/null_fetcher'
+  autoload :PathFetcher, 'omnibus/fetchers/path_fetcher'
 
   autoload :ArtifactoryPublisher, 'omnibus/publishers/artifactory_publisher'
   autoload :NullPublisher,        'omnibus/publishers/null_publisher'
@@ -74,14 +74,16 @@ module Omnibus
   end
 
   module Packager
-    autoload :Base,       'omnibus/packagers/base'
-    autoload :Bff,        'omnibus/packagers/bff'
-    autoload :MacDmg,     'omnibus/packagers/mac_dmg'
-    autoload :MacPkg,     'omnibus/packagers/mac_pkg'
-    autoload :Makeself,   'omnibus/packagers/makeself'
-    autoload :Pkgmk,      'omnibus/packagers/pkgmk'
-    autoload :RPM,        'omnibus/packagers/rpm'
-    autoload :WindowsMsi, 'omnibus/packagers/windows_msi'
+    autoload :Base,     'omnibus/packagers/base'
+    autoload :BFF,      'omnibus/packagers/bff'
+    autoload :Makeself, 'omnibus/packagers/makeself'
+    autoload :MSI,      'omnibus/packagers/msi'
+    autoload :PKG,      'omnibus/packagers/pkg'
+    autoload :Solaris,  'omnibus/packagers/solaris'
+    autoload :RPM,      'omnibus/packagers/rpm'
+
+    # TODO - this is really a "compressor"
+    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
   end
 
   class << self

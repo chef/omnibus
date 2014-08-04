@@ -12,7 +12,7 @@ contains the set of instructions for installating a piece of software on a
 target system.
 
 ### Requirements
-The omnibus generator will create some stock files in `files/mac_pkg`:
+The omnibus generator will create some stock files in `files/pkg`:
 
 - `background.png` - the background image for the installer. We recommend this
 image has a light background color (otherwise, the text will be difficult to

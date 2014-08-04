@@ -2,7 +2,7 @@ require 'stringio'
 require 'spec_helper'
 
 module Omnibus
-  describe Packager::MacPkg do
+  describe Packager::PKG do
     before do
       Config.package_dir('/home/someuser/omnibus-myproject/pkg')
       Config.package_tmp('/var/cache/omnibus/pkg-tmp')
@@ -44,7 +44,7 @@ module Omnibus
   EOH
     end
 
-    let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution' }
+    let(:expected_distribution_path) { '/var/cache/omnibus/pkg-tmp/pkg/Distribution' }
 
     let(:project) do
       double(Project,
@@ -60,18 +60,18 @@ module Omnibus
       )
     end
 
-    let(:packager) { Packager::MacPkg.new(project) }
+    subject { described_class.new(project) }
 
     it 'names the component package PROJECT_NAME-core.pkg' do
-      expect(packager.component_pkg).to eq('myproject-core.pkg')
+      expect(subject.component_pkg).to eq('myproject-core.pkg')
     end
 
     it 'names the product package PROJECT_NAME.pkg' do
-      expect(packager.package_name).to eq('myproject-23.4.2-4.pkg')
+      expect(subject.package_name).to eq('myproject-23.4.2-4.pkg')
     end
 
     it 'runs pkgbuild' do
-      expect(packager).to receive(:execute).with <<-EOH.gsub(/^ {8}/, '')
+      expect(subject).to receive(:execute).with <<-EOH.gsub(/^ {8}/, '')
         pkgbuild \\
           --identifier "com.mycorp.myproject" \\
           --version "23.4.2" \\
@@ -80,7 +80,7 @@ module Omnibus
           --install-location "/opt/myproject" \\
           "myproject-core.pkg"
       EOH
-      packager.build_component_pkg
+      subject.build_component_pkg
     end
 
     it 'generates a Distribution file describing the product package content' do
@@ -88,7 +88,7 @@ module Omnibus
       allow(File).to receive(:open).with(any_args).and_yield(file)
 
       expect(file).to receive(:puts).with(expected_distribution_content)
-      packager.generate_distribution
+      subject.generate_distribution
     end
 
     describe 'generating the distribution file' do
@@ -101,7 +101,7 @@ module Omnibus
       end
 
       it 'writes the distribution file to the staging directory' do
-        packager.generate_distribution
+        subject.generate_distribution
         expect(distribution_file.string).to eq(expected_distribution_content)
       end
     end
@@ -109,14 +109,14 @@ module Omnibus
     describe '#build_product_pkg' do
       context 'when pkg signing is disabled' do
         it 'generates the distribution and runs productbuild' do
-          expect(packager).to receive(:execute).with <<-EOH.gsub(/^ {12}/, '')
+          expect(subject).to receive(:execute).with <<-EOH.gsub(/^ {12}/, '')
             productbuild \\
-              --distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution" \\
-              --resources "/var/cache/omnibus/pkg-tmp/mac_pkg/Resources" \\
+              --distribution "/var/cache/omnibus/pkg-tmp/pkg/Distribution" \\
+              --resources "/var/cache/omnibus/pkg-tmp/pkg/Resources" \\
               "/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg"
           EOH
 
-          packager.build_product_pkg
+          subject.build_product_pkg
         end
       end
 
@@ -127,14 +127,14 @@ module Omnibus
         end
 
         it 'includes the signing parameters in the product build command' do
-          expect(packager).to receive(:execute).with  <<-EOH.gsub(/^ {12}/, '')
+          expect(subject).to receive(:execute).with  <<-EOH.gsub(/^ {12}/, '')
             productbuild \\
-              --distribution "/var/cache/omnibus/pkg-tmp/mac_pkg/Distribution" \\
-              --resources "/var/cache/omnibus/pkg-tmp/mac_pkg/Resources" \\
+              --distribution "/var/cache/omnibus/pkg-tmp/pkg/Distribution" \\
+              --resources "/var/cache/omnibus/pkg-tmp/pkg/Resources" \\
               --sign "My Special Identity" \\
               "/home/someuser/omnibus-myproject/pkg/myproject-23.4.2-4.pkg"
             EOH
-          packager.build_product_pkg
+          subject.build_product_pkg
         end
       end
 
@@ -143,7 +143,7 @@ module Omnibus
         let(:project_name) { 'My $Project' }
 
         it 'uses com.example.PROJECT_NAME as the identifier' do
-          expect(packager.identifier).to eq('test.joessoftware.pkg.myproject')
+          expect(subject.identifier).to eq('test.joessoftware.pkg.myproject')
         end
       end
     end

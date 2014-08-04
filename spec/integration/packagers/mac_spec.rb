@@ -13,7 +13,7 @@ module Omnibus
       end
     end
 
-    let(:mac_packager) { Packager::MacPkg.new(project) }
+    let(:mac_packager) { Packager::PKG.new(project) }
 
     before do
       # Tell things to install into the cache directory
