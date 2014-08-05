@@ -77,6 +77,7 @@ module Omnibus
   module Packager
     autoload :Base,     'omnibus/packagers/base'
     autoload :BFF,      'omnibus/packagers/bff'
+    autoload :DEB,      'omnibus/packagers/deb'
     autoload :Makeself, 'omnibus/packagers/makeself'
     autoload :MSI,      'omnibus/packagers/msi'
     autoload :PKG,      'omnibus/packagers/pkg'

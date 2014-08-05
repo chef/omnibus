@@ -927,8 +927,10 @@ module Omnibus
           # noop, since the dmg creation is handled by the packager
         elsif pkg_type == 'rpm'
           Packager::RPM.new(self).run!
-        else # pkg_type == "fpm"
-          run_fpm(pkg_type)
+        elsif pkg_type == 'deb'
+          Packager::DEB.new(self).run!
+        else
+          raise RuntimeError, "I do not know how to package a `#{pkg_type}'!"
         end
 
         render_metadata(pkg_type)
@@ -1163,6 +1165,10 @@ module Omnibus
       # the final install path
       extra_package_files.each do |files|
         command_and_opts << files
+      when 'deb'
+        Packager::DEB.new(self).package_name
+      else
+        raise RuntimeError, "I do not know how to build a `#{pkg_type}'!"
       end
 
       # Install path must be the final entry in the command
