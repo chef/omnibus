@@ -2,22 +2,20 @@ require 'stringio'
 
 module Omnibus
   describe Packager::Base do
-    before do
-      Config.package_tmp('pkg-tmp')
+    let(:project) do
+      Project.new.tap do |project|
+        project.name('project')
+        project.install_dir('/opt/project')
+        project.build_version('1.2.3')
+        project.build_iteration('2')
+        project.maintainer('Chef Software')
+        project.mac_pkg_identifier('com.getchef.project')
+      end
     end
 
-    let(:project) do
-      double(Project,
-        name: 'hamlet',
-        build_version: '1.0.0',
-        build_iteration: '12902349',
-        mac_pkg_identifier: 'com.chef.hamlet',
-        install_dir: '/opt/hamlet',
-        package_scripts_path: 'package-scripts',
-        files_path: 'files',
-        resources_path: nil,
-        friendly_name: 'HAMLET',
-      )
+    before do
+      # Force the Dir.mktmpdir call on staging_dir
+      allow(Dir).to receive(:mktmpdir).and_return('/tmp/dir')
     end
 
     subject { described_class.new(project) }
@@ -127,49 +125,6 @@ module Omnibus
       end
     end
 
-    describe '#render_template' do
-      it 'return when source is not an erb template' do
-        expect(File).not_to receive(:open)
-        subject.render_template('source.txt')
-      end
-
-      shared_examples_for 'render_template' do
-        let(:output) { StringIO.new }
-
-        before do
-          input = StringIO.new
-          input.write('<%= project.friendly_name %>')
-          input.rewind
-
-          allow(File).to receive(:open).with(source_path).and_yield(input)
-          allow(File).to receive(:open).with(expected_destination_path, 'w').and_yield(output)
-
-          expect(subject).to receive(:remove_file).with(source_path)
-        end
-
-        it 'should render correctly' do
-          subject.render_template(source_path, destination_path)
-          expect(output.string).to eq('HAMLET')
-        end
-      end
-
-      context 'when destination is specified' do
-        let(:source_path) { 'source.txt.erb' }
-        let(:destination_path) { 'destination.txt' }
-        let(:expected_destination_path) { destination_path }
-
-        include_examples 'render_template'
-      end
-
-      context 'when destination is not specified' do
-        let(:source_path) { 'source.txt.erb' }
-        let(:destination_path) { nil }
-        let(:expected_destination_path) { 'source.txt' }
-
-        include_examples 'render_template'
-      end
-    end
-
     describe '#remove_file' do
       before { allow(FileUtils).to receive(:rm_f) }
 
@@ -214,23 +169,23 @@ module Omnibus
     end
 
     describe '#staging_dir' do
-      it 'is the project package tmp and underscored named' do
-        name = "#{Config.package_tmp}/base"
-        expect(subject.send(:staging_dir)).to eq(File.expand_path(name))
+      it 'creates a temporary directory' do
+        expect(Dir).to receive(:mktmpdir)
+        subject.send(:staging_dir)
       end
     end
 
     describe '#staging_resources_path' do
       it 'is base/Resources under package temp' do
-        name = "#{Config.package_tmp}/base/Resources"
-        expect(subject.send(:staging_resources_path)).to eq(File.expand_path(name))
+        name = "/tmp/dir/Resources"
+        expect(subject.send(:staging_resources_path)).to eq(name)
       end
     end
 
     describe '#resource' do
       it 'prefixes to the resources_path' do
-        path = 'pkg-tmp/base/Resources/icon.png'
-        expect(subject.send(:resource, 'icon.png')).to eq(File.expand_path(path))
+        path = '/tmp/dir/Resources/icon.png'
+        expect(subject.send(:resource, 'icon.png')).to eq(path)
       end
     end
 

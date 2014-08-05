@@ -34,7 +34,6 @@ module Omnibus
     include_examples 'a configurable', :source_dir, '/var/cache/omnibus/src'
     include_examples 'a configurable', :build_dir, '/var/cache/omnibus/build'
     include_examples 'a configurable', :package_dir, '/var/cache/omnibus/pkg'
-    include_examples 'a configurable', :package_tmp, '/var/cache/omnibus/pkg-tmp'
     include_examples 'a configurable', :project_root, Dir.pwd
     include_examples 'a configurable', :build_dmg, true
     include_examples 'a configurable', :dmg_window_bounds, '100, 100, 750, 600'
@@ -55,7 +54,6 @@ module Omnibus
       include_examples 'a configurable', :source_dir, 'C:/omnibus-ruby/src'
       include_examples 'a configurable', :build_dir, 'C:/omnibus-ruby/build'
       include_examples 'a configurable', :package_dir, 'C:/omnibus-ruby/pkg'
-      include_examples 'a configurable', :package_tmp, 'C:/omnibus-ruby/pkg-tmp'
     end
 
     context 'when base_dir is changed' do
@@ -66,7 +64,6 @@ module Omnibus
       include_examples 'a configurable', :source_dir, '/foo/bar/src'
       include_examples 'a configurable', :build_dir, '/foo/bar/build'
       include_examples 'a configurable', :package_dir, '/foo/bar/pkg'
-      include_examples 'a configurable', :package_tmp, '/foo/bar/pkg-tmp'
     end
   end
 end

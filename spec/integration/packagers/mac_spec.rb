@@ -18,12 +18,15 @@ module Omnibus
     before do
       # Tell things to install into the cache directory
       root = "#{tmp_path}/var/omnibus"
+
       Config.cache_dir "#{root}/cache"
       Config.git_cache_dir "#{root}/cache/git_cache"
       Config.source_dir "#{root}/src"
       Config.build_dir "#{root}/build"
       Config.package_dir "#{root}/pkg"
-      Config.package_tmp "#{root}/pkg-tmp"
+
+      # Packages are built into a tmpdir, but we control that here
+      allow(Dir).to receive(:mktmpdir).and_return("#{root}/tmp")
 
       # Enable DMG create
       Config.build_dmg true
@@ -41,8 +44,8 @@ module Omnibus
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{Config.package_dir}/sample-12.4.0-1.pkg"
-      dmg = "#{Config.package_dir}/sample-12.4.0-1.dmg"
+      pkg = "#{root}/tmp/#{project.name}-#{project.build_version}-#{project.iteration}.pkg"
+      dmg = "#{root}/tmp/#{project.name}-#{project.build_version}-#{project.iteration}.dmg"
 
       expect(pkg).to be_a_file
       expect(dmg).to be_a_file

@@ -28,9 +28,9 @@ RSpec::Matchers.define :be_a_symlink_to do |path|
   end
 end
 
-# expect('/path/to/directory').to be_a_symlink
-RSpec::Matchers.define :be_a_symlink do
+# expect('/path/to/file').to be_an_executable
+RSpec::Matchers.define :be_an_executable do
   match do |actual|
-    File.symlink?(actual)
+    File.executable?(actual)
   end
 end

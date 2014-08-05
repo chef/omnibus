@@ -34,12 +34,15 @@ module Omnibus
     before do
       # Tell things to install into the cache directory
       root = "#{tmp_path}/var/omnibus"
+
       Config.cache_dir "#{root}/cache"
       Config.git_cache_dir "#{root}/cache/git_cache"
       Config.source_dir "#{root}/src"
       Config.build_dir "#{root}/build"
       Config.package_dir "#{root}/pkg"
-      Config.package_tmp "#{root}/pkg-tmp"
+
+      # Packages are built into a tmpdir, but we control that here
+      allow(Dir).to receive(:mktmpdir).and_return("#{root}/tmp")
 
       # Point at our sample project fixture
       Config.project_root fixture_path('sample')
