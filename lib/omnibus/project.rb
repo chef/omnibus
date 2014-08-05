@@ -880,7 +880,6 @@ module Omnibus
     end
 
     def build_me
-      FileUtils.mkdir_p(Config.package_dir)
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
 
