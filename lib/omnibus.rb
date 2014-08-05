@@ -56,6 +56,7 @@ module Omnibus
   autoload :S3Cache,          'omnibus/s3_cache'
   autoload :Software,         'omnibus/software'
   autoload :Sugarable,        'omnibus/sugarable'
+  autoload :Templating,       'omnibus/templating'
   autoload :Util,             'omnibus/util'
 
   autoload :GitFetcher,  'omnibus/fetchers/git_fetcher'

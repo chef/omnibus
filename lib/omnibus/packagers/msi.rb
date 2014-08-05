@@ -39,9 +39,13 @@ module Omnibus
       # Set the MSI version before rendering MSI source files
       set_msi_version_from_project
 
-      ['localization-en-us.wxl.erb', 'parameters.wxi.erb', 'source.wxs.erb'].each do |res|
-        res_path = resource(res)
-        render_template(res_path) if File.exist?(res_path)
+      %w(localization-en-us.wxl.erb parameters.wxi.erb source.wxs.erb).each do |filename|
+        resource_path = resource(filename)
+        destination   = File.join(staging_dir, filename.chomp('.erb'))
+
+        if File.exist?(resource_path)
+          render_template(resource_path, destination: destination)
+        end
       end
     end
 

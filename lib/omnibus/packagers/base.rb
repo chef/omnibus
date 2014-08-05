@@ -16,11 +16,11 @@
 
 require 'fileutils'
 require 'forwardable'
-require 'erb'
 
 module Omnibus
   class Packager::Base
     include Logging
+    include Templating
     include Util
 
     extend Forwardable
@@ -130,27 +130,6 @@ module Omnibus
       shellout!(command,  options)
     end
 
-    # Render an erb template at +source_path+ to +destination_path+ if
-    # given. Otherwise template is rendered next to +source_path+
-    # by removing the 'erb' extension of the template
-    #
-    # @param [String] source_path
-    # @param [String] destination_path
-    def render_template(source_path, destination_path = nil)
-      return unless source_path.end_with?('.erb')
-
-      destination_path = source_path.chomp('.erb') if destination_path.nil?
-
-      File.open(source_path) do |file|
-        erb = ERB.new(file.read)
-        File.open(destination_path, 'w') do |out|
-          out.write(erb.result(binding))
-        end
-
-        remove_file(source_path)
-      end
-    end
-
     #
     # Validations
     # ------------------------------
@@ -223,6 +202,22 @@ module Omnibus
                   end
 
       File.expand_path(File.join(base_path, underscore_name, 'Resources'))
+    end
+
+    #
+    # The path to a template on disk. By default, these templates are loaded
+    # from +#{Omnibus.source_root}/templates/#{name}+.
+    #
+    # @todo Remove the craziness ERB searches and vendor all templates in
+    # Omnibus, providing a way for users to specify custom values.
+    #
+    # @param [String] name
+    #   the name of the template
+    #
+    # @return [String]
+    #
+    def template_path(name)
+      Omnibus.source_root.join('templates', name).to_s
     end
 
     # The underscored equivalent of this class. This is mostly used by file

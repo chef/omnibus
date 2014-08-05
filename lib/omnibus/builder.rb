@@ -25,6 +25,7 @@ module Omnibus
     include Digestable
     include Instrumentation
     include Logging
+    include Templating
     include Util
 
     #
@@ -319,15 +320,11 @@ module Omnibus
       erbs << source_path
 
       block "Render erb `#{source}'" do
-        template = ERB.new(File.read(source_path), nil, '%')
-        struct   = OpenStruct.new(vars)
-        result   = template.result(struct.instance_eval { binding })
-
-        File.open(dest, 'w') do |file|
-          file.write(result)
-        end
-
-        File.chmod(mode, dest)
+        render_template(source,
+          destination: dest,
+          mode:        mode,
+          variables:   vars,
+        )
       end
     end
     expose :erb

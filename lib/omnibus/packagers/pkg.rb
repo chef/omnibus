@@ -38,9 +38,13 @@ module Omnibus
       copy_directory(resources_path, staging_resources_path)
 
       # Render resource templates if needed
-      ['license.html.erb', 'welcome.html.erb'].each do |res|
-        res_path = resource(res)
-        render_template(res_path) if File.exist?(res_path)
+      %w(license.html.erb welcome.html.erb).each do |res|
+        resource_path = resource(filename)
+        destination   = File.join(staging_dir, filename.chomp('.erb'))
+
+        if File.exist?(resource_path)
+          render_template(resource_path, destination: destination)
+        end
       end
     end
 
