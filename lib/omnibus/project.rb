@@ -489,7 +489,9 @@ module Omnibus
     expose :override
 
     #
-    # Set or retrieve the +{deb/rpm/solaris}+-group fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}+-group fpm argument. Defaults to
+    # +Ohai['root_group']+. If +Ohai['root_group']+ is +nil+, it defaults to
+    # +"root"+.
     #
     # @example
     #   package_group 'build'
@@ -501,7 +503,7 @@ module Omnibus
     #
     def package_group(val = NULL)
       if null?(val)
-        @package_group
+        @package_group || Ohai['root_group'] || 'root'
       else
         @package_group = val
       end
