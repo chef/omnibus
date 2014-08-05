@@ -207,19 +207,18 @@ module Omnibus
     # @return [String, nil]
     #
     def extract_command
-      downloaded_file_safe = Ohai['platform'] == 'windows' ? windows_safe_path(downloaded_file) : downloaded_file
       if Ohai['platform'] == 'windows' && downloaded_file.end_with?(*WIN_7Z_EXTENSIONS)
-        "7z.exe x #{downloaded_file_safe} -o#{Config.source_dir} -r -y"
+        "7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"
       elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.7z')
-        "7z x #{downloaded_file_safe} -o#{Config.source_dir} -r -y"
+        "7z x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"
       elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.zip')
-        "unzip #{downloaded_file_safe} -d #{Config.source_dir}"
+        "unzip #{windows_safe_path(downloaded_file)} -d #{Config.source_dir}"
       elsif downloaded_file.end_with?(*TAR_EXTENSIONS)
         compression_switch = 'z' if downloaded_file.end_with?('gz')
         compression_switch = 'j' if downloaded_file.end_with?('bz2')
         compression_switch = 'J' if downloaded_file.end_with?('xz')
         compression_switch = ''  if downloaded_file.end_with?('tar')
-        "tar #{compression_switch}xf #{downloaded_file_safe} -C#{Config.source_dir}"
+        "tar #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
       end
     end
 
