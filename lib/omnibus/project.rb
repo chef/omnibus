@@ -553,7 +553,7 @@ module Omnibus
     #
     # Any scripts with these names that are present in the package
     # scripts directory will be incorporated into the package that is
-    # built.  This only applies to fpm-built packages.
+    # built.  This applies to packages built with fpm and rpmbuild.
     #
     # Additionally, there may be a +makeselfinst+ script.
     #
