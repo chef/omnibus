@@ -304,14 +304,11 @@ module Omnibus
     expose :description
 
     #
-    # Set or retrieve the name of the package this package will replace.
-    #
-    # Ultimately used as the value for the +--replaces+ flag in
-    # {https://github.com/jordansissel/fpm fpm}.
+    # Add to the list of packages this one replaces.
     #
     # This should only be used when renaming a package and obsoleting the old
-    # name of the package. Setting this to the same name as package_name will
-    # cause RPM upgrades to fail.
+    # name of the package. **Setting this to the same name as package_name will
+    # cause RPM upgrades to fail.**
     #
     # @example
     #   replace 'the-old-package'
@@ -321,14 +318,11 @@ module Omnibus
     #
     # @return [String]
     #
-    def replaces(val = NULL)
-      if null?(val)
-        @replaces
-      else
-        @replaces = val
-      end
+    def replace(val = NULL)
+      replaces << val
+      replaces.dup
     end
-    expose :replaces
+    expose :replace
 
     #
     # Add to the list of packages this one conflicts with.
@@ -782,6 +776,15 @@ module Omnibus
     #
     def conflicts
       @conflicts ||= []
+    end
+
+    #
+    # The list of things this project replaces with.
+    #
+    # @return [Array<String>]
+    #
+    def replaces
+      @replaces ||= []
     end
 
     #
