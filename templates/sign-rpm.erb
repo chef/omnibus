@@ -5,7 +5,7 @@ unless (rpm_cmd = ARGV[0])
   exit 1
 end
 
-password = ENV['SIGN_RPM']
+password = '<%= Omnibus::Config.rpm_signing_passphrase %>'
 
 require 'pty'
 

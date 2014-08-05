@@ -223,7 +223,7 @@ module Omnibus
     #
     def run_rpm(output_path)
       args = ["rpmbuild", "-bb"]
-      args += ['--sign'] if Config.sign_pkg
+      args += ['--sign'] if Config.sign_rpm
       args += [
         "--define", "\'buildroot #{build_path}/BUILD\'",
         "--define", "\'_topdir #{build_path}\'",
@@ -254,7 +254,7 @@ module Omnibus
 
       args << File.join(build_path("SPECS"), "#{package_name}.spec")
 
-      if Config.sign_pkg
+      if Config.sign_rpm
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           macros_home = ENV['HOME']
         else
@@ -262,8 +262,14 @@ module Omnibus
           macros_home = staging_path
         end
         build_cmd = args.join(' ')
-        script_cmd = "#{Omnibus.source_root.join('bin', 'sign-rpm')} \"#{build_cmd}\""
-        execute(script_cmd, environment: { 'HOME' => macros_home })
+        render_template('sign-rpm.erb', '/tmp/sign-rpm')
+        File.chmod(0700, '/tmp/sign-rpm')
+        script_cmd = "/tmp/sign-rpm \"#{build_cmd}\""
+        begin
+          execute(script_cmd, environment: { 'HOME' => macros_home })
+        ensure
+          remove_file('/tmp/sign-rpm')
+        end
       else
         execute(args.join(' '))
       end

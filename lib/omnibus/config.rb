@@ -204,6 +204,24 @@ module Omnibus
     #
 
     #
+    # @!group RPM configuration options
+    # --------------------------------------------------
+
+    # Sign the rpm package.
+    #
+    # @return [true, false]
+    default(:sign_rpm, false)
+
+    # The passphrase to sign the RPM with.
+    #
+    # @return [String]
+    default(:rpm_signing_passphrase, nil)
+
+    # --------------------------------------------------
+    # @!endgroup
+    #
+
+    #
     # @!group S3 Caching Configuration Parameters
     # --------------------------------------------------
 
