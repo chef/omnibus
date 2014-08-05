@@ -156,6 +156,11 @@ module Omnibus
       instance_eval(&self.class.validate) if self.class.validate
       instance_eval(&self.class.build)    if self.class.build
       instance_eval(&self.class.clean)    if self.class.clean
+    ensure
+      # Ensure the temporary directory is removed at the end of the run. Without
+      # removal, failed builds will "leak" in /tmp and cause increased disk
+      # usage.
+      remove_directory(staging_dir)
     end
 
     # The ending name of this package on disk. +Omnibus::Project+ uses this to
