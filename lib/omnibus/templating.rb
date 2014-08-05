@@ -18,8 +18,10 @@ require 'erb'
 
 module Omnibus
   module Templating
-    include Logging
-    extend self
+    def self.included(base)
+      # This module also requires logging
+      base.send(:include, Logging)
+    end
 
     #
     # Render an erb template on disk at +source+. If the +:destination+ option
