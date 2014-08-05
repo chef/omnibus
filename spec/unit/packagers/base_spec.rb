@@ -153,6 +153,9 @@ module Omnibus
 
     describe '#run!' do
       before do
+        allow(subject).to receive(:purge_directory)
+        allow(subject).to receive(:remove_directory)
+
         allow(described_class).to receive(:validate).and_return(proc {})
         allow(described_class).to receive(:setup).and_return(proc {})
         allow(described_class).to receive(:build).and_return(proc {})
