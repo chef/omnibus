@@ -320,7 +320,7 @@ module Omnibus
       erbs << source_path
 
       block "Render erb `#{source}'" do
-        render_template(source,
+        render_template(source_path,
           destination: dest,
           mode:        mode,
           variables:   vars,
