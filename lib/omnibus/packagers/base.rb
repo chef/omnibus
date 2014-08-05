@@ -19,6 +19,7 @@ require 'forwardable'
 
 module Omnibus
   class Packager::Base
+    include Digestable
     include Logging
     include Templating
     include Util
