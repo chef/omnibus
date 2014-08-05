@@ -286,9 +286,6 @@ module Omnibus
     # @example
     #   description 'This is my description'
     #
-    # Corresponds to the +--description+ flag of
-    # {https://github.com/jordansissel/fpm fpm}.
-    #
     # @param [String] val
     #   the project description
     #
@@ -326,9 +323,6 @@ module Omnibus
 
     #
     # Add to the list of packages this one conflicts with.
-    #
-    # Specifying conflicts is optional.  See the +--conflicts+ flag in
-    # {https://github.com/jordansissel/fpm fpm}.
     #
     # @example
     #   conflicts 'foo'
@@ -446,14 +440,17 @@ module Omnibus
     expose :mac_pkg_identifier
 
     #
-    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument. Defaults to
-    # +"root"+ if not specified.
+    # Set or retrieve the user the package should install as. This varies with
+    # operating system, and may be ignored if the underlying packager does not
+    # support it.
+    #
+    # Defaults to +"root"+.
     #
     # @example
     #   package_user 'build'
     #
     # @param [String] val
-    #   the user to retrive for the fpm build
+    #   the user to use for the package build
     #
     # @return [String]
     #
@@ -489,15 +486,18 @@ module Omnibus
     expose :override
 
     #
-    # Set or retrieve the +{deb/rpm/solaris}+-group fpm argument. Defaults to
-    # +Ohai['root_group']+. If +Ohai['root_group']+ is +nil+, it defaults to
-    # +"root"+.
+    # Set or retrieve the group the package should install as. This varies with
+    # operating system and may  be ignored if the underlying packager does not
+    # support it.
+    #
+    # Defaults to +Ohai['root_group']+. If +Ohai['root_group']+ is +nil+, it
+    # defaults to +"root"+.
     #
     # @example
     #   package_group 'build'
     #
     # @param [String] val
-    #   the group to retrive for the fpm build
+    #   the group to use for the package build
     #
     # @return [String]
     #
@@ -531,28 +531,11 @@ module Omnibus
     expose :resources_path
 
     #
-    # The path to the package scripts directory for this project.
-    # These are optional scripts that can be bundled into the
-    # resulting package for running at various points in the package
-    # management lifecycle.
+    # The path to the package scripts directory for this project. These are
+    # optional scripts that can be bundled into the resulting package for
+    # running at various points in the package management lifecycle.
     #
-    # Currently supported scripts include:
-    #
-    # * postinst
-    #
-    #   A post-install script
-    # * prerm
-    #
-    #   A pre-uninstall script
-    # * postrm
-    #
-    #   A post-uninstall script
-    #
-    # Any scripts with these names that are present in the package
-    # scripts directory will be incorporated into the package that is
-    # built.  This applies to packages built with fpm and rpmbuild.
-    #
-    # Additionally, there may be a +makeselfinst+ script.
+    # These scripts and their names vary with operating system.
     #
     # @return [String]
     #
@@ -594,9 +577,6 @@ module Omnibus
     # This is distinct from a build-time dependency, which should correspond to
     # a software definition.
     #
-    # Corresponds to the +--depends+ flag of
-    # {https://github.com/jordansissel/fpm fpm}.
-    #
     # @example
     #   runtime_dependency 'foo'
     #
@@ -613,13 +593,11 @@ module Omnibus
     expose :runtime_dependency
 
     #
-    # Add a new exclusion pattern.
-    #
-    # Corresponds to the +--exclude+ flag of
-    # {https://github.com/jordansissel/fpm fpm}.
+    # Add a new exclusion pattern for a list of files or folders to exclude
+    # when making the package.
     #
     # @example
-    #   exclude 'foo'
+    #   exclude '.git'
     #
     # @param [String] pattern
     #   the thing to exclude
@@ -652,11 +630,11 @@ module Omnibus
     expose :config_file
 
     #
-    # Add other files or dirs outside of +install_dir+.
+    # Add other files or dirs outside of +install_dir+. These files retain their
+    # relative paths inside the scratch directory:
     #
-    # @note This option is currently only supported with FPM based package
-    # builds such as RPM, DEB and .sh (makeselfinst).  This is not supported
-    # on Mac OSX packages, Windows MSI, AIX and Solaris
+    #   /path/to/foo.txt #=> /tmp/package/path/to/foo.txt
+    #
     #
     # @example
     #   extra_package_file '/path/to/file'
@@ -1081,118 +1059,11 @@ module Omnibus
         Packager::MacDmg.new(pkg).package_name
       when 'rpm'
         Packager::RPM.new(self).package_name
-      else # fpm
-        require "fpm/package/#{pkg_type}"
-        pkg = FPM::Package.types[pkg_type].new
-        pkg.version = build_version
-        pkg.name = package_name
-        pkg.iteration = build_iteration
-        if pkg_type == 'solaris'
-          pkg.to_s('NAME.FULLVERSION.ARCH.TYPE')
-        else
-          pkg.to_s
-        end
-      end
-    end
-
-    # The {https://github.com/jordansissel/fpm fpm} command to
-    # generate a package for RedHat, Ubuntu, Solaris, etc. platforms.
-    #
-    # Does not execute the command, only assembles it.
-    #
-    # @return [Array<String>] the components of the fpm command; need
-    #   to be joined with " " first.
-    #
-    # @todo Just make this return a String instead of an Array
-    # @todo Use the long option names (i.e., the double-dash ones) in
-    #   the fpm command for maximum clarity.
-    def fpm_command(pkg_type)
-      command_and_opts = [
-        'fpm',
-        '-s dir',
-        "-t #{pkg_type}",
-        "-v #{build_version}",
-        "-n #{package_name}",
-        "-p #{output_package(pkg_type)}",
-        "--iteration #{build_iteration}",
-        "-m '#{maintainer}'",
-        "--description '#{description}'",
-        "--url #{homepage}",
-      ]
-
-      if File.exist?(File.join(package_scripts_path, 'preinst'))
-        command_and_opts << "--before-install '#{File.join(package_scripts_path, "preinst")}'"
-      end
-
-      if File.exist?("#{package_scripts_path}/postinst")
-        command_and_opts << "--after-install '#{File.join(package_scripts_path, "postinst")}'"
-      end
-      # solaris packages don't support --pre-uninstall
-      if File.exist?("#{package_scripts_path}/prerm")
-        command_and_opts << "--before-remove '#{File.join(package_scripts_path, "prerm")}'"
-      end
-      # solaris packages don't support --post-uninstall
-      if File.exist?("#{package_scripts_path}/postrm")
-        command_and_opts << "--after-remove '#{File.join(package_scripts_path, "postrm")}'"
-      end
-
-      exclusions.each do |pattern|
-        command_and_opts << "--exclude '#{pattern}'"
-      end
-
-      config_files.each do |config_file|
-        command_and_opts << "--config-files '#{config_file}'"
-      end
-
-      runtime_dependencies.each do |runtime_dep|
-        command_and_opts << "--depends '#{runtime_dep}'"
-      end
-
-      conflicts.each do |conflict|
-        command_and_opts << "--conflicts '#{conflict}'"
-      end
-
-      if package_user
-        %w(deb rpm solaris).each do |type|
-          command_and_opts << " --#{type}-user #{package_user}"
-        end
-      end
-
-      if package_group
-        %w(deb rpm solaris).each do |type|
-          command_and_opts << " --#{type}-group #{package_group}"
-        end
-      end
-
-      command_and_opts << " --replaces #{replaces}" if replaces
-
-      # All project files must be appended to the command "last", but before
-      # the final install path
-      extra_package_files.each do |files|
-        command_and_opts << files
       when 'deb'
         Packager::DEB.new(self).package_name
       else
         raise RuntimeError, "I do not know how to build a `#{pkg_type}'!"
       end
-
-      # Install path must be the final entry in the command
-      command_and_opts << install_dir
-      command_and_opts
-    end
-
-    # Runs the necessary command to make a package with fpm. As a side-effect,
-    # sets +output_package+
-    # @return void
-    def run_fpm(pkg_type)
-      run_package_command(fpm_command(pkg_type).join(' '))
-    end
-
-    # Executes the given command via mixlib-shellout.
-    # @return [Mixlib::ShellOut] returns the underlying Mixlib::ShellOut
-    #   object, so the caller can inspect the stdout and stderr.
-    def run_package_command(command)
-      shellout!(command, cwd: Config.package_dir)
     end
 
     #
