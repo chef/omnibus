@@ -149,6 +149,9 @@ module Omnibus
     #   - clean
     #
     def run!
+      # Ensure the package directory exists and is purged
+      purge_directory(package_dir)
+
       instance_eval(&self.class.setup)    if self.class.setup
       instance_eval(&self.class.validate) if self.class.validate
       instance_eval(&self.class.build)    if self.class.build
@@ -161,6 +164,18 @@ module Omnibus
     # @return [String]
     def package_name
       raise AbstractMethod.new("#{self.class.name}#package_name")
+    end
+
+    #
+    # The path where the final packages will live on disk.
+    #
+    # @see {Config#package_dir}
+    # @see {Config#project_root}
+    #
+    # @return [String]
+    #
+    def package_dir
+      File.expand_path(Config.package_dir, Config.project_root)
     end
 
     private

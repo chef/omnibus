@@ -33,7 +33,6 @@ module Omnibus
 
     setup do
       purge_directory(staging_dir)
-      purge_directory(Config.package_dir)
       purge_directory(staging_resources_path)
       copy_directory(resources_path, staging_resources_path)
 
@@ -71,7 +70,7 @@ module Omnibus
     #
     # @return [String] Path to the packge file.
     def final_pkg
-      File.expand_path("#{Config.package_dir}/#{package_name}")
+      File.expand_path("#{package_dir}/#{package_name}")
     end
 
     #
