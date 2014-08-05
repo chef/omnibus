@@ -446,7 +446,8 @@ module Omnibus
     expose :mac_pkg_identifier
 
     #
-    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument. Defaults to
+    # +"root"+ if not specified.
     #
     # @example
     #   package_user 'build'
@@ -458,7 +459,7 @@ module Omnibus
     #
     def package_user(val = NULL)
       if null?(val)
-        @package_user
+        @package_user || 'root'
       else
         @package_user = val
       end
