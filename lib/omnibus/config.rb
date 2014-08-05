@@ -143,7 +143,7 @@ module Omnibus
     #
     # @return [String]
     default(:package_tmp) do
-      log.deprecated(log_key) do
+      Omnibus.logger.deprecated('Config') do
         "Config.package_tmp. This value is no longer used."
       end
     end
