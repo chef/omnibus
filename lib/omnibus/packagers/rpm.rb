@@ -144,7 +144,7 @@ module Omnibus
       command << " --define '_sourcedir #{staging_dir}'"
       command << " --define '_rpmdir #{staging_dir}/RPMS'"
 
-      if Config.sign_pkg
+      if Config.sign_rpm
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
         else
@@ -153,7 +153,7 @@ module Omnibus
           # Generate a temporary home directory
           home = Dir.mktmpdir
 
-          render_template('rpm/rpmmacros.erb',
+          render_template(template_path('rpm/rpmmacros.erb'),
             destination: "#{home}/.rpmmacros",
             variables: {
               gpg_name: project.maintainer,
@@ -164,7 +164,9 @@ module Omnibus
           command << " --sign"
           command << " #{spec_file}"
 
-          shellout!("#{rpmsign} \"#{command}\"", environment: { 'HOME' => home })
+          with_rpm_signing do |signing_script|
+            shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
+          end
         end
       else
         command << " #{spec_file}"
@@ -186,12 +188,32 @@ module Omnibus
     end
 
     #
-    # The path to the RPM signing script inside of Omnibus.
+    # Render the rpm signing script with secure permissions, call the given
+    # block with the path to the script, and ensure deletion of the script from
+    # disk.
+    #
+    # @param [Proc] block
+    #   the block to call
     #
     # @return [String]
     #
-    def rpmsign
-      @rpmsign ||= Omnibus.source_root.join('bin', 'sign-rpm')
+    def with_rpm_signing(&block)
+      directory   = Dir.mktmpdir
+      destination = "#{directory}/sign-rpm"
+
+      render_template(template_path('sign-rpm.erb'),
+        destination: destination,
+        mode: 0700,
+        variables: {
+          passphrase: Config.rpm_signing_passphrase,
+        }
+      )
+
+      # Yield the destination to the block
+      block.call(destination)
+    ensure
+      remove_file(destination)
+      remove_directory(directory)
     end
 
     #
