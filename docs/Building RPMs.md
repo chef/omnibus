@@ -6,7 +6,7 @@ This document details the steps and configurables for building RPMs with Omnibus
 Building an RPM
 ---------------
 ### Requirements
-`rpmbuild` must be installed on your system.
+`rpmbuild` must be installed on your system.  The [Chef omnibus cookcook](http://github.com/opscode-cookbooks/omnibus) manages this in its [`_packaging` recipe](http://github.com/opscode-cookbooks/omnibus/blob/master/recipes/_packaging.rb).
 
 ### Configurables
 The following Omnibus configuration options may be used when building RPMs:
