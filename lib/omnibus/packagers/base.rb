@@ -165,11 +165,13 @@ module Omnibus
 
     private
 
-    # The path to the directory where we can throw staged files.
+    #
+    # The path to the staging dir on disk.
     #
     # @return [String]
+    #
     def staging_dir
-      File.expand_path("#{Config.package_tmp}/#{underscore_name}")
+      @staging_dir ||= Dir.mktmpdir(project.package_name)
     end
 
     # The path to the directory where the packager resources are

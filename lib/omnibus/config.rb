@@ -139,13 +139,14 @@ module Omnibus
     # @return [String]
     default(:package_dir) { File.join(base_dir, 'pkg') }
 
-    # The absolute path to the directory on the virtual machine where
-    # packagers will store intermediate packaging products. Some packaging
-    # methods (notably fpm) handle this internally so not all packagers will
-    # use this setting.
+    # @deprecated Do not use this method.
     #
     # @return [String]
-    default(:package_tmp) { File.join(base_dir, 'pkg-tmp') }
+    default(:package_tmp) do
+      log.deprecated(log_key) do
+        "Config.package_tmp. This value is no longer used."
+      end
+    end
 
     # The relative path of the directory containing {Omnibus::Project}
     # DSL files.  This is relative to {#project_root}.
