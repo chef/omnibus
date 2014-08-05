@@ -1189,6 +1189,12 @@ module Omnibus
       shellout!(command, cwd: Config.package_dir)
     end
 
+    #
+    # The log key for this project, overriden to include the name of the
+    # project for build output.
+    #
+    # @return [String]
+    #
     def log_key
       @log_key ||= "#{super}: #{name}"
     end
