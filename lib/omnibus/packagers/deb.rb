@@ -71,7 +71,7 @@ module Omnibus
     # extension.
     #
     def package_name
-      @package_name ||= "#{safe_package_name}_#{safe_build_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
+      @package_name ||= "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
 
     private
@@ -98,8 +98,8 @@ module Omnibus
       render_template(template_path('deb/control.erb'),
         destination: File.join(debian_dir, 'control'),
         variables: {
-          name:           safe_package_name,
-          version:        safe_build_version,
+          name:           safe_project_name,
+          version:        safe_version,
           iteration:      safe_build_iteration,
           vendor:         'Omnibus <omnibus@getchef.com>', # TODO: make this configurable
           license:        'unknown', # TODO: make this configurable
@@ -213,23 +213,25 @@ module Omnibus
     end
 
     #
-    # Debian package names cannot contain underscores, so we will gsub them out
-    # here.
+    # Return the Debian-ready project name, converting any invalid characters to
+    # dashes (+-+).
     #
     # @return [String]
     #
-    def safe_package_name
-      if project.package_name.include?('_')
-        converted = project.package_name.gsub('_', '-')
+    def safe_project_name
+      if project.name =~ /[a-zA-Z0-9\.\+\-]+/
+        project.name.dup
+      else
+        converted = project.name.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "Debian package names cannot contain underscores. Converting " \
-          "`#{project.package_name}' to `#{converted}'."
+          "The `name' compontent of Debian package names can only include " \
+          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
+          "plus signs (+), and dashes (-). Converting `#{project.name}' to " \
+          "`#{converted}'."
         end
 
         converted
-      else
-        project.package_name
       end
     end
 
@@ -244,23 +246,25 @@ module Omnibus
     end
 
     #
-    # Debian package versions cannot contain dashes, so we will convert them to
-    # underscores.
+    # Return the Debian-ready version, converting any invalid characters to
+    # dashes (+-+).
     #
     # @return [String]
     #
-    def safe_build_version
-      if project.build_version.include?('-')
-        converted = project.build_version.gsub('-', '_')
+    def safe_version
+      if project.build_version =~ /[a-zA-Z0-9\.\+\-\:]+/
+        project.build_version.dup
+      else
+        converted = project.name.gsub(/[^a-zA-Z0-9\.\+\-\:]+/, '-')
 
         log.warn(log_key) do
-          "Debian build versions cannot contain dashes. Converting " \
+          "The `version' compontent of Debian package names can only include " \
+          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
+          "plus signs (+), dashes (-), and colons (:). Converting " \
           "`#{project.build_version}' to `#{converted}'."
         end
 
         converted
-      else
-        project.build_version
       end
     end
 
