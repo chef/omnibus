@@ -89,16 +89,6 @@ module Omnibus
     end
 
     #
-    # The list of files to exclude when making the deb. This comes from the list
-    # of project exclusions and includes "common" SCM directories (like +.git+).
-    #
-    # @return [Array<String>]
-    #
-    def exclusions
-      @exclusions ||= project.exclusions + %w(.git .hg .svn */.gitkeep)
-    end
-
-    #
     # Render a control file in +#{debian_dir}/control+ using the supplied ERB
     # template.
     #

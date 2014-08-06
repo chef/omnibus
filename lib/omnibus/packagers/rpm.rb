@@ -74,16 +74,6 @@ module Omnibus
     end
 
     #
-    # The list of files to exclude when making the rpm. This comes from the list
-    # of project exclusions and includes "common" SCM directories (like +.git+).
-    #
-    # @return [Array<String>]
-    #
-    def exclusions
-      @exclusions ||= project.exclusions + %w(.git .hg .svn */.gitkeep)
-    end
-
-    #
     # Render an rpm spec file in +SPECS/#{name}.spec+ using the supplied ERB
     # template.
     #

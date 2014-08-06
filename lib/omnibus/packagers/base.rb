@@ -132,6 +132,21 @@ module Omnibus
     end
 
     #
+    # The list of files to exclude when syncing files. This comes from the list
+    # of project exclusions and includes "common" SCM directories (like +.git+).
+    #
+    # @return [Array<String>]
+    #
+    def exclusions
+      project.exclusions + %w(
+        **/.git
+        **/.hg
+        **/.svn
+        **/.gitkeep
+      )
+    end
+
+    #
     # Validations
     # ------------------------------
 
