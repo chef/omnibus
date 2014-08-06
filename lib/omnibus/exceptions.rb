@@ -58,11 +58,11 @@ module Omnibus
   class BadReplacesLine < Error
     def to_s
       <<-EOH
-The `replaces` project DSL statement should never equal the `package_name` or
-`name` of a project. The `replaces` option should only be used when you have
-published an artifact under one name and then later renamed the packages that
-you are publishing and you must obsolete the old package name. For example this
-is used, correctly, in chef-client builds:
+A `replace' value should never be the same as the `name' attribute of a project.
+The `replace' option should only be used when you have published an artifact
+under one name and then later renamed the packages that you are publishing and
+you must obsolete the old package name. For example this is used, correctly,
+in chef-client builds:
 
     name 'chef'
     replaces 'chef-full'
