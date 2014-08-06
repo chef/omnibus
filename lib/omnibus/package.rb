@@ -135,7 +135,7 @@ module Omnibus
         #
         def truncate_platform_version(platform_version, platform)
           case platform
-          when 'centos', 'debian', 'fedora', 'freebsd', 'rhel', 'el'
+          when 'centos', 'debian', 'el', 'fedora', 'freebsd', 'rhel', 'sles'
             # Only want MAJOR (e.g. Debian 7)
             platform_version.split('.').first
           when 'aix', 'arch', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'suse', 'ubuntu'
