@@ -36,7 +36,10 @@ module Omnibus
 
       # Copy the full-stack installer into the SOURCE directory, accounting for
       # any excluded files.
-      FileSyncer.sync(project.install_dir, "#{staging_dir}/BUILD", exclude: exclusions)
+      #
+      # /opt/hamlet => /tmp/daj29013/BUILD/opt/hamlet
+      destination = File.join(build_dir, project.install_dir)
+      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
 
       # Copy over any user-specified extra package files.
       #
@@ -74,6 +77,15 @@ module Omnibus
     end
 
     #
+    # The path to the +BUILD+ directory inside the staging directory.
+    #
+    # @return [String]
+    #
+    def build_dir
+      @build_dir ||= File.join(staging_dir, 'BUILD')
+    end
+
+    #
     # Render an rpm spec file in +SPECS/#{name}.spec+ using the supplied ERB
     # template.
     #
@@ -89,8 +101,8 @@ module Omnibus
       config_files = project.config_files.map { |file| rpm_safe(file) }
 
       # Get a list of all files
-      files = FileSyncer.glob("#{staging_dir}/**/*")
-                .map    { |path| path.gsub("#{staging_dir}/", '') }
+      files = FileSyncer.glob("#{build_dir}/**/*")
+                .map    { |path| path.gsub("#{build_dir}/", '') }
                 .map    { |path| rpm_safe(path) }
                 .map    { |path| "/#{path}" }
                 .reject { |path| config_files.include?(path) }
@@ -127,12 +139,10 @@ module Omnibus
     # @return [void]
     #
     def create_rpm_file
-      command =  "rpmbuild"
-      command << " -bb"
-      command << " --buildroot #{staging_dir}"
-      command << " --define '_topdir #{staging_dir}'"
-      command << " --define '_sourcedir #{staging_dir}'"
-      command << " --define '_rpmdir #{staging_dir}/RPMS'"
+      command =  %|rpmbuild|
+      command << %| -bb|
+      command << %| --buildroot #{staging_dir}/BUILD|
+      command << %| --define "_topdir #{staging_dir}"|
 
       if Config.sign_rpm
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
