@@ -78,9 +78,9 @@ module Omnibus
     end
 
     def create_pkg_assets
-      template('pkg/license.html.erb', "#{target}/files/pkg/Resources/license.html", template_options)
-      template('pkg/welcome.html.erb', "#{target}/files/pkg/Resources/welcome.html", template_options)
-      copy_file('pkg/background.png', "#{target}/files/pkg/Resources/background.png")
+      template('mac_pkg/license.html.erb', "#{target}/files/pkg/Resources/license.html", template_options)
+      template('mac_pkg/welcome.html.erb', "#{target}/files/pkg/Resources/welcome.html", template_options)
+      copy_file('mac_pkg/background.png', "#{target}/files/pkg/Resources/background.png")
     end
 
     def create_dmg_assets
