@@ -157,10 +157,14 @@ module Omnibus
       instance_eval(&self.class.validate) if self.class.validate
       instance_eval(&self.class.build)    if self.class.build
       instance_eval(&self.class.clean)    if self.class.clean
-    ensure
-      # Ensure the temporary directory is removed at the end of the run. Without
-      # removal, failed builds will "leak" in /tmp and cause increased disk
-      # usage.
+
+      # Ensure the temporary directory is removed at the end of a successful
+      # run. Without removal, successful builds will "leak" in /tmp and cause
+      # increased disk usage.
+      #
+      # Instead of having this as an +ensure+ block, failed builds will persist
+      # this directory so developers can go poke around and figure out why the
+      # build failed.
       remove_directory(staging_dir)
     end
 
