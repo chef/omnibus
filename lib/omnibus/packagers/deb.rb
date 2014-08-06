@@ -24,7 +24,10 @@ module Omnibus
     setup do
       # Copy the full-stack installer into our scratch directory, accounting for
       # any excluded files.
-      FileSyncer.sync(project.install_dir, staging_dir, exclude: exclusions)
+      #
+      # /opt/hamlet => /tmp/daj29013/opt/hamlet
+      destination = File.join(staging_dir, project.install_dir)
+      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
 
       # Copy over any user-specified extra package files.
       #
