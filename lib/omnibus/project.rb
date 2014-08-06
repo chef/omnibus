@@ -170,27 +170,6 @@ module Omnibus
     expose :msi_parameters
 
     #
-    # Set or retrieve the package name of the project. Defaults to the package
-    # name defaults to the project name.
-    #
-    # @example
-    #   package_name 'com.chef.project'
-    #
-    # @param [String] val
-    #   the package name to set
-    #
-    # @return [String]
-    #
-    def package_name(val = NULL)
-      if null?(val)
-        @package_name || name
-      else
-        @package_name = val
-      end
-    end
-    expose :package_name
-
-    #
     # **[Required]** Set or retrieve the path at which the project should be
     # installed by the generated package.
     #

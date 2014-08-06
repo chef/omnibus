@@ -49,7 +49,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.package_name}-#{project.build_version}_#{project.build_iteration}.#{Ohai['kernel']['machine']}.sh"
+      "#{project.name}-#{project.build_version}_#{project.build_iteration}.#{Ohai['kernel']['machine']}.sh"
     end
 
     def makeself_script

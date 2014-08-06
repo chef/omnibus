@@ -46,7 +46,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.package_name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
+      "#{project.name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
     end
 
     def bff_version
@@ -59,11 +59,11 @@ module Omnibus
 
     def create_gen_template
       preamble = <<-EOF.gsub(/^ {8}/, '')
-        Package Name: #{project.package_name}
+        Package Name: #{project.name}
         Package VRMF: #{bff_version}
         Update: N
         Fileset
-          Fileset Name: #{project.package_name}
+          Fileset Name: #{project.name}
           Fileset VRMF: #{bff_version}
           Fileset Description: #{project.friendly_name}
           USRLIBLPPFiles

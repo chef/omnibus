@@ -39,13 +39,13 @@ module Omnibus
       copy_file("#{project.package_scripts_path}/postrm", '/tmp/pkgmk/postremove')
 
       execute("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
-      execute("pkgchk -vd /tmp/pkgmk #{project.package_name}")
-      execute("pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.package_name}")
+      execute("pkgchk -vd /tmp/pkgmk #{project.name}")
+      execute("pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.name}")
     end
 
     # @see Base#package_name
     def package_name
-      "#{project.package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
+      "#{project.name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
     end
 
     def pkgmk_version
@@ -91,8 +91,8 @@ module Omnibus
         TZ=PST
         PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
         BASEDIR=#{install_dirname}
-        PKG=#{project.package_name}
-        NAME=#{project.package_name}
+        PKG=#{project.name}
+        NAME=#{project.name}
         ARCH=#{`uname -p`.chomp}
         VERSION=#{pkgmk_version}
         CATEGORY=application
