@@ -70,7 +70,7 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      "#{safe_package_name}-#{safe_build_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+      "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
     end
 
     #
@@ -98,8 +98,8 @@ module Omnibus
       render_template(template_path('rpm/spec.erb'),
         destination: spec_file,
         variables: {
-          name:           safe_package_name,
-          version:        safe_build_version,
+          name:           safe_project_name,
+          version:        safe_version,
           iteration:      safe_build_iteration,
           vendor:         'Omnibus <omnibus@getchef.com>', # TODO: make this configurable
           license:        'unknown', # TODO: make this configurable
@@ -228,23 +228,25 @@ module Omnibus
     end
 
     #
-    # RPM package names cannot contain dashes, so we will convert them to
-    # underscores.
+    # Return the RPM-ready project name, converting any invalid characters to
+    # dashes (+-+).
     #
     # @return [String]
     #
-    def safe_package_name
-      if project.package_name.include?('-')
-        converted = project.package_name.gsub('-', '_')
+    def safe_project_name
+      if project.name =~ /[a-z0-9\.\+\-]+/
+        project.name.dup
+      else
+        converted = project.name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "RPM package names cannot contain dashes. Converting " \
-          "`#{project.package_name}' to `#{converted}'."
+          "The `name' compontent of RPM package names can only include " \
+          "lowercase alphabetical characters (a-z), numbers (0-9), dots (.), " \
+          "plus signs (+), and dashes (-). Converting `#{project.name}' to " \
+          "`#{converted}'."
         end
 
         converted
-      else
-        project.package_name
       end
     end
 
@@ -264,18 +266,20 @@ module Omnibus
     #
     # @return [String]
     #
-    def safe_build_version
-      if project.build_version.include?('-')
-        converted = project.build_version.gsub('-', '_')
+    def safe_version
+      if project.build_version =~ /[a-zA-Z0-9\.\+\-]+/
+        project.build_version.dup
+      else
+        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "RPM build versions cannot contain dashes. Converting " \
+          "The `version' compontent of RPM package names can only include " \
+          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
+          "plus signs (+), and dashes (-). Converting " \
           "`#{project.build_version}' to `#{converted}'."
         end
 
         converted
-      else
-        project.build_version
       end
     end
 
