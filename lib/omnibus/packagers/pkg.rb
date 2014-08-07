@@ -25,6 +25,8 @@ module Omnibus
   # and a license. It can also allow for user customization of which
   # component packages to install, but PKG does not expose this feature.
   class Packager::PKG < Packager::Base
+    id :pkg
+
     validate do
       assert_presence!(resource('background.png'))
       assert_presence!(resource('license.html'))

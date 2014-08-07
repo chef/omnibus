@@ -20,6 +20,7 @@ module Omnibus
   # Builds a makeself package (.sh extention)
   #
   class Packager::Makeself < Packager::Base
+    id :makeself
 
     validate do
       assert_presence!(makeself_script)

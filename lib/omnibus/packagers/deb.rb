@@ -17,6 +17,8 @@
 
 module Omnibus
   class Packager::DEB < Packager::Base
+    id :bff
+
     validate do
       # ...
     end

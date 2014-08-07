@@ -29,99 +29,148 @@ module Omnibus
     # The Omnibus::Project instance that we're packaging.
     attr_reader :project
 
-    # The commands/steps to setup the file system.
-    def self.setup(&block)
-      if block_given?
-        @setup = block
-      else
-        @setup
+    class << self
+      #
+      # Set the unique of this packager.
+      #
+      # @see {#id}
+      #
+      # @param [Symbol] name
+      #   the id
+      #
+      def id(name)
+        class_eval <<-EOH, __FILE__, __LINE__
+          def id
+            :#{name}
+          end
+        EOH
+      end
+
+      # The commands/steps use to setup the filesystem.
+      def setup(&block)
+        if block
+          @setup = block
+        else
+          @setup
+        end
+      end
+
+      # The commands/steps to validate any arguments.
+      def validate(&block)
+        if block
+          @validate = block
+        else
+          @validate
+        end
+      end
+
+      # The commands/steps to build the package.
+      def build(&block)
+        if block
+          @build = block
+        else
+          @build
+        end
+      end
+
+      # The commands/steps to cleanup any temporary files/directories.
+      def clean(&block)
+        if block
+          @clean = block
+        else
+          @clean
+        end
       end
     end
 
-    # The commands/steps to validate any arguments.
-    def self.validate(&block)
-      if block_given?
-        @validate = block
-      else
-        @validate
-      end
-    end
-
-    # The commands/steps to build the package.
-    def self.build(&block)
-      if block_given?
-        @build = block
-      else
-        @build || raise(AbstractMethod.new("#{self.class.name}.build"))
-      end
-    end
-
-    # The commands/steps to cleanup any temporary files/directories.
-    def self.clean(&block)
-      if block_given?
-        @clean = block
-      else
-        @clean
-      end
-    end
-
+    #
     # Create a new packager object.
     #
     # @param [Project] project
+    #
     def initialize(project)
       @project = project
     end
 
     #
-    # Generation methods
-    # ------------------------------
+    # The unique identifier for this class - this is used in file paths and
+    # packager searching, so please do not change unless you know what you are
+    # doing!
+    #
+    # @abstract Subclasses should define the +id+ attribute.
+    #
+    # @return [Symbol]
+    #
+    def id
+      raise NotImplementedError
+    end
 
+    #
+    # @!group File system helpers
+    # --------------------------------------------------
+
+    #
     # Create a directory at the given +path+.
     #
     # @param [String] path
+    #
     def create_directory(path)
       FileUtils.mkdir_p(path)
       path
     end
 
+    #
     # Remove the directory at the given +path+.
     #
     # @param [String] path
+    #
     def remove_directory(path)
       FileUtils.rm_rf(path)
     end
 
+    #
     # Purge the directory of all contents.
     #
     # @param [String] path
+    #
     def purge_directory(path)
       remove_directory(path)
       create_directory(path)
     end
 
+    #
     # Copy the +source+ file to the +destination+.
     #
     # @param [String] source
     # @param [String] destination
+    #
     def copy_file(source, destination)
       FileUtils.cp(source, destination)
       destination
     end
 
+    #
     # Remove the file at the given path.
     #
-    # @param [String] pah
+    # @param [String] path
+    #
     def remove_file(path)
       FileUtils.rm_f(path)
     end
 
+    #
     # Copy the +source+ directory to the +destination+.
     #
     # @param [String] source
     # @param [String] destination
+    #
     def copy_directory(source, destination)
       FileUtils.cp_r(FileSyncer.glob("#{source}/*"), destination)
     end
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
 
     # Execute the command using shellout!
     #

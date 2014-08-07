@@ -20,6 +20,7 @@ module Omnibus
   # Builds a bff package (.bff extention)
   #
   class Packager::BFF < Packager::Base
+    id :bff
 
     validate do
       assert_presence!("#{project.package_scripts_path}/aix/opscode.chef.client.template")

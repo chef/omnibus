@@ -23,6 +23,7 @@ module Omnibus
     # !@method msi_parameters
     #   @return (see Project#msi_parameters)
     def_delegator :@project, :msi_parameters, :msi_parameters
+    id :msi
 
     validate do
       assert_presence!(resource('localization-en-us.wxl'))

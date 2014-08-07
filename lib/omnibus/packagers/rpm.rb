@@ -22,6 +22,8 @@ module Omnibus
   # Builds an rpm package
   #
   class Packager::RPM < Packager::Base
+    id :rpm
+
     validate do
       # ...
     end

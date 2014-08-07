@@ -16,6 +16,8 @@
 
 module Omnibus
   class Packager::MacDmg < Packager::Base
+    id :mac_dmg
+
     attr_reader :packager
 
     validate do
