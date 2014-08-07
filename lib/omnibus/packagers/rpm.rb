@@ -188,7 +188,7 @@ module Omnibus
     # @return [String]
     #
     def spec_file
-      @spec_file ||= "#{staging_dir}/SPECS/#{package_name}.spec"
+      "#{staging_dir}/SPECS/#{package_name}.spec"
     end
 
     #
