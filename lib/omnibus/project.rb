@@ -470,7 +470,7 @@ module Omnibus
     expose :package_group
 
     #
-    # Set or retrieve the resources path to be used by packagers.
+    # Set or retrieve the path to the resources on disk for use in packagers.
     #
     # @example
     #   resources_path '/path/to/resources'
@@ -482,7 +482,7 @@ module Omnibus
     #
     def resources_path(val = NULL)
       if null?(val)
-        @resources_path
+        @resources_path || "#{Config.project_root}/resources/#{name}"
       else
         @resources_path = File.expand_path(val)
       end
