@@ -15,39 +15,58 @@
 #
 
 module Omnibus
+  #
   # Builds a Mac OS X "product" package (.pkg extension)
   #
-  # Mac OS X packages are built in two stages. First, files are packaged up
-  # into one or more "component" .pkg files (PKG only supports making a
-  # single component). This is done with `pkgbuild`. Next the component(s)
-  # are combined into a single "product" package, using `productbuild`. It is
-  # this container package that can have custom branding (background image)
-  # and a license. It can also allow for user customization of which
-  # component packages to install, but PKG does not expose this feature.
+  # Mac OS X packages are built in two stages. First, files are packaged into
+  # one or more "component" .pkg files (PKG only supports making a single
+  # component). This is done with `pkgbuild`. Next the component(s) are combined
+  # into a single "product" package, using `productbuild`. It is this container
+  # package that can have custom branding (background image) and a license.
+  #
+  # It can also allow for user customization of which component packages to
+  # install, but PKG does not expose this feature.
+  #
   class Packager::PKG < Packager::Base
     id :pkg
 
     validate do
-      assert_presence!(resource('background.png'))
-      assert_presence!(resource('license.html'))
-      assert_presence!(resource('welcome.html'))
+      # ...
     end
 
     setup do
-      # Render resource templates if needed
-      %w(license.html.erb welcome.html.erb).each do |res|
-        resource_path = resource(filename)
-        destination   = File.join(staging_dir, filename.chomp('.erb'))
+      # Create the resources directory
+      create_directory(resources_dir)
 
-        if File.exist?(resource_path)
-          render_template(resource_path, destination: destination)
-        end
-      end
+      # Render the license
+      render_template(resource_path('license.html.erb'),
+        destination: "#{resources_dir}/license.html",
+        variables: {
+          name:          project.name,
+          friendly_name: project.friendly_name,
+          maintainer:    project.maintainer,
+        }
+      )
+
+      # Render the welcome template
+      render_template(resource_path('welcome.html.erb'),
+        destination: "#{resources_dir}/welcome.html",
+        variables: {
+          name:          project.name,
+          friendly_name: project.friendly_name,
+          maintainer:    project.maintainer,
+        }
+      )
+
+      # "Render" the assets
+      copy_file(resource_path('background.png'), "#{resources_dir}/background.png")
     end
 
     build do
       build_component_pkg
-      generate_distribution
+
+      write_distribution_file
+
       build_product_pkg
 
       if Config.build_dmg
@@ -56,19 +75,33 @@ module Omnibus
     end
 
     clean do
-      # There is nothing to cleanup
+      # ...
     end
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}-#{project.build_iteration}.pkg"
+      "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.pkg"
     end
 
+    #
     # The full path where the product package was/will be written.
     #
-    # @return [String] Path to the packge file.
+    # @return [String]
+    #
     def final_pkg
       File.expand_path("#{package_dir}/#{package_name}")
+    end
+
+    #
+    # The path where the product package resources will live. We cannot store
+    # resources in the top-level staging dir, because +productbuild+'s
+    # +--resources+ flag expects a directory that does not contain the parent
+    # package.
+    #
+    # @return [String]
+    #
+    def resources_dir
+      File.expand_path("#{staging_dir}/Resources")
     end
 
     #
@@ -76,11 +109,13 @@ module Omnibus
     # Installer.app, but doesn't contain the data needed to customize the
     # installer UI.
     #
+    # @return [void]
+    #
     def build_component_pkg
       execute <<-EOH.gsub(/^ {8}/, '')
         pkgbuild \\
-          --identifier "#{identifier}" \\
-          --version "#{project.build_version}" \\
+          --identifier "#{safe_identifier}" \\
+          --version "#{safe_version}" \\
           --scripts "#{project.package_scripts_path}" \\
           --root "#{project.install_dir}" \\
           --install-location "#{project.install_dir}" \\
@@ -96,43 +131,32 @@ module Omnibus
     # It also includes information used to customize the UI of the Mac OS X
     # installer.
     #
-    def generate_distribution
-      File.open(distribution_file, 'w', 0600) do |file|
-        file.puts <<-EOH.gsub(/^ {10}/, '')
-          <?xml version="1.0" standalone="no"?>
-          <installer-gui-script minSpecVersion="1">
-              <title>#{project.friendly_name}</title>
-              <background file="background.png" alignment="bottomleft" mime-type="image/png"/>
-              <welcome file="welcome.html" mime-type="text/html"/>
-              <license file="license.html" mime-type="text/html"/>
-
-              <!-- Generated by productbuild - - synthesize -->
-              <pkg-ref id="#{identifier}"/>
-              <options customize="never" require-scripts="false"/>
-              <choices-outline>
-                  <line choice="default">
-                      <line choice="#{identifier}"/>
-                  </line>
-              </choices-outline>
-              <choice id="default"/>
-              <choice id="#{identifier}" visible="false">
-                  <pkg-ref id="#{identifier}"/>
-              </choice>
-              <pkg-ref id="#{identifier}" version="#{project.build_version}" onConclusion="none">#{component_pkg}</pkg-ref>
-          </installer-gui-script>
-        EOH
-      end
+    # @return [void]
+    #
+    def write_distribution_file
+      render_template(resource_path('distribution.xml.erb'),
+        destination: "#{staging_dir}/Distribution",
+        mode: 0600,
+        variables: {
+          friendly_name: project.friendly_name,
+          identifier:    safe_identifier,
+          version:       safe_version,
+          component_pkg: component_pkg,
+        }
+      )
     end
 
     #
     # Construct the product package. The generated package is the final build
     # product that is shipped to end users.
     #
+    # @return [void]
+    #
     def build_product_pkg
       command = <<-EOH.gsub(/^ {8}/, '')
         productbuild \\
-          --distribution "#{distribution_file}" \\
-          --resources "#{staging_resources_path}" \\
+          --distribution "#{staging_dir}/Distribution" \\
+          --resources "#{resources_dir}" \\
       EOH
 
       command << %Q(  --sign "#{Config.signing_identity}" \\\n) if Config.sign_pkg
@@ -142,36 +166,84 @@ module Omnibus
       execute(command)
     end
 
+    #
+    # The name of the (only) component package.
+    #
+    # @return [String] the filename of the component .pkg file to create.
+    #
+    def component_pkg
+      "#{safe_project_name}-core.pkg"
+    end
+
+    #
+    # Return the PKG-ready project name, removing any invalid characters.
+    #
+    # @return [String]
+    #
+    def safe_project_name
+      if project.name =~ /\A[[:alnum:]]+\z/
+        project.name.dup
+      else
+        converted = project.name.downcase.gsub(/[^[:alnum:]+]/, '')
+
+        log.warn(log_key) do
+          "The `name' compontent of Mac package names can only include " \
+          "alphabetical characters (a-z, A-Z), and numbers (0-9). Converting " \
+          "`#{project.name}' to `#{converted}'."
+        end
+
+        converted
+      end
+    end
+
+    #
     # The identifier for this mac package (the com.whatever.thing.whatever).
     # This is a configurable project value, but a default value is calculated if
     # one is not given.
     #
-    # @return [String]
-    def identifier
-      @identifier ||= project.mac_pkg_identifier ||
-        "test.#{sanitize(project.maintainer)}.pkg.#{sanitize(project.name)}"
-    end
-
-    # Filesystem path where the Distribution XML file is written.
+    # @todo Make this a packager DSL method and remove it from the top-level
+    #   project configuration.
     #
     # @return [String]
-    def distribution_file
-      File.expand_path("#{staging_dir}/Distribution")
+    #
+    def safe_identifier
+      return project.mac_pkg_identifier if project.mac_pkg_identifier
+
+      maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, '').downcase
+      "test.#{maintainer}.pkg.#{safe_project_name}"
     end
 
-    # The name of the (only) component package.
     #
-    # @return [String] the filename of the component .pkg file to create.
-    def component_pkg
-      "#{project.name}-core.pkg"
-    end
-
-    # Sanitize the given string for the package identifier.
+    # This is actually just the regular build_iternation, but it felt lonely
+    # among all the other +safe_*+ methods.
     #
-    # @param [String]
     # @return [String]
-    def sanitize(string)
-      string.gsub(/[^[:alnum:]]/, '').downcase
+    #
+    def safe_build_iteration
+      project.build_iteration
+    end
+
+    #
+    # Return the PKG-ready version, converting any invalid characters to
+    # dashes (+-+).
+    #
+    # @return [String]
+    #
+    def safe_version
+      if project.build_version =~ /\A[a-zA-Z0-9\.\+\-]+\z/
+        project.build_version.dup
+      else
+        converted = project.name.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
+
+        log.warn(log_key) do
+          "The `version' compontent of Mac package names can only include " \
+          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
+          "plus signs (+), and dashes (-). Converting " \
+          "`#{project.build_version}' to `#{converted}'."
+        end
+
+        converted
+      end
     end
   end
 end
