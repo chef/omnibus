@@ -32,11 +32,11 @@ module Omnibus
     # @param [String] source
     #   the path on disk where the ERB template lives
     #
-    # @option options [String] :destination
+    # @option options [String] :destination (default: +source+)
     #   the destination where the rendered ERB should reside
-    # @option options [Fixnum] :mode
+    # @option options [Fixnum] :mode (default: +0644+)
     #   the mode of the rendered file
-    # @option options [Hash] :variables
+    # @option options [Hash] :variables (default: +{}+)
     #   the list of variables to pass to the template
     #
     def render_template(source, options = {})
@@ -56,11 +56,9 @@ module Omnibus
       struct   = Struct.new(*variables.keys).new(*variables.values)
       result   = template.result(struct.instance_eval { binding })
 
-      File.open(destination, 'w') do |file|
+      File.open(destination, 'w', mode) do |file|
         file.write(result)
       end
-
-      File.chmod(mode, destination)
 
       true
     end
