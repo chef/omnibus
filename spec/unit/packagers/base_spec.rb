@@ -49,11 +49,6 @@ module Omnibus
 
         expect(described_class.build).to eq(block)
       end
-
-      it 'is a required phase' do
-        described_class.instance_variable_set(:@build, nil)
-        expect { described_class.build }.to raise_error(AbstractMethod)
-      end
     end
 
     describe '.clean' do
