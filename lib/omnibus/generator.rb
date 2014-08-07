@@ -40,7 +40,7 @@ module Omnibus
       type: :boolean,
       defaults: false
 
-    class_option :dm5_assets,
+    class_option :dmg_assets,
       desc: 'Generate Mac OS X dmg assets',
       type: :boolean,
       defaults: false
@@ -99,15 +99,15 @@ module Omnibus
     def create_dmg_assets
       return unless options[:dmg_assets]
 
-      copy_file(resource_path('dmg/background.png'), "#{target}/files/dmg/background.png")
-      copy_file(resource_path('dmg/icon.png'), "#{target}/files/dmg/icon.png")
+      copy_file(resource_path('dmg/background.png'), "#{target}/resources/dmg/background.png")
+      copy_file(resource_path('dmg/icon.png'), "#{target}/resources/dmg/icon.png")
     end
 
     def create_msi_assets
       return unless options[:msi_assets]
 
       copy_file(resource_path('msi/localization-en-us.wxl.erb'), "#{target}/resources/msi/localization-en-us.wxl.erb")
-      copy_file(resource_path('msi/parameters.erb'), "#{target}/resources/msi/parameters.erb")
+      copy_file(resource_path('msi/parameters.wxi.erb'), "#{target}/resources/msi/parameters.wxi.erb")
       copy_file(resource_path('msi/source.wxs.erb'), "#{target}/resources/msi/source.wxs.erb")
 
       copy_file(resource_path('msi/assets/LICENSE.rtf'), "#{target}/resources/msi/assets/LICENSE.rtf")
