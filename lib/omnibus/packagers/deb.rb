@@ -76,7 +76,7 @@ module Omnibus
     # extension.
     #
     def package_name
-      @package_name ||= "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
+      "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
 
     private
