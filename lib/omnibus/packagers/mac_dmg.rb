@@ -25,8 +25,6 @@ module Omnibus
 
     setup do
       create_directory(dmg_stage)
-      purge_directory(staging_resources_path)
-      copy_directory(resources_path, staging_resources_path)
 
       remove_file(writable_dmg)
       clean_disks

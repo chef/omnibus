@@ -22,9 +22,6 @@ module Omnibus
   class Packager::Solaris < Packager::Base
 
     setup do
-      purge_directory(staging_dir)
-      purge_directory(staging_resources_path)
-      copy_directory(resources_path, staging_resources_path)
       purge_directory('/tmp/pkgmk')
     end
 

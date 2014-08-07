@@ -32,10 +32,6 @@ module Omnibus
     end
 
     setup do
-      purge_directory(staging_dir)
-      purge_directory(staging_resources_path)
-      copy_directory(resources_path, staging_resources_path)
-
       # Render resource templates if needed
       %w(license.html.erb welcome.html.erb).each do |res|
         resource_path = resource(filename)
