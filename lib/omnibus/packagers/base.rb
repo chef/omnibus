@@ -283,14 +283,14 @@ module Omnibus
     #   the name of the resource on disk to find
     #
     def resource_path(name)
-      local  = File.join(resources_path, name)
+      local = File.join(resources_path, name)
 
       if File.exist?(local)
         log.info(log_key) { "Using local resource `#{name}' from `#{local}'" }
         local
       else
         log.debug(log_key) { "Using vendored resource `#{name}'" }
-        Omnibus.source_root.join('resources', id, name).to_s
+        Omnibus.source_root.join("resources/#{id}/#{name}").to_s
       end
     end
 
@@ -304,7 +304,7 @@ module Omnibus
     # @return [String]
     #
     def resources_path
-      File.expand_path(File.join(project.resources_path, id))
+      File.expand_path("#{project.resources_path}/#{id}")
     end
 
     #
