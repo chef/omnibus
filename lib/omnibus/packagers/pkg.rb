@@ -233,7 +233,7 @@ module Omnibus
       if project.build_version =~ /\A[a-zA-Z0-9\.\+\-]+\z/
         project.build_version.dup
       else
-        converted = project.name.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
+        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
           "The `version' compontent of Mac package names can only include " \
