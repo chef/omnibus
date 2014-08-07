@@ -51,9 +51,7 @@ module Omnibus
       defaults: false
 
     class << self
-      #
-      # Set the source root for Thor.
-      #
+      # Set the source root for Thor
       def source_root
         File.expand_path('../generator_files', __FILE__)
       end
@@ -67,13 +65,11 @@ module Omnibus
     end
 
     def create_project_definition
-      template('project.rb.erb', "#{target}/config/projects/#{name}.rb", template_options)
+      template('config/projects/project.rb.erb', "#{target}/config/projects/#{name}.rb", template_options)
     end
 
     def create_example_software_definitions
-      template('software/c-example.rb.erb', "#{target}/config/software/c-example.rb", template_options)
-      template('software/erlang-example.rb.erb', "#{target}/config/software/erlang-example.rb", template_options)
-      template('software/ruby-example.rb.erb', "#{target}/config/software/ruby-example.rb", template_options)
+      template('config/software/zlib.rb.erb', "#{target}/config/software/#{name}-zlib.rb", template_options)
     end
 
     def create_kitchen_files
@@ -87,7 +83,7 @@ module Omnibus
         script_path = "#{target}/package-scripts/#{name}/#{package_script}"
         template("package_scripts/#{package_script}.erb", script_path, template_options)
 
-        # #nsure the package script is executable
+        # Ensure the package script is executable
         chmod(script_path, 0755)
       end
     end
