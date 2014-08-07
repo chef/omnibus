@@ -78,31 +78,27 @@ module Omnibus
     end
 
     def create_pkg_assets
-      template('mac_pkg/license.html.erb', "#{target}/files/pkg/Resources/license.html", template_options)
-      template('mac_pkg/welcome.html.erb', "#{target}/files/pkg/Resources/welcome.html", template_options)
-      copy_file('mac_pkg/background.png', "#{target}/files/pkg/Resources/background.png")
+      copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
+      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
+      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
     end
 
     def create_dmg_assets
-      copy_file('mac_dmg/background.png', "#{target}/files/mac_dmg/Resources/background.png")
-      copy_file('mac_dmg/icon.png', "#{target}/files/mac_dmg/Resources/icon.png")
+      copy_file(resource_path('dmg/background.png'), "#{target}/files/dmg/background.png")
+      copy_file(resource_path('dmg/icon.png'), "#{target}/files/dmg/icon.png")
     end
 
-    def create_windows_assets
-      # These ERB files are actually rendered as ERB files on the target system
-      # because the parameters are resolved at the build time for localization
-      # and parameters files.
-      copy_file('windows_msi/localization-en-us.wxl.erb', "#{target}/files/windows_msi/Resources/localization-en-us.wxl.erb")
-      copy_file('windows_msi/parameters.wxi.erb', "#{target}/files/windows_msi/Resources/parameters.wxi.erb")
+    def create_msi_assets
+      copy_file(resource_path('msi/localization-en-us.wxl.erb'), "#{target}/resources/msi/localization-en-us.wxl.erb")
+      copy_file(resource_path('msi/parameters.erb'), "#{target}/resources/msi/parameters.erb")
+      copy_file(resource_path('msi/source.wxs.erb'), "#{target}/resources/msi/source.wxs.erb")
 
-      template('windows_msi/source.wxs.erb', "#{target}/files/windows_msi/Resources/source.wxs", template_options)
-
-      copy_file('windows_msi/assets/LICENSE.rtf', "#{target}/files/windows_msi/Resources/assets/LICENSE.rtf")
-      copy_file('windows_msi/assets/banner_background.bmp', "#{target}/files/windows_msi/Resources/assets/banner_background.bmp")
-      copy_file('windows_msi/assets/dialog_background.bmp', "#{target}/files/windows_msi/Resources/assets/dialog_background.bmp")
-      copy_file('windows_msi/assets/project.ico', "#{target}/files/windows_msi/Resources/assets/project.ico")
-      copy_file('windows_msi/assets/project_16x16.ico', "#{target}/files/windows_msi/Resources/assets/project_16x16.ico")
-      copy_file('windows_msi/assets/project_32x32.ico', "#{target}/files/windows_msi/Resources/assets/project_32x32.ico")
+      copy_file(resource_path('msi/assets/LICENSE.rtf'), "#{target}/resources/msi/assets/LICENSE.rtf")
+      copy_file(resource_path('msi/assets/banner_background.bmp'), "#{target}/resources/msi/assets/banner_background.bmp")
+      copy_file(resource_path('msi/assets/dialog_background.bmp'), "#{target}/resources/msi/assets/dialog_background.bmp")
+      copy_file(resource_path('msi/assets/project.ico'), "#{target}/resources/msi/assets/project.ico")
+      copy_file(resource_path('msi/assets/project_16x16.ico'), "#{target}/resources/msi/assets/project_16x16.ico")
+      copy_file(resource_path('msi/assets/project_32x32.ico'), "#{target}/resources/msi/assets/project_32x32.ico")
     end
 
     private
@@ -126,6 +122,18 @@ module Omnibus
         name: name,
         install_dir: "/opt/#{name}",
       }
+    end
+
+    #
+    # The path to a vendored resource within Omnibus.
+    #
+    # @param [String, Array<String>] args
+    #   the sub-path to get
+    #
+    # @return [String]
+    #
+    def resource_path(*args)
+      Omnibus.source_root.join('resources', *args).to_s
     end
   end
 end
