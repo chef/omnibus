@@ -254,8 +254,6 @@ module Omnibus
       File.expand_path(Config.package_dir, Config.project_root)
     end
 
-    private
-
     #
     # The path to the staging dir on disk.
     #
