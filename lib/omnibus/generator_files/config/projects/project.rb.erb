@@ -1,0 +1,25 @@
+#
+# Copyright <%= Time.now.year %> YOUR NAME
+#
+# All Rights Reserved.
+#
+
+name "<%= config[:name] %>"
+maintainer "CHANGE ME"
+homepage "https://CHANGE-ME.com"
+
+install_dir "<%= config[:install_dir] %>"
+build_version Omnibus::BuildVersion.semver
+build_iteration 1
+
+# creates required build directories
+dependency "preparation"
+
+# <%= config[:name] %> dependencies/components
+# dependency "somedep"
+
+# version manifest file
+dependency "version-manifest"
+
+exclude "\.git*"
+exclude "bundler\/git"
