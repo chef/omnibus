@@ -21,8 +21,7 @@ module Omnibus
     attr_reader :packager
 
     validate do
-      assert_presence!(resource('background.png'))
-      assert_presence!(resource('icon.png'))
+      # ...
     end
 
     setup do
@@ -84,7 +83,7 @@ module Omnibus
 
       # Copy support files
       support = create_directory("#{dmg_stage}/.support")
-      copy_file(resource('background.png'), "#{support}/background.png")
+      copy_file(resource_path('background.png'), "#{support}/background.png")
     end
 
     #
@@ -123,16 +122,16 @@ module Omnibus
       execute <<-EOH.gsub(/^ {8}/, '')
         # Generate the icns
         mkdir tmp.iconset
-        sips -z 16 16     #{resource('icon.png')} --out tmp.iconset/icon_16x16.png
-        sips -z 32 32     #{resource('icon.png')} --out tmp.iconset/icon_16x16@2x.png
-        sips -z 32 32     #{resource('icon.png')} --out tmp.iconset/icon_32x32.png
-        sips -z 64 64     #{resource('icon.png')} --out tmp.iconset/icon_32x32@2x.png
-        sips -z 128 128   #{resource('icon.png')} --out tmp.iconset/icon_128x128.png
-        sips -z 256 256   #{resource('icon.png')} --out tmp.iconset/icon_128x128@2x.png
-        sips -z 256 256   #{resource('icon.png')} --out tmp.iconset/icon_256x256.png
-        sips -z 512 512   #{resource('icon.png')} --out tmp.iconset/icon_256x256@2x.png
-        sips -z 512 512   #{resource('icon.png')} --out tmp.iconset/icon_512x512.png
-        sips -z 1024 1024 #{resource('icon.png')} --out tmp.iconset/icon_512x512@2x.png
+        sips -z 16 16     #{resource_path('icon.png')} --out tmp.iconset/icon_16x16.png
+        sips -z 32 32     #{resource_path('icon.png')} --out tmp.iconset/icon_16x16@2x.png
+        sips -z 32 32     #{resource_path('icon.png')} --out tmp.iconset/icon_32x32.png
+        sips -z 64 64     #{resource_path('icon.png')} --out tmp.iconset/icon_32x32@2x.png
+        sips -z 128 128   #{resource_path('icon.png')} --out tmp.iconset/icon_128x128.png
+        sips -z 256 256   #{resource_path('icon.png')} --out tmp.iconset/icon_128x128@2x.png
+        sips -z 256 256   #{resource_path('icon.png')} --out tmp.iconset/icon_256x256.png
+        sips -z 512 512   #{resource_path('icon.png')} --out tmp.iconset/icon_256x256@2x.png
+        sips -z 512 512   #{resource_path('icon.png')} --out tmp.iconset/icon_512x512.png
+        sips -z 1024 1024 #{resource_path('icon.png')} --out tmp.iconset/icon_512x512@2x.png
         iconutil -c icns tmp.iconset
 
         # Copy it over
@@ -193,10 +192,10 @@ module Omnibus
     def set_dmg_icon
       execute <<-EOH.gsub(/^ {8}/, '')
         # Convert the png to an icon
-        sips -i "#{resource('icon.png')}"
+        sips -i "#{resource_path('icon.png')}"
 
         # Extract the icon into its own resource
-        DeRez -only icns "#{resource('icon.png')}" > tmp.rsrc
+        DeRez -only icns "#{resource_path('icon.png')}" > tmp.rsrc
 
         # Append the icon reosurce to the DMG
         Rez -append tmp.rsrc -o "#{final_dmg}"
