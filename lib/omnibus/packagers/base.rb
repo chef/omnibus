@@ -267,66 +267,52 @@ module Omnibus
       @staging_dir ||= Dir.mktmpdir(project.name)
     end
 
-    # The path to the directory where the packager resources are
-    # copied into from source.
     #
-    # @return [String]
-    def staging_resources_path
-      File.expand_path("#{staging_dir}/Resources")
-    end
-
-    # The path to a resource in staging directory.
-    #
-    # @param [String]
-    #   the name or path of the resource
-    # @return [String]
-    def resource(path)
-      File.expand_path(File.join(staging_resources_path, path))
-    end
-
-    # The path to all the resources on the packager source.
-    # Uses `resources_path` if specified in the project otherwise
-    # uses the project root set in global config.
-    #
-    # @return [String]
-    def resources_path
-      base_path = if project.resources_path
-                    project.resources_path
-                  else
-                    project.files_path
-                  end
-
-      File.expand_path(File.join(base_path, underscore_name, 'Resources'))
-    end
+    # @!group Resource methods
+    # --------------------------------------------------
 
     #
-    # The path to a template on disk. By default, these templates are loaded
-    # from +#{Omnibus.source_root}/templates/#{name}+.
+    # The preferred path to a resource on disk with the given +name+. This
+    # method will perform an "intelligent" search for a resource by first
+    # looking in the local project expected {#resources_path}, and then falling
+    # back to Omnibus' files.
     #
-    # @todo Remove the craziness ERB searches and vendor all templates in
-    # Omnibus, providing a way for users to specify custom values.
+    # @example When the resource exists locally
+    #   resource_path("spec.erb") #=> "/path/to/project/resources/rpm/spec.erb"
+    #
+    # @example When the resource does not exist locally
+    #   resource_path("spec.erb") #=> "/omnibus-x.y.z/resources/rpm/spec.erb"
     #
     # @param [String] name
-    #   the name of the template
+    #   the name of the resource on disk to find
     #
-    # @return [String]
-    #
-    def template_path(name)
-      Omnibus.source_root.join('templates', name).to_s
+    def resource_path(name)
+      local  = File.join(resources_path, name)
+
+      if File.exist?(local)
+        log.info(log_key) { "Using local resource `#{name}' from `#{local}'" }
+        local
+      else
+        log.debug(log_key) { "Using vendored resource `#{name}'" }
+        Omnibus.source_root.join('resources', id, name).to_s
+      end
     end
 
-    # The underscored equivalent of this class. This is mostly used by file
-    # paths.
+    #
+    # The path where this packager's resources reside on disk. This is the
+    # given {Project#resources_path} combined with the packager's {#id}.
+    #
+    # @example RPM packager
+    #   resources_path #=> "/path/to/project/resources/rpm"
     #
     # @return [String]
-    def underscore_name
-      @underscore_name ||= self.class.name
-        .split('::')
-        .last
-        .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-        .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-        .tr('-', '_')
-        .downcase
+    #
+    def resources_path
+      File.expand_path(File.join(project.resources_path, id))
     end
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
   end
 end
