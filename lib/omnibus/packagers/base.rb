@@ -24,8 +24,6 @@ module Omnibus
     include Templating
     include Util
 
-    extend Forwardable
-
     # The Omnibus::Project instance that we're packaging.
     attr_reader :project
 
