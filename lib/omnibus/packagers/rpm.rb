@@ -141,6 +141,8 @@ module Omnibus
     # @return [void]
     #
     def create_rpm_file
+      log.info(log_key) { "Creating .rpm file" }
+
       command =  %|rpmbuild|
       command << %| -bb|
       command << %| --buildroot #{staging_dir}/BUILD|
