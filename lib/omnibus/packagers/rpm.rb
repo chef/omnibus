@@ -244,7 +244,7 @@ module Omnibus
     # @return [String]
     #
     def safe_project_name
-      if project.name =~ /[a-z0-9\.\+\-]+/
+      if project.name =~ /\A[a-z0-9\.\+\-]+\z/
         project.name.dup
       else
         converted = project.name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
@@ -277,7 +277,7 @@ module Omnibus
     # @return [String]
     #
     def safe_version
-      if project.build_version =~ /[a-zA-Z0-9\.\+\-]+/
+      if project.build_version =~ /\A[a-zA-Z0-9\.\+\-]+\z/
         project.build_version.dup
       else
         converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
