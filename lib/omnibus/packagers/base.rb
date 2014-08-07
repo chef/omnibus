@@ -232,12 +232,16 @@ module Omnibus
       remove_directory(staging_dir)
     end
 
+    #
     # The ending name of this package on disk. +Omnibus::Project+ uses this to
     # generate metadata about the package after it is built.
     #
+    # @abstract
+    #
     # @return [String]
+    #
     def package_name
-      raise AbstractMethod.new("#{self.class.name}#package_name")
+      raise NotImplementedError
     end
 
     #
