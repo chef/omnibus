@@ -109,7 +109,7 @@ module Omnibus
                 .map    { |path| "/#{path}" }
                 .reject { |path| config_files.include?(path) }
 
-      render_template(template_path('rpm/spec.erb'),
+      render_template(resource_path('spec.erb'),
         destination: spec_file,
         variables: {
           name:           safe_project_name,
@@ -155,7 +155,7 @@ module Omnibus
           # Generate a temporary home directory
           home = Dir.mktmpdir
 
-          render_template(template_path('rpm/rpmmacros.erb'),
+          render_template(resource_path('rpmmacros.erb'),
             destination: "#{home}/.rpmmacros",
             variables: {
               gpg_name: project.maintainer,
@@ -192,7 +192,7 @@ module Omnibus
     #
     # Render the rpm signing script with secure permissions, call the given
     # block with the path to the script, and ensure deletion of the script from
-    # disk.
+    # disk since it contains sensitive information.
     #
     # @param [Proc] block
     #   the block to call
@@ -203,7 +203,7 @@ module Omnibus
       directory   = Dir.mktmpdir
       destination = "#{directory}/sign-rpm"
 
-      render_template(template_path('sign-rpm.erb'),
+      render_template(resource_path('signing.erb'),
         destination: destination,
         mode: 0700,
         variables: {
