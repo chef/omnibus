@@ -79,8 +79,6 @@ module Omnibus
       "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
 
-    private
-
     #
     # The path where Debian-specific files will live.
     #
