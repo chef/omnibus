@@ -35,6 +35,21 @@ module Omnibus
       type: :string,
       default: '.'
 
+    class_option :pkg_assets,
+      desc: 'Generate Mac OS X pkg assets',
+      type: :boolean,
+      defaults: false
+
+    class_option :dm5_assets,
+      desc: 'Generate Mac OS X dmg assets',
+      type: :boolean,
+      defaults: false
+
+    class_option :msi_assets,
+      desc: 'Generate Windows MSI assets',
+      type: :boolean,
+      defaults: false
+
     class << self
       #
       # Set the source root for Thor.
@@ -78,17 +93,23 @@ module Omnibus
     end
 
     def create_pkg_assets
+      return unless options[:pkg_assets]
+
       copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
       copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
       copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
     end
 
     def create_dmg_assets
+      return unless options[:dmg_assets]
+
       copy_file(resource_path('dmg/background.png'), "#{target}/files/dmg/background.png")
       copy_file(resource_path('dmg/icon.png'), "#{target}/files/dmg/icon.png")
     end
 
     def create_msi_assets
+      return unless options[:msi_assets]
+
       copy_file(resource_path('msi/localization-en-us.wxl.erb'), "#{target}/resources/msi/localization-en-us.wxl.erb")
       copy_file(resource_path('msi/parameters.erb'), "#{target}/resources/msi/parameters.erb")
       copy_file(resource_path('msi/source.wxs.erb'), "#{target}/resources/msi/source.wxs.erb")
