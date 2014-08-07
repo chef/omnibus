@@ -104,6 +104,18 @@ module Omnibus
     end
 
     #
+    # The ending name of this package on disk. +Omnibus::Project+ uses this to
+    # generate metadata about the package after it is built.
+    #
+    # @abstract
+    #
+    # @return [String]
+    #
+    def package_name
+      raise NotImplementedError
+    end
+
+    #
     # @!group File system helpers
     # --------------------------------------------------
 
@@ -228,18 +240,6 @@ module Omnibus
       # this directory so developers can go poke around and figure out why the
       # build failed.
       remove_directory(staging_dir)
-    end
-
-    #
-    # The ending name of this package on disk. +Omnibus::Project+ uses this to
-    # generate metadata about the package after it is built.
-    #
-    # @abstract
-    #
-    # @return [String]
-    #
-    def package_name
-      raise NotImplementedError
     end
 
     #
