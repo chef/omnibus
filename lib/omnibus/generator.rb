@@ -50,6 +50,11 @@ module Omnibus
       type: :boolean,
       default: false
 
+    class_option :makeself_assets,
+      desc: 'Generate makeself assets',
+      type: :boolean,
+      default: false
+
     class_option :msi_assets,
       desc: 'Generate Windows MSI assets',
       type: :boolean,
@@ -84,7 +89,7 @@ module Omnibus
     end
 
     def create_package_scripts
-      %w(makeselfinst preinst prerm postinst postrm).each do |package_script|
+      %w(preinst prerm postinst postrm).each do |package_script|
         script_path = "#{target}/package-scripts/#{name}/#{package_script}"
         template("package_scripts/#{package_script}.erb", script_path, template_options)
 
@@ -114,6 +119,12 @@ module Omnibus
       copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
       copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
       copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
+    end
+
+    def create_makeself_assets
+      return unless options[:makeself_assets]
+
+      copy_file(resource_path('makeself/post_extract.sh.erb'), "#{target}/resources/makeself/post_extract.sh.erb")
     end
 
     def create_msi_assets

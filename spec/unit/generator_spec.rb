@@ -39,7 +39,6 @@ module Omnibus
           omnibus-name/omnibus.rb
           omnibus-name/package-scripts
           omnibus-name/package-scripts/name
-          omnibus-name/package-scripts/name/makeselfinst
           omnibus-name/package-scripts/name/postinst
           omnibus-name/package-scripts/name/postrm
           omnibus-name/package-scripts/name/preinst
@@ -79,6 +78,16 @@ module Omnibus
           omnibus-name/resources/pkg/background.png
           omnibus-name/resources/pkg/license.html.erb
           omnibus-name/resources/pkg/welcome.html.erb
+        ))
+      end
+    end
+
+    context 'with the --makeself-assets flag' do
+      it 'generates the proper file structure' do
+        Generator.new(['name'], path: tmp_path, makeself_assets: true).invoke_all
+
+        expect(structure).to include(*%w(
+          omnibus-name/resources/makeself/post_extract.sh.erb
         ))
       end
     end

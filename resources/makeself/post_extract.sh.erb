@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# Install a full <%= config[:name] %>
+# Installs <%= friendly_name %>
 #
 
 PROGNAME=`basename $0`
 INSTALLER_DIR=`dirname $0`
-DEST_DIR=<%= config[:install_dir] %>
-CONFIG_DIR=/etc/<%= config[:name] %>
+DEST_DIR=<%= install_dir %>
+CONFIG_DIR=/etc/<%= name %>
 USAGE="usage: $0"
 
 error_exit()
@@ -22,6 +22,6 @@ cp -R $INSTALLER_DIR $DEST_DIR || error_exit "Cannot install to $DEST_DIR"
 rm -f $DEST_DIR/$PROGNAME
 
 # You may want to symlink your packages bin files into /usr/bin
-# ln -sf $DEST_DIR/bin/<%= config[:name] %> /usr/bin || error_exit "Cannot link <%= config[:name] %> to /usr/bin"
+# ln -sf $DEST_DIR/bin/<%= name %> /usr/bin || error_exit "Cannot link <%= name %> to /usr/bin"
 
 exit 0
