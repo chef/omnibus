@@ -1008,7 +1008,7 @@ module Omnibus
       when 'msi'
         Packager::MSI.new(self).package_name
       when 'bff'
-        Packager::Bff.new(self).package_name
+        Packager::BFF.new(self).package_name
       when 'solaris'
         Packager::Solaris.new(self).package_name
       when 'pkg'
