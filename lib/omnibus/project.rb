@@ -856,7 +856,7 @@ module Omnibus
 
       package_types.each do |pkg_type|
         if pkg_type == 'makeself'
-          Packger::Makeself.new(self).run!
+          Packager::Makeself.new(self).run!
         elsif pkg_type == 'msi'
           Packager::MSI.new(self).run!
         elsif pkg_type == 'bff'
@@ -1008,7 +1008,7 @@ module Omnibus
       when 'msi'
         Packager::MSI.new(self).package_name
       when 'bff'
-        Packger::Bff.new(self).package_name
+        Packager::Bff.new(self).package_name
       when 'solaris'
         Packager::Solaris.new(self).package_name
       when 'pkg'
