@@ -22,74 +22,122 @@ module Omnibus
     id :bff
 
     validate do
-      assert_presence!("#{project.package_scripts_path}/aix/opscode.chef.client.template")
+      # ...
     end
 
     setup do
-      purge_directory('/.info')
-      purge_directory('/tmp/bff')
-
-      create_gen_template
-
-      copy_file("#{project.package_scripts_path}/aix/unpostinstall.sh", "#{project.install_dir}/bin")
-      copy_file("#{project.package_scripts_path}/aix/postinstall.sh", "#{project.install_dir}/bin")
+      # Copy the full-stack installer into our scratch directory, accounting for
+      # any excluded files.
+      #
+      # /opt/hamlet => /tmp/daj29013/opt/hamlet
+      destination = File.join(staging_dir, project.install_dir)
+      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
     end
 
     build do
-      execute(bff_command, { returns: [0] })
-      copy_file("/tmp/chef.#{bff_version}.bff", "/var/cache/omnibus/pkg/chef.#{bff_version}.bff")
+      # Render the gen template
+      write_gen_template
+
+      # Create the package
+      create_bff_file
     end
 
     # @see Base#package_name
     def package_name
-      "#{project.name}.#{bff_version}.#{Ohai['kernel']['machine']}.bff"
+      "#{project.name}.#{bff_version}.#{safe_architecture}.bff"
     end
 
+    #
+    # Create the gen template for +mkinstallp+.
+    #
+    # @return [void]
+    #
+    def write_gen_template
+      # Get a list of all files
+      files = FileSyncer.glob("#{staging_dir}/**/*")
+                .map { |path| path.gsub(/^#{staging_dir}/, '') }
+
+      render_template(resource_path('gen.template.erb'),
+        destination: File.join(staging_dir, 'gen.template'),
+        variables: {
+          name:           safe_project_name,
+          install_dir:    project.install_dir,
+          friendly_name:  project.friendly_name,
+          version:        bff_version,
+          description:    project.description,
+          files:          files,
+
+          # Add configuration files
+          configuration_script: resource_path('postinstall.sh'),
+          unconfiguration_script: resource_path('unpostinstall.sh'),
+        }
+      )
+    end
+
+    #
+    # Create the bff file using +mkinstallp+.
+    #
+    # Warning: This command runs as sudo! AIX requires the use of sudo to run
+    # the +mkinstallp+ command.
+    #
+    # @return [void]
+    #
+    def create_bff_file
+      log.info(log_key) { "Creating .bff file" }
+
+      shellout!("/usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
+
+      # Copy the resulting package up to the package_dir
+      FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
+        copy_file(bff, package_dir)
+      end
+    end
+
+    #
+    # Return the BFF-ready project name, converting any invalid characters to
+    # dashes (+-+).
+    #
+    # @return [String]
+    #
+    def safe_project_name
+      if project.name =~ /\A[a-z0-9\.\+\-]+\z/
+        project.name.dup
+      else
+        converted = project.name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
+
+        log.warn(log_key) do
+          "The `name' compontent of BFF package names can only include " \
+          "lowercase alphabetical characters (a-z), numbers (0-9), dots (.), " \
+          "plus signs (+), and dashes (-). Converting `#{project.name}' to " \
+          "`#{converted}'."
+        end
+
+        converted
+      end
+    end
+
+    #
+    # Return the BFF-specific version for this package. This is calculated
+    # using the first two digits of the version, concatenated by a dot, then
+    # suffixed with the build_iteration.
+    #
+    # @todo This is probably not the best way to extract the version and
+    #   probably misses edge cases like when using git describe!
+    #
+    # @return [String]
+    #
     def bff_version
-      project.build_version.split(/[^\d]/)[0..2].join('.') + ".#{project.build_iteration}"
+      version = project.build_version.split(/[^\d]/)[0..2].join('.')
+      "#{version}.#{project.build_iteration}"
     end
 
-    def bff_command
-      'sudo /usr/sbin/mkinstallp -d / -T /tmp/bff/gen.template'
-    end
-
-    def create_gen_template
-      preamble = <<-EOF.gsub(/^ {8}/, '')
-        Package Name: #{project.name}
-        Package VRMF: #{bff_version}
-        Update: N
-        Fileset
-          Fileset Name: #{project.name}
-          Fileset VRMF: #{bff_version}
-          Fileset Description: #{project.friendly_name}
-          USRLIBLPPFiles
-          Configuration Script: #{project.install_path}/bin/postinstall.sh
-          Unconfiguration Script: #{project.install_path}/bin/unpostinstall.sh
-          EOUSRLIBLPPFiles
-          Bosboot required: N
-          License agreement acceptance required: N
-          Include license files in this package: N
-          Requisites:
-            ROOT Part: N
-            ROOTFiles
-            EOROOTFiles
-          USRFiles
-      EOF
-      tail = <<-EOF.gsub(/^ {8}/, '')
-        EOUSRFiles
-        EOFileset
-      EOF
-
-      File.open '/tmp/bff/gen.preamble', 'w+' do |f|
-        f.write preamble
-      end
-
-      File.open '/tmp/bff/gen.tail', 'w+' do |f|
-        f.write tail
-      end
-
-      execute("find #{project.install_dir} -print > /tmp/bff/file.list")
-      execute("cat /tmp/bff/gen.preamble /tmp/bff/file.list /tmp/bff/gen.tail > /tmp/bff/gen.template")
+    #
+    # The architecture for this RPM package.
+    #
+    # @return [String]
+    #
+    def safe_architecture
+      Ohai['kernel']['machine']
     end
   end
 end

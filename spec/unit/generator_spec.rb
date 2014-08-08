@@ -48,14 +48,14 @@ module Omnibus
       end
     end
 
-    context 'with the --pkg-assets flag' do
+    context 'with the --bff-assets flag' do
       it 'generates the proper file structure' do
-        Generator.new(['name'], path: tmp_path, pkg_assets: true).invoke_all
+        Generator.new(['name'], path: tmp_path, bff_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/pkg/background.png
-          omnibus-name/resources/pkg/license.html.erb
-          omnibus-name/resources/pkg/welcome.html.erb
+          omnibus-name/resources/bff/gen.template.erb
+          omnibus-name/resources/bff/postinstall.sh
+          omnibus-name/resources/bff/unpostinstall.sh
         ))
       end
     end
@@ -67,6 +67,18 @@ module Omnibus
         expect(structure).to include(*%w(
           omnibus-name/resources/dmg/background.png
           omnibus-name/resources/dmg/icon.png
+        ))
+      end
+    end
+
+    context 'with the --pkg-assets flag' do
+      it 'generates the proper file structure' do
+        Generator.new(['name'], path: tmp_path, pkg_assets: true).invoke_all
+
+        expect(structure).to include(*%w(
+          omnibus-name/resources/pkg/background.png
+          omnibus-name/resources/pkg/license.html.erb
+          omnibus-name/resources/pkg/welcome.html.erb
         ))
       end
     end
