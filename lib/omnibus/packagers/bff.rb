@@ -88,7 +88,7 @@ module Omnibus
       shellout!("/usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
 
       # Copy the resulting package up to the package_dir
-      FileSyncer.glob("#{staging_dir}/*.bff").each do |bff|
+      FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
         copy_file(bff, package_dir)
       end
     end
