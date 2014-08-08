@@ -19,48 +19,104 @@ module Omnibus
     id :makeself
 
     validate do
-      assert_presence!(makeself_script)
+      # ...
     end
 
     setup do
-      if self_install?
-        copy_file("#{project.package_scripts_path}/makeselfinst", "#{project.install_dir}/makeselfinst")
-      end
+      # Copy the full-stack installer into our scratch directory, accounting for
+      # any excluded files.
+      #
+      # /opt/hamlet => /tmp/daj29013
+      FileSyncer.sync(project.install_dir, staging_dir, exclude: exclusions)
     end
 
     build do
-      execute(makeself_cmd)
+      # Render the post_extract file
+      write_post_extract_file
 
-      if self_install?
-        execute('./makeselfinst')
-      end
+      # Create the makeself archive
+      create_makeself_package
     end
 
     clean do
-      execute("rm -f #{project.install_dir}/makeselfinst")
+      # ...
     end
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}_#{project.build_iteration}.#{Ohai['kernel']['machine']}.sh"
+      "#{project.name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.run"
     end
 
-    def makeself_script
-      Omnibus.source_root.join('bin', 'makeself.sh')
+    #
+    # The path to the makeself script - the default should almost always be
+    # fine!
+    #
+    # @return [String]
+    #
+    def makeself
+      resource_path('makeself.sh')
     end
 
-    def makeself_cmd
-      command_and_opts = [
-        makeself_script,
-        '--gzip',
-        project.install_dir,
-        package_name,
-        "'The full stack of #{project.name}'",
-      ].join(' ')
+    #
+    # The path to the makeself-header script - the default should almost always
+    # be fine!
+    #
+    # @return [String]
+    #
+    def makeself_header
+      resource_path('makeself-header.sh')
     end
 
-    def self_install?
-      File.exist?("#{project.package_scripts_path}/makeselfinst")
+    #
+    # Write the post-extraction file that will be executed upon extraction of
+    # the makeself file.
+    #
+    # @return [void]
+    #
+    def write_post_extract_file
+      render_template(resource_path('post_extract.sh.erb'),
+        destination: File.join(staging_dir, 'post_extract.sh'),
+        mode: 0755,
+        variables: {
+          name:          project.name,
+          friendly_name: project.friendly_name,
+          install_dir:   project.install_dir,
+        }
+      )
+    end
+
+    #
+    # Run the actual makeself command, publishing the generated package.
+    #
+    # @return [void]
+    #
+    def create_makeself_package
+      log.info(log_key) { "Creating makeself package" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, '')
+          #{makeself} \\
+            --header "#{makeself_header}" \\
+            --gzip \\
+            "#{staging_dir}" \\
+            "#{package_name}" \\
+            "#{project.description}" \\
+            "./post_extract.sh"
+        EOH
+      end
+
+      FileSyncer.glob("#{staging_dir}/*.run").each do |makeself|
+        copy_file(makeself, package_dir)
+      end
+    end
+
+    #
+    # The architecture for this makeself package.
+    #
+    # @return [String]
+    #
+    def safe_architecture
+      Ohai['kernel']['machine']
     end
   end
 end
