@@ -32,10 +32,6 @@ module Omnibus
       # /opt/hamlet => /tmp/daj29013/opt/hamlet
       destination = File.join(staging_dir, project.install_dir)
       FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
-
-      # Copy the scripts over
-      copy_file(resource_path('postinstall.sh'), "#{destination}/bin")
-      copy_file(resource_path('unpostinstall.sh'), "#{destination}/bin")
     end
 
     build do
@@ -70,6 +66,10 @@ module Omnibus
           version:        bff_version,
           description:    project.description,
           files:          files,
+
+          # Add configuration files
+          configuration_script: resource_path('postinstall.sh'),
+          unconfiguration_script: resource_path('unpostinstall.sh'),
         }
       )
     end
