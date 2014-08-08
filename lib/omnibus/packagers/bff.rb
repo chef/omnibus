@@ -118,7 +118,7 @@ module Omnibus
 
     #
     # Return the BFF-specific version for this package. This is calculated
-    # using the first two digits of the version, concatenated by a dot, then
+    # using the first three digits of the version, concatenated by a dot, then
     # suffixed with the build_iteration.
     #
     # @todo This is probably not the best way to extract the version and
