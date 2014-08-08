@@ -20,16 +20,13 @@ module Omnibus
   # Builds a makeself package (.sh extention)
   #
   class Packager::Makeself < Packager::Base
+    id :makeself
 
     validate do
       assert_presence!(makeself_script)
     end
 
     setup do
-      purge_directory(staging_dir)
-      purge_directory(staging_resources_path)
-      copy_directory(resources_path, staging_resources_path)
-
       if self_install?
         copy_file("#{project.package_scripts_path}/makeselfinst", "#{project.install_dir}/makeselfinst")
       end

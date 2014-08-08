@@ -20,8 +20,27 @@ module Omnibus
 
     subject { described_class.new(project) }
 
+    it 'includes Digestable' do
+      expect(subject).to be_a(Digestable)
+    end
+
+    it 'includes Logging' do
+      expect(subject).to be_a(Logging)
+    end
+
+    it 'includes Templating' do
+      expect(subject).to be_a(Templating)
+    end
+
     it 'includes Util' do
       expect(subject).to be_a(Util)
+    end
+
+    describe '.id' do
+      it 'defines the id method on the instance' do
+        described_class.id(:base)
+        expect(subject.id).to eq(:base)
+      end
     end
 
     describe '.setup' do
@@ -48,11 +67,6 @@ module Omnibus
         described_class.build(&block)
 
         expect(described_class.build).to eq(block)
-      end
-
-      it 'is a required phase' do
-        described_class.instance_variable_set(:@build, nil)
-        expect { described_class.build }.to raise_error(AbstractMethod)
       end
     end
 
@@ -178,34 +192,44 @@ module Omnibus
       end
     end
 
-    describe '#staging_resources_path' do
-      it 'is base/Resources under package temp' do
-        name = "/tmp/dir/Resources"
-        expect(subject.send(:staging_resources_path)).to eq(name)
-      end
-    end
+    describe '#resource_path' do
+      let(:id) { :base }
+      before { allow(subject).to receive(:id).and_return(id) }
 
-    describe '#resource' do
-      it 'prefixes to the resources_path' do
-        path = '/tmp/dir/Resources/icon.png'
-        expect(subject.send(:resource, 'icon.png')).to eq(path)
+      context 'when a local resource exists' do
+        let(:resources_path) { '/resources/path' }
+
+        before do
+          project.resources_path(resources_path)
+
+          allow(File).to receive(:exist?)
+            .with(/#{resources_path}/)
+            .and_return(true)
+        end
+
+        it 'returns the local path' do
+          expect(subject.resource_path('foo/bar.erb')).to eq("#{resources_path}/#{id}/foo/bar.erb")
+        end
+      end
+
+      context 'when a local resource does not exist' do
+        it 'returns the remote path' do
+          expect(subject.resource_path('foo/bar.erb')).to eq("#{Omnibus.source_root.join("resources/#{id}/foo/bar.erb")}")
+        end
       end
     end
 
     describe '#resoures_path' do
-      context 'when project does not define resources_path' do
-        it 'is the files_path, underscored_name, and Resources' do
-          path = "#{project.files_path}/base/Resources"
-          expect(subject.send(:resources_path)).to eq(File.expand_path(path))
-        end
+      let(:id) { :base }
+      let(:resources_path) { '/resources/path' }
+
+      before do
+        project.resources_path(resources_path)
+        allow(subject).to receive(:id).and_return(id)
       end
 
-      context 'when project defines resources_path' do
-        before { allow(project).to receive(:resources_path).and_return('project/specific') }
-        it 'is the project resources_path, underscored_name, and Resources' do
-          path = 'project/specific/base/Resources'
-          expect(subject.send(:resources_path)).to eq(File.expand_path(path))
-        end
+      it 'returns the path with the id' do
+        expect(subject.resources_path).to eq("#{resources_path}/#{id}")
       end
     end
   end

@@ -24,104 +24,163 @@ module Omnibus
     include Templating
     include Util
 
-    extend Forwardable
-
     # The Omnibus::Project instance that we're packaging.
     attr_reader :project
 
-    # The commands/steps to setup the file system.
-    def self.setup(&block)
-      if block_given?
-        @setup = block
-      else
-        @setup
+    class << self
+      #
+      # Set the unique of this packager.
+      #
+      # @see {#id}
+      #
+      # @param [Symbol] name
+      #   the id
+      #
+      def id(name)
+        class_eval <<-EOH, __FILE__, __LINE__
+          def id
+            :#{name}
+          end
+        EOH
+      end
+
+      # The commands/steps use to setup the filesystem.
+      def setup(&block)
+        if block
+          @setup = block
+        else
+          @setup
+        end
+      end
+
+      # The commands/steps to validate any arguments.
+      def validate(&block)
+        if block
+          @validate = block
+        else
+          @validate
+        end
+      end
+
+      # The commands/steps to build the package.
+      def build(&block)
+        if block
+          @build = block
+        else
+          @build
+        end
+      end
+
+      # The commands/steps to cleanup any temporary files/directories.
+      def clean(&block)
+        if block
+          @clean = block
+        else
+          @clean
+        end
       end
     end
 
-    # The commands/steps to validate any arguments.
-    def self.validate(&block)
-      if block_given?
-        @validate = block
-      else
-        @validate
-      end
-    end
-
-    # The commands/steps to build the package.
-    def self.build(&block)
-      if block_given?
-        @build = block
-      else
-        @build || raise(AbstractMethod.new("#{self.class.name}.build"))
-      end
-    end
-
-    # The commands/steps to cleanup any temporary files/directories.
-    def self.clean(&block)
-      if block_given?
-        @clean = block
-      else
-        @clean
-      end
-    end
-
+    #
     # Create a new packager object.
     #
     # @param [Project] project
+    #
     def initialize(project)
       @project = project
     end
 
     #
-    # Generation methods
-    # ------------------------------
+    # The unique identifier for this class - this is used in file paths and
+    # packager searching, so please do not change unless you know what you are
+    # doing!
+    #
+    # @abstract Subclasses should define the +id+ attribute.
+    #
+    # @return [Symbol]
+    #
+    def id
+      raise NotImplementedError
+    end
 
+    #
+    # The ending name of this package on disk. +Omnibus::Project+ uses this to
+    # generate metadata about the package after it is built.
+    #
+    # @abstract
+    #
+    # @return [String]
+    #
+    def package_name
+      raise NotImplementedError
+    end
+
+    #
+    # @!group File system helpers
+    # --------------------------------------------------
+
+    #
     # Create a directory at the given +path+.
     #
     # @param [String] path
+    #
     def create_directory(path)
       FileUtils.mkdir_p(path)
       path
     end
 
+    #
     # Remove the directory at the given +path+.
     #
     # @param [String] path
+    #
     def remove_directory(path)
       FileUtils.rm_rf(path)
     end
 
+    #
     # Purge the directory of all contents.
     #
     # @param [String] path
+    #
     def purge_directory(path)
       remove_directory(path)
       create_directory(path)
     end
 
+    #
     # Copy the +source+ file to the +destination+.
     #
     # @param [String] source
     # @param [String] destination
+    #
     def copy_file(source, destination)
       FileUtils.cp(source, destination)
       destination
     end
 
+    #
     # Remove the file at the given path.
     #
-    # @param [String] pah
+    # @param [String] path
+    #
     def remove_file(path)
       FileUtils.rm_f(path)
     end
 
+    #
     # Copy the +source+ directory to the +destination+.
     #
     # @param [String] source
     # @param [String] destination
+    #
     def copy_directory(source, destination)
       FileUtils.cp_r(FileSyncer.glob("#{source}/*"), destination)
     end
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
 
     # Execute the command using shellout!
     #
@@ -183,14 +242,6 @@ module Omnibus
       remove_directory(staging_dir)
     end
 
-    # The ending name of this package on disk. +Omnibus::Project+ uses this to
-    # generate metadata about the package after it is built.
-    #
-    # @return [String]
-    def package_name
-      raise AbstractMethod.new("#{self.class.name}#package_name")
-    end
-
     #
     # The path where the final packages will live on disk.
     #
@@ -203,8 +254,6 @@ module Omnibus
       File.expand_path(Config.package_dir, Config.project_root)
     end
 
-    private
-
     #
     # The path to the staging dir on disk.
     #
@@ -214,66 +263,52 @@ module Omnibus
       @staging_dir ||= Dir.mktmpdir(project.name)
     end
 
-    # The path to the directory where the packager resources are
-    # copied into from source.
     #
-    # @return [String]
-    def staging_resources_path
-      File.expand_path("#{staging_dir}/Resources")
-    end
-
-    # The path to a resource in staging directory.
-    #
-    # @param [String]
-    #   the name or path of the resource
-    # @return [String]
-    def resource(path)
-      File.expand_path(File.join(staging_resources_path, path))
-    end
-
-    # The path to all the resources on the packager source.
-    # Uses `resources_path` if specified in the project otherwise
-    # uses the project root set in global config.
-    #
-    # @return [String]
-    def resources_path
-      base_path = if project.resources_path
-                    project.resources_path
-                  else
-                    project.files_path
-                  end
-
-      File.expand_path(File.join(base_path, underscore_name, 'Resources'))
-    end
+    # @!group Resource methods
+    # --------------------------------------------------
 
     #
-    # The path to a template on disk. By default, these templates are loaded
-    # from +#{Omnibus.source_root}/templates/#{name}+.
+    # The preferred path to a resource on disk with the given +name+. This
+    # method will perform an "intelligent" search for a resource by first
+    # looking in the local project expected {#resources_path}, and then falling
+    # back to Omnibus' files.
     #
-    # @todo Remove the craziness ERB searches and vendor all templates in
-    # Omnibus, providing a way for users to specify custom values.
+    # @example When the resource exists locally
+    #   resource_path("spec.erb") #=> "/path/to/project/resources/rpm/spec.erb"
+    #
+    # @example When the resource does not exist locally
+    #   resource_path("spec.erb") #=> "/omnibus-x.y.z/resources/rpm/spec.erb"
     #
     # @param [String] name
-    #   the name of the template
+    #   the name of the resource on disk to find
     #
-    # @return [String]
-    #
-    def template_path(name)
-      Omnibus.source_root.join('templates', name).to_s
+    def resource_path(name)
+      local = File.join(resources_path, name)
+
+      if File.exist?(local)
+        log.info(log_key) { "Using local resource `#{name}' from `#{local}'" }
+        local
+      else
+        log.debug(log_key) { "Using vendored resource `#{name}'" }
+        Omnibus.source_root.join("resources/#{id}/#{name}").to_s
+      end
     end
 
-    # The underscored equivalent of this class. This is mostly used by file
-    # paths.
+    #
+    # The path where this packager's resources reside on disk. This is the
+    # given {Project#resources_path} combined with the packager's {#id}.
+    #
+    # @example RPM packager
+    #   resources_path #=> "/path/to/project/resources/rpm"
     #
     # @return [String]
-    def underscore_name
-      @underscore_name ||= self.class.name
-        .split('::')
-        .last
-        .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-        .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-        .tr('-', '_')
-        .downcase
+    #
+    def resources_path
+      File.expand_path("#{project.resources_path}/#{id}")
     end
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
   end
 end

@@ -20,16 +20,13 @@ module Omnibus
   # Builds a bff package (.bff extention)
   #
   class Packager::BFF < Packager::Base
+    id :bff
 
     validate do
       assert_presence!("#{project.package_scripts_path}/aix/opscode.chef.client.template")
     end
 
     setup do
-      purge_directory(staging_dir)
-      purge_directory(staging_resources_path)
-      copy_directory(resources_path, staging_resources_path)
-
       purge_directory('/.info')
       purge_directory('/tmp/bff')
 

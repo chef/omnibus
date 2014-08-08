@@ -20,60 +20,66 @@ module Omnibus
   # Builds a Windows MSI package (.msi extension)
   #
   class Packager::MSI < Packager::Base
-    # !@method msi_parameters
-    #   @return (see Project#msi_parameters)
-    def_delegator :@project, :msi_parameters, :msi_parameters
+    id :msi
 
     validate do
-      assert_presence!(resource('localization-en-us.wxl'))
-      assert_presence!(resource('parameters.wxi'))
-      assert_presence!(resource('source.wxs'))
+      # ...
     end
 
     setup do
-      purge_directory(staging_dir)
-      purge_directory(staging_resources_path)
-      copy_directory(resources_path, staging_resources_path)
+      # Render the localization
+      write_localization_file
 
-      # Set the MSI version before rendering MSI source files
-      set_msi_version_from_project
+      # Render the msi parameters
+      write_parameters_file
 
-      %w(localization-en-us.wxl.erb parameters.wxi.erb source.wxs.erb).each do |filename|
-        resource_path = resource(filename)
-        destination   = File.join(staging_dir, filename.chomp('.erb'))
+      # Render the source file
+      write_source_file
 
-        if File.exist?(resource_path)
-          render_template(resource_path, destination: destination)
-        end
+      # Copy all the staging assets from vendored Omnibus into the resources
+      # directory.
+      create_directory("#{resources_dir}/assets")
+      FileSyncer.glob("#{Omnibus.source_root}/#{id}/assets/*").each do |file|
+        copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
+      end
+
+      # Copy all assets in the user's project directory - this may overwrite
+      # files copied in the previous step, but that's okay :)
+      FileSyncer.glob("#{resources_path}/assets/*").each do |file|
+        copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
       end
     end
 
     build do
-      # harvest the files with heat.exe
-      # recursively generate fragment for project directory
-      execute [
-        "heat.exe dir \"#{project.install_dir}\"",
-        '-nologo -srd -gg -cg ProjectDir',
-        '-dr PROJECTLOCATION -var var.ProjectSourceDir',
-        '-out project-files.wxs',
-      ].join(' ')
+      # Harvest the files with heat.exe, recursively generate fragment for
+      # project directory
+      execute <<-EOH.gsub(/^ {8}/, '')
+        heat.exe dir "#{project.install_dir}" `
+          -nologo -srd -gg -cg ProjectDir `
+          -dr PROJECTLOCATION `
+          -var var.ProjectSourceDir `
+          -out project-files.wxs
+      EOH
 
-      # compile with candle.exe
-      execute [
-        'candle.exe -nologo',
-        "-dProjectSourceDir=\"#{project.install_dir}\" project-files.wxs",
-        "\"#{resource('source.wxs')}\"",
-      ].join(' ')
+      # Compile with candle.exe
+      execute <<-EOH.gsub(/^ {8}/, '')
+        candle.exe `
+          -nologo `
+          -dProjectSourceDir="#{project.install_dir}" project-files.wxs `
+          "#{resource('source.wxs')}"
+      EOH
 
-      # create the msi
-      # Don't care about the 204 return code from light.exe since it's
-      # about some expected warnings...
-      execute [
-        'light.exe -nologo -ext WixUIExtension -cultures:en-us',
-        "-loc #{resource('localization-en-us.wxl')}",
-        'project-files.wixobj source.wixobj',
-        "-out \"#{final_pkg}\"",
-      ].join(' '), returns: [0, 204]
+      # Create the msi, ignoring the 204 return code from light.exe since it is
+      # about some expected warnings
+      execute <<-EOH.gsub(/^ {8}/, ''), returns: [0, 204]
+        light.exe `
+          -nologo `
+          -ext WixUIExtension `
+          -cultures:en-us `
+          -loc "#{resource('localization-en-us.wxl')}" `
+          project-files.wixobj source.wixobj `
+          -out "#{package_dir}\\#{package_name}"
+      EOH
     end
 
     clean do
@@ -84,29 +90,96 @@ module Omnibus
       "#{project.name}-#{project.build_version}-#{project.iteration}.msi"
     end
 
-    # The full path where the product package was/will be written.
     #
-    # @return [String] Path to the packge file.
-    def final_pkg
-      File.expand_path("#{package_dir}/#{package_name}")
+    # The path where the MSI resources will live.
+    #
+    # @return [String]
+    #
+    def resources_dir
+      File.expand_path("#{staging_dir}/Resources")
     end
 
-    # Helper method to set the msi version for a given project
-    def set_msi_version_from_project
-      # build_version looks something like this:
-      # dev builds => 11.14.0-alpha.1+20140501194641.git.94.561b564
-      #            => 0.0.0+20140506165802.1
-      # rel builds => 11.14.0.alpha.1 || 11.14.0
-      #
-      # MSI version spec expects a version that looks like X.Y.Z.W where
-      # X, Y, Z & W are 32 bit integers.
-      #
-      # MSI source files expect two versions to be set in the msi_parameters:
-      # msi_version & msi_display_version
+    #
+    # Write the localization file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_localization_file
+      render_template(resource_path('localization-en-us.wxl.erb'),
+        destination: "#{staging_dir}/localization-en-us.wxl",
+        variables: {
+          name:          project.name,
+          friendly_name: project.friendly_name,
+          maintainer:    project.maintainer,
+        }
+      )
+    end
 
+    #
+    # Write the parameters file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_parameters_file
+      render_template(resource_path('parameters.wxi.erb'),
+        destination: "#{staging_dir}/parameters.wxi",
+        variables: {
+          name:            project.name,
+          friendly_name:   project.friendly_name,
+          maintainer:      project.maintainer,
+          parameters:      project.msi_parameters,
+          version:         msi_version,
+          display_version: msi_display_version,
+        }
+      )
+    end
+
+    #
+    # Write the source file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_source_file
+      render_template(resource_path('source.wxs.erb'),
+        destination: "#{staging_dir}/source.wxs",
+        variables: {
+          name:          project.name,
+          friendly_name: project.friendly_name,
+          maintainer:    project.maintainer,
+        }
+      )
+    end
+
+    #
+    # Parse and return the MSI version from the {Project#build_version}.
+    #
+    # A project's +build_version+ looks something like:
+    #
+    #     dev builds => 11.14.0-alpha.1+20140501194641.git.94.561b564
+    #                => 0.0.0+20140506165802.1
+    #
+    #     rel builds => 11.14.0.alpha.1 || 11.14.0
+    #
+    # The MSI version spec expects a version that looks like X.Y.Z.W where
+    # X, Y, Z & W are all 32 bit integers.
+    #
+    # @return [String]
+    #
+    def msi_version
       versions = project.build_version.split(/[.+-]/)
-      @msi_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{project.build_iteration}"
-      @msi_display_version = "#{versions[0]}.#{versions[1]}.#{versions[2]}"
+      "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{project.build_iteration}"
+    end
+
+    #
+    # The display version calculated from the {Project#build_version}.
+    #
+    # @see #msi_version an explanation of the breakdown
+    #
+    # @return [String]
+    #
+    def msi_display_version
+      versions = project.build_version.split(/[.+-]/)
+      "#{versions[0]}.#{versions[1]}.#{versions[2]}"
     end
   end
 end

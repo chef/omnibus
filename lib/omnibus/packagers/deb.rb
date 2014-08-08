@@ -17,6 +17,8 @@
 
 module Omnibus
   class Packager::DEB < Packager::Base
+    id :deb
+
     validate do
       # ...
     end
@@ -74,10 +76,8 @@ module Omnibus
     # extension.
     #
     def package_name
-      @package_name ||= "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
+      "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
-
-    private
 
     #
     # The path where Debian-specific files will live.
@@ -98,7 +98,7 @@ module Omnibus
     # @return [void]
     #
     def write_control_file
-      render_template(template_path('deb/control.erb'),
+      render_template(resource_path('control.erb'),
         destination: File.join(debian_dir, 'control'),
         variables: {
           name:           safe_project_name,
@@ -128,7 +128,7 @@ module Omnibus
     def write_conffiles_file
       return if project.config_files.empty?
 
-      render_template(template_path('deb/conffiles.erb'),
+      render_template(resource_path('conffiles.erb'),
         destination: File.join(debian_dir, 'conffiles'),
         variables: {
           config_files: project.config_files,
@@ -170,7 +170,7 @@ module Omnibus
         hash
       end
 
-      render_template(template_path('deb/md5sums.erb'),
+      render_template(resource_path('md5sums.erb'),
         destination: File.join(debian_dir, 'md5sums'),
         variables: {
           md5sums: hash,
