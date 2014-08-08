@@ -15,18 +15,6 @@
 #
 
 module Omnibus
-  #
-  # Builds a Mac OS X "product" package (.pkg extension)
-  #
-  # Mac OS X packages are built in two stages. First, files are packaged into
-  # one or more "component" .pkg files (PKG only supports making a single
-  # component). This is done with `pkgbuild`. Next the component(s) are combined
-  # into a single "product" package, using `productbuild`. It is this container
-  # package that can have custom branding (background image) and a license.
-  #
-  # It can also allow for user customization of which component packages to
-  # install, but PKG does not expose this feature.
-  #
   class Packager::PKG < Packager::Base
     id :pkg
 

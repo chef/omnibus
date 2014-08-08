@@ -15,9 +15,6 @@
 #
 
 module Omnibus
-  #
-  # Builds a bff package (.bff extention)
-  #
   class Packager::BFF < Packager::Base
     id :bff
 

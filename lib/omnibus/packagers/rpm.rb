@@ -17,9 +17,6 @@
 # need to make sure rpmbuild is installed
 
 module Omnibus
-  #
-  # Builds an rpm package
-  #
   class Packager::RPM < Packager::Base
     id :rpm
 

@@ -15,9 +15,6 @@
 #
 
 module Omnibus
-  #
-  # Builds a Windows MSI package (.msi extension)
-  #
   class Packager::MSI < Packager::Base
     id :msi
 

@@ -15,9 +15,6 @@
 #
 
 module Omnibus
-  #
-  # Builds a pkgmk package (.solaris extention)
-  #
   class Packager::Solaris < Packager::Base
     id :solaris
 
