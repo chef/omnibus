@@ -43,17 +43,17 @@ module Omnibus
     class_option :dmg_assets,
       desc: 'Generate Mac OS X dmg assets',
       type: :boolean,
-      defaults: false
+      default: false
 
     class_option :pkg_assets,
       desc: 'Generate Mac OS X pkg assets',
       type: :boolean,
-      defaults: false
+      default: false
 
     class_option :msi_assets,
       desc: 'Generate Windows MSI assets',
       type: :boolean,
-      defaults: false
+      default: false
 
     class << self
       # Set the source root for Thor
