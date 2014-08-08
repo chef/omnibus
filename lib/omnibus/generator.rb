@@ -35,13 +35,18 @@ module Omnibus
       type: :string,
       default: '.'
 
-    class_option :pkg_assets,
-      desc: 'Generate Mac OS X pkg assets',
+    class_option :bff_assets,
+      desc: 'Generate AIX bff assets',
       type: :boolean,
-      defaults: false
+      default: false
 
     class_option :dmg_assets,
       desc: 'Generate Mac OS X dmg assets',
+      type: :boolean,
+      defaults: false
+
+    class_option :pkg_assets,
+      desc: 'Generate Mac OS X pkg assets',
       type: :boolean,
       defaults: false
 
@@ -88,12 +93,12 @@ module Omnibus
       end
     end
 
-    def create_pkg_assets
-      return unless options[:pkg_assets]
+    def create_bff_assets
+      return unless options[:bff_assets]
 
-      copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
-      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
-      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
+      copy_file(resource_path('bff/gen.template.erb'), "#{target}/resources/bff/gen.template.erb")
+      copy_file(resource_path('bff/postinstall.sh'), "#{target}/resources/bff/postinstall.sh")
+      copy_file(resource_path('bff/unpostinstall.sh'), "#{target}/resources/bff/unpostinstall.sh")
     end
 
     def create_dmg_assets
@@ -101,6 +106,14 @@ module Omnibus
 
       copy_file(resource_path('dmg/background.png'), "#{target}/resources/dmg/background.png")
       copy_file(resource_path('dmg/icon.png'), "#{target}/resources/dmg/icon.png")
+    end
+
+    def create_pkg_assets
+      return unless options[:pkg_assets]
+
+      copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
+      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
+      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
     end
 
     def create_msi_assets
