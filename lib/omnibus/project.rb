@@ -371,7 +371,7 @@ module Omnibus
     #
     def build_iteration(val = NULL)
       if null?(val)
-        @build_iteration ||= 1
+        @build_iteration || 1
       else
         @build_iteration = val
       end
