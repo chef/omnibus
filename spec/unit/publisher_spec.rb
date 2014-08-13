@@ -46,7 +46,7 @@ module Omnibus
 
     describe '#publish' do
       it 'is an abstract method' do
-        expect { subject.publish }.to raise_error(AbstractMethod)
+        expect { subject.publish }.to raise_error(NotImplementedError)
       end
     end
   end

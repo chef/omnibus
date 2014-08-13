@@ -272,21 +272,21 @@ module Omnibus
     #
     # @return [String]
     default(:s3_bucket) do
-      raise MissingConfigOption.new(:s3_bucket, "'my_bucket'")
+      raise MissingRequiredAttribute.new(self, :s3_bucket, "'my_bucket'")
     end
 
     # The S3 access key to use with S3 caching.
     #
     # @return [String]
     default(:s3_access_key) do
-      raise MissingConfigOption.new(:s3_access_key, "'ABCD1234'")
+      raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
     end
 
     # The S3 secret key to use with S3 caching.
     #
     # @return [String]
     default(:s3_secret_key) do
-      raise MissingConfigOption.new(:s3_secret_key, "'EFGH5678'")
+      raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
     end
 
     # --------------------------------------------------
@@ -301,21 +301,21 @@ module Omnibus
     #
     # @return [String]
     default(:artifactory_endpoint) do
-      raise MissingConfigOption.new(:artifactory_endpoint, "'https://...'")
+      raise MissingRequiredAttribute.new(self, :artifactory_endpoint, "'https://...'")
     end
 
     # The username of the artifactory user to authenticate with.
     #
     # @return [String]
     default(:artifactory_username) do
-      raise MissingConfigOption.new(:artifactory_username, "'admin'")
+      raise MissingRequiredAttribute.new(self, :artifactory_username, "'admin'")
     end
 
     # The password of the artifactory user to authenticate with.
     #
     # @return [String]
     default(:artifactory_password) do
-      raise MissingConfigOption.new(:artifactory_password, "'password'")
+      raise MissingRequiredAttribute.new(self, :artifactory_password, "'password'")
     end
 
     # The base path artifacts are published to. This is usually maps to
@@ -324,7 +324,7 @@ module Omnibus
     #
     # @return [String]
     default(:artifactory_base_path) do
-      raise MissingConfigOption.new(:artifactory_base_path, "'com/mycompany'")
+      raise MissingRequiredAttribute.new(self, :artifactory_base_path, "'com/mycompany'")
     end
 
     # The path on disk to an SSL pem file to sign requests with.
@@ -369,14 +369,14 @@ module Omnibus
     #
     # @return [String]
     default(:publish_s3_access_key) do
-      raise MissingConfigOption.new(:publish_s3_access_key, "'ABCD1234'")
+      raise MissingRequiredAttribute.new(self, :publish_s3_access_key, "'ABCD1234'")
     end
 
     # The S3 secret key to use for S3 artifact release
     #
     # @return [String]
     default(:publish_s3_secret_key) do
-      raise MissingConfigOption.new(:publish_s3_secret_key, "'EFGH5678'")
+      raise MissingRequiredAttribute.new(self, :publish_s3_secret_key, "'EFGH5678'")
     end
 
     # --------------------------------------------------

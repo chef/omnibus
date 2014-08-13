@@ -90,7 +90,7 @@ module Omnibus
     # @example
     #   name 'chef'
     #
-    # @raise [MissingProjectConfiguration] if a value was not set before being
+    # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
     #
     # @param [String] val
@@ -100,7 +100,7 @@ module Omnibus
     #
     def name(val = NULL)
       if null?(val)
-        @name || raise(MissingProjectConfiguration.new('name', 'my_project'))
+        @name || raise(MissingRequiredAttribute.new(self, :name, 'hamlet'))
       else
         @name = val
       end
@@ -135,7 +135,7 @@ module Omnibus
     # @example
     #   install_dir '/opt/chef'
     #
-    # @raise [MissingProjectConfiguration] if a value was not set before being
+    # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
     #
     # @param [String] val
@@ -145,7 +145,7 @@ module Omnibus
     #
     def install_dir(val = NULL)
       if null?(val)
-        @install_dir || raise(MissingProjectConfiguration.new('install_dir', '/opt/chef'))
+        @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, '/opt/chef'))
       else
         @install_dir = File.expand_path(val, Config.project_root)
       end
@@ -158,7 +158,7 @@ module Omnibus
     # @example
     #   maintainer 'Chef Software, Inc.'
     #
-    # @raise [MissingProjectConfiguration] if a value was not set before being
+    # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
     #
     # @param [String] val
@@ -168,7 +168,7 @@ module Omnibus
     #
     def maintainer(val = NULL)
       if null?(val)
-        @maintainer || raise(MissingProjectConfiguration.new('maintainer', 'Chef Software, Inc.'))
+        @maintainer || raise(MissingRequiredAttribute.new(self, :maintainer, 'Chef Software, Inc.'))
       else
         @maintainer = val
       end
@@ -181,7 +181,7 @@ module Omnibus
     # @example
     #   homepage 'https://www.getchef.com'
     #
-    # @raise [MissingProjectConfiguration] if a value was not set before being
+    # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
     #
     # @param [String] val
@@ -191,7 +191,7 @@ module Omnibus
     #
     def homepage(val = NULL)
       if null?(val)
-        @homepage || raise(MissingProjectConfiguration.new('homepage', 'http://www.getchef.com'))
+        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, 'https://www.getchef.com'))
       else
         @homepage = val
       end
@@ -340,7 +340,10 @@ module Omnibus
     #
     #
     #
+    def package(id, &block)
+      packagers[id] = block
     end
+    expose :package
 
     #
     # Set or retrieve the user the package should install as. This varies with

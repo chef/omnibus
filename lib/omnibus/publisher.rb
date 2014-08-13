@@ -74,7 +74,7 @@ module Omnibus
     #   the list of uploaded packages
     #
     def publish(&_block)
-      raise AbstractMethod.new("#{self.class.name}#publish")
+      raise NotImplementedError
     end
 
     private
