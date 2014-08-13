@@ -16,6 +16,7 @@
 
 require 'omnibus/core_extensions'
 
+require 'cleanroom'
 require 'pathname'
 require 'json'
 
@@ -34,7 +35,6 @@ module Omnibus
   autoload :BuildVersion,     'omnibus/build_version'
   autoload :BuildVersionDSL,  'omnibus/build_version_dsl'
   autoload :Cleaner,          'omnibus/cleaner'
-  autoload :Cleanroom,        'omnibus/cleanroom'
   autoload :Config,           'omnibus/config'
   autoload :Digestable,       'omnibus/digestable'
   autoload :Error,            'omnibus/exceptions'

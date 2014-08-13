@@ -22,6 +22,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'chef-sugar',      '~> 2.1'
+  gem.add_dependency 'cleanroom',       '~> 1.0'
   gem.add_dependency 'mixlib-shellout', '~> 1.4'
   gem.add_dependency 'ohai',            '~> 7.2'
   gem.add_dependency 'uber-s3'
