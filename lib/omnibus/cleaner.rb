@@ -35,9 +35,7 @@ module Omnibus
 
     def initialize(*)
       super
-
-      @project = Omnibus.project(name)
-      raise ProjectNotFound.new(name) unless @project
+      @project = Project.load(name)
     end
 
     def clean_source_dir
