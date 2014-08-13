@@ -305,11 +305,11 @@ module Omnibus
       end
 
       Package::Metadata.generate(Package.new(path),
-        name:             name,
-        friendly_name:    friendly_name,
-        homepage:         homepage,
-        version:          build_version,
-        iteration:        build_iteration,
+        name:             project.name,
+        friendly_name:    project.friendly_name,
+        homepage:         project.homepage,
+        version:          project.build_version,
+        iteration:        project.build_iteration,
       )
     end
 
