@@ -211,7 +211,7 @@ module Omnibus
     #
     def description(val = NULL)
       if null?(val)
-        @description ||= "The full stack of #{name}"
+        @description || "The full stack of #{name}"
       else
         @description = val
       end
