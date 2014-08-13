@@ -94,6 +94,10 @@ module Omnibus
       if null?(val)
         @upgrade_code || raise(MissingRequiredAttribute.new(self, :upgrade_code, 'ABCD-1234'))
       else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:parameters, 'be a String')
+        end
+
         @upgrade_code = val
       end
     end
