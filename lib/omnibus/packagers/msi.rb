@@ -46,19 +46,19 @@ module Omnibus
       # Harvest the files with heat.exe, recursively generate fragment for
       # project directory
       execute <<-EOH.gsub(/^ {8}/, '')
-        heat.exe dir "#{project.install_dir}" `
+        heat.exe dir "#{windows_safe_path(project.install_dir)}" `
           -nologo -srd -gg -cg ProjectDir `
           -dr PROJECTLOCATION `
-          -var var.ProjectSourceDir `
-          -out project-files.wxs
+          -var "var.ProjectSourceDir" `
+          -out "project-files.wxs"
       EOH
 
       # Compile with candle.exe
       execute <<-EOH.gsub(/^ {8}/, '')
         candle.exe `
           -nologo `
-          -dProjectSourceDir="#{project.install_dir}" project-files.wxs `
-          "#{resource_path('source.wxs')}"
+          -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs" `
+          "#{windows_safe_path(resource_path('source.wxs'))}"
       EOH
 
       # Create the msi, ignoring the 204 return code from light.exe since it is
@@ -68,9 +68,9 @@ module Omnibus
           -nologo `
           -ext WixUIExtension `
           -cultures:en-us `
-          -loc "#{resource_path('localization-en-us.wxl')}" `
+          -loc "#{windows_safe_path(resource_path('localization-en-us.wxl'))}" `
           project-files.wixobj source.wixobj `
-          -out "#{package_dir}\\#{package_name}"
+          -out "#{windows_safe_path(package_dir, package_name)}"
       EOH
     end
 
