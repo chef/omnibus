@@ -50,6 +50,7 @@ module Omnibus
   autoload :NullArgumentable, 'omnibus/null_argumentable'
   autoload :Ohai,             'omnibus/ohai'
   autoload :Package,          'omnibus/package'
+  autoload :Packager,         'omnibus/packager'
   autoload :Project,          'omnibus/project'
   autoload :Publisher,        'omnibus/publisher'
   autoload :Reports,          'omnibus/reports'
@@ -72,20 +73,6 @@ module Omnibus
     autoload :Base,    'omnibus/cli/base'
     autoload :Cache,   'omnibus/cli/cache'
     autoload :Publish, 'omnibus/cli/publish'
-  end
-
-  module Packager
-    autoload :Base,     'omnibus/packagers/base'
-    autoload :BFF,      'omnibus/packagers/bff'
-    autoload :DEB,      'omnibus/packagers/deb'
-    autoload :Makeself, 'omnibus/packagers/makeself'
-    autoload :MSI,      'omnibus/packagers/msi'
-    autoload :PKG,      'omnibus/packagers/pkg'
-    autoload :Solaris,  'omnibus/packagers/solaris'
-    autoload :RPM,      'omnibus/packagers/rpm'
-
-    # TODO - this is really a "compressor"
-    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
   end
 
   class << self
