@@ -1,15 +1,15 @@
 Building RPMs with Omnibus
-=====================================
-This document details the steps and configurables for building RPMs with Omnibus.
+==========================
+This document details the steps and configurables for building RPM packages with Omnibus.
 
 
-Building an RPM
+Building a .rpm
 ---------------
 ### Requirements
-`rpmbuild` must be installed on your system.  The [Chef omnibus cookcook](http://github.com/opscode-cookbooks/omnibus) manages this in its [`_packaging` recipe](http://github.com/opscode-cookbooks/omnibus/blob/master/recipes/_packaging.rb).
+Omnibus assumes the existence of the `rpmbuild` command on the build system. The [omnibus cookbook](https://supermarket.getchef.com/cookbooks/omnibus) automatically handles this installation. If you are not using the Omnibus cookbook, you must install the package manually or using another tool.
 
 ### Configurables
-The following Omnibus configuration options may be used when building RPMs:
+The following Project values are taken into consideration when building RPMs:
 
 - `build_version`
 - `config_file`
@@ -26,14 +26,43 @@ The following Omnibus configuration options may be used when building RPMs:
 - `runtime_dependency`
 - `url`
 
-These options are further described in the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project)
+These options are further described in the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
 
-Signing a RPM
----------------
-The following tunables can be set in the Omnibus config if you wish to sign an RPM:
+These values are interpolated and evaluated using Omnibus' internal RPM templates. For 99% of users, these templates should be satisfactory. If you encounter an instance where Omnibus' RPM templates do not satisfy a use case, please open an issue.
 
-- `sign_rpm` - specifies whether an RPM is to be signed (default is `false`)
-- `rpm_signing_passphrase` - the passphrase of the GPG key to be used for RPM signing.  ** We recommend generating a special edition of the Omnibus config to be used for signing, then removing it when signing is done. **
+Because of the unlikelihood of their necessity, Omnibus does not generate rpm-related assets. If you find yourself in a situation where you need to generate highly-customized RPM assets, run the Omnibus generator command with the `--rpm-assets` flag:
 
-### Requirements
-To sign an RPM, you will need a GPG keypair. You can [create](http://www.madboa.com/geek/gpg-quickstart/) your own signing key or [import](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/gpg-cs.html) an existing one.  Omnibus generates a `.rpmmacros` config file for `rpmbuild` that assumes that the real name associated to the GPG key is the same as the name of the project maintainer as specified in your Omnibus config.  You can override this by creating your own `.rpmmacros` config file and putting it in the home directory of the build user.
+    $ omnibus generate NAME --rpm-assets
+
+**If this is an existing project, be sure to answer "NO" when asked if you want to overwrite existing files!**
+
+With the `--rpm-assets` flag, Omnibus will generate the following "stock" resources in `resources/NAME/rpm`:
+
+- `rpmmacros.erb` - the macros file
+- `signing.erb` - a Ruby script for signing RPMs
+- `spec.erb` - the ERB for generating the spec
+
+**You should only generate the RPM assets if you cannot set values using attributes!**
+
+### DSL
+You can further customize the behavior of the packager using the `package` DSL command in your project definition:
+
+```ruby
+# project.rb
+name 'hamlet'
+
+package :rpm do
+  signing_passphrase 'acbd1234'
+end
+```
+
+Some DSL methods available include:
+
+| DSL Method           | Description                                 |
+| :------------------: | --------------------------------------------|
+| `signing_passphrase` | The passphrase to sign the RPM with         |
+
+For more information, please see the [`Packager::RPM` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Packager/RPM).
+
+### Notes on RPM-signing
+To sign an RPM, you will need a GPG keypair. You can [create your own signing key](http://www.madboa.com/geek/gpg-quickstart/) or [import an existing one](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/gpg-cs.html). Omnibus automatically generates an `.rpmmacros` config file for `rpmbuild` that assumes that the real name associated to the GPG key is the same as the name of the project maintainer as specified in your Omnibus config. You can override this by creating your own `.rpmmacros` using the steps above.
