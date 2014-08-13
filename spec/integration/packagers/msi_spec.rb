@@ -37,8 +37,8 @@ module Omnibus
       FileUtils.touch(File.join(project.install_dir, 'golden_file'))
     end
 
-    it 'builds a pkg and a dmg' do
-      # Create the pkg resource
+    it 'builds a msi' do
+      # Create the msi resource
       subject.run!
 
       # There is a tiny bit of hard-coding here, but I don't see a better
