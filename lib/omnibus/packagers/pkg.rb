@@ -83,27 +83,6 @@ module Omnibus
     expose :identifier
 
     #
-    # Sign the PKG package. If this method is +true+, then +signing_identity+
-    # must also be specified!
-    #
-    # @example
-    #   sign true
-    #
-    # @param [true, false] val
-    #   whether to sign the PKG
-    #
-    # @return [true, false]
-    #
-    def sign(val = NULL)
-      if null?(val)
-        @sign || false
-      else
-        @sign = val
-      end
-    end
-    expose :sign
-
-    #
     # Set or return the signing identity. This value is required if {#sign} is
     # +true+.
     #
@@ -210,7 +189,7 @@ module Omnibus
           --resources "#{resources_dir}" \\
       EOH
 
-      command << %Q(  --sign "#{signing_identity}" \\\n) if sign
+      command << %Q(  --sign "#{signing_identity}" \\\n) if signing_identity
       command << %Q(  "#{final_pkg}")
       command << %Q(\n)
 
