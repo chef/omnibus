@@ -32,7 +32,6 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :conflict, %|conflict 'puppet'|
     it_behaves_like 'a cleanroom setter', :build_version, %|build_version '1.2.3'|
     it_behaves_like 'a cleanroom setter', :build_iteration, %|build_iteration 1|
-    it_behaves_like 'a cleanroom setter', :mac_pkg_identifier, %|mac_pkg_identifier 'com.getchef'|
     it_behaves_like 'a cleanroom setter', :package_user, %|package_user 'chef'|
     it_behaves_like 'a cleanroom setter', :package_group, %|package_group 'chef'|
     it_behaves_like 'a cleanroom setter', :override, %|override :chefdk, source: 'foo.com'|

@@ -9,7 +9,6 @@ module Omnibus
         project.build_version('1.2.3')
         project.build_iteration('2')
         project.maintainer('Chef Software')
-        project.mac_pkg_identifier('com.getchef.project')
       end
     end
 

@@ -9,7 +9,10 @@ module Omnibus
         homepage           'https://getchef.com'
         build_version      '12.4.0'
         install_dir        File.join(tmp_path, 'opt', 'sample')
-        mac_pkg_identifier 'test.pkg.sa,ple'
+
+        packager :pkg do
+          identifier 'test.pkg.sa,ple'
+        end
       end
     end
 

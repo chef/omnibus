@@ -379,24 +379,9 @@ module Omnibus
     expose :build_iteration
 
     #
-    # The identifer for the mac package.
     #
-    # @example
-    #   mac_pkg_identifier 'com.getchef.chefdk'
     #
-    # @param [String] val
-    #   the package identifier
-    #
-    # @return [String]
-    #
-    def mac_pkg_identifier(val = NULL)
-      if null?(val)
-        @mac_pkg_identifier
-      else
-        @mac_pkg_identifier = val
-      end
     end
-    expose :mac_pkg_identifier
 
     #
     # Set or retrieve the user the package should install as. This varies with

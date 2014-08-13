@@ -10,7 +10,6 @@ module Omnibus
         project.build_version('1.2.3')
         project.build_iteration('2')
         project.maintainer('Chef Software')
-        project.mac_pkg_identifier('com.getchef.project')
       end
     end
 
@@ -21,6 +20,8 @@ module Omnibus
     let(:staging_dir)  { "#{tmp_path}/staging/dir" }
 
     before do
+      subject.identifier('com.getchef.project')
+
       Config.project_root(project_root)
       Config.package_dir(package_dir)
 
@@ -29,6 +30,10 @@ module Omnibus
     end
 
     describe 'DSL' do
+      it 'exposes :identifier' do
+        expect(subject).to have_exposed_method(:identifier)
+      end
+
       it 'exposes :sign' do
         expect(subject).to have_exposed_method(:sign)
       end
@@ -120,9 +125,9 @@ module Omnibus
         end
       end
 
-      context "when the mac_pkg_identifier isn't specified by the project" do
+      context "when the identifier isn't specified by the project" do
         before do
-          project.mac_pkg_identifier(nil)
+          subject.identifier(nil)
           project.name('$Project#')
         end
 
@@ -160,8 +165,8 @@ module Omnibus
     end
 
     describe '#safe_identifier' do
-      context 'when Project#mac_pkg_identifier is given' do
-        before { project.mac_pkg_identifier('com.apple.project') }
+      context 'when Project#identifier is given' do
+        before { subject.identifier('com.apple.project') }
 
         it 'is used' do
           expect(subject.safe_identifier).to eq('com.apple.project')
@@ -169,7 +174,7 @@ module Omnibus
       end
 
       context 'when no value in project is given' do
-        before { project.mac_pkg_identifier(nil) }
+        before { subject.identifier(nil) }
 
         it 'is interpreted' do
           expect(subject.safe_identifier).to eq('test.chefsoftware.pkg.project')
@@ -180,7 +185,7 @@ module Omnibus
         before do
           project.name("$Project123.for-realz_2")
           project.maintainer("This is SPARTA!")
-          project.mac_pkg_identifier(nil)
+          subject.identifier(nil)
         end
 
         it 'uses the "safe" values' do

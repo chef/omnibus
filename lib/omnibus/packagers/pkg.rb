@@ -63,6 +63,26 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # The identifer for the PKG package.
+    #
+    # @example
+    #   identifier 'com.getchef.chefdk'
+    #
+    # @param [String] val
+    #   the package identifier
+    #
+    # @return [String]
+    #
+    def identifier(val = NULL)
+      if null?(val)
+        @identifier
+      else
+        @identifier = val
+      end
+    end
+    expose :identifier
+
+    #
     # Sign the PKG package. If this method is +true+, then +signing_identity+
     # must also be specified!
     #
@@ -238,7 +258,7 @@ module Omnibus
     # @return [String]
     #
     def safe_identifier
-      return project.mac_pkg_identifier if project.mac_pkg_identifier
+      return identifier if identifier
 
       maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, '').downcase
       "test.#{maintainer}.pkg.#{safe_project_name}"
