@@ -121,6 +121,10 @@ module Omnibus
       if null?(val)
         @parameters || {}
       else
+        unless val.is_a?(Hash)
+          raise InvalidValue.new(:parameters, 'be a Hash')
+        end
+
         @parameters = val
       end
     end
