@@ -53,30 +53,12 @@ module Omnibus
         end
       end
 
-      # The commands/steps to validate any arguments.
-      def validate(&block)
-        if block
-          @validate = block
-        else
-          @validate
-        end
-      end
-
       # The commands/steps to build the package.
       def build(&block)
         if block
           @build = block
         else
           @build
-        end
-      end
-
-      # The commands/steps to cleanup any temporary files/directories.
-      def clean(&block)
-        if block
-          @clean = block
-        else
-          @clean
         end
       end
     end
@@ -206,31 +188,17 @@ module Omnibus
     end
 
     #
-    # Validations
-    # ------------------------------
-
-    # Validate the presence of a file.
-    #
-    # @param [String] path
-    def assert_presence!(path)
-      raise MissingAsset.new(path) unless File.exist?(path)
-    end
-
     # Execute this packager by running the following phases in order:
     #
     #   - setup
-    #   - validate
     #   - build
-    #   - clean
     #
     def run!
       # Ensure the package directory exists and is purged
       purge_directory(package_dir)
 
-      instance_eval(&self.class.setup)    if self.class.setup
-      instance_eval(&self.class.validate) if self.class.validate
-      instance_eval(&self.class.build)    if self.class.build
-      instance_eval(&self.class.clean)    if self.class.clean
+      instance_eval(&self.class.setup) if self.class.setup
+      instance_eval(&self.class.build) if self.class.build
 
       # Ensure the temporary directory is removed at the end of a successful
       # run. Without removal, successful builds will "leak" in /tmp and cause

@@ -20,10 +20,6 @@ module Omnibus
 
     attr_reader :packager
 
-    validate do
-      # ...
-    end
-
     setup do
       create_directory(dmg_stage)
 
@@ -41,11 +37,6 @@ module Omnibus
       prettify_dmg
       compress_dmg
       set_dmg_icon
-    end
-
-    clean do
-      remove_file("#{staging_dir}/tmp.icns")
-      remove_file("#{staging_dir}/tmp.rsrc")
     end
 
     #

@@ -18,10 +18,6 @@ module Omnibus
   class Packager::DEB < Packager::Base
     id :deb
 
-    validate do
-      # ...
-    end
-
     setup do
       # Copy the full-stack installer into our scratch directory, accounting for
       # any excluded files.
@@ -64,10 +60,6 @@ module Omnibus
 
       # Create the deb
       create_deb_file
-    end
-
-    clean do
-      # ...
     end
 
     #

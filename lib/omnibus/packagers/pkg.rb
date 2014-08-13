@@ -18,10 +18,6 @@ module Omnibus
   class Packager::PKG < Packager::Base
     id :pkg
 
-    validate do
-      # ...
-    end
-
     setup do
       # Create the resources directory
       create_directory(resources_dir)
@@ -60,10 +56,6 @@ module Omnibus
       if Config.build_dmg
         Packager::MacDmg.new(self).run!
       end
-    end
-
-    clean do
-      # ...
     end
 
     # @see Base#package_name

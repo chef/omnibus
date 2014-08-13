@@ -18,10 +18,6 @@ module Omnibus
   class Packager::Makeself < Packager::Base
     id :makeself
 
-    validate do
-      # ...
-    end
-
     setup do
       # Copy the full-stack installer into our scratch directory, accounting for
       # any excluded files.
@@ -36,10 +32,6 @@ module Omnibus
 
       # Create the makeself archive
       create_makeself_package
-    end
-
-    clean do
-      # ...
     end
 
     # @see Base#package_name

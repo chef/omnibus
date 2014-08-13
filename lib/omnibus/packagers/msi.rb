@@ -18,10 +18,6 @@ module Omnibus
   class Packager::MSI < Packager::Base
     id :msi
 
-    validate do
-      # ...
-    end
-
     setup do
       # Render the localization
       write_localization_file
@@ -76,9 +72,6 @@ module Omnibus
           project-files.wixobj source.wixobj `
           -out "#{package_dir}\\#{package_name}"
       EOH
-    end
-
-    clean do
     end
 
     # @see Base#package_name

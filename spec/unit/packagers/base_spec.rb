@@ -52,30 +52,12 @@ module Omnibus
       end
     end
 
-    describe '.validate' do
-      it 'sets the value of the block' do
-        block = proc {}
-        described_class.validate(&block)
-
-        expect(described_class.validate).to eq(block)
-      end
-    end
-
     describe '.build' do
       it 'sets the value of the block' do
         block = proc {}
         described_class.build(&block)
 
         expect(described_class.build).to eq(block)
-      end
-    end
-
-    describe '.clean' do
-      it 'sets the value of the block' do
-        block = proc {}
-        described_class.clean(&block)
-
-        expect(described_class.clean).to eq(block)
       end
     end
 
@@ -158,29 +140,18 @@ module Omnibus
       end
     end
 
-    describe '#assert_presence!' do
-      it 'raises a MissingAsset exception when the file does not exist' do
-        allow(File).to receive(:exist?).and_return(false)
-        expect { subject.assert_presence!('foo') }.to raise_error(MissingAsset)
-      end
-    end
-
     describe '#run!' do
       before do
         allow(subject).to receive(:purge_directory)
         allow(subject).to receive(:remove_directory)
 
-        allow(described_class).to receive(:validate).and_return(proc {})
         allow(described_class).to receive(:setup).and_return(proc {})
         allow(described_class).to receive(:build).and_return(proc {})
-        allow(described_class).to receive(:clean).and_return(proc {})
       end
 
       it 'calls the methods in order' do
         expect(described_class).to receive(:setup).ordered
-        expect(described_class).to receive(:validate).ordered
         expect(described_class).to receive(:build).ordered
-        expect(described_class).to receive(:clean).ordered
         subject.run!
       end
     end

@@ -20,10 +20,6 @@ module Omnibus
   class Packager::RPM < Packager::Base
     id :rpm
 
-    validate do
-      # ...
-    end
-
     setup do
       # Create our magic directories
       create_directory("#{staging_dir}/BUILD")
@@ -61,10 +57,6 @@ module Omnibus
 
       # Generate the rpm
       create_rpm_file
-    end
-
-    clean do
-      # ...
     end
 
     #
