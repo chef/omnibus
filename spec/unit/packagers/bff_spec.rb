@@ -129,7 +129,7 @@ module Omnibus
       context 'when the project name has invalid characters' do
         before { project.name("Pro$ject123.for-realz_2") }
 
-        it 'returns the value without logging a message' do
+        it 'returns the value while logging a message' do
           output = capture_logging do
             expect(subject.safe_project_name).to eq('pro-ject123.for-realz-2')
           end
