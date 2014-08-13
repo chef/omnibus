@@ -211,12 +211,22 @@ module Omnibus
     # Sign the rpm package.
     #
     # @return [true, false]
-    default(:sign_rpm, false)
+    default(:sign_rpm) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.sign_rpm. This value is no longer part of the config and " \
+        "should be defined in the `package' block in the project."
+      end
+    end
 
     # The passphrase to sign the RPM with.
     #
     # @return [String]
-    default(:rpm_signing_passphrase, nil)
+    default(:rpm_signing_passphrase) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.rpm_signing_passphrase. This value is no longer part of the " \
+        "config and should be defined in the `package' block in the project."
+      end
+    end
 
     # --------------------------------------------------
     # @!endgroup

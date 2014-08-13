@@ -32,6 +32,16 @@ module Omnibus
       create_directory("#{staging_dir}/SPECS")
     end
 
+    describe 'DSL' do
+      it 'exposes :sign' do
+        expect(subject).to have_exposed_method(:sign)
+      end
+
+      it 'exposes :signing_passphrase' do
+        expect(subject).to have_exposed_method(:signing_passphrase)
+      end
+    end
+
     describe '#id' do
       it 'is :rpm' do
         expect(subject.id).to eq(:rpm)
@@ -156,8 +166,8 @@ module Omnibus
 
       context 'when RPM signing is enabled' do
         before do
-          Config.sign_rpm(true)
-          Config.rpm_signing_passphrase('foobar')
+          subject.sign(true)
+          subject.signing_passphrase('foobar')
           allow(Dir).to receive(:mktmpdir).and_return(tmp_path)
         end
 

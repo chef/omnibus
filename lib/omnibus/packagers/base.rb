@@ -19,8 +19,10 @@ require 'forwardable'
 
 module Omnibus
   class Packager::Base
+    include Cleanroom
     include Digestable
     include Logging
+    include NullArgumentable
     include Templating
     include Util
 

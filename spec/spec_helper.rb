@@ -1,6 +1,8 @@
 require 'rspec'
 require 'rspec/its'
 
+require 'cleanroom/rspec'
+
 require 'omnibus'
 
 def windows?

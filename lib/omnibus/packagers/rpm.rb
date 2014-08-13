@@ -60,6 +60,57 @@ module Omnibus
     end
 
     #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Sign the RPM package. If this method is +true+, then +signing_passphrase+
+    # must also be specified!
+    #
+    # @example
+    #   sign true
+    #
+    # @param [true, false] val
+    #   whether to sign the RPM
+    #
+    # @return [true, false]
+    #
+    def sign(val = NULL)
+      if null?(val)
+        @sign || false
+      else
+        @sign = val
+      end
+    end
+    expose :sign
+
+    #
+    # Set or return the signing passphrase. This value is required if {#sign} is
+    # +true+.
+    #
+    # @example
+    #   signing_passphrase "foo"
+    #
+    # @param [String] val
+    #   the passphrase to use when signing the RPM
+    #
+    # @return [String]
+    #   the RPM-signing passphrase
+    #
+    def signing_passphrase(val = NULL)
+      if null?(val)
+        @signing_passphrase
+      else
+        @signing_passphrase = val
+      end
+    end
+    expose :signing_passphrase
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
     # @return [String]
     #
     def package_name
@@ -136,7 +187,7 @@ module Omnibus
       command << %| --buildroot #{staging_dir}/BUILD|
       command << %| --define "_topdir #{staging_dir}"|
 
-      if Config.sign_rpm
+      if sign
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
         else
@@ -197,7 +248,7 @@ module Omnibus
         destination: destination,
         mode: 0700,
         variables: {
-          passphrase: Config.rpm_signing_passphrase,
+          passphrase: signing_passphrase,
         }
       )
 
