@@ -58,7 +58,7 @@ module Omnibus
         candle.exe `
           -nologo `
           -dProjectSourceDir="#{project.install_dir}" project-files.wxs `
-          "#{resource('source.wxs')}"
+          "#{resource_path('source.wxs')}"
       EOH
 
       # Create the msi, ignoring the 204 return code from light.exe since it is
@@ -68,7 +68,7 @@ module Omnibus
           -nologo `
           -ext WixUIExtension `
           -cultures:en-us `
-          -loc "#{resource('localization-en-us.wxl')}" `
+          -loc "#{resource_path('localization-en-us.wxl')}" `
           project-files.wixobj source.wixobj `
           -out "#{package_dir}\\#{package_name}"
       EOH
