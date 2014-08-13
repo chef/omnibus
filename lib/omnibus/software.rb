@@ -335,7 +335,7 @@ module Omnibus
     #
     def relative_path(val = NULL)
       if null?(val)
-        @relative_path ||= name
+        @relative_path || name
       else
         @relative_path = val
       end
