@@ -177,18 +177,33 @@ module Omnibus
     # Package OSX pkg files inside a DMG
     #
     # @return [true, false]
-    default(:build_dmg, true)
+    default(:build_dmg) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.build_dmg. This value is no longer part of the " \
+        "config and is implied when defining a `compressor' block in the project."
+      end
+    end
 
     # The starting x,y and ending x,y positions for the created DMG window.
     #
     # @return [String]
-    default(:dmg_window_bounds, '100, 100, 750, 600')
+    default(:dmg_window_bounds) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.dmg_window_bounds. This value is no longer part of the " \
+        "config and should be defined in the `compressor' block in the project."
+      end
+    end
 
     # The starting x,y position where the .pkg file should live in the DMG
     # window.
     #
     # @return [String]
-    default(:dmg_pkg_position, '535, 50')
+    default(:dmg_pkg_position) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.dmg_pkg_position. This value is no longer part of the " \
+        "config and should be defined in the `compressor' block in the project."
+      end
+    end
 
     # Sign the pkg package.
     #
