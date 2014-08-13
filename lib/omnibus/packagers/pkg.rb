@@ -52,10 +52,6 @@ module Omnibus
       write_distribution_file
 
       build_product_pkg
-
-      if Config.build_dmg
-        Packager::MacDmg.new(self).run!
-      end
     end
 
     #
