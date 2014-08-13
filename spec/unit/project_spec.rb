@@ -172,6 +172,38 @@ module Omnibus
       end
     end
 
+    describe '#package' do
+      it 'raises an exception when a block is not given' do
+        expect { subject.package(:foo) }.to raise_error(InvalidValue)
+      end
+
+      it 'adds the block to the list' do
+        block = Proc.new {}
+        subject.package(:foo, &block)
+
+        expect(subject.packagers[:foo]).to include(block)
+      end
+
+      it 'allows for multiple invocations, keeping order' do
+        block_1, block_2 = Proc.new {}, Proc.new {}
+        subject.package(:foo, &block_1)
+        subject.package(:foo, &block_2)
+
+        expect(subject.packagers[:foo]).to eq([block_1, block_2])
+      end
+    end
+
+    describe '#packagers' do
+      it 'returns a Hash' do
+        expect(subject.packagers).to be_a(Hash)
+      end
+
+      it 'has a default Hash value of an empty array' do
+        expect(subject.packagers[:foo]).to be_a(Array)
+        expect(subject.packagers[:bar]).to_not be(subject.packagers[:foo])
+      end
+    end
+
     describe '#shasum' do
       context 'when a filepath is given' do
         let(:path) { '/project.rb' }

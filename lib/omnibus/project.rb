@@ -338,10 +338,24 @@ module Omnibus
     expose :build_iteration
 
     #
+    # Add or override a customization for the packager with the given +id+. When
+    # given multiple blocks with the same +id+, they are evaluated _in order_,
+    # so the last block evaluated will take precedence over the previous ones.
     #
+    # @example
+    #   package :id do
+    #     key 'value'
+    #   end
+    #
+    # @param [Symbol] id
+    #   the id of the packager to customize
     #
     def package(id, &block)
-      packagers[id] = block
+      unless block
+        raise InvalidValue.new(:package, 'have a block')
+      end
+
+      packagers[id] << block
     end
     expose :package
 
@@ -672,6 +686,30 @@ module Omnibus
     end
 
     #
+    # The list of packagers, in the following format:
+    #
+    #     {
+    #       id: [#<Proc:0x001>, #<Proc:0x002>],
+    #       # ...
+    #     }
+    #
+    # @return [Hash<Symbol, Array<Proc>>]
+    #   the packager blocks, indexed by key
+    #
+    def packagers
+      @packagers ||= Hash.new { |h, k| h[k] = [] }
+    end
+
+    #
+    # Instantiate a new instance of the best packager for this system.
+    #
+    # @return [~Packager::Base]
+    #
+    def packager
+      @packager ||= Packager.for_current_system.new(self)
+    end
+
+    #
     # The DSL for this build version.
     #
     # @return [BuildVersionDSL]
@@ -748,6 +786,9 @@ module Omnibus
       build_iteration
     end
 
+    #
+    #
+    #
     def build_me
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
@@ -772,6 +813,9 @@ module Omnibus
       package_me
     end
 
+    #
+    #
+    #
     def package_me
       destination = File.expand_path('pkg', Config.project_root)
 
@@ -780,37 +824,18 @@ module Omnibus
         FileUtils.mkdir_p(destination)
       end
 
-      package_types.each do |pkg_type|
-        if pkg_type == 'makeself'
-          Packager::Makeself.new(self).run!
-        elsif pkg_type == 'msi'
-          Packager::MSI.new(self).run!
-        elsif pkg_type == 'bff'
-          Packager::BFF.new(self).run!
-        elsif pkg_type == 'solaris'
-          Packager::Solaris.new(self).run!
-        elsif pkg_type == 'pkg'
-          Packager::PKG.new(self).run!
-        elsif pkg_type == 'mac_dmg'
-          # noop, since the dmg creation is handled by the packager
-        elsif pkg_type == 'rpm'
-          Packager::RPM.new(self).run!
-        elsif pkg_type == 'deb'
-          Packager::DEB.new(self).run!
-        else
-          raise RuntimeError, "I do not know how to package a `#{pkg_type}'!"
-        end
-
-        render_metadata(pkg_type)
-
-        if Ohai['platform'] == 'windows'
-          FileUtils.cp(FileSyncer.glob("#{Config.package_dir}/*.msi*"), destination)
-        elsif Ohai['platform'] == 'aix'
-          FileUtils.cp(FileSyncer.glob("#{Config.package_dir}/*.bff*"), destination)
-        else
-          FileUtils.cp(FileSyncer.glob("#{Config.package_dir}/*"), destination)
-        end
+      # Evaluate any packager-specific blocks, in order.
+      packagers[packager.id].each do |block|
+        packager.evaluate(&block)
       end
+
+      # Run the actual packager
+      packager.run!
+
+      # Copy the generated package and metadata back into the workspace
+      package_path = File.join(Config.package_dir, packager.package_name)
+      FileUtils.cp(package_path, destination)
+      FileUtils.cp("#{package_path}.metadata.json", destination)
     end
 
     #
@@ -879,77 +904,6 @@ module Omnibus
     # --------------------------------------------------
 
     private
-
-    #
-    # Determine the package type(s) to be built, based on the platform
-    # family for which the package is being built.
-    #
-    # If specific types cannot be determined, default to +["makeself"]+.
-    #
-    # @return [Array<(String)>]
-    #
-    def package_types
-      case Ohai['platform_family']
-      when 'debian'
-        %w(deb)
-      when 'fedora', 'rhel'
-        %w(rpm)
-      when 'aix'
-        %w(bff)
-      when 'solaris2'
-        %w(solaris)
-      when 'windows'
-        %w(msi)
-      when 'mac_os_x'
-        %w(pkg mac_dmg)
-      else
-        %w(makeself)
-      end
-    end
-
-    def render_metadata(pkg_type)
-      basename = output_package(pkg_type)
-      pkg_path = "#{Config.package_dir}/#{basename}"
-
-      # Don't generate metadata for packages that haven't been created.
-      # TODO: Fix this and make it betterer
-      return unless File.exist?(pkg_path)
-
-      package = Package.new(pkg_path)
-      Package::Metadata.generate(package,
-        name:             name,
-        friendly_name:    friendly_name,
-        homepage:         homepage,
-        version:          build_version,
-        iteration:        build_iteration,
-      )
-    end
-
-    # The basename of the resulting package file.
-    # @return [String] the basename of the package file
-    def output_package(pkg_type)
-      case pkg_type
-      when 'makeself'
-        Packager::Makeself.new(self).package_name
-      when 'msi'
-        Packager::MSI.new(self).package_name
-      when 'bff'
-        Packager::BFF.new(self).package_name
-      when 'solaris'
-        Packager::Solaris.new(self).package_name
-      when 'pkg'
-        Packager::PKG.new(self).package_name
-      when 'mac_dmg'
-        pkg = Packager::PKG.new(self)
-        Packager::MacDmg.new(pkg).package_name
-      when 'rpm'
-        Packager::RPM.new(self).package_name
-      when 'deb'
-        Packager::DEB.new(self).package_name
-      else
-        raise RuntimeError, "I do not know how to build a `#{pkg_type}'!"
-      end
-    end
 
     #
     # The log key for this project, overriden to include the name of the
