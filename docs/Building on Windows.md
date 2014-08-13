@@ -17,21 +17,21 @@ In order to create an MSI package, we will need to have some source files that
 can be used by WIX toolset to be able to build the MSI. Omnibus creates some
 skeletal MSI source files for you to help you get started.
 
-When you execute `omnibus project <<project_name>>` these files will be created
-to be able to build MSIs:
+When you execute `omnibus project NAME` with the `--msi-assets` flag, Omnibus
+will generate a series of "stubbed" files for your customization:
 
 ```
-C:\> omnibus project demo
+C:\> omnibus project demo --msi-assets
   ...
-  create  omnibus-demo/files/windows_msi/Resources/localization-en-us.wxl.erb
-  create  omnibus-demo/files/windows_msi/Resources/parameters.wxi.erb
-  create  omnibus-demo/files/windows_msi/Resources/source.wxs
-  create  omnibus-demo/files/windows_msi/Resources/assets/LICENSE.rtf
-  create  omnibus-demo/files/windows_msi/Resources/assets/banner_background.bmp
-  create  omnibus-demo/files/windows_msi/Resources/assets/dialog_background.bmp
-  create  omnibus-demo/files/windows_msi/Resources/assets/project.ico
-  create  omnibus-demo/files/windows_msi/Resources/assets/project_16x16.ico
-  create  omnibus-demo/files/windows_msi/Resources/assets/project_32x32.ico
+  create  omnibus-demo/resources/demo/msi/localization-en-us.wxl.erb
+  create  omnibus-demo/resources/demo/msi/parameters.wxi.erb
+  create  omnibus-demo/resources/demo/msi/source.wxs.erb
+  create  omnibus-demo/resources/demo/msi/assets/LICENSE.rtf
+  create  omnibus-demo/resources/demo/msi/assets/banner_background.bmp
+  create  omnibus-demo/resources/demo/msi/assets/dialog_background.bmp
+  create  omnibus-demo/resources/demo/msi/assets/project.ico
+  create  omnibus-demo/resources/demo/msi/assets/project_16x16.ico
+  create  omnibus-demo/resources/demo/msi/assets/project_32x32.ico
   ...
 ```
 - `localization-en-us.wxl.erb` => File that contains the strings that are being
@@ -55,37 +55,30 @@ You can modify these XML files based on the documentation
 
 Configurables
 -------------
-You can use `msi_parameters` DSL option in your Omnibus project files to pass
-dynamic information to your MSI source templates. You can specify a hash or a
-block for this option. When block is specified, it is executed at the time of
-rendering and it is expected to return a hash. Here is an example:
+You can use the `parameters` DSL option in your Omnibus project files to pass
+dynamic information to your MSI source templates. You can specify a hash for
+this option. Here is an example:
 
 ```ruby
 # config/projects/my_project.rb
 name 'my_project'
 
-...
-
-msi_parameters do
-  # Set the upgrade code dynamically
-  params = { }
-  params[:upgrade_code] = determine_upgrade_code()
-  params
+package :msi do
+  parameters upgrade_code: 'AABCD-12234-55913'
 end
 ```
 
 ```xml
-<!-- files/windows_msi/Resources/parameters.wxi.erb -->
+<!-- resources/PROJECT/msi/parameters.wxi.erb -->
 
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
-  <!--
-    Versioning. These have to be changed for upgrades.
-  -->
-  <?define VersionNumber="<%= @msi_version %>" ?>
-  <?define DisplayVersionNumber="<%= @msi_display_version %>" ?>
+  <?define VersionNumber="<%= version %>" ?>
+  <?define DisplayVersionNumber="<%= display_version %>" ?>
 
-  <?define UpgradeCode="<%= msi_parameters[:upgrade_code] %>" ?>
+<% parameters.each do |key, value| -%>
+  <?define <%= key %>="<%= value %>" ?>
+<% end -%>
 </Include>
 ```
 
@@ -94,5 +87,5 @@ MSI Creation
 To create an MSI you would normally run:
 
 ```
-C:\> omnibus build project <name>
+C:\> omnibus build <name>
 ```

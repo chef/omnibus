@@ -129,47 +129,6 @@ module Omnibus
     expose :friendly_name
 
     #
-    # Set or retrieve the custom msi building parameters
-    #
-    # @example Using a hash
-    #   msi_parameters upgrade_code: 'ABCD-1234'
-    #
-    # @example Using a block
-    #   msi_parameters do
-    #     # some complex operation
-    #     { key: value }
-    #   end
-    #
-    # @param [Hash] val
-    #   the parameters to set
-    # @param [Proc] block
-    #   block to run when building the msi that returns a hash
-    #
-    # @return [Hash]
-    #
-    def msi_parameters(val = NULL, &block)
-      if block && !null?(val)
-        raise Error, 'You cannot specify additional parameters to ' \
-          '#msi_parameters when a block is given!'
-      end
-
-      if block
-        @msi_parameters = block
-      else
-        if null?(val)
-          if @msi_parameters.is_a?(Proc)
-            @msi_parameters.call
-          else
-            @msi_parameters ||= {}
-          end
-        else
-          @msi_parameters = val
-        end
-      end
-    end
-    expose :msi_parameters
-
-    #
     # **[Required]** Set or retrieve the path at which the project should be
     # installed by the generated package.
     #

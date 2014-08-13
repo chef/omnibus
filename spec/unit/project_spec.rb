@@ -23,7 +23,6 @@ module Omnibus
 
     it_behaves_like 'a cleanroom setter', :name, %|name 'chef'|
     it_behaves_like 'a cleanroom setter', :friendly_name, %|friendly_name 'Chef'|
-    it_behaves_like 'a cleanroom setter', :msi_parameters, %|msi_parameters {}|
     it_behaves_like 'a cleanroom setter', :install_dir, %|install_dir '/opt/chef'|
     it_behaves_like 'a cleanroom setter', :maintainer, %|maintainer 'Chef Software, Inc'|
     it_behaves_like 'a cleanroom setter', :homepage, %|homepage 'https://getchef.com'|

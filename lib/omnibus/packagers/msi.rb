@@ -74,6 +74,35 @@ module Omnibus
       EOH
     end
 
+    #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Set or retrieve the custom msi building parameters.
+    #
+    # @example
+    #   parameters upgrade_code: 'ABCD-1234'
+    #
+    # @param [Hash] val
+    #   the parameters to set
+    #
+    # @return [Hash]
+    #   the set parameters
+    #
+    def parameters(val = NULL)
+      if null?(val)
+        @parameters || {}
+      else
+        @parameters = val
+      end
+    end
+    expose :parameters
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
     # @see Base#package_name
     def package_name
       "#{project.name}-#{project.build_version}-#{project.iteration}.msi"
@@ -116,7 +145,7 @@ module Omnibus
           name:            project.name,
           friendly_name:   project.friendly_name,
           maintainer:      project.maintainer,
-          parameters:      project.msi_parameters,
+          parameters:      parameters,
           version:         msi_version,
           display_version: msi_display_version,
         }
