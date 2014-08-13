@@ -33,10 +33,6 @@ module Omnibus
     end
 
     describe 'DSL' do
-      it 'exposes :sign' do
-        expect(subject).to have_exposed_method(:sign)
-      end
-
       it 'exposes :signing_passphrase' do
         expect(subject).to have_exposed_method(:signing_passphrase)
       end
@@ -166,7 +162,6 @@ module Omnibus
 
       context 'when RPM signing is enabled' do
         before do
-          subject.sign(true)
           subject.signing_passphrase('foobar')
           allow(Dir).to receive(:mktmpdir).and_return(tmp_path)
         end

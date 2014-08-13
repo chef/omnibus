@@ -64,27 +64,6 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # Sign the RPM package. If this method is +true+, then +signing_passphrase+
-    # must also be specified!
-    #
-    # @example
-    #   sign true
-    #
-    # @param [true, false] val
-    #   whether to sign the RPM
-    #
-    # @return [true, false]
-    #
-    def sign(val = NULL)
-      if null?(val)
-        @sign || false
-      else
-        @sign = val
-      end
-    end
-    expose :sign
-
-    #
     # Set or return the signing passphrase. This value is required if {#sign} is
     # +true+.
     #
@@ -187,7 +166,7 @@ module Omnibus
       command << %| --buildroot #{staging_dir}/BUILD|
       command << %| --define "_topdir #{staging_dir}"|
 
-      if sign
+      if signing_passphrase
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
         else
