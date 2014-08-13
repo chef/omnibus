@@ -79,10 +79,33 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # Set or retrieve the upgrade code.
+    #
+    # @example
+    #   upgrade_code 'ABCD-1234'
+    #
+    # @param [Hash] val
+    #   the UpgradeCode to set
+    #
+    # @return [Hash]
+    #   the set UpgradeCode
+    #
+    def upgrade_code(val = NULL)
+      if null?(val)
+        @upgrade_code || raise(MissingRequiredAttribute.new(self, :upgrade_code, 'ABCD-1234'))
+      else
+        @upgrade_code = val
+      end
+    end
+    expose :upgrade_code
+
+    #
     # Set or retrieve the custom msi building parameters.
     #
     # @example
-    #   parameters upgrade_code: 'ABCD-1234'
+    #   parameters {
+    #     'MagicParam' => 'ABCD-1234'
+    #   }
     #
     # @param [Hash] val
     #   the parameters to set
@@ -145,6 +168,7 @@ module Omnibus
           name:            project.name,
           friendly_name:   project.friendly_name,
           maintainer:      project.maintainer,
+          upgrade_code:    upgrade_code,
           parameters:      parameters,
           version:         msi_version,
           display_version: msi_display_version,
