@@ -622,27 +622,6 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # The path (on disk) where this project came from. Warning: this can be
-    # +nil+ if a project was dynamically created!
-    #
-    # @return [String, nil]
-    #
-    def filepath
-      @filepath
-    end
-
-    #
-    # @!endgroup
-    # --------------------------------------------------
-
-    #
-    # @!group Public API
-    #
-    # In addition to the DSL methods, the following methods are considered to
-    # be the "public API" for a project.
-    # --------------------------------------------------
-
-    #
     # Recursively load all the dependencies for this project.
     #
     # @return [true]
