@@ -28,6 +28,16 @@ module Omnibus
       create_directory(staging_dir)
     end
 
+    describe 'DSL' do
+      it 'exposes :sign' do
+        expect(subject).to have_exposed_method(:sign)
+      end
+
+      it 'exposes :signing_identity' do
+        expect(subject).to have_exposed_method(:signing_identity)
+      end
+    end
+
     describe '#id' do
       it 'is :pkg' do
         expect(subject.id).to eq(:pkg)
@@ -94,8 +104,8 @@ module Omnibus
 
       context 'when pkg signing is enabled' do
         before do
-          Config.sign_pkg(true)
-          Config.signing_identity('My Special Identity')
+          subject.sign(true)
+          subject.signing_identity('My Special Identity')
         end
 
         it 'includes the signing parameters in the product build command' do

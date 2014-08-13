@@ -193,12 +193,22 @@ module Omnibus
     # Sign the pkg package.
     #
     # @return [true, false]
-    default(:sign_pkg, false)
+    default(:sign_pkg) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.sign_pkg. This value is no longer part of the config and " \
+        "should be defined in the `package' block in the project."
+      end
+    end
 
     # The identity to sign the pkg with.
     #
     # @return [String]
-    default(:signing_identity, nil)
+    default(:signing_identity) do
+      Omnibus.logger.deprecated('Config') do
+        "Config.signing_identity. This value is no longer part of the " \
+        "config and should be defined in the `package' block in the project."
+      end
+    end
 
     # --------------------------------------------------
     # @!endgroup

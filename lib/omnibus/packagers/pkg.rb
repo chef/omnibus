@@ -58,6 +58,57 @@ module Omnibus
       end
     end
 
+    #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Sign the PKG package. If this method is +true+, then +signing_identity+
+    # must also be specified!
+    #
+    # @example
+    #   sign true
+    #
+    # @param [true, false] val
+    #   whether to sign the PKG
+    #
+    # @return [true, false]
+    #
+    def sign(val = NULL)
+      if null?(val)
+        @sign || false
+      else
+        @sign = val
+      end
+    end
+    expose :sign
+
+    #
+    # Set or return the signing identity. This value is required if {#sign} is
+    # +true+.
+    #
+    # @example
+    #   signing_identity "foo"
+    #
+    # @param [String] val
+    #   the identity to use when signing the PKG
+    #
+    # @return [String]
+    #   the PKG-signing identity
+    #
+    def signing_identity(val = NULL)
+      if null?(val)
+        @signing_identity
+      else
+        @signing_identity = val
+      end
+    end
+    expose :signing_identity
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
     # @see Base#package_name
     def package_name
       "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.pkg"
@@ -139,7 +190,7 @@ module Omnibus
           --resources "#{resources_dir}" \\
       EOH
 
-      command << %Q(  --sign "#{Config.signing_identity}" \\\n) if Config.sign_pkg
+      command << %Q(  --sign "#{signing_identity}" \\\n) if sign
       command << %Q(  "#{final_pkg}")
       command << %Q(\n)
 
