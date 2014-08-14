@@ -147,7 +147,7 @@ module Omnibus
       if null?(val)
         @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, '/opt/chef'))
       else
-        @install_dir = File.expand_path(val, Config.project_root)
+        @install_dir = val
       end
     end
     expose :install_dir
