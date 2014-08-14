@@ -159,6 +159,26 @@ module Omnibus
     expose :install_dir
 
     #
+    # The default root where a project should be installed. On Windows-based
+    # systems, this value defaults to +C:+. On non-Windows systems, this value
+    # defaults to +/opt+.
+    #
+    # @example
+    #   install_dir "#{default_root}/chef" #=> Produces +C:/chef+ on Windows and
+    #                                      #=> +/opt/chef+ on Linux
+    #
+    # @return [String]
+    #
+    def default_root
+      if windows?
+        'C:'
+      else
+        '/opt'
+      end
+    end
+    expose :default_root
+
+    #
     # **[Required]** Set or retrieve the the package maintainer.
     #
     # @example

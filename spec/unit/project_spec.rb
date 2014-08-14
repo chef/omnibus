@@ -100,6 +100,28 @@ module Omnibus
       end
     end
 
+    describe '#default_root' do
+      context 'on Windows' do
+        before { stub_ohai(platform: 'windows', version: '2012') }
+
+        it 'returns C:/' do
+          expect(subject.default_root).to eq('C:')
+        end
+      end
+
+      context 'on non-Windows' do
+        before { stub_ohai(platform: 'ubuntu', version: '12.04') }
+
+        it 'returns /opt' do
+          expect(subject.default_root).to eq('/opt')
+        end
+      end
+
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:default_root)
+      end
+    end
+
     describe '#dirty!' do
       it 'dirties the cache' do
         subject.instance_variable_set(:@dirty, nil)
