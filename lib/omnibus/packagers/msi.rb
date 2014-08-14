@@ -92,7 +92,7 @@ module Omnibus
     #
     def upgrade_code(val = NULL)
       if null?(val)
-        @upgrade_code || raise(MissingRequiredAttribute.new(self, :upgrade_code, 'ABCD-1234'))
+        @upgrade_code || raise(MissingRequiredAttribute.new(self, :upgrade_code, '2CD7259C-776D-4DDB-A4C8-6E544E580AA1'))
       else
         unless val.is_a?(String)
           raise InvalidValue.new(:parameters, 'be a String')
