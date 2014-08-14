@@ -30,14 +30,15 @@
     </InstallExecuteSequence>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="WindowsVolume">
-        <!-- Service needs chef directory to be present. -->
+      <Directory Id="WINDOWSVOLUME">
         <Directory Id="INSTALLLOCATION" Name="opt">
           <Directory Id="PROJECTLOCATION" Name="<%= name %>">
           </Directory>
         </Directory>
       </Directory>
     </Directory>
+
+    <SetDirectory Id="WINDOWSVOLUME" Value="[WindowsVolume]" />
 
     <!-- Set the components defined in our fragment files that will be used for our feature  -->
     <Feature Id="ProjectFeature" Title="!(loc.FeatureMainName)" Absent="disallow" AllowAdvertise="no" Level="1" ConfigurableDirectory="INSTALLLOCATION">
