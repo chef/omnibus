@@ -132,6 +132,12 @@ module Omnibus
     # **[Required]** Set or retrieve the path at which the project should be
     # installed by the generated package.
     #
+    # Even on Windows-based systems, this path should be the Unix-like path,
+    # since that's what Ruby expects. In the event +\+ is used as a file
+    # separator, it will be replaced with +/+. This method also attempts to
+    # remove duplicate slashes which might be caused as a result of string
+    # interpolation.
+    #
     # @example
     #   install_dir '/opt/chef'
     #
@@ -147,7 +153,7 @@ module Omnibus
       if null?(val)
         @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, '/opt/chef'))
       else
-        @install_dir = val
+        @install_dir = val.gsub('\\', '/').squeeze('/').chomp('/')
       end
     end
     expose :install_dir

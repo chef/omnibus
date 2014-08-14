@@ -23,7 +23,6 @@ module Omnibus
 
     it_behaves_like 'a cleanroom setter', :name, %|name 'chef'|
     it_behaves_like 'a cleanroom setter', :friendly_name, %|friendly_name 'Chef'|
-    it_behaves_like 'a cleanroom setter', :install_dir, %|install_dir '/opt/chef'|
     it_behaves_like 'a cleanroom setter', :maintainer, %|maintainer 'Chef Software, Inc'|
     it_behaves_like 'a cleanroom setter', :homepage, %|homepage 'https://getchef.com'|
     it_behaves_like 'a cleanroom setter', :description, %|description 'Installs the thing'|
@@ -77,6 +76,27 @@ module Omnibus
 
       it 'returns a resources_path' do
         expect(subject.resources_path).to include('sample/project/resources')
+      end
+    end
+
+    describe '#install_dir' do
+      it 'removes duplicate slashes' do
+        subject.install_dir('///opt//chef')
+        expect(subject.install_dir).to eq('/opt/chef')
+      end
+
+      it 'converts Windows slashes to Ruby ones' do
+        subject.install_dir('C:\\chef\\chefdk')
+        expect(subject.install_dir).to eq('C:/chef/chefdk')
+      end
+
+      it 'removes trailing slashes' do
+        subject.install_dir('/opt/chef//')
+        expect(subject.install_dir).to eq('/opt/chef')
+      end
+
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:install_dir)
       end
     end
 
