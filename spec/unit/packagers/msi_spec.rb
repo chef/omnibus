@@ -140,12 +140,31 @@ module Omnibus
       end
 
       it 'has the correct content' do
+        project.install_dir('C:/foo/bar/blip')
         subject.write_source_file
         contents = File.read("#{staging_dir}/source.wxs")
 
         expect(contents).to include('<?include "parameters.wxi" ?>')
-        expect(contents).to include('<Directory Id="INSTALLLOCATION" Name="opt">')
-        expect(contents).to include('<Directory Id="PROJECTLOCATION" Name="project">')
+        expect(contents).to include <<-EOH.gsub(/^ {6}/, '')
+          <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="WINDOWSVOLUME">
+              <Directory Id="FOOLOCATION" Name="foo">
+                <Directory Id="FOOBARLOCATION" Name="bar">
+                  <Directory Id="PROJECTLOCATION" Name="blip">
+                  </Directory>
+                </Directory>
+              </Directory>
+            </Directory>
+          </Directory>
+        EOH
+      end
+
+      it 'has the correct wix_install_dir when the path is short' do
+        subject.write_source_file
+        contents = File.read("#{staging_dir}/source.wxs")
+
+        expect(contents).to include('<?include "parameters.wxi" ?>')
+        expect(contents).to include('<Property Id="WIXUI_INSTALLDIR" Value="WINDOWSVOLUME" />')
       end
     end
 

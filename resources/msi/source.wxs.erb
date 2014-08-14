@@ -31,17 +31,19 @@
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="WINDOWSVOLUME">
-        <Directory Id="INSTALLLOCATION" Name="opt">
-          <Directory Id="PROJECTLOCATION" Name="<%= name %>">
-          </Directory>
-        </Directory>
+<% hierarchy.each.with_index do |(name, id), index| -%>
+        <%= '  '*index %><Directory Id="<%= id %>" Name="<%= name %>">
+<% end -%>
+<% hierarchy.keys.each.with_index do |_, index| -%>
+        <%= '  '*(hierarchy.size - index-1) %></Directory>
+<% end -%>
       </Directory>
     </Directory>
 
     <SetDirectory Id="WINDOWSVOLUME" Value="[WindowsVolume]" />
 
     <!-- Set the components defined in our fragment files that will be used for our feature  -->
-    <Feature Id="ProjectFeature" Title="!(loc.FeatureMainName)" Absent="disallow" AllowAdvertise="no" Level="1" ConfigurableDirectory="INSTALLLOCATION">
+    <Feature Id="ProjectFeature" Title="!(loc.FeatureMainName)" Absent="disallow" AllowAdvertise="no" Level="1" ConfigurableDirectory="<%= wix_install_dir %>">
       <ComponentGroupRef Id="ProjectDir" />
     </Feature>
 
@@ -49,7 +51,7 @@
     <Icon Id="project.ico" SourceFile="Resources\assets\project_16x16.ico"/>
     <Property Id="ARPPRODUCTICON" Value="project.ico" />
     <Property Id="ARPHELPLINK" Value="http://www.getchef.com/" />
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <Property Id="WIXUI_INSTALLDIR" Value="<%= wix_install_dir %>" />
 
     <UIRef Id="ProjectUI_InstallDir"/>
     <UI Id="ProjectUI_InstallDir">

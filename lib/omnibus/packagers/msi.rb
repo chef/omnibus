@@ -190,12 +190,44 @@ module Omnibus
     # @return [void]
     #
     def write_source_file
+      paths = []
+
+      # Remove C:/
+      install_dir = project.install_dir.split('/')[1..-1].join('/')
+
+      # Grab all parent paths
+      Pathname.new(install_dir).ascend do |path|
+        paths << path.to_s
+      end
+
+      # Create the hierarchy
+      hierarchy = paths.reverse.inject({}) do |hash, path|
+        hash[File.basename(path)] = path.gsub(/[^[:alnum:]]/, '').upcase + 'LOCATION'
+        hash
+      end
+
+      # The last item in the path MUST be named PROJECTLOCATION or else space
+      # robots will cause permanent damage to you and your family.
+      hierarchy[hierarchy.keys.last] = 'PROJECTLOCATION'
+
+      # If the path hierarchy is > 1, the customizable installation directory
+      # should default to the second-to-last item in the hierarchy. If the
+      # hierarchy is smaller than that, then just use the system drive.
+      wix_install_dir = if hierarchy.size > 1
+        hierarchy.to_a[-2][1]
+      else
+        'WINDOWSVOLUME'
+      end
+
       render_template(resource_path('source.wxs.erb'),
         destination: "#{staging_dir}/source.wxs",
         variables: {
           name:          project.name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
+          hierarchy:     hierarchy,
+
+          wix_install_dir: wix_install_dir,
         }
       )
     end
