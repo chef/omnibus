@@ -136,7 +136,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}-#{project.iteration}.msi"
+      "#{project.name}-#{project.build_version}-#{project.build_iteration}.msi"
     end
 
     #
