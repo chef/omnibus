@@ -65,8 +65,7 @@ module Omnibus
     #
     desc 'build PROJECT', 'Build the given Omnibus project'
     def build(name)
-      project = Omnibus.project(name)
-      raise ProjectNotFound.new(name) unless project
+      project = Project.load(name)
 
       say("Building #{project.name} #{project.build_version}...")
       project.build_me

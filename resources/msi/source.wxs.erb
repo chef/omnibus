@@ -15,15 +15,14 @@
       Define the minimum supported installer version (2.0).
       The install should be done for the whole machine not just the current user
     -->
-    <Package InstallerVersion="200" InstallPrivileges="elevated"
-             Compressed="yes" InstallScope="perMachine" />
+    <Package InstallerVersion="200" InstallPrivileges="elevated" Compressed="yes" InstallScope="perMachine" />
 
     <Media Id="1" Cabinet="Project.cab" EmbedCab="yes" CompressionLevel="high" />
 
     <!-- Major upgrade -->
     <Upgrade Id="$(var.UpgradeCode)">
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VersionNumber)" IncludeMinimum="no" Property="NEWERVERSIONDETECTED" />
-      <UpgradeVersion Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.VersionNumber)" IncludeMaximum="no" Property="OLDERVERSIONBEINGUPGRADED" />
+      <UpgradeVersion Minimum="0.0.0.0" IncludeMinimum="yes" Maximum="$(var.VersionNumber)" IncludeMaximum="yes" Property="OLDERVERSIONBEINGUPGRADED" />
     </Upgrade>
 
     <InstallExecuteSequence>
@@ -31,27 +30,28 @@
     </InstallExecuteSequence>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="WindowsVolume">
-        <!-- Service needs chef directory to be present. -->
-        <Directory Id="INSTALLLOCATION" Name="opt">
-          <Directory Id="PROJECTLOCATION" Name="<%= name %>">
-          </Directory>
-        </Directory>
+      <Directory Id="WINDOWSVOLUME">
+<% hierarchy.each.with_index do |(name, id), index| -%>
+        <%= '  '*index %><Directory Id="<%= id %>" Name="<%= name %>">
+<% end -%>
+<% hierarchy.keys.each.with_index do |_, index| -%>
+        <%= '  '*(hierarchy.size - index-1) %></Directory>
+<% end -%>
       </Directory>
     </Directory>
 
+    <SetDirectory Id="WINDOWSVOLUME" Value="[WindowsVolume]" />
+
     <!-- Set the components defined in our fragment files that will be used for our feature  -->
-    <Feature Id="ProjectFeature" Title="!(loc.FeatureMainName)" Absent="disallow" AllowAdvertise="no" Level="1" ConfigurableDirectory="INSTALLLOCATION">
+    <Feature Id="ProjectFeature" Title="!(loc.FeatureMainName)" Absent="disallow" AllowAdvertise="no" Level="1" ConfigurableDirectory="<%= wix_install_dir %>">
       <ComponentGroupRef Id="ProjectDir" />
     </Feature>
 
-    <!--
-      UI Stuff
-    -->
+    <!-- UI Stuff -->
     <Icon Id="project.ico" SourceFile="Resources\assets\project_16x16.ico"/>
     <Property Id="ARPPRODUCTICON" Value="project.ico" />
     <Property Id="ARPHELPLINK" Value="http://www.getchef.com/" />
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <Property Id="WIXUI_INSTALLDIR" Value="<%= wix_install_dir %>" />
 
     <UIRef Id="ProjectUI_InstallDir"/>
     <UI Id="ProjectUI_InstallDir">
@@ -69,6 +69,5 @@
     <WixVariable Id="WixUIInfoIco" Value="Resources\assets\project_32x32.ico" />
     <WixVariable Id="WixUINewIco" Value="Resources\assets\project_16x16.ico" />
     <WixVariable Id="WixUIUpIco" Value="Resources\assets\project_16x16.ico" />
-
   </Product>
 </Wix>

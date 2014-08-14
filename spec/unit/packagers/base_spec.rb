@@ -6,16 +6,18 @@ module Omnibus
       Project.new.tap do |project|
         project.name('project')
         project.install_dir('/opt/project')
+        project.homepage('https://example.com')
         project.build_version('1.2.3')
         project.build_iteration('2')
         project.maintainer('Chef Software')
-        project.mac_pkg_identifier('com.getchef.project')
       end
     end
 
     before do
       # Force the Dir.mktmpdir call on staging_dir
       allow(Dir).to receive(:mktmpdir).and_return('/tmp/dir')
+
+      Config.package_dir(tmp_path)
     end
 
     subject { described_class.new(project) }
@@ -52,30 +54,12 @@ module Omnibus
       end
     end
 
-    describe '.validate' do
-      it 'sets the value of the block' do
-        block = proc {}
-        described_class.validate(&block)
-
-        expect(described_class.validate).to eq(block)
-      end
-    end
-
     describe '.build' do
       it 'sets the value of the block' do
         block = proc {}
         described_class.build(&block)
 
         expect(described_class.build).to eq(block)
-      end
-    end
-
-    describe '.clean' do
-      it 'sets the value of the block' do
-        block = proc {}
-        described_class.clean(&block)
-
-        expect(described_class.clean).to eq(block)
       end
     end
 
@@ -158,29 +142,19 @@ module Omnibus
       end
     end
 
-    describe '#assert_presence!' do
-      it 'raises a MissingAsset exception when the file does not exist' do
-        allow(File).to receive(:exist?).and_return(false)
-        expect { subject.assert_presence!('foo') }.to raise_error(MissingAsset)
-      end
-    end
-
     describe '#run!' do
       before do
         allow(subject).to receive(:purge_directory)
         allow(subject).to receive(:remove_directory)
+        allow(subject).to receive(:render_metadata!)
 
-        allow(described_class).to receive(:validate).and_return(proc {})
         allow(described_class).to receive(:setup).and_return(proc {})
         allow(described_class).to receive(:build).and_return(proc {})
-        allow(described_class).to receive(:clean).and_return(proc {})
       end
 
       it 'calls the methods in order' do
         expect(described_class).to receive(:setup).ordered
-        expect(described_class).to receive(:validate).ordered
         expect(described_class).to receive(:build).ordered
-        expect(described_class).to receive(:clean).ordered
         subject.run!
       end
     end
@@ -230,6 +204,51 @@ module Omnibus
 
       it 'returns the path with the id' do
         expect(subject.resources_path).to eq("#{resources_path}/#{id}")
+      end
+    end
+
+    describe '#render_metadata!' do
+      let(:package)      { double(Package) }
+      let(:package_name) { 'project-1.2.3.base' }
+      let(:package_path) { File.join(Config.package_dir, package_name) }
+
+      before do
+        allow(Package).to receive(:new)
+          .and_return(package)
+
+        allow(Package::Metadata).to receive(:generate)
+
+        allow(subject).to receive(:package_name)
+          .and_return(package_name)
+      end
+
+      context 'when the file does not exist' do
+        it 'raises an exception' do
+          expect {
+            subject.render_metadata!
+          }.to raise_error(NoPackageFile)
+        end
+      end
+
+      context 'when the file exists' do
+        before do
+          create_file(package_path)
+        end
+
+        it 'delegates to the Package::Metadata class' do
+          expect(Package::Metadata).to receive(:generate).with(
+            package,
+            {
+              name:          project.name,
+              friendly_name: project.friendly_name,
+              homepage:      project.homepage,
+              version:       project.build_version,
+              iteration:     project.build_iteration,
+            }
+          )
+
+          subject.render_metadata!
+        end
       end
     end
   end

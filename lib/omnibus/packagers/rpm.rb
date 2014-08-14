@@ -20,10 +20,6 @@ module Omnibus
   class Packager::RPM < Packager::Base
     id :rpm
 
-    validate do
-      # ...
-    end
-
     setup do
       # Create our magic directories
       create_directory("#{staging_dir}/BUILD")
@@ -63,9 +59,35 @@ module Omnibus
       create_rpm_file
     end
 
-    clean do
-      # ...
+    #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Set or return the signing passphrase. This value is required if {#sign} is
+    # +true+.
+    #
+    # @example
+    #   signing_passphrase "foo"
+    #
+    # @param [String] val
+    #   the passphrase to use when signing the RPM
+    #
+    # @return [String]
+    #   the RPM-signing passphrase
+    #
+    def signing_passphrase(val = NULL)
+      if null?(val)
+        @signing_passphrase
+      else
+        @signing_passphrase = val
+      end
     end
+    expose :signing_passphrase
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
 
     #
     # @return [String]
@@ -144,7 +166,7 @@ module Omnibus
       command << %| --buildroot #{staging_dir}/BUILD|
       command << %| --define "_topdir #{staging_dir}"|
 
-      if Config.sign_rpm
+      if signing_passphrase
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
         else
@@ -205,7 +227,7 @@ module Omnibus
         destination: destination,
         mode: 0700,
         variables: {
-          passphrase: Config.rpm_signing_passphrase,
+          passphrase: signing_passphrase,
         }
       )
 

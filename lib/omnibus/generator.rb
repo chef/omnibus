@@ -40,13 +40,13 @@ module Omnibus
       type: :boolean,
       default: false
 
-    class_option :dmg_assets,
-      desc: 'Generate Mac OS X dmg assets',
+    class_option :deb_assets,
+      desc: 'Generate Debian deb assets',
       type: :boolean,
       default: false
 
-    class_option :pkg_assets,
-      desc: 'Generate Mac OS X pkg assets',
+    class_option :dmg_assets,
+      desc: 'Generate Mac OS X dmg assets',
       type: :boolean,
       default: false
 
@@ -57,6 +57,16 @@ module Omnibus
 
     class_option :msi_assets,
       desc: 'Generate Windows MSI assets',
+      type: :boolean,
+      default: false
+
+    class_option :pkg_assets,
+      desc: 'Generate Mac OS X pkg assets',
+      type: :boolean,
+      default: false
+
+    class_option :rpm_assets,
+      desc: 'Generate RHEL/CentOS rpm assets',
       type: :boolean,
       default: false
 
@@ -106,19 +116,19 @@ module Omnibus
       copy_file(resource_path('bff/unpostinstall.sh'), "#{target}/resources/bff/unpostinstall.sh")
     end
 
+    def create_deb_assets
+      return unless options[:deb_assets]
+
+      copy_file(resource_path('deb/conffiles.erb'), "#{target}/resources/deb/conffiles.erb")
+      copy_file(resource_path('deb/control.erb'), "#{target}/resources/deb/control.erb")
+      copy_file(resource_path('deb/md5sums.erb'), "#{target}/resources/deb/md5sums.erb")
+    end
+
     def create_dmg_assets
       return unless options[:dmg_assets]
 
       copy_file(resource_path('dmg/background.png'), "#{target}/resources/dmg/background.png")
       copy_file(resource_path('dmg/icon.png'), "#{target}/resources/dmg/icon.png")
-    end
-
-    def create_pkg_assets
-      return unless options[:pkg_assets]
-
-      copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
-      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
-      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
     end
 
     def create_makeself_assets
@@ -142,6 +152,21 @@ module Omnibus
       copy_file(resource_path('msi/assets/project_32x32.ico'), "#{target}/resources/msi/assets/project_32x32.ico")
     end
 
+    def create_pkg_assets
+      return unless options[:pkg_assets]
+
+      copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
+      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
+      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
+    end
+
+    def create_rpm_assets
+      return unless options[:rpm_assets]
+
+      copy_file(resource_path('rpm/rpmmacros.erb'), "#{target}/resources/rpm/rpmmacros.erb")
+      copy_file(resource_path('rpm/signing.erb'), "#{target}/resources/rpm/signing.erb")
+      copy_file(resource_path('rpm/spec.erb'), "#{target}/resources/rpm/spec.erb")
+    end
     private
 
     #

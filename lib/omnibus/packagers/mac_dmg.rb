@@ -20,10 +20,6 @@ module Omnibus
 
     attr_reader :packager
 
-    validate do
-      # ...
-    end
-
     setup do
       create_directory(dmg_stage)
 
@@ -43,11 +39,6 @@ module Omnibus
       set_dmg_icon
     end
 
-    clean do
-      remove_file("#{staging_dir}/tmp.icns")
-      remove_file("#{staging_dir}/tmp.rsrc")
-    end
-
     #
     # Create a new DMG packager.
     #
@@ -57,6 +48,58 @@ module Omnibus
       @packager = packager
       super(packager.project)
     end
+
+    #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Set or return the starting x,y and ending x,y positions for the created
+    # DMG window.
+    #
+    # @example
+    #   window_bounds "100, 100, 750, 600"
+    #
+    # @param [String] val
+    #   the DMG window bounds
+    #
+    # @return [String]
+    #   the DMG window bounds
+    #
+    def window_bounds(val = NULL)
+      if null?(val)
+        @window_bounds || '100, 100, 750, 600'
+      else
+        @window_bounds = val
+      end
+    end
+    expose :window_bounds
+
+    #
+    # Set or return the starting x,y position where the .pkg file should live
+    # in the DMG window.
+    #
+    # @example
+    #   pkg_position "535, 50"
+    #
+    # @param [String] val
+    #   the PKG position inside the DMG
+    #
+    # @return [String]
+    #   the PKG position inside the DMG
+    #
+    def pkg_position(val = NULL)
+      if null?(val)
+        @pkg_position || '535, 50'
+      else
+        @pkg_position = val
+      end
+    end
+    expose :pkg_position
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
 
     #
     # Cleans any previously left over mounted disks
@@ -154,13 +197,13 @@ module Omnibus
                set current view of container window to icon view
                set toolbar visible of container window to false
                set statusbar visible of container window to false
-               set the bounds of container window to {#{Config.dmg_window_bounds}}
+               set the bounds of container window to {#{window_bounds}}
                set theViewOptions to the icon view options of container window
                set arrangement of theViewOptions to not arranged
                set icon size of theViewOptions to 72
                set background picture of theViewOptions to file ".support:'background.png'"
                delay 5
-               set position of item "'#{project.name}.pkg'" of container window to {#{Config.dmg_pkg_position}}
+               set position of item "'#{project.name}.pkg'" of container window to {#{pkg_position}}
                update without registering applications
                delay 5
              end tell

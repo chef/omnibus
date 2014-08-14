@@ -32,6 +32,12 @@ module Omnibus
       create_directory("#{staging_dir}/SPECS")
     end
 
+    describe 'DSL' do
+      it 'exposes :signing_passphrase' do
+        expect(subject).to have_exposed_method(:signing_passphrase)
+      end
+    end
+
     describe '#id' do
       it 'is :rpm' do
         expect(subject.id).to eq(:rpm)
@@ -156,8 +162,7 @@ module Omnibus
 
       context 'when RPM signing is enabled' do
         before do
-          Config.sign_rpm(true)
-          Config.rpm_signing_passphrase('foobar')
+          subject.signing_passphrase('foobar')
           allow(Dir).to receive(:mktmpdir).and_return(tmp_path)
         end
 
@@ -212,7 +217,7 @@ module Omnibus
       context 'when the project name has invalid characters' do
         before { project.name("Pro$ject123.for-realz_2") }
 
-        it 'returns the value without logging a message' do
+        it 'returns the value while logging a message' do
           output = capture_logging do
             expect(subject.safe_project_name).to eq('pro-ject123.for-realz-2')
           end
@@ -239,7 +244,7 @@ module Omnibus
       context 'when the project build_version has invalid characters' do
         before { project.build_version("1.2$alpha.##__2") }
 
-        it 'returns the value without logging a message' do
+        it 'returns the value while logging a message' do
           output = capture_logging do
             expect(subject.safe_version).to eq('1.2-alpha.-2')
           end

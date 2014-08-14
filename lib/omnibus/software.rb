@@ -122,6 +122,8 @@ module Omnibus
     #
     # **[Required]** Sets or retreives the name of the software.
     #
+    # @raise [MissingRequiredAttribute]
+    #
     # @example
     #   name 'libxslt'
     #
@@ -132,7 +134,7 @@ module Omnibus
     #
     def name(val = NULL)
       if null?(val)
-        @name || raise(MissingSoftwareConfiguration.new(name, 'name', 'libxslt'))
+        @name || raise(MissingRequiredAttribute.new(self, :name, 'libxslt'))
       else
         @name = val
       end
@@ -335,7 +337,7 @@ module Omnibus
     #
     def relative_path(val = NULL)
       if null?(val)
-        @relative_path ||= name
+        @relative_path || name
       else
         @relative_path = val
       end

@@ -18,10 +18,6 @@ module Omnibus
   class Packager::BFF < Packager::Base
     id :bff
 
-    validate do
-      # ...
-    end
-
     setup do
       # Copy the full-stack installer into our scratch directory, accounting for
       # any excluded files.

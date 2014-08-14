@@ -23,7 +23,6 @@ module Omnibus
 
     it_behaves_like 'a cleanroom setter', :name, %|name 'chef'|
     it_behaves_like 'a cleanroom setter', :friendly_name, %|friendly_name 'Chef'|
-    it_behaves_like 'a cleanroom setter', :msi_parameters, %|msi_parameters {}|
     it_behaves_like 'a cleanroom setter', :install_dir, %|install_dir '/opt/chef'|
     it_behaves_like 'a cleanroom setter', :maintainer, %|maintainer 'Chef Software, Inc'|
     it_behaves_like 'a cleanroom setter', :homepage, %|homepage 'https://getchef.com'|
@@ -32,7 +31,6 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :conflict, %|conflict 'puppet'|
     it_behaves_like 'a cleanroom setter', :build_version, %|build_version '1.2.3'|
     it_behaves_like 'a cleanroom setter', :build_iteration, %|build_iteration 1|
-    it_behaves_like 'a cleanroom setter', :mac_pkg_identifier, %|mac_pkg_identifier 'com.getchef'|
     it_behaves_like 'a cleanroom setter', :package_user, %|package_user 'chef'|
     it_behaves_like 'a cleanroom setter', :package_group, %|package_group 'chef'|
     it_behaves_like 'a cleanroom setter', :override, %|override :chefdk, source: 'foo.com'|
@@ -171,6 +169,38 @@ module Omnibus
       it 'retrieves the things set through #overrides' do
         subject.override(:thing, version: '6.6.6')
         expect(subject.override(:thing)[:version]).to eq('6.6.6')
+      end
+    end
+
+    describe '#package' do
+      it 'raises an exception when a block is not given' do
+        expect { subject.package(:foo) }.to raise_error(InvalidValue)
+      end
+
+      it 'adds the block to the list' do
+        block = Proc.new {}
+        subject.package(:foo, &block)
+
+        expect(subject.packagers[:foo]).to include(block)
+      end
+
+      it 'allows for multiple invocations, keeping order' do
+        block_1, block_2 = Proc.new {}, Proc.new {}
+        subject.package(:foo, &block_1)
+        subject.package(:foo, &block_2)
+
+        expect(subject.packagers[:foo]).to eq([block_1, block_2])
+      end
+    end
+
+    describe '#packagers' do
+      it 'returns a Hash' do
+        expect(subject.packagers).to be_a(Hash)
+      end
+
+      it 'has a default Hash value of an empty array' do
+        expect(subject.packagers[:foo]).to be_a(Array)
+        expect(subject.packagers[:bar]).to_not be(subject.packagers[:foo])
       end
     end
 

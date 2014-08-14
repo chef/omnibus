@@ -18,10 +18,6 @@ module Omnibus
   class Packager::PKG < Packager::Base
     id :pkg
 
-    validate do
-      # ...
-    end
-
     setup do
       # Create the resources directory
       create_directory(resources_dir)
@@ -56,15 +52,57 @@ module Omnibus
       write_distribution_file
 
       build_product_pkg
+    end
 
-      if Config.build_dmg
-        Packager::MacDmg.new(self).run!
+    #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # The identifer for the PKG package.
+    #
+    # @example
+    #   identifier 'com.getchef.chefdk'
+    #
+    # @param [String] val
+    #   the package identifier
+    #
+    # @return [String]
+    #
+    def identifier(val = NULL)
+      if null?(val)
+        @identifier
+      else
+        @identifier = val
       end
     end
+    expose :identifier
 
-    clean do
-      # ...
+    #
+    # Set or return the signing identity. This value is required if {#sign} is
+    # +true+.
+    #
+    # @example
+    #   signing_identity "foo"
+    #
+    # @param [String] val
+    #   the identity to use when signing the PKG
+    #
+    # @return [String]
+    #   the PKG-signing identity
+    #
+    def signing_identity(val = NULL)
+      if null?(val)
+        @signing_identity
+      else
+        @signing_identity = val
+      end
     end
+    expose :signing_identity
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
 
     # @see Base#package_name
     def package_name
@@ -147,7 +185,7 @@ module Omnibus
           --resources "#{resources_dir}" \\
       EOH
 
-      command << %Q(  --sign "#{Config.signing_identity}" \\\n) if Config.sign_pkg
+      command << %Q(  --sign "#{signing_identity}" \\\n) if signing_identity
       command << %Q(  "#{final_pkg}")
       command << %Q(\n)
 
@@ -195,7 +233,7 @@ module Omnibus
     # @return [String]
     #
     def safe_identifier
-      return project.mac_pkg_identifier if project.mac_pkg_identifier
+      return identifier if identifier
 
       maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, '').downcase
       "test.#{maintainer}.pkg.#{safe_project_name}"
