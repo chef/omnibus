@@ -31,7 +31,7 @@ module Omnibus
       # Copy all the staging assets from vendored Omnibus into the resources
       # directory.
       create_directory("#{resources_dir}/assets")
-      FileSyncer.glob("#{Omnibus.source_root}/#{id}/assets/*").each do |file|
+      FileSyncer.glob("#{Omnibus.source_root}/resources/#{id}/assets/*").each do |file|
         copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
       end
 
