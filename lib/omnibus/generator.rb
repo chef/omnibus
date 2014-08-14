@@ -184,10 +184,7 @@ module Omnibus
     # @return [Hash]
     #
     def template_options
-      @template_options ||= {
-        name: name,
-        install_dir: "/opt/#{name}",
-      }
+      @template_options ||= { name: name }
     end
 
     #

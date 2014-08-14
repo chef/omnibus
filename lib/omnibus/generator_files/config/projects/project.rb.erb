@@ -8,17 +8,20 @@ name "<%= config[:name] %>"
 maintainer "CHANGE ME"
 homepage "https://CHANGE-ME.com"
 
-install_dir "<%= config[:install_dir] %>"
+# Defaults to C:/<%= config[:name] %> on Windows
+# and /opt/<%= config[:name] %> on all other platforms
+install_dir "#{default_root}/#{name}"
+
 build_version Omnibus::BuildVersion.semver
 build_iteration 1
 
-# creates required build directories
+# Creates required build directories
 dependency "preparation"
 
 # <%= config[:name] %> dependencies/components
 # dependency "somedep"
 
-# version manifest file
+# Version manifest file
 dependency "version-manifest"
 
 exclude "**/.git"
