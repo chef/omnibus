@@ -770,22 +770,6 @@ module Omnibus
       self.name <=> other.name
     end
 
-    # Defines the iteration for the package to be generated.  Adheres
-    # to the conventions of the platform for which the package is
-    # being built.
-    #
-    # @deprecated Use +build_iteration+ instead.
-    #
-    # @return [String] build_iteration
-    #
-    def iteration
-      log.deprecated(log_key) do
-        "iteration (DSL). Please use build_iteration instead."
-      end
-
-      build_iteration
-    end
-
     #
     #
     #

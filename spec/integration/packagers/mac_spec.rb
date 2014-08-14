@@ -47,8 +47,8 @@ module Omnibus
 
       # There is a tiny bit of hard-coding here, but I don't see a better
       # solution for generating the package name
-      pkg = "#{root}/tmp/#{project.name}-#{project.build_version}-#{project.iteration}.pkg"
-      dmg = "#{root}/tmp/#{project.name}-#{project.build_version}-#{project.iteration}.dmg"
+      pkg = "#{root}/tmp/#{project.name}-#{project.build_version}-#{project.build_iteration}.pkg"
+      dmg = "#{root}/tmp/#{project.name}-#{project.build_version}-#{project.build_iteration}.dmg"
 
       expect(pkg).to be_a_file
       expect(dmg).to be_a_file
