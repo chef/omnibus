@@ -15,8 +15,7 @@
       Define the minimum supported installer version (2.0).
       The install should be done for the whole machine not just the current user
     -->
-    <Package InstallerVersion="200" InstallPrivileges="elevated"
-             Compressed="yes" InstallScope="perMachine" />
+    <Package InstallerVersion="200" InstallPrivileges="elevated" Compressed="yes" InstallScope="perMachine" />
 
     <Media Id="1" Cabinet="Project.cab" EmbedCab="yes" CompressionLevel="high" />
 
@@ -45,9 +44,7 @@
       <ComponentGroupRef Id="ProjectDir" />
     </Feature>
 
-    <!--
-      UI Stuff
-    -->
+    <!-- UI Stuff -->
     <Icon Id="project.ico" SourceFile="Resources\assets\project_16x16.ico"/>
     <Property Id="ARPPRODUCTICON" Value="project.ico" />
     <Property Id="ARPHELPLINK" Value="http://www.getchef.com/" />
@@ -69,6 +66,5 @@
     <WixVariable Id="WixUIInfoIco" Value="Resources\assets\project_32x32.ico" />
     <WixVariable Id="WixUINewIco" Value="Resources\assets\project_16x16.ico" />
     <WixVariable Id="WixUIUpIco" Value="Resources\assets\project_16x16.ico" />
-
   </Product>
 </Wix>
