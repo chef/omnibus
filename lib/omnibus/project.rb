@@ -598,6 +598,19 @@ module Omnibus
     expose :extra_package_file
 
     #
+    # A proxy method to the underlying Ohai system.
+    #
+    # @example
+    #   ohai['platform_family']
+    #
+    # @return [Ohai]
+    #
+    def ohai
+      Ohai
+    end
+    expose :ohai
+
+    #
     # @!endgroup
     # --------------------------------------------------
 

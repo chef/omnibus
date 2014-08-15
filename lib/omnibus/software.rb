@@ -549,6 +549,19 @@ module Omnibus
     expose :prepend_path
 
     #
+    # A proxy method to the underlying Ohai system.
+    #
+    # @example
+    #   ohai['platform_family']
+    #
+    # @return [Ohai]
+    #
+    def ohai
+      Ohai
+    end
+    expose :ohai
+
+    #
     # @!endgroup
     # --------------------------------------------------
 

@@ -236,6 +236,18 @@ module Omnibus
       end
     end
 
+    describe '#ohai' do
+      before { stub_ohai(platform: 'ubuntu', version: '12.04') }
+
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:ohai)
+      end
+
+      it 'delegates to the Ohai class' do
+        expect(subject.ohai).to be(Ohai)
+      end
+    end
+
     describe '#<=>' do
       let(:zlib)   { described_class.new(project).tap { |s| s.name('zlib') } }
       let(:erchef) { described_class.new(project).tap { |s| s.name('erchef') } }

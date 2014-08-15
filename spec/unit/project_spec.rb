@@ -214,6 +214,30 @@ module Omnibus
       end
     end
 
+    describe '#ohai' do
+      before { stub_ohai(platform: 'ubuntu', version: '12.04') }
+
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:ohai)
+      end
+
+      it 'delegates to the Ohai class' do
+        expect(subject.ohai).to be(Ohai)
+      end
+    end
+
+    describe '#packager' do
+      it 'returns a packager object' do
+        expect(subject.packager).to be_a(Packager::Base)
+      end
+
+      it 'calls Packager#for_current_system' do
+        expect(Packager).to receive(:for_current_system)
+          .and_call_original
+        subject.packager
+      end
+    end
+
     describe '#package' do
       it 'raises an exception when a block is not given' do
         expect { subject.package(:foo) }.to raise_error(InvalidValue)
