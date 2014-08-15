@@ -83,7 +83,7 @@ s3_bucket      ENV['S3_BUCKET']
 
 For more information, please see the [`Config` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Config).
 
-You can tell Omnibus to load a difference configuration file by passing the `--config` option to any command:
+You can tell Omnibus to load a different configuration file by passing the `--config` option to any command:
 
 ```shell
 $ bin/omnibus --config /path/to/config.rb
