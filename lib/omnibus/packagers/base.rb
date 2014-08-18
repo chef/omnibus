@@ -15,7 +15,6 @@
 #
 
 require 'fileutils'
-require 'forwardable'
 
 module Omnibus
   class Packager::Base
