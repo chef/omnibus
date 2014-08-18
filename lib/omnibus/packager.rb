@@ -59,14 +59,14 @@ module Omnibus
       family = Ohai['platform_family']
 
       if klass = PLATFORM_PACKAGER_MAP[family]
-        @packager = klass
+        klass
       else
         log.warn(log_key) do
           "Could not determine packager for `#{family}', defaulting " \
           "to `makeself'!"
         end
 
-        @packager = Makeself
+        Makeself
       end
     end
     module_function :for_current_system
