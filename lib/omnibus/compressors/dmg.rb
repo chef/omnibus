@@ -18,8 +18,6 @@ module Omnibus
   class Compressor::DMG < Compressor::Base
     id :dmg
 
-    attr_reader :packager
-
     setup do
       # Clean any previously mounted disks
       clean_disks
