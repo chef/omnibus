@@ -102,5 +102,68 @@ module Omnibus
         path
       end
     end
+
+    #
+    # Create a directory at the given +path+.
+    #
+    # @param [String, Array<String>] paths
+    #   the path or list of paths to join to create
+    #
+    # @return [String]
+    #   the path to the created directory
+    #
+    def create_directory(*paths)
+      path = File.join(*paths)
+      Omnibus.logger.debug("Creating directory `#{path}'")
+      FileUtils.mkdir_p(path)
+      path
+    end
+
+    #
+    # Remove the directory at the given +path+.
+    #
+    # @param [String, Array<String>] paths
+    #   the path or list of paths to join to delete
+    #
+    # @return [String]
+    #   the path to the removed directory
+    #
+    def remove_directory(*paths)
+      path = File.join(*paths)
+      Omnibus.logger.debug("Remove directory `#{path}'")
+      FileUtils.rm_rf(path)
+      path
+    end
+
+    #
+    # Copy the +source+ file to the +destination+.
+    #
+    # @param [String] source
+    # @param [String] destination
+    #
+    # @return [String]
+    #   the destination path
+    #
+    def copy_file(source, destination)
+      Omnibus.logger.debug("Copying `#{source}' to `#{destination}'")
+      FileUtils.cp(source, destination)
+      destination
+    end
+
+    #
+    # Remove the file at the given path.
+    #
+    # @param [String, Array<String>] paths
+    #   the path or list of paths to join to delete
+    #
+    # @return [String]
+    #   the path to the removed file
+    #
+    def remove_file(*paths)
+      path = File.join(*paths)
+      Omnibus.logger.debug("Removing file `#{path}'")
+      FileUtils.rm_f(path)
+      path
+    end
   end
 end
