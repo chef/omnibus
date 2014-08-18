@@ -128,7 +128,7 @@ module Omnibus
       instance_eval(&self.class.build) if self.class.build
 
       # Render the metadata
-      render_metadata!
+      Metadata.generate(package_path, project)
 
       # Ensure the temporary directory is removed at the end of a successful
       # run. Without removal, successful builds will "leak" in /tmp and cause
@@ -203,38 +203,6 @@ module Omnibus
     #
     def resources_path
       File.expand_path("#{project.resources_path}/#{id}")
-    end
-
-    #
-    # @!endgroup
-    # --------------------------------------------------
-
-    #
-    # @!group Metadata methods
-    # --------------------------------------------------
-
-    #
-    # Render the +metadata.json+ file inside the package directory. This method
-    # is valled after the package has been built.
-    #
-    # @return [void]
-    #
-    def render_metadata!
-      path = File.join(Config.package_dir, package_name)
-
-      # If the package does not exist, something went wrong, and we should not
-      # proceed any further.
-      unless File.exist?(path)
-        raise NoPackageFile.new(path)
-      end
-
-      Package::Metadata.generate(Package.new(path),
-        name:             project.name,
-        friendly_name:    project.friendly_name,
-        homepage:         project.homepage,
-        version:          project.build_version,
-        iteration:        project.build_iteration,
-      )
     end
 
     #

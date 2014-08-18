@@ -67,7 +67,7 @@ module Omnibus
       before do
         allow(subject).to receive(:purge_directory)
         allow(subject).to receive(:remove_directory)
-        allow(subject).to receive(:render_metadata!)
+        allow(Metadata).to receive(:generate)
 
         allow(described_class).to receive(:setup).and_return(proc {})
         allow(described_class).to receive(:build).and_return(proc {})
@@ -125,51 +125,6 @@ module Omnibus
 
       it 'returns the path with the id' do
         expect(subject.resources_path).to eq("#{resources_path}/#{id}")
-      end
-    end
-
-    describe '#render_metadata!' do
-      let(:package)      { double(Package) }
-      let(:package_name) { 'project-1.2.3.base' }
-      let(:package_path) { File.join(Config.package_dir, package_name) }
-
-      before do
-        allow(Package).to receive(:new)
-          .and_return(package)
-
-        allow(Package::Metadata).to receive(:generate)
-
-        allow(subject).to receive(:package_name)
-          .and_return(package_name)
-      end
-
-      context 'when the file does not exist' do
-        it 'raises an exception' do
-          expect {
-            subject.render_metadata!
-          }.to raise_error(NoPackageFile)
-        end
-      end
-
-      context 'when the file exists' do
-        before do
-          create_file(package_path)
-        end
-
-        it 'delegates to the Package::Metadata class' do
-          expect(Package::Metadata).to receive(:generate).with(
-            package,
-            {
-              name:          project.name,
-              friendly_name: project.friendly_name,
-              homepage:      project.homepage,
-              version:       project.build_version,
-              iteration:     project.build_iteration,
-            }
-          )
-
-          subject.render_metadata!
-        end
       end
     end
   end
