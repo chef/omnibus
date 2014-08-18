@@ -47,20 +47,12 @@ module Omnibus
 
       # The commands/steps use to setup the filesystem.
       def setup(&block)
-        if block
-          @setup = block
-        else
-          @setup
-        end
+        block ? @setup = block : @setup
       end
 
       # The commands/steps to build the package.
       def build(&block)
-        if block
-          @build = block
-        else
-          @build
-        end
+        block ? @build = block : @build
       end
     end
 
