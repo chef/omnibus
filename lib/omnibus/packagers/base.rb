@@ -25,7 +25,7 @@ module Omnibus
     include Templating
     include Util
 
-    # The Omnibus::Project instance that we're packaging.
+    # The {Project} instance that we are packaging
     attr_reader :project
 
     class << self
@@ -79,8 +79,8 @@ module Omnibus
     end
 
     #
-    # The ending name of this package on disk. +Omnibus::Project+ uses this to
-    # generate metadata about the package after it is built.
+    # The ending name of this package on disk. This method is used to generate
+    # metadata about the package after it is built.
     #
     # @abstract
     #
@@ -112,8 +112,8 @@ module Omnibus
     #   - build
     #
     def run!
-      # Ensure the package directory exists and is purged
-      purge_directory(package_dir)
+      # Ensure the package directory exists
+      create_directory(Config.package_dir)
 
       # Run the setup and build sequences
       instance_eval(&self.class.setup) if self.class.setup
@@ -133,15 +133,14 @@ module Omnibus
     end
 
     #
-    # The path where the final packages will live on disk.
-    #
-    # @see {Config#package_dir}
-    # @see {Config#project_root}
+    # The path to the rendered package on disk. This is calculated by
+    # combining the {Config#package_dir} with the name of the package, as
+    # calculated by one of the subclasses.
     #
     # @return [String]
     #
-    def package_dir
-      File.expand_path(Config.package_dir, Config.project_root)
+    def package_path
+      File.join(Config.package_dir, package_name)
     end
 
     #
