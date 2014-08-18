@@ -138,7 +138,7 @@ module Omnibus
     # @return [void]
     #
     def build_component_pkg
-      execute <<-EOH.gsub(/^ {8}/, '')
+      command = <<-EOH.gsub(/^ {8}/, '')
         pkgbuild \\
           --identifier "#{safe_identifier}" \\
           --version "#{safe_version}" \\
@@ -147,6 +147,10 @@ module Omnibus
           --install-location "#{project.install_dir}" \\
           "#{component_pkg}"
       EOH
+
+      Dir.chdir(staging_dir) do
+        shellout!(command)
+      end
     end
 
     #
@@ -189,7 +193,9 @@ module Omnibus
       command << %Q(  "#{final_pkg}")
       command << %Q(\n)
 
-      execute(command)
+      Dir.chdir(staging_dir) do
+        shellout!(command)
+      end
     end
 
     #
