@@ -386,6 +386,35 @@ module Omnibus
     expose :package
 
     #
+    # Add or override a customization for the compressor with the given +id+.
+    # When given multiple blocks with the same +id+, they are evaluated
+    # _in order_, so the last block evaluated will take precedence over the
+    # previous ones.
+    #
+    # @example With customization
+    #   compress :dmg do
+    #     window_bounds '10, 20, 30, 40'
+    #   end
+    #
+    # @example Without customization
+    #   compress :tgz
+    #
+    # If multiple +compress+ blocks are specified, the "most prefered" one for
+    # the current system will be used.
+    #
+    # @param [Symbol] id
+    #   the id of the compressor to customize
+    #
+    def compress(id, &block)
+      if block
+        compressors[id] << block
+      else
+        compressors[id] << Proc.new {}
+      end
+    end
+    expose :compress
+
+    #
     # Set or retrieve the user the package should install as. This varies with
     # operating system, and may be ignored if the underlying packager does not
     # support it.
@@ -749,6 +778,30 @@ module Omnibus
     end
 
     #
+    # The list of compressors, in the following format:
+    #
+    #     {
+    #       id: [#<Proc:0x001>, #<Proc:0x002>],
+    #       # ...
+    #     }
+    #
+    # @return [Hash<Symbol, Array<Proc>>]
+    #   the compressor blocks, indexed by key
+    #
+    def compressors
+      @compressors ||= Hash.new { |h, k| h[k] = [] }
+    end
+
+    #
+    # Instantiate a new instance of the best compressor for this system.
+    #
+    # @return [~Compressor::Base]
+    #
+    def compressor
+      @compressor ||= Compressor.for_current_system(compressors.keys).new(self)
+    end
+
+    #
     # The DSL for this build version.
     #
     # @return [BuildVersionDSL]
@@ -834,6 +887,9 @@ module Omnibus
 
       # Package
       package_me
+
+      # Compress
+      compress_me
     end
 
     #
@@ -857,6 +913,31 @@ module Omnibus
 
       # Copy the generated package and metadata back into the workspace
       package_path = File.join(Config.package_dir, packager.package_name)
+      FileUtils.cp(package_path, destination)
+      FileUtils.cp("#{package_path}.metadata.json", destination)
+    end
+
+    #
+    #
+    #
+    def compress_me
+      destination = File.expand_path('pkg', Config.project_root)
+
+      # Create the destination directory
+      unless File.directory?(destination)
+        FileUtils.mkdir_p(destination)
+      end
+
+      # Evaluate any compressor-specific blocks, in order.
+      compressors[compressor.id].each do |block|
+        compressor.evaluate(&block)
+      end
+
+      # Run the actual compressor
+      compressor.run!
+
+      # Copy the generated package and metadata back into the workspace
+      package_path = File.join(Config.package_dir, compressor.package_name)
       FileUtils.cp(package_path, destination)
       FileUtils.cp("#{package_path}.metadata.json", destination)
     end
