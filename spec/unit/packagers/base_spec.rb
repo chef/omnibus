@@ -22,12 +22,20 @@ module Omnibus
 
     subject { described_class.new(project) }
 
+    it 'includes Cleanroom' do
+      expect(subject).to be_a(Cleanroom)
+    end
+
     it 'includes Digestable' do
       expect(subject).to be_a(Digestable)
     end
 
     it 'includes Logging' do
       expect(subject).to be_a(Logging)
+    end
+
+    it 'includes NullArgumentable' do
+      expect(subject).to be_a(NullArgumentable)
     end
 
     it 'includes Templating' do
@@ -65,12 +73,13 @@ module Omnibus
 
     describe '#run!' do
       before do
-        allow(subject).to receive(:purge_directory)
         allow(subject).to receive(:remove_directory)
         allow(Metadata).to receive(:generate)
 
         allow(described_class).to receive(:setup).and_return(proc {})
         allow(described_class).to receive(:build).and_return(proc {})
+
+        allow(subject).to receive(:package_name).and_return('foo')
       end
 
       it 'calls the methods in order' do
