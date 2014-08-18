@@ -16,7 +16,7 @@ module Omnibus
     end
 
     let(:metadata) do
-      Package::Metadata.new(package,
+      Metadata.new(package,
         name: 'chef',
         friendly_name: 'Chef',
         homepage: 'https://www.getchef.com',

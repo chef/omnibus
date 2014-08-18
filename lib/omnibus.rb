@@ -47,6 +47,7 @@ module Omnibus
   autoload :Library,          'omnibus/library'
   autoload :Logger,           'omnibus/logger'
   autoload :Logging,          'omnibus/logging'
+  autoload :Metadata,         'omnibus/metadata'
   autoload :NullArgumentable, 'omnibus/null_argumentable'
   autoload :Ohai,             'omnibus/ohai'
   autoload :Package,          'omnibus/package'
