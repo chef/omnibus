@@ -1,0 +1,17 @@
+tell application "Finder"
+  tell disk "<%= volume_name %>"
+    open
+    set current view of container window to icon view
+    set toolbar visible of container window to false
+    set statusbar visible of container window to false
+    set the bounds of container window to {<%= window_bounds %>}
+    set theViewOptions to the icon view options of container window
+    set arrangement of theViewOptions to not arranged
+    set icon size of theViewOptions to 72
+    set background picture of theViewOptions to file ".support:background.png"
+    delay 5
+    set position of item "<%= pkg_name %>" of container window to {<%= pkg_position %>}
+    update without registering applications
+    delay 5
+  end tell
+end tell

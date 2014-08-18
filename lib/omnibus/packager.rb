@@ -27,9 +27,6 @@ module Omnibus
     autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :RPM,      'omnibus/packagers/rpm'
 
-    # TODO - this is really a "compressor"
-    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
-
     #
     # The list of Ohai platform families mapped to the respective packager
     # class.
