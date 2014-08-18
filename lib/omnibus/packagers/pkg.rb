@@ -115,7 +115,7 @@ module Omnibus
     # @return [String]
     #
     def final_pkg
-      File.expand_path("#{package_dir}/#{package_name}")
+      File.expand_path("#{Config.package_dir}/#{package_name}")
     end
 
     #

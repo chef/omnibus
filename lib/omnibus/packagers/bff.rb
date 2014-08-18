@@ -82,7 +82,7 @@ module Omnibus
 
       # Copy the resulting package up to the package_dir
       FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
-        copy_file(bff, package_dir)
+        copy_file(bff, Config.package_dir)
       end
     end
 
