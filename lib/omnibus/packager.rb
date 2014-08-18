@@ -16,6 +16,8 @@
 
 module Omnibus
   module Packager
+    include Logging
+
     autoload :Base,     'omnibus/packagers/base'
     autoload :BFF,      'omnibus/packagers/bff'
     autoload :DEB,      'omnibus/packagers/deb'
