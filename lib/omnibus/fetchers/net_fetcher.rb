@@ -218,8 +218,19 @@ module Omnibus
         compression_switch = 'j' if downloaded_file.end_with?('bz2')
         compression_switch = 'J' if downloaded_file.end_with?('xz')
         compression_switch = ''  if downloaded_file.end_with?('tar')
-        "tar #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
+
+        "#{tar} #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
       end
+    end
+
+    #
+    # Primitively determine whether we should use gtar or tar to untar a file.
+    # If gtar is present, we will use gtar (AIX). Otherwise, we fallback to tar.
+    #
+    # @return [String]
+    #
+    def tar
+      Omnibus.which('gtar') ? 'gtar' : 'tar'
     end
 
     #

@@ -200,6 +200,29 @@ module Omnibus
         it_behaves_like 'an extractor', 'txz',     'tar Jxf /file.txz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf /file.tar.xz -C/tmp/out'
       end
+
+      context 'when gtar is present' do
+        before do
+          Config.cache_dir('/')
+
+          stub_ohai(platform: 'ubuntu', version: '12.04')
+          stub_const('File::ALT_SEPARATOR', nil)
+
+          allow(Omnibus).to receive(:which)
+            .with('gtar')
+            .and_return('/path/to/gtar')
+        end
+
+        it_behaves_like 'an extractor', '7z',      '7z x /file.7z -o/tmp/out -r -y'
+        it_behaves_like 'an extractor', 'zip',     'unzip /file.zip -d /tmp/out'
+        it_behaves_like 'an extractor', 'tar',     'gtar xf /file.tar -C/tmp/out'
+        it_behaves_like 'an extractor', 'tgz',     'gtar zxf /file.tgz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.gz',  'gtar zxf /file.tar.gz -C/tmp/out'
+        it_behaves_like 'an extractor', 'bz2',     'gtar jxf /file.bz2 -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.bz2', 'gtar jxf /file.tar.bz2 -C/tmp/out'
+        it_behaves_like 'an extractor', 'txz',     'gtar Jxf /file.txz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.xz',  'gtar Jxf /file.tar.xz -C/tmp/out'
+      end
     end
   end
 end
