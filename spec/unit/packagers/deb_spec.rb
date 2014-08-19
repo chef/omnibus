@@ -28,6 +28,62 @@ module Omnibus
       create_directory("#{staging_dir}/DEBIAN")
     end
 
+    describe '#vendor' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:vendor)
+      end
+
+      it 'has a default value' do
+        expect(subject.vendor).to eq('Omnibus <omnibus@getchef.com>')
+      end
+
+      it 'must be a string' do
+        expect { subject.vendor(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe '#license' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:license)
+      end
+
+      it 'has a default value' do
+        expect(subject.license).to eq('unknown')
+      end
+
+      it 'must be a string' do
+        expect { subject.license(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe '#priority' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:priority)
+      end
+
+      it 'has a default value' do
+        expect(subject.priority).to eq('extra')
+      end
+
+      it 'must be a string' do
+        expect { subject.priority(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe '#section' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:section)
+      end
+
+      it 'has a default value' do
+        expect(subject.section).to eq('misc')
+      end
+
+      it 'must be a string' do
+        expect { subject.section(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
     describe '#id' do
       it 'is :deb' do
         expect(subject.id).to eq(:deb)

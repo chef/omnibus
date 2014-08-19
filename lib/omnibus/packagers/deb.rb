@@ -63,6 +63,114 @@ module Omnibus
     end
 
     #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Set or return the vendor who made this package.
+    #
+    # @example
+    #   vendor "Seth Vargo <sethvargo@gmail.com>"
+    #
+    # @param [String] val
+    #   the vendor who make this package
+    #
+    # @return [String]
+    #   the vendor who make this package
+    #
+    def vendor(val = NULL)
+      if null?(val)
+        @vendor || 'Omnibus <omnibus@getchef.com>'
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:vendor, 'be a String')
+        end
+
+        @vendor = val
+      end
+    end
+    expose :vendor
+
+    #
+    # Set or return the license for this package.
+    #
+    # @example
+    #   license "Apache 2.0"
+    #
+    # @param [String] val
+    #   the license for this package
+    #
+    # @return [String]
+    #   the license for this package
+    #
+    def license(val = NULL)
+      if null?(val)
+        @license || 'unknown'
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:license, 'be a String')
+        end
+
+        @license = val
+      end
+    end
+    expose :license
+
+    #
+    # Set or return the priority for this package.
+    #
+    # @example
+    #   priority "extra"
+    #
+    # @param [String] val
+    #   the priority for this package
+    #
+    # @return [String]
+    #   the priority for this package
+    #
+    def priority(val = NULL)
+      if null?(val)
+        @priority || 'extra'
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:priority, 'be a String')
+        end
+
+        @priority = val
+      end
+    end
+    expose :priority
+
+    #
+    # Set or return the section for this package.
+    #
+    # @example
+    #   section "databases"
+    #
+    # @param [String] val
+    #   the section for this package
+    #
+    # @return [String]
+    #   the section for this package
+    #
+    def section(val = NULL)
+      if null?(val)
+        @section || 'misc'
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:section, 'be a String')
+        end
+
+        @section = val
+      end
+    end
+    expose :section
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
     # The name of the package to create. Note, this does **not** include the
     # extension.
     #
@@ -95,15 +203,15 @@ module Omnibus
           name:           safe_project_name,
           version:        safe_version,
           iteration:      safe_build_iteration,
-          vendor:         'Omnibus <omnibus@getchef.com>', # TODO: make this configurable
-          license:        'unknown', # TODO: make this configurable
+          vendor:         vendor,
+          license:        license,
           architecture:   safe_architecture,
           maintainer:     project.maintainer,
           installed_size: package_size,
           homepage:       project.homepage,
           description:    project.description,
-          priority:       'extra', # TODO: make this configurable
-          section:        'misc', # TODO: make this configurable
+          priority:       priority,
+          section:        section,
           conflicts:      project.conflicts,
           replaces:       project.replaces,
           dependencies:   project.runtime_dependencies,
