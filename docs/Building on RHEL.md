@@ -1,5 +1,5 @@
-Building RPMs with Omnibus
-==========================
+Building Omnibus Packages for RHEL
+==================================
 This document details the steps and configurables for building RPM packages with Omnibus.
 
 
