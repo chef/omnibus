@@ -187,6 +187,7 @@ module Omnibus
         before do
           Config.cache_dir('/')
           stub_ohai(platform: 'ubuntu', version: '12.04')
+          stub_const('File::ALT_SEPARATOR', nil)
         end
 
         it_behaves_like 'an extractor', '7z',      '7z x /file.7z -o/tmp/out -r -y'
