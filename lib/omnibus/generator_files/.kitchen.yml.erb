@@ -10,6 +10,8 @@ provisioner:
   require_chef_omnibus: 11.8.0
 
 platforms:
+  - name: ubuntu-14.04
+    run_list: apt::default
   - name: ubuntu-12.04
     run_list: apt::default
   - name: ubuntu-11.04
