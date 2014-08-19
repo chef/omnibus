@@ -32,9 +32,70 @@ module Omnibus
       create_directory("#{staging_dir}/SPECS")
     end
 
-    describe 'DSL' do
-      it 'exposes :signing_passphrase' do
+    describe '#signing_passphrase' do
+      it 'is a DSL method' do
         expect(subject).to have_exposed_method(:signing_passphrase)
+      end
+
+      it 'has a no default value' do
+        expect(subject.signing_passphrase).to be(nil)
+      end
+    end
+
+
+    describe '#vendor' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:vendor)
+      end
+
+      it 'has a default value' do
+        expect(subject.vendor).to eq('Omnibus <omnibus@getchef.com>')
+      end
+
+      it 'must be a string' do
+        expect { subject.vendor(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe '#license' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:license)
+      end
+
+      it 'has a default value' do
+        expect(subject.license).to eq('unknown')
+      end
+
+      it 'must be a string' do
+        expect { subject.license(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe '#priority' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:priority)
+      end
+
+      it 'has a default value' do
+        expect(subject.priority).to eq('extra')
+      end
+
+      it 'must be a string' do
+        expect { subject.priority(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe '#category' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:category)
+      end
+
+      it 'has a default value' do
+        expect(subject.category).to eq('default')
+      end
+
+      it 'must be a string' do
+        expect { subject.category(Object.new) }.to raise_error(InvalidValue)
       end
     end
 
