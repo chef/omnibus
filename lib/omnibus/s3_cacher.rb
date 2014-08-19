@@ -122,11 +122,15 @@ module Omnibus
 
     def bucket
       @bucket ||= begin
-        b = UberS3::Bucket.new(@client, @client.bucket)
-        # creating the bucket is idempotent, make sure it's created:
-        @client.connection.put('/')
-        b
+        if @client.exists?('/')
+          @client.bucket
+        else
+          b = UberS3::Bucket.new(@client, @client.bucket)
+          @client.connection.put('/')
+          b
+        end
       end
     end
+
   end
 end
