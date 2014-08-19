@@ -87,6 +87,42 @@ module Omnibus
     expose :command
 
     #
+    # Execute the given make command. When present, this method will prefer the
+    # use of +gmake+ over +make+. If applicable, this method will also set
+    # the `MAKE=gmake` environment variable when gmake is to be preferred.
+    #
+    # @example With no arguments
+    #   make
+    #
+    # @example With arguments
+    #   make 'install'
+    #
+    # @example With custom make bin
+    #   make 'install', bin: '/path/to/custom/make'
+    #
+    # @param (see #command)
+    # @return (see #command)
+    #
+    def make(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      command = args.join(' ')
+
+      make = if makebin = options.delete(:bin)
+               makebin
+             elsif Omnibus.which('gmake')
+               env = options.delete(:env) || {}
+               env = { 'MAKE' => 'gmake' }.merge(env)
+               options[:env] = env
+               'gmake'
+             else
+               'make'
+             end
+
+      command("#{make} #{command}".strip, options)
+    end
+    expose :make
+
+    #
     # Apply the patch by the given name. This method will search all possible
     # locations for a patch (such as {Config#software_gems}).
     #
