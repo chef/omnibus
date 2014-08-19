@@ -26,6 +26,12 @@ module Omnibus
       end
     end
 
+    describe '#make' do
+      it 'is waiting for a good samaritan to write tests' do
+        skip
+      end
+    end
+
     describe '#patch' do
       it 'applies the patch' do
         configure = File.join(project_dir, 'configure')
