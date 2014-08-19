@@ -58,6 +58,7 @@ module Omnibus
         shellout! <<-EOH.split.join(' ').squeeze(' ').strip
           candle.exe
             -nologo
+            #{wix_extension_switches(wix_candle_extensions)}
             -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
             "#{windows_safe_path(staging_dir, 'source.wxs')}"
         EOH
@@ -68,6 +69,7 @@ module Omnibus
           light.exe
             -nologo
             -ext WixUIExtension
+            #{wix_extension_switches(wix_light_extensions)}
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
             project-files.wixobj source.wixobj
@@ -131,6 +133,48 @@ module Omnibus
       end
     end
     expose :parameters
+
+    #
+    # Set the wix light extensions to load
+    #
+    # @example
+    #   wix_light_extension 'WixUtilExtension'
+    #
+    # @param [String] extension
+    #   A list of extensions to load
+    #
+    # @return [Array]
+    #   The list of extensions that will be loaded
+    #
+    def wix_light_extension(extension)
+      unless extension.is_a?(String)
+        raise InvalidValue.new(:wix_light_extension, 'be an String')
+      end
+
+      wix_light_extensions << extension
+    end
+    expose :wix_light_extension
+
+    #
+    # Set the wix candle extensions to load
+    #
+    # @example
+    #   wix_candle_extension 'WixUtilExtension'
+    #
+    # @param [String] extension
+    #   A list of extensions to load
+    #
+    # @return [Array]
+    #   The list of extensions that will be loaded
+    #
+    def wix_candle_extension(extension)
+      unless extension.is_a?(String)
+        raise InvalidValue.new(:wix_candle_extension, 'be an String')
+      end
+
+      wix_candle_extensions << extension
+    end
+    expose :wix_candle_extension
 
     #
     # @!endgroup
@@ -264,6 +308,39 @@ module Omnibus
     def msi_display_version
       versions = project.build_version.split(/[.+-]/)
       "#{versions[0]}.#{versions[1]}.#{versions[2]}"
+    end
+
+    #
+    # Returns the extensions to use for light
+    #
+    # @return [Array]
+    #   the extensions that will be loaded for light
+    #
+    def wix_light_extensions
+      @wix_light_extensions ||= []
+    end
+
+    #
+    # Returns the extensions to use for candle
+    #
+    # @return [Array]
+    #   the extensions that will be loaded for candle
+    #
+    def wix_candle_extensions
+      @wix_candle_extensions ||= []
+    end
+
+    #
+    # Takes an array of wix extension names and creates a string
+    # that can be passed to wix to load those.
+    #
+    # for example,
+    # ['a', 'b'] => "-ext 'a' -ext 'b'"
+    #
+    # @return [String]
+    #
+    def wix_extension_switches(arr)
+      "#{arr.map {|e| "-ext '#{e}'"}.join(' ')}"
     end
   end
 end

@@ -199,5 +199,69 @@ module Omnibus
         end
       end
     end
+
+    describe '#wix_candle_extensions' do
+      it 'defaults to an empty Array' do
+        expect(subject.wix_candle_extensions).to be_an(Array)
+        expect(subject.wix_candle_extensions).to be_empty
+      end
+    end
+
+    describe '#wix_light_extensions' do
+      it 'defaults to an empty Array' do
+        expect(subject.wix_light_extensions).to be_an(Array)
+        expect(subject.wix_light_extensions).to be_empty
+      end
+    end
+
+    describe '#wix_candle_extension' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:wix_candle_extension)
+      end
+
+      it 'requires the value to be an String' do
+        expect {
+          subject.wix_candle_extension(Object.new)
+        }.to raise_error(InvalidValue)
+      end
+
+      it 'returns the given value' do
+        extensions = ['a']
+        subject.wix_candle_extension(extensions[0])
+        expect(subject.wix_candle_extensions).to match_array(extensions)
+      end
+    end
+
+    describe '#wix_light_extension' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:wix_light_extension)
+      end
+
+      it 'requires the value to be an String' do
+        expect {
+          subject.wix_light_extension(Object.new)
+        }.to raise_error(InvalidValue)
+      end
+
+      it 'returns the given value' do
+        extensions = ['a']
+        subject.wix_light_extension(extensions[0])
+        expect(subject.wix_light_extensions).to match_array(extensions)
+      end
+    end
+
+    describe '#wix_extension_switches' do
+      it 'returns an empty string for an empty array' do
+        expect(subject.wix_extension_switches([])).to eq('')
+      end
+
+      it 'returns the correct value for one extension' do
+        expect(subject.wix_extension_switches(['a'])).to eq("-ext 'a'")
+      end
+
+      it 'returns the correct value for many extensions' do
+        expect(subject.wix_extension_switches(['a', 'b'])).to eq("-ext 'a' -ext 'b'")
+      end
+    end
   end
 end
