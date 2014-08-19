@@ -93,13 +93,11 @@ module Omnibus
 
       context 'when scripts are given' do
         before do
-          create_file("#{project_root}/package-scripts/project/pre")
-          create_file("#{project_root}/package-scripts/project/post")
-          create_file("#{project_root}/package-scripts/project/preun")
-          create_file("#{project_root}/package-scripts/project/postun")
-          create_file("#{project_root}/package-scripts/project/verifyscript")
-          create_file("#{project_root}/package-scripts/project/pretans")
-          create_file("#{project_root}/package-scripts/project/posttrans")
+          Packager::RPM::SCRIPTS.each do |name|
+            create_file("#{project_root}/package-scripts/project/#{name}") do
+              "Contents of #{name}"
+            end
+          end
         end
 
         it 'writes the scripts into the spec' do
@@ -107,19 +105,19 @@ module Omnibus
           contents = File.read(spec_file)
 
           expect(contents).to include("%pre")
-          expect(contents).to include("#{project_root}/package-scripts/project/pre")
+          expect(contents).to include("Contents of pre")
           expect(contents).to include("%post")
-          expect(contents).to include("#{project_root}/package-scripts/project/post")
+          expect(contents).to include("Contents of post")
           expect(contents).to include("%preun")
-          expect(contents).to include("#{project_root}/package-scripts/project/preun")
+          expect(contents).to include("Contents of preun")
           expect(contents).to include("%postun")
-          expect(contents).to include("#{project_root}/package-scripts/project/postun")
+          expect(contents).to include("Contents of postun")
           expect(contents).to include("%verifyscript")
-          expect(contents).to include("#{project_root}/package-scripts/project/verifyscript")
+          expect(contents).to include("Contents of verifyscript")
           expect(contents).to include("%pretans")
-          expect(contents).to include("#{project_root}/package-scripts/project/pretans")
+          expect(contents).to include("Contents of pretans")
           expect(contents).to include("%posttrans")
-          expect(contents).to include("#{project_root}/package-scripts/project/posttrans")
+          expect(contents).to include("Contents of posttrans")
         end
       end
 

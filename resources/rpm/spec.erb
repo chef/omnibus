@@ -53,9 +53,9 @@ Obsoletes: <%= name %>
 %clean
 # noop
 
-<% scripts.each do |script| -%>
-%<%= File.basename(script) %>
-<%= script %>
+<% scripts.each do |name, contents| -%>
+%<%= name %>
+<%= contents %>
 <% end -%>
 
 %files

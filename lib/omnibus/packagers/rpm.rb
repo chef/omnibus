@@ -18,6 +18,9 @@
 
 module Omnibus
   class Packager::RPM < Packager::Base
+    # @return [Array]
+    SCRIPTS = %w(pre post preun postun verifyscript pretans posttrans).freeze
+
     id :rpm
 
     setup do
@@ -112,10 +115,16 @@ module Omnibus
     # @return [void]
     #
     def write_rpm_spec
-      # Grab a list of all the scripts which exist and should be added
-      scripts = %w(pre post preun postun verifyscript pretans posttrans)
-                  .map    { |name| File.join(project.package_scripts_path, name) }
-                  .select { |path| File.file?(path) }
+      # Create a map of scripts that exist and their contents
+      scripts = SCRIPTS.inject({}) do |hash, name|
+        path = File.join(project.package_scripts_path, name)
+
+        if File.file?(path)
+          hash[name] = File.read(path)
+        end
+
+        hash
+      end
 
       # Get a list of user-declared config files
       config_files = project.config_files.map { |file| rpm_safe(file) }
