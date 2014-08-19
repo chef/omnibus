@@ -59,7 +59,7 @@ module Omnibus
 
     describe '#build_component_pkg' do
       it 'executes the pkgbuild command' do
-        expect(subject).to receive(:execute).with <<-EOH.gsub(/^ {10}/, '')
+        expect(subject).to receive(:shellout!).with <<-EOH.gsub(/^ {10}/, '')
           pkgbuild \\
             --identifier "com.getchef.project" \\
             --version "1.2.3" \\
@@ -92,7 +92,7 @@ module Omnibus
     describe '#build_product_pkg' do
       context 'when pkg signing is disabled' do
         it 'generates the distribution and runs productbuild' do
-          expect(subject).to receive(:execute).with <<-EOH.gsub(/^ {12}/, '')
+          expect(subject).to receive(:shellout!).with <<-EOH.gsub(/^ {12}/, '')
             productbuild \\
               --distribution "#{staging_dir}/Distribution" \\
               --resources "#{staging_dir}/Resources" \\
@@ -109,7 +109,7 @@ module Omnibus
         end
 
         it 'includes the signing parameters in the product build command' do
-          expect(subject).to receive(:execute).with  <<-EOH.gsub(/^ {12}/, '')
+          expect(subject).to receive(:shellout!).with  <<-EOH.gsub(/^ {12}/, '')
             productbuild \\
               --distribution "#{staging_dir}/Distribution" \\
               --resources "#{staging_dir}/Resources" \\

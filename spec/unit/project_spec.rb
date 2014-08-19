@@ -270,6 +270,67 @@ module Omnibus
       end
     end
 
+    describe '#compressor' do
+      it 'returns a compressor object' do
+        expect(subject.compressor).to be_a(Compressor::Base)
+      end
+
+      it 'calls Compressor#for_current_system' do
+        expect(Compressor).to receive(:for_current_system)
+          .and_call_original
+
+        subject.compressor
+      end
+
+      it 'passes in the current compressors' do
+        subject.compress(:dmg)
+        subject.compress(:tgz)
+
+        expect(Compressor).to receive(:for_current_system)
+          .with([:dmg, :tgz])
+          .and_call_original
+
+        subject.compressor
+      end
+    end
+
+    describe '#compress' do
+      it 'does not raises an exception when a block is not given' do
+        expect { subject.compress(:foo) }.to_not raise_error
+      end
+
+      it 'adds the compressor to the list' do
+        subject.compress(:foo)
+        expect(subject.compressors).to include(:foo)
+      end
+
+      it 'adds the block to the list' do
+        block = Proc.new {}
+        subject.compress(:foo, &block)
+
+        expect(subject.compressors[:foo]).to include(block)
+      end
+
+      it 'allows for multiple invocations, keeping order' do
+        block_1, block_2 = Proc.new {}, Proc.new {}
+        subject.compress(:foo, &block_1)
+        subject.compress(:foo, &block_2)
+
+        expect(subject.compressors[:foo]).to eq([block_1, block_2])
+      end
+    end
+
+    describe '#compressors' do
+      it 'returns a Hash' do
+        expect(subject.compressors).to be_a(Hash)
+      end
+
+      it 'has a default Hash value of an empty array' do
+        expect(subject.compressors[:foo]).to be_a(Array)
+        expect(subject.compressors[:bar]).to_not be(subject.compressors[:foo])
+      end
+    end
+
     describe '#shasum' do
       context 'when a filepath is given' do
         let(:path) { '/project.rb' }

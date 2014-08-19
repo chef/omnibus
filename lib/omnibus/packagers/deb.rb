@@ -286,7 +286,7 @@ module Omnibus
       log.info(log_key) { "Creating .deb file" }
 
       # Execute the build command
-      Dir.chdir(package_dir) do
+      Dir.chdir(Config.package_dir) do
         shellout!("fakeroot dpkg-deb -z9 -Zgzip -D --build #{staging_dir} #{package_name}")
       end
     end

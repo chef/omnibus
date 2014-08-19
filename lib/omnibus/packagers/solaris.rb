@@ -19,11 +19,14 @@ module Omnibus
     id :solaris
 
     setup do
-      purge_directory('/tmp/pkgmk')
+      remove_directory('/tmp/pkgmk')
+      create_directory('/tmp/pkgmk')
     end
 
     build do
-      execute("cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files")
+      Dir.chdir(staging_dir) do
+        shellout! "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
+      end
 
       write_prototype_content
 
@@ -32,9 +35,11 @@ module Omnibus
       copy_file("#{project.package_scripts_path}/postinst", '/tmp/pkgmk/postinstall')
       copy_file("#{project.package_scripts_path}/postrm", '/tmp/pkgmk/postremove')
 
-      execute("pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype")
-      execute("pkgchk -vd /tmp/pkgmk #{project.name}")
-      execute("pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.name}")
+      Dir.chdir(staging_dir) do
+        shellout! "pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"
+        shellout! "pkgchk -vd /tmp/pkgmk #{project.name}"
+        shellout! "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.name}"
+      end
     end
 
     # @see Base#package_name
@@ -69,11 +74,13 @@ module Omnibus
         f.write prototype_content
       end
 
-      # generate the prototype's file list
-      execute("cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files")
+      Dir.chdir(staging_dir) do
+        # generate the prototype's file list
+        shellout! "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
 
-      # fix up the user and group in the file list to root
-      execute("awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype")
+        # fix up the user and group in the file list to root
+        shellout! "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
+      end
     end
 
     #

@@ -22,12 +22,20 @@ module Omnibus
 
     subject { described_class.new(project) }
 
+    it 'includes Cleanroom' do
+      expect(subject).to be_a(Cleanroom)
+    end
+
     it 'includes Digestable' do
       expect(subject).to be_a(Digestable)
     end
 
     it 'includes Logging' do
       expect(subject).to be_a(Logging)
+    end
+
+    it 'includes NullArgumentable' do
+      expect(subject).to be_a(NullArgumentable)
     end
 
     it 'includes Templating' do
@@ -63,93 +71,15 @@ module Omnibus
       end
     end
 
-    describe '#create_directory' do
-      before { allow(FileUtils).to receive(:mkdir_p) }
-
-      it 'creates the directory' do
-        expect(FileUtils).to receive(:mkdir_p).with('/foo/bar')
-        subject.create_directory('/foo/bar')
-      end
-
-      it 'returns the path' do
-        expect(subject.create_directory('/foo/bar')).to eq('/foo/bar')
-      end
-    end
-
-    describe '#remove_directory' do
-      before { allow(FileUtils).to receive(:rm_rf) }
-
-      it 'remove the directory' do
-        expect(FileUtils).to receive(:rm_rf).with('/foo/bar')
-        subject.remove_directory('/foo/bar')
-      end
-    end
-
-    describe '#purge_directory' do
-      before do
-        allow(subject).to receive(:remove_directory)
-        allow(subject).to receive(:create_directory)
-      end
-
-      it 'removes and creates the directory' do
-        expect(subject).to receive(:remove_directory).with('/foo/bar')
-        expect(subject).to receive(:create_directory).with('/foo/bar')
-        subject.purge_directory('/foo/bar')
-      end
-    end
-
-    describe '#copy_file' do
-      before { allow(FileUtils).to receive(:cp) }
-
-      it 'copies the file' do
-        expect(FileUtils).to receive(:cp).with('foo', 'bar')
-        subject.copy_file('foo', 'bar')
-      end
-
-      it 'returns the destination path' do
-        expect(subject.copy_file('foo', 'bar')).to eq('bar')
-      end
-    end
-
-    describe '#copy_directory' do
-      before do
-        allow(FileUtils).to receive(:cp_r)
-        allow(FileSyncer).to receive(:glob).and_return(['baz/file'])
-      end
-
-      it 'copies the directory' do
-        expect(FileUtils).to receive(:cp_r).with(['baz/file'], 'bar')
-        subject.copy_directory('baz', 'bar')
-      end
-    end
-
-    describe '#remove_file' do
-      before { allow(FileUtils).to receive(:rm_f) }
-
-      it 'removes the file' do
-        expect(FileUtils).to receive(:rm_f).with('/foo/bar')
-        subject.remove_file('/foo/bar')
-      end
-    end
-
-    describe '#execute' do
-      before { allow(subject).to receive(:shellout!) }
-
-      it 'shellsout' do
-        expect(subject).to receive(:shellout!)
-          .with('echo "hello"', timeout: 3600, cwd: anything)
-        subject.execute('echo "hello"')
-      end
-    end
-
     describe '#run!' do
       before do
-        allow(subject).to receive(:purge_directory)
         allow(subject).to receive(:remove_directory)
-        allow(subject).to receive(:render_metadata!)
+        allow(Metadata).to receive(:generate)
 
         allow(described_class).to receive(:setup).and_return(proc {})
         allow(described_class).to receive(:build).and_return(proc {})
+
+        allow(subject).to receive(:package_name).and_return('foo')
       end
 
       it 'calls the methods in order' do
@@ -204,51 +134,6 @@ module Omnibus
 
       it 'returns the path with the id' do
         expect(subject.resources_path).to eq("#{resources_path}/#{id}")
-      end
-    end
-
-    describe '#render_metadata!' do
-      let(:package)      { double(Package) }
-      let(:package_name) { 'project-1.2.3.base' }
-      let(:package_path) { File.join(Config.package_dir, package_name) }
-
-      before do
-        allow(Package).to receive(:new)
-          .and_return(package)
-
-        allow(Package::Metadata).to receive(:generate)
-
-        allow(subject).to receive(:package_name)
-          .and_return(package_name)
-      end
-
-      context 'when the file does not exist' do
-        it 'raises an exception' do
-          expect {
-            subject.render_metadata!
-          }.to raise_error(NoPackageFile)
-        end
-      end
-
-      context 'when the file exists' do
-        before do
-          create_file(package_path)
-        end
-
-        it 'delegates to the Package::Metadata class' do
-          expect(Package::Metadata).to receive(:generate).with(
-            package,
-            {
-              name:          project.name,
-              friendly_name: project.friendly_name,
-              homepage:      project.homepage,
-              version:       project.build_version,
-              iteration:     project.build_iteration,
-            }
-          )
-
-          subject.render_metadata!
-        end
       end
     end
   end

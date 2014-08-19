@@ -16,6 +16,8 @@
 
 module Omnibus
   module Packager
+    include Logging
+
     autoload :Base,     'omnibus/packagers/base'
     autoload :BFF,      'omnibus/packagers/bff'
     autoload :DEB,      'omnibus/packagers/deb'
@@ -24,9 +26,6 @@ module Omnibus
     autoload :PKG,      'omnibus/packagers/pkg'
     autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :RPM,      'omnibus/packagers/rpm'
-
-    # TODO - this is really a "compressor"
-    autoload :MacDmg, 'omnibus/packagers/mac_dmg'
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -57,14 +56,14 @@ module Omnibus
       family = Ohai['platform_family']
 
       if klass = PLATFORM_PACKAGER_MAP[family]
-        @packager = klass
+        klass
       else
         log.warn(log_key) do
           "Could not determine packager for `#{family}', defaulting " \
           "to `makeself'!"
         end
 
-        @packager = Makeself
+        Makeself
       end
     end
     module_function :for_current_system

@@ -98,7 +98,7 @@ module Omnibus
       end
 
       FileSyncer.glob("#{staging_dir}/*.run").each do |makeself|
-        copy_file(makeself, package_dir)
+        copy_file(makeself, Config.package_dir)
       end
     end
 
