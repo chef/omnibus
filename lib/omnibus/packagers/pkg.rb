@@ -227,9 +227,6 @@ module Omnibus
     # This is a configurable project value, but a default value is calculated if
     # one is not given.
     #
-    # @todo Make this a packager DSL method and remove it from the top-level
-    #   project configuration.
-    #
     # @return [String]
     #
     def safe_identifier
