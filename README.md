@@ -54,7 +54,10 @@ Omnibus determines the platform for which to build an installer based on **the p
 
 More documentation
 ------------------
-If you are creating OSX packages, please see the [OSX-specific documentation](docs/Building on OSX.md).
+- [Building on OSX](docs/Building on OSX.md)
+- [Building on Windows](docs/Building on Windows.md)
+- [Building on RHEL](docs/Building on RHEL.md)
+- [Build Cache](docs/Build Cache.md)
 
 
 Configuration DSL
@@ -161,7 +164,33 @@ Some of the DSL methods available include:
 | `dependency`      | An Omnibus software-defined component that this software depends on |
 | `relative_path`   | The relative path of the extracted tarball |
 | `build`           | The build instructions                     |
-| `command`         | An individual build step                   |
+
+For more DSL methods, please consult the [`Software` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Software).
+
+Additionally, there are a number of DSL methods avaiable inside the `build` block:
+
+| DSL Method          | Description                                |
+| :-----------------: | -------------------------------------------|
+| `command`           | Execute a single shell command             |
+| `make`              | Run make (with or without args), using gmake when appropriate |
+| `patch`             | Apply a patch from disk                    |
+| `max_build_jobs`    | The maximum number of builders             |
+| `windows_safe_path` | Format the path to be safe for shelling out on Windows |
+| `ruby`              | Execute the code as the embedded Ruby      |
+| `gem`               | Execute the code as the embedded Rubygems  |
+| `bundle`            | Execute the code as the embedded Bundler   |
+| `rake`              | Execute the code as the embedded Rake gem  |
+| `block`             | Execute Ruby block at build time           |
+| `erb`               | Render the given ERB template              |
+| `mkdir`             | Create the given directory                 |
+| `touch`             | Create the given empty file                |
+| `delete`            | Remove the given file or directory         |
+| `copy`              | Copy a to b                                |
+| `move`              | Move a to b                                |
+| `link`              | Link a to b                                |
+| `sync`              | Copy all files from a to b, removing any union files |
+
+For more DSL methods, please consult the [`Builder` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Builder).
 
 
 You can support building multiple verisons of the same software in the same software definition file using the `version` method and giving a block:
@@ -182,8 +211,6 @@ end
 ```
 
 Since the software definitions are simply ruby code, you can conditionally execute anything by wrapping it with pure Ruby that tests for the version number.
-
-For more DSL methods, please consult the [`Software` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Software).
 
 #### Sharing software definitions
 The easiest way to share organization-wide software is via bundler and Rubygems. For an example software repository, look at Chef's [omnibus-software](https://github.com/opscode/omnibus-software). For more information, please see the [Rubygems documentation](http://guides.rubygems.org/publishing/).
