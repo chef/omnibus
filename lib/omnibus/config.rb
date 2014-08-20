@@ -424,11 +424,6 @@ module Omnibus
     # @return [String, nil]
     default(:solaris_compiler, nil)
 
-    # Define the number of threads to use for parallel fetching
-    #
-    # @return[Fixnum]
-    default(:concurrency, 10)
-
     # --------------------------------------------------
     # @!endgroup
     #
