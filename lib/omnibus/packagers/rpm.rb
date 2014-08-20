@@ -232,8 +232,8 @@ module Omnibus
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
                 .map    { |path| path.gsub("#{build_dir}/", '') }
-                .map    { |path| rpm_safe(path) }
                 .map    { |path| "/#{path}" }
+                .map    { |path| rpm_safe(path) }
                 .reject { |path| config_files.include?(path) }
 
       render_template(resource_path('spec.erb'),
