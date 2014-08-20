@@ -68,11 +68,12 @@ module Omnibus
             software.fetch
           end
 
-          key = key_for(software)
-          content = IO.read(software.downloaded_file)
+          key     = key_for(software)
+          fetcher = software.fetcher
+          content = IO.read(fetcher.downloaded_file)
 
           log.info(log_key) do
-            "Caching '#{software.downloaded_file}' to '#{Config.s3_bucket}/#{key}'"
+            "Caching '#{fetcher.downloaded_file}' to '#{Config.s3_bucket}/#{key}'"
           end
 
           client.store(key, content,
