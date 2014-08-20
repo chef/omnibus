@@ -872,8 +872,8 @@ module Omnibus
       # Cache the build order so we don't re-compute
       softwares = library.build_order
 
-      # Download all softwares first
-      softwares.each do |software|
+      # Download all softwares in parallel first
+      parallel_do(softwares) do |software|
         software.fetch
       end
 
@@ -1021,6 +1021,11 @@ module Omnibus
     #
     def log_key
       @log_key ||= "#{super}: #{name}"
+    end
+
+    def parallel_do(enum, options={}, &block)
+        pool = Omnibus::Parallelizer.new(:concurrency)
+        pool.parallel_do(enum, options={}, &block)
     end
   end
 end

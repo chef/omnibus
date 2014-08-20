@@ -41,6 +41,7 @@ module Omnibus
     include_examples 'a configurable', :append_timestamp, true
     include_examples 'a configurable', :build_retries, 3
     include_examples 'a configurable', :use_git_caching, true
+    include_examples 'a configurable', :concurrency, 10
 
     context 'on Windows' do
       before { stub_ohai(platform: 'windows', version: '2012') }
