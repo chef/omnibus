@@ -936,10 +936,14 @@ module Omnibus
       # Run the actual compressor
       compressor.run!
 
-      # Copy the generated package and metadata back into the workspace
+      # Copy the compressed package and metadata back into the workspace, if it
+      # exists
       package_path = File.join(Config.package_dir, compressor.package_name)
-      FileUtils.cp(package_path, destination)
-      FileUtils.cp("#{package_path}.metadata.json", destination)
+
+      if File.file?(package_path)
+        FileUtils.cp(package_path, destination)
+        FileUtils.cp("#{package_path}.metadata.json", destination)
+      end
     end
 
     #
