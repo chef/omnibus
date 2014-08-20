@@ -18,6 +18,10 @@ module Omnibus
   class Compressor::Null < Compressor::Base
     id :null
 
+    def package_name
+      ''
+    end
+
     def run!
       # noop
     end
