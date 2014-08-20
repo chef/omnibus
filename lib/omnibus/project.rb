@@ -605,6 +605,31 @@ module Omnibus
     expose :config_file
 
     #
+    # Allow Concurrency to be configureable
+    #
+    # @example
+    #   concurrency 10
+    #
+    # @param [Fixnum] val
+    #   the max thread pool size
+    #
+    # @return [Fixnum]
+    #   the max thread pool size
+    def concurrency(val)
+        @max_concurrency = val
+    end
+    expose :concurrency
+
+    #
+    # Return the max concurrency
+    #
+    # @return [Fixnum]
+    #   the max thread pool size
+    def max_concurrency
+        @max_concurrency ||= 10
+    end
+
+    #
     # Add other files or dirs outside of +install_dir+. These files retain their
     # relative paths inside the scratch directory:
     #
@@ -872,8 +897,9 @@ module Omnibus
       # Cache the build order so we don't re-compute
       softwares = library.build_order
 
-      # Download all softwares first
-      softwares.each do |software|
+      # Download all softwares in parallel first
+      log.debug(log_key) { "fetching softwares with a max concurrency of #{max_concurrency}" }
+      parallel_do(softwares) do |software|
         software.fetch
       end
 
@@ -1021,6 +1047,11 @@ module Omnibus
     #
     def log_key
       @log_key ||= "#{super}: #{name}"
+    end
+
+    def parallel_do(enum, options={}, &block)
+        pool = Omnibus::Parallelizer.new(max_concurrency)
+        pool.parallel_do(enum, options={}, &block)
     end
   end
 end
