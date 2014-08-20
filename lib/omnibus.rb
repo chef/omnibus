@@ -22,6 +22,7 @@ require 'json'
 
 require 'omnibus/exceptions'
 require 'omnibus/version'
+require 'omnibus/thread_pool'
 
 module Omnibus
   #

@@ -17,6 +17,7 @@
 
 require 'time'
 require 'json'
+require 'thread'
 
 module Omnibus
   #
@@ -872,9 +873,20 @@ module Omnibus
       # Cache the build order so we don't re-compute
       softwares = library.build_order
 
+      pool = ThreadPool.new(10)
+      log.debug(log_key)  { "fetching softwares in parallel with a max concurrency of #{10}" }
+      semaphore = Mutex.new
+      counter = 0
       # Download all softwares first
       softwares.each do |software|
-        software.fetch
+        pool.parallel_do { 
+            software.fetch
+            semaphore.synchronize {counter += 1}
+        }
+      end
+
+      while counter < softwares.length do
+        sleep 0.2
       end
 
       # Now build each software
