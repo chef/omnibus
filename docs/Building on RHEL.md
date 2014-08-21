@@ -61,6 +61,12 @@ Some DSL methods available include:
 | DSL Method           | Description                                 |
 | :------------------: | --------------------------------------------|
 | `signing_passphrase` | The passphrase to sign the RPM with         |
+| `vendor`             | The name of the package producer            |
+| `license`            | The default license for the package         |
+| `priority`           | The priority for the package                |
+| `catetory`           | The catetory for this package               |
+
+If you are unfamilar with any of these terms, you should just accept the defaults. For more information on the purpose of any of these configuration options, please see the RPM spec.
 
 For more information, please see the [`Packager::RPM` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Packager/RPM).
 
