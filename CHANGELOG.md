@@ -1,5 +1,184 @@
-Omnibus Ruby CHANGELOG
-======================
+Omnibus CHANGELOG
+=================
+
+v4.0.0.beta.1 (August 20, 2014)
+-------------------------------
+### New Features
+- Implement packager-specific DSLs. Packagers now define their own custom methods that may be configured using the `package` block in a project file. For more information, please see the README or any of the embedded "Building on X" documents.
+- Use vendored assets. In previous versions of Omnibus, the generator would create resource assets for DMG, PKG, and MSI packages, regardless of whether you intended to build those packages. This could cause repo bloat and information overload. In Omnibus 4, the default generator does not create these assets, and instead prefers "general" vendored assets. If you are planning to make a resource-intensive package (such as a PKG or MSI), it is encouraged you generate these assets by specifing the `--pkg-assets` flag during project generation. Omnibus will prefer local resources in the `resources/` directory and then fall-back to "sane" defaults which are vendored within Omnibus.
+- Refactored packagers and remove FPM. Omnibus now builds all packages using Ruby and system tooling. This provides a speed improvement and added control over the way packages are built, while simplifying the DSL.
+- Refactored fetcher objects that include performance enhancements and better cachability across platforms.
+- Added `Omnibus.which` to search `ENV['PATH']` for the given executable. This is used internally in Omnibus but is also available inside software definitions.
+- Lazy load project and software definitions. In previous versions of Omnibus, Omnibus would load **all** software files found on disk. Omnibus 4 will selectively load softwares from the most preferred location.
+- Expand project and software searching. Omnibus 4 now allows a user to specify a list of local software repos and software gems. Omnibus 4 will search the local repository (config/software), then any local file system specified software repos, then any loaded gems. These search paths and gems can be specified in the Omnibus config.
+- Extracted template rendering into a helper module. Omnibus now renders templates from this single method, so you always have the same ERB expectations.
+- Added many new DSL methods for packagers, builders, project, and software. Please see the **DSL Changes** below for detailed information.
+- Extracted FileSyncer into a top-level class with added test coverage.
+- Builder DSL method `erb` will search all configured software repos for the template, following the previously described specificity search.
+- Builder DSL method `patch` will search all configured software repos for the patch file, following the previously described specificity search.
+- Standardize on a single way for loading projects from disk - `Project.load`. This method is part of the public API and can be used with Omnibus as a library for loading a project from preferred paths on disk.
+- Standardize on a single way for loading software from disk - `Software.load`. This method is part of the public API and can be used with Omnibus as a library for loading a software from preferred paths on disk.
+- Added all-new compressor scaffolding and skeleton. Previously, a DMG was considered a "packager", but it is actually a compressor. You can read more about the compressor syntax in the Omnibus 4 release notes or the Omnibus README.
+- Added a TGZ compressor for post-processing larger packagers into tarballs.
+- Use Ruby's native `open-uri` in the NetFetcher. This permits users to specify http, https, or ftp URLs.
+- Include hidden files and folders when calculating a directory digest.
+- Use the relative path of a file when calculating a directory digest.
+- Create required directories "as-needed" rather than at the start of a run. This prevents Omnibus from creating a ton of random directories on disk before the build even begins.
+- Use an Ruby implmentation that behaves like rsync for PathFetcher objects. This removes the implicit dependency on rsync/rubocopy on build systems.
+- Add support for Ubuntu 14.04 in the build lab
+- Centralize the algorithm for determining the packager for the current system.
+- Enhance the `Util` module to include FileSystem methods like `create_directory`.
+- Always build packages in a temporary, staging directory and then copy the generated asset(s) back into `Config.package_dir`.
+- Add sanity checking around package name generation (e.g. removing specical characters) and issue a warning when package names might contain invalid characters.
+- Rewrite AIX BFF packager from scratch.
+- Rewrite Debian/Ubuntu DEB packager from scratch using `dpkg-deb`.
+- Rewrite Other Makeself packager from scratch using more in-memory operations (instead of filesystem).
+- Rewrite Windows MSI packager from scratch and use more flexible default XML templates.
+- Support installing an MSI package into more than one directory deep (e.g. C:\Program Files\Chef Software\Chef).
+- Rewrite OS X PKG packager from scratch with templates instead of heredocs for XML/PLists.
+- Rewrite RedHat/CentOS RPM packager from scratch to use custom spec files and `rpmbuild`.
+- Rewrite Solaris Solaris packager. This packager is still in need of a major overhaul.
+- Allow DSL authors to specify a URL may be downloaded using `:unsafe` redirects from HTTPS -> HTTP.
+- Added a real functional test suite that runs on Travis CI for the Build DSL
+- Improved test coverage by 280%.
+- Treat all files as binary. This solves a number of strange encoding issues you may have been experiencing.
+- Prevent Ruby from automatically ungzipping responses.
+- Added `Config.workers` key for specifying the maximum number of parallel events to take place.
+- Added parallel downloads for fetcher objects.
+- Use `fakeroot` for building DEBs and RPMs.
+
+### Potentially Breaking Changes
+- Remove embedded functional tests. Because the functional tests were skipped on CI (and require a system of each type to properly execute), they have been removed. Chef has created the [omnibus-harmony](https://github.com/opscode/omnibus-harmony) pipeline to perform true integration testing using the in-house CI cluster. If you were relying on the integration tests (or the associated Rake tasks), they have been removed.
+- Move vendored `makeself` and `makeself-header` script from `bin/` to `resources/` folder. Having the `makeself` script inside `bin/` would cause `makeself` to be bundled with the gem and added to `$PATH`. If you were previously relying on Omnibus adding `makeself` to your `$PATH`, this will no longer happen.
+- Cleanroom now subclasses `Object` instead of `Omnibus`. This could have unintended side-effects if you were accessing Omnibus internals (like `Config`) inside software or project DSL methods. You must now specify the entire namespace (e.g. `Omnibus::Config`).
+- Builder filesystem DSL methods change directory into `Software#project_dir` before executing.
+- Builder filesystem DSL methods now accept paths or globs.
+- Packagers attempt to ignore SCM-based files during packaging.
+- Move internal cleanroom implementation into a [cleanroom standalone-gem](https://rubygems.org/gems/cleanroom). If you were relying or invoking `Omnibus::Cleanroom`, please see the gem documentation.
+- `Omnibus.process_configuration` has been removed. This method was actually a noop and entirely unused. If you are using Omnibus as a library, this method does not need to be invoked and the call can safely be removed.
+- Remove `Config.fetch` and `Config[:key]`. You should use `Config.thing` instead.
+- Standardize errors on `MissingRequiredAttribute`. In previous versions of Omnibus, you would get a different error depending on _where_ a required attribute was missing. In Config, Omnibus would raise `MissingConfigOption`, in project, Omnibus would raise `MissingProjectConfiguration` and in software, Omnibus would raise `MissingSoftwareConfiguration`. All these error classes have been removed and standardized on `MissingRequiredAttribute`.
+- Remove many unused error classes.
+- Remove all implementations of ErrorReporter classes. These classes attempted to read the output of a stacktrace and intelligently display information to the user about the failure. However, these classes proved to hide errors or provide false information more than they were helpful.
+- Raise `NotImplementedError` (Ruby core) instead of `AbstractMethod` or `AbstractFunction` (Omnibus) errors when a method should be overridden by the child class.
+- Refactor `GitFetcher`, removing retries and complex error handling. If a git command fails, you will see the error from git instead of an Omnibus-translated error.
+- Raise a `ChecksumMismatch` exception when a provided md5 does not match the downloaded one.
+- When extracting tar archives, prefer gtar over tar when gtar is present.
+- Move `Omnibus::Packager::Metadata` to `Omnibus::Metadata` and improve documentation
+- Change the airty of `Omnibus::Metadata.generate` to accept [1] the path to the package on disk and [2] the project which created the package.
+- Selectively load Ohai plugins. Please note: the Ohai that is loaded with Omnibus includes very minimal system information compared to the Ohai that comes with Chef. If you are expecting the data to be the same, you have been warned!
+- Remove all uses of forwardable delegation.
+- Cache the loading of projects
+- Cache the loading of software
+- When accessing DSL methods for the first time, do not persist the default value onto the instance variable.
+- Bump the required version of Chef Sugar to `~> 2.2` to pick up new `smartos?` and `omnios?` matchers.
+- Removed vendor spec fixture data. I do not know why you would be using it, but if you were relying on any of that data, it is now gone and fixtures are constructed manually at test time.
+- Renamed `Package::MacPkg` to `Packager::PKG`
+- Renamed `Package::MacDmg` to `Compressor::DMG`
+- Truncate SLES and other RedHat derivatives platform version.
+- Refactor logger objects to separate Omnibus internal debugging info with build/compile/configure debugging info.
+- Improve error and debugging output when an exception is raised while shelling out. Failed shell commands will now raise `Omnibus::CommandFailed` and `Omnibus::CommandTimeout` instead of the `Mixlib::ShellOut` exceptions. If you were previously rescuing the Mixlib exceptions, you should switch to the new ones.
+
+### Definitely Breaking Changes
+- Previously deprecated methods have been removed.
+- `Config#package_tmp` is no longer used. `Dir.mktmpdir` is used to generate an operating-system agnostic temporary directory for packagers to operate in.
+- `Config#build_dmg` is no longer used. If you wish to build a dmg, you must specify a `compressor` block with the `:dmg` option.
+- `Config#dmg_window_bounds` is no longer used. If you wish to specify dmg window bounds, you must specify a `compressor` block with the `:dmg` option and specify the `window_bounds` attribute.
+- `Config#dmg_pkg_position` is no longer used. If you wish to specify dmg package positioning, you must specify a `compressor` block with the `:dmg` option and specify the `pkg_position` attribute.
+- `Config#sign_pkg` is no longer used. If you specify a signing identity, it is assumed you want to sign the package.
+- `Config#signing_identity` is no longer used. If you wish to specify package signing identity, you must specify a `package` block with the `:pkg` option and specify the `signing_identity` attribute.
+- `Config#sign_rpm` is no longer used. If you specify an rpm signing passphrase, it is assumed you want to sign the package.
+- `Config#rpm_signing_passphrase` is no longer used. If you wish to specify package signing identity, you must specify a `package` block with the `:rpm` option and specify the `signing_passphrase` attribute.
+- `Project#msi_parameters` has been removed. If you wish to specify msi parameters, you must specify a `package` block with the `:msi` option and specify the `parameters` attribute.
+- **`Project#msi_parameters[:upgrade_code]` is no longer used!** You must specify an `upgrade_code` in a `package` block with the `:msi` option.
+- Remove all instances of `NullBuilder`. If you were previously invoking a `NullBuilder`, simply omit a `build` block.
+- Remove packager `validate` pre-step
+- Remove packager `cleanup` post-step
+- **Changed the method arity of `Software#initialize` - this method no longer accepts a list of overrides.**
+- `Builder#max_build_jobs` has been renamed to `Builder#workers`.
+
+### Deprecations
+- `Config#package_tmp` prints a deprecation. There is no replacement for this method.
+- `Config#build_dmg` prints a deprecation. You should specify a `compressor` block with the `:dmg` option instead.
+- `Config#dmg_window_bounds` prints a deprecation. You should specify the `window_bounds` inside `compressor :dmg` instead.
+- `Config#dmg_pkg_position` prints a deprecation. You should specify the `pkg_position` inside `compressor :dmg` instead.
+- `Config#sign_pkg` prints a deprecation. If you specify a signing identity, it is assumed you want to sign the package.
+- `Config#signing_identity` prints a deprecation. You should specify the `signing_identity` inside `package :pkg` instead.
+- `Config#sign_rpm` prints a deprecation. If you specify an rpm signing passphrase, it is assumed you want to sign the package.
+- `Config#rpm_signing_passphrase` prints a deprecation. You should specify the `signing_passphrase` inside `package :rpm` instead.
+- Warn the user when invoking the `command` method in a `build` block that should be replaced with a top-level DSL method (like `command "rm -rf thing.rb"` should be replaced with `delete "thing.rb"`).
+
+### Generator Changes
+- The generator (`omnibus new NAME`) no longer generates assets (MSI, PKG, DMG, etc). If you need those assets, you can specify the `--thing-assets` (e.g. `--msi-assets`) flag.
+- The generator does not render ERB files for assets - instead, it just generates the raw ERB files for your modification.
+- Improve the comments in teh generated project Gemfile
+- Put "development" gems in a `:development` group in the generated project Gemfile for easy exclusion with `bundle install --without development`.
+- Update generated `<project>.rb` file to use new APIs
+- Generate a "real" software example (zlib) that showcases many of the new APIs for learning.
+- Always generate an `omnibus.rb` configuration file with "secret" values specified using `ENV`.
+- Remove outdated and `-example.rb` software definitions.
+
+### DSL Changes
+#### Project
+- Removed `Project#msi_parameters`. Please use the packager-specific DSL `parameters` method instead.
+- Removed `Project#msi_parameters[:upgrade_code]`. You must specify the `upgrade_code` packager-specific DSL method instead.
+- Removed `Project#package_name`. This value is now calculated by Omnibus and you cannot tune it.
+- Removed `Project#install_path`. Please use `Project#install_dir` instead.
+- Removed `Project#files_path`. Please use `Project#resources_path` instead.
+- Added `Project#resources_path`. Previously called "files", any Omnibus assets, images, or files are now referred to as "resources". The default value is `resources/PROJECT_NAME`.
+- Removed `Project#replaces`. Please use `Project#replace` and specify a single package. You can specify `Package#replace` multiple times in the same project.
+- Added `Project#replace` for specifying which existing package this project replaces.
+- Added `Project#default_root` that uses `/opt` on Unix and `C:/` on Windows for easy cross-platform path-setting.
+- Added `Project#package` for customizing a specific packager. This is a sub-DSL that is evaluated on the OS-specific packager. This DSL method may be specified in a file multiple times.
+- Added `Project#compress` for customizing a specific compressor. This is a sub-DSL that is evaluated on the given compressor. This DSL method may be specified in a file multiple times and Omnibus will select the "best" compressor for the given platform. For example, if both DMG and TGZ compressors are given, Omnibus will prefer DMG on OS X systems and fallback to TGZ on others.
+- Changed `Project#package_user` to default to `root` when no value is given.
+- Changed `Project#package_group` to default to `Ohai['root_group']` and then `root` when no value is given.
+- Removed `Project#platform_version`. Use `ohai` instead.
+- Removed `Project#platform_family`. Use `ohai` instead.
+- Removed `Project#platform`. Use `ohai` instead.
+- Removed `Project#machine`. Use `ohai` instead.
+- Removed `Project#dependencies`. List each dependency using `dependency` instead.
+- Added `Project#ohai` for quick access to Ohai data.
+- Removed `Software#override_version`. There is no replacement.
+- Removed `Software#install_dir`. Please use `Software#install_path` instead.
+- Removed `Software#platform_version`. Use `ohai` instead.
+- Removed `Software#platform_family`. Use `ohai` instead.
+- Removed `Software#platform`. Use `ohai` instead.
+- Removed `Software#architecture`. Use `ohai` instead or Chef Sugar instead.
+- Added `Software#ohai` for quick access to Ohai data.
+- Changed `Software#downloaded_file` to `Software#project_file`.
+- Removed `Software#source_dir`. You can use `Omnibus::Config.source_dir` instead, but if you need access to this method, it is probably a bug in Omnibus.
+- Removed `Software#cache_dir`. You can use `Omnibus::Config.cache_dir` instead, but if you need access to this method, it is probably a bug in Omnibus.
+- Removed `Software#config`. You can use `Omnibus::Config` instead.
+- Added `Builder#make` for choosing the correct `make` binary on the system. When `gmake` is present, it is preferred. The use of this method also sets the `MAKE` environment variable for consistency. You should change all instances of `command "make ..."` to `make "..."` to ensure true cross-platform building.
+- Added `Builder#windows_safe_path` for shelling out to the system with the correct path separators.
+- Added `Buidler#workers` for delegation to the config option.
+- Removed `Buidler#max_build_jobs` in favor of `Builder#workers`.
+- Added `Packager::DEB#vendor` for specifying the package vendor.
+- Added `Packager::DEB#license` for specifying the package license.
+- Added `Packager::DEB#priority` for specifying the package priority.
+- Added `Packager::DEB#section` for specifying the package section.
+- Added `Packager::MSI#upgrade_code` for specifying an upgrade code. You must specify this attribute to make MSI packages.
+- Added `Packager::MSI#parameters` for specifying arbitrary parameters to be read into the Wix XML.
+- Added `Packager::MSI#wix_light_extension` for activating arbitrary Wix light extentions.
+- Added `Packager::MSI#wix_candle_extension` for activating arbitrary Wix candle extentions.
+- Added `Packager::PKG#identifer` for specifying the identifier of the the Mac OS X PKG. This value is still interpreted if one is not given. Note: the `Config.mac_pkg_identifier` is no longer honored.
+- Added `Packager::PKG#signing_passphrase` for specifying the signing passphrase. If this value is given, it is assumed you want to sign the package. Note: the `Config.sign_rpm` and `Config.rpm_signing_passphrase` is no longer honored.
+- Added `Packager::RPM#vendor` for specifying the package vendor.
+- Added `Packager::RPM#license` for specifying the package license.
+- Added `Packager::RPM#priority` for specifying the package priority.
+- Added `Packager::RPM#category` for specifying the package category.
+
+### Bugfixes
+- Drastically improve test coverage around packagers.
+- Improved documentation for Building on OSX.
+- Improved documentation for Building on Windows.
+- Improved documentation for Building on RHEL.
+- Improved documentation for the `Builder` DSL.
+- Standardized license headers.
+- Added SSH forwarding as part of the default generated `.kitchen.yml`.
+- Updated Chef version in generated `.kitchen.yml`.
+
 
 v3.2.1 (July 26, 2014)
 ----------------------
