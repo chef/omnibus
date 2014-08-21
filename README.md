@@ -105,15 +105,15 @@ A Project DSL file defines your actual application; this is the thing you are cr
 All project definitions must be in the `config/projects` directory of your Omnibus repository.
 
 ```ruby
-name            'chef-full'
-maintainer      'YOUR NAME'
-homepage        'http://yoursite.com'
+name            "chef-full"
+maintainer      "YOUR NAME"
+homepage        "http://yoursite.com"
 
-install_dir     '/opt/chef'
-build_version   '0.10.8'
+install_dir     "/opt/chef"
+build_version   "0.10.8"
 build_iteration 4
 
-dependency 'chef'
+dependency "chef"
 ```
 
 Some DSL methods available include:
@@ -138,21 +138,21 @@ All Software definitions should go in the `config/software` directory of your Om
 Here is an example:
 
 ```ruby
-name 'ruby'
-default_version '1.9.2-p290'
-source url: 'http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz',
-       md5: '604da71839a6ae02b5b5b5e1b792d5eb'
+name "ruby"
+default_version "1.9.2-p290"
+source url: "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
+       md5: "604da71839a6ae02b5b5b5e1b792d5eb"
 
-dependency 'zlib'
-dependency 'ncurses'
-dependency 'openssl'
+dependency "zlib"
+dependency "ncurses"
+dependency "openssl"
 
 relative_path "ruby-#{version}"
 
 build do
-  command './configure'
-  command 'make'
-  command 'make install'
+  command "./configure"
+  command "make"
+  command "make install"
 end
 ```
 
@@ -197,17 +197,17 @@ For more DSL methods, please consult the [`Builder` documentation](http://rubydo
 You can support building multiple verisons of the same software in the same software definition file using the `version` method and giving a block:
 
 ```ruby
-name 'ruby'
-default_version '1.9.2-p290'
+name "ruby"
+default_version "1.9.2-p290"
 
-version '1.9.2-p290' do
-  source url: 'http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz',
-         md5: '604da71839a6ae02b5b5b5e1b792d5eb'
+version "1.9.2-p290" do
+  source url: "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
+         md5: "604da71839a6ae02b5b5b5e1b792d5eb"
 end
 
-version '2.1.1' do
-  source url: 'http://ftp.ruby-lang.org/pub/ruby/2.1/ruby-#{version}.tar.gz',
-         md5: 'e57fdbb8ed56e70c43f39c79da1654b2'
+version "2.1.1" do
+  source url: "http://ftp.ruby-lang.org/pub/ruby/2.1/ruby-#{version}.tar.gz",
+         md5: "e57fdbb8ed56e70c43f39c79da1654b2"
 end
 ```
 
@@ -255,13 +255,13 @@ Caveats
 The project definitions can override specific software dependencies by passing in `override` to use the correct version:
 
 ```ruby
-name 'chef-full'
+name "chef-full"
 # <snip>
 
 # This will override the default version of "chef"
-override :chef, version: '2.1.1'
+override :chef, version: "2.1.1"
 
-dependency 'chef'
+dependency "chef"
 ```
 
 **The overridden version must be defined in the associated software!**
@@ -270,7 +270,7 @@ dependency 'chef'
 By default, Omnibus will log at the `warn` level. You can override this by passing the `--log-level` flag to your Omnibus call:
 
 ```shell
-$ bin/omnibus build <project> --log-level info // or 'debug'
+$ bin/omnibus build <project> --log-level info # or "debug"
 ```
 
 ### Git caching
