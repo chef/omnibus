@@ -54,9 +54,10 @@ Omnibus determines the platform for which to build an installer based on **the p
 
 More documentation
 ------------------
+- [Building on Debian](docs/Building on Debian.md)
 - [Building on OSX](docs/Building on OSX.md)
-- [Building on Windows](docs/Building on Windows.md)
 - [Building on RHEL](docs/Building on RHEL.md)
+- [Building on Windows](docs/Building on Windows.md)
 - [Build Cache](docs/Build Cache.md)
 
 
@@ -124,9 +125,10 @@ Some DSL methods available include:
 | `build_version`   | The package version                         |
 | `build_iteration` | The package iteration number                |
 | `dependency`      | An Omnibus software-defined component to include in this package |
+| `package`         | Invoke a packager-specific DSL              |
+| `compress`        | Invoke a compressor-specific DSL            |
 
 For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
-
 
 ### Software
 Omnibus "software" files define individual software components that go into making your overall package. They are the building blocks of your application. The Software DSL provides a way to define where to retrieve the software sources, how to build them, and what dependencies they have. These dependencies are also defined in their own Software DSL files, thus forming the basis for a dependency-aware build ordering.
@@ -191,7 +193,6 @@ Additionally, there are a number of DSL methods avaiable inside the `build` bloc
 | `sync`              | Copy all files from a to b, removing any union files |
 
 For more DSL methods, please consult the [`Builder` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Builder).
-
 
 You can support building multiple verisons of the same software in the same software definition file using the `version` method and giving a block:
 
