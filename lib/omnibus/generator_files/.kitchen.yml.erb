@@ -1,5 +1,6 @@
 driver:
   name: vagrant
+  forward_agent: yes
   customize:
     cpus: 2
     memory: 2048
@@ -7,7 +8,8 @@ driver:
     - ['.', '/home/vagrant/<%= config[:name] %>']
 
 provisioner:
-  require_chef_omnibus: 11.8.0
+  name: chef_zero
+  require_chef_omnibus: 11.14.6
 
 platforms:
   - name: ubuntu-14.04
