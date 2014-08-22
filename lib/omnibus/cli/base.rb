@@ -91,7 +91,7 @@ module Omnibus
       aliases: '-l',
       type: :string,
       enum: Logger::LEVELS.map(&:downcase),
-      lazy_default: 'info'
+      default: 'info'
     class_option :override,
       desc: 'Override one or more Omnibus config options',
       aliases: '-o',
