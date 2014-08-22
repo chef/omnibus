@@ -77,5 +77,54 @@ module Omnibus
         expect(output).to include("Removing file `/foo/bar'")
       end
     end
+
+    describe '#create_file' do
+      before do
+        allow(FileUtils).to receive(:mkdir_p)
+        allow(FileUtils).to receive(:touch)
+        allow(File).to receive(:open)
+      end
+
+      it 'creates the containing directory' do
+        expect(FileUtils).to receive(:mkdir_p).with('/foo')
+        subject.create_file('/foo/bar')
+      end
+
+      it 'creates the file' do
+        expect(FileUtils).to receive(:touch).with('/foo/bar')
+        subject.create_file('/foo/bar')
+      end
+
+      it 'accepts multiple parameters' do
+        expect(FileUtils).to receive(:touch).with('/foo/bar')
+        subject.create_file('/foo', 'bar')
+      end
+
+      it 'accepts a block' do
+        expect(File).to receive(:open).with('/foo/bar', 'wb')
+
+        block = Proc.new { 'Some content!' }
+        subject.create_file('/foo', 'bar', &block)
+      end
+
+      it 'logs a message' do
+        output = capture_logging { subject.create_file('/foo/bar') }
+        expect(output).to include("Creating file `/foo/bar'")
+      end
+    end
+
+    describe '#create_link' do
+      before { allow(FileUtils).to receive(:ln_s) }
+
+      it 'creates the directory' do
+        expect(FileUtils).to receive(:ln_s).with('/foo/bar', '/zip/zap')
+        subject.create_link('/foo/bar', '/zip/zap')
+      end
+
+      it 'logs a message' do
+        output = capture_logging { subject.create_link('/foo/bar', '/zip/zap') }
+        expect(output).to include("Linking `/foo/bar' to `/zip/zap'")
+      end
+    end
   end
 end

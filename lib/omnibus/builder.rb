@@ -81,7 +81,7 @@ module Omnibus
       warn_for_shell_commands(command)
 
       build_commands << BuildCommand.new("Execute: `#{command}'") do
-        _shellout!(command, options)
+        shellout!(command, options)
       end
     end
     expose :command
@@ -167,7 +167,7 @@ module Omnibus
       patches << patch_path
 
       build_commands << BuildCommand.new("Apply patch `#{source}'") do
-        _shellout!(command, options)
+        shellout!(command, options)
       end
     end
     expose :patch
@@ -219,7 +219,7 @@ module Omnibus
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/ruby")
-        _shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", options)
       end
     end
     expose :ruby
@@ -236,7 +236,7 @@ module Omnibus
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/gem")
-        _shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", options)
       end
     end
     expose :gem
@@ -256,7 +256,7 @@ module Omnibus
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/bundle")
-        _shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", options)
       end
     end
     expose :bundle
@@ -274,7 +274,7 @@ module Omnibus
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/rake")
-        _shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", options)
       end
     end
     expose :rake
@@ -628,12 +628,18 @@ module Omnibus
     #
     # @see (Util#shellout!)
     #
-    def _shellout!(command_string, options = {})
+    def shellout!(command_string, options = {})
       # Make sure the PWD is set to the correct directory
       options = { cwd: software.project_dir }.merge(options)
 
+      # Set the log level to :info so users will see build commands
+      options[:log_level] ||= :info
+
+      # Set the live stream to :debug so users will see build output
+      options[:live_stream] ||= log.live_stream(:debug)
+
       # Use Util's shellout
-      shellout!(command_string, options)
+      super(command_string, options)
     end
 
     #

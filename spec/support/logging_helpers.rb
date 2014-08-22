@@ -25,7 +25,7 @@ module Omnibus
         end
 
         def output
-          @logdev.dev.string
+          io.string
         end
       end
     end
