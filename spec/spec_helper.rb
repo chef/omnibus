@@ -47,7 +47,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     # Suppress logging
-    Omnibus.logger.level = :unknown
+    Omnibus.logger.level = :nothing
 
     # Reset config
     Omnibus.reset!

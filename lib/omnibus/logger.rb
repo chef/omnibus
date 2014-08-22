@@ -28,7 +28,7 @@ module Omnibus
     #
     # @return [Array]
     #
-    LEVELS = %w(FATAL ERROR WARN INFO DEBUG INTERNAL UNKNOWN)
+    LEVELS = %w(UNKNOWN INTERNAL DEBUG INFO WARN ERROR FATAL NOTHING).freeze
 
     #
     # The mutex lock for synchronizing IO writing.
