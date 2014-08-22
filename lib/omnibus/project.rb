@@ -17,6 +17,7 @@
 
 require 'time'
 require 'json'
+require 'thread'
 
 module Omnibus
   #
@@ -862,19 +863,41 @@ module Omnibus
       self.name <=> other.name
     end
 
+    # make max concurrency for parallel fetching configurable through the DSL
+    def max_concurrency(val)
+      @concurrency = val
+    end
+    expose :max_concurrency
+
+    # return max concurrency value for parallel fetching
+    # defaults to the amount of softwares to download
+    def concurrency
+      @concurrency ||= softwares.length
+    end
+
+    def softwares
+      # Cache the build order so we don't re-compute
+      library.build_order
+    end
     #
     #
     #
     def build_me
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
-
-      # Cache the build order so we don't re-compute
-      softwares = library.build_order
-
-      # Download all softwares first
+      
+      # create a thread pool to use
+      pool = ThreadPool.new(concurrency)
+      log.debug(log_key)  { "fetching softwares in parallel with a max concurrency of #{concurrency}" }
+      
+      # Download all softwares using the threadpool first
       softwares.each do |software|
-        software.fetch
+        pool.launch { software.fetch }
+      end
+      # wait for the downloads to finish before moving on
+      while pool.state == 'working'
+        #log.debug(log_key) { "downloaded #{softwares.length-pool.jobs} of #{softwares.length} softwares" }
+        sleep 0.5 # don't hammer the CPU checking status
       end
 
       # Now build each software
