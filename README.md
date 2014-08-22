@@ -176,7 +176,7 @@ Additionally, there are a number of DSL methods avaiable inside the `build` bloc
 | `command`           | Execute a single shell command             |
 | `make`              | Run make (with or without args), using gmake when appropriate |
 | `patch`             | Apply a patch from disk                    |
-| `max_build_jobs`    | The maximum number of builders             |
+| `workers`           | The maximum number of builders             |
 | `windows_safe_path` | Format the path to be safe for shelling out on Windows |
 | `ruby`              | Execute the code as the embedded Ruby      |
 | `gem`               | Execute the code as the embedded Rubygems  |

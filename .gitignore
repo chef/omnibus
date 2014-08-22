@@ -51,6 +51,7 @@ $RECYCLE.BIN/
 /test/tmp/
 /test/version_tmp/
 /tmp/
+/spec/tmp
 
 ## Specific to RubyMotion:
 .dat*
@@ -139,4 +140,3 @@ tramp
 
 # AUCTeX auto folder
 /auto/
-

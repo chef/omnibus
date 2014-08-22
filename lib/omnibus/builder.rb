@@ -173,22 +173,14 @@ module Omnibus
     expose :patch
 
     #
-    # The maximum number of build jobs, as computed from Ohai data. If the Ohai
-    # data is unavailable, +3+ is used.
+    # The maximum number of workers suitable for this system.
     #
-    # @example
-    #   command "make install -j#{max_build_jobs}"
+    # @see (Config#workers)
     #
-    # @return [Fixnum]
-    #
-    def max_build_jobs
-      if Ohai['cpu'] && Ohai['cpu']['total'] && Ohai['cpu']['total'].to_s =~ /^\d+$/
-        Ohai['cpu']['total'].to_i + 1
-      else
-        3
-      end
+    def workers
+      Config.workers
     end
-    expose :max_build_jobs
+    expose :workers
 
     #
     # (see Util#windows_safe_path)

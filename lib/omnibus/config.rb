@@ -449,6 +449,19 @@ module Omnibus
     # @return [true, false]
     default(:use_git_caching, true)
 
+    # The number of worker threads for make. If this is not set
+    # explicitly in config, it will attempt to determine via Ohai in
+    # the builder, and failing that will default to 3
+    #
+    # @return [Integer]
+    default(:workers) do
+      if Ohai['cpu'] && Ohai['cpu']['total']
+        Ohai['cpu']['total'].to_i + 1
+      else
+        3
+      end
+    end
+
     # --------------------------------------------------
     # @!endgroup
     #

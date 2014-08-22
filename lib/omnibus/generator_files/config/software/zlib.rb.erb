@@ -48,8 +48,8 @@ build do
   # You can have multiple steps - they are executed in the order in which they
   # are read.
   #
-  # "max_build_jobs" is a DSL method that returns the most suitable number of
+  # "workers" is a DSL method that returns the most suitable number of
   # builders for the currently running system.
-  command "make -j #{max_build_jobs}", env: env
-  command "make -j #{max_build_jobs} install", env: env
+  command "make -j #{workers}", env: env
+  command "make -j #{workers} install", env: env
 end

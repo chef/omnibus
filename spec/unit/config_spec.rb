@@ -42,6 +42,32 @@ module Omnibus
     include_examples 'a configurable', :build_retries, 3
     include_examples 'a configurable', :use_git_caching, true
 
+    describe '#workers' do
+      context 'when the Ohai data is not present' do
+        before do
+          stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
+            data['cpu'] = nil
+          end
+        end
+
+        it 'defaults to 3' do
+          expect(described_class.workers).to eq(3)
+        end
+      end
+
+      context 'when the Ohai data is present' do
+        before do
+          stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
+            data['cpu'] = { 'total' => '5' }
+          end
+        end
+
+        it 'defaults to the value + 6' do
+          expect(described_class.workers).to eq(6)
+        end
+      end
+    end
+
     context 'on Windows' do
       before { stub_ohai(platform: 'windows', version: '2012') }
 

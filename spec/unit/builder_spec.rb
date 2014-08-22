@@ -24,9 +24,9 @@ module Omnibus
       end
     end
 
-    describe '#max_build_jobs' do
+    describe '#workers' do
       it 'is a DSL method' do
-        expect(subject).to have_exposed_method(:max_build_jobs)
+        expect(subject).to have_exposed_method(:workers)
       end
     end
 
