@@ -22,7 +22,6 @@ require 'json'
 
 require 'omnibus/exceptions'
 require 'omnibus/version'
-require 'omnibus/thread_pool'
 
 module Omnibus
   #
@@ -61,6 +60,7 @@ module Omnibus
   autoload :Software,         'omnibus/software'
   autoload :Sugarable,        'omnibus/sugarable'
   autoload :Templating,       'omnibus/templating'
+  autoload :ThreadPool,       'omnibus/thread_pool'
   autoload :Util,             'omnibus/util'
 
   autoload :GitFetcher,  'omnibus/fetchers/git_fetcher'
