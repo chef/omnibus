@@ -169,7 +169,7 @@ Some of the DSL methods available include:
 
 For more DSL methods, please consult the [`Software` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Software).
 
-Additionally, there are a number of DSL methods avaiable inside the `build` block:
+Additionally, there are a number of DSL methods available inside the `build` block:
 
 | DSL Method          | Description                                |
 | :-----------------: | -------------------------------------------|
