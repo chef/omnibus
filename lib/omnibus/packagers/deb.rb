@@ -278,7 +278,9 @@ module Omnibus
     end
 
     #
-    # Create the +.deb+ file, compressing at gzip level 9.
+    # Create the +.deb+ file, compressing at gzip level 9. The use of the
+    # +fakeroot+ command is required so that the package is owned by
+    # +root:root+, but the build user does not need to have sudo permissions.
     #
     # @return [void]
     #
