@@ -216,7 +216,7 @@ Since the software definitions are simply ruby code, you can conditionally execu
 #### Sharing software definitions
 The easiest way to share organization-wide software is via bundler and Rubygems. For an example software repository, look at Chef's [omnibus-software](https://github.com/opscode/omnibus-software). For more information, please see the [Rubygems documentation](http://guides.rubygems.org/publishing/).
 
-It is recommended you use bundler to pull down these gems (as bundler also permits pulling softare directly from GitHub):
+It is recommended you use bundler to pull down these gems (as bundler also permits pulling software directly from GitHub):
 
 ```ruby
 gem 'my-company-omnibus-software'
