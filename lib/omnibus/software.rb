@@ -36,7 +36,7 @@ module Omnibus
           if filepath.nil?
             raise MissingSoftware.new(name)
           else
-            log.debug(log_key) do
+            log.internal(log_key) do
               "Loading software `#{name}' from `#{filepath}'."
             end
           end
@@ -723,11 +723,14 @@ module Omnibus
     def build_me
       # Build if we need to
       if always_build?
+        log.info(log_key) { "Forcing build because `always_build' was given" }
         execute_build
       else
         if GitCache.new(self).restore
+          log.info(log_key) { "Restored from cache" }
           true
         else
+          log.info(log_key) { "Could not restore from cache, building..." }
           execute_build
         end
       end
@@ -772,12 +775,6 @@ module Omnibus
       @shasum ||= begin
         digest = Digest::SHA256.new
 
-        log.debug(log_key) { "project (SHA): #{project.shasum.inspect}" }
-        log.debug(log_key) { "builder (SHA): #{builder.shasum.inspect}" }
-        log.debug(log_key) { "name: #{name.inspect}" }
-        log.debug(log_key) { "version_for_cache: #{version_for_cache.inspect}" }
-        log.debug(log_key) { "overrides: #{overrides.inspect}" }
-
         update_with_string(digest, project.shasum)
         update_with_string(digest, builder.shasum)
         update_with_string(digest, name)
@@ -785,18 +782,12 @@ module Omnibus
         update_with_string(digest, JSON.fast_generate(overrides))
 
         if filepath && File.exist?(filepath)
-          log.debug(log_key) { "filepath: #{filepath.inspect}" }
           update_with_file_contents(digest, filepath)
         else
-          log.debug(log_key) { "filepath: <DYNAMIC>" }
           update_with_string(digest, '<DYNAMIC>')
         end
 
-        shasum = digest.hexdigest
-
-        log.debug(log_key) { "shasum: #{shasum.inspect}" }
-
-        shasum
+        digest.hexdigest
       end
     end
 
@@ -854,9 +845,8 @@ module Omnibus
       builder.build
 
       if Config.use_git_caching
-        log.info(log_key) { 'Caching build' }
         GitCache.new(self).incremental
-        log.info(log_key) { 'Dirtied the cache!' }
+        log.info(log_key) { 'Dirtied the cache' }
       end
 
       project.dirty!

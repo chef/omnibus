@@ -36,6 +36,9 @@ RSpec.configure do |config|
   require_relative 'support/path_helpers'
   config.include(Omnibus::RSpec::PathHelpers)
 
+  require_relative 'support/shell_helpers'
+  config.include(Omnibus::RSpec::ShellHelpers)
+
   config.filter_run(focus: true)
   config.run_all_when_everything_filtered = true
 
@@ -44,7 +47,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     # Suppress logging
-    Omnibus.logger.level = :unknown
+    Omnibus.logger.level = :nothing
 
     # Reset config
     Omnibus.reset!

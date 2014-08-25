@@ -46,16 +46,16 @@ module Omnibus
 
       # Do not load the Omnibus config if we are asking for help or the version
       if %w(help version).include?(config[:current_command].name)
-        log.debug { 'Skipping Omnibus loading (detected help or version)' }
+        log.debug(log_key) { 'Skipping Omnibus loading (detected help or version)' }
         return
       end
 
       if File.exist?(@options[:config])
-        log.info { "Using config from '#{@options[:config]}'" }
+        log.info(log_key) { "Using config from '#{@options[:config]}'" }
         Omnibus.load_configuration(@options[:config])
       else
         if @options[:config] == Omnibus::DEFAULT_CONFIG
-          log.debug { 'Config file not given - using defaults' }
+          log.debug(log_key) { 'Config file not given - using defaults' }
         else
           raise "The given config file '#{@options[:config]}' does not exist!"
         end
@@ -63,20 +63,20 @@ module Omnibus
 
       @options[:override].each do |key, value|
         if %w(true false nil).include?(value)
-          log.debug { "Detected #{value.inspect} should be an object" }
+          log.debug(log_key) { "Detected #{value.inspect} should be an object" }
           value = { 'true' => true, 'false' => false, 'nil' => nil }[value]
         end
 
         if value =~ /\A[[:digit:]]+\Z/
-          log.debug { "Detected #{value.inspect} should be an integer" }
+          log.debug(log_key) { "Detected #{value.inspect} should be an integer" }
           value = value.to_i
         end
 
         if Config.respond_to?(key)
-          log.debug { "Setting Config.#{key} = #{value.inspect}" }
+          log.debug(log_key) { "Setting Config.#{key} = #{value.inspect}" }
           Config.send(key, value)
         else
-          log.debug { "Skipping option '#{key}' - not a config option" }
+          log.debug (log_key){ "Skipping option '#{key}' - not a config option" }
         end
       end
     end
@@ -90,8 +90,8 @@ module Omnibus
       desc: 'The log level',
       aliases: '-l',
       type: :string,
-      enum: %w(fatal error warn info debug),
-      lazy_default: 'info'
+      enum: Logger::LEVELS.map(&:downcase),
+      default: 'info'
     class_option :override,
       desc: 'Override one or more Omnibus config options',
       aliases: '-o',

@@ -61,11 +61,9 @@ module Omnibus
     #
     def create_cache_path
       if File.directory?(cache_path)
-        log.info(log_key) { "Cache path `#{cache_path}' exists, skipping creation" }
         false
       else
-        log.info(log_key) { "Creating cache path `#{cache_path}'" }
-        FileUtils.mkdir_p(File.dirname(cache_path))
+        create_directory(File.dirname(cache_path))
         shellout!("git --git-dir=#{cache_path} init -q")
         true
       end
@@ -79,7 +77,7 @@ module Omnibus
     def tag
       return @tag if @tag
 
-      log.info(log_key) { "Calculating tag" }
+      log.internal(log_key) { "Calculating tag" }
 
       # Accumulate an array of all the software projects that come before
       # the name and version we are tagging. So if you have
@@ -95,7 +93,7 @@ module Omnibus
         end
       end
 
-      log.debug(log_key) { "dep_list: #{dep_list.map(&:name).inspect}" }
+      log.internal(log_key) { "dep_list: #{dep_list.map(&:name).inspect}" }
 
       # This is the list of all the unqiue shasums of all the software build
       # dependencies, including the on currently being acted upon.
@@ -103,14 +101,14 @@ module Omnibus
       suffix  = Digest::SHA256.hexdigest(shasums.join('|'))
       @tag    = "#{software.name}-#{suffix}"
 
-      log.debug(log_key) { "tag: #{@tag}" }
+      log.internal(log_key) { "tag: #{@tag}" }
 
       @tag
     end
 
     # Create an incremental install path cache for the software step
     def incremental
-      log.info(log_key) { 'Performing incremental cache' }
+      log.internal(log_key) { 'Performing incremental cache' }
 
       create_cache_path
       remove_git_dirs
@@ -127,7 +125,7 @@ module Omnibus
     end
 
     def restore
-      log.info(log_key) { 'Performing cache restoration' }
+      log.internal(log_key) { 'Performing cache restoration' }
 
       create_cache_path
 
@@ -139,11 +137,11 @@ module Omnibus
       end
 
       if restore_me
-        log.debug(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
+        log.internal(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
         shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{tag}"))
         true
       else
-        log.debug(log_key) { "Could not find tag `#{tag}', skipping restore" }
+        log.internal(log_key) { "Could not find tag `#{tag}', skipping restore" }
         false
       end
     end
@@ -155,14 +153,14 @@ module Omnibus
     #
     # @return [true]
     def remove_git_dirs
-      log.info(log_key) { "Removing git directories" }
+      log.internal(log_key) { "Removing git directories" }
 
       Dir.glob("#{install_dir}/**/{,.*}/config").reject do |path|
         REQUIRED_GIT_FILES.any? do |required_file|
           !File.exist?(File.join(File.dirname(path), required_file))
         end
       end.each do |path|
-        log.info(log_key) { "Removing git dir `#{path}'" }
+        log.internal(log_key) { "Removing git dir `#{path}'" }
         FileUtils.rm_rf(File.dirname(path))
       end
 

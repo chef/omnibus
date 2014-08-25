@@ -18,13 +18,18 @@ require 'mixlib/shellout'
 
 module Omnibus
   module Util
+    def self.included(base)
+      # This module requires logging is also available
+      base.send(:include, Logging)
+    end
+
     #
     # The default shellout options.
     #
     # @return [Hash]
     #
     SHELLOUT_OPTIONS = {
-      live_stream: Omnibus.logger.live_stream(:debug),
+      log_level: :internal,
       timeout: 7200, # 2 hours
       environment: {},
     }.freeze
@@ -48,6 +53,12 @@ module Omnibus
       options = args.last.kind_of?(Hash) ? args.pop : {}
       options = SHELLOUT_OPTIONS.merge(options)
 
+      # Grab the log_level
+      log_level = options.delete(:log_level)
+
+      # Set the live stream if one was not given
+      options[:live_stream] ||= log.live_stream(:internal)
+
       # Since Mixlib::ShellOut supports :environment and :env, we want to
       # standardize here
       if options[:env]
@@ -56,14 +67,14 @@ module Omnibus
 
       # Log any environment options given
       unless options[:environment].empty?
-        Omnibus.logger.info { 'Environment:' }
-        options[:environment].each do |key, value|
-          Omnibus.logger.info { "  #{key.to_s.upcase}=#{value.inspect}" }
+        log.public_send(log_level, log_key)  { 'Environment:' }
+        options[:environment].sort.each do |key, value|
+          log.public_send(log_level, log_key)  { "  #{key.to_s.upcase}=#{value.inspect}" }
         end
       end
 
       # Log the actual command
-      Omnibus.logger.info { "$ #{args.join(' ')}" }
+      log.public_send(log_level, log_key) { "$ #{args.join(' ')}" }
 
       cmd = Mixlib::ShellOut.new(*args, options)
       cmd.environment['HOME'] = '/tmp' unless ENV['HOME']
@@ -114,7 +125,7 @@ module Omnibus
     #
     def create_directory(*paths)
       path = File.join(*paths)
-      Omnibus.logger.debug("Creating directory `#{path}'")
+      log.debug(log_key) { "Creating directory `#{path}'" }
       FileUtils.mkdir_p(path)
       path
     end
@@ -130,7 +141,7 @@ module Omnibus
     #
     def remove_directory(*paths)
       path = File.join(*paths)
-      Omnibus.logger.debug("Remove directory `#{path}'")
+      log.debug(log_key) { "Remove directory `#{path}'" }
       FileUtils.rm_rf(path)
       path
     end
@@ -145,7 +156,7 @@ module Omnibus
     #   the destination path
     #
     def copy_file(source, destination)
-      Omnibus.logger.debug("Copying `#{source}' to `#{destination}'")
+      log.debug(log_key) { "Copying `#{source}' to `#{destination}'" }
       FileUtils.cp(source, destination)
       destination
     end
@@ -161,9 +172,46 @@ module Omnibus
     #
     def remove_file(*paths)
       path = File.join(*paths)
-      Omnibus.logger.debug("Removing file `#{path}'")
+      log.debug(log_key) { "Removing file `#{path}'" }
       FileUtils.rm_f(path)
       path
+    end
+
+    #
+    # Create a file at the given path. If a block is given, the contents of the
+    # block are written to the file. If the block is not given, the file is
+    # simply "touched".
+    #
+    # @param [String, Array<String>] paths
+    #   the path or list of paths to join to create
+    #
+    # @return [String]
+    #   the path to the created file
+    #
+    def create_file(*paths, &block)
+      path = File.join(*paths)
+      log.debug(log_key) { "Creating file `#{path}'" }
+
+      FileUtils.mkdir_p(File.dirname(path))
+
+      if block
+        File.open(path, 'wb') { |f| f.write(block.call) }
+      else
+        FileUtils.touch(path)
+      end
+
+      path
+    end
+
+    #
+    # Create a symlink from a to b
+    #
+    # @param [String] a
+    # @param [String] b
+    #
+    def create_link(a, b)
+      log.debug(log_key) { "Linking `#{a}' to `#{b}'" }
+      FileUtils.ln_s(a, b)
     end
   end
 end

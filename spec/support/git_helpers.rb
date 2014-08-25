@@ -1,7 +1,9 @@
+require_relative 'shell_helpers'
+
 module Omnibus
   module RSpec
     module GitHelpers
-      include Util
+      include ShellHelpers
 
       def git_origin_for(repo, options = {})
         "file://#{fake_git_remote("git://github.com/omnibus/#{repo}.git", options)}/.git"
@@ -62,7 +64,7 @@ module Omnibus
       # @return [String]
       def sha_for_ref(repo, ref)
         Dir.chdir(File.join(remotes, repo)) do
-          shellout! %|git show-ref #{ref}").stdout.split(/\s/).firs|
+          git("show-ref #{ref}").stdout.split(/\s/).first
         end
       end
 
@@ -77,9 +79,6 @@ module Omnibus
         path
       end
 
-      #
-      #
-      #
       def git_scratch
         path = File.join(tmp_path, 'git', 'scratch')
         FileUtils.mkdir_p(path) unless File.directory?(path)

@@ -122,7 +122,7 @@ module Omnibus
       existing_disks.stdout.lines.each do |existing_disk|
         existing_disk.chomp!
 
-        Omnibus.logger.debug do
+        Omnibus.logger.debug(log_key) do
           "Detaching disk `#{existing_disk}' before starting dmg packaging."
         end
 

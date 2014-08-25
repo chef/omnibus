@@ -14,10 +14,8 @@
 # limitations under the License.
 #
 
-require 'logger'
-
 module Omnibus
-  class Logger < ::Logger
+  class Logger
     #
     # The amount of padding on the left column.
     #
@@ -25,20 +23,51 @@ module Omnibus
     #
     LEFT = 40
 
-    def initialize(logdev = $stdout, *)
-      super
-      @level = Logger::WARN
+    #
+    # Our custom log levels, in order of severity
+    #
+    # @return [Array]
+    #
+    LEVELS = %w(UNKNOWN INTERNAL DEBUG INFO WARN ERROR FATAL NOTHING).freeze
+
+    #
+    # The mutex lock for synchronizing IO writing.
+    #
+    # @return [Mutex]
+    #
+    MUTEX = Mutex.new
+
+    attr_reader :io
+    attr_reader :level
+
+    #
+    # Create a new logger object.
+    #
+    # @param [IO] io
+    #   the IO object to read/write
+    #
+    def initialize(io = $stdout)
+      @io = io
+      @level = LEVELS.index('WARN')
+    end
+
+    LEVELS.each.with_index do |level, index|
+      class_eval <<-EOH, __FILE__, __LINE__
+        def #{level.downcase}(progname, &block)
+          add(#{index}, progname, &block)
+        end
+      EOH
     end
 
     #
-    # Print a deprecation warning.
+    # Print a deprecation warning. This actually outputs to +WARN+, but is
+    # prefixed with the string "DEPRECATED" first.
     #
     # @see (Logger#add)
     #
-    def deprecated(progname = nil, &block)
-      if level <= WARN
-        add(WARN, 'DEPRECATED: ' + (block ? yield : progname), progname)
-      end
+    def deprecated(progname, &block)
+      meta = Proc.new { "DEPRECATED: #{block.call}" }
+      add(LEVELS.index('WARN'), progname, &meta)
     end
 
     #
@@ -50,9 +79,7 @@ module Omnibus
     # @param [Symbol] level
     #
     def level=(level)
-      @level = ::Logger.const_get(level.to_s.upcase)
-    rescue NameError
-      raise "'#{level.inspect}' does not appear to be a valid log level!"
+      @level = LEVELS.index(level.to_s.upcase) || -1
     end
 
     #
@@ -65,6 +92,16 @@ module Omnibus
     def live_stream(level = :debug)
       @live_streams ||= {}
       @live_streams[level.to_sym] ||= LiveStream.new(self, level)
+    end
+
+    #
+    # Add a message to the logger with the given severity and progname.
+    #
+    def add(severity, progname, &block)
+      return true if io.nil? || severity < level
+      message = format_message(severity, progname, yield)
+      MUTEX.synchronize { io.write(message) }
+      true
     end
 
     #
@@ -87,14 +124,31 @@ module Omnibus
 
     private
 
-    def format_message(severity, _datetime, progname, msg)
-      left = if progname
-               "[#{progname}] #{severity[0]} | "
-             else
-               "#{severity[0]} | "
-             end
+    #
+    # Format the log message.
+    #
+    # @return [String]
+    #
+    def format_message(severity, progname, message)
+      if progname
+        left = "[#{progname}] #{format_severity(severity)} | "
+      else
+        left = "#{format_severity(severity)} | "
+      end
+      "#{left.rjust(LEFT)}#{message}\n"
+    end
 
-      "#{left.rjust(LEFT)}#{msg}\n"
+    #
+    # Format the log severity.
+    #
+    # @return [String]
+    #
+    def format_severity(severity)
+      if severity == 0
+        '_'
+      else
+        (LEVELS[severity] || '?')[0]
+      end
     end
 
     #
@@ -172,7 +226,7 @@ module Omnibus
       # @param [String] data
       #
       def log_line(data)
-        @log.public_send(@level) { data }
+        @log.public_send(@level, nil) { data }
       end
     end
   end
