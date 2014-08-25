@@ -61,8 +61,6 @@ module Omnibus
     #
     #   $ omnibus build chefdk
     #
-    # @todo Support regular expressions (+$ omnibus build chef*+)
-    #
     desc 'build PROJECT', 'Build the given Omnibus project'
     def build(name)
       project = Project.load(name)
