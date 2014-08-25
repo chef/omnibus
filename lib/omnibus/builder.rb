@@ -667,8 +667,8 @@ module Omnibus
     # Execute the given block with (n) reties defined by {Config#build_retries}.
     # This method will only retry for the following exceptions:
     #
-    #   - +Mixlib::ShellOut::ShellCommandFailed+
-    #   - +Mixlib::ShellOut::CommandTimeout+
+    #   - +CommandFailed+
+    #   - +CommandTimeout+
     #
     # @param [Proc] block
     #   the block to execute
@@ -676,10 +676,7 @@ module Omnibus
     def with_retries(&block)
       tries = Config.build_retries
       delay = 5
-      exceptions = [
-        Mixlib::ShellOut::ShellCommandFailed,
-        Mixlib::ShellOut::CommandTimeout,
-      ]
+      exceptions = [CommandFailed, CommandTimeout]
 
       begin
         block.call

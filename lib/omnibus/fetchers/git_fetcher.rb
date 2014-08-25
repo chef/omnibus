@@ -136,7 +136,7 @@ module Omnibus
     #
     def current_revision
       @current_revision ||= git('rev-parse HEAD').stdout.strip
-    rescue Mixlib::ShellOut::ShellCommandFailed
+    rescue CommandFailed
       nil
     end
 
@@ -147,7 +147,7 @@ module Omnibus
     #
     def target_revision
       @target_revision ||= git("rev-parse #{version}").stdout.strip
-    rescue Mixlib::ShellOut::ShellCommandFailed => e
+    rescue CommandFailed => e
       if e.message.include?('ambiguous argument')
         @target_revision = git("rev-parse origin/#{version}").stdout.strip
         @target_revision

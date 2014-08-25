@@ -4,6 +4,64 @@ module Omnibus
   describe Util do
     subject { Class.new { include Util }.new }
 
+    describe '#shellout!' do
+      let(:shellout) do
+        double(Mixlib::ShellOut,
+          command:     'evil command',
+          stdout:      'command failed',
+          stderr:      'The quick brown fox did not jump over the barn!',
+          timeout:     7_200,
+          exitstatus:  32,
+          environment: {
+            'TICKLE_ME'  => 'elmo',
+            'I_LOVE_YOU' => 'barney',
+          }
+        )
+      end
+
+      context 'when the command fails' do
+        before do
+          allow(subject).to receive(:shellout)
+            .and_return(shellout)
+          allow(shellout).to receive(:error!)
+            .and_raise(Mixlib::ShellOut::ShellCommandFailed)
+        end
+
+        it 'raises an CommandFailed exception' do
+          expect {
+            subject.shellout!
+          }.to raise_error(CommandFailed) { |error|
+            message = error.message
+
+            expect(message).to include("$ I_LOVE_YOU=barney TICKLE_ME=elmo evil command")
+            expect(message).to include("command failed")
+            expect(message).to include("The quick brown fox did not jump over the barn!")
+          }
+        end
+      end
+
+      context 'when the command times out' do
+        before do
+          allow(subject).to receive(:shellout)
+            .and_return(shellout)
+          allow(shellout).to receive(:error!)
+            .and_raise(Mixlib::ShellOut::CommandTimeout)
+        end
+
+        it 'raises an CommandFailed exception' do
+          expect {
+            subject.shellout!
+          }.to raise_error(CommandTimeout) { |error|
+            message = error.message
+
+            expect(message).to include("shell command timed out at 7,200 seconds")
+            expect(message).to include("$ I_LOVE_YOU=barney TICKLE_ME=elmo evil command")
+            expect(message).to include("Please increase the `:timeout' value")
+          }
+        end
+      end
+    end
+
     describe '#create_directory' do
       before { allow(FileUtils).to receive(:mkdir_p) }
 

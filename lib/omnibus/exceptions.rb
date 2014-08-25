@@ -229,4 +229,63 @@ software publisher's website.
 EOH
     end
   end
+
+  class CommandFailed < Error
+    def initialize(cmd)
+      status = cmd.exitstatus
+
+      if cmd.environment.nil? || cmd.environment.empty?
+        env = nil
+      else
+        env = cmd.environment.sort.map { |k,v| "#{k}=#{v}" }.join(' ')
+      end
+
+      command = cmd.command
+      command_with_env = [env, command].compact.join(' ')
+
+      stdout = cmd.stdout.empty? ? '(nothing)' : cmd.stdout.strip
+      stderr = cmd.stderr.empty? ? '(nothing)' : cmd.stderr.strip
+
+      super <<-EOH
+The following shell command exited with status #{status}:
+
+    $ #{command_with_env}
+
+Output:
+
+    #{stdout}
+
+Error:
+
+    #{stderr}
+EOH
+    end
+  end
+
+  class CommandTimeout < Error
+    def initialize(cmd)
+      status = cmd.exitstatus
+
+      if cmd.environment.nil? || cmd.environment.empty?
+        env = nil
+      else
+        env = cmd.environment.sort.map { |k,v| "#{k}=#{v}" }.join(' ')
+      end
+
+      command = cmd.command
+      command_with_env = [env, command].compact.join(' ')
+
+      timeout = cmd.timeout.to_s.reverse.gsub(/...(?=.)/,'\&,').reverse
+
+      super <<-EOH
+The following shell command timed out at #{timeout} seconds:
+
+    $ #{command_with_env}
+
+Please increase the `:timeout' value or run the command manually to make sure it
+is completing successfully. Sometimes it is common for a command to wait for
+user input.
+EOH
+    end
+  end
 end

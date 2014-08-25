@@ -117,7 +117,7 @@ module Omnibus
 
       begin
         shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{tag}"))
-      rescue Mixlib::ShellOut::ShellCommandFailed => e
+      rescue CommandFailed => e
         raise unless e.message.include?('nothing to commit')
       end
 

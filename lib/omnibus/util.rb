@@ -82,18 +82,25 @@ module Omnibus
       cmd
     end
 
+    #
     # Similar to +shellout+ method except it raises an exception if the
     # command fails.
     #
     # @see #shellout
     #
-    # @raise [Mixlib::ShellOut::ShellCommandFailed] if +exitstatus+ is not in
-    #   the list of +valid_exit_codes+.
+    # @raise [CommandFailed]
+    #   if +exitstatus+ is not in the list of +valid_exit_codes+
+    # @raise [CommandTimeout]
+    #   if execution time exceeds +timeout+
     #
     def shellout!(*args)
       cmd = shellout(*args)
       cmd.error!
       cmd
+    rescue Mixlib::ShellOut::ShellCommandFailed
+      raise CommandFailed.new(cmd)
+    rescue Mixlib::ShellOut::CommandTimeout
+      raise CommandTimeout.new(cmd)
     end
 
     #
