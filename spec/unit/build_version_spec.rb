@@ -24,7 +24,7 @@ module Omnibus
         its(:prerelease_tag) { should be_nil }
         its(:git_sha_tag) { should be_nil }
         its(:commits_since_tag) { should == 0 }
-        its(:prerelease_version?) { should be_falsey }
+        its(:prerelease_version?) { should be(false) }
       end
 
       # SemVer compliant prerelease version

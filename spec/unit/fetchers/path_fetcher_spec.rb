@@ -23,7 +23,7 @@ module Omnibus
         end
 
         it 'returns false' do
-          expect(subject.fetch_required?).to be_falsey
+          expect(subject.fetch_required?).to be(false)
         end
       end
 
@@ -77,7 +77,7 @@ module Omnibus
         end
 
         it 'returns false' do
-          expect(subject.clean).to be_falsey
+          expect(subject.clean).to be(false)
         end
       end
     end
