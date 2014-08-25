@@ -68,7 +68,7 @@ module Omnibus
 
     describe '#tag' do
       it 'returns the correct tag' do
-        expect(ipc.tag).to eql('zlib-25a09c83aca0f38a6e9d0d555358e772cde7ae7c40214edf108f1d1fded96bc7')
+        expect(ipc.tag).to eql('zlib-cd7af52fa55e629e79960ba744e4b8a00913a330903489c36a86b6432f1ba8ba')
       end
 
       describe 'with no deps' do
@@ -77,7 +77,7 @@ module Omnibus
         end
 
         it 'returns the correct tag' do
-          expect(ipc.tag).to eql('zlib-4315c8f2f9a0850b6fabeeaffe1f2dde4a3b52a234cc5e9bfaaf37f2280c6829')
+          expect(ipc.tag).to eql('zlib-89bac4cbe2ebae5e75b67ef88ef8d91289c0b655f130fef57b580fc05a83c686')
         end
       end
     end

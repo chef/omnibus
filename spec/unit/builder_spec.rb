@@ -19,6 +19,7 @@ module Omnibus
 
       it_behaves_like 'a cleanroom setter', :command, %|command 'echo "hello"'|
       it_behaves_like 'a cleanroom setter', :patch, %|patch source: 'diff.patch'|
+      it_behaves_like 'a cleanroom getter', :workers
       it_behaves_like 'a cleanroom getter', :max_build_jobs
       it_behaves_like 'a cleanroom setter', :ruby, %|ruby '-e "puts"'|
       it_behaves_like 'a cleanroom setter', :gem, %|gem 'install bacon'|
@@ -46,6 +47,20 @@ module Omnibus
       # From software
       it_behaves_like 'a cleanroom getter', :project_dir
       it_behaves_like 'a cleanroom getter', :install_dir
+    end
+
+    describe '#max_build_jobs' do
+      before { allow(subject).to receive(:workers).and_return(5) }
+
+      it 'prints a deprecation' do
+        output = capture_logging { subject.max_build_jobs }
+        expect(output).to include("Please use `workers' instead.")
+      end
+
+      it 'delegates to #workers' do
+        expect(subject).to receive(:workers).once
+        subject.max_build_jobs
+      end
     end
   end
 end

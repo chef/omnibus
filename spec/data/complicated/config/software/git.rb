@@ -35,6 +35,6 @@ env = {
 }
 
 build do
-  command "make -j #{max_build_jobs} prefix=#{install_dir}/embedded", :env => env
+  command "make -j #{workers} prefix=#{install_dir}/embedded", :env => env
   command "make install prefix=#{install_dir}/embedded", :env => env
 end

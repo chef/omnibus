@@ -48,6 +48,6 @@ build do
           :env => configure_env)
 
   # build it
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+  command "make -j #{workers}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
   command "sudo make install"
 end

@@ -1,6 +1,10 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+v3.x.x (Unreleased)
+-------------------
+- Deprecate `max_build_jobs` in favor of `workers`
+
 v3.2.1 (July 26, 2014)
 ----------------------
 - Add support for overriding publish platform/version

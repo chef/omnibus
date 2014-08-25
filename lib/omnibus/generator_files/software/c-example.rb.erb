@@ -37,6 +37,6 @@ build do
            "--with-ssl=#{install_dir}/embedded",
            "--with-zlib=#{install_dir}/embedded"].join(" "), :env => env
 
-  command "make -j #{max_build_jobs}", :env => env
+  command "make -j #{workers}", :env => env
 
 end

@@ -57,8 +57,8 @@ configure_env =
 
 build do
   command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
-  command "make -j #{max_build_jobs}"
-  command "make -j #{max_build_jobs} install"
+  command "make -j #{workers}"
+  command "make -j #{workers} install"
   # libffi's default install location of header files is aweful...
   command "cp -f #{install_dir}/embedded/lib/libffi-3.0.13/include/* #{install_dir}/embedded/include"
 
