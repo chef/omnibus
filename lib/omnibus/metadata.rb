@@ -146,7 +146,7 @@ module Omnibus
       #
       # @param [String] platform_version
       #   the platform version to truncate
-      # @param [String] platform_shortname
+      # @param [String] platform
       #   the platform shortname. this might be an Ohai-returned platform or
       #   platform family but it also might be a shortname like `el`
       #

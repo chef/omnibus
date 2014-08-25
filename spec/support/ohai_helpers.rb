@@ -7,8 +7,6 @@ module Omnibus
       #
       # Stub Ohai with the given data.
       #
-      # @param [Hash] data
-      #
       def stub_ohai(options = {}, &block)
         ohai = Mash.from_hash(Fauxhai.mock(options, &block).data)
         allow(Ohai).to receive(:ohai).and_return(ohai)

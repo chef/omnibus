@@ -67,7 +67,7 @@ module Omnibus
     #
     # @abstract
     #
-    # @param [Proc] block
+    # @param [Proc] _block
     #   if given, the block will yield the currently uploading "thing"
     #
     # @return [Array<String>]

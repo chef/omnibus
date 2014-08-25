@@ -79,8 +79,8 @@ module Omnibus
     expose :identifier
 
     #
-    # Set or return the signing identity. This value is required if {#sign} is
-    # +true+.
+    # Set or return the signing identity. If this value is provided, Omnibus
+    # will attempt to sign the PKG.
     #
     # @example
     #   signing_identity "foo"

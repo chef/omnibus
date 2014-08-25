@@ -30,7 +30,7 @@ module Omnibus
     # @example
     #   Compressor.for_current_system([:dmg, :tgz]) #=> Packager::DMG
     #
-    # @param [Array<Symbol>]
+    # @param [Array<Symbol>] compressors
     #   the list of configured compressors
     #
     # @return [~Compressor::Base]

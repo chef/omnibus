@@ -27,7 +27,7 @@ module Omnibus
     #
     # Create a new compressor object from the given packager.
     #
-    # @param [~Packager::Base] packager
+    # @param [Project] project
     #
     def initialize(project)
       @project  = project

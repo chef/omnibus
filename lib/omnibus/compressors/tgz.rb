@@ -41,7 +41,7 @@ module Omnibus
     # @example
     #   compression_level 9
     #
-    # @param [Fixnum]
+    # @param [Fixnum] val
     #   the compression level to use
     #
     # @return [Fixnum]

@@ -157,7 +157,7 @@ EOH
     #
     # @param [Symbol] source
     #   the source method that received an invalid value
-    # @Param [String] message
+    # @param [String] message
     #   the message about why the value is invalid
     #
     def initialize(source, message)

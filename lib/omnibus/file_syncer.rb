@@ -27,8 +27,8 @@ module Omnibus
     # Glob across the given pattern, accounting for dotfiles, removing Ruby's
     # dumb idea to include +'.'+ and +'..'+ as entries.
     #
-    # @param [String] path
-    #   the path to get all files from
+    # @param [String] pattern
+    #   the path or glob pattern to get all files from
     #
     # @return [Array<String>]
     #   the list of all files

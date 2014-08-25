@@ -67,8 +67,8 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # Set or return the signing passphrase. This value is required if {#sign} is
-    # +true+.
+    # Set or return the signing passphrase. If this value is provided,
+    # Omnibus will attempt to sign the RPM.
     #
     # @example
     #   signing_passphrase "foo"

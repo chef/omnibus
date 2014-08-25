@@ -55,7 +55,7 @@ module Omnibus
     # DSL method to set the output_format of the build_version. Only honored
     #  when source_type is set to :git
     #
-    # @param source_type [Symbol] Can be set to any method on Omnibus::BuildVersion
+    # @param output_method [Symbol] Can be set to any method on Omnibus::BuildVersion
     # @return [void]
     def output_format(output_method)
       @output_method = output_method

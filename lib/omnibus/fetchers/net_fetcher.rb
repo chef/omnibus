@@ -66,7 +66,7 @@ module Omnibus
 
     #
     # Fetch the given software definition. This method **always** fetches the
-    # file, even if it already exists on disk! You should use {fetch_required?}
+    # file, even if it already exists on disk! You should use {#fetch_required?}
     # to guard against this check in your implementation.
     #
     # @return [void]

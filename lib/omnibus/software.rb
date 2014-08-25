@@ -282,20 +282,19 @@ module Omnibus
     #
     # @param [String] val
     #   the version of the software
-    #
     # @param [Proc] block
     #   the block to run if the version we are building matches the argument
     #
     # @return [String, Proc]
     #
-    def version(val = NULL)
+    def version(val = NULL, &block)
       if block_given?
         if val.equal?(NULL)
           raise InvalidValue.new(:version,
             'pass a block when given a version argument')
         else
           if val == apply_overrides(:version)
-            yield
+            block.call
           end
         end
       end
@@ -329,7 +328,7 @@ module Omnibus
     # @example
     #   relative_path 'example-1.2.3'
     #
-    # @param [String] relative_path
+    # @param [String] val
     #   the relative path inside the tarball
     #
     # @return [String]
@@ -434,8 +433,8 @@ module Omnibus
     # Supported options:
     #    :aix => :use_gcc    force using gcc/g++ compilers on aix
     #
-    # @params [Hash] env
-    # @params [Hash] opts
+    # @param [Hash] env
+    # @param [Hash] opts
     #
     # @return [Hash]
     #
@@ -519,7 +518,7 @@ module Omnibus
     # project's embedded/bin directory prepended. The correct path separator
     # for the platform is used to join the paths.
     #
-    # @params [Hash] env
+    # @param [Hash] env
     #
     # @return [Hash]
     #

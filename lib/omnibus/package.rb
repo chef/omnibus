@@ -94,7 +94,7 @@ module Omnibus
     #
     # The parsed contents of the metadata.
     #
-    # @raise [NoPackageMetadataFile] if the {metadata} does not exist
+    # @raise [NoPackageMetadataFile] if the {#metadata} does not exist
     # @raise [JSON::ParserError] if the JSON is not valid
     #
     # @return [Hash<Symbol, String>]
