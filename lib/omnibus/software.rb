@@ -18,7 +18,6 @@ require 'fileutils'
 require 'uri'
 
 module Omnibus
-  # Omnibus software DSL reader
   class Software
     class << self
       #
