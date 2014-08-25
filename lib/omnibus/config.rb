@@ -440,7 +440,7 @@ module Omnibus
     # The number of times to retry the build before failing.
     #
     # @return [Integer]
-    default(:build_retries, 3)
+    default(:build_retries, 0)
 
     # Use the incremental build caching implemented via git. This will
     # drastically improve build times, but may result in hidden and
