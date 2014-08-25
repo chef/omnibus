@@ -263,14 +263,16 @@ module Omnibus
     end
 
     #
-    # Generate the RPM file using +rpmbuild+.
+    # Generate the RPM file using +rpmbuild+.  The use of the +fakeroot+ command
+    # is required so that the package is owned by +root:root+, but the build
+    # user does not need to have sudo permissions.
     #
     # @return [void]
     #
     def create_rpm_file
       log.info(log_key) { "Creating .rpm file" }
 
-      command =  %|rpmbuild|
+      command =  %|fakeroot rpmbuild|
       command << %| -bb|
       command << %| --buildroot #{staging_dir}/BUILD|
       command << %| --define "_topdir #{staging_dir}"|
