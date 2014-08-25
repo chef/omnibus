@@ -34,6 +34,6 @@ configure_env = {
 build do
   command "./bootstrap", :env => {"PATH" => "#{install_dir}/embedded/bin:#{ENV['PATH']}"}
   command "./configure --prefix=#{install_dir}/embedded", :env => configure_env
-  command "make -j #{max_build_jobs}"
+  command "make -j #{workers}"
   command "make install"
 end

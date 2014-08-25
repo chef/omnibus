@@ -42,6 +42,6 @@ env =
 build do
   # --disable-nls => Disable localization support.
   command "./configure --prefix=#{install_dir}/embedded --disable-nls", :env => env
-  command "make -j #{max_build_jobs}", :env => env
+  command "make -j #{workers}", :env => env
   command "make install"
 end

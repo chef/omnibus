@@ -43,6 +43,6 @@ build do
            "--with-ssl=#{install_dir}/embedded",
            "--with-zlib=#{install_dir}/embedded"].join(" ")
 
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+  command "make -j #{workers}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
   command "make install"
 end

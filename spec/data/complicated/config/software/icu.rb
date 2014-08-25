@@ -31,7 +31,7 @@ build do
             "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include"
           },
           :cwd => working_dir)
-  command("make -j #{max_build_jobs}",
+  command("make -j #{workers}",
           :env => {
             "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
           },

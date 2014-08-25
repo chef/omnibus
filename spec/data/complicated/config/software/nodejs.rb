@@ -39,6 +39,6 @@ end
 
 build do
   command "#{python} ./configure --prefix=#{install_dir}/embedded"
-  command "make -j #{max_build_jobs}"
+  command "make -j #{workers}"
   command "make install"
 end

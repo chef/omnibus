@@ -64,6 +64,6 @@ build do
   command ["./configure",
            "--prefix=#{install_dir}/embedded"
            ].join(" "), :env => env
-  command "make -j #{max_build_jobs}", :env => env
-  command "make -j #{max_build_jobs} install"
+  command "make -j #{workers}", :env => env
+  command "make -j #{workers} install"
 end

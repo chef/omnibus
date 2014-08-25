@@ -48,6 +48,6 @@ build do
            "--with-erlang=#{install_dir}/embedded/lib/erlang/usr/include",
            "--with-js-include=#{install_dir}/embedded/include",
            "--with-js-lib=#{install_dir}/embedded/lib"].join(" "), :env => build_env
-  command "make -j #{max_build_jobs}", :env => build_env
+  command "make -j #{workers}", :env => build_env
   command "make install", :env => build_env
 end

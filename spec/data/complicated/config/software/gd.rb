@@ -51,6 +51,6 @@ build do
           :env => configure_env,
           :cwd => source_dir)
 
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin", "LIBS" => "-liconv"}, :cwd => source_dir
+  command "make -j #{workers}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin", "LIBS" => "-liconv"}, :cwd => source_dir
   command "make install", :cwd => source_dir
 end

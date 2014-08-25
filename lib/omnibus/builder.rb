@@ -143,16 +143,33 @@ module Omnibus
     # @todo Should this be moved to {Software}?
     #
     # @example
-    #   command "make install -j#{max_build_jobs}"
+    #   command "make install -j #{workers}"
     #
     # @return [Fixnum]
     #
-    def max_build_jobs
+    def workers
       if Ohai['cpu'] && Ohai['cpu']['total'] && Ohai['cpu']['total'].to_s =~ /^\d+$/
         Ohai['cpu']['total'].to_i + 1
       else
         3
       end
+    end
+    expose :workers
+
+    #
+    # @deprecated Use {#max_build_jobs} instead.
+    #
+    # @example (see #max_build_jobs)
+    # @raise (see #max_build_jobs)
+    # @param (see #max_build_jobs)
+    # @return (see #max_build_jobs)
+    #
+    def max_build_jobs
+      log.deprecated(log_key) do
+        "max_build_jobs (DSL). Please use `workers' instead."
+      end
+
+      workers
     end
     expose :max_build_jobs
 

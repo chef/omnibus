@@ -34,7 +34,7 @@ build do
   command ["./configure",
            "--prefix=#{install_dir}/embedded",
            "--enable-pcretest-libedit"].join(" "), :env => configure_env
-  command("make -j #{max_build_jobs}",
+  command("make -j #{workers}",
           :env => {
             "PATH" => "#{install_dir}/embedded/bin:#{ENV["PATH"]}"
           })

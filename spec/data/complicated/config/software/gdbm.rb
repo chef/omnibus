@@ -35,6 +35,6 @@ build do
   end
 
   command configure_command.join(" ")
-  command "make -j #{max_build_jobs}"
+  command "make -j #{workers}"
   command "make install"
 end

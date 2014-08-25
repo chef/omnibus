@@ -47,6 +47,6 @@ build do
            "--without-python",
            "--without-crypto"].join(" "),
           :env => env)
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
+  command "make -j #{workers}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
   command "make install", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/bin"}
 end

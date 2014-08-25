@@ -46,6 +46,6 @@ build do
            "--with-libedit-preferred",
            "--with-openssl --with-includes=#{install_dir}/embedded/include",
            "--with-libraries=#{install_dir}/embedded/lib"].join(" "), :env => configure_env
-  command "make -j #{max_build_jobs}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
+  command "make -j #{workers}", :env => {"LD_RUN_PATH" => "#{install_dir}/embedded/lib"}
   command "make install"
 end
