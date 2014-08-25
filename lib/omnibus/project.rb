@@ -19,14 +19,6 @@ require 'time'
 require 'json'
 
 module Omnibus
-  #
-  # Omnibus project DSL reader
-  #
-  # @todo It seems like there's a bit of a conflation between a "project" and a
-  #   "package" in this class... perhaps the package-building portions should be
-  #   extracted to a separate class.
-  #
-  #
   class Project
     class << self
       #
