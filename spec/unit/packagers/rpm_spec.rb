@@ -42,7 +42,6 @@ module Omnibus
       end
     end
 
-
     describe '#vendor' do
       it 'is a DSL method' do
         expect(subject).to have_exposed_method(:vendor)
@@ -305,7 +304,7 @@ module Omnibus
 
         it 'returns the value while logging a message' do
           output = capture_logging do
-            expect(subject.safe_version).to eq('1.2-alpha.-2')
+            expect(subject.safe_version).to eq('1.2_alpha._2')
           end
 
           expect(output).to include("The `version' compontent of RPM package names can only include")
