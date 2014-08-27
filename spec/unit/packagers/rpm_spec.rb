@@ -301,14 +301,14 @@ module Omnibus
       end
 
       context 'when the project build_version has invalid characters' do
-        before { project.build_version("1.2$alpha.##__2") }
+        before { project.build_version("1.2-pre$alpha.##__2") }
 
         it 'returns the value while logging a message' do
           output = capture_logging do
-            expect(subject.safe_version).to eq('1.2-alpha.-2')
+            expect(subject.safe_version).to eq('1.2_pre$alpha.##__2')
           end
 
-          expect(output).to include("The `version' compontent of RPM package names can only include")
+          expect(output).to include("The `version' component of RPM package names can only include")
         end
       end
     end
