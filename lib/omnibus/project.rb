@@ -830,10 +830,23 @@ module Omnibus
     # install path cache, or software definitions to invalidate the cache for
     # this project.
     #
+    # @param [Software] software
+    #   the software that dirtied the cache
+    #
     # @return [true, false]
     #
-    def dirty!
-      @dirty = true
+    def dirty!(software)
+      raise ProjectAlreadyDirty.new(self) if culprit
+      @culprit = software
+    end
+
+    #
+    # The software definition which dirtied this project.
+    #
+    # @return [Software, nil]
+    #
+    def culprit
+      @culprit
     end
 
     #
@@ -842,7 +855,7 @@ module Omnibus
     # @return [true, false]
     #
     def dirty?
-      !!@dirty
+      !!culprit
     end
 
     #

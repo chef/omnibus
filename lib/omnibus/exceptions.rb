@@ -288,4 +288,17 @@ user input.
 EOH
     end
   end
+
+  class ProjectAlreadyDirty < Error
+    def initialize(project)
+      name = project.name
+      culprit = project.culprit.name
+
+      super <<-EOH
+The project `#{name}' was already marked as dirty by `#{culprit}'. You cannot
+mark a project as dirty twice. This is probably a bug in Omnibus and should be
+reported.
+EOH
+    end
+  end
 end

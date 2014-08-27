@@ -161,19 +161,6 @@ module Omnibus
     expose :description
 
     #
-    # Always build the given software definition.
-    #
-    # @param [true, false] val
-    #
-    # @return [true, false]
-    #
-    def always_build(val)
-      @always_build = val
-      @always_build
-    end
-    expose :always_build
-
-    #
     # Add a software dependency to this software.
     #
     # @example
@@ -717,20 +704,32 @@ module Omnibus
       end
     end
 
-    # Actually build the software package
+    #
+    # Build the software package. If git caching is turned on (see
+    # {Config#use_git_caching}), the build is restored according to the
+    # documented restoration procedure in the git cache. If the build cannot
+    # be restored (if the tag does not exist), the actual build steps are
+    # executed.
+    #
+    # @return [true]
+    #
     def build_me
-      # Build if we need to
-      if always_build?
-        log.info(log_key) { "Forcing build because `always_build' was given" }
-        execute_build
-      else
-        if GitCache.new(self).restore
-          log.info(log_key) { "Restored from cache" }
-          true
-        else
-          log.info(log_key) { "Could not restore from cache, building..." }
+      if Config.use_git_caching
+        if project.dirty?
+          log.info(log_key) do
+            "Building because `#{project.culprit.name}' dirtied the cache"
+          end
           execute_build
+        elsif git_cache.restore
+          log.info(log_key) { "Restored from cache" }
+        else
+          log.info(log_key) { "Could not restore from cache" }
+          execute_build
+          project.dirty!(self)
         end
+      else
+        log.debug(log_key) { "Forcing build because git caching is off" }
+        execute_build
       end
 
       project.build_version_dsl.resolve(self)
@@ -792,22 +791,12 @@ module Omnibus
     private
 
     #
-    # Determine if this software should always be built. A software should
-    # always be built if git caching is disabled ({Config#use_git_caching}) or
-    # if the parent project has dirtied the cache.
+    # The git caching implementation for this software.
     #
-    # @return [true, false]
+    # @return [GitCache]
     #
-    def always_build?
-      unless Config.use_git_caching
-        return true
-      end
-
-      if project.dirty?
-        return true
-      end
-
-      !!@always_build
+    def git_cache
+      @git_cache ||= GitCache.new(self)
     end
 
     #
@@ -838,18 +827,27 @@ module Omnibus
       end
     end
 
+    #
+    # Actually build this software, executing the steps provided in the
+    # {#build} block and dirtying the cache.
+    #
+    # @return [void]
+    #
     def execute_build
       fetcher.clean
       builder.build
 
       if Config.use_git_caching
-        GitCache.new(self).incremental
+        git_cache.incremental
         log.info(log_key) { 'Dirtied the cache' }
       end
-
-      project.dirty!
     end
 
+    #
+    # The log key for this software, including its name.
+    #
+    # @return [String]
+    #
     def log_key
       @log_key ||= "#{super}: #{name}"
     end

@@ -123,26 +123,34 @@ module Omnibus
     end
 
     describe '#dirty!' do
+      let(:software) { double(Omnibus::Software) }
+
       it 'dirties the cache' do
-        subject.instance_variable_set(:@dirty, nil)
-        subject.dirty!
+        subject.instance_variable_set(:@culprit, nil)
+        subject.dirty!(software)
         expect(subject).to be_dirty
+      end
+
+      it 'sets the culprit' do
+        subject.instance_variable_set(:@culprit, nil)
+        subject.dirty!(software)
+        expect(subject.culprit).to be(software)
       end
     end
 
     describe '#dirty?' do
       it 'returns true by default' do
-        subject.instance_variable_set(:@dirty, nil)
+        subject.instance_variable_set(:@culprit, nil)
         expect(subject).to_not be_dirty
       end
 
       it 'returns true when the cache is dirty' do
-        subject.instance_variable_set(:@dirty, true)
+        subject.instance_variable_set(:@culprit, true)
         expect(subject).to be_dirty
       end
 
       it 'returns false when the cache is not dirty' do
-        subject.instance_variable_set(:@dirty, false)
+        subject.instance_variable_set(:@culprit, false)
         expect(subject).to_not be_dirty
       end
     end

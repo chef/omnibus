@@ -22,7 +22,6 @@ module Omnibus
     it_behaves_like 'a cleanroom getter', :project
     it_behaves_like 'a cleanroom setter', :name, %|name 'libxml2'|
     it_behaves_like 'a cleanroom setter', :description, %|description 'The XML magician'|
-    it_behaves_like 'a cleanroom setter', :always_build, %|always_build true|
     it_behaves_like 'a cleanroom setter', :dependency, %|dependency 'libxslt'|
     it_behaves_like 'a cleanroom setter', :source, %|source url: 'https://source.example.com'|
     it_behaves_like 'a cleanroom setter', :default_version, %|default_version '1.2.3'|
