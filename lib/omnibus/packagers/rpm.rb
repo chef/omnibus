@@ -410,15 +410,15 @@ module Omnibus
     # @return [String]
     #
     def safe_version
-      if project.build_version =~ /\A[a-zA-Z0-9\.\+\-]+\z/
+      if project.build_version =~ /\A[a-zA-Z0-9\.\+\_]+\z/
         project.build_version.dup
       else
-        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
+        converted = project.build_version.gsub('-', '_')
 
         log.warn(log_key) do
-          "The `version' compontent of RPM package names can only include " \
+          "The `version' component of RPM package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), and dashes (-). Converting " \
+          "plus signs (+), and underscores (_). Converting " \
           "`#{project.build_version}' to `#{converted}'."
         end
 
