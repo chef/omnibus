@@ -1006,11 +1006,11 @@ module Omnibus
         render_metadata(pkg_type)
 
         if Ohai['platform'] == 'windows'
-          FileUtils.cp(Dir["#{Config.package_dir}/*.msi*"], destination)
+          FileUtils.cp(Dir["#{Config.package_dir}/*.msi*"], destination, preserve: true)
         elsif Ohai['platform'] == 'aix'
-          FileUtils.cp(Dir["#{Config.package_dir}/*.bff*"], destination)
+          FileUtils.cp(Dir["#{Config.package_dir}/*.bff*"], destination, preserve: true)
         else
-          FileUtils.cp(Dir["#{Config.package_dir}/*"], destination)
+          FileUtils.cp(Dir["#{Config.package_dir}/*"], destination, preserve: true)
         end
       end
     end
