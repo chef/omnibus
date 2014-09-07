@@ -29,6 +29,7 @@ module Omnibus
           name:          project.name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
+          build_version: project.build_version,
         }
       )
 
@@ -39,6 +40,7 @@ module Omnibus
           name:          project.name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
+          build_version: project.build_version,
         }
       )
 
