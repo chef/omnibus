@@ -275,7 +275,7 @@ module Omnibus
       command =  %|fakeroot rpmbuild|
       command << %| -bb|
       command << %| --buildroot #{staging_dir}/BUILD|
-      command << %| --define "_topdir #{staging_dir}"|
+      command << %| --define '_topdir #{staging_dir}'|
 
       if signing_passphrase
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
