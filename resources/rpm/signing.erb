@@ -29,7 +29,7 @@ PTY.spawn(rpm_cmd) do |r, w, pid|
     begin
       line = r.gets
       puts line
-      if line =~ /failed/
+      if (line =~ /failed/) && !(line =~ /warning:/)
         STDERR.puts 'RPM signing failure'
         exit 1
       end
