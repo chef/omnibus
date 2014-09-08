@@ -270,14 +270,14 @@ module Omnibus
     # @return [void]
     #
     def create_rpm_file
-      log.info(log_key) { "Creating .rpm file" }
-
       command =  %|fakeroot rpmbuild|
       command << %| -bb|
       command << %| --buildroot #{staging_dir}/BUILD|
       command << %| --define '_topdir #{staging_dir}'|
 
       if signing_passphrase
+        log.info(log_key) { "Signing enabled for .rpm file" }
+
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
           home = ENV['HOME']
@@ -300,9 +300,11 @@ module Omnibus
         command << " #{spec_file}"
 
         with_rpm_signing do |signing_script|
+          log.info(log_key) { "Creating .rpm file" }
           shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
         end
       else
+        log.info(log_key) { "Creating .rpm file" }
         command << " #{spec_file}"
         shellout!("#{command}")
       end
