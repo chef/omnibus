@@ -280,6 +280,7 @@ module Omnibus
       if signing_passphrase
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
+          home = ENV['HOME']
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
 
@@ -293,13 +294,13 @@ module Omnibus
               gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
             }
           )
+        end
 
-          command << " --sign"
-          command << " #{spec_file}"
+        command << " --sign"
+        command << " #{spec_file}"
 
-          with_rpm_signing do |signing_script|
-            shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
-          end
+        with_rpm_signing do |signing_script|
+          shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
         end
       else
         command << " #{spec_file}"
