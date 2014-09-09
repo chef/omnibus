@@ -153,10 +153,12 @@ module Omnibus
       end
 
       context 'when scripts are given' do
+        let(:scripts) {  %w( pre post preun postun verifyscript pretans posttrans ) }
+
         before do
-          Packager::RPM::SCRIPTS.each do |name|
-            create_file("#{project_root}/package-scripts/project/#{name}") do
-              "Contents of #{name}"
+          scripts.each do |script_name|
+            create_file("#{project_root}/package-scripts/project/#{script_name}") do
+              "Contents of #{script_name}"
             end
           end
         end
@@ -165,20 +167,33 @@ module Omnibus
           subject.write_rpm_spec
           contents = File.read(spec_file)
 
-          expect(contents).to include("%pre")
-          expect(contents).to include("Contents of pre")
-          expect(contents).to include("%post")
-          expect(contents).to include("Contents of post")
-          expect(contents).to include("%preun")
-          expect(contents).to include("Contents of preun")
-          expect(contents).to include("%postun")
-          expect(contents).to include("Contents of postun")
-          expect(contents).to include("%verifyscript")
-          expect(contents).to include("Contents of verifyscript")
-          expect(contents).to include("%pretans")
-          expect(contents).to include("Contents of pretans")
-          expect(contents).to include("%posttrans")
-          expect(contents).to include("Contents of posttrans")
+          scripts.each do |script_name|
+            expect(contents).to include("%#{script_name}")
+            expect(contents).to include("Contents of #{script_name}")
+          end
+        end
+      end
+
+      context 'when scripts with default omnibus naming are given' do
+        let(:default_scripts) {  %w( preinst postinst prerm postrm ) }
+
+        before do
+          default_scripts.each do |default_name|
+            create_file("#{project_root}/package-scripts/project/#{default_name}") do
+              "Contents of #{default_name}"
+            end
+          end
+        end
+
+        it 'writes the scripts into the spec' do
+          subject.write_rpm_spec
+          contents = File.read(spec_file)
+
+          default_scripts.each do |script_name|
+            mapped_name = Packager::RPM::SCRIPT_MAP[script_name.to_sym]
+            expect(contents).to include("%#{mapped_name}")
+            expect(contents).to include("Contents of #{script_name}")
+          end
         end
       end
 

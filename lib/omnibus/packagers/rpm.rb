@@ -18,8 +18,22 @@
 
 module Omnibus
   class Packager::RPM < Packager::Base
-    # @return [Array]
-    SCRIPTS = %w(pre post preun postun verifyscript pretans posttrans).freeze
+    # @return [Hash]
+    SCRIPT_MAP = {
+      # Default Omnibus naming
+      preinst:  'pre',
+      postinst: 'post',
+      prerm:    'preun',
+      postrm:   'postun',
+      # Default RPM naming
+      pre:          'pre',
+      post:         'post',
+      preun:        'preun',
+      postun:       'postun',
+      verifyscript: 'verifyscript',
+      pretans:      'pretans',
+      posttrans:    'posttrans',
+    }.freeze
 
     id :rpm
 
@@ -216,11 +230,11 @@ module Omnibus
     #
     def write_rpm_spec
       # Create a map of scripts that exist and their contents
-      scripts = SCRIPTS.inject({}) do |hash, name|
-        path = File.join(project.package_scripts_path, name)
+      scripts = SCRIPT_MAP.inject({}) do |hash, (source, destination)|
+        path =  File.join(project.package_scripts_path, source.to_s)
 
         if File.file?(path)
-          hash[name] = File.read(path)
+          hash[destination] = File.read(path)
         end
 
         hash
