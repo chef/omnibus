@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'digest'
+require 'openssl'
 require 'pathname'
 
 module Omnibus
@@ -96,7 +96,7 @@ module Omnibus
     #
     def digest_from_type(type)
       id = type.to_s.upcase
-      instance = Digest.const_get(id).new
+      instance = OpenSSL::Digest.const_get(id).new
     end
 
     #
