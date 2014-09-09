@@ -183,7 +183,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}-#{project.build_iteration}.msi"
+      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}.msi"
     end
 
     #
@@ -204,7 +204,7 @@ module Omnibus
       render_template(resource_path('localization-en-us.wxl.erb'),
         destination: "#{staging_dir}/localization-en-us.wxl",
         variables: {
-          name:          project.name,
+          name:          project.package_name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
         }
@@ -220,7 +220,7 @@ module Omnibus
       render_template(resource_path('parameters.wxi.erb'),
         destination: "#{staging_dir}/parameters.wxi",
         variables: {
-          name:            project.name,
+          name:            project.package_name,
           friendly_name:   project.friendly_name,
           maintainer:      project.maintainer,
           upgrade_code:    upgrade_code,
@@ -269,7 +269,7 @@ module Omnibus
       render_template(resource_path('source.wxs.erb'),
         destination: "#{staging_dir}/source.wxs",
         variables: {
-          name:          project.name,
+          name:          project.package_name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
           hierarchy:     hierarchy,

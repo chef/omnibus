@@ -36,7 +36,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.run"
+      "#{project.package_name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.run"
     end
 
     #

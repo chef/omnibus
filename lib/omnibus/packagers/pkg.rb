@@ -43,6 +43,7 @@ module Omnibus
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
           build_version: project.build_version,
+          package_name:  project.package_name,
         }
       )
 
@@ -54,6 +55,7 @@ module Omnibus
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
           build_version: project.build_version,
+          package_name:  project.package_name,
         }
       )
 
@@ -123,7 +125,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.pkg"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.pkg"
     end
 
     #
@@ -251,24 +253,24 @@ module Omnibus
     # @return [String] the filename of the component .pkg file to create.
     #
     def component_pkg
-      "#{safe_project_name}-core.pkg"
+      "#{safe_base_package_name}-core.pkg"
     end
 
     #
-    # Return the PKG-ready project name, removing any invalid characters.
+    # Return the PKG-ready base package name, removing any invalid characters.
     #
     # @return [String]
     #
-    def safe_project_name
-      if project.name =~ /\A[[:alnum:]]+\z/
-        project.name.dup
+    def safe_base_package_name
+      if project.package_name =~ /\A[[:alnum:]]+\z/
+        project.package_name.dup
       else
-        converted = project.name.downcase.gsub(/[^[:alnum:]+]/, '')
+        converted = project.package_name.downcase.gsub(/[^[:alnum:]+]/, '')
 
         log.warn(log_key) do
           "The `name' compontent of Mac package names can only include " \
           "alphabetical characters (a-z, A-Z), and numbers (0-9). Converting " \
-          "`#{project.name}' to `#{converted}'."
+          "`#{project.package_name}' to `#{converted}'."
         end
 
         converted
@@ -286,7 +288,7 @@ module Omnibus
       return identifier if identifier
 
       maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, '').downcase
-      "test.#{maintainer}.pkg.#{safe_project_name}"
+      "test.#{maintainer}.pkg.#{safe_base_package_name}"
     end
 
     #

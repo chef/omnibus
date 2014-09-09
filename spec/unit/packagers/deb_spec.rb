@@ -247,10 +247,10 @@ module Omnibus
       end
     end
 
-    describe '#safe_project_name' do
+    describe '#safe_base_package_name' do
       context 'when the project name is "safe"' do
         it 'returns the value without logging a message' do
-          expect(subject.safe_project_name).to eq('project')
+          expect(subject.safe_base_package_name).to eq('project')
           expect(subject).to_not receive(:log)
         end
       end
@@ -260,7 +260,7 @@ module Omnibus
 
         it 'returns the value while logging a message' do
           output = capture_logging do
-            expect(subject.safe_project_name).to eq('Pro-ject123.for-realz-2')
+            expect(subject.safe_base_package_name).to eq('Pro-ject123.for-realz-2')
           end
 
           expect(output).to include("The `name' compontent of Debian package names can only include")

@@ -37,14 +37,14 @@ module Omnibus
 
       Dir.chdir(staging_dir) do
         shellout! "pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"
-        shellout! "pkgchk -vd /tmp/pkgmk #{project.name}"
-        shellout! "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.name}"
+        shellout! "pkgchk -vd /tmp/pkgmk #{project.package_name}"
+        shellout! "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.package_name}"
       end
     end
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
+      "#{project.package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
     end
 
     def pkgmk_version
@@ -92,8 +92,8 @@ module Omnibus
         TZ=PST
         PATH=/sbin:/usr/sbin:/usr/bin:/usr/sadm/install/bin
         BASEDIR=#{install_dirname}
-        PKG=#{project.name}
-        NAME=#{project.name}
+        PKG=#{project.package_name}
+        NAME=#{project.package_name}
         ARCH=#{`uname -p`.chomp}
         VERSION=#{pkgmk_version}
         CATEGORY=application

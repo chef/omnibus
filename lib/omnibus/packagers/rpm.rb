@@ -210,7 +210,7 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
     end
 
     #
@@ -253,7 +253,7 @@ module Omnibus
       render_template(resource_path('spec.erb'),
         destination: spec_file,
         variables: {
-          name:           safe_project_name,
+          name:           safe_base_package_name,
           version:        safe_version,
           iteration:      safe_build_iteration,
           vendor:         vendor,
@@ -388,21 +388,21 @@ module Omnibus
     end
 
     #
-    # Return the RPM-ready project name, converting any invalid characters to
+    # Return the RPM-ready base package name, converting any invalid characters to
     # dashes (+-+).
     #
     # @return [String]
     #
-    def safe_project_name
-      if project.name =~ /\A[a-z0-9\.\+\-]+\z/
-        project.name.dup
+    def safe_base_package_name
+      if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
+        project.package_name.dup
       else
-        converted = project.name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
+        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
           "The `name' compontent of RPM package names can only include " \
           "lowercase alphabetical characters (a-z), numbers (0-9), dots (.), " \
-          "plus signs (+), and dashes (-). Converting `#{project.name}' to " \
+          "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
         end
 

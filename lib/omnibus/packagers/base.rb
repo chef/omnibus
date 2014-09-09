@@ -149,7 +149,7 @@ module Omnibus
     # @return [String]
     #
     def staging_dir
-      @staging_dir ||= Dir.mktmpdir(project.name)
+      @staging_dir ||= Dir.mktmpdir(project.package_name)
     end
 
     #
