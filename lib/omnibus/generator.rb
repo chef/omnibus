@@ -107,8 +107,6 @@ module Omnibus
       return unless options[:bff_assets]
 
       copy_file(resource_path('bff/gen.template.erb'), "#{target}/resources/bff/gen.template.erb")
-      copy_file(resource_path('bff/postinstall.sh'), "#{target}/resources/bff/postinstall.sh")
-      copy_file(resource_path('bff/unpostinstall.sh'), "#{target}/resources/bff/unpostinstall.sh")
     end
 
     def create_deb_assets

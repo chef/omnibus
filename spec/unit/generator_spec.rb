@@ -53,8 +53,6 @@ module Omnibus
 
         expect(structure).to include(*%w(
           omnibus-name/resources/bff/gen.template.erb
-          omnibus-name/resources/bff/postinstall.sh
-          omnibus-name/resources/bff/unpostinstall.sh
         ))
       end
     end

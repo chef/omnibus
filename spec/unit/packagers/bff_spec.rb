@@ -25,6 +25,7 @@ module Omnibus
 
       allow(subject).to receive(:staging_dir).and_return(staging_dir)
       create_directory(staging_dir)
+      create_directory(subject.scripts_staging_dir)
     end
 
     describe '#id' do
@@ -40,6 +41,41 @@ module Omnibus
 
       it 'includes the name, version, and build iteration' do
         expect(subject.package_name).to eq('project.1.2.3.2.x86_64.bff')
+      end
+    end
+
+    describe '#scripts_install_dir' do
+      it 'is nested inside the project install_dir' do
+        expect(subject.scripts_install_dir).to eq("#{project.install_dir}/embedded/share/installp")
+      end
+    end
+
+    describe '#scripts_staging_dir' do
+      it 'is nested inside the staging_dir' do
+        expect(subject.scripts_staging_dir).to eq("#{staging_dir}#{subject.scripts_install_dir}")
+      end
+    end
+
+    describe '#write_scripts' do
+      context 'when scripts are given' do
+        let(:scripts) { %w( preinst postinst prerm postrm ) }
+        before do
+          scripts.each do |script_name|
+            create_file("#{project_root}/package-scripts/project/#{script_name}") do
+              "Contents of #{script_name}"
+            end
+          end
+        end
+
+        it 'writes the scripts into scripts staging dir' do
+          subject.write_scripts
+
+          scripts.each do |script_name|
+            script_file = "#{subject.scripts_staging_dir}/#{script_name}"
+            contents = File.read(script_file)
+            expect(contents).to include("Contents of #{script_name}")
+          end
+        end
       end
     end
 
@@ -67,8 +103,6 @@ module Omnibus
         expect(contents).to include("  Fileset VRMF: 1.2.3.2")
         expect(contents).to include("  Fileset Description: The full stack of project")
         expect(contents).to include("  USRLIBLPPFiles")
-        expect(contents).to include("    Configuration Script:")
-        expect(contents).to include("    Unconfiguration Script:")
         expect(contents).to include("  EOUSRLIBLPPFiles")
         expect(contents).to include("  Bosboot required: N")
         expect(contents).to include("  License agreement acceptance required: N")
@@ -96,6 +130,25 @@ module Omnibus
           expect(contents).to include("/.file1")
           expect(contents).to include("/dir2")
           expect(contents).to include("/file2")
+        end
+      end
+
+      context 'when script files are present' do
+        before do
+          create_file("#{subject.scripts_staging_dir}/preinst")
+          create_file("#{subject.scripts_staging_dir}/postinst")
+          create_file("#{subject.scripts_staging_dir}/prerm")
+          create_file("#{subject.scripts_staging_dir}/postrm")
+        end
+
+        it 'writes them into the template' do
+          subject.write_gen_template
+          contents = File.read(gen_file)
+
+          expect(contents).to include("    Pre-installation Script: #{subject.scripts_install_dir}/preinst")
+          expect(contents).to include("    Post-installation Script: #{subject.scripts_install_dir}/postinst")
+          expect(contents).to include("    Pre_rm Script: #{subject.scripts_install_dir}/prerm")
+          expect(contents).to include("    Unconfiguration Script: #{subject.scripts_install_dir}/postrm")
         end
       end
     end
