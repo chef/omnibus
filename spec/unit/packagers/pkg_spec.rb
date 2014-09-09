@@ -27,6 +27,7 @@ module Omnibus
 
       allow(subject).to receive(:staging_dir).and_return(staging_dir)
       create_directory(staging_dir)
+      create_directory("#{staging_dir}/Scripts")
     end
 
     describe 'DSL' do
@@ -57,13 +58,65 @@ module Omnibus
       end
     end
 
+    describe '#scripts_dir' do
+      it 'is nested inside the staging_dir' do
+        expect(subject.scripts_dir).to eq("#{staging_dir}/Scripts")
+      end
+    end
+
+    describe '#write_scripts' do
+      context 'when scripts are given' do
+        let(:scripts) { %w( preinstall postinstall ) }
+        before do
+          scripts.each do |script_name|
+            create_file("#{project_root}/package-scripts/project/#{script_name}") do
+              "Contents of #{script_name}"
+            end
+          end
+        end
+
+        it 'writes the scripts into scripts staging dir' do
+          subject.write_scripts
+
+          scripts.each do |script_name|
+            script_file = "#{staging_dir}/Scripts/#{script_name}"
+            contents = File.read(script_file)
+            expect(contents).to include("Contents of #{script_name}")
+          end
+        end
+      end
+
+      context 'when scripts with default omnibus naming are given' do
+        let(:default_scripts) { %w( preinst postinst ) }
+        before do
+          default_scripts.each do |script_name|
+            create_file("#{project_root}/package-scripts/project/#{script_name}") do
+              "Contents of #{script_name}"
+            end
+          end
+        end
+
+        it 'writes the scripts into scripts staging dir' do
+          subject.write_scripts
+
+          default_scripts.each do |script_name|
+            mapped_name = Packager::PKG::SCRIPT_MAP[script_name.to_sym]
+            script_file = "#{staging_dir}/Scripts/#{mapped_name}"
+            contents = File.read(script_file)
+            expect(contents).to include("Contents of #{script_name}")
+          end
+        end
+      end
+    end
+
+
     describe '#build_component_pkg' do
       it 'executes the pkgbuild command' do
         expect(subject).to receive(:shellout!).with <<-EOH.gsub(/^ {10}/, '')
           pkgbuild \\
             --identifier "com.getchef.project" \\
             --version "1.2.3" \\
-            --scripts "#{project_root}/package-scripts/project" \\
+            --scripts "#{staging_dir}/Scripts" \\
             --root "/opt/project" \\
             --install-location "/opt/project" \\
             "project-core.pkg"

@@ -16,11 +16,24 @@
 
 module Omnibus
   class Packager::PKG < Packager::Base
+    # @return [Hash]
+    SCRIPT_MAP = {
+      # Default Omnibus naming
+      preinst:  'preinstall',
+      postinst: 'postinstall',
+      # Default PKG naming
+      preinstall:  'preinstall',
+      postinstall: 'postinstall',
+    }.freeze
+
     id :pkg
 
     setup do
       # Create the resources directory
       create_directory(resources_dir)
+
+      # Create the scripts directory
+      create_directory(scripts_dir)
 
       # Render the license
       render_template(resource_path('license.html.erb'),
@@ -49,6 +62,8 @@ module Omnibus
     end
 
     build do
+      write_scripts
+
       build_component_pkg
 
       write_distribution_file
@@ -133,6 +148,36 @@ module Omnibus
     end
 
     #
+    # The path where the package scripts will live. We cannot store
+    # scripts in the top-level staging dir, because +pkgbuild+'s
+    # +--scripts+ flag expects a directory that does not contain the parent
+    # package.
+    #
+    # @return [String]
+    #
+    def scripts_dir
+      File.expand_path("#{staging_dir}/Scripts")
+    end
+
+    #
+    # Copy all scripts in {Project#package_scripts_path} to the package
+    # directory.
+    #
+    # @return [void]
+    #
+    def write_scripts
+      SCRIPT_MAP.each do |source, destination|
+        source_path = File.join(project.package_scripts_path, source.to_s)
+
+        if File.file?(source_path)
+          destination_path = File.join(scripts_dir, destination)
+          log.debug(log_key) { "Adding script `#{source}' to `#{destination_path}'" }
+          copy_file(source_path, destination_path)
+        end
+      end
+    end
+
+    #
     # Construct the intermediate build product. It can be installed with the
     # Installer.app, but doesn't contain the data needed to customize the
     # installer UI.
@@ -144,7 +189,7 @@ module Omnibus
         pkgbuild \\
           --identifier "#{safe_identifier}" \\
           --version "#{safe_version}" \\
-          --scripts "#{project.package_scripts_path}" \\
+          --scripts "#{scripts_dir}" \\
           --root "#{project.install_dir}" \\
           --install-location "#{project.install_dir}" \\
           "#{component_pkg}"
