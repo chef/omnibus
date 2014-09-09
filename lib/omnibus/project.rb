@@ -192,6 +192,21 @@ module Omnibus
     expose :default_root
 
     #
+    # Path to the +/files+ directory in the omnibus project. This directory can
+    # contain arbritary files used by the project.
+    #
+    # @example
+    #   patch = File.join(files_path, 'rubygems', 'patch.rb')
+    #
+    # @return [String]
+    #   path to the files directory
+    #
+    def files_path
+      File.expand_path("#{Config.project_root}/files")
+    end
+    expose :files_path
+
+    #
     # **[Required]** Set or retrieve the the package maintainer.
     #
     # @example

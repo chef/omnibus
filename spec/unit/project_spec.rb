@@ -42,6 +42,8 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :config_file, %|config_file '/path/to/config.rb'|
     it_behaves_like 'a cleanroom setter', :extra_package_file, %|extra_package_file '/path/to/asset'|
 
+    it_behaves_like 'a cleanroom getter', :files_path
+
     describe 'basics' do
       it 'returns a name' do
         expect(subject.name).to eq('sample')
