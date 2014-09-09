@@ -82,16 +82,6 @@ module Omnibus
       end
     end
 
-    context 'with the --makeself-assets flag' do
-      it 'generates the proper file structure' do
-        Generator.new(['name'], path: tmp_path, makeself_assets: true).invoke_all
-
-        expect(structure).to include(*%w(
-          omnibus-name/resources/makeself/post_extract.sh.erb
-        ))
-      end
-    end
-
     context 'with the --msi-assets flag' do
       it 'generates the proper file structure' do
         Generator.new(['name'], path: tmp_path, msi_assets: true).invoke_all

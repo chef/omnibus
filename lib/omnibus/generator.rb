@@ -50,11 +50,6 @@ module Omnibus
       type: :boolean,
       default: false
 
-    class_option :makeself_assets,
-      desc: 'Generate makeself assets',
-      type: :boolean,
-      default: false
-
     class_option :msi_assets,
       desc: 'Generate Windows MSI assets',
       type: :boolean,
@@ -129,12 +124,6 @@ module Omnibus
 
       copy_file(resource_path('dmg/background.png'), "#{target}/resources/dmg/background.png")
       copy_file(resource_path('dmg/icon.png'), "#{target}/resources/dmg/icon.png")
-    end
-
-    def create_makeself_assets
-      return unless options[:makeself_assets]
-
-      copy_file(resource_path('makeself/post_extract.sh.erb'), "#{target}/resources/makeself/post_extract.sh.erb")
     end
 
     def create_msi_assets
