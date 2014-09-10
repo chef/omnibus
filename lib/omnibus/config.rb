@@ -466,6 +466,19 @@ module Omnibus
     # @!endgroup
     #
 
+    #
+    # @!group Fetcher Parameters
+    # --------------------------------------------------
+
+    # The number of seconds to wait
+    #
+    # @return [Integer]
+    default(:fetcher_read_timeout, 60)
+
+    # --------------------------------------------------
+    # @!endgroup
+    #
+
     private
 
     #
