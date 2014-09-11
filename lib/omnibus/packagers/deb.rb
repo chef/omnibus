@@ -381,6 +381,8 @@ module Omnibus
       case Ohai['kernel']['machine']
       when 'x86_64'
         'amd64'
+      when 'i686'
+        'i386'
       else
         Ohai['kernel']['machine']
       end
