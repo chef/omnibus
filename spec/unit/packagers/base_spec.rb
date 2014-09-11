@@ -71,6 +71,16 @@ module Omnibus
       end
     end
 
+    describe '#install_dir' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:install_dir)
+      end
+
+      it 'returns the project instances install_dir' do
+        expect(subject.install_dir).to eq('/opt/project')
+      end
+    end
+
     describe '#run!' do
       before do
         allow(subject).to receive(:remove_directory)
