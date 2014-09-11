@@ -81,6 +81,12 @@ module Omnibus
       end
     end
 
+    describe '#windows_safe_path' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:windows_safe_path)
+      end
+    end
+
     describe '#run!' do
       before do
         allow(subject).to receive(:remove_directory)

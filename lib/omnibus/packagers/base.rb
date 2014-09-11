@@ -121,6 +121,11 @@ module Omnibus
     expose :install_dir
 
     #
+    # (see Util#windows_safe_path)
+    #
+    expose :windows_safe_path
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
