@@ -98,6 +98,16 @@ module Omnibus
         end
       end
 
+      context 'when the version is an annnotated tag' do
+        let(:version)  { 'v1.2.4' }
+        let(:remote)   { remote_git_repo('zlib', annotated_tags: [version]) }
+
+        it 'it defererences and parses the annotated tag' do
+          subject.fetch
+          expect(revision).to eq('efde208366abd0f91419d8a54b45e3f6e0540105')
+        end
+      end
+
       context 'when the version is a branch' do
         let(:version) { 'sethvargo/magic_ponies' }
         let(:remote)  { remote_git_repo('zlib', branches: [version]) }
@@ -108,13 +118,32 @@ module Omnibus
         end
       end
 
-      context 'when the version is a ref' do
+      context 'when the version is a full SHA-1' do
+        let(:version) { '45ded6d3b1a35d66ed866b2c3eb418426e6382b0' }
+        let(:remote)  { remote_git_repo('zlib') }
+
+        it 'parses the full SHA-1' do
+          subject.fetch
+          expect(revision).to eq('45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
+        end
+      end
+
+      context 'when the version is a abbreviated SHA-1' do
         let(:version) { '45ded6d' }
         let(:remote)  { remote_git_repo('zlib') }
 
-        it 'parses the ref' do
+        it 'parses the abbreviated SHA-1' do
           subject.fetch
           expect(revision).to eq('45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
+        end
+      end
+
+      context 'when the version is a non-existent ref' do
+        let(:version) { 'fufufufufu' }
+        let(:remote)  { remote_git_repo('zlib') }
+
+        it 'raise an exception' do
+          expect { subject.fetch }.to raise_error(UnresolvableGitReference)
         end
       end
     end

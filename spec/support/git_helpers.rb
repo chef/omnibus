@@ -33,6 +33,14 @@ module Omnibus
           git %|remote add origin "#{remote_url}"|
           git %|push origin master|
 
+          options[:annotated_tags].each do |tag|
+            File.open('tag', 'w') { |f| f.write(tag) }
+            git %|add tag|
+            git %|commit -am "Create tag #{tag}"|
+            git %|tag "#{tag}" -m "#{tag}"|
+            git %|push origin "#{tag}"|
+          end if options[:annotated_tags]
+
           options[:tags].each do |tag|
             File.open('tag', 'w') { |f| f.write(tag) }
             git %|add tag|
