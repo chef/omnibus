@@ -301,4 +301,12 @@ reported.
 EOH
     end
   end
+
+  class UnresolvableGitReference < Error
+    def initialize(ref)
+      super <<-EOH
+Could not resolve `#{ref}' to a valid git SHA-1.
+EOH
+    end
+  end
 end

@@ -146,15 +146,11 @@ module Omnibus
     # @return [String]
     #
     def target_revision
-      @target_revision ||= git("rev-parse #{version}").stdout.strip
-    rescue CommandFailed => e
-      if e.message.include?('ambiguous argument')
-        @target_revision = git("rev-parse origin/#{version}").stdout.strip
-        @target_revision
-      else
-        log.warn { 'Could not determine target revision!' }
-        nil
-      end
+      @target_revision ||= if sha_hash?(version)
+                             version
+                           else
+                             revision_from_remote_reference(version)
+                           end
     end
 
     #
@@ -164,6 +160,76 @@ module Omnibus
     #
     def same_revision?
       current_revision == target_revision
+    end
+
+    #
+    # Determine if the given revision is a SHA
+    #
+    # @return [true, false]
+    #
+    def sha_hash?(rev)
+      rev =~ /^[0-9a-f]{4,40}$/
+    end
+
+    #
+    # Return the SHA corresponding to ref. If ref is an annotated tag,
+    # return the SHA that was tagged not the SHA of the tag itself.
+    #
+    # @return [String]
+    #
+    def revision_from_remote_reference(ref)
+      # execute `git ls-remote` the trailing '*' does globbing. This
+      # allows us to return the SHA of the tagged commit for annotated
+      # tags. We take care to only return exact matches in
+      # process_remote_list.
+      remote_list = git("ls-remote origin #{ref}*").stdout
+      commit_ref = dereference_annotated_tag(remote_list, ref)
+
+      unless commit_ref
+        raise UnresolvableGitReference.new(ref)
+      end
+      commit_ref
+    end
+
+    #
+    # Dereference annotated tags.
+    #
+    # The +remote_list+ parameter is assumed to look like this:
+    #
+    #   a2ed66c01f42514bcab77fd628149eccb4ecee28        refs/tags/rel-0.11.0
+    #   f915286abdbc1907878376cce9222ac0b08b12b8        refs/tags/rel-0.11.0^{}
+    #
+    # The SHA with ^{} is the commit pointed to by an annotated
+    # tag. If ref isn't an annotated tag, there will not be a line
+    # with trailing ^{}.
+    #
+    # @param [String] remote_list
+    #   output from `git ls-remote origin` command
+    # @param [String] ref
+    #   the target git ref
+    #
+    # @return [String]
+    #
+    def dereference_annotated_tag(remote_list, ref)
+      # We'll return the SHA corresponding to the ^{} which is the
+      # commit pointed to by an annotated tag. If no such commit
+      # exists (not an annotated tag) then we return the SHA of the
+      # ref.  If nothing matches, return "".
+      lines = remote_list.split("\n")
+      matches = lines.map { |line| line.split("\t") }
+      # First try for ^{} indicating the commit pointed to by an
+      # annotated tag.
+      tagged_commit = matches.find { |m| m[1].end_with?("#{ref}^{}") }
+      if tagged_commit
+        tagged_commit.first
+      else
+        found = matches.find { |m| m[1].end_with?("#{ref}") }
+        if found
+          found.first
+        else
+          nil
+        end
+      end
     end
 
     #
