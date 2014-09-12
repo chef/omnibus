@@ -121,6 +121,27 @@ module Omnibus
     expose :friendly_name
 
     #
+    # Set or retrieve the package name of the project. Defaults to the package
+    # name defaults to the project name.
+    #
+    # @example
+    #   package_name 'com.chef.project'
+    #
+    # @param [String] val
+    #   the package name to set
+    #
+    # @return [String]
+    #
+    def package_name(val = NULL)
+      if null?(val)
+        @package_name || name
+      else
+        @package_name = val
+      end
+    end
+    expose :package_name
+
+    #
     # **[Required]** Set or retrieve the path at which the project should be
     # installed by the generated package.
     #
@@ -169,6 +190,21 @@ module Omnibus
       end
     end
     expose :default_root
+
+    #
+    # Path to the +/files+ directory in the omnibus project. This directory can
+    # contain arbritary files used by the project.
+    #
+    # @example
+    #   patch = File.join(files_path, 'rubygems', 'patch.rb')
+    #
+    # @return [String]
+    #   path to the files directory
+    #
+    def files_path
+      File.expand_path("#{Config.project_root}/files")
+    end
+    expose :files_path
 
     #
     # **[Required]** Set or retrieve the the package maintainer.

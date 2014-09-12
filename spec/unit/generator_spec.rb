@@ -53,8 +53,6 @@ module Omnibus
 
         expect(structure).to include(*%w(
           omnibus-name/resources/bff/gen.template.erb
-          omnibus-name/resources/bff/postinstall.sh
-          omnibus-name/resources/bff/unpostinstall.sh
         ))
       end
     end
@@ -78,16 +76,6 @@ module Omnibus
         expect(structure).to include(*%w(
           omnibus-name/resources/dmg/background.png
           omnibus-name/resources/dmg/icon.png
-        ))
-      end
-    end
-
-    context 'with the --makeself-assets flag' do
-      it 'generates the proper file structure' do
-        Generator.new(['name'], path: tmp_path, makeself_assets: true).invoke_all
-
-        expect(structure).to include(*%w(
-          omnibus-name/resources/makeself/post_extract.sh.erb
         ))
       end
     end

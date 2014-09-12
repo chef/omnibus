@@ -23,6 +23,7 @@ module Omnibus
 
     it_behaves_like 'a cleanroom setter', :name, %|name 'chef'|
     it_behaves_like 'a cleanroom setter', :friendly_name, %|friendly_name 'Chef'|
+    it_behaves_like 'a cleanroom setter', :package_name, %|package_name 'chef.package'|
     it_behaves_like 'a cleanroom setter', :maintainer, %|maintainer 'Chef Software, Inc'|
     it_behaves_like 'a cleanroom setter', :homepage, %|homepage 'https://getchef.com'|
     it_behaves_like 'a cleanroom setter', :description, %|description 'Installs the thing'|
@@ -40,6 +41,8 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :exclude, %|exclude 'hamlet'|
     it_behaves_like 'a cleanroom setter', :config_file, %|config_file '/path/to/config.rb'|
     it_behaves_like 'a cleanroom setter', :extra_package_file, %|extra_package_file '/path/to/asset'|
+
+    it_behaves_like 'a cleanroom getter', :files_path
 
     describe 'basics' do
       it 'returns a name' do

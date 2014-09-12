@@ -106,6 +106,30 @@ module Omnibus
     end
 
     #
+    # @!group DSL methods
+    # --------------------------------------------------
+
+    #
+    # Retrieve the path at which the project will be installed by the
+    # generated package.
+    #
+    # @return [String]
+    #
+    def install_dir
+      project.install_dir
+    end
+    expose :install_dir
+
+    #
+    # (see Util#windows_safe_path)
+    #
+    expose :windows_safe_path
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
     # Execute this packager by running the following phases in order:
     #
     #   - setup
@@ -149,7 +173,7 @@ module Omnibus
     # @return [String]
     #
     def staging_dir
-      @staging_dir ||= Dir.mktmpdir(project.name)
+      @staging_dir ||= Dir.mktmpdir(project.package_name)
     end
 
     #

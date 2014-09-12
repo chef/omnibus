@@ -19,6 +19,7 @@ The following Project values are taken into consideration when building RPMs:
 - `extra_package_files`
 - `iteration`
 - `maintainer`
+- `package_name`
 - `package_user`
 - `package_group`
 - `package_scripts_path`

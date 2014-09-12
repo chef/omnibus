@@ -18,8 +18,22 @@
 
 module Omnibus
   class Packager::RPM < Packager::Base
-    # @return [Array]
-    SCRIPTS = %w(pre post preun postun verifyscript pretans posttrans).freeze
+    # @return [Hash]
+    SCRIPT_MAP = {
+      # Default Omnibus naming
+      preinst:  'pre',
+      postinst: 'post',
+      prerm:    'preun',
+      postrm:   'postun',
+      # Default RPM naming
+      pre:          'pre',
+      post:         'post',
+      preun:        'preun',
+      postun:       'postun',
+      verifyscript: 'verifyscript',
+      pretans:      'pretans',
+      posttrans:    'posttrans',
+    }.freeze
 
     id :rpm
 
@@ -196,7 +210,7 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
     end
 
     #
@@ -216,11 +230,11 @@ module Omnibus
     #
     def write_rpm_spec
       # Create a map of scripts that exist and their contents
-      scripts = SCRIPTS.inject({}) do |hash, name|
-        path = File.join(project.package_scripts_path, name)
+      scripts = SCRIPT_MAP.inject({}) do |hash, (source, destination)|
+        path =  File.join(project.package_scripts_path, source.to_s)
 
         if File.file?(path)
-          hash[name] = File.read(path)
+          hash[destination] = File.read(path)
         end
 
         hash
@@ -239,7 +253,7 @@ module Omnibus
       render_template(resource_path('spec.erb'),
         destination: spec_file,
         variables: {
-          name:           safe_project_name,
+          name:           safe_base_package_name,
           version:        safe_version,
           iteration:      safe_build_iteration,
           vendor:         vendor,
@@ -270,16 +284,17 @@ module Omnibus
     # @return [void]
     #
     def create_rpm_file
-      log.info(log_key) { "Creating .rpm file" }
-
       command =  %|fakeroot rpmbuild|
       command << %| -bb|
       command << %| --buildroot #{staging_dir}/BUILD|
-      command << %| --define "_topdir #{staging_dir}"|
+      command << %| --define '_topdir #{staging_dir}'|
 
       if signing_passphrase
+        log.info(log_key) { "Signing enabled for .rpm file" }
+
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
+          home = ENV['HOME']
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
 
@@ -293,15 +308,17 @@ module Omnibus
               gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
             }
           )
+        end
 
-          command << " --sign"
-          command << " #{spec_file}"
+        command << " --sign"
+        command << " #{spec_file}"
 
-          with_rpm_signing do |signing_script|
-            shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
-          end
+        with_rpm_signing do |signing_script|
+          log.info(log_key) { "Creating .rpm file" }
+          shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
         end
       else
+        log.info(log_key) { "Creating .rpm file" }
         command << " #{spec_file}"
         shellout!("#{command}")
       end
@@ -371,21 +388,21 @@ module Omnibus
     end
 
     #
-    # Return the RPM-ready project name, converting any invalid characters to
+    # Return the RPM-ready base package name, converting any invalid characters to
     # dashes (+-+).
     #
     # @return [String]
     #
-    def safe_project_name
-      if project.name =~ /\A[a-z0-9\.\+\-]+\z/
-        project.name.dup
+    def safe_base_package_name
+      if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
+        project.package_name.dup
       else
-        converted = project.name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
+        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
           "The `name' compontent of RPM package names can only include " \
           "lowercase alphabetical characters (a-z), numbers (0-9), dots (.), " \
-          "plus signs (+), and dashes (-). Converting `#{project.name}' to " \
+          "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
         end
 

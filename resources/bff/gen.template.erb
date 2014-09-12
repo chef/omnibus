@@ -6,8 +6,9 @@ Fileset
   Fileset VRMF: <%= version %>
   Fileset Description: <%= description %>
   USRLIBLPPFiles
-    Configuration Script: <%= configuration_script %>
-    Unconfiguration Script: <%= unconfiguration_script %>
+  <% scripts.each do |name, install_path| -%>
+    <%= name %>: <%= install_path %>
+  <% end -%>
   EOUSRLIBLPPFiles
   Bosboot required: N
   License agreement acceptance required: N

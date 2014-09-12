@@ -16,11 +16,24 @@
 
 module Omnibus
   class Packager::PKG < Packager::Base
+    # @return [Hash]
+    SCRIPT_MAP = {
+      # Default Omnibus naming
+      preinst:  'preinstall',
+      postinst: 'postinstall',
+      # Default PKG naming
+      preinstall:  'preinstall',
+      postinstall: 'postinstall',
+    }.freeze
+
     id :pkg
 
     setup do
       # Create the resources directory
       create_directory(resources_dir)
+
+      # Create the scripts directory
+      create_directory(scripts_dir)
 
       # Render the license
       render_template(resource_path('license.html.erb'),
@@ -29,6 +42,8 @@ module Omnibus
           name:          project.name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
+          build_version: project.build_version,
+          package_name:  project.package_name,
         }
       )
 
@@ -39,6 +54,8 @@ module Omnibus
           name:          project.name,
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
+          build_version: project.build_version,
+          package_name:  project.package_name,
         }
       )
 
@@ -47,6 +64,8 @@ module Omnibus
     end
 
     build do
+      write_scripts
+
       build_component_pkg
 
       write_distribution_file
@@ -106,7 +125,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{safe_project_name}-#{safe_version}-#{safe_build_iteration}.pkg"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.pkg"
     end
 
     #
@@ -131,6 +150,36 @@ module Omnibus
     end
 
     #
+    # The path where the package scripts will live. We cannot store
+    # scripts in the top-level staging dir, because +pkgbuild+'s
+    # +--scripts+ flag expects a directory that does not contain the parent
+    # package.
+    #
+    # @return [String]
+    #
+    def scripts_dir
+      File.expand_path("#{staging_dir}/Scripts")
+    end
+
+    #
+    # Copy all scripts in {Project#package_scripts_path} to the package
+    # directory.
+    #
+    # @return [void]
+    #
+    def write_scripts
+      SCRIPT_MAP.each do |source, destination|
+        source_path = File.join(project.package_scripts_path, source.to_s)
+
+        if File.file?(source_path)
+          destination_path = File.join(scripts_dir, destination)
+          log.debug(log_key) { "Adding script `#{source}' to `#{destination_path}'" }
+          copy_file(source_path, destination_path)
+        end
+      end
+    end
+
+    #
     # Construct the intermediate build product. It can be installed with the
     # Installer.app, but doesn't contain the data needed to customize the
     # installer UI.
@@ -142,7 +191,7 @@ module Omnibus
         pkgbuild \\
           --identifier "#{safe_identifier}" \\
           --version "#{safe_version}" \\
-          --scripts "#{project.package_scripts_path}" \\
+          --scripts "#{scripts_dir}" \\
           --root "#{project.install_dir}" \\
           --install-location "#{project.install_dir}" \\
           "#{component_pkg}"
@@ -204,24 +253,24 @@ module Omnibus
     # @return [String] the filename of the component .pkg file to create.
     #
     def component_pkg
-      "#{safe_project_name}-core.pkg"
+      "#{safe_base_package_name}-core.pkg"
     end
 
     #
-    # Return the PKG-ready project name, removing any invalid characters.
+    # Return the PKG-ready base package name, removing any invalid characters.
     #
     # @return [String]
     #
-    def safe_project_name
-      if project.name =~ /\A[[:alnum:]]+\z/
-        project.name.dup
+    def safe_base_package_name
+      if project.package_name =~ /\A[[:alnum:]]+\z/
+        project.package_name.dup
       else
-        converted = project.name.downcase.gsub(/[^[:alnum:]+]/, '')
+        converted = project.package_name.downcase.gsub(/[^[:alnum:]+]/, '')
 
         log.warn(log_key) do
           "The `name' compontent of Mac package names can only include " \
           "alphabetical characters (a-z, A-Z), and numbers (0-9). Converting " \
-          "`#{project.name}' to `#{converted}'."
+          "`#{project.package_name}' to `#{converted}'."
         end
 
         converted
@@ -239,7 +288,7 @@ module Omnibus
       return identifier if identifier
 
       maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, '').downcase
-      "test.#{maintainer}.pkg.#{safe_project_name}"
+      "test.#{maintainer}.pkg.#{safe_base_package_name}"
     end
 
     #

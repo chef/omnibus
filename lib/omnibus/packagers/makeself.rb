@@ -16,6 +16,14 @@
 
 module Omnibus
   class Packager::Makeself < Packager::Base
+    # @return [Hash]
+    SCRIPT_MAP = {
+      # Default Omnibus naming
+      postinst: 'makeselfinst',
+      # Default Makeself naming
+      makeselfinst: 'makeselfinst',
+    }.freeze
+
     id :makeself
 
     setup do
@@ -27,8 +35,8 @@ module Omnibus
     end
 
     build do
-      # Render the post_extract file
-      write_post_extract_file
+      # Write the scripts
+      write_scripts
 
       # Create the makeself archive
       create_makeself_package
@@ -36,7 +44,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.run"
+      "#{project.package_name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.run"
     end
 
     #
@@ -60,21 +68,21 @@ module Omnibus
     end
 
     #
-    # Write the post-extraction file that will be executed upon extraction of
-    # the makeself file.
+    # Copy all scripts in {Project#package_scripts_path} to the staging
+    # directory.
     #
     # @return [void]
     #
-    def write_post_extract_file
-      render_template(resource_path('post_extract.sh.erb'),
-        destination: File.join(staging_dir, 'post_extract.sh'),
-        mode: 0755,
-        variables: {
-          name:          project.name,
-          friendly_name: project.friendly_name,
-          install_dir:   project.install_dir,
-        }
-      )
+    def write_scripts
+      SCRIPT_MAP.each do |source, destination|
+        source_path = File.join(project.package_scripts_path, source.to_s)
+
+        if File.file?(source_path)
+          destination_path = File.join(staging_dir, destination)
+          log.debug(log_key) { "Adding script `#{source}' to `#{destination_path}'" }
+          copy_file(source_path, destination_path)
+        end
+      end
     end
 
     #
@@ -93,7 +101,7 @@ module Omnibus
             "#{staging_dir}" \\
             "#{package_name}" \\
             "#{project.description}" \\
-            "./post_extract.sh"
+            "./makeselfinst"
         EOH
       end
 

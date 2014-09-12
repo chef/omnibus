@@ -175,7 +175,7 @@ module Omnibus
     # extension.
     #
     def package_name
-      "#{safe_project_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
+      "#{safe_base_package_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
 
     #
@@ -200,7 +200,7 @@ module Omnibus
       render_template(resource_path('control.erb'),
         destination: File.join(debian_dir, 'control'),
         variables: {
-          name:           safe_project_name,
+          name:           safe_base_package_name,
           version:        safe_version,
           iteration:      safe_build_iteration,
           vendor:         vendor,
@@ -317,21 +317,21 @@ module Omnibus
     end
 
     #
-    # Return the Debian-ready project name, converting any invalid characters to
+    # Return the Debian-ready base package name, converting any invalid characters to
     # dashes (+-+).
     #
     # @return [String]
     #
-    def safe_project_name
-      if project.name =~ /\A[a-zA-Z0-9\.\+\-]+\z/
-        project.name.dup
+    def safe_base_package_name
+      if project.package_name =~ /\A[a-zA-Z0-9\.\+\-]+\z/
+        project.package_name.dup
       else
-        converted = project.name.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
+        converted = project.package_name.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
           "The `name' compontent of Debian package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), and dashes (-). Converting `#{project.name}' to " \
+          "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
         end
 
