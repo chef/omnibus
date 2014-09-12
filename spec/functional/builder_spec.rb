@@ -10,8 +10,8 @@ module Omnibus
     # a real Ruby just for functional tests.
     #
     def fake_embedded_bin(name)
-      create_directory(bin_dir)
-      create_link(Bundler.which(name), File.join(bin_dir, name))
+      create_directory(embedded_bin_dir)
+      create_link(Bundler.which(name), File.join(embedded_bin_dir, name))
     end
 
     subject { described_class.new(software) }
@@ -131,10 +131,82 @@ module Omnibus
 
         fake_embedded_bin('bundle')
 
-        subject.bundle('install')
+        # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
+        options = {}
+        options[:env] = {
+          'GEM_HOME' => ENV['GEM_HOME'],
+          'GEM_PATH' => ENV['GEM_PATH'],
+        }
+
+        subject.bundle('install', options)
         output = capture_logging { subject.build }
 
         expect(output).to include('bundle install')
+      end
+    end
+
+    describe '#appbundle' do
+      it 'executes the command as the embedded appbundler' do
+
+        source_dir       = "#{Omnibus::Config.source_dir}/example"
+        embedded_app_dir = "#{software.install_dir}/embedded/apps/example"
+        bin_dir          = "#{software.install_dir}/bin"
+
+        FileUtils.mkdir(source_dir)
+
+        gemspec = File.join(source_dir, 'example.gemspec')
+        File.open(gemspec, 'w') do |f|
+          f.write <<-EOH.gsub(/^ {12}/, '')
+            Gem::Specification.new do |gem|
+              gem.name           = 'example'
+              gem.version        = '1.0.0'
+              gem.author         = 'Chef Software, Inc.'
+              gem.email          = 'info@getchef.com'
+              gem.description    = 'Installs a thing'
+              gem.summary        = gem.description
+            end
+          EOH
+        end
+
+        gemfile      = File.join(source_dir, 'Gemfile')
+        File.open(gemfile, 'w') do |f|
+          f.write <<-EOH.gsub(/^ {12}/, '')
+            gemspec
+          EOH
+        end
+
+        gemfile_lock = File.join(source_dir, 'Gemfile.lock')
+        File.open(gemfile_lock, 'w') do |f|
+          f.write <<-EOH.gsub(/^ {12}/, '')
+            PATH
+              remote: .
+              specs:
+                example (1.0.0)
+
+            GEM
+              specs:
+
+            PLATFORMS
+              ruby
+
+            DEPENDENCIES
+              example!
+          EOH
+        end
+
+        fake_embedded_bin('appbundler')
+
+        # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
+        options = {}
+        options[:env] = {
+          'GEM_HOME' => ENV['GEM_HOME'],
+          'GEM_PATH' => ENV['GEM_PATH'],
+        }
+
+        subject.appbundle('example', options)
+        output = capture_logging { subject.build }
+
+        expect(output).to include("/opt/chefdk/embedded/bin/appbundler '#{embedded_app_dir}' '#{bin_dir}'")
       end
     end
 

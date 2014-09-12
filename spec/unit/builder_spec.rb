@@ -48,6 +48,12 @@ module Omnibus
       end
     end
 
+    describe '#appbundle' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:appbundle)
+      end
+    end
+
     describe '#block' do
       it 'is a DSL method' do
         expect(subject).to have_exposed_method(:block)
