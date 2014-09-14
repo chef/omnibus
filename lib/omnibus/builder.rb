@@ -218,8 +218,7 @@ module Omnibus
     #
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
-        bin = windows_safe_path("#{install_dir}/embedded/bin/ruby")
-        shellout!("#{bin} #{command}", options)
+        _ruby(command, options)
       end
     end
     expose :ruby
@@ -236,7 +235,7 @@ module Omnibus
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/gem")
-        shellout!("#{bin} #{command}", options)
+        _ruby("#{bin} #{command}", options)
       end
     end
     expose :gem
@@ -256,7 +255,7 @@ module Omnibus
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/bundle")
-        shellout!("#{bin} #{command}", options)
+        _ruby("#{bin} #{command}", options)
       end
     end
     expose :bundle
@@ -296,7 +295,7 @@ module Omnibus
         env["BUNDLE_GEMFILE"] = gemfile_lock
         options[:env].merge!(env)
 
-        shellout!("#{appbundler_bin} '#{embedded_app_dir}' '#{bin_dir}'", options)
+        _ruby("#{appbundler_bin} '#{embedded_app_dir}' '#{bin_dir}'", options)
       end
     end
     expose :appbundle
@@ -314,7 +313,7 @@ module Omnibus
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
         bin = windows_safe_path("#{install_dir}/embedded/bin/rake")
-        shellout!("#{bin} #{command}", options)
+        _ruby("#{bin} #{command}", options)
       end
     end
     expose :rake
@@ -825,6 +824,20 @@ module Omnibus
       when /^rsync /i
         log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
       end
+    end
+
+    #
+    # Execute the given Ruby command or script against the embedded Ruby.
+    #
+    # @example
+    #   ruby 'setup.rb'
+    #
+    # @param (see #command)
+    # @return (see #command)
+    #
+    def _ruby(command, options)
+      bin = windows_safe_path("#{install_dir}/embedded/bin/ruby")
+      shellout!("#{bin} #{command}", options)
     end
 
     #
