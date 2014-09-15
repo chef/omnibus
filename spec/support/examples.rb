@@ -15,8 +15,9 @@ RSpec.shared_examples 'a software' do |name = 'chefdk'|
   let(:softwares_dir) { File.join(project_root, 'config', 'software', name) }
   let(:templates_dir) { File.join(project_root, 'config', 'templates', name) }
 
-  let(:install_dir) { File.join(project_root, 'opt', name) }
-  let(:bin_dir)     { File.join(install_dir, 'embedded', 'bin') }
+  let(:install_dir)      { File.join(project_root, 'opt', name) }
+  let(:bin_dir)          { File.join(install_dir, 'bin') }
+  let(:embedded_bin_dir) { File.join(install_dir, 'embedded', 'bin') }
 
   let(:software) do
     double(Omnibus::Software,
@@ -52,5 +53,10 @@ RSpec.shared_examples 'a software' do |name = 'chefdk'|
 
     FileUtils.mkdir_p(install_dir)
     FileUtils.mkdir_p(bin_dir)
+    FileUtils.mkdir_p(embedded_bin_dir)
+
+    allow(software).to receive(:with_embedded_path).and_return(
+      "PATH" => "#{bin_dir}:#{embedded_bin_dir}:#{ENV['PATH']}"
+    )
   end
 end
