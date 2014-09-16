@@ -445,7 +445,8 @@ module Omnibus
     expose :mac_pkg_identifier
 
     #
-    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument. Defaults
+    # to +root+ if not otherwise set.
     #
     # @example
     #   package_user 'build'
@@ -457,7 +458,7 @@ module Omnibus
     #
     def package_user(val = NULL)
       if null?(val)
-        @package_user
+        @package_user ||= 'root'
       else
         @package_user = val
       end
@@ -487,7 +488,8 @@ module Omnibus
     expose :override
 
     #
-    # Set or retrieve the +{deb/rpm/solaris}+-group fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}+-group fpm argument. Defaults
+    # to +root+ if not otherwise set.
     #
     # @example
     #   package_group 'build'
@@ -499,7 +501,7 @@ module Omnibus
     #
     def package_group(val = NULL)
       if null?(val)
-        @package_group
+        @package_group ||= 'root'
       else
         @package_group = val
       end
