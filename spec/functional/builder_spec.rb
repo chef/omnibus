@@ -95,7 +95,6 @@ module Omnibus
           EOH
         end
 
-        fake_embedded_bin('ruby')
         fake_embedded_bin('gem')
 
         subject.gem("build #{gemspec}")
@@ -130,7 +129,6 @@ module Omnibus
           EOH
         end
 
-        fake_embedded_bin('ruby')
         fake_embedded_bin('bundle')
 
         # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
@@ -196,7 +194,6 @@ module Omnibus
           EOH
         end
 
-        fake_embedded_bin('ruby')
         fake_embedded_bin('appbundler')
 
         # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
@@ -222,7 +219,6 @@ module Omnibus
           EOH
         end
 
-        fake_embedded_bin('ruby')
         fake_embedded_bin('rake')
 
         subject.rake('-T')
