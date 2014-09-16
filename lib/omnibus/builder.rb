@@ -743,11 +743,17 @@ module Omnibus
     # which only removes Bundler-specific values. We need to remove all
     # values, specifically:
     #
+    # - _ORIGINAL_GEM_PATH
     # - GEM_PATH
     # - GEM_HOME
     # - GEM_ROOT
+    # - BUNDLE_BIN_PATH
     # - BUNDLE_GEMFILE
+    # - RUBYLIB
     # - RUBYOPT
+    # - RUBY_ENGINE
+    # - RUBY_ROOT
+    # - RUBY_VERSION
     #
     # The original environment restored at the end of this call.
     #
@@ -757,9 +763,10 @@ module Omnibus
     def with_clean_env(&block)
       original = ENV.to_hash
 
-      ENV.delete('RUBYOPT')
+      ENV.delete('_ORIGINAL_GEM_PATH')
       ENV.delete_if { |k,_| k.start_with?('BUNDLE_') }
       ENV.delete_if { |k,_| k.start_with?('GEM_') }
+      ENV.delete_if { |k,_| k.start_with?('RUBY') }
 
       block.call
     ensure
