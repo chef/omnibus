@@ -73,6 +73,20 @@ module Omnibus
       end
     end
 
+    describe '#package_user' do
+      it 'returns root by default' do
+        subject.instance_variable_set(:@package_user, nil)
+        expect(subject.package_user).to eq('root')
+      end
+    end
+
+    describe '#package_group' do
+      it 'returns root by default' do
+        subject.instance_variable_set(:@package_group, nil)
+        expect(subject.package_group).to eq('root')
+      end
+    end
+
     describe '#dirty!' do
       it 'dirties the cache' do
         subject.instance_variable_set(:@dirty, nil)
