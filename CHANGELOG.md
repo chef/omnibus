@@ -1,6 +1,13 @@
 Omnibus Ruby CHANGELOG
 ======================
 
+v2.0.2 (September 16, 2014)
+-----------------------
+- Ensure default package user and group are `root`.
+- Fix S3 bucket retrieval.
+- Add metadata to support modern publishers.
+- Downgrade FPM to ~> 0.4 
+
 v2.0.1 (March 18, 2014)
 -----------------------
 - Fix the name of the `pkg` artifact created on OSX
