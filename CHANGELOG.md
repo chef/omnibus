@@ -1,10 +1,11 @@
 Omnibus Ruby CHANGELOG
 ======================
 
-v3.x.x (Unreleased)
+v3.2.2 (September 16, 2014)
 -------------------
 - Deprecate `max_build_jobs` in favor of `workers`
 - Ensure permissions are preserved on copy package. #336
+- Ensure default package user and group are `root`.
 
 v3.2.1 (July 26, 2014)
 ----------------------
