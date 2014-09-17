@@ -131,6 +131,5 @@ module Omnibus
         end
       end
     end
-
   end
 end
