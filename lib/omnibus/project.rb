@@ -249,13 +249,14 @@ module Omnibus
       @mac_pkg_identifier
     end
 
-    # Set or retrieve the {deb/rpm/solaris}-user fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}-user+ fpm argument. Defaults
+    # to +root+ if not otherwise set.
     #
     # @param val [String]
     # @return [String]
     def package_user(val = NULL_ARG)
       @pkg_user = val unless val.equal?(NULL_ARG)
-      @pkg_user
+      @pkg_user ||= 'root'
     end
 
     # Set or retrieve the full overrides hash for all software being overridden.  Calling it as
@@ -278,13 +279,14 @@ module Omnibus
       @overrides[name]
     end
 
-    # Set or retrieve the {deb/rpm/solaris}-group fpm argument.
+    # Set or retrieve the +{deb/rpm/solaris}-group+ fpm argument. Defaults
+    # to +root+ if not otherwise set.
     #
     # @param val [String]
     # @return [String]
     def package_group(val = NULL_ARG)
       @pkg_group = val unless val.equal?(NULL_ARG)
-      @pkg_group
+      @pkg_group ||= 'root'
     end
 
     # Add an Omnibus software dependency.
