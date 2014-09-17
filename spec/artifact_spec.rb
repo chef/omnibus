@@ -32,6 +32,8 @@ describe Omnibus::Artifact do
 
   let(:artifact) { Omnibus::Artifact.new(path, platforms,  version: '11.4.0-1') }
 
+  let(:flat_metadata) { artifact.flat_metadata }
+
   it 'has the path to the package' do
     expect(artifact.path).to eq(path)
   end
@@ -51,8 +53,7 @@ describe Omnibus::Artifact do
   end
 
   it "generates 'flat' metadata" do
-    expect(File).to receive(:open).twice.with(path).and_return(content)
-    flat_metadata = artifact.flat_metadata
+    expect(File).to receive(:open).at_least(2).with(path).and_return(content)
     expect(flat_metadata['platform']).to eq('el')
     expect(flat_metadata['platform_version']).to eq('5')
     expect(flat_metadata['arch']).to eq('x86_64')
