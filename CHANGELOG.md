@@ -1,6 +1,35 @@
 Omnibus CHANGELOG
 =================
 
+v4.0.0.rc.1 (September 23, 2014)
+--------------------------------
+
+### New Features
+- Expose `build_version` to all `pkg` templates
+- Improve info messages during RPM creation
+- Make PKG packager aware of scripts with default Omnibus naming
+- Make RPM packager aware of scripts with default Omnibus naming
+- Clean up script logic in BFF packager
+- Add an option for configuring Fetcher read timeout
+
+### DSL Changes
+#### Builder
+- Add an `appbundle` function to the builder DSL
+
+#### Packager
+- Expose `install_dir` in Packager DSL
+- Expose `windows_safe_path` in Packager DSL
+
+### Bugfixes
+- Replace dashes with underscores in RPM version names.
+- The achitecture of deb package is i386, not i686.
+- Re-ignore 204 exit code from `light.exe`
+- Use single quotes in main `rpmbuild` command
+- Be sure to create and sign the RPM if `~/.rpmmacros` exists
+- Switch to OpenSSL::Digest which is threadsafe on 2.1.2
+- Ensure `GitFetcher` properly resolves remote refs
+- Ensure we clean ALL Ruby environment vars
+
 v4.0.0.beta.1 (August 20, 2014)
 -------------------------------
 ### New Features
