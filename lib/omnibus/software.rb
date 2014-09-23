@@ -437,6 +437,7 @@ module Omnibus
                 "CC" => "gcc -maix64",
                 "CXX" => "g++ -maix64",
                 "CFLAGS" => "-maix64 -O -I#{install_dir}/embedded/include",
+                "CXXFLAGS" => "-maix64 -O -I#{install_dir}/embedded/include",
                 "LDFLAGS" => "-L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
               }
             else
@@ -444,6 +445,7 @@ module Omnibus
                 "CC" => "xlc -q64",
                 "CXX" => "xlC -q64",
                 "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+                "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
                 "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
               }
             end
@@ -456,21 +458,25 @@ module Omnibus
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CXXFLAGS" => "-I#{install_dir}/embedded/include",
           }
         when "solaris2"
           {
             "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CXXFLAGS" => "-I#{install_dir}/embedded/include",
           }
         when "freebsd"
           {
             "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CXXFLAGS" => "-I#{install_dir}/embedded/include",
           }
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CXXFLAGS" => "-I#{install_dir}/embedded/include",
           }
         end
 

@@ -51,6 +51,7 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -59,6 +60,7 @@ module Omnibus
           expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -67,6 +69,16 @@ module Omnibus
           expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+          )
+        end
+        it 'ovesrride CXXFLAGS' do
+          expect(subject.with_standard_compiler_flags('CXXFLAGS'=>'foo')).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -76,6 +88,7 @@ module Omnibus
             'numberwang'      => 4,
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -94,6 +107,7 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
             'CFLAGS'          => '-I/opt/project/embedded/include',
+            "CXXFLAGS"        => "-I/opt/project/embedded/include",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'LD_OPTIONS'      => '-R/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
@@ -108,6 +122,7 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'LDFLAGS'         => '-L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
+            "CXXFLAGS"        => "-I/opt/project/embedded/include",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -127,6 +142,7 @@ module Omnibus
             'CC'              => 'xlc -q64',
             'CXX'             => 'xlC -q64',
             'CFLAGS'          => '-q64 -I/opt/project/embedded/include -O',
+            "CXXFLAGS"        => "-q64 -I/opt/project/embedded/include -O",
             'LDFLAGS'         => '-q64 -L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
@@ -150,6 +166,7 @@ module Omnibus
             'CC'              => 'gcc -maix64',
             'CXX'             => 'g++ -maix64',
             'CFLAGS'          => '-maix64 -O -I/opt/project/embedded/include',
+            "CXXFLAGS"        => "-maix64 -O -I/opt/project/embedded/include",
             'LDFLAGS'         => '-L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
