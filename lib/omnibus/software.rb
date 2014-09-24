@@ -496,7 +496,9 @@ module Omnibus
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
-        merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"})
+        merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"}).
+        # Set default values for CXXFLAGS.
+        merge('CXXFLAGS' => compiler_flags['CFLAGS'])
     end
     expose :with_standard_compiler_flags
 
