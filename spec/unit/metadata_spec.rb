@@ -36,7 +36,12 @@ module Omnibus
         expect(described_class.platform_shortname).to eq('el')
       end
 
-      it 'returns .platform on non-rhel systems' do
+      it 'returns sles on suse' do
+        stub_ohai(platform: 'suse', version: '12.0')
+        expect(described_class.platform_shortname).to eq('sles')
+      end
+
+      it 'returns .platform on all other systems' do
         stub_ohai(platform: 'ubuntu', version: '12.04')
         expect(described_class.platform_shortname).to eq('ubuntu')
       end
@@ -69,14 +74,15 @@ module Omnibus
       it_behaves_like 'a version manipulator', 'mac_os_x', '10.9.1', '10.9'
       it_behaves_like 'a version manipulator', 'omnios', 'r151010', 'r151010'
       it_behaves_like 'a version manipulator', 'openbsd', '5.4.4', '5.4'
+      it_behaves_like 'a version manipulator', 'opensuse', '5.9', '5.9'
       it_behaves_like 'a version manipulator', 'pidora', '11.5', '11'
       it_behaves_like 'a version manipulator', 'raspbian', '7.1', '7'
       it_behaves_like 'a version manipulator', 'rhel', '6.5', '6'
       it_behaves_like 'a version manipulator', 'slackware', '12.0.1', '12.0'
       it_behaves_like 'a version manipulator', 'sles', '11.2', '11'
+      it_behaves_like 'a version manipulator', 'suse', '12.0', '12'
       it_behaves_like 'a version manipulator', 'smartos', '20120809T221258Z', '20120809T221258Z'
       it_behaves_like 'a version manipulator', 'solaris2', '5.9', '5.9'
-      it_behaves_like 'a version manipulator', 'suse', '5.9', '5.9'
       it_behaves_like 'a version manipulator', 'ubuntu', '10.04', '10.04'
       it_behaves_like 'a version manipulator', 'ubuntu', '10.04.04', '10.04'
       it_behaves_like 'a version manipulator', 'windows', '5.0.2195', '2000'
