@@ -69,6 +69,8 @@ module Omnibus
       it_behaves_like 'a version manipulator', 'mac_os_x', '10.9.1', '10.9'
       it_behaves_like 'a version manipulator', 'omnios', 'r151010', 'r151010'
       it_behaves_like 'a version manipulator', 'openbsd', '5.4.4', '5.4'
+      it_behaves_like 'a version manipulator', 'pidora', '11.5', '11'
+      it_behaves_like 'a version manipulator', 'raspbian', '7.1', '7'
       it_behaves_like 'a version manipulator', 'rhel', '6.5', '6'
       it_behaves_like 'a version manipulator', 'slackware', '12.0.1', '12.0'
       it_behaves_like 'a version manipulator', 'sles', '11.2', '11'
