@@ -807,17 +807,13 @@ module Omnibus
     # @return [String]
     #
     def path_key
-      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
-      # $WINDOWSRAGE, and if you don't set that your native gem compiles
-      # will fail because the magic fixup it does to add the mingw compiler
-      # stuff won't work.
-      #
-      # Turns out there is other build environments that only set ENV['PATH'] and if we
-      # modify ENV['Path'] then it ignores that.  So, we scan ENV and returns the first
-      # one that we find.
-      #
-      if Ohai['platform'] == 'windows'
-        ENV.keys.grep(/\Apath\Z/i).first
+      # The Ruby Devkit needs a path key of `Path` instead of the standard
+      # `PATH` because $WINDOWSRAGE, and if you don't set that your native
+      # gem compiles will fail because the magic fixup it does to add the
+      # mingw compiler stuff won't work. If ENV['Path'] is not defined on
+      # Windows systems we'll fall back to using a path key of `PATH`.
+      if (Ohai['platform'] == 'windows') && ENV.key?('Path')
+        'Path'
       else
         'PATH'
       end
