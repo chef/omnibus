@@ -69,7 +69,7 @@ module Omnibus
       unless options[:environment].empty?
         log.public_send(log_level, log_key)  { 'Environment:' }
         options[:environment].sort.each do |key, value|
-          log.public_send(log_level, log_key)  { "  #{key.to_s.upcase}=#{value.inspect}" }
+          log.public_send(log_level, log_key)  { "  #{key}=#{value.inspect}" }
         end
       end
 
