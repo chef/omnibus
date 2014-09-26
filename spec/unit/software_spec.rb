@@ -179,37 +179,44 @@ module Omnibus
     end
 
     describe 'path helpers' do
+
       before do
         stub_const('File::PATH_SEPARATOR', separator)
         stub_env('PATH', path)
+        allow(project).to receive(:install_dir).and_return(install_dir)
       end
 
-      context 'on *NIX' do
+      let(:prepended_path) do
+        ["#{install_dir}/bin", separator, "#{install_dir}/embedded/bin", separator, path].join
+      end
+
+      context 'on *Nix' do
         let(:separator) { ':' }
         let(:path) { '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin' }
+        let(:install_dir) { '/opt/project' }
 
         it 'prepends a path to PATH' do
           expect(subject.prepend_path('/foo/bar')).to eq(
-            '/foo/bar:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+            ['/foo/bar', separator, path].join
           )
         end
 
         it 'prepends the embedded bin to PATH' do
           expect(subject.with_embedded_path).to eq(
-            'PATH' => '/opt/project/bin:/opt/project/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+            'PATH' => prepended_path
           )
         end
 
         it 'with_embedded_path merges with a hash argument' do
           expect(subject.with_embedded_path('numberwang' => 4)).to eq(
             'numberwang' => 4,
-            'PATH' => '/opt/project/bin:/opt/project/embedded/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+            'PATH' => prepended_path
           )
         end
 
         it 'prepends multiple paths to PATH' do
           expect(subject.prepend_path('/foo/bar', '/foo/baz')).to eq(
-            '/foo/bar:/foo/baz:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin'
+            ['/foo/bar', separator, '/foo/baz', separator, path].join
           )
         end
       end
@@ -217,37 +224,31 @@ module Omnibus
       context 'on Windows' do
         before do
           stub_ohai(platform: 'windows', version: '2012')
-          allow(project).to receive(:install_dir).and_return('c:/opt/project')
-          stub_env('Path', windows_path)
         end
 
         let(:separator) { ';' }
         let(:path) { 'c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem' }
-        let(:windows_path) { 'c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem' }
+        let(:install_dir) { 'c:/opt/project' }
 
-        it "prepends a path to PATH" do
-          expect(subject.prepend_path('c:/foo/bar')).to eq(
-            'c:/foo/bar;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
-          )
+        context '`Path` exists in the environment' do
+          before do
+            stub_env('Path', path)
+            allow(ENV).to receive(:key?).with('Path').and_return(true)
+          end
+
+          it 'returns a path key of `Path`' do
+            expect(subject.with_embedded_path).to eq(
+              'Path' => prepended_path
+            )
+          end
         end
 
-        it 'prepends the embedded bin to PATH' do
-          expect(subject.with_embedded_path).to eq(
-            'Path' => 'c:/opt/project/bin;c:/opt/project/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
-          )
-        end
-
-        it 'with_embedded_path merges with a hash argument' do
-          expect(subject.with_embedded_path('numberwang' => 4)).to eq(
-            'numberwang' => 4,
-            'Path' => 'c:/opt/project/bin;c:/opt/project/embedded/bin;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
-          )
-        end
-
-        it 'prepends multiple paths to PATH' do
-          expect(subject.prepend_path('c:/foo/bar', 'c:/foo/baz')).to eq(
-            'c:/foo/bar;c:/foo/baz;c:/Ruby999/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem'
-          )
+        context '`Path` does not exist in the environment' do
+          it 'returns a path key of `PATH`' do
+            expect(subject.with_embedded_path).to eq(
+              'PATH' => prepended_path
+            )
+          end
         end
       end
     end
