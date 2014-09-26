@@ -831,7 +831,16 @@ module Omnibus
       # $WINDOWSRAGE, and if you don't set that your native gem compiles
       # will fail because the magic fixup it does to add the mingw compiler
       # stuff won't work.
-      Ohai['platform'] == 'windows' ? 'Path' : 'PATH'
+      #
+      # Turns out there is other build environments that only set ENV['PATH'] and if we
+      # modify ENV['Path'] then it ignores that.  So, we scan ENV and returns the first
+      # one that we find.
+      #
+      if Ohai['platform'] == 'windows'
+        ENV.keys.grep(/\Apath\Z/i).first
+      else
+        'PATH'
+      end
     end
 
     #
