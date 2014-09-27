@@ -812,8 +812,8 @@ module Omnibus
       # gem compiles will fail because the magic fixup it does to add the
       # mingw compiler stuff won't work. If ENV['Path'] is not defined on
       # Windows systems we'll fall back to using a path key of `PATH`.
-      if (Ohai['platform'] == 'windows') && ENV.key?('Path')
-        'Path'
+      if (Ohai['platform'] == 'windows')
+        ENV.keys.grep(/\Apath\Z/i).first
       else
         'PATH'
       end
