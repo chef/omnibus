@@ -281,7 +281,8 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.name}-#{project.build_version}-#{project.build_iteration}.dmg"
+      extname = File.extname(packager.package_name)
+      File.basename(packager.package_name, extname) + ".dmg"
     end
 
     # The path to the writable dmg on disk.
@@ -295,8 +296,7 @@ module Omnibus
     #
     # @return [String]
     def final_dmg
-      dmg_name = packager.package_name.sub('.pkg', '.dmg')
-      File.expand_path("#{Config.package_dir}/#{dmg_name}")
+      File.expand_path("#{Config.package_dir}/#{package_name}")
     end
 
     #
