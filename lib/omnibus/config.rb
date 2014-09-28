@@ -35,18 +35,24 @@ module Omnibus
       end
 
       #
-      # @macro default
+      # @macro attribute
       #   @method $1(value = NULL)
       #
       # @param [Symbol] key
       #   the name of the configuration value to create
-      # @param [Object] default
-      #   the default value
+      # @param [Hash] options
+      #   a Hash containing:
+      #    :default - the default vlaue
+      #    :type    - the type of attribute
       # @param [Proc] block
       #   a block to be called for the default value. If the block is provided,
       #   the +default+ attribute is ignored
       #
-      def default(key, default = NullArgumentable::NULL, &block)
+      def attribute(key, options = {}, &block)
+        options = {
+          :default => NullArgumentable::NULL,
+        }.merge(options)
+
         # This is a class method, which delegates to the instance method
         define_singleton_method(key) do |value = NullArgumentable::NULL|
           instance.send(key, value)
@@ -54,7 +60,7 @@ module Omnibus
 
         # This is an instance method, but this is a singleton object ;)
         define_method(key) do |value = NullArgumentable::NULL|
-          set_or_return(key, value, default, &block)
+          set_or_return(key, value, options, &block)
         end
 
         # All config options should be avaiable as DSL methods
@@ -99,7 +105,7 @@ module Omnibus
     # - Defaults to +/var/cache/omnibus+ on other platforms
     #
     # @return [String]
-    default(:base_dir) do
+    attribute(:base_dir, :type => :path) do
       if Ohai['platform'] == 'windows'
         'C:/omnibus-ruby'
       else
@@ -111,13 +117,13 @@ module Omnibus
     # code will be cached.
     #
     # @return [String]
-    default(:cache_dir) { File.join(base_dir, 'cache') }
+    attribute(:cache_dir, :type => :path) { File.join(base_dir, 'cache') }
 
     # The absolute path to the directory on the virtual machine where
     # git caching will occur and software's will be progressively cached.
     #
     # @return [String]
-    default(:git_cache_dir) do
+    attribute(:git_cache_dir, :type => :path) do
       File.join(base_dir, 'cache', 'git_cache')
     end
 
@@ -125,24 +131,24 @@ module Omnibus
     # source code will be downloaded.
     #
     # @return [String]
-    default(:source_dir) { File.join(base_dir, 'src') }
+    attribute(:source_dir, :type => :path) { File.join(base_dir, 'src') }
 
     # The absolute path to the directory on the virtual machine where
     # software will be built.
     #
     # @return [String]
-    default(:build_dir) { File.join(base_dir, 'build') }
+    attribute(:build_dir, :type => :path) { File.join(base_dir, 'build') }
 
     # The absolute path to the directory on the virtual machine where
     # packages will be constructed.
     #
     # @return [String]
-    default(:package_dir) { File.join(base_dir, 'pkg') }
+    attribute(:package_dir, :type => :path) { File.join(base_dir, 'pkg') }
 
     # @deprecated Do not use this method.
     #
     # @return [String]
-    default(:package_tmp) do
+    attribute(:package_tmp) do
       Omnibus.logger.deprecated('Config') do
         "Config.package_tmp. This value is no longer used."
       end
@@ -152,19 +158,19 @@ module Omnibus
     # DSL files.  This is relative to {#project_root}.
     #
     # @return [String]
-    default(:project_dir, 'config/projects')
+    attribute(:project_dir, :default => 'config/projects')
 
     # The relative path of the directory containing {Omnibus::Software}
     # DSL files.  This is relative {#project_root}.
     #
     # @return [String]
-    default(:software_dir, 'config/software')
+    attribute(:software_dir, :default => 'config/software')
 
     # The root directory in which to look for {Omnibus::Project} and
     # {Omnibus::Software} DSL files.
     #
     # @return [String]
-    default(:project_root) { Dir.pwd }
+    attribute(:project_root) { Dir.pwd }
 
     # --------------------------------------------------
     # @!endgroup
@@ -177,7 +183,7 @@ module Omnibus
     # Package OSX pkg files inside a DMG
     #
     # @return [true, false]
-    default(:build_dmg) do
+    attribute(:build_dmg) do
       Omnibus.logger.deprecated('Config') do
         "Config.build_dmg. This value is no longer part of the " \
         "config and is implied when defining a `compressor' block in the project."
@@ -187,7 +193,7 @@ module Omnibus
     # The starting x,y and ending x,y positions for the created DMG window.
     #
     # @return [String]
-    default(:dmg_window_bounds) do
+    attribute(:dmg_window_bounds) do
       Omnibus.logger.deprecated('Config') do
         "Config.dmg_window_bounds. This value is no longer part of the " \
         "config and should be defined in the `compressor' block in the project."
@@ -198,7 +204,7 @@ module Omnibus
     # window.
     #
     # @return [String]
-    default(:dmg_pkg_position) do
+    attribute(:dmg_pkg_position) do
       Omnibus.logger.deprecated('Config') do
         "Config.dmg_pkg_position. This value is no longer part of the " \
         "config and should be defined in the `compressor' block in the project."
@@ -208,7 +214,7 @@ module Omnibus
     # Sign the pkg package.
     #
     # @return [true, false]
-    default(:sign_pkg) do
+    attribute(:sign_pkg) do
       Omnibus.logger.deprecated('Config') do
         "Config.sign_pkg. This value is no longer part of the config and " \
         "should be defined in the `package' block in the project."
@@ -218,7 +224,7 @@ module Omnibus
     # The identity to sign the pkg with.
     #
     # @return [String]
-    default(:signing_identity) do
+    attribute(:signing_identity) do
       Omnibus.logger.deprecated('Config') do
         "Config.signing_identity. This value is no longer part of the " \
         "config and should be defined in the `package' block in the project."
@@ -236,7 +242,7 @@ module Omnibus
     # Sign the rpm package.
     #
     # @return [true, false]
-    default(:sign_rpm) do
+    attribute(:sign_rpm) do
       Omnibus.logger.deprecated('Config') do
         "Config.sign_rpm. This value is no longer part of the config and " \
         "should be defined in the `package' block in the project."
@@ -246,7 +252,7 @@ module Omnibus
     # The passphrase to sign the RPM with.
     #
     # @return [String]
-    default(:rpm_signing_passphrase) do
+    attribute(:rpm_signing_passphrase) do
       Omnibus.logger.deprecated('Config') do
         "Config.rpm_signing_passphrase. This value is no longer part of the " \
         "config and should be defined in the `package' block in the project."
@@ -266,26 +272,26 @@ module Omnibus
     # and {#s3_secret_key} to be set if this is set to +true+.
     #
     # @return [true, false]
-    default(:use_s3_caching, false)
+    attribute(:use_s3_caching, :default => false)
 
     # The name of the S3 bucket you want to cache software artifacts in.
     #
     # @return [String]
-    default(:s3_bucket) do
+    attribute(:s3_bucket) do
       raise MissingRequiredAttribute.new(self, :s3_bucket, "'my_bucket'")
     end
 
     # The S3 access key to use with S3 caching.
     #
     # @return [String]
-    default(:s3_access_key) do
+    attribute(:s3_access_key) do
       raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
     end
 
     # The S3 secret key to use with S3 caching.
     #
     # @return [String]
-    default(:s3_secret_key) do
+    attribute(:s3_secret_key) do
       raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
     end
 
@@ -300,21 +306,21 @@ module Omnibus
     # The full URL where the artifactory instance is accessible.
     #
     # @return [String]
-    default(:artifactory_endpoint) do
+    attribute(:artifactory_endpoint) do
       raise MissingRequiredAttribute.new(self, :artifactory_endpoint, "'https://...'")
     end
 
     # The username of the artifactory user to authenticate with.
     #
     # @return [String]
-    default(:artifactory_username) do
+    attribute(:artifactory_username) do
       raise MissingRequiredAttribute.new(self, :artifactory_username, "'admin'")
     end
 
     # The password of the artifactory user to authenticate with.
     #
     # @return [String]
-    default(:artifactory_password) do
+    attribute(:artifactory_password) do
       raise MissingRequiredAttribute.new(self, :artifactory_password, "'password'")
     end
 
@@ -323,39 +329,39 @@ module Omnibus
     # world.
     #
     # @return [String]
-    default(:artifactory_base_path) do
+    attribute(:artifactory_base_path) do
       raise MissingRequiredAttribute.new(self, :artifactory_base_path, "'com/mycompany'")
     end
 
     # The path on disk to an SSL pem file to sign requests with.
     #
     # @return [String, nil]
-    default(:artifactory_ssl_pem_file, nil)
+    attribute(:artifactory_ssl_pem_file, :default => nil)
 
     # Whether to perform SSL verification when connecting to artifactory.
     #
     # @return [true, false]
-    default(:artifactory_ssl_verify, true)
+    attribute(:artifactory_ssl_verify, :default => true)
 
     # The username to use when connecting to artifactory via a proxy.
     #
     # @return [String]
-    default(:artifactory_proxy_username, nil)
+    attribute(:artifactory_proxy_username, :default => nil)
 
     # The password to use when connecting to artifactory via a proxy.
     #
     # @return [String]
-    default(:artifactory_proxy_password, nil)
+    attribute(:artifactory_proxy_password, :default => nil)
 
     # The address to use when connecting to artifactory via a proxy.
     #
     # @return [String]
-    default(:artifactory_proxy_address, nil)
+    attribute(:artifactory_proxy_address, :default => nil)
 
     # The port to use when connecting to artifactory via a proxy.
     #
     # @return [String]
-    default(:artifactory_proxy_port, nil)
+    attribute(:artifactory_proxy_port, :default => nil)
 
     # --------------------------------------------------
     # @!endgroup
@@ -368,14 +374,14 @@ module Omnibus
     # The S3 access key to use for S3 artifact release.
     #
     # @return [String]
-    default(:publish_s3_access_key) do
+    attribute(:publish_s3_access_key) do
       raise MissingRequiredAttribute.new(self, :publish_s3_access_key, "'ABCD1234'")
     end
 
     # The S3 secret key to use for S3 artifact release
     #
     # @return [String]
-    default(:publish_s3_secret_key) do
+    attribute(:publish_s3_secret_key) do
       raise MissingRequiredAttribute.new(self, :publish_s3_secret_key, "'EFGH5678'")
     end
 
@@ -400,7 +406,7 @@ module Omnibus
     #     /PATH/config/software/*
     #
     # @return [Array<String>]
-    default(:local_software_dirs) { [] }
+    attribute(:local_software_dirs) { [] }
 
     # The list of gems to pull software definitions from. The software
     # definitions from these gems are pulled **in order**, so if multiple gems
@@ -415,14 +421,14 @@ module Omnibus
     #     /GEM_ROOT/config/software/*
     #
     # @return [Array<String>]
-    default(:software_gems) do
+    attribute(:software_gems) do
       ['omnibus-software']
     end
 
     # The solaris compiler to use
     #
     # @return [String, nil]
-    default(:solaris_compiler, nil)
+    attribute(:solaris_compiler, :default => nil)
 
     # --------------------------------------------------
     # @!endgroup
@@ -435,26 +441,26 @@ module Omnibus
     # Append the current timestamp to the version identifier.
     #
     # @return [true, false]
-    default(:append_timestamp, true)
+    attribute(:append_timestamp, :default => true)
 
     # The number of times to retry the build before failing.
     #
     # @return [Integer]
-    default(:build_retries, 0)
+    attribute(:build_retries, :default => 0)
 
     # Use the incremental build caching implemented via git. This will
     # drastically improve build times, but may result in hidden and
     # unexpected bugs.
     #
     # @return [true, false]
-    default(:use_git_caching, true)
+    attribute(:use_git_caching, :default => true)
 
     # The number of worker threads for make. If this is not set
     # explicitly in config, it will attempt to determine via Ohai in
     # the builder, and failing that will default to 3
     #
     # @return [Integer]
-    default(:workers) do
+    attribute(:workers) do
       if Ohai['cpu'] && Ohai['cpu']['total']
         Ohai['cpu']['total'].to_i + 1
       else
@@ -473,7 +479,7 @@ module Omnibus
     # The number of seconds to wait
     #
     # @return [Integer]
-    default(:fetcher_read_timeout, 60)
+    attribute(:fetcher_read_timeout, :default => 60)
 
     # --------------------------------------------------
     # @!endgroup
@@ -484,7 +490,7 @@ module Omnibus
     #
     #
     #
-    def set_or_return(key, value = NULL, default = NULL, &block)
+    def set_or_return(key, value = NULL, options = {}, &block)
       instance_variable = :"@#{key}"
 
       if null?(value)
@@ -494,9 +500,11 @@ module Omnibus
           if block
             instance_eval(&block)
           else
-            null?(default) ? nil : default
+            null?(options[:default]) ? nil : options[:default]
           end
         end
+      elsif options[:type] == :path
+        instance_variable_set(instance_variable, File.expand_path(value))
       else
         instance_variable_set(instance_variable, value)
       end
