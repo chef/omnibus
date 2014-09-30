@@ -123,7 +123,6 @@ module Omnibus
 
       #
       # Platform name to be used when creating metadata for the artifact.
-      # rhel/centos become "el", all others are just platform
       #
       # @return [String]
       #   the platform family short name
@@ -131,6 +130,8 @@ module Omnibus
       def platform_shortname
         if Ohai['platform_family'] == 'rhel'
           'el'
+        elsif Ohai['platform'] == 'suse'
+          'sles'
         else
           Ohai['platform']
         end
@@ -152,15 +153,12 @@ module Omnibus
       #
       def truncate_platform_version(platform_version, platform)
         case platform
-        when 'centos', 'debian', 'el', 'fedora', 'freebsd', 'rhel', 'sles'
-          # Only want MAJOR (e.g. Debian 7)
+        when 'centos', 'debian', 'el', 'fedora', 'freebsd', 'omnios', 'pidora', 'raspbian', 'rhel', 'sles', 'suse', 'smartos'
+          # Only want MAJOR (e.g. Debian 7, OmniOS r151006, SmartOS 20120809T221258Z)
           platform_version.split('.').first
-        when 'aix', 'arch', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'suse', 'ubuntu'
+        when 'aix', 'arch', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'opensuse', 'ubuntu'
           # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
           platform_version.split('.')[0..1].join('.')
-        when 'omnios', 'smartos'
-          # Only want MAJOR (e.g OmniOS r151006, SmartOS 20120809T221258Z)
-          platform_version.split('.').first
         when 'windows'
           # Windows has this really awesome "feature", where their version numbers
           # internally do not match the "marketing" name.
