@@ -282,7 +282,7 @@ module Omnibus
     # @see Base#package_name
     def package_name
       extname = File.extname(packager.package_name)
-      File.basename(packager.package_name, extname) + ".dmg"
+      packager.package_name.sub(extname, '.dmg')
     end
 
     # The path to the writable dmg on disk.
