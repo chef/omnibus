@@ -248,7 +248,7 @@ module Omnibus
             -format UDZO \\
             -imagekey \\
             zlib-level=9 \\
-            -o "#{final_dmg}"
+            -o "#{Config.package_dir}/#{package_name}"
           rm -rf "#{writable_dmg}"
         EOH
       end
@@ -271,10 +271,10 @@ module Omnibus
           DeRez -only icns "#{resource_path('icon.png')}" > tmp.rsrc
 
           # Append the icon reosurce to the DMG
-          Rez -append tmp.rsrc -o "#{final_dmg}"
+          Rez -append tmp.rsrc -o "#{Config.package_dir}/#{package_name}"
 
           # Source the icon
-          SetFile -a C "#{final_dmg}"
+          SetFile -a C "#{Config.package_dir}/#{package_name}"
         EOH
       end
     end
@@ -290,13 +290,6 @@ module Omnibus
     # @return [String]
     def writable_dmg
       File.expand_path("#{staging_dir}/#{project.name}-writable.dmg")
-    end
-
-    # The path where the final dmg will be produced.
-    #
-    # @return [String]
-    def final_dmg
-      File.expand_path("#{Config.package_dir}/#{package_name}")
     end
 
     #
