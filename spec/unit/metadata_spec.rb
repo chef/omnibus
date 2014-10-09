@@ -62,7 +62,7 @@ module Omnibus
       end
 
       it_behaves_like 'a version manipulator', 'aix', '7.1', '7.1'
-      it_behaves_like 'a version manipulator', 'arch', 'rolling'
+      it_behaves_like 'a version manipulator', 'arch', 'rolling', 'rolling'
       it_behaves_like 'a version manipulator', 'centos', '5.9.6', '5'
       it_behaves_like 'a version manipulator', 'debian', '7.1', '7'
       it_behaves_like 'a version manipulator', 'debian', '6.9', '6'
