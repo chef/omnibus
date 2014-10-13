@@ -141,6 +141,10 @@ module Omnibus
     #   the level to apply the patch
     # @option options [String] :target
     #   the destination to apply the patch
+    # @option options [String] :patch_command
+    #   alternative patch command - allows us to pass in a separate command
+    #   for things like AIX, which uses patch in /opt/freeware/bin instead
+    #   of /usr/bin
     #
     # @return (see #command)
     #
@@ -148,6 +152,7 @@ module Omnibus
       source = options.delete(:source)
       plevel = options.delete(:plevel) || 1
       target = options.delete(:target)
+      patch_command = options.delete(:patch_command) || "patch"
 
       locations, patch_path = find_file('config/patches', source)
 
@@ -159,9 +164,9 @@ module Omnibus
       patch_path = windows_safe_path(patch_path)
 
       if target
-        command = "cat #{patch_path} | patch -p#{plevel} #{target}"
+        command = "cat #{patch_path} | #{patch_command} -p#{plevel} #{target}"
       else
-        command = "patch -d #{software.project_dir} -p#{plevel} -i #{patch_path}"
+        command = "#{patch_command} -d #{software.project_dir} -p#{plevel} -i #{patch_path}"
       end
 
       patches << patch_path
