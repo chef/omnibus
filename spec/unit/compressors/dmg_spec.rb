@@ -266,8 +266,16 @@ module Omnibus
     end
 
     describe '#package_name' do
-      it 'includes the name, version, and build iteration' do
+      it 'reflects the packager\'s unmodified package_name' do
         expect(subject.package_name).to eq('project-1.2.3-2.dmg')
+      end
+
+      it 'reflects the packager\'s modified package_name' do
+        package_basename = 'projectsub-1.2.3-3'
+        allow(project.packager).to receive(:package_name)
+          .and_return("#{package_basename}.pkg")
+
+        expect(subject.package_name).to eq("#{package_basename}.dmg")
       end
     end
 
