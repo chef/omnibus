@@ -441,9 +441,10 @@ module Omnibus
               }
             else
               {
-                "CC" => "xlc -q64",
-                "CXX" => "xlC -q64",
+                "CC" => "xlc_r -q64",
+                "CXX" => "xlC_r -q64",
                 "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+		"CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
                 "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
               }
             end
@@ -490,7 +491,7 @@ module Omnibus
         {
           "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
         }
-      ) if Ohai['platform'] == "solaris2"
+      ) if Ohai['platform'] == "solaris2" 
       env.merge(compiler_flags).
         merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
