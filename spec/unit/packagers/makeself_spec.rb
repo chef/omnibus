@@ -39,7 +39,7 @@ module Omnibus
       end
 
       it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project-1.2.3_2.x86_64.run')
+        expect(subject.package_name).to eq('project-1.2.3_2.x86_64.sh')
       end
     end
 
