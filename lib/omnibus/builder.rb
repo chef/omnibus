@@ -148,7 +148,6 @@ module Omnibus
       source = options.delete(:source)
       plevel = options.delete(:plevel) || 1
       target = options.delete(:target)
-      patch_command = options.delete(:patch_command) || "patch"
 
       locations, patch_path = find_file('config/patches', source)
 
@@ -160,9 +159,9 @@ module Omnibus
       patch_path = windows_safe_path(patch_path)
 
       if target
-        command = "cat #{patch_path} | #{patch_command} -p#{plevel} #{target}"
+        command = "cat #{patch_path} | patch -p#{plevel} #{target}"
       else
-        command = "#{patch_command} -d #{software.project_dir} -p#{plevel} -i #{patch_path}"
+        command = "patch -d #{software.project_dir} -p#{plevel} -i #{patch_path}"
       end
 
       patches << patch_path
