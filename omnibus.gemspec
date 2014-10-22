@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(/^(test|spec|features)\//)
   gem.require_paths = ['lib']
 
-  gem.add_dependency 'chef-sugar',      '~> 2.2'
+  gem.add_dependency 'chef-sugar',      '~> 2.4'
   gem.add_dependency 'cleanroom',       '~> 1.0'
   gem.add_dependency 'mixlib-shellout', '~> 1.4'
   gem.add_dependency 'ohai',            '~> 7.2'
