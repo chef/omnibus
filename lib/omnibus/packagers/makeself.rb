@@ -44,7 +44,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.package_name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.run"
+      "#{project.package_name}-#{project.build_version}_#{project.build_iteration}.#{safe_architecture}.sh"
     end
 
     #
@@ -105,7 +105,7 @@ module Omnibus
         EOH
       end
 
-      FileSyncer.glob("#{staging_dir}/*.run").each do |makeself|
+      FileSyncer.glob("#{staging_dir}/*.sh").each do |makeself|
         copy_file(makeself, Config.package_dir)
       end
     end
