@@ -431,28 +431,16 @@ module Omnibus
       compiler_flags =
         case Ohai['platform']
         when "aix"
-          cc_flags =
-            if opts[:aix] && opts[:aix][:use_gcc]
-              {
-                "CC" => "gcc -maix64",
-                "CXX" => "g++ -maix64",
-                "CFLAGS" => "-maix64 -O -I#{install_dir}/embedded/include",
-                "LDFLAGS" => "-L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
-              }
-            else
-              {
-                "CC" => "xlc_r -q64",
-                "CXX" => "xlC_r -q64",
-                "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
-		"CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
-                "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
-              }
-            end
-          cc_flags.merge({
+          {
+            "CC" => "xlc_r -q64",
+            "CXX" => "xlC_r -q64",
+            "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+            "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+            "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
             "LD" => "ld -b64",
             "OBJECT_MODE" => "64",
             "ARFLAGS" => "-X64 cru",
-          })
+          }
         when "mac_os_x"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
@@ -491,7 +479,7 @@ module Omnibus
         {
           "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
         }
-      ) if Ohai['platform'] == "solaris2" 
+      ) if Ohai['platform'] == "solaris2"
       env.merge(compiler_flags).
         merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
