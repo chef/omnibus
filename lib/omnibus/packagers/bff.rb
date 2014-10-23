@@ -49,7 +49,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{safe_base_package_name}.#{bff_version}.#{safe_architecture}.bff"
+      "#{safe_base_package_name}.#{project.build_version}.#{project.build_iteration}.bff"
     end
 
     #
@@ -169,9 +169,23 @@ module Omnibus
 
       # Copy the resulting package up to the package_dir
       FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
-        copy_file(bff, Config.package_dir)
+        copy_file(bff, File.join(Config.package_dir, create_bff_file_name))
       end
     end
+
+    #
+    # Create bff file name
+    #
+    # +mkinstallp+ names the bff file according to the version specified in
+    # the template. We want to differentiate the build specific version
+    # correctly.
+    #
+    # @return [String]
+    #
+    def create_bff_file_name
+      "#{safe_base_package_name}.#{project.build_version}.#{project.build_iteration}.bff"
+    end
+
 
     #
     # Return the BFF-ready base package name, converting any invalid characters to

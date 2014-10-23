@@ -39,8 +39,8 @@ module Omnibus
         allow(subject).to receive(:safe_architecture).and_return('x86_64')
       end
 
-      it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project.1.2.3.2.x86_64.bff')
+      it 'includes the name and version' do
+        expect(subject.package_name).to eq('project.1.2.3.2.bff')
       end
     end
 
@@ -109,8 +109,8 @@ module Omnibus
         expect(contents).to include("  Include license files in this package: N")
         expect(contents).to include("  Requisites:")
         expect(contents).to include("  ROOT Part: Y")
-        expect(contents).to include("  ROOTFiles")
-        expect(contents).to include("  EOROOTFiles")
+        expect(contents).to include("  USRFiles")
+        expect(contents).to include("  EOUSRFiles")
         expect(contents).to include("EOFileset")
       end
 
@@ -190,6 +190,13 @@ module Omnibus
           expect(output).to include("The `name' compontent of BFF package names can only include")
         end
       end
+    end
+
+    describe '#create_bff_file_name' do
+      it 'constructs the proper package name' do
+        expect(subject.create_bff_file_name).to eq('project.1.2.3.2.bff')
+      end
+
     end
 
     describe '#bff_version' do
