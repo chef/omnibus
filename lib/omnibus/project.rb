@@ -956,7 +956,6 @@ module Omnibus
 
       # Copy the generated package and metadata back into the workspace
       package_path = File.join(Config.package_dir, packager.package_name)
-      puts "THING: " + package_path.to_s + " FFF " + destination.to_s
       FileUtils.cp(package_path, destination, preserve: true)
       FileUtils.cp("#{package_path}.metadata.json", destination, preserve: true)
     end
