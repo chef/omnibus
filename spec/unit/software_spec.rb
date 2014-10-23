@@ -139,8 +139,8 @@ module Omnibus
 
         it 'sets the defaults' do
           expect(subject.with_standard_compiler_flags).to eq(
-            'CC'              => 'xlc -q64',
-            'CXX'             => 'xlC -q64',
+            'CC'              => 'xlc_r -q64',
+            'CXX'             => 'xlC_r -q64',
             'CFLAGS'          => '-q64 -I/opt/project/embedded/include -O',
             "CXXFLAGS"        => "-q64 -I/opt/project/embedded/include -O",
             'LDFLAGS'         => '-q64 -L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
@@ -153,29 +153,6 @@ module Omnibus
         end
       end
 
-      context 'on aix with gcc' do
-        before do
-          # There's no AIX in Fauxhai :(
-          stub_ohai(platform: 'solaris2', version: '5.11') do |data|
-            data['platform'] = 'aix'
-          end
-        end
-
-        it 'sets the defaults' do
-          expect(subject.with_standard_compiler_flags(nil, aix: { use_gcc: true })).to eq(
-            'CC'              => 'gcc -maix64',
-            'CXX'             => 'g++ -maix64',
-            'CFLAGS'          => '-maix64 -O -I/opt/project/embedded/include',
-            "CXXFLAGS"        => "-maix64 -O -I/opt/project/embedded/include",
-            'LDFLAGS'         => '-L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
-            'LD'              => 'ld -b64',
-            'OBJECT_MODE'     => '64',
-            'ARFLAGS'         => '-X64 cru',
-            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
-          )
-        end
-      end
     end
 
     describe 'path helpers' do
