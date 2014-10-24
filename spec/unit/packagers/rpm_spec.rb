@@ -329,14 +329,28 @@ module Omnibus
     end
 
     describe '#safe_architecture' do
-      before do
-        stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
-          data['kernel']['machine'] = 'i386'
+      context 'when pidora' do
+        before do
+          stub_ohai(platform: 'pidora', version: '2014') do |data|
+            data['kernel']['machine'] = 'armv6l'
+          end
+        end
+  
+        it 'returns armv6hl' do
+          expect(subject.safe_architecture).to eq('armv6hl')
         end
       end
+      
+      context 'when not pidora' do
+        before do
+          stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
+            data['kernel']['machine'] = 'i386'
+          end
+        end
 
-      it 'returns the value from Ohai' do
-        expect(subject.safe_architecture).to eq('i386')
+        it 'returns the value from Ohai' do
+          expect(subject.safe_architecture).to eq('i386')
+        end
       end
     end
   end
