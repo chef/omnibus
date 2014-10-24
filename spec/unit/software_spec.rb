@@ -141,8 +141,8 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'CC'              => 'xlc_r -q64',
             'CXX'             => 'xlC_r -q64',
-            'CFLAGS'          => '-q64 -I/opt/project/embedded/include -O',
-            "CXXFLAGS"        => "-q64 -I/opt/project/embedded/include -O",
+            'CFLAGS'          => '-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O',
+            "CXXFLAGS"        => "-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O",
             'LDFLAGS'         => '-q64 -L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
