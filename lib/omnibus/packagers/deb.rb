@@ -384,7 +384,11 @@ module Omnibus
       when 'i686'
         'i386'
       else
-        Ohai['kernel']['machine']
+        if Ohai['platform'] == 'raspbian'
+          'armhf'
+        else
+          Ohai['kernel']['machine']
+        end
       end
     end
   end
