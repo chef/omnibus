@@ -340,6 +340,21 @@ module Omnibus
       it 'returns the value from Ohai' do
         expect(subject.safe_architecture).to eq('i386')
       end
+
+      context 'on Pidora' do
+        before do
+          # There's no Pidora in Fauxhai :(
+          stub_ohai(platform: 'fedora', version: '20') do |data|
+            data['platform'] = 'pidora'
+            data['platform_version'] = '20'
+            data['kernel']['machine'] = 'armv6l'
+          end
+        end
+
+        it 'returns armv6hl' do
+          expect(subject.safe_architecture).to eq('armv6hl')
+        end
+      end
     end
   end
 end
