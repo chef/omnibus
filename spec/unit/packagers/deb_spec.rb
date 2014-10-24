@@ -331,6 +331,18 @@ module Omnibus
           expect(subject.safe_architecture).to eq('i386')
         end
       end
+  
+      context 'when raspbian' do
+        before do
+          stub_ohai(platform: 'raspbian', version: '7.4') do |data|
+            data['kernel']['machine'] = 'armv6l'
+          end
+        end
+  
+        it 'returns armhf' do
+          expect(subject.safe_architecture).to eq('armhf')
+        end
+      end
     end
   end
 end
