@@ -19,9 +19,7 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      postinst: 'makeselfinst',
-      # Default Makeself naming
-      makeselfinst: 'makeselfinst',
+      postinst: 'postinst',
     }.freeze
 
     id :makeself
@@ -37,6 +35,9 @@ module Omnibus
     build do
       # Write the scripts
       write_scripts
+
+      # Write the makeselfinst file
+      write_makeselfinst
 
       # Create the makeself archive
       create_makeself_package
@@ -65,6 +66,24 @@ module Omnibus
     #
     def makeself_header
       resource_path('makeself-header.sh')
+    end
+
+    #
+    # Render a makeselfinst in the staging directory using the supplied ERB
+    # template. This file will be used to move the contents of the self-
+    # extracting archive into place following extraction.
+    #
+    # @return [void]
+    #
+    def write_makeselfinst
+      makeselfinst_staging_path = File.join(staging_dir, 'makeselfinst')
+      render_template(resource_path('makeselfinst.erb'),
+        destination: makeselfinst_staging_path,
+        variables: {
+          install_dir: project.install_dir,
+        }
+      )
+      FileUtils.chmod(0755, makeselfinst_staging_path)
     end
 
     #

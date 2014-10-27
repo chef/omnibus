@@ -43,65 +43,38 @@ module Omnibus
       end
     end
 
-    describe '#write_scripts' do
-      before do
-        create_file("#{project_root}/package-scripts/project/makeselfinst") { 'Contents of makeselfinst' }
-      end
-
-      it 'copies the scripts into the STAGING dir' do
-        subject.write_scripts
-        expect("#{staging_dir}/makeselfinst").to be_a_file
+    describe '#write_makeselfinst' do
+      it 'generates the executable file' do
+        subject.write_makeselfinst
+        expect("#{staging_dir}/makeselfinst").to be_an_executable
       end
 
       it 'has the correct content' do
-        subject.write_scripts
+        subject.write_makeselfinst
         contents = File.read("#{staging_dir}/makeselfinst")
 
-        expect(contents).to include('Contents of makeselfinst')
+        expect(contents).to include('INSTALL_DIR=/opt/project')
       end
     end
 
     describe '#write_scripts' do
-      context 'when scripts are given' do
-        let(:scripts) { %w( makeselfinst ) }
-        before do
-          scripts.each do |script_name|
-            create_file("#{project_root}/package-scripts/project/#{script_name}") do
-              "Contents of #{script_name}"
-            end
-          end
-        end
-
-        it 'writes the scripts into the staging dir' do
-          subject.write_scripts
-
-          scripts.each do |script_name|
-            script_file = "#{staging_dir}/#{script_name}"
-            contents = File.read(script_file)
-            expect(contents).to include("Contents of #{script_name}")
+      let(:default_scripts) { %w( postinst ) }
+      before do
+        default_scripts.each do |script_name|
+          create_file("#{project_root}/package-scripts/project/#{script_name}") do
+            "Contents of #{script_name}"
           end
         end
       end
 
-      context 'when scripts with default omnibus naming are given' do
-        let(:default_scripts) { %w( postinst ) }
-        before do
-          default_scripts.each do |script_name|
-            create_file("#{project_root}/package-scripts/project/#{script_name}") do
-              "Contents of #{script_name}"
-            end
-          end
-        end
+      it 'writes the scripts into the staging dir' do
+        subject.write_scripts
 
-        it 'writes the scripts into the staging dir' do
-          subject.write_scripts
-
-          default_scripts.each do |script_name|
-            mapped_name = Packager::Makeself::SCRIPT_MAP[script_name.to_sym]
-            script_file = "#{staging_dir}/#{mapped_name}"
-            contents = File.read(script_file)
-            expect(contents).to include("Contents of #{script_name}")
-          end
+        default_scripts.each do |script_name|
+          mapped_name = Packager::Makeself::SCRIPT_MAP[script_name.to_sym]
+          script_file = "#{staging_dir}/#{mapped_name}"
+          contents = File.read(script_file)
+          expect(contents).to include("Contents of #{script_name}")
         end
       end
     end

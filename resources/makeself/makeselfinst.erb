@@ -1,0 +1,35 @@
+#!/bin/sh
+# WARNING: REQUIRES /bin/sh
+#
+# - must run on /bin/sh on solaris 9
+# - must run on /bin/sh on AIX 6.x
+# - if you think you are a bash wizard, you probably do not understand
+#   this programming language.  do not touch.
+# - if you are under 40, get peer review from your elders.
+#
+
+#########################################################################
+# HELPERS
+#########################################################################
+error_exit()
+{
+  echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+  exit 1
+}
+
+PROGNAME=`basename $0`
+EXTRACT_DIR=`dirname $0`
+INSTALL_DIR=<%= install_dir %>
+
+#########################################################################
+# MOVE SELF-EXTRACTING ARCHIVE FILES INTO PLACE
+#########################################################################
+rm -rf $INSTALL_DIR/* || error_exit "Cannot remove contents of $INSTALL_DIR"
+mkdir -p $INSTALL_DIR || error_exit "Cannot create $INSTALL_DIR"
+cp -R $EXTRACT_DIR $INSTALL_DIR || error_exit "Cannot install to $INSTALL_DIR"
+rm -f $INSTALL_DIR/$PROGNAME
+
+# Execute the optional postinst script
+if test -f "$INSTALL_DIR/postinst"; then
+  $INSTALL_DIR/postinst
+fi
