@@ -105,6 +105,7 @@ module Omnibus
 
         it 'sets the defaults' do
           expect(subject.with_standard_compiler_flags).to eq(
+            'CC'              => 'gcc -static-libgcc',
             'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             "CXXFLAGS"        => "-I/opt/project/embedded/include",
