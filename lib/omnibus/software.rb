@@ -434,8 +434,8 @@ module Omnibus
           {
             "CC" => "xlc_r -q64",
             "CXX" => "xlC_r -q64",
-            "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
-            "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -O",
+            "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
+            "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
             "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
             "LD" => "ld -b64",
             "OBJECT_MODE" => "64",
