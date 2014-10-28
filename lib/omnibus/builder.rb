@@ -279,14 +279,45 @@ module Omnibus
         embedded_apps_root = "#{install_dir}/embedded/apps"
         embedded_app_dir   = "#{embedded_apps_root}/#{app_name}"
         gemfile_lock       = "#{embedded_app_dir}/Gemfile.lock"
+        source_app_dir     = "#{Omnibus::Config.source_dir}/#{app_name}"
         appbundler_bin     = windows_safe_path("#{install_dir}/embedded/bin/appbundler")
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
         # Ensure the embedded app directory exists
         FileUtils.mkdir_p(embedded_apps_root)
+        # Try to find gemspec for platform
+        spec_path = ["#{source_app_dir}/#{app_name}-#{RUBY_PLATFORM}.gemspec", 
+                     "#{source_app_dir}/#{app_name}.gemspec"].detect do |f|
+          File.exists?(f)
+        end
+
+        spec = nil
+        if spec_path
+          Dir.chdir(source_app_dir) do
+            spec = Gem::Specification::load(spec_path) if spec_path
+          end
+        end
+
         # Copy the application code into place
-        FileUtils.cp_r("#{Omnibus::Config.source_dir}/#{app_name}", embedded_apps_root)
+        if spec
+          # Copy only the files in the gemspec
+          FileUtils.mkdir_p(embedded_app_dir)
+          spec.files.each do |f|
+            src = "#{source_app_dir}/#{f}"
+            dst = "#{embedded_app_dir}/#{f}"
+            if File.directory?(src)
+              FileUtils.mkdir_p(dst)
+            else
+              FileUtils.mkdir_p(File.dirname(dst))
+              FileUtils.cp(src, dst)
+            end
+          end
+
+          FileUtils.cp_r("#{source_app_dir}/Gemfile.lock", embedded_app_dir)
+        else
+          FileUtils.cp_r("#{source_app_dir}", embedded_apps_root)
+        end
         # Delete any top-level `.git` directory
         FileUtils.rm_rf("#{embedded_app_dir}/.git")
 
