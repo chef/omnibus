@@ -145,10 +145,10 @@ module Omnibus
           subject.write_gen_template
           contents = File.read(gen_file)
 
-          expect(contents).to include("    Pre-installation Script: #{subject.scripts_install_dir}/preinst")
-          expect(contents).to include("    Post-installation Script: #{subject.scripts_install_dir}/postinst")
-          expect(contents).to include("    Pre_rm Script: #{subject.scripts_install_dir}/prerm")
-          expect(contents).to include("    Unconfiguration Script: #{subject.scripts_install_dir}/postrm")
+          expect(contents).to include("    Pre-installation Script: #{subject.scripts_staging_dir}/preinst")
+          expect(contents).to include("    Post-installation Script: #{subject.scripts_staging_dir}/postinst")
+          expect(contents).to include("    Pre_rm Script: #{subject.scripts_staging_dir}/prerm")
+          expect(contents).to include("    Unconfiguration Script: #{subject.scripts_staging_dir}/postrm")
         end
       end
     end
