@@ -40,6 +40,9 @@ module Omnibus
     end
 
     build do
+      # Copy scripts
+      write_scripts
+
       # Render the gen template
       write_gen_template
 
@@ -124,13 +127,12 @@ module Omnibus
     #   Unconfiguration Script: /path/script
     #
     def write_gen_template
-      # Create a map of scripts that exist and install path
+      # Create a map of scripts that exist to inject into the template
       scripts = SCRIPT_MAP.inject({}) do |hash, (script, installp_key)|
         staging_path =  File.join(scripts_staging_dir, script.to_s)
-        install_path =  File.join(scripts_install_dir, script.to_s)
 
         if File.file?(staging_path)
-          hash[installp_key] = install_path
+          hash[installp_key] = staging_path
         end
 
         hash
@@ -163,9 +165,17 @@ module Omnibus
     # @return [void]
     #
     def create_bff_file
+      # We are making the assumption that sudo exists.
+      # Unforunately, the owner of the file in the staging directory is what
+      # will be on the target machine, and mkinstallp can't tell you if that
+      # is a bad thing (it usually is).
+      shellout!("sudo chown -R 0:0 #{staging_dir}/#{project.install_dir}")
       log.info(log_key) { "Creating .bff file" }
 
-      shellout!("/usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
+      # Since we want the owner to be root, we need to sudo the mkinstallp
+      # command, otherwise it will not have access to the previously chowned
+      # directory.
+      shellout!("sudo /usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
 
       # Copy the resulting package up to the package_dir
       FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
