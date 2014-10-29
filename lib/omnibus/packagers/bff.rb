@@ -169,7 +169,7 @@ module Omnibus
       # Unforunately, the owner of the file in the staging directory is what
       # will be on the target machine, and mkinstallp can't tell you if that
       # is a bad thing (it usually is).
-      shellout!("sudo chown -R 0:0 #{staging_dir}/opt")
+      shellout!("sudo chown -R 0:0 #{staging_dir}/#{project.install_dir}")
       log.info(log_key) { "Creating .bff file" }
 
       # Since we want the owner to be root, we need to sudo the mkinstallp
