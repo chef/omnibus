@@ -40,6 +40,9 @@ module Omnibus
     end
 
     build do
+      # Copy scripts
+      write_scripts
+      
       # Render the gen template
       write_gen_template
 
@@ -127,7 +130,7 @@ module Omnibus
       # Create a map of scripts that exist and install path
       scripts = SCRIPT_MAP.inject({}) do |hash, (script, installp_key)|
         staging_path =  File.join(scripts_staging_dir, script.to_s)
-        install_path =  File.join(scripts_install_dir, script.to_s)
+        install_path =  File.join(scripts_staging_dir, script.to_s)
 
         if File.file?(staging_path)
           hash[installp_key] = install_path
@@ -163,9 +166,10 @@ module Omnibus
     # @return [void]
     #
     def create_bff_file
+      shellout!("sudo chown -R 0:0 #{staging_dir}/opt")
       log.info(log_key) { "Creating .bff file" }
 
-      shellout!("/usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
+      shellout!("sudo /usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
 
       # Copy the resulting package up to the package_dir
       FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
