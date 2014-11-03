@@ -40,7 +40,7 @@ module Omnibus
       end
 
       it 'includes the name and version' do
-        expect(subject.package_name).to eq('project.1.2.3.2.bff')
+        expect(subject.package_name).to eq('project-1.2.3-2.x86_64.bff')
       end
     end
 
@@ -194,7 +194,7 @@ module Omnibus
 
     describe '#create_bff_file_name' do
       it 'constructs the proper package name' do
-        expect(subject.create_bff_file_name).to eq('project.1.2.3.2.bff')
+        expect(subject.create_bff_file_name).to eq('project-1.2.3-2.x86_64.bff')
       end
 
     end

@@ -52,7 +52,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{safe_base_package_name}.#{project.build_version}.#{project.build_iteration}.bff"
+      "#{safe_base_package_name}-#{project.build_version}-#{project.build_iteration}.#{safe_architecture}.bff"
     end
 
     #
@@ -197,7 +197,7 @@ module Omnibus
     # @return [String]
     #
     def create_bff_file_name
-      "#{safe_base_package_name}.#{project.build_version}.#{project.build_iteration}.bff"
+      "#{safe_base_package_name}-#{project.build_version}-#{project.build_iteration}.#{safe_architecture}.bff"
     end
 
 
