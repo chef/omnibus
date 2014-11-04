@@ -10,6 +10,7 @@ module Omnibus
         project.build_version('1.2.3')
         project.build_iteration('2')
         project.maintainer('Chef Software')
+        project.replace('old-project')
       end
     end
 
@@ -150,6 +151,7 @@ module Omnibus
         expect(contents).to include("Vendor: Omnibus <omnibus@getchef.com>")
         expect(contents).to include("URL: https://example.com")
         expect(contents).to include("Packager: Chef Software")
+        expect(contents).to include("Obsoletes: old-project")
       end
 
       context 'when scripts are given' do

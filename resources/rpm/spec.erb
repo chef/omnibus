@@ -34,7 +34,7 @@ Requires: <%= name %>
 <% conflicts.each do |name| -%>
 Conflicts: <%= name %>
 <% end -%>
-<% conflicts.each do |name| -%>
+<% replaces.each do |name| -%>
 Obsoletes: <%= name %>
 <%- end -%>
 <% # RPM rejects descriptions with blank lines (even between content) -%>
