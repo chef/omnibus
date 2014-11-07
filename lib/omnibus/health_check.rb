@@ -129,11 +129,13 @@ module Omnibus
 
     FREEBSD_WHITELIST_LIBS = [
       /libc\.so/,
+      /libgcc_s\.so/,
       /libcrypt\.so/,
       /libm\.so/,
       /librt\.so/,
       /libthr\.so/,
       /libutil\.so/,
+      /libelf\.so/,
     ].freeze
 
     class << self
