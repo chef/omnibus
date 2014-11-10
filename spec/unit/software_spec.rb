@@ -154,6 +154,40 @@ module Omnibus
         end
       end
 
+      context 'on freebsd' do
+        before do
+          stub_ohai(platform: 'freebsd', version: '9.2')
+        end
+
+        it 'sets the defaults' do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'CFLAGS'  => '-I/opt/project/embedded/include',
+            'CXXFLAGS'  => '-I/opt/project/embedded/include',
+            'LDFLAGS' => '-L/opt/project/embedded/lib',
+            'LD_RUN_PATH' => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+          )
+        end
+
+        context 'on freebsd' do
+          before do
+            stub_ohai(platform: 'freebsd', version: '10.0')
+          end
+
+          it 'Clang as the default compiler' do
+            expect(subject.with_standard_compiler_flags).to eq(
+              'CC'              => 'clang',
+              'CXX'             => 'clang++',
+              'CFLAGS'          => '-I/opt/project/embedded/include',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include',
+              'LDFLAGS'         => '-L/opt/project/embedded/lib',
+              'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+            )
+          end
+        end
+      end
+
     end
 
     describe 'path helpers' do

@@ -455,10 +455,18 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include",
           }
         when "freebsd"
-          {
-            "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
+          freebsd_flags = {
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
           }
+          # Clang became the default compiler in FreeBSD 10+
+          if Ohai['os_version'].to_i >= 1000024
+            freebsd_flags.merge!(
+              "CC" => "clang",
+              "CXX" => "clang++",
+            )
+          end
+          freebsd_flags
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
