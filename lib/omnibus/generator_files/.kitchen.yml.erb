@@ -12,6 +12,22 @@ provisioner:
   require_chef_omnibus: 11.14.6
 
 platforms:
+  - name: centos-7.0
+    run_list: yum-epel::default
+  - name: centos-6.5
+    run_list: yum-epel::default
+  - name: centos-5.10
+    run_list: yum-epel::default
+  - name: debian-7.2.0
+    run_list: apt::default
+  - name: debian-6.0.8
+    run_list: apt::default
+  - name: freebsd-10.0
+    run_list: freebsd::portsnap
+  - name: freebsd-9.2
+    run_list:
+      - freebsd::portsnap
+      - freebsd::pkgng
   - name: ubuntu-14.04
     run_list: apt::default
   - name: ubuntu-12.04
@@ -20,8 +36,6 @@ platforms:
     run_list: apt::default
   - name: ubuntu-10.04
     run_list: apt::default
-  - name: centos-5.10
-  - name: centos-6.5
 
 suites:
   - name: default
