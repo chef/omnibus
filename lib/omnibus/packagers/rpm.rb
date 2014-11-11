@@ -449,7 +449,16 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      Ohai['kernel']['machine']
+      case Ohai['kernel']['machine']
+      when 'armv6l'
+        if Ohai['platform'] == 'pidora'
+          'armv6hl'
+        else
+          'armv6l'
+        end
+      else
+        Ohai['kernel']['machine']
+      end
     end
   end
 end
