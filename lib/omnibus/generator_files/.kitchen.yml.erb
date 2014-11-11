@@ -42,6 +42,7 @@ suites:
     run_list: omnibus::default
     attributes:
       omnibus:
-        build_user:  vagrant
-        build_dir:   /home/vagrant/<%= config[:name] %>
-        install_dir: /opt/<%= config[:name] %>
+        build_user:          vagrant
+        build_user_group:    vagrant
+        build_user_password: vagrant
+        install_dir:         /opt/<%= config[:name] %>
