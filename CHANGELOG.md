@@ -1,6 +1,32 @@
 Omnibus CHANGELOG
 =================
 
+v4.0.0.rc.2 (November 10, 2014)
+-------------------------------
+
+### New Features
+
+#### Platforms
+- Raspberry Pi platform support (currently Raspbian and Pidora)
+- AIX
+    - XL C is the default compiler on AIX.
+- FreeBSD 10
+    - Clang is the default compiler on FreeBSD 10+
+    - Add `libgcc` and `libelf` to the FreeBSD whitelist
+- Solaris
+    - Make compilation default `-static-libgcc`
+
+### Bugfixes
+
+- Set default values for `CXXFLAGS`.
+- Retrieve the correct path_key from the ENV on Windows.
+- openSUSE/SLES fixes for OHAI-339.
+- Properly truncate platform version on Arch Linux.
+- Ensure final `*.dmg` name matches actual `*.pkg` name.
+- Change `makeself` package extension back to `.sh`.
+- Generate a default `makeselfinst` which fires at following install.
+- Map `Omnibus::Project#replaces` to RPM Spec file's `Obsoletes:`.
+
 v4.0.0.rc.1 (September 23, 2014)
 --------------------------------
 
