@@ -159,7 +159,7 @@ module Omnibus
         when 'aix', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'opensuse', 'ubuntu'
           # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
           platform_version.split('.')[0..1].join('.')
-        when 'arch'
+        when 'arch', 'exherbo'
           # Arch Linux does not have a platform_version ohai attribute, it is rolling release (lsb_release -r)
           'rolling'
         when 'windows'

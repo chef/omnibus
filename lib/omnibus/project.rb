@@ -171,6 +171,11 @@ module Omnibus
     end
     expose :install_dir
 
+    def dest_dir
+      File.expand_path("#{Config.dest_dir}")
+    end
+    expose :dest_dir
+
     #
     # The default root where a project should be installed. On Windows-based
     # systems, this value defaults to +C:+. On non-Windows systems, this value

@@ -107,6 +107,8 @@ module Omnibus
       end
     end
 
+    default(:dest_dir) { '/' }
+
     # The absolute path to the directory on the virtual machine where
     # code will be cached.
     #

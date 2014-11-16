@@ -46,6 +46,10 @@ module Omnibus
       FileSyncer.glob("#{Config.build_dir}/**/*").each(&method(:remove_file))
     end
 
+    def clean_dest_dir
+      FileSyncer.glob("#{Config.dest_dir}/**/*").each(&method(:remove_file))
+    end
+
     def clean_package_dir
       return unless purge?
       FileSyncer.glob("#{Config.package_dir}/**/*").each(&method(:remove_file))

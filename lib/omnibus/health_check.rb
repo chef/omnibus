@@ -26,6 +26,7 @@ module Omnibus
       /libdl/,
       /libfreebl\d\.so/,
       /libgcc_s\.so/,
+      /libgmp\.so/,
       /libm\.so/,
       /libnsl\.so/,
       /libpthread/,
@@ -43,6 +44,7 @@ module Omnibus
       /libdb-5\.3\.so/,
       /libdl\.so/,
       /libffi\.so/,
+      /libgmp\.so/,
       /libgdbm\.so/,
       /libm\.so/,
       /libnsl\.so/,
@@ -286,7 +288,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      read_shared_libs("find #{project.dest_dir}/#{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -310,7 +312,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
+      read_shared_libs("find #{project.dest_dir}/#{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -338,7 +340,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | xargs ldd") do |line|
+      read_shared_libs("find #{project.dest_dir}/#{project.install_dir}/ -type f | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -404,7 +406,7 @@ module Omnibus
       safe = nil
 
       whitelist_libs = case Ohai['platform']
-                       when 'arch'
+                       when 'arch', 'exherbo'
                          ARCH_WHITELIST_LIBS
                        when 'mac_os_x'
                          MAC_WHITELIST_LIBS

@@ -349,6 +349,12 @@ module Omnibus
     end
     expose :build_dir
 
+    def dest_dir
+      File.expand_path("#{Config.dest_dir}")
+    end
+    expose :dest_dir
+
+
     #
     # The directory where this software is installed on disk.
     #
@@ -469,8 +475,9 @@ module Omnibus
           freebsd_flags
         else
           {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -Wl,-rpath-link,#{dest_dir}/#{install_dir}/embedded/lib -L#{dest_dir}/#{install_dir}/embedded/lib",
+            "CFLAGS" => "-I#{dest_dir}/#{install_dir}/embedded/include",
+            "DESTDIR" => "#{dest_dir}",
           }
         end
 
@@ -482,7 +489,7 @@ module Omnibus
       # better.  in that case LD_RUN_PATH will probably survive whatever
       # edits the configure script does
       extra_linker_flags = {
-        "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
+        "LD_RUN_PATH" => "#{dest_dir}/#{install_dir}/embedded/lib"
       }
       # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
       # the linker, to find every way to make it use our rpath.
@@ -496,7 +503,7 @@ module Omnibus
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
-        merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"}).
+        merge({"PKG_CONFIG_PATH" => "#{dest_dir}/#{install_dir}/embedded/lib/pkgconfig"}).
         # Set default values for CXXFLAGS.
         merge('CXXFLAGS' => compiler_flags['CFLAGS'])
     end
@@ -512,7 +519,7 @@ module Omnibus
     # @return [Hash]
     #
     def with_embedded_path(env = {})
-      path_value = prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+      path_value = prepend_path("#{dest_dir}/#{install_dir}/bin", "#{dest_dir}/#{install_dir}/embedded/bin")
       env.merge(path_key => path_value)
     end
     expose :with_embedded_path
