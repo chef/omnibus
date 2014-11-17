@@ -323,14 +323,14 @@ module Omnibus
     # @return [String]
     #
     def safe_base_package_name
-      if project.package_name =~ /\A[a-zA-Z0-9\.\+\-]+\z/
+      if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
-        converted = project.package_name.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
+        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
           "The `name' compontent of Debian package names can only include " \
-          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
+          "lower case alphabetical characters (a-z), numbers (0-9), dots (.), " \
           "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
         end
@@ -340,7 +340,7 @@ module Omnibus
     end
 
     #
-    # This is actually just the regular build_iternation, but it felt lonely
+    # This is actually just the regular build_iteration, but it felt lonely
     # among all the other +safe_*+ methods.
     #
     # @return [String]
@@ -356,15 +356,15 @@ module Omnibus
     # @return [String]
     #
     def safe_version
-      if project.build_version =~ /\A[a-zA-Z0-9\.\+\-\:]+\z/
+      if project.build_version =~ /\A[a-zA-Z0-9\.\+\-\:\~]+\z/
         project.build_version.dup
       else
-        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-\:]+/, '-')
+        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-\:\~]+/, '-')
 
         log.warn(log_key) do
           "The `version' compontent of Debian package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), dashes (-), and colons (:). Converting " \
+          "plus signs (+), dashes (-), tildes (~) and colons (:). Converting " \
           "`#{project.build_version}' to `#{converted}'."
         end
 
