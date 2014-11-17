@@ -240,6 +240,11 @@ module Omnibus
         hash
       end
 
+      # Exclude directories from the spec that are owned by the filesystem package:
+      # http://fedoraproject.org/wiki/Packaging:Guidelines#File_and_Directory_Ownership
+      filesystem_directories = IO.readlines(resource_path('filesystem_list'))
+      filesystem_directories.map! { |dirname| dirname.chomp }
+
       # Get a list of user-declared config files
       config_files = project.config_files.map { |file| rpm_safe(file) }
 
@@ -249,6 +254,7 @@ module Omnibus
                 .map    { |path| "/#{path}" }
                 .map    { |path| rpm_safe(path) }
                 .reject { |path| config_files.include?(path) }
+                .reject { |path| filesystem_directories.include?(path) }
 
       render_template(resource_path('spec.erb'),
         destination: spec_file,

@@ -217,6 +217,19 @@ module Omnibus
           expect(contents).to include("/file2")
         end
       end
+
+      context 'when leaf directories owned by the filesystem package are present' do
+        before do
+          create_file("#{staging_dir}/BUILD/opt")
+        end
+
+        it 'does not write them into the spec' do
+          subject.write_rpm_spec
+          contents = File.read(spec_file)
+
+          expect(contents).to_not include("/opt")
+        end
+      end
     end
 
     describe '#create_rpm_file' do
