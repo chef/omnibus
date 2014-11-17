@@ -24,7 +24,7 @@ describe Omnibus do
       expect(subject.which('not_a_real_executable')).to be nil
     end
 
-    it 'retusnt the path when the file exists' do
+    it 'returns the path when the file exists' do
       ruby = Bundler.which('ruby')
       expect(subject.which(ruby)).to eq(ruby)
     end
