@@ -489,7 +489,7 @@ module Omnibus
       # better.  in that case LD_RUN_PATH will probably survive whatever
       # edits the configure script does
       extra_linker_flags = {
-        "LD_RUN_PATH" => "#{dest_dir}/#{install_dir}/embedded/lib"
+        "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
       }
       # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
       # the linker, to find every way to make it use our rpath.
