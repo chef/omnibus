@@ -31,9 +31,9 @@ These options are further described in the [`Project` documentation](http://ruby
 
 These values are interpolated and evaluated using Omnibus' internal RPM templates. For 99% of users, these templates should be satisfactory. If you encounter an instance where Omnibus' RPM templates do not satisfy a use case, please open an issue.
 
-Because of the unlikelihood of their necessity, Omnibus does not generate rpm-related assets. If you find yourself in a situation where you need to generate highly-customized RPM assets, run the Omnibus generator command with the `--rpm-assets` flag:
+Because of the unlikelihood of their necessity, Omnibus does not generate rpm-related assets. If you find yourself in a situation where you need to generate highly-customized RPM assets, run the Omnibus new command with the `--rpm-assets` flag:
 
-    $ omnibus generate NAME --rpm-assets
+    $ omnibus new NAME --rpm-assets
 
 **If this is an existing project, be sure to answer "NO" when asked if you want to overwrite existing files!**
 
