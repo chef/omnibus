@@ -149,6 +149,7 @@ module Omnibus
     # @return [void]
     #
     def download
+      tries = 5
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
       options = download_headers
@@ -175,9 +176,16 @@ module Omnibus
            Errno::ECONNREFUSED,
            Errno::ECONNRESET,
            Errno::ENETUNREACH,
+           Timeout::Error,
            OpenURI::HTTPError => e
-      log.error(log_key) { "Download failed - #{e.class}!" }
-      raise
+      tries -= 1
+      if tries != 0
+        log.debug(log_key) { "Retrying failed download (#{tries})..." }
+        retry
+      else
+        log.error(log_key) { "Download failed - #{e.class}!" }
+        raise
+      end
     end
 
     #
