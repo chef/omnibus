@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+require 'pathname'
+
 module Omnibus
   class HealthCheck
     include Logging
@@ -286,7 +288,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.dest_dir}/#{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      read_shared_libs("find #{Pathname.new(File.join(project.dest_dir, project.install_dir)).cleanpath.to_s}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -310,7 +312,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.dest_dir}/#{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
+      read_shared_libs("find #{Pathname.new(File.join(project.dest_dir, project.install_dir)).cleanpath.to_s}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -338,7 +340,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.dest_dir}/#{project.install_dir}/ -type f | xargs ldd") do |line|
+      read_shared_libs("find #{Pathname.new(File.join(project.dest_dir, project.install_dir)).cleanpath.to_s}/ -type f | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]

@@ -33,6 +33,7 @@ module Omnibus
     include_examples 'a configurable', :git_cache_dir, '/var/cache/omnibus/cache/git_cache'
     include_examples 'a configurable', :source_dir, '/var/cache/omnibus/src'
     include_examples 'a configurable', :build_dir, '/var/cache/omnibus/build'
+    include_examples 'a configurable', :dest_dir, '/'
     include_examples 'a configurable', :package_dir, '/var/cache/omnibus/pkg'
     include_examples 'a configurable', :project_root, Dir.pwd
     include_examples 'a configurable', :local_software_dirs, []
@@ -77,6 +78,7 @@ module Omnibus
       include_examples 'a configurable', :git_cache_dir, 'C:/omnibus-ruby/cache/git_cache'
       include_examples 'a configurable', :source_dir, 'C:/omnibus-ruby/src'
       include_examples 'a configurable', :build_dir, 'C:/omnibus-ruby/build'
+      include_examples 'a configurable', :dest_dir, 'C:/'
       include_examples 'a configurable', :package_dir, 'C:/omnibus-ruby/pkg'
     end
 

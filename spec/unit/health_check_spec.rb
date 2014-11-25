@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'pathname'
 
 module Omnibus
   describe HealthCheck do
@@ -6,6 +7,7 @@ module Omnibus
       double(Project,
         name: 'chefdk',
         install_dir: '/opt/chefdk',
+        dest_dir: '/',
         library: double(Library,
           components: [],
         ),
@@ -55,7 +57,7 @@ module Omnibus
 
       it 'raises an exception when there are external dependencies' do
         allow(subject).to receive(:shellout)
-          .with("find #{project.install_dir}/ -type f | xargs ldd")
+          .with("find #{Pathname.new(File.join(project.dest_dir, project.install_dir)).cleanpath.to_s}/ -type f | xargs ldd")
           .and_return(bad_healthcheck)
 
         expect { subject.run! }.to raise_error(HealthCheckFailed)
@@ -63,7 +65,7 @@ module Omnibus
 
       it 'does not raise an exception when the healthcheck passes' do
         allow(subject).to receive(:shellout)
-          .with("find #{project.install_dir}/ -type f | xargs ldd")
+          .with("find #{Pathname.new(File.join(project.dest_dir, project.install_dir)).cleanpath.to_s}/ -type f | xargs ldd")
           .and_return(good_healthcheck)
 
         expect { subject.run! }.to_not raise_error

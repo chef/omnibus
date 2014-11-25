@@ -172,7 +172,7 @@ module Omnibus
     expose :install_dir
 
     def dest_dir
-      File.expand_path("#{Config.dest_dir}")
+      Pathname.new(File.expand_path(Config.dest_dir)).cleanpath.to_s
     end
     expose :dest_dir
 

@@ -92,6 +92,14 @@ module Omnibus
     # @!group Directory Configuration Parameters
     # --------------------------------------------------
 
+    default(:dest_dir) do
+      if Ohai['platform'] == 'windows'
+        'C:/'
+      else
+        '/'
+      end
+    end
+
     # The "base" directory where Omnibus will store it's data. Other paths are
     # dynamically computed from this value.
     #
@@ -106,8 +114,6 @@ module Omnibus
         '/var/cache/omnibus'
       end
     end
-
-    default(:dest_dir) { '/' }
 
     # The absolute path to the directory on the virtual machine where
     # code will be cached.

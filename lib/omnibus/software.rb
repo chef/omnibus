@@ -16,6 +16,7 @@
 
 require 'fileutils'
 require 'uri'
+require 'pathname'
 
 module Omnibus
   class Software
@@ -350,7 +351,7 @@ module Omnibus
     expose :build_dir
 
     def dest_dir
-      File.expand_path("#{Config.dest_dir}")
+      Pathname.new(Config.dest_dir).cleanpath.to_s
     end
     expose :dest_dir
 
@@ -475,8 +476,8 @@ module Omnibus
           freebsd_flags
         else
           {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -Wl,-rpath-link,#{dest_dir}/#{install_dir}/embedded/lib -L#{dest_dir}/#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{dest_dir}/#{install_dir}/embedded/include",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -Wl,-rpath-link,#{Pathname.new(File.join(dest_dir, install_dir, '/embedded/lib')).cleanpath.to_s} -L#{Pathname.new(File.join(dest_dir, install_dir, '/embedded/lib')).cleanpath.to_s}",
+            "CFLAGS" => "-I#{Pathname.new(File.join(dest_dir, install_dir, '/embedded/include')).cleanpath.to_s}",
             "DESTDIR" => "#{dest_dir}",
           }
         end
@@ -503,7 +504,7 @@ module Omnibus
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
-        merge({"PKG_CONFIG_PATH" => "#{dest_dir}/#{install_dir}/embedded/lib/pkgconfig"}).
+        merge({"PKG_CONFIG_PATH" => Pathname.new(File.join(dest_dir, install_dir, '/embedded/lib/pkgconfig')).cleanpath.to_s}).
         # Set default values for CXXFLAGS.
         merge('CXXFLAGS' => compiler_flags['CFLAGS'])
     end
@@ -519,7 +520,12 @@ module Omnibus
     # @return [Hash]
     #
     def with_embedded_path(env = {})
-      path_value = prepend_path("#{dest_dir}/#{install_dir}/bin", "#{dest_dir}/#{install_dir}/embedded/bin")
+      path_value = ''
+      if Ohai['platform'] == 'windows'
+        path_value = prepend_path(Pathname.new(File.join(dest_dir, install_dir[2..-1], 'bin')).cleanpath.to_s, Pathname.new(File.join(dest_dir, install_dir[2..-1], '/embedded/bin')).cleanpath.to_s)
+      else
+        path_value = prepend_path(Pathname.new(File.join(dest_dir, install_dir, 'bin')).cleanpath.to_s, Pathname.new(File.join(dest_dir, install_dir, '/embedded/bin')).cleanpath.to_s)
+      end
       env.merge(path_key => path_value)
     end
     expose :with_embedded_path

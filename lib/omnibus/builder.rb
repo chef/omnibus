@@ -218,7 +218,7 @@ module Omnibus
     #
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
-        bin = windows_safe_path("#{install_dir}/embedded/bin/ruby")
+        bin = windows_safe_path(Pathname.new(File.join(dest_dir, install_dir, '/embedded/bin/ruby')).cleanpath.to_s)
         shellout!("#{bin} #{command}", options)
       end
     end
@@ -235,7 +235,7 @@ module Omnibus
     #
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
-        bin = windows_safe_path("#{dest_dir}/#{install_dir}/embedded/bin/gem")
+        bin = windows_safe_path(Pathname.new(File.join(dest_dir, install_dir, '/embedded/bin/gem')).cleanpath.to_s)
         shellout!("#{bin} #{command}", options)
       end
     end
@@ -255,7 +255,7 @@ module Omnibus
     #
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
-        bin = windows_safe_path("#{dest_dir}/#{install_dir}/embedded/bin/bundle")
+        bin = windows_safe_path(Pathname.new(File.join(dest_dir, install_dir, '/embedded/bin/bundle')).cleanpath.to_s)
         shellout!("#{bin} #{command}", options)
       end
     end
@@ -275,11 +275,11 @@ module Omnibus
     #
     def appbundle(app_name, options = {})
       build_commands << BuildCommand.new("appbundle `#{app_name}'") do
-        bin_dir            = "#{dest_dir}/#{install_dir}/bin"
-        embedded_apps_root = "#{dest_dir}/#{install_dir}/embedded/apps"
+        bin_dir            = Pathname.new(File.join(dest_dir, install_dir, '/bin')).cleanpath.to_s
+        embedded_apps_root = Pathname.new(File.join(dest_dir, install_dir, '/embedded/apps')).cleanpath.to_s
         embedded_app_dir   = "#{embedded_apps_root}/#{app_name}"
         gemfile_lock       = "#{embedded_app_dir}/Gemfile.lock"
-        appbundler_bin     = windows_safe_path("#{dest_dir}/#{install_dir}/embedded/bin/appbundler")
+        appbundler_bin     = windows_safe_path(Pathname.new(File.join(dest_dir, install_dir, '/embedded/bin/appbundler')).cleanpath.to_s)
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
@@ -313,7 +313,7 @@ module Omnibus
     #
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
-        bin = windows_safe_path("#{dest_dir}/#{install_dir}/embedded/bin/rake")
+        bin = windows_safe_path(Pathname.new(File.join(dest_dir, install_dir, '/embedded/bin/rake')).cleanpath.to_s)
         shellout!("#{bin} #{command}", options)
       end
     end

@@ -31,6 +31,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :build, %|build {}|
     it_behaves_like 'a cleanroom getter', :project_dir
     it_behaves_like 'a cleanroom getter', :build_dir
+    it_behaves_like 'a cleanroom getter', :dest_dir
     it_behaves_like 'a cleanroom getter', :install_dir
     it_behaves_like 'a cleanroom getter', :with_standard_compiler_flags
     it_behaves_like 'a cleanroom setter', :with_embedded_path, %|with_embedded_path({ 'foo' => 'bar' })|
@@ -49,48 +50,53 @@ module Omnibus
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -Wl,-rpath-link,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+            'DESTDIR'         => '/'
           )
         end
-        it 'ovesrride LDFLAGS' do
+        it 'override LDFLAGS' do
           expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -Wl,-rpath-link,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+            'DESTDIR'         => '/'
           )
         end
-        it 'ovesrride CFLAGS' do
+        it 'override CFLAGS' do
           expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -Wl,-rpath-link,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+            'DESTDIR'         => '/'
           )
         end
-        it 'ovesrride CXXFLAGS' do
+        it 'override CXXFLAGS' do
           expect(subject.with_standard_compiler_flags('CXXFLAGS'=>'foo')).to eq(
-            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -Wl,-rpath-link,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+            'DESTDIR'         => '/'
           )
         end
         it 'presserve anything else' do
           expect(subject.with_standard_compiler_flags('numberwang'=>4)).to eq(
             'numberwang'      => 4,
-            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -Wl,-rpath-link,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+            'DESTDIR'         => '/'
           )
         end
       end
@@ -206,6 +212,7 @@ module Omnibus
         let(:separator) { ':' }
         let(:path) { '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin' }
         let(:install_dir) { '/opt/project' }
+        let(:dest_dir) { '/' }
 
         it 'prepends a path to PATH' do
           expect(subject.prepend_path('/foo/bar')).to eq(
@@ -239,8 +246,9 @@ module Omnibus
         end
 
         let(:separator) { ';' }
-        let(:path) { 'c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem' }
-        let(:install_dir) { 'c:/opt/project' }
+        let(:path) { 'C:/Ruby193/bin;C:/Windows/system32;C:/Windows;C:/Windows/System32/Wbem' }
+        let(:install_dir) { 'C:/opt/project' }
+        let(:dest_dir) { 'C:/' }
 
         context '`Path` exists in the environment' do
           before do
