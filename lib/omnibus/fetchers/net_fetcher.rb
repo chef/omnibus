@@ -149,8 +149,6 @@ module Omnibus
 
       options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
 
-      log.debug(log_key) { "Downloading #{download_url}" }
-
       file = open(download_url, options)
       FileUtils.cp(file.path, downloaded_file)
       file.close
