@@ -156,6 +156,7 @@ module Omnibus
            Errno::ECONNREFUSED,
            Errno::ECONNRESET,
            Errno::ENETUNREACH,
+           Timeout::Error,
            OpenURI::HTTPError => e
       tries -= 1
       if tries != 0
