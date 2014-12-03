@@ -351,7 +351,7 @@ module Omnibus
 
     #
     # Return the Debian-ready version, converting any invalid characters to
-    # dashes (+-+).
+    # underscores (+_+).
     #
     # @return [String]
     #
@@ -359,7 +359,7 @@ module Omnibus
       if project.build_version =~ /\A[a-zA-Z0-9\.\+\-\:\~]+\z/
         project.build_version.dup
       else
-        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-\:\~]+/, '-')
+        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-\:\~]+/, '_')
 
         log.warn(log_key) do
           "The `version' compontent of Debian package names can only include " \
