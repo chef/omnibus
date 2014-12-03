@@ -55,4 +55,17 @@ module OpenURI
       end
     end
   end
+
+  #
+  # Force Kernel#open to always return a Tempfile. This works around the fact
+  # that the OpenURI-provided Kernel#open returns a StringIO OR a Tempfile
+  # instances depending on the size of the data being downloaded. In the case
+  # of Omnibus we always want a Tempfile.
+  #
+  # @see http://winstonyw.com/2013/10/02/openuris_open_tempfile_and_stringio/
+  #
+  class Buffer
+    remove_const :StringMax
+    StringMax = 0
+  end
 end
