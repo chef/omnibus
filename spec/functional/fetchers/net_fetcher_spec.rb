@@ -93,6 +93,16 @@ module Omnibus
         subject.fetch
         expect(extracted).to be_a_directory
       end
+
+      context 'when the file is less than 10240 bytes' do
+        let(:source_url) { 'https://downloads.chef.io/chef.gpg.key' }
+        let(:source_md5) { 'c8f49b137b190707a0c5f5702a147155' }
+
+        it 'downloads the file' do
+          subject.fetch
+          expect(downloaded_file).to be_a_file
+        end
+      end
     end
 
     describe '#version_for_cache' do
