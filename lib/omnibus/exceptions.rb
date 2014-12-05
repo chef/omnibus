@@ -314,7 +314,7 @@ EOH
     def initialize(package, local, remote)
       super <<-EOH
 Publishing of #{package.name} failed due to a checksum mismatch between
-the local and uploaded versions of the package:
+the local and remote versions of the package:
 
       expected MD5: #{local}
       actual MD5:   #{remote}
