@@ -15,6 +15,7 @@
 #
 
 require 'uri'
+require 'benchmark'
 
 module Omnibus
   class ArtifactoryPublisher < Publisher
@@ -29,11 +30,18 @@ module Omnibus
 
         # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
-        artifact_for(package).upload(
-          repository,
-          remote_path_for(package),
-          metadata_for(package),
-        )
+        upload_time = Benchmark.realtime do
+          uploaded_artifact = artifact_for(package).upload(
+            repository,
+            remote_path_for(package),
+            metadata_for(package),
+          )
+
+          unless (package.md5 == uploaded_artifact.checksums['md5']) && (package.sha1 == uploaded_artifact.checksums['sha1'])
+            raise Omnibus::PublishedPackageChecksumMismatch.new(package, package.md5, uploaded_artifact.checksums['md5'])
+          end
+        end
+        log.debug(log_key) { "Elapsed time to publish #{package.name}:  #{1000*upload_time} ms"}
 
         # If a block was given, "yield" the package to the caller
         block.call(package) if block

@@ -12,6 +12,8 @@ module Omnibus
         name: 'chef.deb',
         content: 'BINARY',
         validate!: true,
+        sha1: 'SHA1',
+        md5: 'ABCDEF123456',
       )
     end
 
@@ -31,9 +33,18 @@ module Omnibus
       )
     end
 
+    let(:uploaded_artifact) do
+      double('Artifactory::Resource::Artifact',
+        checksums: {
+          'sha1' => 'SHA1',
+          'md5' => 'ABCDEF123456'
+        }
+      )
+    end
+
     let(:packages) { [package] }
     let(:client)   { double('Artifactory::Client') }
-    let(:artifact) { double('Artifactory::Resource::Artifact', upload: nil) }
+    let(:artifact) { double('Artifactory::Resource::Artifact', upload: uploaded_artifact) }
 
     before do
       allow(subject).to receive(:client).and_return(client)
@@ -63,6 +74,26 @@ module Omnibus
 
         subject.publish
       end
+
+    context 'when the checksums do not match' do
+      let(:uploaded_artifact) do
+        double('Artifactory::Resource::Artifact',
+          checksums: {
+            'sha1' => 'AHS1',
+            'md5' => 'FEDCBA123456'
+          }
+        )
+      end
+
+      it 'raises an error' do
+        expect(artifact).to receive(:upload).with(
+          repository,
+          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
+          an_instance_of(Hash),
+        ).and_return(uploaded_artifact)
+        expect { subject.publish }.to raise_error(Omnibus::PublishedPackageChecksumMismatch)
+      end
+    end
 
       context 'when an alternate platform and platform version are provided' do
         subject do

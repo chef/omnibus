@@ -309,4 +309,17 @@ Could not resolve `#{ref}' to a valid git SHA-1.
 EOH
     end
   end
+
+  class PublishedPackageChecksumMismatch < Error
+    def initialize(package, local, remote)
+      super <<-EOH
+Publishing of #{package.name} failed due to a checksum mismatch between
+the local and remote versions of the package:
+
+      expected MD5: #{local}
+      actual MD5:   #{remote}
+
+EOH
+    end
+  end
 end
