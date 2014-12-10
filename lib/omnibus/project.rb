@@ -667,6 +667,11 @@ module Omnibus
     end
     expose :ohai
 
+    def watch(dir)
+      dirs_to_watch << dir
+    end
+    expose :watch
+
     #
     # @!endgroup
     # --------------------------------------------------
@@ -703,6 +708,10 @@ module Omnibus
     #
     def dependencies
       @dependencies ||= []
+    end
+
+    def dependencies
+      @dirs_to_watch ||= []
     end
 
     #
