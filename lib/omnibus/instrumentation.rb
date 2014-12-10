@@ -33,18 +33,23 @@ module Omnibus
       end
       block.call
     ensure
-      changes = indexes.each do |dir, index|
+      log.info(log_key) { "Starting changes for #{label}" }
+      indexes.each do |dir, index|
         index.changes.each do |change|
-          log.info(log_key) { "Changes: #{label}: #{change}" }
+          log.info(log_key) { "#{change}" }
         end
       end
+      log.info(log_key) { "Ending changes for #{label}" }
       log.info(log_key) { "--------------------------" }
     end
 
     class Index
       def self.create(dir)
-        stats = Dir.foreach(dir).map do |f|
-          File::Stat.new(File.join(dir, f))
+        stats = {}
+        if FileTest.exist? dir
+          Dir.foreach(dir).each do |f|
+            stats[f] = File::Stat.new(File.join(dir, f))
+          end
         end
         Index.new(dir, stats)
       end
@@ -55,23 +60,26 @@ module Omnibus
       end
 
       def changes
-        c = {}
-        files = []
-        Dir.foreach(dir) do |f|
-          files << f
-          prev_stat = @stats[f]
-          if prev_stat
-            stat = File::Stat.new(File.join(dir, f))
-            if stat.mtime != prev_stat.mtime && not stat.directory?
-              c << "m #{File.join(dir, f)}"
+        c = []
+        if FileTest.exist? @dir
+          files = []
+          Dir.foreach(@dir) do |f|
+            files << f
+            prev_stat = @stats[f]
+            if prev_stat
+              stat = File::Stat.new(File.join(@dir, f))
+              if stat.mtime != prev_stat.mtime && !stat.directory?
+                c << "m #{File.join(@dir, f)}"
+              end
+            else
+              c << "+ #{File.join(@dir, f)}"
             end
-          else
-            c << "+ #{File.join(dir, f)}"
+          end
+          @stats.keys.reject {|x| files.include? x}.each do |deleted|
+            c << "- #{File.join(@dir, deleted)}"
           end
         end
-        @stats.keys.filter {|x| files.include? x}.each do |deleted|
-          c << "- #{File.join(dir, f)}"
-        end
+        c
       end
     end
   end

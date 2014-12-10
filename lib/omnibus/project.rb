@@ -710,7 +710,7 @@ module Omnibus
       @dependencies ||= []
     end
 
-    def dependencies
+    def dirs_to_watch
       @dirs_to_watch ||= []
     end
 
