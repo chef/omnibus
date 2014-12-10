@@ -695,9 +695,11 @@ module Omnibus
     #
     def execute(command)
       with_clean_env do
-        measure(command.description) do
-          with_retries do
-            command.run(self)
+        record_changes(command.description, software.project.dirs_to_watch) do
+          measure(command.description) do
+            with_retries do
+              command.run(self)
+            end
           end
         end
       end
