@@ -481,9 +481,9 @@ module Omnibus
     #
     def override(name, val = NULL)
       if null?(val)
-        overrides[name]
+        overrides[name.to_sym]
       else
-        overrides[name] = val
+        overrides[name.to_sym] = val
       end
     end
     expose :override
