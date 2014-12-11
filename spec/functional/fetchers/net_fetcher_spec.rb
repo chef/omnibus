@@ -95,8 +95,8 @@ module Omnibus
       end
 
       context 'when the file is less than 10240 bytes' do
-        let(:source_url) { 'https://downloads.chef.io/chef.gpg.key' }
-        let(:source_md5) { 'c8f49b137b190707a0c5f5702a147155' }
+        let(:source_url) { 'https://downloads.chef.io/packages-chef-io-public.key' }
+        let(:source_md5) { '369efc3a19b9118cdf51c7e87a34f266' }
 
         it 'downloads the file' do
           subject.fetch
