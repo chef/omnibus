@@ -223,6 +223,14 @@ module Omnibus
         subject.override(:thing, version: '6.6.6')
         expect(subject.override(:thing)[:version]).to eq('6.6.6')
       end
+
+      it 'symbolizes #overrides' do
+        subject.override('thing', version: '6.6.6')
+        [:thing, 'thing'].each do |thing|
+          expect(subject.override(thing)).not_to be_nil
+        end
+        expect(subject.override(:thing)[:version]).to eq('6.6.6')
+      end
     end
 
     describe '#ohai' do
