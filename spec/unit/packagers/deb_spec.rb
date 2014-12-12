@@ -282,7 +282,7 @@ module Omnibus
             expect(subject.safe_base_package_name).to eq('pro-ject123.for-realz-2')
           end
 
-          expect(output).to include("The `name' compontent of Debian package names can only include")
+          expect(output).to include("The `name' component of Debian package names can only include")
         end
       end
     end
