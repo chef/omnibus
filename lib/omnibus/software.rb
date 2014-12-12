@@ -44,7 +44,7 @@ module Omnibus
           instance.evaluate_file(filepath)
           instance.load_dependencies
 
-          # Add the loaded compontent to the library
+          # Add the loaded component to the library
           project.library.component_added(instance)
 
           instance

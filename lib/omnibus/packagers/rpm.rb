@@ -406,7 +406,7 @@ module Omnibus
         converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "The `name' compontent of RPM package names can only include " \
+          "The `name' component of RPM package names can only include " \
           "lowercase alphabetical characters (a-z), numbers (0-9), dots (.), " \
           "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
@@ -433,15 +433,37 @@ module Omnibus
     # @return [String]
     #
     def safe_version
-      if project.build_version =~ /\A[a-zA-Z0-9\.\+\_]+\z/
-        project.build_version.dup
+      version = project.build_version.dup
+
+      # RPM 4.10+ added support for using the tilde (~) as a way to mark
+      # versions as lower priority in comparisons. More details on this
+      # feature can be found here:
+      #
+      #   http://rpm.org/ticket/56
+      #
+      if version =~ /\-/
+        converted = version.gsub('-', '~')
+
+        log.warn(log_key) do
+          "Tildes hold special significance in the RPM package versions. " \
+          "They mark a version as lower priority in RPM's version compare " \
+          "logic. We'll replace all dashes (-) with tildes (~) so pre-release" \
+          "versions get sorted earlier then final versions. Converting" \
+          "`#{project.build_version}' to `#{converted}'."
+        end
+
+        version = converted
+      end
+
+      if version =~ /\A[a-zA-Z0-9\.\+\~]+\z/
+        version
       else
-        converted = project.build_version.gsub('-', '_')
+        converted = version.gsub(/[^a-zA-Z0-9\.\+\~]+/, '_')
 
         log.warn(log_key) do
           "The `version' component of RPM package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), and underscores (_). Converting " \
+          "plus signs (+), tildes (~) and underscores (_). Converting " \
           "`#{project.build_version}' to `#{converted}'."
         end
 
