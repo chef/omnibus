@@ -354,7 +354,7 @@ module Omnibus
         converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "The `name' compontent of Debian package names can only include " \
+          "The `name' component of Debian package names can only include " \
           "lower case alphabetical characters (a-z), numbers (0-9), dots (.), " \
           "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
