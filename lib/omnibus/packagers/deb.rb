@@ -167,6 +167,30 @@ module Omnibus
     expose :section
 
     #
+    # Set or return the base name for this package.
+    #
+    # @example
+    #   base_name "my-software"
+    #
+    # @param [String] val
+    #   the base name for this package
+    #
+    # @return [String]
+    #   the base name for this package
+    #
+    def base_name(val = NULL)
+      unless null?(val)
+        unless val.is_a?(String)
+          raise InvalidValue.new(:base_name, 'be a String')
+        end
+
+        @base_name = val
+      end
+      @base_name
+    end
+    expose :base_name
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -175,7 +199,8 @@ module Omnibus
     # extension.
     #
     def package_name
-      "#{safe_base_package_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
+      base = base_name || safe_base_package_name
+      "#{base}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
 
     #
