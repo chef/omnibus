@@ -488,6 +488,11 @@ module Omnibus
     # @return [Integer]
     default(:fetcher_read_timeout, 60)
 
+    # The number of retries before marking a download as failed
+    #
+    # @return [Integer]
+    default(:fetcher_retries, 5)
+
     # --------------------------------------------------
     # @!endgroup
     #

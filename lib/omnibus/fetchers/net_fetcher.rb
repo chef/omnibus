@@ -137,7 +137,6 @@ module Omnibus
     # @return [void]
     #
     def download
-      tries = 5
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
       options = download_headers
@@ -148,6 +147,7 @@ module Omnibus
       end
 
       options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
+      fetcher_retries = Omnibus::Config.fetcher_retries
 
       file = open(download_url, options)
       FileUtils.cp(file.path, downloaded_file)
@@ -158,8 +158,8 @@ module Omnibus
            Errno::ENETUNREACH,
            Timeout::Error,
            OpenURI::HTTPError => e
-      tries -= 1
-      if tries != 0
+      fetcher_retries -= 1
+      if fetcher_retries != 0
         log.debug(log_key) { "Retrying failed download (#{tries})..." }
         retry
       else
