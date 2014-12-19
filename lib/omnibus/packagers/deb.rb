@@ -329,7 +329,7 @@ module Omnibus
         converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "The `name' compontent of Debian package names can only include " \
+          "The `name' component of Debian package names can only include " \
           "lower case alphabetical characters (a-z), numbers (0-9), dots (.), " \
           "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
@@ -350,19 +350,36 @@ module Omnibus
     end
 
     #
-    # Return the Debian-ready version, converting any invalid characters to
-    # dashes (+-+).
+    # Return the Debian-ready version, replacing all dashes (+-+) with tildes
+    # (+~+) and converting any invalid characters to underscores (+_+).
     #
     # @return [String]
     #
     def safe_version
-      if project.build_version =~ /\A[a-zA-Z0-9\.\+\-\:\~]+\z/
-        project.build_version.dup
-      else
-        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-\:\~]+/, '-')
+      version = project.build_version.dup
+
+      if version =~ /\-/
+        converted = version.gsub('-', '~')
 
         log.warn(log_key) do
-          "The `version' compontent of Debian package names can only include " \
+          "Dashes hold special significance in the Debian package versions. " \
+          "Versions that contain a dash and should be considered an earlier " \
+          "version (e.g. pre-releases) may actually be ordered as later " \
+          "(e.g. 12.0.0-rc.6 > 12.0.0). We'll work around this by replacing " \
+          "dashes (-) with tildes (~). Converting `#{project.build_version}' " \
+          "to `#{converted}'."
+        end
+
+        version = converted
+      end
+
+      if version =~ /\A[a-zA-Z0-9\.\+\:\~]+\z/
+        version
+      else
+        converted = version.gsub(/[^a-zA-Z0-9\.\+\:\~]+/, '_')
+
+        log.warn(log_key) do
+          "The `version' component of Debian package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
           "plus signs (+), dashes (-), tildes (~) and colons (:). Converting " \
           "`#{project.build_version}' to `#{converted}'."

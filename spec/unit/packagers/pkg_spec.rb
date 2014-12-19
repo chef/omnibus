@@ -207,7 +207,7 @@ module Omnibus
             expect(subject.safe_base_package_name).to eq('project123forrealz2')
           end
 
-          expect(output).to include("The `name' compontent of Mac package names can only include")
+          expect(output).to include("The `name' component of Mac package names can only include")
         end
       end
     end
@@ -264,7 +264,7 @@ module Omnibus
             expect(subject.safe_version).to eq('1.2-alpha.-2')
           end
 
-          expect(output).to include("The `version' compontent of Mac package names can only include")
+          expect(output).to include("The `version' component of Mac package names can only include")
         end
       end
     end

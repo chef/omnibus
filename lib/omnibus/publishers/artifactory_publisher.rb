@@ -15,6 +15,7 @@
 #
 
 require 'uri'
+require 'benchmark'
 
 module Omnibus
   class ArtifactoryPublisher < Publisher
@@ -29,11 +30,28 @@ module Omnibus
 
         # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
-        artifact_for(package).upload(
-          repository,
-          remote_path_for(package),
-          metadata_for(package),
-        )
+
+        retries = Config.publish_retries
+
+        begin
+          upload_time = Benchmark.realtime do
+            artifact_for(package).upload(
+              repository,
+              remote_path_for(package),
+              metadata_for(package),
+            )
+          end
+        rescue Artifactory::Error::HTTPError => e
+          if (retries -= 1) != 0
+            log.info(log_key) { "Upload failed with exception: #{e}"}
+            log.info(log_key) { "Retrying failed publish #{retries} more time(s)..." }
+            retry
+          else
+            raise e
+          end
+        end
+
+        log.debug(log_key)  { "Elapsed time to publish #{package.name}:  #{1000*upload_time} ms" }
 
         # If a block was given, "yield" the package to the caller
         block.call(package) if block

@@ -294,6 +294,19 @@ module Omnibus
     #
 
     #
+    # @!group Publisher
+    # --------------------------------------------------
+
+    # The number of times to try to publish an artifact
+    #
+    # @return [Integer]
+    default(:publish_retries, 2)
+
+    # --------------------------------------------------
+    # @!endgroup
+    #
+
+    #
     # @!group Artifactory Publisher
     # --------------------------------------------------
 

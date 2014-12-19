@@ -1,63 +1,8 @@
 Omnibus CHANGELOG
 =================
 
-v4.0.0.rc.2 (November 10, 2014)
--------------------------------
-
-### New Features
-
-#### Platforms
-- Raspberry Pi platform support (currently Raspbian and Pidora)
-- AIX
-    - XL C is the default compiler on AIX.
-- FreeBSD 10
-    - Clang is the default compiler on FreeBSD 10+
-    - Add `libgcc` and `libelf` to the FreeBSD whitelist
-- Solaris
-    - Make compilation default `-static-libgcc`
-
-### Bugfixes
-
-- Set default values for `CXXFLAGS`.
-- Retrieve the correct path_key from the ENV on Windows.
-- openSUSE/SLES fixes for OHAI-339.
-- Properly truncate platform version on Arch Linux.
-- Ensure final `*.dmg` name matches actual `*.pkg` name.
-- Change `makeself` package extension back to `.sh`.
-- Generate a default `makeselfinst` which fires at following install.
-- Map `Omnibus::Project#replaces` to RPM Spec file's `Obsoletes:`.
-
-v4.0.0.rc.1 (September 23, 2014)
---------------------------------
-
-### New Features
-- Expose `build_version` to all `pkg` templates
-- Improve info messages during RPM creation
-- Make PKG packager aware of scripts with default Omnibus naming
-- Make RPM packager aware of scripts with default Omnibus naming
-- Clean up script logic in BFF packager
-- Add an option for configuring Fetcher read timeout
-
-### DSL Changes
-#### Builder
-- Add an `appbundle` function to the builder DSL
-
-#### Packager
-- Expose `install_dir` in Packager DSL
-- Expose `windows_safe_path` in Packager DSL
-
-### Bugfixes
-- Replace dashes with underscores in RPM version names.
-- The achitecture of deb package is i386, not i686.
-- Re-ignore 204 exit code from `light.exe`
-- Use single quotes in main `rpmbuild` command
-- Be sure to create and sign the RPM if `~/.rpmmacros` exists
-- Switch to OpenSSL::Digest which is threadsafe on 2.1.2
-- Ensure `GitFetcher` properly resolves remote refs
-- Ensure we clean ALL Ruby environment vars
-
-v4.0.0.beta.1 (August 20, 2014)
--------------------------------
+v4.0.0 (December 15, 2014)
+--------------------------
 ### New Features
 - Implement packager-specific DSLs. Packagers now define their own custom methods that may be configured using the `package` block in a project file. For more information, please see the README or any of the embedded "Building on X" documents.
 - Use vendored assets. In previous versions of Omnibus, the generator would create resource assets for DMG, PKG, and MSI packages, regardless of whether you intended to build those packages. This could cause repo bloat and information overload. In Omnibus 4, the default generator does not create these assets, and instead prefers "general" vendored assets. If you are planning to make a resource-intensive package (such as a PKG or MSI), it is encouraged you generate these assets by specifing the `--pkg-assets` flag during project generation. Omnibus will prefer local resources in the `resources/` directory and then fall-back to "sane" defaults which are vendored within Omnibus.
@@ -101,6 +46,8 @@ v4.0.0.beta.1 (August 20, 2014)
 - Added `Config.workers` key for specifying the maximum number of parallel events to take place.
 - Added parallel downloads for fetcher objects.
 - Use `fakeroot` for building DEBs and RPMs.
+- Raspberry Pi platform support (Raspian, Pidora).
+- Retry uploads to Artifactory on publish failures.
 
 ### Potentially Breaking Changes
 - Remove embedded functional tests. Because the functional tests were skipped on CI (and require a system of each type to properly execute), they have been removed. Chef has created the [omnibus-harmony](https://github.com/opscode/omnibus-harmony) pipeline to perform true integration testing using the in-house CI cluster. If you were relying on the integration tests (or the associated Rake tasks), they have been removed.
@@ -133,6 +80,10 @@ v4.0.0.beta.1 (August 20, 2014)
 - Truncate SLES and other RedHat derivatives platform version.
 - Refactor logger objects to separate Omnibus internal debugging info with build/compile/configure debugging info.
 - Improve error and debugging output when an exception is raised while shelling out. Failed shell commands will now raise `Omnibus::CommandFailed` and `Omnibus::CommandTimeout` instead of the `Mixlib::ShellOut` exceptions. If you were previously rescuing the Mixlib exceptions, you should switch to the new ones.
+- XL C is now the default compiler on AIX
+- Clang is now the default compiler on FreeBSD 10+
+- Make compilation default `-static-libgcc` on Solaris
+- Only allow installation on system volume for Mac OS X PKGs.
 
 ### Definitely Breaking Changes
 - Previously deprecated methods have been removed.
@@ -194,6 +145,8 @@ v4.0.0.beta.1 (August 20, 2014)
 - Removed `Project#machine`. Use `ohai` instead.
 - Removed `Project#dependencies`. List each dependency using `dependency` instead.
 - Added `Project#ohai` for quick access to Ohai data.
+
+#### Software
 - Removed `Software#override_version`. There is no replacement.
 - Removed `Software#install_dir`. Please use `Software#install_path` instead.
 - Removed `Software#platform_version`. Use `ohai` instead.
@@ -205,10 +158,15 @@ v4.0.0.beta.1 (August 20, 2014)
 - Removed `Software#source_dir`. You can use `Omnibus::Config.source_dir` instead, but if you need access to this method, it is probably a bug in Omnibus.
 - Removed `Software#cache_dir`. You can use `Omnibus::Config.cache_dir` instead, but if you need access to this method, it is probably a bug in Omnibus.
 - Removed `Software#config`. You can use `Omnibus::Config` instead.
+
+#### Builder
 - Added `Builder#make` for choosing the correct `make` binary on the system. When `gmake` is present, it is preferred. The use of this method also sets the `MAKE` environment variable for consistency. You should change all instances of `command "make ..."` to `make "..."` to ensure true cross-platform building.
 - Added `Builder#windows_safe_path` for shelling out to the system with the correct path separators.
 - Added `Buidler#workers` for delegation to the config option.
 - Removed `Buidler#max_build_jobs` in favor of `Builder#workers`.
+- Add an `Builder#appbundle` function to the builder DSL
+
+#### Packagers
 - Added `Packager::DEB#vendor` for specifying the package vendor.
 - Added `Packager::DEB#license` for specifying the package license.
 - Added `Packager::DEB#priority` for specifying the package priority.
@@ -233,7 +191,9 @@ v4.0.0.beta.1 (August 20, 2014)
 - Standardized license headers.
 - Added SSH forwarding as part of the default generated `.kitchen.yml`.
 - Updated Chef version in generated `.kitchen.yml`.
-
+- Switch to OpenSSL::Digest which is threadsafe on 2.1.2
+- Ensure final `*.dmg` name matches actual `*.pkg` name.
+- Replace dashes (`-`) with tildes (`~`) in DEB and RPM versions
 
 v3.2.1 (July 26, 2014)
 ----------------------
