@@ -130,6 +130,31 @@ module Omnibus
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
+
+        context 'when loader mapping file is specified' do
+          before do
+            stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+              # For some reason, this isn't set in Fauxhai
+              data['platform'] = 'solaris2'
+            end
+            Config.project_root('/root/project')
+            Config.solaris_linker_mapfile('files/mapfile/solaris')
+            allow(File).to receive(:exist?).and_return(true)
+          end
+
+          it 'sets LD_OPTIONS correctly' do
+            expect(subject.with_standard_compiler_flags).to eq(
+              'CC'              => 'gcc -static-libgcc',
+              'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
+              'CFLAGS'          => '-I/opt/project/embedded/include',
+              "CXXFLAGS"        => "-I/opt/project/embedded/include",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include",
+              'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+              'LD_OPTIONS'      => '-R/opt/project/embedded/lib -M /root/project/files/mapfile/solaris',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            )
+          end
+        end
       end
 
       context 'on mac_os_x' do
