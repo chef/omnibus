@@ -88,6 +88,16 @@ module Omnibus
         its(:commits_since_tag) { should == 0 }
         its(:prerelease_version?) { should be_truthy }
       end
+
+      # v-prefixed tag
+      context "v1.2.3-beta2" do
+        let(:git_describe) { "v1.2.3-beta2" }
+        its(:version_tag) { should == "1.2.3" }
+        its(:prerelease_tag) { should == "beta2" }
+        its(:git_sha_tag) { should be(nil) }
+        its(:commits_since_tag) { should eq(0) }
+        its(:prerelease_version?) { should be(true) }
+      end
     end
 
     describe 'semver output' do
