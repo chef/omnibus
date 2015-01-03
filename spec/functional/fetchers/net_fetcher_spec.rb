@@ -2,16 +2,16 @@ require 'spec_helper'
 
 module Omnibus
   describe NetFetcher do
-    include_examples 'a software'
+    include_examples 'a software', 'zlib'
 
-    let(:source_url) { 'http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz' }
-    let(:source_md5) { '00b516f4704d4a7cb50a1d97e6e8e15b' }
+    let(:source_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz' }
+    let(:source_md5) { '44d667c142d7cda120332623eab69f40' }
     let(:source) do
       { url: source_url, md5: source_md5 }
     end
 
     let(:downloaded_file) { subject.send(:downloaded_file) }
-    let(:extracted) { File.join(source_dir, 'bzip2-1.0.6') }
+    let(:extracted) { File.join(source_dir, 'zlib-1.2.8') }
 
     subject { described_class.new(software) }
 
