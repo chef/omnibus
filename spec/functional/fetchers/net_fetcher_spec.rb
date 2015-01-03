@@ -13,6 +13,8 @@ module Omnibus
     let(:downloaded_file) { subject.send(:downloaded_file) }
     let(:extracted) { File.join(source_dir, 'zlib-1.2.8') }
 
+    let(:fetch!) { capture_stdout { subject.fetch } }
+
     subject { described_class.new(software) }
 
     describe '#fetch_required?' do
@@ -23,7 +25,7 @@ module Omnibus
       end
 
       context 'when the file is downloaded' do
-        before { subject.fetch }
+        before { fetch! }
 
         context 'when the checksum is different' do
           it 'return true' do
@@ -47,7 +49,7 @@ module Omnibus
     end
 
     describe '#clean' do
-      before { subject.fetch }
+      before { fetch! }
 
       context 'when the project directory exists' do
         before do
@@ -77,7 +79,7 @@ module Omnibus
 
     describe '#fetch' do
       it 'downloads the file' do
-        subject.fetch
+        fetch!
         expect(downloaded_file).to be_a_file
       end
 
@@ -85,12 +87,12 @@ module Omnibus
         let(:source_md5) { 'bad01234checksum' }
 
         it 'raises an exception' do
-          expect { subject.fetch }.to raise_error(ChecksumMismatch)
+          expect { fetch! }.to raise_error(ChecksumMismatch)
         end
       end
 
       it 'extracts the file' do
-        subject.fetch
+        fetch!
         expect(extracted).to be_a_directory
       end
 
@@ -99,7 +101,7 @@ module Omnibus
         let(:source_md5) { '369efc3a19b9118cdf51c7e87a34f266' }
 
         it 'downloads the file' do
-          subject.fetch
+          fetch!
           expect(downloaded_file).to be_a_file
         end
       end

@@ -150,6 +150,7 @@ module Omnibus
       options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
 
       progress_bar = ProgressBar.create(
+        output: $stdout,
         format: '%e %B %p%% (%r KB/sec)',
         rate_scale: ->(rate) { rate / 1024 },
       )
