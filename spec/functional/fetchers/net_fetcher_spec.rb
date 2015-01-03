@@ -2,16 +2,18 @@ require 'spec_helper'
 
 module Omnibus
   describe NetFetcher do
-    include_examples 'a software'
+    include_examples 'a software', 'zlib'
 
-    let(:source_url) { 'http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz' }
-    let(:source_md5) { '00b516f4704d4a7cb50a1d97e6e8e15b' }
+    let(:source_url) { 'http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz' }
+    let(:source_md5) { '44d667c142d7cda120332623eab69f40' }
     let(:source) do
       { url: source_url, md5: source_md5 }
     end
 
     let(:downloaded_file) { subject.send(:downloaded_file) }
-    let(:extracted) { File.join(source_dir, 'bzip2-1.0.6') }
+    let(:extracted) { File.join(source_dir, 'zlib-1.2.8') }
+
+    let(:fetch!) { capture_stdout { subject.fetch } }
 
     subject { described_class.new(software) }
 
@@ -23,7 +25,7 @@ module Omnibus
       end
 
       context 'when the file is downloaded' do
-        before { subject.fetch }
+        before { fetch! }
 
         context 'when the checksum is different' do
           it 'return true' do
@@ -47,7 +49,7 @@ module Omnibus
     end
 
     describe '#clean' do
-      before { subject.fetch }
+      before { fetch! }
 
       context 'when the project directory exists' do
         before do
@@ -77,7 +79,7 @@ module Omnibus
 
     describe '#fetch' do
       it 'downloads the file' do
-        subject.fetch
+        fetch!
         expect(downloaded_file).to be_a_file
       end
 
@@ -85,12 +87,12 @@ module Omnibus
         let(:source_md5) { 'bad01234checksum' }
 
         it 'raises an exception' do
-          expect { subject.fetch }.to raise_error(ChecksumMismatch)
+          expect { fetch! }.to raise_error(ChecksumMismatch)
         end
       end
 
       it 'extracts the file' do
-        subject.fetch
+        fetch!
         expect(extracted).to be_a_directory
       end
 
@@ -99,7 +101,7 @@ module Omnibus
         let(:source_md5) { '369efc3a19b9118cdf51c7e87a34f266' }
 
         it 'downloads the file' do
-          subject.fetch
+          fetch!
           expect(downloaded_file).to be_a_file
         end
       end
