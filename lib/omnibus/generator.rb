@@ -106,53 +106,53 @@ module Omnibus
     def create_bff_assets
       return unless options[:bff_assets]
 
-      copy_file(resource_path('bff/gen.template.erb'), "#{target}/resources/bff/gen.template.erb")
+      copy_file(resource_path('bff/gen.template.erb'), "#{target}/resources/#{name}/bff/gen.template.erb")
     end
 
     def create_deb_assets
       return unless options[:deb_assets]
 
-      copy_file(resource_path('deb/conffiles.erb'), "#{target}/resources/deb/conffiles.erb")
-      copy_file(resource_path('deb/control.erb'), "#{target}/resources/deb/control.erb")
-      copy_file(resource_path('deb/md5sums.erb'), "#{target}/resources/deb/md5sums.erb")
+      copy_file(resource_path('deb/conffiles.erb'), "#{target}/resources/#{name}/deb/conffiles.erb")
+      copy_file(resource_path('deb/control.erb'), "#{target}/resources/#{name}/deb/control.erb")
+      copy_file(resource_path('deb/md5sums.erb'), "#{target}/resources/#{name}/deb/md5sums.erb")
     end
 
     def create_dmg_assets
       return unless options[:dmg_assets]
 
-      copy_file(resource_path('dmg/background.png'), "#{target}/resources/dmg/background.png")
-      copy_file(resource_path('dmg/icon.png'), "#{target}/resources/dmg/icon.png")
+      copy_file(resource_path('dmg/background.png'), "#{target}/resources/#{name}/dmg/background.png")
+      copy_file(resource_path('dmg/icon.png'), "#{target}/resources/#{name}/dmg/icon.png")
     end
 
     def create_msi_assets
       return unless options[:msi_assets]
 
-      copy_file(resource_path('msi/localization-en-us.wxl.erb'), "#{target}/resources/msi/localization-en-us.wxl.erb")
-      copy_file(resource_path('msi/parameters.wxi.erb'), "#{target}/resources/msi/parameters.wxi.erb")
-      copy_file(resource_path('msi/source.wxs.erb'), "#{target}/resources/msi/source.wxs.erb")
+      copy_file(resource_path('msi/localization-en-us.wxl.erb'), "#{target}/resources/#{name}/msi/localization-en-us.wxl.erb")
+      copy_file(resource_path('msi/parameters.wxi.erb'), "#{target}/resources/#{name}/msi/parameters.wxi.erb")
+      copy_file(resource_path('msi/source.wxs.erb'), "#{target}/resources/#{name}/msi/source.wxs.erb")
 
-      copy_file(resource_path('msi/assets/LICENSE.rtf'), "#{target}/resources/msi/assets/LICENSE.rtf")
-      copy_file(resource_path('msi/assets/banner_background.bmp'), "#{target}/resources/msi/assets/banner_background.bmp")
-      copy_file(resource_path('msi/assets/dialog_background.bmp'), "#{target}/resources/msi/assets/dialog_background.bmp")
-      copy_file(resource_path('msi/assets/project.ico'), "#{target}/resources/msi/assets/project.ico")
-      copy_file(resource_path('msi/assets/project_16x16.ico'), "#{target}/resources/msi/assets/project_16x16.ico")
-      copy_file(resource_path('msi/assets/project_32x32.ico'), "#{target}/resources/msi/assets/project_32x32.ico")
+      copy_file(resource_path('msi/assets/LICENSE.rtf'), "#{target}/resources/#{name}/msi/assets/LICENSE.rtf")
+      copy_file(resource_path('msi/assets/banner_background.bmp'), "#{target}/resources/#{name}/msi/assets/banner_background.bmp")
+      copy_file(resource_path('msi/assets/dialog_background.bmp'), "#{target}/resources/#{name}/msi/assets/dialog_background.bmp")
+      copy_file(resource_path('msi/assets/project.ico'), "#{target}/resources/#{name}/msi/assets/project.ico")
+      copy_file(resource_path('msi/assets/project_16x16.ico'), "#{target}/resources/#{name}/msi/assets/project_16x16.ico")
+      copy_file(resource_path('msi/assets/project_32x32.ico'), "#{target}/resources/#{name}/msi/assets/project_32x32.ico")
     end
 
     def create_pkg_assets
       return unless options[:pkg_assets]
 
-      copy_file(resource_path('pkg/background.png'), "#{target}/resources/pkg/background.png")
-      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/pkg/license.html.erb")
-      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/pkg/welcome.html.erb")
+      copy_file(resource_path('pkg/background.png'), "#{target}/resources/#{name}/pkg/background.png")
+      copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/#{name}/pkg/license.html.erb")
+      copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/#{name}/pkg/welcome.html.erb")
     end
 
     def create_rpm_assets
       return unless options[:rpm_assets]
 
-      copy_file(resource_path('rpm/rpmmacros.erb'), "#{target}/resources/rpm/rpmmacros.erb")
-      copy_file(resource_path('rpm/signing.erb'), "#{target}/resources/rpm/signing.erb")
-      copy_file(resource_path('rpm/spec.erb'), "#{target}/resources/rpm/spec.erb")
+      copy_file(resource_path('rpm/rpmmacros.erb'), "#{target}/resources/#{name}/rpm/rpmmacros.erb")
+      copy_file(resource_path('rpm/signing.erb'), "#{target}/resources/#{name}/rpm/signing.erb")
+      copy_file(resource_path('rpm/spec.erb'), "#{target}/resources/#{name}/rpm/spec.erb")
     end
     private
 
