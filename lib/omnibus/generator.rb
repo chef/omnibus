@@ -145,6 +145,7 @@ module Omnibus
       copy_file(resource_path('pkg/background.png'), "#{target}/resources/#{name}/pkg/background.png")
       copy_file(resource_path('pkg/license.html.erb'), "#{target}/resources/#{name}/pkg/license.html.erb")
       copy_file(resource_path('pkg/welcome.html.erb'), "#{target}/resources/#{name}/pkg/welcome.html.erb")
+      copy_file(resource_path('pkg/distribution.xml.erb'), "#{target}/resources/#{name}/pkg/distribution.xml.erb")
     end
 
     def create_rpm_assets
