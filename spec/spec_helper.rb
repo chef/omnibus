@@ -33,6 +33,9 @@ RSpec.configure do |config|
   require_relative 'support/ohai_helpers'
   config.include(Omnibus::RSpec::OhaiHelpers)
 
+  require_relative 'support/output_helpers'
+  config.include(Omnibus::RSpec::OutputHelpers)
+
   require_relative 'support/path_helpers'
   config.include(Omnibus::RSpec::PathHelpers)
 

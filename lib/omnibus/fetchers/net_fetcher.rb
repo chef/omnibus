@@ -16,6 +16,7 @@
 
 require 'fileutils'
 require 'open-uri'
+require 'ruby-progressbar'
 
 module Omnibus
   class NetFetcher < Fetcher
@@ -148,6 +149,14 @@ module Omnibus
 
       options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
       fetcher_retries = Omnibus::Config.fetcher_retries
+
+      progress_bar = ProgressBar.create(
+        output: $stdout,
+        format: '%e %B %p%% (%r KB/sec)',
+        rate_scale: ->(rate) { rate / 1024 },
+      )
+      options[:content_length_proc] = ->(total) { progress_bar.total = total }
+      options[:progress_proc] = ->(step) { progress_bar.progress = step }
 
       file = open(download_url, options)
       FileUtils.cp(file.path, downloaded_file)
