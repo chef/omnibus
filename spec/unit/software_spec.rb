@@ -52,43 +52,58 @@ module Omnibus
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'ovesrride LDFLAGS' do
+        it 'overrides LDFLAGS' do
           expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'ovesrride CFLAGS' do
+        it 'overrides CFLAGS' do
           expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'ovesrride CXXFLAGS' do
+        it 'overrides CXXFLAGS' do
           expect(subject.with_standard_compiler_flags('CXXFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'presserve anything else' do
+        it 'overrides CPPFLAGS' do
+          expect(subject.with_standard_compiler_flags('CPPFLAGS'=>'foo')).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+          )
+        end
+        it 'preserves anything else' do
           expect(subject.with_standard_compiler_flags('numberwang'=>4)).to eq(
             'numberwang'      => 4,
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -109,6 +124,7 @@ module Omnibus
             'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             "CXXFLAGS"        => "-I/opt/project/embedded/include",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'LD_OPTIONS'      => '-R/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
@@ -124,6 +140,7 @@ module Omnibus
             'LDFLAGS'         => '-L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             "CXXFLAGS"        => "-I/opt/project/embedded/include",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -144,6 +161,7 @@ module Omnibus
             'CXX'             => 'xlC_r -q64',
             'CFLAGS'          => '-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O',
             "CXXFLAGS"        => "-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O",
+            "CPPFLAGS"        => "-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O",
             'LDFLAGS'         => '-q64 -L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
@@ -163,6 +181,7 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'CFLAGS'  => '-I/opt/project/embedded/include',
             'CXXFLAGS'  => '-I/opt/project/embedded/include',
+            'CPPFLAGS'  => '-I/opt/project/embedded/include',
             'LDFLAGS' => '-L/opt/project/embedded/lib',
             'LD_RUN_PATH' => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
@@ -180,6 +199,7 @@ module Omnibus
               'CXX'             => 'clang++',
               'CFLAGS'          => '-I/opt/project/embedded/include',
               'CXXFLAGS'        => '-I/opt/project/embedded/include',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include',
               'LDFLAGS'         => '-L/opt/project/embedded/lib',
               'LD_RUN_PATH'     => '/opt/project/embedded/lib',
               'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
