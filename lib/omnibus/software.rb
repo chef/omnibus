@@ -474,6 +474,15 @@ module Omnibus
           }
         end
 
+      # Add extra CFLAGS and LDFLAGS if required in the configuration
+      unless Config.inject_cflags.empty?
+        compiler_flags["CFLAGS"] = "#{compiler_flags["CFLAGS"]} #{Config.inject_cflags}"
+      end
+
+      unless Config.inject_ldflags.empty?
+        compiler_flags["LDFLAGS"] = "#{compiler_flags["LDFLAGS"]} #{Config.inject_ldflags}"
+      end
+
       # merge LD_RUN_PATH into the environment.  most unix distros will fall
       # back to this if there is no LDFLAGS passed to the linker that sets
       # the rpath.  the LDFLAGS -R or -Wl,-rpath will override this, but in

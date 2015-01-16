@@ -95,6 +95,23 @@ module Omnibus
         end
       end
 
+      context 'with extra flags' do
+        before do
+          Omnibus::Config.inject_cflags('-pie')
+          Omnibus::Config.inject_ldflags('-Wl,-z,relro')
+        end
+
+        it 'includes extra flags' do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -Wl,-z,relro',
+            'CFLAGS'          => '-I/opt/project/embedded/include -pie',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -pie',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+          )
+        end
+      end
+
       context 'on solaris2' do
         before do
           stub_ohai(platform: 'solaris2', version: '5.11') do |data|

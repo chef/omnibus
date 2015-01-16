@@ -42,6 +42,8 @@ module Omnibus
     include_examples 'a configurable', :build_retries, 0
     include_examples 'a configurable', :use_git_caching, true
     include_examples 'a configurable', :fetcher_read_timeout, 60
+    include_examples 'a configurable', :inject_cflags, ''
+    include_examples 'a configurable', :inject_ldflags, ''
 
     describe '#workers' do
       context 'when the Ohai data is not present' do
