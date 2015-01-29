@@ -19,6 +19,8 @@ module Omnibus
 
     let(:data) { { foo: 'bar' } }
 
+    WebMock.allow_net_connect!
+
     subject { described_class.new(package, data) }
 
     describe '.arch' do

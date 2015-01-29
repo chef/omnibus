@@ -1,5 +1,6 @@
 require 'rspec'
 require 'rspec/its'
+require 'webmock/rspec'
 
 require 'cleanroom/rspec'
 
