@@ -15,6 +15,8 @@ module Omnibus
 
     let(:fetch!) { capture_stdout { subject.fetch } }
 
+    WebMock.allow_net_connect!
+
     subject { described_class.new(software) }
 
     describe '#fetch_required?' do
@@ -81,6 +83,21 @@ module Omnibus
       it 'downloads the file' do
         fetch!
         expect(downloaded_file).to be_a_file
+      end
+
+      it 'when the download times out' do
+        # Mock the Timeout::Error for this particular test only
+        WebMock.disable_net_connect!
+        stub_request(:get, "http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz").to_timeout
+        output = capture_logging do
+          expect { subject.send(:download) }.to raise_error(Timeout::Error)
+        end
+
+        expect(output).to include('Retrying failed download')
+        expect(output).to include('Download failed')
+        retry_count = output.scan('Retrying failed download').count
+        expect(retry_count).to eq(Omnibus::Config.fetcher_retries)
+        WebMock.allow_net_connect!
       end
 
       context 'when the checksum is invalid' do

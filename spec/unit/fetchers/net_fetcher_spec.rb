@@ -46,19 +46,6 @@ module Omnibus
           end
         end
 
-        it 'when the download times out' do
-          stub_request(:get, "https://get.example.com/file.tar.gz").to_timeout
-          output = capture_logging do
-            expect { subject.send(:download) }.to raise_error(Timeout::Error)
-          end
-
-          expect(output).to include('Retrying failed download')
-          expect(output).to include('Download failed')
-
-          retry_count = output.scan('Retrying failed download').count
-          expect(retry_count).to eq(Omnibus::Config.fetcher_retries)
-        end
-
         context 'when the shasums are the same' do
           before do
             allow(subject).to receive(:digest).and_return('abcd1234')
