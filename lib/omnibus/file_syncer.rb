@@ -101,7 +101,17 @@ module Omnibus
             FileUtils.ln_sf(target, "#{destination}/#{relative_path}")
           end
         when :file
-          FileUtils.cp(source_file, "#{destination}/#{relative_path}")
+          # First attempt a regular copy. If we don't have write
+          # permission on the File, open will probably fail with
+          # EACCES (making it hard to sync files with permission
+          # r--r--r--). Rescue this error and use cp_r's
+          # :remove_destination option.
+          begin
+            FileUtils.cp(source_file, "#{destination}/#{relative_path}")
+          rescue Errno::EACCES
+            FileUtils.cp_r(source_file, "#{destination}/#{relative_path}",
+                           :remove_destination => true)
+          end
         else
           raise RuntimeError,
             "Unknown file type: `File.ftype(source_file)' at `#{source_file}'!"
