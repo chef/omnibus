@@ -63,7 +63,7 @@ module Omnibus
     #
     def digest_directory(path, type = :md5)
       digest = digest_from_type(type)
-
+      log.info(log_key) { "Digesting #{path} with #{type}" } if defined?(log) && defined?(log_key)
       FileSyncer.glob("#{path}/**/*").each do |filename|
         # Calculate the filename relative to the given path. Since directories
         # are SHAed according to their filepath, two difference directories on
