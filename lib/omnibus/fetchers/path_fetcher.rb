@@ -65,6 +65,9 @@ module Omnibus
 
       create_required_directories
       FileSyncer.sync(source_path, project_dir, source_options)
+      # Reset target shasum on every fetch
+      @target_shasum = nil
+      target_shasum
     end
 
     #
