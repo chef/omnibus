@@ -862,5 +862,9 @@ module Omnibus
     def log_key
       @log_key ||= "#{super}: #{name}"
     end
+
+    def to_s
+      "#{name}[#{filepath}]"
+    end
   end
 end
