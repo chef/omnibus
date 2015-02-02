@@ -16,9 +16,14 @@
 
 require 'openssl'
 require 'pathname'
+require 'omnibus/logging'
 
 module Omnibus
   module Digestable
+
+    def self.included(other)
+      other.send(:include, Logging)
+    end
     #
     # Calculate the digest of the file at the given path. Files are read in
     # binary chunks to prevent Ruby from exploding.
@@ -63,7 +68,7 @@ module Omnibus
     #
     def digest_directory(path, type = :md5)
       digest = digest_from_type(type)
-      log.info(log_key) { "Digesting #{path} with #{type}" } if defined?(log) && defined?(log_key)
+      log.info(log_key) { "Digesting #{path} with #{type}" }
       FileSyncer.glob("#{path}/**/*").each do |filename|
         # Calculate the filename relative to the given path. Since directories
         # are SHAed according to their filepath, two difference directories on
