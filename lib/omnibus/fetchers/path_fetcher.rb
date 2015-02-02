@@ -64,7 +64,10 @@ module Omnibus
       log.info(log_key) { "Copying from `#{source_path}'" }
 
       create_required_directories
-      FileSyncer.sync(source_path, project_dir)
+      FileSyncer.sync(source_path, project_dir, source_options)
+      # Reset target shasum on every fetch
+      @target_shasum = nil
+      target_shasum
     end
 
     #
@@ -86,6 +89,19 @@ module Omnibus
     #
     def source_path
       source[:path]
+    end
+
+    #
+    # Options to pass to the underlying FileSyncer
+    #
+    # @return [Hash]
+    #
+    def source_options
+      if source[:options] && source[:options].is_a?(Hash)
+        source[:options]
+      else
+        {}
+      end
     end
 
     #
