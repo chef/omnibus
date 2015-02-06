@@ -31,6 +31,8 @@ module Omnibus
       create_directory("#{staging_dir}/SRPMS")
       create_directory("#{staging_dir}/SOURCES")
       create_directory("#{staging_dir}/SPECS")
+
+      stub_ohai(platform: 'redhat', version: '6.5')
     end
 
     describe '#signing_passphrase' do
@@ -112,7 +114,7 @@ module Omnibus
       end
 
       it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project-1.2.3-2.x86_64.rpm')
+        expect(subject.package_name).to eq('project-1.2.3-2.el6.x86_64.rpm')
       end
     end
 
@@ -127,7 +129,7 @@ module Omnibus
         allow(subject).to receive(:safe_architecture).and_return('x86_64')
       end
 
-      let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.x86_64.rpm.spec" }
+      let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.el6.x86_64.rpm.spec" }
 
       it 'generates the file' do
         subject.write_rpm_spec
@@ -140,7 +142,7 @@ module Omnibus
 
         expect(contents).to include("Name: project")
         expect(contents).to include("Version: 1.2.3")
-        expect(contents).to include("Release: 2")
+        expect(contents).to include("Release: 2.el6")
         expect(contents).to include("Summary:  The full stack of project")
         expect(contents).to include("BuildArch: x86_64")
         expect(contents).to include("AutoReqProv: no")
@@ -295,6 +297,12 @@ module Omnibus
       end
     end
 
+    describe '#dist_tag' do
+      it 'returns the Fedora packaging guidelines dist tag for the package' do
+        expect(subject.dist_tag).to eq('.el6')
+      end
+    end
+
     describe '#safe_base_package_name' do
       context 'when the project name is "safe"' do
         it 'returns the value without logging a message' do
@@ -357,7 +365,7 @@ module Omnibus
 
     describe '#safe_architecture' do
       before do
-        stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
+        stub_ohai(platform: 'redhat', version: '6.5') do |data|
           data['kernel']['machine'] = 'i386'
         end
       end
