@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'omnibus/manifest_entry'
 
 module Omnibus
   describe GitFetcher do
@@ -144,6 +145,22 @@ module Omnibus
 
         it 'raise an exception' do
           expect { subject.fetch }.to raise_error(UnresolvableGitReference)
+        end
+      end
+
+      context 'when a manifest entry locks a version' do
+        let(:version)  { 'v1.2.4' }
+        let(:remote)   { remote_git_repo('zlib', annotated_tags: [version]) }
+        let (:a_manifest) {
+          Omnibus::ManifestEntry.new("zlib",
+                                     { :locked_version => 'efde208366abd0f91419d8a54b45e3f6e0540105',
+                                       :locked_source => {:git => remote}})
+        }
+
+        it 'fetches the locked version' do
+          subject.use_manifest_entry(a_manifest)
+          subject.fetch
+          expect(revision).to eq('efde208366abd0f91419d8a54b45e3f6e0540105')
         end
       end
     end

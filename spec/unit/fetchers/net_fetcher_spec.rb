@@ -3,15 +3,18 @@ require 'spec_helper'
 module Omnibus
   describe NetFetcher do
     let(:project_dir) { '/tmp/project' }
+    let(:build_dir) { '/tmp/build' }
 
     let(:software) do
       double(Software,
         downloaded_file: 'file.tar.gz',
         name: 'file',
+        version: nil,
         source: { url: 'https://get.example.com/file.tar.gz', md5: 'abcd1234' },
         checksum: 'abc123',
         source_uri: 'http://example.com/file.tar.gz',
         project_dir: project_dir,
+        build_dir: build_dir,
       )
     end
 

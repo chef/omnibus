@@ -23,7 +23,7 @@ module Omnibus
     # @return [true, false]
     #
     def fetch_required?
-      !(cloned? && same_revision?)
+      !(cloned? && same_revision?(resolved_version))
     end
 
     #
@@ -59,14 +59,13 @@ module Omnibus
     #
     def fetch
       log.info(log_key) { "Fetching from `#{source_url}'" }
-
       create_required_directories
 
       if cloned?
-        git_fetch unless same_revision?
+        git_fetch(resolved_version) unless same_revision?(resolved_version)
       else
         git_clone
-        git_checkout
+        git_checkout(resolved_version)
       end
     end
 
@@ -78,6 +77,10 @@ module Omnibus
     #
     def version_for_cache
       "revision:#{current_revision}"
+    end
+
+    def resolve_version
+      target_revision
     end
 
     private
@@ -110,23 +113,23 @@ module Omnibus
     end
 
     #
-    # Checkout the +target_revision+.
+    # Checkout the +resolved_version+.
     #
     # @return [void]
     #
-    def git_checkout
+    def git_checkout(ref=resolved_version)
       git("fetch --all")
-      git("checkout #{target_revision}")
+      git("checkout #{ref}")
     end
 
     #
-    # Fetch the remote tags and refs, and reset to +target_revision+.
+    # Fetch the remote tags and refs, and reset to +resolved_version+.
     #
     # @return [void]
     #
-    def git_fetch
+    def git_fetch(ref=resolved_version)
       git("fetch --all")
-      git("reset --hard #{target_revision}")
+      git("reset --hard #{ref}")
     end
 
     #
@@ -158,8 +161,8 @@ module Omnibus
     #
     # @return [true, false]
     #
-    def same_revision?
-      current_revision == target_revision
+    def same_revision?(rev=resolved_version)
+      current_revision == rev
     end
 
     #
@@ -182,7 +185,7 @@ module Omnibus
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      remote_list = git("ls-remote origin #{ref}*").stdout
+      remote_list = shellout!("git ls-remote \"#{source_url}\" #{ref}*").stdout
       commit_ref = dereference_annotated_tag(remote_list, ref)
 
       unless commit_ref

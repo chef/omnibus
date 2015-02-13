@@ -4,18 +4,22 @@ module Omnibus
   describe GitFetcher do
     let(:source_path) { '/local/path' }
     let(:project_dir) { '/project/dir' }
+    let(:build_dir) { '/build/dir' }
 
     let(:software) do
       double(Software,
         name: 'software',
+        version: 'master',
         source: { path: source_path },
         project_dir: project_dir,
+        build_dir: project_dir,
       )
     end
 
     subject { described_class.new(software) }
 
     describe '#fetch_required?' do
+
       context 'when the repository is not cloned' do
         before { allow(subject).to receive(:cloned?).and_return(false) }
 
@@ -26,7 +30,7 @@ module Omnibus
 
       context 'when the repository is cloned' do
         before { allow(subject).to receive(:cloned?).and_return(true) }
-
+        before { allow(subject).to receive(:resolved_version).and_return("12341235")}
         context 'when the revision is difference' do
           before { allow(subject).to receive(:same_revision?).and_return(false) }
 
@@ -97,6 +101,7 @@ module Omnibus
         allow(subject).to receive(:git_fetch)
         allow(subject).to receive(:git_clone)
         allow(subject).to receive(:git_checkout)
+        allow(subject).to receive(:resolved_version).and_return("134aeba31234")
       end
 
       context 'when the repository is cloned' do
@@ -105,8 +110,8 @@ module Omnibus
         context 'when the revision is different' do
           before { allow(subject).to receive(:same_revision?).and_return(false) }
 
-          it 'fetches and resets' do
-            expect(subject).to receive(:git_fetch)
+          it 'fetches and resets to the resolved_version' do
+            expect(subject).to receive(:git_fetch).with("134aeba31234")
             subject.fetch
           end
         end
@@ -130,7 +135,7 @@ module Omnibus
         end
 
         it 'checks out the correct revision' do
-          expect(subject).to receive(:git_checkout).once
+          expect(subject).to receive(:git_checkout).with("134aeba31234")
           subject.fetch
         end
       end

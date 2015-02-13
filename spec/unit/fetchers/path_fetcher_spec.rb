@@ -4,12 +4,15 @@ module Omnibus
   describe PathFetcher do
     let(:source_path) { '/local/path' }
     let(:project_dir) { '/project/dir' }
+    let(:build_dir) { '/build/dir' }
 
     let(:software) do
       double(Software,
         name: 'software',
+        version: nil,
         source: { path: source_path },
         project_dir: project_dir,
+        build_dir: build_dir
       )
     end
 

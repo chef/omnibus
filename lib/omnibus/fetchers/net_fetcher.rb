@@ -92,6 +92,17 @@ module Omnibus
     end
 
     #
+    # Returned the resolved version for the manifest.  Since this is a
+    # remote URL, there is no resolution, the version is what we said
+    # it is.
+    #
+    # @return [String]
+    #
+    def resolve_version
+      version
+    end
+
+    #
     # The path on disk to the downloaded asset. This method requires the
     # presence of a +source_uri+.
     #
@@ -124,7 +135,7 @@ module Omnibus
     #
     def download_url
       if Config.use_s3_caching
-        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(software)}"
+        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(self)}"
       else
         source[:url]
       end
@@ -208,7 +219,7 @@ module Omnibus
       actual   = digest(downloaded_file, :md5)
 
       if expected != actual
-        raise ChecksumMismatch.new(software, expected, actual)
+        raise ChecksumMismatch.new(self, expected, actual)
       end
     end
 

@@ -31,6 +31,13 @@ module Omnibus
     end
 
     #
+    # @return [String, nil]
+    #
+    def resolve_version
+      version
+    end
+
+    #
     # @return [false]
     #
     def clean
@@ -41,7 +48,7 @@ module Omnibus
     # @return [void]
     #
     def fetch
-      log.info(log_key) { "Fetching `#{software.name}' (nothing to fetch)" }
+      log.info(log_key) { "Fetching `#{name}' (nothing to fetch)" }
 
       create_required_directories
       nil

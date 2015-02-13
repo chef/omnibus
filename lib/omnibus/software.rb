@@ -16,6 +16,7 @@
 
 require 'fileutils'
 require 'uri'
+require 'omnibus/manifest_entry'
 
 module Omnibus
   class Software
@@ -581,6 +582,14 @@ module Omnibus
       @builder ||= Builder.new(self)
     end
 
+    def to_manifest_entry
+      Omnibus::ManifestEntry.new(name, {
+                                   source_type: source_type,
+                                   described_version: version,
+                                   locked_version: fetcher.resolved_version,
+                                   locked_source: source})
+    end
+
     #
     # Fetch the software definition using the appropriate fetcher. This may
     # fetch the software from a local path location, git location, or download
@@ -589,7 +598,8 @@ module Omnibus
     # @return [true, false]
     #   true if the software was fetched, false if it was cached
     #
-    def fetch
+    def fetch(me=to_manifest_entry)
+      fetcher.use_manifest_entry(me)
       if fetcher.fetch_required?
         fetcher.fetch
         true
@@ -684,7 +694,7 @@ module Omnibus
     end
 
     #
-    # The fetcher for this software, based off of the +source+ attribute.
+    # The fetcher for this software, based off of the source_type
     #
     # - +:url+ - {NetFetcher}
     # - +:git+ - {GitFetcher}
@@ -693,16 +703,34 @@ module Omnibus
     # @return [Fetcher]
     #
     def fetcher
-      @fetcher ||= if source
+      @fetcher ||= case source_type
+                   when :url
+                     NetFetcher.new(self)
+                   when :git
+                     GitFetcher.new(self)
+                   when :path
+                     PathFetcher.new(self)
+                   when :project_local
+                     NullFetcher.new(self)
+                   end
+    end
+
+    #
+    # The type of source specified for this software defintion.
+    #
+    # @return [String]
+    #
+    def source_type
+      if source
         if source[:url]
-          NetFetcher.new(self)
+          :url
         elsif source[:git]
-          GitFetcher.new(self)
+          :git
         elsif source[:path]
-          PathFetcher.new(self)
+          :path
         end
       else
-        NullFetcher.new(self)
+        :project_local
       end
     end
 
