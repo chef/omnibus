@@ -16,6 +16,7 @@ RSpec.shared_examples 'a software' do |name = 'chefdk'|
   let(:templates_dir) { File.join(project_root, 'config', 'templates', name) }
 
   let(:install_dir)      { File.join(project_root, 'opt', name) }
+  let(:dest_dir)         { '/' }
   let(:bin_dir)          { File.join(install_dir, 'bin') }
   let(:embedded_bin_dir) { File.join(install_dir, 'embedded', 'bin') }
 
@@ -25,6 +26,7 @@ RSpec.shared_examples 'a software' do |name = 'chefdk'|
       version:     version,
       build_dir:   build_dir,
       install_dir: install_dir,
+      dest_dir:    dest_dir,
       project_dir: project_dir,
       source:      source,
       overridden?: false,
