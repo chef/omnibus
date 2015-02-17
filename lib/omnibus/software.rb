@@ -45,7 +45,7 @@ module Omnibus
           instance.evaluate_file(filepath)
           instance.load_dependencies
 
-          # Add the loaded compontent to the library
+          # Add the loaded component to the library
           project.library.component_added(instance)
 
           instance
@@ -220,7 +220,7 @@ module Omnibus
             "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
-        extra_keys = val.keys - [:git, :path, :url, :md5, :cookie, :warning, :unsafe]
+        extra_keys = val.keys - [:git, :path, :url, :md5, :cookie, :warning, :unsafe, :options]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
@@ -442,7 +442,6 @@ module Omnibus
             "CC" => "xlc_r -q64",
             "CXX" => "xlC_r -q64",
             "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
-            "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
             "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
             "LD" => "ld -b64",
             "OBJECT_MODE" => "64",
@@ -507,6 +506,9 @@ module Omnibus
         merge({"PKG_CONFIG_PATH" => Pathname.new(File.join(dest_dir, install_dir, '/embedded/lib/pkgconfig')).cleanpath.to_s}).
         # Set default values for CXXFLAGS.
         merge('CXXFLAGS' => compiler_flags['CFLAGS'])
+        # Set default values for CXXFLAGS and CPPFLAGS.
+        merge('CXXFLAGS' => compiler_flags['CFLAGS']).
+        merge('CPPFLAGS' => compiler_flags['CFLAGS'])
     end
     expose :with_standard_compiler_flags
 
@@ -874,6 +876,10 @@ module Omnibus
     #
     def log_key
       @log_key ||= "#{super}: #{name}"
+    end
+
+    def to_s
+      "#{name}[#{filepath}]"
     end
   end
 end

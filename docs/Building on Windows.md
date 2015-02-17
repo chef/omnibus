@@ -8,9 +8,9 @@ Building an .msi
 In Windows, an `.msi` is a special executable that contains the set of instructions for installating a piece of software on a target system. Please note, Omnibus does not support the creation of `.exe` files.
 
 ### Requirements
-By default, Omnibus does not generate msi-related assets. To generate the msi assets, run the Omnibus generator command with the `--msi-assets` flag:
+By default, Omnibus does not generate msi-related assets. To generate the msi assets, run the Omnibus new command with the `--msi-assets` flag:
 
-    $ omnibus generate NAME --msi-assets
+    $ omnibus new NAME --msi-assets
 
 **If this is an existing project, be sure to answer "NO" when asked if you want to overwrite existing files!**
 

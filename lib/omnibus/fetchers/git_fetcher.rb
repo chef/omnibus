@@ -135,7 +135,7 @@ module Omnibus
     # @return [String]
     #
     def current_revision
-      @current_revision ||= git('rev-parse HEAD').stdout.strip
+      git('rev-parse HEAD').stdout.strip
     rescue CommandFailed
       nil
     end

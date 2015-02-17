@@ -89,7 +89,7 @@ module Omnibus
       end
 
       it 'copies the new files over' do
-        expect(FileSyncer).to receive(:sync).with(source_path, project_dir)
+        expect(FileSyncer).to receive(:sync).with(source_path, project_dir, {})
         subject.fetch
       end
     end

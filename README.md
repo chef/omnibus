@@ -39,10 +39,10 @@ You can now create an Omnibus project in your current directory by using the pro
 $ omnibus new $MY_PROJECT_NAME
 ```
 
-This will generate a complete project skeleton in the directory `$MY_PROJECT_NAME`
+This will generate a complete project skeleton in the directory `omnibus-$MY_PROJECT_NAME`
 
 ```bash
-$ cd $MY_PROJECT_NAME
+$ cd omnibus-$MY_PROJECT_NAME
 $ bundle install --binstubs
 $ bin/omnibus build $MY_PROJECT_NAME
 ```

@@ -8,9 +8,9 @@ Building a .pkg
 In Mac OS X, a `.pkg` is a special file that is read by Installer.app that contains the set of instructions for installating a piece of software on a target system.
 
 ### Requirements
-By default, Omnibus does not generate pkg-related assets. To generate the pkg assets, run the Omnibus generator command with the `--pkg-assets` flag:
+By default, Omnibus does not generate pkg-related assets. To generate the pkg assets, run the Omnibus new command with the `--pkg-assets` flag:
 
-    $ omnibus generate NAME --pkg-assets
+    $ omnibus new NAME --pkg-assets
 
 **If this is an existing project, be sure to answer "NO" when asked if you want to overwrite existing files!**
 
@@ -53,9 +53,9 @@ Building a .dmg
 In Mac OSX, a `.dmg` is a compressed wrapper around a collection of resources, often including a `.pkg`. The possibilities for creating and customizing a DMG are endless, but Omnibus provides a"basic starter case that will generate a pretty DMG that contains the `.pkg` file it creates.
 
 ### Requirements
-By default, Omnibus does not generate dmg-related assets. To generate the dmg assets, run the Omnibus generator with the `--dmg-assets` flag:
+By default, Omnibus does not generate dmg-related assets. To generate the dmg assets, run the Omnibus new with the `--dmg-assets` flag:
 
-    $ omnibus generate NAME --dmg-assets
+    $ omnibus new NAME --dmg-assets
 
 **If this is an existing project, be sure to answer "NO" when asked if you want to overwrite existing files!**
 

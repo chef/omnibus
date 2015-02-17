@@ -13,9 +13,9 @@ A number of project configuration values are taken into consideration for buildi
 
 These values are interpolated and evaluated using Omnibus' internal DEB templates. For 99% of users, these templates should be satisfactory. If you encounter an instance where Omnibus' ERB templates do not satisfy a use case, please open an issue.
 
-Because of the unlikelihood of their necessity, Omnibus does not generate deb-related assets. If you find yourself in a situation where you need to generate highly-customized DEB assets, run the Omnibus generator command with the `--deb-assets` flag:
+Because of the unlikelihood of their necessity, Omnibus does not generate deb-related assets. If you find yourself in a situation where you need to generate highly-customized DEB assets, run the Omnibus new command with the `--deb-assets` flag:
 
-    $ omnibus generate NAME --deb-assets
+    $ omnibus new NAME --deb-assets
 
 **If this is an existing project, be sure to answer "NO" when asked if you want to overwrite existing files!**
 

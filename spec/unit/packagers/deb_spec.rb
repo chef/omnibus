@@ -260,16 +260,16 @@ module Omnibus
 
         it 'returns the value while logging a message' do
           output = capture_logging do
-            expect(subject.safe_base_package_name).to eq('Pro-ject123.for-realz-2')
+            expect(subject.safe_base_package_name).to eq('pro-ject123.for-realz-2')
           end
 
-          expect(output).to include("The `name' compontent of Debian package names can only include")
+          expect(output).to include("The `name' component of Debian package names can only include")
         end
       end
     end
 
     describe '#safe_build_iteration' do
-      it 'returns the build iternation' do
+      it 'returns the build iteration' do
         expect(subject.safe_build_iteration).to eq(project.build_iteration)
       end
     end
@@ -282,15 +282,27 @@ module Omnibus
         end
       end
 
-      context 'when the project build_version has invalid characters' do
-        before { project.build_version("1.2$alpha.##__2") }
+      context 'when the project build_version has dashes' do
+        before { project.build_version('1.2-rc.1') }
 
         it 'returns the value while logging a message' do
           output = capture_logging do
-            expect(subject.safe_version).to eq('1.2-alpha.-2')
+            expect(subject.safe_version).to eq('1.2~rc.1')
           end
 
-          expect(output).to include("The `version' compontent of Debian package names can only include")
+          expect(output).to include("Dashes hold special significance in the Debian package versions.")
+        end
+      end
+
+      context 'when the project build_version has invalid characters' do
+        before { project.build_version("1.2$alpha.~##__2") }
+
+        it 'returns the value while logging a message' do
+          output = capture_logging do
+            expect(subject.safe_version).to eq('1.2_alpha.~_2')
+          end
+
+          expect(output).to include("The `version' component of Debian package names can only include")
         end
       end
     end
