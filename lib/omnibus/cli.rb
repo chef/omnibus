@@ -71,20 +71,20 @@ module Omnibus
       default: nil
     desc 'build PROJECT', 'Build the given Omnibus project'
     def build(name)
-      project = Project.load(name)
+      manifest = if @options[:use_manifest]
+                   Omnibus::Manifest.from_file(@options[:use_manifest])
+                 else
+                   nil
+                 end
 
+      project = Project.load(name, manifest)
       say("Building #{project.name} #{project.build_version}...")
-
-      if @options[:use_manifest]
-        project.manifest(Omnibus::Manifest.from_file(@options[:use_manifest]))
-      end
-
       project.download
       project.build
 
       if @options[:output_manifest]
         File.open('version-manifest.json', 'w') do |f|
-          f.write(JSON.pretty_generate(project.manifest.to_hash))
+          f.write(JSON.pretty_generate(project.built_manifest.to_hash))
         end
       end
     end

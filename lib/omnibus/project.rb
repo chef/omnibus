@@ -30,7 +30,7 @@ module Omnibus
       #
       # @return [Project]
       #
-      def load(name)
+      def load(name, manifest=nil)
         loaded_projects[name] ||= begin
           filepath = Omnibus.project_path(name)
 
@@ -42,7 +42,7 @@ module Omnibus
             end
           end
 
-          instance = new(filepath)
+          instance = new(filepath, manifest)
           instance.evaluate_file(filepath)
           instance.load_dependencies
           instance
@@ -61,6 +61,8 @@ module Omnibus
       end
     end
 
+    attr_reader :manifest
+
     include Cleanroom
     include Digestable
     include Logging
@@ -68,8 +70,9 @@ module Omnibus
     include Sugarable
     include Util
 
-    def initialize(filepath = nil)
+    def initialize(filepath = nil, manifest=nil)
       @filepath = filepath
+      @manifest = manifest
     end
 
     #
@@ -722,7 +725,7 @@ module Omnibus
     #
     def load_dependencies
       dependencies.each do |dependency|
-        Software.load(self, dependency)
+        Software.load(self, dependency, manifest)
       end
 
       true
@@ -949,34 +952,24 @@ module Omnibus
       @softwares ||= library.build_order
     end
 
-    def manifest(arg=nil)
-      if arg.nil?
-        @manifest ||= resolve_manifest
-      else
-        @manifest = arg
-      end
-    end
-
     #
     # Generate a version manifest of the loaded software sources.
-    # This manifest can be returned to the user for later use
-    # or used internally during the donwload phase.
     #
     # @returns [Omnibus::Manifest]
     #
-    def resolve_manifest
-      log.info(log_key) { "Resolving version manifest" }
+    def built_manifest
+      log.info(log_key) { "Building version manifest" }
       m = Omnibus::Manifest.new
       softwares.each do |software|
-        m.add(software.name, software.to_manifest_entry)
+        m.add(software.name, software.manifest_entry)
       end
       m
     end
 
-    def download(m=manifest)
+    def download
       ThreadPool.new(Config.workers) do |pool|
         softwares.each do |software|
-          pool.schedule { software.fetch(m.entry_for(software.name)) }
+          pool.schedule { software.fetch }
         end
       end
     end
@@ -998,7 +991,7 @@ module Omnibus
 
     def write_json_manifest
       File.open(@json_manifest_path, 'w') do |f|
-        f.write(JSON.pretty_generate(manifest.to_hash))
+        f.write(JSON.pretty_generate(built_manifest.to_hash))
       end
     end
 

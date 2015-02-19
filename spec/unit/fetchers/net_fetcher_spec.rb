@@ -5,17 +5,11 @@ module Omnibus
     let(:project_dir) { '/tmp/project' }
     let(:build_dir) { '/tmp/build' }
 
-    let(:software) do
-      double(Software,
-        downloaded_file: 'file.tar.gz',
-        name: 'file',
-        version: nil,
-        source: { url: 'https://get.example.com/file.tar.gz', md5: 'abcd1234' },
-        checksum: 'abc123',
-        source_uri: 'http://example.com/file.tar.gz',
-        project_dir: project_dir,
-        build_dir: build_dir,
-      )
+    let(:manifest_entry) do
+      double(Omnibus::ManifestEntry,
+             name: 'file',
+             locked_version: "1.2.3",
+             locked_source: { url: 'https://get.example.com/file.tar.gz', md5: 'abcd1234' })
     end
 
     let(:cache_dir) { '/cache' }
@@ -24,7 +18,7 @@ module Omnibus
       Config.cache_dir(cache_dir)
     end
 
-    subject { described_class.new(software) }
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
     describe '#fetch_required?' do
       context 'when file is not downloaded' do
@@ -107,23 +101,21 @@ module Omnibus
     end
 
     describe '#version_for_cache' do
-      before do
-        allow(software).to receive(:source).and_return({
-          url: 'https://url',
-          md5: 'abcd1234',
-        })
-      end
-
       it 'returns the download URL and md5' do
-        expect(subject.version_for_cache).to eq('download_url:https://url|md5:abcd1234')
+        expect(subject.version_for_cache).to eq('download_url:https://get.example.com/file.tar.gz|md5:abcd1234')
       end
     end
 
     shared_examples 'an extractor' do |extension, command|
       context "when the file is a .#{extension}" do
-        before do
-          software.source[:url] = "https://example.com/file.#{extension}"
+        let(:manifest_entry) do
+          double(Omnibus::ManifestEntry,
+                 name: 'file',
+                 locked_version: "1.2.3",
+                 locked_source: { url: "https://get.example.com/file.#{extension}", md5: 'abcd1234' })
         end
+
+        subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
         it 'is the right command' do
           expect(subject.send(:extract_command)).to eq(command)
@@ -137,29 +129,45 @@ module Omnibus
       end
 
       context 'when the downloaded file is a folder' do
+        let(:manifest_entry) do
+          double(Omnibus::ManifestEntry,
+                 name: 'file',
+                 locked_version: "1.2.3",
+                 locked_source: { url: "https://get.example.com/folder", md5: 'abcd1234' })
+        end
+
+        subject { described_class.new(manifest_entry, project_dir, build_dir) }
+
         before do
           allow(FileUtils).to receive(:cp_r)
           allow(File).to receive(:directory?).and_return(true)
-          allow(subject).to receive(:extract_command)
-          software.source[:url] = 'https://example.com/folder'
         end
 
         it 'copies the entire directory to project_dir' do
+          allow(subject).to receive(:extract_command)
           expect(FileUtils).to receive(:cp_r).with("#{cache_dir}/folder", project_dir)
           subject.extract
         end
       end
 
       context 'when the downloaded file is a regular file' do
+        let(:manifest_entry) do
+          double(Omnibus::ManifestEntry,
+                 name: 'file',
+                 locked_version: "1.2.3",
+                 locked_source: { url: "https://get.example.com/file", md5: 'abcd1234' })
+        end
+
+        subject { described_class.new(manifest_entry, project_dir, build_dir) }
+
         before do
           allow(FileUtils).to receive(:mkdir_p)
           allow(FileUtils).to receive(:cp)
           allow(File).to receive(:directory?).and_return(false)
-          allow(subject).to receive(:extract_command)
-          software.source[:url] = 'https://example.com/file'
         end
 
         it 'copies the file into the project_dir' do
+          allow(subject).to receive(:extract_command)
           expect(FileUtils).to receive(:cp).with("#{cache_dir}/file", "#{project_dir}/")
           subject.extract
         end

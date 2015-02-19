@@ -15,7 +15,14 @@ module Omnibus
 
     let(:fetch!) { capture_stdout { subject.fetch } }
 
-    subject { described_class.new(software) }
+    let(:manifest_entry) do
+      double(ManifestEntry,
+             name: 'software',
+             locked_version: '1.2.8',
+             locked_source: source)
+    end
+
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
     describe '#fetch_required?' do
       context 'when the file is not downloaded' do

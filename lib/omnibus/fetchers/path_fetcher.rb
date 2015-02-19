@@ -83,7 +83,7 @@ module Omnibus
     #
     # @return [String, nil]
     #
-    def resolve_version
+    def self.resolve_version(version, source)
       version
     end
 

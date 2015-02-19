@@ -7,37 +7,23 @@ module Omnibus
     let(:project_dir) { '/project/dir' }
     let(:build_dir) { '/build/dir' }
 
-    let(:software) do
+    let(:manifest_entry) do
       double(Software,
         name: 'software',
-        version: 'master',
-        source: { path: source_path },
-        project_dir: project_dir,
-        build_dir: project_dir,
-      )
+        locked_version: '31aedfs',
+        locked_source: { path: source_path })
     end
 
-    subject { described_class.new(software) }
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
 
-    describe "#use_manifest_entry" do
-      let(:source) {{:git => "git://git.example.com/important/stuff"}}
-      let(:version) { 'efde208366abd0f91419d8a54b45e3f6e0540105' }
-      let(:manifest_entry) {
-        Omnibus::ManifestEntry.new("zlib",
-                                   { :locked_version => version,
-                                     :locked_source => source})
-
-      }
-
+    describe "#initialize" do
       it "sets the resovled_version to the locked_version" do
-        subject.use_manifest_entry(manifest_entry)
-        expect(subject.resolved_version).to eq(version)
+        expect(subject.resolved_version).to eq("31aedfs")
       end
 
       it "sets the source to the locked_source" do
-        subject.use_manifest_entry(manifest_entry)
-        expect(subject.source).to eq(source)
+        expect(subject.source).to eq({ path: source_path})
       end
     end
   end

@@ -79,10 +79,6 @@ module Omnibus
       "revision:#{current_revision}"
     end
 
-    def resolve_version
-      target_revision
-    end
-
     private
 
     #
@@ -144,19 +140,6 @@ module Omnibus
     end
 
     #
-    # The target revision from the user.
-    #
-    # @return [String]
-    #
-    def target_revision
-      @target_revision ||= if sha_hash?(version)
-                             version
-                           else
-                             revision_from_remote_reference(version)
-                           end
-    end
-
-    #
     # Determine if the given revision matches the current revision.
     #
     # @return [true, false]
@@ -166,11 +149,34 @@ module Omnibus
     end
 
     #
+    # Execute the given git command, inside the +project_dir+.
+    #
+    # @see Util#shellout!
+    #
+    # @return [Mixlib::ShellOut]
+    #   the shellout object
+    #
+    def git(command)
+      shellout!("git #{command}", cwd: project_dir)
+    end
+
+    # Class methods
+    public
+
+    def self.resolve_version(ref, source)
+      if sha_hash?(ref)
+        ref
+      else
+        revision_from_remote_reference(ref, source)
+      end
+    end
+
+    #
     # Determine if the given revision is a SHA
     #
     # @return [true, false]
     #
-    def sha_hash?(rev)
+    def self.sha_hash?(rev)
       rev =~ /^[0-9a-f]{4,40}$/
     end
 
@@ -180,12 +186,12 @@ module Omnibus
     #
     # @return [String]
     #
-    def revision_from_remote_reference(ref)
+    def self.revision_from_remote_reference(ref, source)
       # execute `git ls-remote` the trailing '*' does globbing. This
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      remote_list = shellout!("git ls-remote \"#{source_url}\" #{ref}*").stdout
+      remote_list = shellout!("git ls-remote \"#{source[:git]}\" #{ref}*").stdout
       commit_ref = dereference_annotated_tag(remote_list, ref)
 
       unless commit_ref
@@ -213,7 +219,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def dereference_annotated_tag(remote_list, ref)
+    def self.dereference_annotated_tag(remote_list, ref)
       # We'll return the SHA corresponding to the ^{} which is the
       # commit pointed to by an annotated tag. If no such commit
       # exists (not an annotated tag) then we return the SHA of the
@@ -233,18 +239,6 @@ module Omnibus
           nil
         end
       end
-    end
-
-    #
-    # Execute the given git command, inside the +project_dir+.
-    #
-    # @see Util#shellout!
-    #
-    # @return [Mixlib::ShellOut]
-    #   the shellout object
-    #
-    def git(command)
-      shellout!("git #{command}", cwd: project_dir)
     end
   end
 end

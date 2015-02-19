@@ -12,7 +12,14 @@ module Omnibus
       { git: remote }
     end
 
-    subject { described_class.new(software) }
+    let(:manifest_entry) do
+      double(ManifestEntry,
+        name: 'software',
+        locked_version: '45ded6d3b1a35d66ed866b2c3eb418426e6382b0',
+        locked_source: source)
+    end
+
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
     describe '#fetch_required?' do
       context 'when the repo is not cloned' do
@@ -83,19 +90,37 @@ module Omnibus
 
     describe '#fetch'  do
       let(:revision) { shellout!('git rev-parse HEAD', cwd: project_dir).stdout.strip }
+      let(:version)  { 'v1.2.4' }
+      let(:remote)   { remote_git_repo('zlib', annotated_tags: [version]) }
+      let(:manifest_entry) do
+        double(ManifestEntry,
+               name: 'software',
+               locked_version: 'efde208366abd0f91419d8a54b45e3f6e0540105',
+               locked_source: source)
+      end
+
+      subject { described_class.new(manifest_entry, project_dir, build_dir) }
+
 
       it 'clones the repository' do
         subject.fetch
         expect("#{project_dir}/.git").to be_a_directory
       end
 
+      it 'fetches the locked_version from the manifest' do
+        subject.fetch
+        expect(revision).to eq(manifest_entry.locked_version)
+      end
+    end
+
+
+    describe '#resolve_version' do
       context 'when the version is a tag' do
         let(:version)  { 'v1.2.3' }
         let(:remote)   { remote_git_repo('zlib', tags: [version]) }
 
         it 'parses the tag' do
-          subject.fetch
-          expect(revision).to eq('53c72c4abcc961b153996f5b5f402ce715e47146')
+          expect(GitFetcher.resolve_version(version, source)).to eq('53c72c4abcc961b153996f5b5f402ce715e47146')
         end
       end
 
@@ -104,8 +129,7 @@ module Omnibus
         let(:remote)   { remote_git_repo('zlib', annotated_tags: [version]) }
 
         it 'it defererences and parses the annotated tag' do
-          subject.fetch
-          expect(revision).to eq('efde208366abd0f91419d8a54b45e3f6e0540105')
+          expect(GitFetcher.resolve_version(version, source)).to eq('efde208366abd0f91419d8a54b45e3f6e0540105')
         end
       end
 
@@ -114,8 +138,7 @@ module Omnibus
         let(:remote)  { remote_git_repo('zlib', branches: [version]) }
 
         it 'parses the branch' do
-          subject.fetch
-          expect(revision).to eq('171a1aec35ac0a050f8dccd9c9ef4609b1d8d8ea')
+          expect(GitFetcher.resolve_version(version, source)).to eq('171a1aec35ac0a050f8dccd9c9ef4609b1d8d8ea')
         end
       end
 
@@ -124,8 +147,7 @@ module Omnibus
         let(:remote)  { remote_git_repo('zlib') }
 
         it 'parses the full SHA-1' do
-          subject.fetch
-          expect(revision).to eq('45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
+          expect(GitFetcher.resolve_version(version, source)).to eq('45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
         end
       end
 
@@ -134,8 +156,7 @@ module Omnibus
         let(:remote)  { remote_git_repo('zlib') }
 
         it 'parses the abbreviated SHA-1' do
-          subject.fetch
-          expect(revision).to eq('45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
+          expect(GitFetcher.resolve_version(version, source)).to eq('45ded6d')
         end
       end
 
@@ -144,23 +165,7 @@ module Omnibus
         let(:remote)  { remote_git_repo('zlib') }
 
         it 'raise an exception' do
-          expect { subject.fetch }.to raise_error(UnresolvableGitReference)
-        end
-      end
-
-      context 'when a manifest entry locks a version' do
-        let(:version)  { 'v1.2.4' }
-        let(:remote)   { remote_git_repo('zlib', annotated_tags: [version]) }
-        let (:a_manifest) {
-          Omnibus::ManifestEntry.new("zlib",
-                                     { :locked_version => 'efde208366abd0f91419d8a54b45e3f6e0540105',
-                                       :locked_source => {:git => remote}})
-        }
-
-        it 'fetches the locked version' do
-          subject.use_manifest_entry(a_manifest)
-          subject.fetch
-          expect(revision).to eq('efde208366abd0f91419d8a54b45e3f6e0540105')
+          expect { GitFetcher.resolve_version(version, source) }.to raise_error(UnresolvableGitReference)
         end
       end
     end

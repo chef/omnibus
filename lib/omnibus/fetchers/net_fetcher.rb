@@ -98,7 +98,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def resolve_version
+    def self.resolve_version(version, source)
       version
     end
 
