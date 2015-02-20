@@ -1,10 +1,10 @@
 ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 ===========================================================
 [![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
-[![Build Status](http://img.shields.io/travis/opscode/omnibus.svg)][travis]
+[![Build Status](http://img.shields.io/travis/chef/omnibus.svg)][travis]
 
 [gem]: https://rubygems.org/gems/omnibus
-[travis]: http://travis-ci.org/opscode/omnibus
+[travis]: http://travis-ci.org/chef/omnibus
 
 Easily create full-stack installers for your project across a variety of platforms.
 
@@ -214,7 +214,7 @@ end
 Since the software definitions are simply ruby code, you can conditionally execute anything by wrapping it with pure Ruby that tests for the version number.
 
 #### Sharing software definitions
-The easiest way to share organization-wide software is via bundler and Rubygems. For an example software repository, look at Chef's [omnibus-software](https://github.com/opscode/omnibus-software). For more information, please see the [Rubygems documentation](http://guides.rubygems.org/publishing/).
+The easiest way to share organization-wide software is via bundler and Rubygems. For an example software repository, look at Chef's [omnibus-software](https://github.com/chef/omnibus-software). For more information, please see the [Rubygems documentation](http://guides.rubygems.org/publishing/).
 
 It is recommended you use bundler to pull down these gems (as bundler also permits pulling software directly from GitHub):
 
