@@ -9,7 +9,7 @@ module Omnibus
         project.install_dir('C:/project')
         project.build_version('1.2.3')
         project.build_iteration('2')
-        project.maintainer('Chef Software')
+        project.maintainer('Chef Software <maintainers@chef.io>')
       end
     end
 
@@ -108,7 +108,7 @@ module Omnibus
         contents = File.read("#{staging_dir}/localization-en-us.wxl")
 
         expect(contents).to include('<String Id="ProductName">Project</String>')
-        expect(contents).to include('<String Id="ManufacturerName">Chef Software</String>')
+        expect(contents).to include('<String Id="ManufacturerName">"Chef Software &lt;maintainers@chef.io&gt;"</String>')
         expect(contents).to include('<String Id="FeatureMainName">Project</String>')
       end
     end
