@@ -41,8 +41,8 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :exclude, %|exclude 'hamlet'|
     it_behaves_like 'a cleanroom setter', :config_file, %|config_file '/path/to/config.rb'|
     it_behaves_like 'a cleanroom setter', :extra_package_file, %|extra_package_file '/path/to/asset'|
-    it_behaves_like 'a cleanroom setter', :with_text_manifest, %|with_text_manifest '/path/to/manifest.txt'|
-    it_behaves_like 'a cleanroom setter', :with_json_manifest, %|with_text_manifest '/path/to/manifest.txt'|
+    it_behaves_like 'a cleanroom setter', :text_manifest_path, %|text_manifest_path '/path/to/manifest.txt'|
+    it_behaves_like 'a cleanroom setter', :json_manifest_path, %|json_manifest_path '/path/to/manifest.txt'|
     it_behaves_like 'a cleanroom getter', :files_path
 
     describe 'basics' do

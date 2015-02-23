@@ -674,38 +674,44 @@ module Omnibus
     expose :ohai
 
     #
-    # Write a json-format version manifest to the specified location
-    # at the end of the build. If no path is specified
+    # Location of json-formated version manifest, written at at the
+    # end of the build. If no path is specified
     # +install_dir+/version-manifest.json is used.
     #
     # @example
-    #   with_json_manifest
+    #   json_manifest_path
     #
     # @return [String]
     #
-    def with_json_manifest(path=File.join(install_dir, "version-manifest.json"))
-      @write_json_manifest=true
-      @json_manifest_path=path
+    def json_manifest_path(path = NULL)
+      if null?(path)
+        @json_manifest_path || File.join(install_dir, "version-manifest.json")
+      else
+        @json_manifest_path=path
+      end
     end
-    expose :with_json_manifest
+    expose :json_manifest_path
 
     #
-    # Write a text-formatted manifest to the specified location
-    #(+install_dir+/version-manifest.txt if none is provided).
+    # Location of text-formatted manifest.
+    # (+install_dir+/version-manifest.txt if none is provided)
     #
     # This manifest uses the same format used by the
     # 'version-manifest' software definition in omnibus-software.
     #
     # @example
-    #   with_text_manifest
+    #   text_manifest_path
     #
     # @return [String]
     #
-    def with_text_manifest(path=File.join(install_dir, "version-manifest.txt"))
-      @write_text_manifest=true
-      @text_manifest_path=path
+    def text_manifest_path(path = NULL)
+      if null?(path)
+        @test_manifest_path || File.join(install_dir, "version-manifest.txt")
+      else
+        @text_manifest_path = path
+      end
     end
-    expose :with_text_manifest
+    expose :text_manifest_path
 
     #
     # @!endgroup
@@ -982,15 +988,15 @@ module Omnibus
         software.build_me
       end
 
-      write_json_manifest if @write_json_manifest
-      write_text_manifest if @write_text_manifest
+      write_json_manifest
+      write_text_manifest
       HealthCheck.run!(self)
       package_me
       compress_me
     end
 
     def write_json_manifest
-      File.open(@json_manifest_path, 'w') do |f|
+      File.open(json_manifest_path, 'w') do |f|
         f.write(JSON.pretty_generate(built_manifest.to_hash))
       end
     end
@@ -1001,7 +1007,7 @@ module Omnibus
     # omnibus-software.
     #
     def write_text_manifest
-      File.open(@text_manifest_path, 'w') do |f|
+      File.open(text_manifest_path, 'w') do |f|
         f.puts "#{name} #{build_version}"
         f.puts ""
         f.puts Omnibus::Reports.pretty_version_map(self)
