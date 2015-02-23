@@ -16,6 +16,7 @@
 
 require 'fileutils'
 require 'uri'
+require 'omnibus/manifest_entry'
 
 module Omnibus
   class Software
@@ -28,7 +29,7 @@ module Omnibus
       #
       # @return [Software]
       #
-      def load(project, name)
+      def load(project, name, manifest)
         loaded_softwares[name] ||= begin
           filepath = Omnibus.software_path(name)
 
@@ -40,7 +41,7 @@ module Omnibus
             end
           end
 
-          instance = new(project, filepath)
+          instance = new(project, filepath, manifest)
           instance.evaluate_file(filepath)
           instance.load_dependencies
 
@@ -69,6 +70,8 @@ module Omnibus
     include NullArgumentable
     include Sugarable
 
+    attr_reader :manifest
+
     #
     # Create a new software object.
     #
@@ -76,10 +79,12 @@ module Omnibus
     #   the Omnibus project that instantiated this software definition
     # @param [String] filepath
     #   the path to where this software definition lives on disk
+    # @param [String] manifest
+    #   the user-supplied software manifest
     #
     # @return [Software]
     #
-    def initialize(project, filepath = nil)
+    def initialize(project, filepath = nil, manifest=nil)
       unless project.is_a?(Project)
         raise ArgumentError,
           "`project' must be a kind of `Omnibus::Project', but was `#{project.class.inspect}'!"
@@ -88,9 +93,20 @@ module Omnibus
       # Magical methods
       @filepath = filepath
       @project  = project
+      @manifest = manifest
 
       # Overrides
       @overrides = NULL
+    end
+
+    def manifest_entry
+      @manifest_entry ||= if manifest
+                            log.info(log_key) {"Using user-supplied manifest entry for #{name}"}
+                            manifest.entry_for(name)
+                          else
+                            log.info(log_key) {"Resolving manifest entry for #{name}"}
+                            to_manifest_entry
+                          end
     end
 
     #
@@ -566,7 +582,7 @@ module Omnibus
     #
     def load_dependencies
       dependencies.each do |dependency|
-        software = Software.load(project, dependency)
+        Software.load(project, dependency, manifest)
       end
 
       true
@@ -579,6 +595,14 @@ module Omnibus
     #
     def builder
       @builder ||= Builder.new(self)
+    end
+
+    def to_manifest_entry
+      Omnibus::ManifestEntry.new(name, {
+                                   source_type: source_type,
+                                   described_version: version,
+                                   locked_version: Fetcher.resolve_version(version, source),
+                                   locked_source: source})
     end
 
     #
@@ -684,25 +708,30 @@ module Omnibus
     end
 
     #
-    # The fetcher for this software, based off of the +source+ attribute.
-    #
-    # - +:url+ - {NetFetcher}
-    # - +:git+ - {GitFetcher}
-    # - +:path+ - {PathFetcher}
+    # The fetcher for this software
     #
     # @return [Fetcher]
     #
     def fetcher
-      @fetcher ||= if source
+      @fetcher ||= Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir)
+    end
+
+    #
+    # The type of source specified for this software defintion.
+    #
+    # @return [String]
+    #
+    def source_type
+      if source
         if source[:url]
-          NetFetcher.new(self)
+          :url
         elsif source[:git]
-          GitFetcher.new(self)
+          :git
         elsif source[:path]
-          PathFetcher.new(self)
+          :path
         end
       else
-        NullFetcher.new(self)
+        :project_local
       end
     end
 

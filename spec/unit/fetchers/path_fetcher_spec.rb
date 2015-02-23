@@ -4,16 +4,16 @@ module Omnibus
   describe PathFetcher do
     let(:source_path) { '/local/path' }
     let(:project_dir) { '/project/dir' }
+    let(:build_dir) { '/build/dir' }
 
-    let(:software) do
-      double(Software,
+    let(:manifest_entry) do
+      double(ManifestEntry,
         name: 'software',
-        source: { path: source_path },
-        project_dir: project_dir,
-      )
+        locked_version: nil,
+        locked_source: { path: source_path })
     end
 
-    subject { described_class.new(software) }
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
     describe '#fetch_required?' do
       context 'when the SHAs match' do

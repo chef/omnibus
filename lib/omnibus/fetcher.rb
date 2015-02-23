@@ -19,22 +19,53 @@ module Omnibus
     include Digestable
     include Logging
     include Util
+    extend Util
 
     #
-    # The software for this fetcher.
+    # The name of the software this fetcher shall fetch
     #
-    # @return [Software]
+    # @return [String]
     #
-    attr_reader :software
+    attr_reader :name
+
+    #
+    # The source for this fetcher.
+    #
+    # @return [Hash]
+    #
+    attr_reader :source
+
+    #
+    # The exact upstream version that a fetcher should fetch. For
+    # sources that allow aliases (branch name, tags, etc). Users
+    # should use the class method resolve_version to determine this
+    # before constructing a fetcher.
+    #
+    attr_reader :resolved_version
+
+    #
+    # The path where extracted software should live.
+    #
+    # @return [String]
+    #
+    attr_reader :project_dir
+    attr_reader :build_dir
+
 
     #
     # Create a new Fetcher object from the given software.
     #
     # @param [Software] software
-    #   the software to create this fetcher
     #
-    def initialize(software)
-      @software = software
+    # To preserve the original interface, this still takes a software-like
+    # argument, but to avoid coupling with the software object, we pull out
+    # what we need and don't touch it again.
+    def initialize(manifest_entry, project_dir, build_dir)
+      @name    = manifest_entry.name
+      @source  = manifest_entry.locked_source
+      @resolved_version = manifest_entry.locked_version
+      @project_dir = project_dir
+      @build_dir = build_dir
     end
 
     #
@@ -83,36 +114,19 @@ module Omnibus
     # @!endgroup
     # --------------------------------------------------
 
-    private
-
-    #
-    # The "source" for this software, with applied overrides.
-    #
-    # @return [Hash]
-    #
-    def source
-      software.source
+    def fetcher
+      self
     end
 
     #
-    # The path where extracted software should live.
-    #
-    # @see Software#project_dir
-    #
-    # @return [String]
-    #
-    def project_dir
-      software.project_dir
-    end
-
-    #
-    # The version for this sfotware, with applied overrides.
-    #
-    # @return [String]
+    # All fetchers should prefer resolved_version to version
+    # this is provided for compatibility.
     #
     def version
-      software.version
+      resolved_version
     end
+
+    private
 
     #
     # Override the +log_key+ for this fetcher to include the name of the
@@ -121,9 +135,8 @@ module Omnibus
     # @return [String]
     #
     def log_key
-      @log_key ||= "#{super}: #{software.name}"
+      @log_key ||= "#{super}: #{name}"
     end
-
 
     #
     # Idempotently create the required directories for building/downloading.
@@ -136,10 +149,29 @@ module Omnibus
       [
         Config.cache_dir,
         Config.source_dir,
-        software.build_dir,
-        software.project_dir,
+        build_dir,
+        project_dir,
       ].each do |directory|
         FileUtils.mkdir_p(directory) unless File.directory?(directory)
+      end
+    end
+
+    # Class Methods
+    def self.resolve_version(version, source)
+      fetcher_class_for_source(source).resolve_version(version, source)
+    end
+
+    def self.fetcher_class_for_source(source)
+      if source
+        if source[:url]
+          NetFetcher
+        elsif source[:git]
+          GitFetcher
+        elsif source[:path]
+          PathFetcher
+        end
+      else
+        NullFetcher
       end
     end
   end

@@ -297,6 +297,64 @@ module Omnibus
       end
     end
 
+    describe "#manifest_entry" do
+      let(:a_source) do
+        { url: 'http://example.com/',
+          md5: 'abcd1234' }
+      end
+
+      let(:manifest_entry) {Omnibus::ManifestEntry.new("software", {locked_version: "1.2.8", locked_source: a_source})}
+      let(:manifest) do
+        m = Omnibus::Manifest.new
+        m.add("software", manifest_entry)
+      end
+
+      let(:project_with_manifest) do
+        described_class.new(project, nil, manifest).evaluate do
+          name 'software'
+          default_version '1.2.3'
+          source url: 'http://example.com/',
+          md5: 'abcd1234'
+        end
+      end
+
+      let(:project_without_manifest) do
+        described_class.new(project, nil, nil).evaluate do
+          name 'software'
+          default_version '1.2.3'
+          source url: 'http://example.com/',
+          md5: 'abcd1234'
+        end
+      end
+
+      let(:another_project) do
+        described_class.new(project, nil, manifest).evaluate do
+          name 'ruroh'
+        end
+      end
+
+      it "constructs a manifest entry if no manifest was provided" do
+        expect(project_without_manifest.manifest_entry).to be_a Omnibus::ManifestEntry
+        expect(project_without_manifest.manifest_entry.locked_version).to eq("1.2.3")
+        expect(project_without_manifest.manifest_entry.locked_source).to eq(a_source)
+      end
+
+      it "constructs a manifest entry with a fully resolved version" do
+        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", a_source).and_return("1.2.8")
+        expect(project_without_manifest.manifest_entry.locked_version).to eq("1.2.8")
+      end
+
+      it "returns the entry from the user-provided manifest if it was given one" do
+        expect(project_with_manifest.manifest_entry).to eq(manifest_entry)
+        expect(project_with_manifest.manifest_entry.locked_version).to eq("1.2.8")
+        expect(project_with_manifest.manifest_entry.locked_source).to eq(a_source)
+      end
+
+      it "raises an error if it was given a manifest but can't find it's entry" do
+        expect{another_project.manifest_entry}.to raise_error
+      end
+    end
+
     describe '#<=>' do
       let(:zlib)   { described_class.new(project).tap { |s| s.name('zlib') } }
       let(:erchef) { described_class.new(project).tap { |s| s.name('erchef') } }

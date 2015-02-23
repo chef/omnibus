@@ -80,6 +80,13 @@ module Omnibus
       "path:#{source_path}|shasum:#{target_shasum}"
     end
 
+    #
+    # @return [String, nil]
+    #
+    def self.resolve_version(version, source)
+      version
+    end
+
     private
 
     #
