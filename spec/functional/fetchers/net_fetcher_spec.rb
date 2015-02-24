@@ -15,9 +15,16 @@ module Omnibus
 
     let(:fetch!) { capture_stdout { subject.fetch } }
 
-    WebMock.allow_net_connect!
+    let(:manifest_entry) do
+      double(ManifestEntry,
+             name: 'software',
+             locked_version: '1.2.8',
+             locked_source: source)
+    end
 
-    subject { described_class.new(software) }
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
+
+    WebMock.allow_net_connect!
 
     describe '#fetch_required?' do
       context 'when the file is not downloaded' do

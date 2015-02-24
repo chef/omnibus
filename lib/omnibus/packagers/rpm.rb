@@ -210,7 +210,7 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
     end
 
     #
@@ -264,6 +264,7 @@ module Omnibus
           iteration:      safe_build_iteration,
           vendor:         vendor,
           license:        license,
+          dist_tag:       dist_tag,
           architecture:   safe_architecture,
           maintainer:     project.maintainer,
           homepage:       project.homepage,
@@ -391,6 +392,17 @@ module Omnibus
         .gsub("*", "[*]")
         .gsub("?", "[?]")
         .gsub("%", "[%]")
+    end
+
+    #
+    # The Dist Tag for this RPM package per the Fedora packaging guidlines.
+    #
+    # @see http://fedoraproject.org/wiki/Packaging:DistTag
+    #
+    # @return [String]
+    #
+    def dist_tag
+      ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
     end
 
     #

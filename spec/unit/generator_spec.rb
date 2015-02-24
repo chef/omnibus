@@ -52,7 +52,7 @@ module Omnibus
         Generator.new(['name'], path: tmp_path, bff_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/bff/gen.template.erb
+          omnibus-name/resources/name/bff/gen.template.erb
         ))
       end
     end
@@ -62,9 +62,9 @@ module Omnibus
         Generator.new(['name'], path: tmp_path, deb_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/deb/conffiles.erb
-          omnibus-name/resources/deb/control.erb
-          omnibus-name/resources/deb/md5sums.erb
+          omnibus-name/resources/name/deb/conffiles.erb
+          omnibus-name/resources/name/deb/control.erb
+          omnibus-name/resources/name/deb/md5sums.erb
         ))
       end
     end
@@ -74,8 +74,8 @@ module Omnibus
         Generator.new(['name'], path: tmp_path, dmg_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/dmg/background.png
-          omnibus-name/resources/dmg/icon.png
+          omnibus-name/resources/name/dmg/background.png
+          omnibus-name/resources/name/dmg/icon.png
         ))
       end
     end
@@ -85,15 +85,15 @@ module Omnibus
         Generator.new(['name'], path: tmp_path, msi_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/msi/assets/LICENSE.rtf
-          omnibus-name/resources/msi/assets/banner_background.bmp
-          omnibus-name/resources/msi/assets/dialog_background.bmp
-          omnibus-name/resources/msi/assets/project.ico
-          omnibus-name/resources/msi/assets/project_16x16.ico
-          omnibus-name/resources/msi/assets/project_32x32.ico
-          omnibus-name/resources/msi/localization-en-us.wxl.erb
-          omnibus-name/resources/msi/parameters.wxi.erb
-          omnibus-name/resources/msi/source.wxs.erb
+          omnibus-name/resources/name/msi/assets/LICENSE.rtf
+          omnibus-name/resources/name/msi/assets/banner_background.bmp
+          omnibus-name/resources/name/msi/assets/dialog_background.bmp
+          omnibus-name/resources/name/msi/assets/project.ico
+          omnibus-name/resources/name/msi/assets/project_16x16.ico
+          omnibus-name/resources/name/msi/assets/project_32x32.ico
+          omnibus-name/resources/name/msi/localization-en-us.wxl.erb
+          omnibus-name/resources/name/msi/parameters.wxi.erb
+          omnibus-name/resources/name/msi/source.wxs.erb
         ))
       end
     end
@@ -103,9 +103,10 @@ module Omnibus
         Generator.new(['name'], path: tmp_path, pkg_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/pkg/background.png
-          omnibus-name/resources/pkg/license.html.erb
-          omnibus-name/resources/pkg/welcome.html.erb
+          omnibus-name/resources/name/pkg/background.png
+          omnibus-name/resources/name/pkg/license.html.erb
+          omnibus-name/resources/name/pkg/welcome.html.erb
+          omnibus-name/resources/name/pkg/distribution.xml.erb
         ))
       end
     end
@@ -115,9 +116,9 @@ module Omnibus
         Generator.new(['name'], path: tmp_path, rpm_assets: true).invoke_all
 
         expect(structure).to include(*%w(
-          omnibus-name/resources/rpm/rpmmacros.erb
-          omnibus-name/resources/rpm/signing.erb
-          omnibus-name/resources/rpm/spec.erb
+          omnibus-name/resources/name/rpm/rpmmacros.erb
+          omnibus-name/resources/name/rpm/signing.erb
+          omnibus-name/resources/name/rpm/spec.erb
         ))
       end
     end

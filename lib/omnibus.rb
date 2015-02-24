@@ -72,6 +72,9 @@ module Omnibus
   autoload :NullPublisher,        'omnibus/publishers/null_publisher'
   autoload :S3Publisher,          'omnibus/publishers/s3_publisher'
 
+  autoload :Manifest,      'omnibus/manifest'
+  autoload :ManifestEntry, 'omnibus/manifest_entry'
+
   module Command
     autoload :Base,    'omnibus/cli/base'
     autoload :Cache,   'omnibus/cli/cache'

@@ -67,8 +67,33 @@ You can inspect the cache keys like this:
     git --git-dir=$CACHE_PATH tag -l
 
 You can manually remove a cache entry using `git tag --delete
-$TAG`. In theory, you can share the cache among build slaves using
-`git clone/fetch`.
+$TAG`.
+
+
+## Build Slaves ##
+
+You can share the cache among build slaves using `git clone/fetch`.
+
+Using git bundles is another option (if you're using Jenkins, the bundle
+can be persisted as an artifact):
+
+  + Backup: `git --git-dir=$CACHE_PATH bundle create $CACHE_BUNDLE --tags`
+  + Restore: `git clone --mirror $CACHE_BUNDLE $CACHE_PATH`
+
+(CACHE_BUNDLE is anywhere you're persisting the bundle to)
+
+
+### Important Caveat ###
+
+Note that Omnibus caches instructions *exactly as they will be executed*
+(e.g. Omnibus caches `make -j 9`, it doesn't cache `make -j #{workers}`).
+
+So, if you intend to share your build cache among slaves, you should ensure
+that their build environments are identical (failing which you'll bust the
+cache with commands that depend on the environment).
+
+
+## Mac OS X Caveats ##
 
 When running a build vm on OS X, note that you will likely run into
 trouble if you attempt to locate your cache on your local

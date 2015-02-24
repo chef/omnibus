@@ -32,7 +32,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'bundler'
   gem.add_development_dependency 'artifactory', '~> 2.0'
   gem.add_development_dependency 'aruba',       '~> 0.5'
-  gem.add_development_dependency 'fauxhai',     '~> 2.1'
+  gem.add_development_dependency 'fauxhai',     '~> 2.3'
   gem.add_development_dependency 'rspec',       '~> 3.0'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'webmock'
