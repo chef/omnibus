@@ -159,6 +159,7 @@ module Omnibus
       end
 
       options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
+      fetcher_retries ||= Omnibus::Config.fetcher_retries
 
       progress_bar = ProgressBar.create(
         output: $stdout,
@@ -175,9 +176,16 @@ module Omnibus
            Errno::ECONNREFUSED,
            Errno::ECONNRESET,
            Errno::ENETUNREACH,
+           Timeout::Error,
            OpenURI::HTTPError => e
-      log.error(log_key) { "Download failed - #{e.class}!" }
-      raise
+      if fetcher_retries != 0
+        log.debug(log_key) { "Retrying failed download (#{fetcher_retries})..." }
+        fetcher_retries -= 1
+        retry
+      else
+        log.error(log_key) { "Download failed - #{e.class}!" }
+        raise
+      end
     end
 
     #

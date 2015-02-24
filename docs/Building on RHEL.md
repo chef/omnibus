@@ -65,7 +65,7 @@ Some DSL methods available include:
 | `vendor`             | The name of the package producer            |
 | `license`            | The default license for the package         |
 | `priority`           | The priority for the package                |
-| `catetory`           | The catetory for this package               |
+| `category`           | The category for this package               |
 
 If you are unfamilar with any of these terms, you should just accept the defaults. For more information on the purpose of any of these configuration options, please see the RPM spec.
 
