@@ -15,8 +15,6 @@ module Omnibus
 
     let(:fetch!) { capture_stdout { subject.fetch } }
 
-    WebMock.allow_net_connect!
-
     let(:manifest_entry) do
       double(ManifestEntry,
              name: 'software',
@@ -104,7 +102,6 @@ module Omnibus
         expect(output).to include('Download failed')
         retry_count = output.scan('Retrying failed download').count
         expect(retry_count).to eq(Omnibus::Config.fetcher_retries)
-        WebMock.allow_net_connect!
       end
 
       context 'when the checksum is invalid' do
