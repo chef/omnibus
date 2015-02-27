@@ -432,10 +432,16 @@ module Omnibus
       ['omnibus-software']
     end
 
-    # The solaris compiler to use
+    # Solaris linker mapfile to use, if needed
+    # see http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
+    # Path is relative to the 'files' directory in your omnibus project
+    #
+    # For example:
+    #
+    #     /PATH/files/my_map_file 
     #
     # @return [String, nil]
-    default(:solaris_compiler, nil)
+    default(:solaris_linker_mapfile, "files/mapfiles/solaris")
 
     # --------------------------------------------------
     # @!endgroup
