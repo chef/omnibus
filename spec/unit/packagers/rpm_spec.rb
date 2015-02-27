@@ -213,9 +213,9 @@ module Omnibus
           subject.write_rpm_spec
           contents = File.read(spec_file)
 
-          expect(contents).to include("/.dir1")
+          expect(contents).to include("%dir /.dir1")
           expect(contents).to include("/.file1")
-          expect(contents).to include("/dir2")
+          expect(contents).to include("%dir /dir2")
           expect(contents).to include("/file2")
         end
       end

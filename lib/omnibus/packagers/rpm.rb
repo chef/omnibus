@@ -255,6 +255,7 @@ module Omnibus
                 .map    { |path| rpm_safe(path) }
                 .reject { |path| config_files.include?(path) }
                 .reject { |path| filesystem_directories.include?(path) }
+                .map    { |path| dir?(path) }
 
       render_template(resource_path('spec.erb'),
         destination: spec_file,
@@ -333,6 +334,15 @@ module Omnibus
       FileSyncer.glob("#{staging_dir}/RPMS/**/*.rpm").each do |rpm|
         copy_file(rpm, Config.package_dir)
       end
+    end
+
+    #
+    #  Mark directories with the %dir directive.
+    #
+    def dir?(path)
+      full_path = build_dir + path.gsub('[%]','%')
+      return "%dir #{path}" if !File.symlink?(full_path) && File.directory?(full_path)
+      path
     end
 
     #
