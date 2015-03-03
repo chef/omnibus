@@ -29,6 +29,26 @@ module Omnibus
       end
     end
 
+    describe "#each" do
+      it "yields each item to the block" do
+        first  = ManifestEntry.new("foobar", {})
+        second = ManifestEntry.new("wombat", {})
+        subject.add("foobar", first)
+        subject.add("wombat", second)
+        expect{ |b| subject.each &b }.to yield_successive_args(first, second)
+      end
+    end
+
+    describe "#entry_names" do
+      it "returns an array of software names present in the manifest" do
+        first  = ManifestEntry.new("foobar", {})
+        second = ManifestEntry.new("wombat", {})
+        subject.add("foobar", first)
+        subject.add("wombat", second)
+        expect(subject.entry_names).to eq(["foobar", "wombat"])
+      end
+    end
+
     describe "#to_hash" do
       it "returns a Hash containg the current manifest format" do
         expect(subject.to_hash['manifest_format']).to eq(Manifest::LATEST_MANIFEST_FORMAT)

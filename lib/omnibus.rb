@@ -74,11 +74,17 @@ module Omnibus
 
   autoload :Manifest,      'omnibus/manifest'
   autoload :ManifestEntry, 'omnibus/manifest_entry'
+  autoload :ManifestDiff,  'omnibus/manifest_diff'
+
+  autoload :ChangeLog, 'omnibus/changelog'
+  autoload :GitRepository, 'omnibus/git_repository'
+
 
   module Command
     autoload :Base,    'omnibus/cli/base'
     autoload :Cache,   'omnibus/cli/cache'
     autoload :Publish, 'omnibus/cli/publish'
+    autoload :ChangeLog, 'omnibus/cli/changelog'
   end
 
   class << self
