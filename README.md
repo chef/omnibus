@@ -248,6 +248,22 @@ $PWD/config/software/foo.rb
 
 The first instance of `foo.rb` that is encountered will be used. Please note that **local** (vendored) softare definitions take precedence!
 
+Version Manifest
+----------------
+
+Git-based software definitions may specify branches as their
+default_version. In this case, the exact git revision to use will be
+determined at build-time unless a project override (see below) or
+external version manifest is used. To generate a version manifest use
+the `omnibus manifest` command:
+
+```
+omnibus manifest PROJECT -l warn
+```
+
+This will output a JSON-formatted manifest containing the resolved
+version of every software definition.
+
 
 Caveats
 -------
