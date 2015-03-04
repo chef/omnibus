@@ -223,6 +223,25 @@ module Omnibus
     end
 
     #
+    # Get a list of user-declared config files
+    #
+    # @return [Array]
+    #
+    def config_files
+      @config_files ||= project.config_files.map { |file| rpm_safe(file) }
+    end
+
+    #
+    # Exclude directories from the spec that are owned by the filesystem package:
+    # http://fedoraproject.org/wiki/Packaging:Guidelines#File_and_Directory_Ownership
+    #
+    # @return [Array]
+    #
+    def filesystem_directories
+      @filesystem_directories ||= IO.readlines(resource_path('filesystem_list')).map! { |dirname| dirname.chomp }
+    end
+
+    #
     # Render an rpm spec file in +SPECS/#{name}.spec+ using the supplied ERB
     # template.
     #
@@ -240,21 +259,9 @@ module Omnibus
         hash
       end
 
-      # Exclude directories from the spec that are owned by the filesystem package:
-      # http://fedoraproject.org/wiki/Packaging:Guidelines#File_and_Directory_Ownership
-      filesystem_directories = IO.readlines(resource_path('filesystem_list'))
-      filesystem_directories.map! { |dirname| dirname.chomp }
-
-      # Get a list of user-declared config files
-      config_files = project.config_files.map { |file| rpm_safe(file) }
-
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
-                .map    { |path| path.gsub("#{build_dir}/", '') }
-                .map    { |path| "/#{path}" }
-                .map    { |path| rpm_safe(path) }
-                .reject { |path| config_files.include?(path) }
-                .reject { |path| filesystem_directories.include?(path) }
+                .map    { |path| build_filepath(path) }
 
       render_template(resource_path('spec.erb'),
         destination: spec_file,
@@ -279,6 +286,7 @@ module Omnibus
           scripts:        scripts,
           config_files:   config_files,
           files:          files,
+          build_dir:      build_dir,
         }
       )
     end
@@ -333,6 +341,20 @@ module Omnibus
       FileSyncer.glob("#{staging_dir}/RPMS/**/*.rpm").each do |rpm|
         copy_file(rpm, Config.package_dir)
       end
+    end
+
+    #
+    # Convert the path of a file in the staging directory to an entry for use in the spec file.
+    #
+    # @return [String]
+    #
+    def build_filepath(path)
+      filepath = rpm_safe('/' + path.gsub("#{build_dir}/", ''))
+      return if config_files.include?(filepath) || filesystem_directories.include?(filepath)
+      full_path = build_dir + filepath.gsub('[%]','%')
+      # Mark directories with the %dir directive to prevent rpmbuild from counting their contents twice.
+      return "%dir #{filepath}" if !File.symlink?(full_path) && File.directory?(full_path)
+      filepath
     end
 
     #
