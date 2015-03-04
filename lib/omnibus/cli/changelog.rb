@@ -42,6 +42,11 @@ module Omnibus
     type: :string,
     default: "version-manifest.json"
 
+    method_option :skip_components,
+    desc: "Don't include component changes in the changelog",
+    type: :boolean,
+    default: false
+
     method_option :major,
     desc: "Bump the major version",
     type: :boolean,
@@ -62,17 +67,21 @@ module Omnibus
     type: :string
 
     desc 'generate', 'Generate a changelog for a new release'
-    def generate(project_name)
+    def generate
       g = GitRepository.new
-      old_manifest = if @options[:starting_manifest]
-                       Omnibus::Manifest.from_file(@options[:starting_manifest])
-                     else
-                       Omnibus::Manifest.from_hash(JSON.parse(g.file_at_revision("version-manifest.json",
-                                                                                 g.latest_tag)))
-                     end
 
-      new_manifest = Omnibus::Manifest.from_file(@options[:ending_manifest])
-      diff = Omnibus::ManifestDiff.new(old_manifest, new_manifest)
+      if @options[:skip_components]
+        diff = Omnibus::EmptyManifestDiff.new
+      else
+        old_manifest = if @options[:starting_manifest]
+                         Omnibus::Manifest.from_file(@options[:starting_manifest])
+                       else
+                         Omnibus::Manifest.from_hash(JSON.parse(g.file_at_revision("version-manifest.json",
+                                                                                   g.latest_tag)))
+                       end
+        new_manifest = Omnibus::Manifest.from_file(@options[:ending_manifest])
+        diff = Omnibus::ManifestDiff.new(old_manifest, new_manifest)
+      end
 
       new_version = if @options[:version]
                       @options[:version]

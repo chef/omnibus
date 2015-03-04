@@ -57,6 +57,17 @@ module Omnibus
                                        }])
         end
       end
+
+      describe "#empty?" do
+        it "returns false if there have been changes" do
+          expect(subject.empty?).to eq(false)
+        end
+
+        it "returns true if nothing changed" do
+          diff = Omnibus::ManifestDiff.new(manifest_one, manifest_one)
+          expect(diff.empty?).to eq(true)
+        end
+      end
     end
   end
 end

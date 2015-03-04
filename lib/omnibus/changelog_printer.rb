@@ -9,9 +9,10 @@ module Omnibus
     def print(new_version)
       puts "## #{new_version} (#{Time.now.strftime('%Y-%m-%d')})"
       print_changelog
-      puts ""
-      print_components
-      puts ""
+      if !diff.empty?
+        print_components
+        puts ""
+      end
       print_contributors
     end
 
