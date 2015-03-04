@@ -79,6 +79,7 @@ module Omnibus
   autoload :ChangeLog, 'omnibus/changelog'
   autoload :GitRepository, 'omnibus/git_repository'
 
+  autoload :SemanticVersion, 'omnibus/semantic_version'
 
   module Command
     autoload :Base,    'omnibus/cli/base'

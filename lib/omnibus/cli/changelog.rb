@@ -77,11 +77,11 @@ module Omnibus
       new_version = if @options[:version]
                       @options[:version]
                     elsif @options[:patch]
-                      Omnibus::SemanticVersion.new(g.latest_tag).next_patch
+                      Omnibus::SemanticVersion.new(g.latest_tag).next_patch.to_s
                     elsif @options[:minor] && !@options[:major] # minor is the default so it will always be true
-                      Omnibus::SemanticVersion.new(g.latest_tag).next_minor
+                      Omnibus::SemanticVersion.new(g.latest_tag).next_minor.to_s
                     elsif @options[:major]
-                      Omnibus::SemanticVersion.new(g.latest_tag).next_major
+                      Omnibus::SemanticVersion.new(g.latest_tag).next_major.to_s
                     end
 
 
