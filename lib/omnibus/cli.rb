@@ -90,6 +90,16 @@ module Omnibus
     end
 
     #
+    # Generate a version manifest for the given project definition
+    #
+    #   $ omnibus manifest PROJECT
+    #
+    desc 'manifest PROJECT', 'Print a manifest for the given Omnibus project'
+    def manifest(name)
+      puts JSON.pretty_generate(Project.load(name).built_manifest.to_hash)
+    end
+
+    #
     # Perform cache management functions.
     #
     #   $ omnibus cache list
