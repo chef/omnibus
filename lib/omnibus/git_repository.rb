@@ -13,7 +13,7 @@ module Omnibus
     end
 
     def commit_messages(start_ref, end_ref)
-      formatted_log_between(start_ref, end_ref, '%B').lines
+      formatted_log_between(start_ref, end_ref, '%B').lines.to_a
     end
 
     def latest_tag
