@@ -265,6 +265,24 @@ This will output a JSON-formatted manifest containing the resolved
 version of every software definition.
 
 
+Changelog
+---------
+STATUS: *EXPERIMENTAL*
+
+`omnibus changelog generate` will generate a changelog for an omnibus
+project.  This command currently assumes:
+
+- version-manifest.json is checked into the project root
+- the project is a git repository
+- each version is tagged with a SemVer compliant annotated tag
+- Any git-based sources are checked out at ../COMPONENT_NAME
+- Any commit message line prepended with ChangeLog-Entry: should be
+  added to the changelog.
+
+These assumptions *will* change as we determine what works best for a
+number of our projects.
+
+
 Caveats
 -------
 ### Overrides
