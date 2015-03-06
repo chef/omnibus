@@ -64,7 +64,7 @@ module Omnibus
     method_option :output_manifest,
       desc: "Create version-manifest.json in current directory at the end of the build",
       type: :boolean,
-      default: false
+      default: true
     method_option :use_manifest,
       desc: "Use the given manifest when downloading software sources.",
       type: :string,
@@ -83,7 +83,8 @@ module Omnibus
       project.build
 
       if @options[:output_manifest]
-        File.open('version-manifest.json', 'w') do |f|
+        FileUtils.mkdir_p('pkg')
+        File.open(::File.join('pkg', 'version-manifest.json'), 'w') do |f|
           f.write(JSON.pretty_generate(project.built_manifest.to_hash))
         end
       end
