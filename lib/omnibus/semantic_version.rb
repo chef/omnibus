@@ -18,6 +18,8 @@ require 'mixlib/versioning'
 
 module Omnibus
   class SemanticVersion
+    class InvalidVersion < StandardError; end
+
     def initialize(version_string)
       @prefix = if version_string =~ /^v/
                   "v"
@@ -25,6 +27,9 @@ module Omnibus
                   ""
                 end
       @version = Mixlib::Versioning.parse(version_string.gsub(/^v/, ""))
+      if @version.nil?
+        raise InvalidVersion, "#{version_string} could not be parsed as a valid version"
+      end
     end
 
     def to_s

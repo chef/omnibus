@@ -18,6 +18,10 @@ require 'spec_helper'
 module Omnibus
   describe SemanticVersion do
 
+    it "raises an InvalidVersion error if it doesn't understand the format" do
+      expect {Omnibus::SemanticVersion.new("wut")}.to raise_error(Omnibus::SemanticVersion::InvalidVersion)
+    end
+
     it "preserves leading the leading v when printing the string" do
       v = Omnibus::SemanticVersion.new("v1.0.0")
       expect(v.to_s).to eq("v1.0.0")
