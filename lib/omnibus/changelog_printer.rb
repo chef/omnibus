@@ -1,9 +1,10 @@
 module Omnibus
   class ChangeLogPrinter
 
-    def initialize(changelog, diff)
+    def initialize(changelog, diff, source_path="../")
       @changelog = changelog
       @diff = diff
+      @source_path = source_path
     end
 
     def print(new_version)
@@ -17,7 +18,8 @@ module Omnibus
     end
 
     private
-    attr_reader :changelog, :diff
+
+    attr_reader :changelog, :diff, :source_path
 
     def print_changelog(cl=changelog, indent=0)
       cl.changelog_entries.each do |entry|
@@ -47,8 +49,9 @@ module Omnibus
       diff.updated.each do |entry|
         puts sprintf("* %s (%.8s -> %.8s)",
                      entry[:name], entry[:old_version], entry[:new_version])
-        if entry[:source_type] == 'git' && ::File.directory?("../#{entry[:name]}/.git")
-          cl = ChangeLog.new(entry[:old_version], entry[:new_version], GitRepository.new("../#{entry[:name]}"))
+        repo_path = ::File.join(source_path, entry[:name])
+        if entry[:source_type] == 'git' && ::File.directory?("#{repo_path}/.git")
+          cl = ChangeLog.new(entry[:old_version], entry[:new_version], GitRepository.new("#{repo_path}"))
           print_changelog(cl, 2)
         end
       end

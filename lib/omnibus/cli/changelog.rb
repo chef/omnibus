@@ -94,7 +94,9 @@ module Omnibus
                     end
 
 
-      Omnibus::ChangeLogPrinter.new(ChangeLog.new(), diff).print(new_version)
+      Omnibus::ChangeLogPrinter.new(ChangeLog.new(),
+                                    diff,
+                                    @options[:source_path]).print(new_version)
     end
   end
 end
