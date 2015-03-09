@@ -376,6 +376,24 @@ module Omnibus
     end
     expose :build_version
 
+
+    #
+    # Set or retrieve the git revision of the omnibus
+    # project being built.
+    #
+    # If not set by the user, and the current workding directory is a
+    # git directory, it will return the revision of the current
+    # working directory.
+    #
+    def build_git_revision(val = NULL)
+      if null?(val)
+        @build_git_revision ||= get_local_revision
+      else
+        @build_git_revision = val
+      end
+    end
+    expose :build_git_revision
+
     #
     # Set or retrieve the build iteration of the project. Defaults to +1+ if not
     # otherwise set.
@@ -965,7 +983,7 @@ module Omnibus
     #
     def built_manifest
       log.info(log_key) { "Building version manifest" }
-      m = Omnibus::Manifest.new
+      m = Omnibus::Manifest.new(build_version, build_git_revision)
       softwares.each do |software|
         m.add(software.name, software.manifest_entry)
       end
@@ -1134,6 +1152,13 @@ module Omnibus
 
     private
 
+    def get_local_revision
+      if File.directory?(".git")
+        GitRepository.new("./").revision
+      else
+        "unknown"
+      end
+    end
     #
     # The log key for this project, overriden to include the name of the
     # project for build output.

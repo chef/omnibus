@@ -63,6 +63,14 @@ module Omnibus
         subject.add("foobar", ManifestEntry.new("foobar", {}))
         expect(subject.to_hash['software']['foobar']).to be_a(Hash)
       end
+
+      it "returns a build_version if one was passed in" do
+        expect(Omnibus::Manifest.new("1.2.3").to_hash["build_version"]).to eq("1.2.3")
+      end
+
+      it "returns a build_git_revision if one was passed in" do
+        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8").to_hash["build_git_revision"]).to eq("e8e8e8")
+      end
     end
 
     describe "#from_hash" do
