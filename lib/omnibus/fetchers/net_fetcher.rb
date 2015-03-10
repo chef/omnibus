@@ -27,7 +27,7 @@ module Omnibus
     TAR_EXTENSIONS = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
 
     # Digest types used for verifying file checksums
-    DIGESTS = [:md5, :sha1, :sha256, :sha512]
+    DIGESTS = [:sha512, :sha256, :sha1, :md5]
 
     #
     # A fetch is required if the downloaded_file (such as a tarball) does not
