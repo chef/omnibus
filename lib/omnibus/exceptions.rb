@@ -309,4 +309,12 @@ Could not resolve `#{ref}' to a valid git SHA-1.
 EOH
     end
   end
+
+  class InvalidVersion < Error
+    def initialize(version)
+      super <<-EOF
+'#{version}' could not be parsed as a valid version.
+EOF
+    end
+  end
 end

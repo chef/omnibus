@@ -90,6 +90,10 @@ module Omnibus
       end
     end
 
+
+    register(Command::ChangeLog, 'changelog', 'changelog [COMMAND]', 'Create and view changelogs')
+    CLI.tasks['changelog'].options = Command::ChangeLog.class_options
+
     #
     # Generate a version manifest for the given project definition
     #

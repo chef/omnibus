@@ -51,6 +51,16 @@ module Omnibus
       self
     end
 
+    def each
+      @data.each do |key, entry|
+        yield entry
+      end
+    end
+
+    def entry_names
+      @data.keys
+    end
+
     def to_hash
       software_hash = @data.inject({}) do |memo, (k,v)|
         memo[k] = v.to_hash

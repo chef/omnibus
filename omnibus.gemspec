@@ -24,6 +24,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'chef-sugar',       '~> 2.2'
   gem.add_dependency 'cleanroom',        '~> 1.0'
   gem.add_dependency 'mixlib-shellout',  '~> 1.4'
+  gem.add_dependency 'mixlib-versioning'
   gem.add_dependency 'ohai',             '~> 7.2'
   gem.add_dependency 'ruby-progressbar', '~> 1.7'
   gem.add_dependency 'uber-s3'
