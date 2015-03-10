@@ -19,7 +19,7 @@ module Omnibus
   describe SemanticVersion do
 
     it "raises an InvalidVersion error if it doesn't understand the format" do
-      expect {Omnibus::SemanticVersion.new("wut")}.to raise_error(Omnibus::SemanticVersion::InvalidVersion)
+      expect {Omnibus::SemanticVersion.new("wut")}.to raise_error(Omnibus::InvalidVersion)
     end
 
     it "preserves leading the leading v when printing the string" do
