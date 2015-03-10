@@ -55,6 +55,7 @@ RSpec.configure do |config|
 
     # Reset config
     Omnibus.reset!
+    Omnibus::Config.append_timestamp(false)
 
     # Clear the tmp_path on each run
     FileUtils.rm_rf(tmp_path)

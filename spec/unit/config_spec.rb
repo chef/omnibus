@@ -9,6 +9,7 @@ module Omnibus
     end
 
     before do
+      Config.reset!
       # Don't expand paths on the build system. Otherwise, you will end up with
       # paths like +\\Users\\you\\Development\\omnibus-ruby\\C:/omnibus-ruby+
       # when testing on "other" operating systems
