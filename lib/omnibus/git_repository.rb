@@ -16,6 +16,10 @@ module Omnibus
       formatted_log_between(start_ref, end_ref, '%B').lines.to_a
     end
 
+    def revision
+      git("rev-parse HEAD").strip
+    end
+
     def latest_tag
       git('describe --abbrev=0').chomp
     end

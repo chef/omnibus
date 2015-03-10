@@ -26,8 +26,11 @@ module Omnibus
 
     LATEST_MANIFEST_FORMAT = 1
 
-    def initialize
+    attr_reader :build_version, :build_git_revision
+    def initialize(version=nil, git_rev=nil)
       @data = {}
+      @build_version = version
+      @build_git_revision = git_rev
     end
 
     def entry_for(name)
@@ -66,10 +69,13 @@ module Omnibus
         memo[k] = v.to_hash
         memo
       end
-      {
+      ret = {
         'manifest_format' => LATEST_MANIFEST_FORMAT,
         'software' => software_hash
       }
+      ret['build_version'] = build_version if build_version
+      ret['build_git_revision'] = build_git_revision if build_git_revision
+      ret
     end
 
     #

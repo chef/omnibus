@@ -31,6 +31,12 @@ module Omnibus
       end
     end
 
+    describe "#revision" do
+      it "returns the current revision at HEAD" do
+        expect(git_repo.revision).to eq("632501dde2c41f3bdd988b818b4c008e2ff398dc")
+      end
+    end
+
     describe "#file_at_revision" do
       it "returns the text of the specified file in a repository at a given revision" do
         expect(git_repo.file_at_revision("configure", "1.0")).to eq("echo \"Done!\"")
