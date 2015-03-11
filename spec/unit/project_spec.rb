@@ -43,6 +43,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :extra_package_file, %|extra_package_file '/path/to/asset'|
     it_behaves_like 'a cleanroom setter', :text_manifest_path, %|text_manifest_path '/path/to/manifest.txt'|
     it_behaves_like 'a cleanroom setter', :json_manifest_path, %|json_manifest_path '/path/to/manifest.txt'|
+    it_behaves_like 'a cleanroom setter', :build_git_revision, %|build_git_revision 'wombats'|
     it_behaves_like 'a cleanroom getter', :files_path
 
     describe 'basics' do
