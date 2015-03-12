@@ -406,6 +406,8 @@ module Omnibus
         else
           'armv6l'
         end
+      when 'ppc64le'
+        'ppc64el'  #dpkg --print-architecture = ppc64el
       else
         Ohai['kernel']['machine']
       end
