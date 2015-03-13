@@ -7,8 +7,9 @@ module Omnibus
 
     let(:version_string) { "1.0.0" }
     let(:description) { nil }
+    let(:today_string) { Time.now.utc.strftime(Omnibus::BuildVersion::TIMESTAMP_FORMAT) }
 
-    let(:zoo_version) { double("BuildVersion", semver: "5.5.5", custom: "7.7.7") }
+    let(:zoo_version) { double("BuildVersion", semver: "5.5.5", custom: "7.7.7", build_start_time: today_string) }
     let(:zoo_software) { double("software", name: 'zoo', project_dir: '/etc/zoo', version: "6.6.6") }
 
     describe "when given nil" do
@@ -20,6 +21,32 @@ module Omnibus
     describe "when given a string" do
       it "sets the version to the string" do
         expect(subject_with_version.build_version).to eq("1.0.0")
+      end
+    end
+
+    describe "when Config.append_timestamp is true" do
+      let(:description) do
+        proc do
+            source(:git, from_dependency: 'zoo')
+        end
+      end
+
+      before { Config.append_timestamp(true) }
+
+      it "appends a timestamp to a static (String) version" do
+        expect(subject_with_version.build_version).to eq("1.0.0+#{today_string}")
+      end
+
+      it "doesn't append timestamp to something that already looks like it has a timestamp" do
+        semver = "1.0.0+#{today_string}.git.222.694b062"
+        expect(described_class.new(semver).build_version).to eq("1.0.0+#{today_string}.git.222.694b062")
+      end
+
+      it "appends a timestamp to a DSL-built version" do
+        allow(BuildVersion).to receive(:new).and_return(BuildVersion.new)
+        allow(BuildVersion).to receive(:new).with("/etc/zoo").and_return(zoo_version)
+        subject_with_description.resolve(zoo_software)
+        expect(subject_with_description.build_version).to eq("5.5.5+#{today_string}")
       end
     end
 

@@ -128,6 +128,11 @@ Some DSL methods available include:
 | `package`         | Invoke a packager-specific DSL              |
 | `compress`        | Invoke a compressor-specific DSL            |
 
+By default a timestamp is appended to the build_version.  You can turn
+this behavior off by setting `append_timestamp` to `false` in your
+configuration file or using `--override append_timestamp:false` at the
+command line.
+
 For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
 
 ### Software

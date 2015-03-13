@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+require 'time'
+
 module Omnibus
   class BuildVersionDSL
     include Logging
@@ -33,7 +35,7 @@ module Omnibus
       @output_method = nil
 
       if version_string
-        @build_version = version_string
+        self.build_version = version_string
       elsif block_given?
         instance_eval(&block)
         construct_build_version unless from_dependency?
@@ -78,7 +80,7 @@ module Omnibus
     # @return [String]
     def explain
       if build_version
-        "Build Version: #{@build_version}"
+        "Build Version: #{build_version}"
       else
         if from_dependency?
           "Build Version will be determined from software '#{version_dependency}'"
@@ -105,6 +107,43 @@ module Omnibus
       source_options[:from_dependency]
     end
 
+    def build_version=(new_version)
+      @build_version = maybe_append_timestamp(new_version)
+    end
+
+    # Append the build_start_time to the given string if
+    # Config.append_timestamp is true
+    #
+    # @param [String] version
+    # @return [String]
+    def maybe_append_timestamp(version)
+      if Config.append_timestamp && !has_timestamp?(version)
+        [version, Omnibus::BuildVersion.build_start_time].join("+")
+      else
+        version
+      end
+    end
+
+    # Returns true if a given version string Looks like it was already
+    # created with a function that added a timestamp. The goal of this
+    # is to avoid breaking all of the people who are currently using
+    # BuildVersion.semver to create dates.
+    #
+    # @param [String] version
+    # @return [Boolean]
+    def has_timestamp?(version)
+      _ver, build_info = version.split('+')
+      return false if build_info.nil?
+      build_info.split('.').any? do |part|
+        begin
+          Time.strptime(part, Omnibus::BuildVersion::TIMESTAMP_FORMAT)
+          true
+        rescue ArgumentError
+          false
+        end
+      end
+    end
+
     # Determines the build_version based on source_type, output_method.
     #
     # @param version_source [Omnibus::Software] Software object from which the
@@ -120,10 +159,10 @@ module Omnibus
                   end
 
         output = output_method || :semver
-        @build_version = version.send(output)
+        self.build_version = version.send(output)
       when :version
         if version_source
-          @build_version = version_source.version
+          self.build_version = version_source.version
         else
           raise "Please tell me the source to get the version from"
         end

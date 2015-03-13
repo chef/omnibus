@@ -1,5 +1,13 @@
 Omnibus CHANGELOG
 =================
+v4.1.0 (Unreleased)
+### Bug Fixes
+- Config.append_timestamp is now properly handled by the build_version
+  DSL.  For some users, this may introduce a change in behavior.  To
+  revert to the old behavior set append_timestamp to false in
+  `omnibus.rb` or use --override append_timestamp:false at the command
+  line.
+
 
 v4.0.0 (December 15, 2014)
 --------------------------

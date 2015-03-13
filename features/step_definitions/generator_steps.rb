@@ -18,6 +18,7 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
 
   write_file('omnibus.rb', <<-EOH.gsub(/^ {4}/, ''))
     # Build configuration
+    append_timestamp false
     cache_dir     './local/omnibus/cache'
     git_cache_dir './local/omnibus/cache/git_cache'
     source_dir    './local/omnibus/src'
