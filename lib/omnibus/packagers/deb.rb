@@ -406,6 +406,11 @@ module Omnibus
         else
           'armv6l'
         end
+      when 'ppc64le'
+        # Debian prefers to use ppc64el for little endian architecture name 
+        # where as others like gnutools/rhel use ppc64le( note the last 2 chars)
+        # see http://linux.debian.ports.powerpc.narkive.com/8eeWSBtZ/switching-ppc64el-port-name-to-ppc64le
+        'ppc64el'  #dpkg --print-architecture = ppc64el
       else
         Ohai['kernel']['machine']
       end
