@@ -180,5 +180,38 @@ module Omnibus
         subject.make(timeout: 3600)
       end
     end
+
+    describe "#shasum" do
+      let(:build_step) do
+        Proc.new {
+          block do
+            command("true")
+          end
+        }
+      end
+
+      let(:tmp_dir) { Dir.mktmpdir }
+      after { FileUtils.rmdir(tmp_dir) }
+
+      let(:software) do
+        double(Software,
+               name: 'chefdk',
+               install_dir: tmp_dir,
+               project_dir: tmp_dir,
+               overridden?: false)
+      end
+
+      let(:before_build_shasum) do
+        b = described_class.new(software)
+        b.evaluate(&build_step)
+        b.shasum
+      end
+
+      it "returns the same value when called before or after the build" do
+        subject.evaluate(&build_step)
+        subject.build
+        expect(subject.shasum).to eq(before_build_shasum)
+      end
+    end
   end
 end
