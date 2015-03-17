@@ -344,6 +344,18 @@ module Omnibus
         end
       end
 
+      context 'when ppc64le' do
+        before do
+          stub_ohai(platform: 'ubuntu', version: '14.04') do |data|
+            data['kernel']['machine'] = 'ppc64le'
+          end
+        end
+
+        it 'returns ppc64el' do
+          expect(subject.safe_architecture).to eq('ppc64el')
+        end
+      end
+
       context 'on Raspbian' do
         before do
           # There's no Raspbian in Fauxhai :(
