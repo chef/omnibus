@@ -580,7 +580,8 @@ module Omnibus
     #
     def build
       log.info(log_key) { 'Starting build' }
-
+      shasum # ensure shashum is calculated before build since the build can alter the shasum
+      log.internal(log_key) { 'Cached builder checksum before build: #{shasum}'}
       if software.overridden?
         log.info(log_key) do
           "Version overridden from #{software.default_version} to "\

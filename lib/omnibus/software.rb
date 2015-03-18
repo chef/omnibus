@@ -519,7 +519,7 @@ module Omnibus
           }
         )
       end
- 
+
       env.merge(compiler_flags).
         merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
