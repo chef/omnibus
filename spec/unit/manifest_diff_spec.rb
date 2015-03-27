@@ -16,6 +16,7 @@ module Omnibus
       m = Omnibus::Manifest.new()
       m.add("foo", manifest_entry_for("foo", "1.2.4", "deadbeef"))
       m.add("bar", manifest_entry_for("bar", "1.2.4", "deadbeef"))
+      m.add("baz", manifest_entry_for("baz", "1.2.4", "deadbeef"))
       m
     end
 
@@ -23,6 +24,7 @@ module Omnibus
       m = Omnibus::Manifest.new()
       m.add("foo", manifest_entry_for("foo", "1.2.5", "deadbea0"))
       m.add("baz", manifest_entry_for("baz", "1.2.4", "deadbeef"))
+      m.add("quux", manifest_entry_for("quux", "1.2.4", "deadbeef"))
       m
     end
 
@@ -50,10 +52,10 @@ module Omnibus
 
       describe "#added" do
         it "returns items that did not exist in the first manifest but do exist in the second" do
-          expect(subject.added).to eq([{ :name => "baz",
+          expect(subject.added).to eq([{ :name => "quux",
                                          :new_version => "deadbeef",
                                          :source_type => :git,
-                                         :source => {:git => "git://baz@example.com"}
+                                         :source => {:git => "git://quux@example.com"}
                                        }])
         end
       end
