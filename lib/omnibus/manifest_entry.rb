@@ -33,5 +33,11 @@ module Omnibus
         "described_version" => @described_version
       }
     end
+
+    def ==(other)
+      if other.is_a?(ManifestEntry)
+        (self.to_hash == other.to_hash) && (self.name == other.name)
+      end
+    end
   end
 end
