@@ -66,37 +66,84 @@ module Omnibus
     desc: "Explicit version for this changelog",
     type: :string
 
-    desc 'generate', 'Generate a changelog for a new release'
-    def generate
-      g = GitRepository.new
+    desc 'generate [START] [END]', 'Generate a changelog for a new release'
+    def generate(start_ref=nil, end_ref=nil)
+      @start_ref = start_ref
+      @end_ref = end_ref
+      diff = if @options[:skip_components]
+               Omnibus::EmptyManifestDiff.new
+             else
+               Omnibus::ManifestDiff.new(old_manifest, new_manifest)
+             end
 
-      if @options[:skip_components]
-        diff = Omnibus::EmptyManifestDiff.new
-      else
-        old_manifest = if @options[:starting_manifest]
-                         Omnibus::Manifest.from_file(@options[:starting_manifest])
-                       else
-                         Omnibus::Manifest.from_hash(JSON.parse(g.file_at_revision("version-manifest.json",
-                                                                                   g.latest_tag)))
-                       end
-        new_manifest = Omnibus::Manifest.from_file(@options[:ending_manifest])
-        diff = Omnibus::ManifestDiff.new(old_manifest, new_manifest)
-      end
-
-      new_version = if @options[:version]
-                      @options[:version]
-                    elsif @options[:patch]
-                      Omnibus::SemanticVersion.new(g.latest_tag).next_patch.to_s
-                    elsif @options[:minor] && !@options[:major] # minor is the default so it will always be true
-                      Omnibus::SemanticVersion.new(g.latest_tag).next_minor.to_s
-                    elsif @options[:major]
-                      Omnibus::SemanticVersion.new(g.latest_tag).next_major.to_s
-                    end
-
-
-      Omnibus::ChangeLogPrinter.new(ChangeLog.new(),
+      Omnibus::ChangeLogPrinter.new(ChangeLog.new(starting_revision, ending_revision),
                                     diff,
                                     @options[:source_path]).print(new_version)
+    end
+
+    private
+
+    def local_git_repo
+      GitRepository.new
+    end
+
+    def old_manifest
+      @old_manifest ||= if @options[:starting_manifest]
+                          Omnibus::Manifest.from_file(@options[:starting_manifest])
+                        else
+                          manifest_for_revision(starting_revision)
+                        end
+    end
+
+    def new_manifest
+      @new_manifest ||= if @options[:ending_manifest]
+                          Omnibus::Manifest.from_file(@options[:ending_manifest])
+                        else
+                          manifest_for_revision(ending_revision)
+                        end
+    end
+
+    def manifest_for_revision(rev)
+      Omnibus::Manifest.from_hash(JSON.parse(local_git_repo.file_at_revision("version-manifest.json", rev)))
+    end
+
+
+    def new_version
+      if @options[:version]
+        @options[:version]
+      elsif @options[:patch]
+        Omnibus::SemanticVersion.new(local_git_repo.latest_tag).next_patch.to_s
+      elsif @options[:minor] && !@options[:major] # minor is the default so it will always be true
+        Omnibus::SemanticVersion.new(local_git_repo.latest_tag).next_minor.to_s
+      elsif @options[:major]
+        Omnibus::SemanticVersion.new(local_git_repo.latest_tag).next_major.to_s
+      elsif @options[:ending_manifest]
+        new_manifest.build_version
+      end
+    end
+
+    # starting_revision is taken from:
+    # - value passed as the first argument
+    # - value found in the starting manifest
+    # - the latest git tag in the local repository
+    def starting_revision
+      @start_ref ||= if @options[:starting_manifest]
+                       old_manifest.build_git_revision
+                     else
+                       local_git_repo.latest_tag
+                     end
+    end
+
+    # ending_revision is taken from:
+    # - value passed as the first argument
+    # - value found in the ending manifest
+    # - HEAD in the current git repository
+    def ending_revision
+      @end_ref ||= if @options[:ending_manifest]
+                     new_manifest.build_git_revision
+                   else
+                     'HEAD'
+                   end
     end
   end
 end
