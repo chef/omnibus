@@ -35,11 +35,10 @@ module Omnibus
       copy_file("#{project.package_scripts_path}/postinst", '/tmp/pkgmk/postinstall')
       copy_file("#{project.package_scripts_path}/postrm", '/tmp/pkgmk/postremove')
 
-      Dir.chdir(staging_dir) do
-        shellout! "pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"
-        shellout! "pkgchk -vd /tmp/pkgmk #{project.package_name}"
-        shellout! "pkgtrans /tmp/pkgmk /var/cache/omnibus/pkg/#{package_name} #{project.package_name}"
-      end
+      shellout! "pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"
+      shellout! "pkgchk -vd /tmp/pkgmk #{project.package_name}"
+      abs_package_path = File.absolute_path(package_path) 
+      shellout! "pkgtrans /tmp/pkgmk #{abs_package_path} #{project.package_name}"
     end
 
     # @see Base#package_name
