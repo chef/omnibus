@@ -83,6 +83,14 @@ Gemfile.lock
 *.tmproject
 tmtags
 
+# avoid generic ctags files too
+tags
+gems.tags
+gemtags
+.tags
+.gem.tags
+.gemtags
+.tags_sorted_by_file
 
 ### SublimeText ###
 # workspace files are user-specific
