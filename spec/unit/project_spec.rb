@@ -127,6 +127,21 @@ module Omnibus
       end
     end
 
+    describe "build_git_revision" do
+      let(:git_repo_subdir_path) do
+        path = local_git_repo("foobar", annotated_tags: ["1.0", "2.0", "3.0"])
+        subdir_path = File.join(path, "asubdir")
+        Dir.mkdir(subdir_path)
+        subdir_path
+      end
+
+      it "returns a revision even when running in a subdir" do
+        Dir.chdir(git_repo_subdir_path) do
+          expect(subject.build_git_revision).to eq("632501dde2c41f3bdd988b818b4c008e2ff398dc")
+        end
+      end
+    end
+
     describe '#dirty!' do
       let(:software) { double(Omnibus::Software) }
 

@@ -1153,12 +1153,11 @@ module Omnibus
     private
 
     def get_local_revision
-      if File.directory?(".git")
-        GitRepository.new("./").revision
-      else
-        "unknown"
-      end
+      GitRepository.new("./").revision
+    rescue StandardError
+      "unknown"
     end
+
     #
     # The log key for this project, overriden to include the name of the
     # project for build output.
