@@ -22,7 +22,7 @@ repository) is
 customize the location of the cache in the `omnibus.rb` config file
 using the key `git_cache_dir`. For example:
 
-    git_cache_dir "/opt/ominbus-caches"
+    git_cache_dir "/opt/omnibus-caches"
 
 ## How It Works ##
 
