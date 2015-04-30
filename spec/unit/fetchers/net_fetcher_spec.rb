@@ -4,12 +4,15 @@ module Omnibus
   describe NetFetcher do
     let(:project_dir) { '/tmp/project' }
     let(:build_dir) { '/tmp/build' }
+    let(:source) do
+      { url: 'https://get.example.com/file.tar.gz', md5: 'abcd1234' }
+    end
 
     let(:manifest_entry) do
       double(Omnibus::ManifestEntry,
              name: 'file',
              locked_version: "1.2.3",
-             locked_source: { url: 'https://get.example.com/file.tar.gz', md5: 'abcd1234' })
+             locked_source: source)
     end
 
     let(:cache_dir) { '/cache' }
@@ -57,8 +60,40 @@ module Omnibus
     end
 
     describe '#version_guid' do
-      it 'returns the shasum' do
-        expect(subject.version_guid).to eq('md5:abcd1234')
+      context 'source with md5' do
+        it 'returns the shasum' do
+          expect(subject.version_guid).to eq('md5:abcd1234')
+        end
+      end
+
+      context 'source with sha1' do
+        let(:source) do
+          { url: 'https://get.example.com/file.tar.gz', sha1: 'abcd1234' }
+        end
+
+        it 'returns the shasum' do
+          expect(subject.version_guid).to eq('sha1:abcd1234')
+        end
+      end
+
+      context 'source with sha256' do
+        let(:source) do
+          { url: 'https://get.example.com/file.tar.gz', sha256: 'abcd1234' }
+        end
+
+        it 'returns the shasum' do
+          expect(subject.version_guid).to eq('sha256:abcd1234')
+        end
+      end
+
+      context 'source with sha512' do
+        let(:source) do
+          { url: 'https://get.example.com/file.tar.gz', sha512: 'abcd1234' }
+        end
+
+        it 'returns the shasum' do
+          expect(subject.version_guid).to eq('sha512:abcd1234')
+        end
       end
     end
 
@@ -101,8 +136,40 @@ module Omnibus
     end
 
     describe '#version_for_cache' do
-      it 'returns the download URL and md5' do
-        expect(subject.version_for_cache).to eq('download_url:https://get.example.com/file.tar.gz|md5:abcd1234')
+      context 'source with md5' do
+        it 'returns the download URL and md5' do
+          expect(subject.version_for_cache).to eq('download_url:https://get.example.com/file.tar.gz|md5:abcd1234')
+        end
+      end
+
+      context 'source with sha1' do
+        let(:source) do
+          { url: 'https://get.example.com/file.tar.gz', sha1: 'abcd1234' }
+        end
+
+        it 'returns the download URL and sha1' do
+          expect(subject.version_for_cache).to eq('download_url:https://get.example.com/file.tar.gz|sha1:abcd1234')
+        end
+      end
+
+      context 'source with sha256' do
+        let(:source) do
+          { url: 'https://get.example.com/file.tar.gz', sha256: 'abcd1234' }
+        end
+
+        it 'returns the download URL and sha256' do
+          expect(subject.version_for_cache).to eq('download_url:https://get.example.com/file.tar.gz|sha256:abcd1234')
+        end
+      end
+
+      context 'source with sha512' do
+        let(:source) do
+          { url: 'https://get.example.com/file.tar.gz', sha512: 'abcd1234' }
+        end
+
+        it 'returns the download URL and sha1' do
+          expect(subject.version_for_cache).to eq('download_url:https://get.example.com/file.tar.gz|sha512:abcd1234')
+        end
       end
     end
 

@@ -26,6 +26,9 @@ module Omnibus
     # tar probably has compression scheme linked in, otherwise for tarballs
     TAR_EXTENSIONS = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
 
+    # Digest types used for verifying file checksums
+    DIGESTS = [:sha512, :sha256, :sha1, :md5]
+
     #
     # A fetch is required if the downloaded_file (such as a tarball) does not
     # exist on disk, or if the checksum of the downloaded file is different
@@ -34,7 +37,7 @@ module Omnibus
     # @return [true, false]
     #
     def fetch_required?
-      !(File.exist?(downloaded_file) && digest(downloaded_file, :md5) == checksum)
+      !(File.exist?(downloaded_file) && digest(downloaded_file, digest_type) == checksum)
     end
 
     #
@@ -44,7 +47,7 @@ module Omnibus
     # @return [String]
     #
     def version_guid
-      "md5:#{checksum}"
+      "#{digest_type}:#{checksum}"
     end
 
     #
@@ -82,13 +85,13 @@ module Omnibus
     end
 
     #
-    # The version for this item in the cache. The is the md5 of downloaded file
-    # and the URL where it was downloaded from.
+    # The version for this item in the cache. This is the digest of downloaded
+    # file and the URL where it was downloaded from.
     #
     # @return [String]
     #
     def version_for_cache
-      "download_url:#{source[:url]}|md5:#{source[:md5]}"
+      "download_url:#{source[:url]}|#{digest_type}:#{checksum}"
     end
 
     #
@@ -114,12 +117,12 @@ module Omnibus
     end
 
     #
-    # The checksum (+md5+) as defined by the user in the software definition.
+    # The checksum as defined by the user in the software definition.
     #
     # @return [String]
     #
     def checksum
-      source[:md5]
+      source[digest_type]
     end
 
     private
@@ -215,6 +218,17 @@ module Omnibus
     end
 
     #
+    # The digest type defined in the software definition
+    #
+    # @return [Symbol]
+    #
+    def digest_type
+      DIGESTS.each do |digest|
+        return digest if source.key? digest
+      end
+    end
+
+    #
     # Verify the downloaded file has the correct checksum.#
     #
     # @raise [ChecksumMismatch]
@@ -224,7 +238,7 @@ module Omnibus
       log.info(log_key) { 'Verifying checksum' }
 
       expected = checksum
-      actual   = digest(downloaded_file, :md5)
+      actual   = digest(downloaded_file, digest_type)
 
       if expected != actual
         raise ChecksumMismatch.new(self, expected, actual)
