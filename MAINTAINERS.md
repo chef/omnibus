@@ -15,14 +15,11 @@ project lead.
 
 * [Seth Chisamore](https://github.com/schisamo)
 
-## Lieutenants
-
-* [Scott Hain](https://github.com/scotthain)
-* [Steven Danna](https://github.com/stevendanna)
-* [Yvonne Lam](http://github.com/yzl)
-
 ## Maintainers
 
 * [Daniel DeLeo](https://github.com/danielsdeleo)
 * [Jay Mundrawala](https://github.com/jdmundrawala)
 * [Lamont Granquist](https://github.com/lamont-granquist)
+* [Scott Hain](https://github.com/scotthain)
+* [Steven Danna](https://github.com/stevendanna)
+* [Yvonne Lam](http://github.com/yzl)
