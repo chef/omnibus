@@ -64,6 +64,7 @@ module Omnibus
       if cloned?
         git_fetch(resolved_version) unless same_revision?(resolved_version)
       else
+        force_recreate_project_dir! unless dir_empty?(project_dir)
         git_clone
         git_checkout(resolved_version)
       end
@@ -88,6 +89,24 @@ module Omnibus
     #
     def source_url
       source[:git]
+    end
+
+    #
+    # Determine if a directory is empty
+    #
+    # @return [true, false]
+    #
+    def dir_empty?(dir)
+      Dir.entries(dir).reject {|d| ['.', '..'].include?(d) }.empty?
+    end
+
+    #
+    # Forcibly remove and recreate the project directory
+    #
+    def force_recreate_project_dir!
+      log.warn(log_key) { "Removing exisitng directory #{project_dir} before cloning" }
+      FileUtils.rm_rf(project_dir)
+      Dir.mkdir(project_dir)
     end
 
     #
