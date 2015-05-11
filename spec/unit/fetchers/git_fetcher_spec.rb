@@ -98,6 +98,7 @@ module Omnibus
         allow(subject).to receive(:git_fetch)
         allow(subject).to receive(:git_clone)
         allow(subject).to receive(:git_checkout)
+        allow(subject).to receive(:dir_empty?).and_return(true)
         allow(subject).to receive(:resolved_version).and_return("134aeba31234")
       end
 
@@ -125,6 +126,16 @@ module Omnibus
 
       context 'when the repository is not cloned' do
         before { allow(subject).to receive(:cloned?).and_return(false) }
+
+        context "but a directory does exist" do
+          before { expect(subject).to receive(:dir_empty?).with(project_dir).and_return(false)}
+
+          it "forcefully removes and recreateds the directory" do
+            expect(FileUtils).to receive(:rm_rf).with(project_dir).and_return(project_dir)
+            expect(Dir).to receive(:mkdir).with(project_dir).and_return(0)
+            subject.fetch
+          end
+        end
 
         it 'clones the repository' do
           expect(subject).to receive(:git_clone).once
