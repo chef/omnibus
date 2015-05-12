@@ -34,3 +34,10 @@ RSpec::Matchers.define :be_an_executable do
     File.executable?(actual)
   end
 end
+
+# expect('/path/to/file').to be_a_hardlink
+RSpec::Matchers.define :be_a_hardlink do |path|
+  match do |actual|
+    File.stat(actual).nlink > 2
+  end
+end
