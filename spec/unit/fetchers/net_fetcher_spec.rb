@@ -173,6 +173,78 @@ module Omnibus
       end
     end
 
+    describe "downloading the file" do
+
+      let(:expected_open_opts) do
+        {
+          "Accept-Encoding" => "identity",
+          :read_timeout => 60,
+          :content_length_proc => an_instance_of(Proc),
+          :progress_proc => an_instance_of(Proc)
+        }
+      end
+
+      let(:tempfile_path) { "/tmp/intermediate_path/tempfile_path.random_garbage.tmp" }
+
+      let(:fetched_file) { instance_double("File", path: tempfile_path) }
+
+      let(:destination_path) { "/cache/file.tar.gz" }
+
+      let(:progress_bar_output) { StringIO.new }
+
+      let(:reported_content_length) { 100 }
+
+      let(:cumulative_downloaded_length) { 100 }
+
+      def capturing_stdout
+        old_stdout, $stdout = $stdout, progress_bar_output
+        yield
+      ensure
+        $stdout = old_stdout
+      end
+
+
+      before do
+        expect(subject).to receive(:open).with(source[:url], expected_open_opts) do |_url, open_uri_opts|
+          open_uri_opts[:content_length_proc].call(reported_content_length)
+          open_uri_opts[:progress_proc].call(cumulative_downloaded_length)
+
+          fetched_file
+        end
+        expect(FileUtils).to receive(:cp).with(tempfile_path, destination_path)
+        expect(fetched_file).to receive(:close)
+      end
+
+      it "downloads the thing" do
+        capturing_stdout do
+          expect { subject.send(:download) }.to_not raise_error
+        end
+      end
+
+      # In Ci we somewhat frequently see:
+      #   ProgressBar::InvalidProgressError: You can't set the item's current value to be greater than the total.
+      #
+      # My hunch is that this is caused by some floating point shenanigans
+      # where we sum a bunch of floating point numbers and they add up to some
+      # small fraction greater than the actual total. Since we're gonna verify
+      # the checksum of what we downloaded later, we don't want to hear about
+      # this error.
+      context "when cumulative downloaded amount exceeds reported content length" do
+
+        let(:reported_content_length) { 100 }
+
+        let(:cumulative_downloaded_length) { 100.1 }
+
+        it "downloads the thing" do
+          capturing_stdout do
+            expect { subject.send(:download) }.to_not raise_error
+          end
+        end
+
+      end
+
+    end
+
     shared_examples 'an extractor' do |extension, command|
       context "when the file is a .#{extension}" do
         let(:manifest_entry) do

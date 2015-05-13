@@ -169,8 +169,17 @@ module Omnibus
         format: '%e %B %p%% (%r KB/sec)',
         rate_scale: ->(rate) { rate / 1024 },
       )
-      options[:content_length_proc] = ->(total) { progress_bar.total = total }
-      options[:progress_proc] = ->(step) { progress_bar.progress = step }
+
+      reported_total = 0
+
+      options[:content_length_proc] = ->(total) {
+        reported_total = total
+        progress_bar.total = total
+      }
+      options[:progress_proc] = ->(step) {
+        downloaded_amount = [step, reported_total].min
+        progress_bar.progress = downloaded_amount
+      }
 
       file = open(download_url, options)
       FileUtils.cp(file.path, downloaded_file)
@@ -199,7 +208,7 @@ module Omnibus
     def extract
       if command = extract_command
         log.info(log_key) { "Extracting `#{downloaded_file}' to `#{Config.source_dir}'" }
-        shellout!(extract_command)
+        shellout!(command)
       else
         log.info(log_key) { "`#{downloaded_file}' is not an archive - copying to `#{project_dir}'" }
 

@@ -49,6 +49,14 @@ RSpec.configure do |config|
   config.filter_run_excluding(windows_only: true) unless windows?
   config.filter_run_excluding(mac_only: true) unless mac?
 
+  if config.files_to_run.one?
+    # Use the documentation formatter for detailed output,
+    # unless a formatter has already been configured
+    # (e.g. via a command-line flag).
+    config.default_formatter = 'doc'
+    config.color = true
+  end
+
   config.before(:each) do
     # Suppress logging
     Omnibus.logger.level = :nothing
