@@ -101,6 +101,30 @@ module Omnibus
         end
       end
 
+      context 'when target files are hard links' do
+        let(:source) do
+          source = File.join(tmp_path, 'source')
+          FileUtils.mkdir_p(source)
+
+          create_directory(source, 'bin')
+               create_file(source, 'bin', 'git')
+               FileUtils.ln("#{source}/bin/git", "#{source}/bin/git-tag")
+               FileUtils.ln("#{source}/bin/git", "#{source}/bin/git-write-tree")
+
+          source
+        end
+
+        it 'copies the first instance and links to that instance thereafter' do
+          FileUtils.mkdir_p("#{destination}/bin")
+
+          described_class.sync(source, destination)
+
+          expect("#{destination}/bin/git").to be_a_file
+          expect("#{destination}/bin/git-tag").to be_a_hardlink
+          expect("#{destination}/bin/git-write-tree").to be_a_hardlink
+        end
+      end
+
       context 'with deeply nested paths and symlinks' do
         let(:source) do
           source = File.join(tmp_path, 'source')
