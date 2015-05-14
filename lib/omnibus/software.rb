@@ -256,13 +256,14 @@ module Omnibus
     expose :source
 
     #
-    # Set or retieve the {#default_version} of the software to build.
+    # Set or retrieve the {#default_version} of the software to build.
     #
     # @example
     #   default_version '1.2.3'
     #
     # @param [String] val
-    #   the default version to set for the software
+    #   the default version to set for the software.
+    #   For a git source, the default version may be a git ref (e.g. tag, branch name, or sha).
     #
     # @return [String]
     #
