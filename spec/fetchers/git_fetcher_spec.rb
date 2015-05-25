@@ -59,7 +59,7 @@ describe Omnibus::GitFetcher do
             'a2ed66c01f42514bcab77fd628149eccb4ecee28	refs/tags/0.0.1'
           end
 
-          it 'should clone the Git repository and then check out the commit' do
+          before do
             1.times { expect_git_clone_and_ls_remote }
             double('git_checkout').tap do |g|
               expect(shell_out).to receive(:new)
@@ -69,8 +69,28 @@ describe Omnibus::GitFetcher do
               expect(g).to receive(:run_command).ordered
               expect(g).to receive(:error!).ordered
             end
+          end
 
-            expect { subject.fetch }.to_not raise_error
+          context 'and the project directory does not exist' do
+            before do
+              expect(subject).to receive(:dir_empty?).and_return(true)
+            end
+
+            it 'should clone the Git repository and then check out the commit' do
+              expect { subject.fetch }.to_not raise_error
+            end
+          end
+
+          context 'and the project directory does exist' do
+            before do
+              expect(subject).to receive(:dir_empty?).and_return(false)
+            end
+
+            it 'forcefully removes and recreates the directory' do
+              expect(FileUtils).to receive(:rm_rf).with('/tmp/project').and_return('/tmp/project')
+              expect(Dir).to receive(:mkdir).with('/tmp/project').and_return(0)
+              subject.fetch
+            end
           end
         end
 
@@ -81,6 +101,7 @@ describe Omnibus::GitFetcher do
           before { Omnibus::Fetcher::ErrorReporter.stub(:new).and_return(error_reporter) }
 
           it 'should clone the Git repository and then fail while retrying 3 times' do
+            expect(subject).to receive(:dir_empty?).and_return(true).at_least(1).times
             expect(error_reporter).to receive(:explain)
               .with(%(Failed to fetch git repository 'git@example.com:test/project.git'))
 

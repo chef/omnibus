@@ -67,6 +67,7 @@ E
       if existing_git_clone?
         fetch_updates unless current_rev_matches_target_rev?
       else
+        force_recreate_project_dir! unless dir_empty?(project_dir)
         clone
         checkout
       end
@@ -85,6 +86,24 @@ E
     end
 
     private
+
+    #
+    # Determine if a directory is empty
+    #
+    # @return [true, false]
+    #
+    def dir_empty?(dir)
+      Dir.entries(dir).reject { |d| ['.', '..'].include?(d) }.empty?
+    end
+
+    #
+    # Forcibly remove and recreate the project directory
+    #
+    def force_recreate_project_dir!
+      log "Removing exisitng directory #{project_dir} before cloning"
+      FileUtils.rm_rf(project_dir)
+      Dir.mkdir(project_dir)
+    end
 
     def clone
       puts 'cloning the source from git'
