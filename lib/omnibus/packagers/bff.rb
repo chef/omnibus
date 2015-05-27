@@ -142,6 +142,9 @@ module Omnibus
       files = FileSyncer.glob("#{staging_dir}/**/*")
                 .map { |path| path.gsub(/^#{staging_dir}/, '') }
 
+      # Here we remove any paths which contain
+      files.reject! { |path| patch.match(/\:\:/) }
+
       render_template(resource_path('gen.template.erb'),
         destination: File.join(staging_dir, 'gen.template'),
         variables: {

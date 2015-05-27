@@ -76,7 +76,7 @@ module Omnibus
     # @return [void]
     #
     def fetch
-      log.info(log_key) { "Downloading from `#{download_url}'" }
+      log.info(log_key) { "Downloading from '#{download_url}'" }
 
       create_required_directories
       download
