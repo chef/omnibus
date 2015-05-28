@@ -374,6 +374,18 @@ module Omnibus
         expect(subject.safe_architecture).to eq('i386')
       end
 
+      context 'when i686' do
+        before do
+          stub_ohai(platform: 'redhat', version: '6.5') do |data|
+            data['kernel']['machine'] = 'i686'
+          end
+        end
+
+        it 'returns i386' do
+          expect(subject.safe_architecture).to eq('i386')
+        end
+      end
+
       context 'on Pidora' do
         before do
           # There's no Pidora in Fauxhai :(
