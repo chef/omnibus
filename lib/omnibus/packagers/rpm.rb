@@ -512,6 +512,8 @@ module Omnibus
     #
     def safe_architecture
       case Ohai['kernel']['machine']
+      when 'i686'
+        'i386'
       when 'armv6l'
         if Ohai['platform'] == 'pidora'
           'armv6hl'
