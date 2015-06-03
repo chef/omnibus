@@ -207,6 +207,7 @@ module Omnibus
           create_file("#{staging_dir}/BUILD/file2")
           create_directory("#{staging_dir}/BUILD/.dir1")
           create_directory("#{staging_dir}/BUILD/dir2")
+          create_directory("#{staging_dir}/BUILD/dir3 space")
         end
 
         it 'writes them into the spec' do
@@ -217,6 +218,7 @@ module Omnibus
           expect(contents).to include("/.file1")
           expect(contents).to include("%dir /dir2")
           expect(contents).to include("/file2")
+          expect(contents).to include("%dir \"/dir3 space\"")
         end
       end
 
