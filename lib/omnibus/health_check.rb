@@ -175,6 +175,11 @@ module Omnibus
     #   if the healthchecks pass
     #
     def run!
+      if Config.disable_healthcheck
+        log.warn(log_key) { 'Health check is disabled' }
+        return true
+      end
+
       if Ohai['platform'] == 'windows'
         log.warn(log_key) { 'Skipping health check on Windows' }
         return true
