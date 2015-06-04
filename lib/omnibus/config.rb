@@ -481,6 +481,11 @@ module Omnibus
       end
     end
 
+    # Disable the healthcheck
+    #
+    # @return [true, false]
+    default(:disable_healthcheck, false)
+
     # --------------------------------------------------
     # @!endgroup
     #
