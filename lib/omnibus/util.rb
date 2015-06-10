@@ -164,7 +164,7 @@ module Omnibus
     #
     def copy_file(source, destination)
       log.debug(log_key) { "Copying `#{source}' to `#{destination}'" }
-      FileUtils.cp(source, destination)
+      FileUtils.cp_r(source, destination)
       destination
     end
 
