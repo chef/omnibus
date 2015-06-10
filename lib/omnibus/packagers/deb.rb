@@ -35,13 +35,19 @@ module Omnibus
       # extra_package_file '/path/to/foo.txt' #=> /tmp/scratch/path/to/foo.txt
       project.extra_package_files.each do |file|
         parent      = File.dirname(file)
-        destination = File.join(staging_dir, parent)
 
-        create_directory(destination)
-        copy_file(file, destination)
+        if File.directory?(file)
+          destination = File.join(staging_dir, file)
+          create_directory(destination)
+          FileSyncer.sync(file, destination)
+        else
+          destination = File.join(staging_dir, parent)
+          create_directory(destination)
+          copy_file(file, destination)
+        end
       end
 
-      # Create the Debain file directory
+      # Create the Debian file directory
       create_directory(debian_dir)
     end
 
@@ -407,7 +413,7 @@ module Omnibus
           'armv6l'
         end
       when 'ppc64le'
-        # Debian prefers to use ppc64el for little endian architecture name 
+        # Debian prefers to use ppc64el for little endian architecture name
         # where as others like gnutools/rhel use ppc64le( note the last 2 chars)
         # see http://linux.debian.ports.powerpc.narkive.com/8eeWSBtZ/switching-ppc64el-port-name-to-ppc64le
         'ppc64el'  #dpkg --print-architecture = ppc64el
