@@ -14,6 +14,13 @@ RSpec::Matchers.define :be_a_file do
   end
 end
 
+# expect('/path/to/file').to have_content
+RSpec::Matchers.define :have_content do |content|
+  match do |actual|
+    IO.read(actual) == content
+  end
+end
+
 # expect('/path/to/directory').to be_a_symlink
 RSpec::Matchers.define :be_a_symlink do
   match do |actual|
