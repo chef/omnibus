@@ -31,6 +31,22 @@ module Omnibus
       it 'exposes :parameters' do
         expect(subject).to have_exposed_method(:parameters)
       end
+
+      it 'exposes :cert_store_name' do
+        expect(subject).to have_exposed_method(:cert_store_name)
+      end
+
+      it 'exposes :cert_name' do
+        expect(subject).to have_exposed_method(:cert_name)
+      end
+
+      it 'exposes :timestamp_server' do
+        expect(subject).to have_exposed_method(:timestamp_server)
+      end
+
+      it 'exposes :timestamp_servers' do
+        expect(subject).to have_exposed_method(:timestamp_servers)
+      end
     end
 
     describe '#id' do
@@ -262,6 +278,72 @@ module Omnibus
       it 'returns the correct value for many extensions' do
         expect(subject.wix_extension_switches(['a', 'b'])).to eq("-ext 'a' -ext 'b'")
       end
+    end
+
+    context 'when signing parameters are provided' do
+      let(:msi) { 'somemsi.msi' }
+
+      context 'when parameters are underspecified' do
+        it 'should raise an exception if cert_store_name is missing' do
+          subject.cert_name('foo')
+          expect {subject.sign_package(msi) }.to raise_error(MissingRequiredAttribute)
+        end
+
+        it 'should raise an exception if cert_name is missing' do
+          subject.cert_store_name('foo')
+          expect {subject.sign_package(msi) }.to raise_error(MissingRequiredAttribute)
+        end
+      end
+
+      context 'when valid parameters' do
+        before do
+          allow(subject).to receive(:shellout!)
+          subject.cert_name('foo')
+          subject.cert_store_name('foo')
+        end
+
+        it 'should sign the file and then add the timestamp' do
+          expect(subject).to receive(:add_timestamp)
+          subject.sign_package(msi)
+        end
+
+        describe "#timestamp_servers" do
+          it "defaults to using ['http://timestamp.digicert.com','http://timestamp.verisign.com/scripts/timestamp.dll']" do
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://timestamp.digicert.com').and_return(false)
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://timestamp.verisign.com/scripts/timestamp.dll').and_return(true)
+            subject.sign_package(msi)
+          end
+
+          it 'uses the timestamp server if provided through the #timestamp_server dsl' do
+            subject.timestamp_server('http://fooserver')
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://fooserver').and_return(true)
+            subject.sign_package(msi)
+          end
+
+          it 'tries all timestamp server if provided through the #timestamp_server dsl' do
+            subject.timestamp_server('http://fooserver')
+            subject.timestamp_server('http://barserver')
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://fooserver').and_return(false)
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://barserver').and_return(true)
+            subject.sign_package(msi)
+          end
+
+          it 'tries all timestamp server if provided through the #timestamp_servers dsl' do
+            subject.timestamp_servers(['http://fooserver', 'http://barserver'])
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://fooserver').and_return(false)
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://barserver').and_return(true)
+            subject.sign_package(msi)
+          end
+
+
+          it 'raises an exception if there are no available timestamp servers' do
+            subject.timestamp_server('http://fooserver')
+            expect(subject).to receive(:try_timestamp).with(msi, 'http://fooserver').and_return(false)
+            expect {subject.sign_package(msi)}.to raise_error(FailedToTimestamp)
+          end
+        end
+      end
+
     end
   end
 end

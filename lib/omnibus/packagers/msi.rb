@@ -237,13 +237,13 @@ module Omnibus
     # Add a timestamp server to be tried.
     #
     # Setting nothing will default to trying ['http://timestamp.digicert.com', 
-    # 'http://timestamp.verisign.com/scripts/timstamp.dll']
+    # 'http://timestamp.verisign.com/scripts/timestamp.dll']
     #
     # If you specify multiple timestamp servers, they will be tried in
     # the order specified until one of them succeeds
     #
     # @example
-    #   timestamp_server "http://timestamp.globalsign.com/scripts/timstamp.dll"
+    #   timestamp_server "http://timestamp.globalsign.com/scripts/timestamp.dll"
     #
     # @param [String] url
     #   Url of the timestamp server
@@ -265,13 +265,13 @@ module Omnibus
     # Set the list of timestamp servers to be tried.
     #
     # Setting nothing will default to trying ['http://timestamp.digicert.com', 
-    # 'http://timestamp.verisign.com/scripts/timstamp.dll']
+    # 'http://timestamp.verisign.com/scripts/timestamp.dll']
     #
     # If you specify multiple timestamp servers, they will be tried in
     # the order specified until one of them succeeds
     #
     # @example
-    #   timestamp_server "http://timestamp.globalsign.com/scripts/timstamp.dll"
+    #   timestamp_server "http://timestamp.globalsign.com/scripts/timestamp.dll"
     #
     # @param [Array] url
     #   Urls of timestamp servers
@@ -282,12 +282,13 @@ module Omnibus
     def timestamp_servers(urls = NULL)
       if null?(urls)
         @timestamp_servers || ['http://timestamp.digicert.com',
-                          'http://timestamp.verisign.com/scripts/timstamp.dll']
+                          'http://timestamp.verisign.com/scripts/timestamp.dll']
       else
         unless urls.is_a?(Array)
-          urls.each do |url|
-            timestamp_server(url)
-          end
+          raise InvalidValue.new(:timestamp_server, 'be an Array')
+        end
+        urls.each do |url|
+          timestamp_server(url)
         end
       end
     end
@@ -465,6 +466,8 @@ module Omnibus
     # certificate name
     #
     def sign_package(msi_file)
+      raise MissingRequiredAttribute.new(self, :cert_store_name) if !cert_store_name
+      raise MissingRequiredAttribute.new(self, :cert_name) if !cert_name
       shellout!("signtool.exe sign /v /s #{cert_store_name} /n #{cert_name} #{msi_file}")
       add_timestamp(msi_file)
     end
@@ -476,12 +479,19 @@ module Omnibus
     def add_timestamp(msi_file)
       success = false
       timestamp_servers.each do |ts|
-        timestamp_command = "signtool.exe timestamp -t #{ts} #{msi_file}"
-        status = shellout(timestamp_command)
-        if status.exitstatus != 0
-          log.warn(log_key) do
-            <<-EOH.strip
-                Failed to add timestamp with timeserver #{ts}
+        success = try_timestamp(msi_file, ts)
+        break if success
+      end
+      raise FailedToTimestamp.new("Failed to add timestamp") if !success
+    end
+
+    def try_timestamp(msi_file, url)
+      timestamp_command = "signtool.exe timestamp -t #{url} #{msi_file}"
+      status = shellout(timestamp_command)
+      if status.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to add timestamp with timeserver #{url}
 
                 STDOUT
                 ------
@@ -491,14 +501,9 @@ module Omnibus
                 ------
                 #{status.stderr}
                 EOH
-          end
-        else
-          success = true
-          break
         end
       end
-      raise FailedToTimestamp.new("Failed to add timestamp") if !success
+      status.exitstatus == 0
     end
-
   end
 end
