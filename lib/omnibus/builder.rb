@@ -488,10 +488,16 @@ module Omnibus
     # @return (see #command)
     #
     def copy(source, destination, options = {})
-      build_commands << BuildCommand.new("copy `#{source}' to `#{destination}'") do
+      command = "copy `#{source}' to `#{destination}'"
+      build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
-          FileSyncer.glob(source).each do |file|
-            FileUtils.cp_r(file, destination, options)
+          files = FileSyncer.glob(source)
+          if files.empty?
+            log.warn(log_key) {"no matched files for glob #{command}"}
+          else
+            files.each do |file|
+              FileUtils.cp_r(file, destination, options)
+            end
           end
         end
       end
@@ -499,7 +505,7 @@ module Omnibus
     expose :copy
 
     #
-    # Copy the given source to the destination. This method accepts a single
+    # Move the given source to the destination. This method accepts a single
     # file or a file pattern to match
     #
     # @param [String] source
@@ -511,10 +517,16 @@ module Omnibus
     # @return (see #command)
     #
     def move(source, destination, options = {})
-      build_commands << BuildCommand.new("move `#{source}' to `#{destination}'") do
+      command = "move `#{source}' to `#{destination}'"
+      build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
-          FileSyncer.glob(source).each do |file|
-            FileUtils.mv(file, destination, options)
+          files = FileSyncer.glob(source)
+          if files.empty?
+            log.warn(log_key) {"no matched files for glob #{command}"}
+          else
+            files.each do |file|
+              FileUtils.mv(file, destination, options)
+            end
           end
         end
       end
@@ -534,10 +546,16 @@ module Omnibus
     # @return (see #command)
     #
     def link(source, destination, options = {})
-      build_commands << BuildCommand.new("link `#{source}' to `#{destination}'") do
+      command = "link `#{source}' to `#{destination}'"
+      build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
-          FileSyncer.glob(source).each do |file|
-            FileUtils.ln_s(file, destination, options)
+          files = FileSyncer.glob(source)
+          if files.empty?
+            log.warn(log_key) {"no matched files for glob #{command}"}
+          else
+            files.each do |file|
+              FileUtils.ln_s(file, destination, options)
+            end
           end
         end
       end
