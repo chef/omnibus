@@ -317,4 +317,10 @@ EOH
 EOF
     end
   end
+
+  class FailedToTimestamp < Error
+    def initialize(msg)
+      super
+    end
+  end
 end

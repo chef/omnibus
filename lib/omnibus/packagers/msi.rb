@@ -65,6 +65,9 @@ module Omnibus
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
+
+        msi_file = windows_safe_path(Config.package_dir, package_name)
+
         light_command = <<-EOH.split.join(' ').squeeze(' ').strip
           light.exe
             -nologo
@@ -73,9 +76,13 @@ module Omnibus
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
             project-files.wixobj source.wixobj
-            -out "#{windows_safe_path(Config.package_dir, package_name)}"
+            -out "#{msi_file}"
         EOH
         shellout!(light_command, returns: [0, 204])
+
+        if cert_name
+          sign_package(msi_file)
+        end
       end
     end
 
@@ -176,6 +183,115 @@ module Omnibus
       wix_candle_extensions << extension
     end
     expose :wix_candle_extension
+
+    #
+    # Set the name of the certificate store to use when signing packages.
+    #
+    # @example
+    #   cert_store_name "MY"
+    #
+    # @param [String] name
+    #   Name of the certificate store
+    #
+    # @return [String]
+    #   The name of the certificate store to be used
+    #
+    def cert_store_name(name = NULL)
+      if null?(name)
+        @cert_store_name
+      else
+        unless name.is_a?(String)
+          raise InvalidValue.new(:cert_store_name, 'be a String')
+        end
+        @cert_store_name = name
+      end
+    end
+    expose :cert_store_name
+
+    #
+    # Set the name of the certificate use when signing packages.
+    #
+    # @example
+    #   cert_name "MySigningCert"
+    #
+    # @param [String] name
+    #   Name of the certificate
+    #
+    # @return [String]
+    #   The name of the certificate store to be used
+    #
+    def cert_name(name = NULL)
+      if null?(name)
+        @cert_name
+      else
+        unless name.is_a?(String)
+          raise InvalidValue.new(:cert_name, 'be a String')
+        end
+        @cert_name = name
+      end
+    end
+    expose :cert_name
+
+
+    #
+    # Add a timestamp server to be tried.
+    #
+    # Setting nothing will default to trying ['http://timestamp.digicert.com', 
+    # 'http://timestamp.verisign.com/scripts/timstamp.dll']
+    #
+    # If you specify multiple timestamp servers, they will be tried in
+    # the order specified until one of them succeeds
+    #
+    # @example
+    #   timestamp_server "http://timestamp.globalsign.com/scripts/timstamp.dll"
+    #
+    # @param [String] url
+    #   Url of the timestamp server
+    #
+    # @return [Array]
+    #   A list of the timestamp servers to be used
+    #
+    def timestamp_server(url)
+      unless url.is_a?(String)
+        raise InvalidValue.new(:timestamp_server, 'be a String')
+      end
+      @timestamp_servers ||= []
+      @timestamp_servers << url
+      @timestamp_servers
+    end
+    expose :timestamp_server
+
+    #
+    # Set the list of timestamp servers to be tried.
+    #
+    # Setting nothing will default to trying ['http://timestamp.digicert.com', 
+    # 'http://timestamp.verisign.com/scripts/timstamp.dll']
+    #
+    # If you specify multiple timestamp servers, they will be tried in
+    # the order specified until one of them succeeds
+    #
+    # @example
+    #   timestamp_server "http://timestamp.globalsign.com/scripts/timstamp.dll"
+    #
+    # @param [Array] url
+    #   Urls of timestamp servers
+    #
+    # @return [Array]
+    #   A list of the timestamp servers to be used
+    #
+    def timestamp_servers(urls = NULL)
+      if null?(urls)
+        @timestamp_servers || ['http://timestamp.digicert.com',
+                          'http://timestamp.verisign.com/scripts/timstamp.dll']
+      else
+        unless urls.is_a?(Array)
+          urls.each do |url|
+            timestamp_server(url)
+          end
+        end
+      end
+    end
+    expose :timestamp_servers
 
     #
     # @!endgroup
@@ -343,5 +459,46 @@ module Omnibus
     def wix_extension_switches(arr)
       "#{arr.map {|e| "-ext '#{e}'"}.join(' ')}"
     end
+
+    #
+    # Takes a path to a msi and uses the set certificate store and 
+    # certificate name
+    #
+    def sign_package(msi_file)
+      shellout!("signtool.exe sign /v /s #{cert_store_name} /n #{cert_name} #{msi_file}")
+      add_timestamp(msi_file)
+    end
+
+    #
+    # Iterates through available timestamp servers and tries to timestamp
+    # the file. If non succeed, an exception is raised.
+    #
+    def add_timestamp(msi_file)
+      success = false
+      timestamp_servers.each do |ts|
+        timestamp_command = "signtool.exe timestamp -t #{ts} #{msi_file}"
+        status = shellout(timestamp_command)
+        if status.exitstatus != 0
+          log.warn(log_key) do
+            <<-EOH.strip
+                Failed to add timestamp with timeserver #{ts}
+
+                STDOUT
+                ------
+                #{status.stdout}
+
+                STDERR
+                ------
+                #{status.stderr}
+                EOH
+          end
+        else
+          success = true
+          break
+        end
+      end
+      raise FailedToTimestamp.new("Failed to add timestamp") if !success
+    end
+
   end
 end
