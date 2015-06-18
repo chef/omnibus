@@ -318,9 +318,9 @@ EOF
     end
   end
 
-  class FailedToTimestamp < Error
-    def initialize(msg)
-      super
+  class FailedToTimestampMSI < Error
+    def initialize
+      super("Failed to add timestamp to MSI.")
     end
   end
 end

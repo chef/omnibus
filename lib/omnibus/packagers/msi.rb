@@ -482,7 +482,7 @@ module Omnibus
         success = try_timestamp(msi_file, ts)
         break if success
       end
-      raise FailedToTimestamp.new("Failed to add timestamp") if !success
+      raise FailedToTimestampMSI.new if !success
     end
 
     def try_timestamp(msi_file, url)

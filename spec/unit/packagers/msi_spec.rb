@@ -339,7 +339,7 @@ module Omnibus
           it 'raises an exception if there are no available timestamp servers' do
             subject.timestamp_server('http://fooserver')
             expect(subject).to receive(:try_timestamp).with(msi, 'http://fooserver').and_return(false)
-            expect {subject.sign_package(msi)}.to raise_error(FailedToTimestamp)
+            expect {subject.sign_package(msi)}.to raise_error(FailedToTimestampMSI)
           end
         end
       end
