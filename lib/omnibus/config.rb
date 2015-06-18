@@ -438,7 +438,7 @@ module Omnibus
     #
     # For example:
     #
-    #     /PATH/files/my_map_file 
+    #     /PATH/files/my_map_file
     #
     # @return [String, nil]
     default(:solaris_linker_mapfile, "files/mapfiles/solaris")
@@ -480,6 +480,12 @@ module Omnibus
         3
       end
     end
+
+    # Override the packager type from the default for the platform.
+    # Typically only used for creating 'tarball' packages
+    #
+    # @return [String]
+    default(:packager_override, nil)
 
     # --------------------------------------------------
     # @!endgroup

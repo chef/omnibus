@@ -26,6 +26,7 @@ module Omnibus
     autoload :PKG,      'omnibus/packagers/pkg'
     autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :RPM,      'omnibus/packagers/rpm'
+    autoload :Tarball,  'omnibus/packagers/tarball'
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -55,7 +56,10 @@ module Omnibus
     def for_current_system
       family = Ohai['platform_family']
 
-      if klass = PLATFORM_PACKAGER_MAP[family]
+      if Config.packager_override
+        log.info(log_key) {"Overridding default packager in favor of #{Config.packager_override}"}
+        eval("#{Config.packager_override}")
+      elsif klass = PLATFORM_PACKAGER_MAP[family]
         klass
       else
         log.warn(log_key) do
