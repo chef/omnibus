@@ -468,7 +468,7 @@ module Omnibus
     def sign_package(msi_file)
       raise MissingRequiredAttribute.new(self, :cert_store_name) if !cert_store_name
       raise MissingRequiredAttribute.new(self, :cert_name) if !cert_name
-      shellout!("signtool.exe sign /v /s #{cert_store_name} /n #{cert_name} #{msi_file}")
+      shellout!("signtool.exe sign /v /s #{cert_store_name} /n #{cert_name} \"#{msi_file}\"")
       add_timestamp(msi_file)
     end
 
@@ -486,7 +486,7 @@ module Omnibus
     end
 
     def try_timestamp(msi_file, url)
-      timestamp_command = "signtool.exe timestamp -t #{url} #{msi_file}"
+      timestamp_command = "signtool.exe timestamp -t #{url} \"#{msi_file}\""
       status = shellout(timestamp_command)
       if status.exitstatus != 0
         log.warn(log_key) do
