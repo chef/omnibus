@@ -16,6 +16,8 @@
 
 module Omnibus
   class Packager::MSI < Packager::Base
+    DEFAULT_TIMESTAMP_SERVERS = ['http://timestamp.digicert.com',
+                                 'http://timestamp.verisign.com/scripts/timestamp.dll']
     id :msi
 
     setup do
@@ -281,8 +283,7 @@ module Omnibus
     #
     def timestamp_servers(urls = NULL)
       if null?(urls)
-        @timestamp_servers || ['http://timestamp.digicert.com',
-                          'http://timestamp.verisign.com/scripts/timestamp.dll']
+        @timestamp_servers || DEFAULT_TIMESTAMP_SERVERS
       else
         unless urls.is_a?(Array)
           raise InvalidValue.new(:timestamp_server, 'be an Array')
