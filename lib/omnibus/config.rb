@@ -294,6 +294,19 @@ module Omnibus
     #
 
     #
+    # @!group Publisher
+    # --------------------------------------------------
+
+    # The number of times to try to publish an artifact
+    #
+    # @return [Integer]
+    default(:publish_retries, 2)
+
+    # --------------------------------------------------
+    # @!endgroup
+    #
+
+    #
     # @!group Artifactory Publisher
     # --------------------------------------------------
 
@@ -419,10 +432,16 @@ module Omnibus
       ['omnibus-software']
     end
 
-    # The solaris compiler to use
+    # Solaris linker mapfile to use, if needed
+    # see http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
+    # Path is relative to the 'files' directory in your omnibus project
+    #
+    # For example:
+    #
+    #     /PATH/files/my_map_file 
     #
     # @return [String, nil]
-    default(:solaris_compiler, nil)
+    default(:solaris_linker_mapfile, "files/mapfiles/solaris")
 
     # --------------------------------------------------
     # @!endgroup
@@ -474,6 +493,11 @@ module Omnibus
     #
     # @return [Integer]
     default(:fetcher_read_timeout, 60)
+
+    # The number of retries before marking a download as failed
+    #
+    # @return [Integer]
+    default(:fetcher_retries, 5)
 
     # --------------------------------------------------
     # @!endgroup

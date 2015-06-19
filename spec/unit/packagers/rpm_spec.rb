@@ -31,6 +31,8 @@ module Omnibus
       create_directory("#{staging_dir}/SRPMS")
       create_directory("#{staging_dir}/SOURCES")
       create_directory("#{staging_dir}/SPECS")
+
+      stub_ohai(platform: 'redhat', version: '6.5')
     end
 
     describe '#signing_passphrase' do
@@ -112,7 +114,7 @@ module Omnibus
       end
 
       it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project-1.2.3-2.x86_64.rpm')
+        expect(subject.package_name).to eq('project-1.2.3-2.el6.x86_64.rpm')
       end
     end
 
@@ -127,7 +129,7 @@ module Omnibus
         allow(subject).to receive(:safe_architecture).and_return('x86_64')
       end
 
-      let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.x86_64.rpm.spec" }
+      let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.el6.x86_64.rpm.spec" }
 
       it 'generates the file' do
         subject.write_rpm_spec
@@ -140,7 +142,7 @@ module Omnibus
 
         expect(contents).to include("Name: project")
         expect(contents).to include("Version: 1.2.3")
-        expect(contents).to include("Release: 2")
+        expect(contents).to include("Release: 2.el6")
         expect(contents).to include("Summary:  The full stack of project")
         expect(contents).to include("BuildArch: x86_64")
         expect(contents).to include("AutoReqProv: no")
@@ -205,16 +207,18 @@ module Omnibus
           create_file("#{staging_dir}/BUILD/file2")
           create_directory("#{staging_dir}/BUILD/.dir1")
           create_directory("#{staging_dir}/BUILD/dir2")
+          create_directory("#{staging_dir}/BUILD/dir3 space")
         end
 
         it 'writes them into the spec' do
           subject.write_rpm_spec
           contents = File.read(spec_file)
 
-          expect(contents).to include("/.dir1")
+          expect(contents).to include("%dir /.dir1")
           expect(contents).to include("/.file1")
-          expect(contents).to include("/dir2")
+          expect(contents).to include("%dir /dir2")
           expect(contents).to include("/file2")
+          expect(contents).to include("%dir \"/dir3 space\"")
         end
       end
 
@@ -295,6 +299,12 @@ module Omnibus
       end
     end
 
+    describe '#dist_tag' do
+      it 'returns the Fedora packaging guidelines dist tag for the package' do
+        expect(subject.dist_tag).to eq('.el6')
+      end
+    end
+
     describe '#safe_base_package_name' do
       context 'when the project name is "safe"' do
         it 'returns the value without logging a message' do
@@ -311,7 +321,7 @@ module Omnibus
             expect(subject.safe_base_package_name).to eq('pro-ject123.for-realz-2')
           end
 
-          expect(output).to include("The `name' compontent of RPM package names can only include")
+          expect(output).to include("The `name' component of RPM package names can only include")
         end
       end
     end
@@ -330,12 +340,24 @@ module Omnibus
         end
       end
 
-      context 'when the project build_version has invalid characters' do
-        before { project.build_version("1.2-pre$alpha.##__2") }
+      context 'when the project build_version has dashes' do
+        before { project.build_version('1.2-rc.1') }
 
         it 'returns the value while logging a message' do
           output = capture_logging do
-            expect(subject.safe_version).to eq('1.2_pre$alpha.##__2')
+            expect(subject.safe_version).to eq('1.2~rc.1')
+          end
+
+          expect(output).to include("Tildes hold special significance in the RPM package versions.")
+        end
+      end
+
+      context 'when the project build_version has invalid characters' do
+        before { project.build_version("1.2-pre_alpha.##__2") }
+
+        it 'returns the value while logging a message' do
+          output = capture_logging do
+            expect(subject.safe_version).to eq('1.2~pre_alpha._2')
           end
 
           expect(output).to include("The `version' component of RPM package names can only include")
@@ -345,13 +367,25 @@ module Omnibus
 
     describe '#safe_architecture' do
       before do
-        stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
+        stub_ohai(platform: 'redhat', version: '6.5') do |data|
           data['kernel']['machine'] = 'i386'
         end
       end
 
       it 'returns the value from Ohai' do
         expect(subject.safe_architecture).to eq('i386')
+      end
+
+      context 'when i686' do
+        before do
+          stub_ohai(platform: 'redhat', version: '6.5') do |data|
+            data['kernel']['machine'] = 'i686'
+          end
+        end
+
+        it 'returns i386' do
+          expect(subject.safe_architecture).to eq('i386')
+        end
       end
 
       context 'on Pidora' do

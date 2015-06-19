@@ -210,7 +210,7 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
     end
 
     #
@@ -220,6 +220,25 @@ module Omnibus
     #
     def build_dir
       @build_dir ||= File.join(staging_dir, 'BUILD')
+    end
+
+    #
+    # Get a list of user-declared config files
+    #
+    # @return [Array]
+    #
+    def config_files
+      @config_files ||= project.config_files.map { |file| rpm_safe(file) }
+    end
+
+    #
+    # Exclude directories from the spec that are owned by the filesystem package:
+    # http://fedoraproject.org/wiki/Packaging:Guidelines#File_and_Directory_Ownership
+    #
+    # @return [Array]
+    #
+    def filesystem_directories
+      @filesystem_directories ||= IO.readlines(resource_path('filesystem_list')).map! { |dirname| dirname.chomp }
     end
 
     #
@@ -240,21 +259,9 @@ module Omnibus
         hash
       end
 
-      # Exclude directories from the spec that are owned by the filesystem package:
-      # http://fedoraproject.org/wiki/Packaging:Guidelines#File_and_Directory_Ownership
-      filesystem_directories = IO.readlines(resource_path('filesystem_list'))
-      filesystem_directories.map! { |dirname| dirname.chomp }
-
-      # Get a list of user-declared config files
-      config_files = project.config_files.map { |file| rpm_safe(file) }
-
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
-                .map    { |path| path.gsub("#{build_dir}/", '') }
-                .map    { |path| "/#{path}" }
-                .map    { |path| rpm_safe(path) }
-                .reject { |path| config_files.include?(path) }
-                .reject { |path| filesystem_directories.include?(path) }
+                .map    { |path| build_filepath(path) }
 
       render_template(resource_path('spec.erb'),
         destination: spec_file,
@@ -264,6 +271,7 @@ module Omnibus
           iteration:      safe_build_iteration,
           vendor:         vendor,
           license:        license,
+          dist_tag:       dist_tag,
           architecture:   safe_architecture,
           maintainer:     project.maintainer,
           homepage:       project.homepage,
@@ -278,6 +286,7 @@ module Omnibus
           scripts:        scripts,
           config_files:   config_files,
           files:          files,
+          build_dir:      build_dir,
         }
       )
     end
@@ -332,6 +341,22 @@ module Omnibus
       FileSyncer.glob("#{staging_dir}/RPMS/**/*.rpm").each do |rpm|
         copy_file(rpm, Config.package_dir)
       end
+    end
+
+    #
+    # Convert the path of a file in the staging directory to an entry for use in the spec file.
+    #
+    # @return [String]
+    #
+    def build_filepath(path)
+      filepath = rpm_safe('/' + path.gsub("#{build_dir}/", ''))
+      return if config_files.include?(filepath) || filesystem_directories.include?(filepath)
+      full_path = build_dir + filepath.gsub('[%]','%')
+      # FileSyncer.glob quotes pathnames that contain spaces, which is a problem on el7
+      full_path.gsub!('"', '')
+      # Mark directories with the %dir directive to prevent rpmbuild from counting their contents twice.
+      return "%dir #{filepath}" if !File.symlink?(full_path) && File.directory?(full_path)
+      filepath
     end
 
     #
@@ -394,6 +419,17 @@ module Omnibus
     end
 
     #
+    # The Dist Tag for this RPM package per the Fedora packaging guidlines.
+    #
+    # @see http://fedoraproject.org/wiki/Packaging:DistTag
+    #
+    # @return [String]
+    #
+    def dist_tag
+      ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
+    end
+
+    #
     # Return the RPM-ready base package name, converting any invalid characters to
     # dashes (+-+).
     #
@@ -406,7 +442,7 @@ module Omnibus
         converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "The `name' compontent of RPM package names can only include " \
+          "The `name' component of RPM package names can only include " \
           "lowercase alphabetical characters (a-z), numbers (0-9), dots (.), " \
           "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
@@ -433,15 +469,37 @@ module Omnibus
     # @return [String]
     #
     def safe_version
-      if project.build_version =~ /\A[a-zA-Z0-9\.\+\_]+\z/
-        project.build_version.dup
+      version = project.build_version.dup
+
+      # RPM 4.10+ added support for using the tilde (~) as a way to mark
+      # versions as lower priority in comparisons. More details on this
+      # feature can be found here:
+      #
+      #   http://rpm.org/ticket/56
+      #
+      if version =~ /\-/
+        converted = version.gsub('-', '~')
+
+        log.warn(log_key) do
+          "Tildes hold special significance in the RPM package versions. " \
+          "They mark a version as lower priority in RPM's version compare " \
+          "logic. We'll replace all dashes (-) with tildes (~) so pre-release" \
+          "versions get sorted earlier then final versions. Converting" \
+          "`#{project.build_version}' to `#{converted}'."
+        end
+
+        version = converted
+      end
+
+      if version =~ /\A[a-zA-Z0-9\.\+\~]+\z/
+        version
       else
-        converted = project.build_version.gsub('-', '_')
+        converted = version.gsub(/[^a-zA-Z0-9\.\+\~]+/, '_')
 
         log.warn(log_key) do
           "The `version' component of RPM package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), and underscores (_). Converting " \
+          "plus signs (+), tildes (~) and underscores (_). Converting " \
           "`#{project.build_version}' to `#{converted}'."
         end
 
@@ -456,6 +514,8 @@ module Omnibus
     #
     def safe_architecture
       case Ohai['kernel']['machine']
+      when 'i686'
+        'i386'
       when 'armv6l'
         if Ohai['platform'] == 'pidora'
           'armv6hl'

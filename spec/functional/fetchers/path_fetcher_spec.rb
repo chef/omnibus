@@ -10,11 +10,19 @@ module Omnibus
       { path: source_path }
     end
 
+    let(:manifest_entry) do
+      double(Omnibus::ManifestEntry,
+             name: 'pathelogical',
+             locked_version: nil,
+             locked_source: source)
+    end
+
     before do
       create_directory(source_path)
     end
 
-    subject { described_class.new(software) }
+    subject { described_class.new(manifest_entry, project_dir, build_dir) }
+
 
     describe '#fetch_required?' do
       context 'when the directories have different files' do
@@ -91,6 +99,12 @@ module Omnibus
 
       it 'includes the source_path and shasum' do
         expect(subject.version_for_cache).to eq("path:#{source_path}|shasum:#{sha}")
+      end
+    end
+
+    describe "#resolve_version" do
+      it "just returns the version" do
+        expect(NetFetcher.resolve_version("1.2.3", source)).to eq("1.2.3")
       end
     end
   end

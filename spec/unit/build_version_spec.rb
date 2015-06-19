@@ -9,6 +9,7 @@ module Omnibus
     subject(:build_version) { described_class.new }
 
     before do
+      Config.append_timestamp(true)
       allow_any_instance_of(described_class).to receive(:shellout)
         .and_return(double('ouput', stdout: git_describe, exitstatus: 0))
     end
@@ -88,6 +89,16 @@ module Omnibus
         its(:commits_since_tag) { should == 0 }
         its(:prerelease_version?) { should be_truthy }
       end
+
+      # v-prefixed tag
+      context "v1.2.3-beta2" do
+        let(:git_describe) { "v1.2.3-beta2" }
+        its(:version_tag) { should == "1.2.3" }
+        its(:prerelease_tag) { should == "beta2" }
+        its(:git_sha_tag) { should be(nil) }
+        its(:commits_since_tag) { should eq(0) }
+        its(:prerelease_version?) { should be(true) }
+      end
     end
 
     describe 'semver output' do
@@ -129,7 +140,6 @@ module Omnibus
 
       describe 'appending a timestamp' do
         let(:git_describe) { '11.0.0-alpha-3-207-g694b062' }
-
         context 'by default' do
           it 'appends a timestamp' do
             expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
@@ -137,8 +147,6 @@ module Omnibus
         end
 
         context 'when Config.append_timestamp is true' do
-          before { Config.append_timestamp(true) }
-
           it 'appends a timestamp' do
             expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
           end
@@ -146,7 +154,6 @@ module Omnibus
 
         context 'when Config.append_timestamp is false' do
           before { Config.append_timestamp(false) }
-
           it 'does not append a timestamp' do
             expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
           end

@@ -23,7 +23,7 @@ module Omnibus
     # @return [true, false]
     #
     def fetch_required?
-      !(cloned? && same_revision?)
+      !(cloned? && same_revision?(resolved_version))
     end
 
     #
@@ -59,14 +59,14 @@ module Omnibus
     #
     def fetch
       log.info(log_key) { "Fetching from `#{source_url}'" }
-
       create_required_directories
 
       if cloned?
-        git_fetch unless same_revision?
+        git_fetch(resolved_version) unless same_revision?(resolved_version)
       else
+        force_recreate_project_dir! unless dir_empty?(project_dir)
         git_clone
-        git_checkout
+        git_checkout(resolved_version)
       end
     end
 
@@ -92,6 +92,24 @@ module Omnibus
     end
 
     #
+    # Determine if a directory is empty
+    #
+    # @return [true, false]
+    #
+    def dir_empty?(dir)
+      Dir.entries(dir).reject {|d| ['.', '..'].include?(d) }.empty?
+    end
+
+    #
+    # Forcibly remove and recreate the project directory
+    #
+    def force_recreate_project_dir!
+      log.warn(log_key) { "Removing exisitng directory #{project_dir} before cloning" }
+      FileUtils.rm_rf(project_dir)
+      Dir.mkdir(project_dir)
+    end
+
+    #
     # Determine if the clone exists.
     #
     # @return [true, false]
@@ -110,23 +128,23 @@ module Omnibus
     end
 
     #
-    # Checkout the +target_revision+.
+    # Checkout the +resolved_version+.
     #
     # @return [void]
     #
-    def git_checkout
+    def git_checkout(ref=resolved_version)
       git("fetch --all")
-      git("checkout #{target_revision}")
+      git("checkout #{ref}")
     end
 
     #
-    # Fetch the remote tags and refs, and reset to +target_revision+.
+    # Fetch the remote tags and refs, and reset to +resolved_version+.
     #
     # @return [void]
     #
-    def git_fetch
+    def git_fetch(ref=resolved_version)
       git("fetch --all")
-      git("reset --hard #{target_revision}")
+      git("reset --hard #{ref}")
     end
 
     #
@@ -135,22 +153,9 @@ module Omnibus
     # @return [String]
     #
     def current_revision
-      @current_revision ||= git('rev-parse HEAD').stdout.strip
+      git('rev-parse HEAD').stdout.strip
     rescue CommandFailed
       nil
-    end
-
-    #
-    # The target revision from the user.
-    #
-    # @return [String]
-    #
-    def target_revision
-      @target_revision ||= if sha_hash?(version)
-                             version
-                           else
-                             revision_from_remote_reference(version)
-                           end
     end
 
     #
@@ -158,8 +163,31 @@ module Omnibus
     #
     # @return [true, false]
     #
-    def same_revision?
-      current_revision == target_revision
+    def same_revision?(rev=resolved_version)
+      current_revision == rev
+    end
+
+    #
+    # Execute the given git command, inside the +project_dir+.
+    #
+    # @see Util#shellout!
+    #
+    # @return [Mixlib::ShellOut]
+    #   the shellout object
+    #
+    def git(command)
+      shellout!("git #{command}", cwd: project_dir)
+    end
+
+    # Class methods
+    public
+
+    def self.resolve_version(ref, source)
+      if sha_hash?(ref)
+        ref
+      else
+        revision_from_remote_reference(ref, source)
+      end
     end
 
     #
@@ -167,7 +195,7 @@ module Omnibus
     #
     # @return [true, false]
     #
-    def sha_hash?(rev)
+    def self.sha_hash?(rev)
       rev =~ /^[0-9a-f]{4,40}$/
     end
 
@@ -177,12 +205,12 @@ module Omnibus
     #
     # @return [String]
     #
-    def revision_from_remote_reference(ref)
+    def self.revision_from_remote_reference(ref, source)
       # execute `git ls-remote` the trailing '*' does globbing. This
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      remote_list = git("ls-remote origin #{ref}*").stdout
+      remote_list = shellout!("git ls-remote \"#{source[:git]}\" #{ref}*").stdout
       commit_ref = dereference_annotated_tag(remote_list, ref)
 
       unless commit_ref
@@ -210,7 +238,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def dereference_annotated_tag(remote_list, ref)
+    def self.dereference_annotated_tag(remote_list, ref)
       # We'll return the SHA corresponding to the ^{} which is the
       # commit pointed to by an annotated tag. If no such commit
       # exists (not an annotated tag) then we return the SHA of the
@@ -230,18 +258,6 @@ module Omnibus
           nil
         end
       end
-    end
-
-    #
-    # Execute the given git command, inside the +project_dir+.
-    #
-    # @see Util#shellout!
-    #
-    # @return [Mixlib::ShellOut]
-    #   the shellout object
-    #
-    def git(command)
-      shellout!("git #{command}", cwd: project_dir)
     end
   end
 end

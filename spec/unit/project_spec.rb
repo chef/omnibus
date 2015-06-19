@@ -41,7 +41,9 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :exclude, %|exclude 'hamlet'|
     it_behaves_like 'a cleanroom setter', :config_file, %|config_file '/path/to/config.rb'|
     it_behaves_like 'a cleanroom setter', :extra_package_file, %|extra_package_file '/path/to/asset'|
-
+    it_behaves_like 'a cleanroom setter', :text_manifest_path, %|text_manifest_path '/path/to/manifest.txt'|
+    it_behaves_like 'a cleanroom setter', :json_manifest_path, %|json_manifest_path '/path/to/manifest.txt'|
+    it_behaves_like 'a cleanroom setter', :build_git_revision, %|build_git_revision 'wombats'|
     it_behaves_like 'a cleanroom getter', :files_path
 
     describe 'basics' do
@@ -122,6 +124,21 @@ module Omnibus
 
       it 'is a DSL method' do
         expect(subject).to have_exposed_method(:default_root)
+      end
+    end
+
+    describe "build_git_revision" do
+      let(:git_repo_subdir_path) do
+        path = local_git_repo("foobar", annotated_tags: ["1.0", "2.0", "3.0"])
+        subdir_path = File.join(path, "asubdir")
+        Dir.mkdir(subdir_path)
+        subdir_path
+      end
+
+      it "returns a revision even when running in a subdir" do
+        Dir.chdir(git_repo_subdir_path) do
+          expect(subject.build_git_revision).to eq("632501dde2c41f3bdd988b818b4c008e2ff398dc")
+        end
       end
     end
 

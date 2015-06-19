@@ -52,43 +52,58 @@ module Omnibus
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'ovesrride LDFLAGS' do
+        it 'overrides LDFLAGS' do
           expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'ovesrride CFLAGS' do
+        it 'overrides CFLAGS' do
           expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'ovesrride CXXFLAGS' do
+        it 'overrides CXXFLAGS' do
           expect(subject.with_standard_compiler_flags('CXXFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
         end
-        it 'presserve anything else' do
+        it 'overrides CPPFLAGS' do
+          expect(subject.with_standard_compiler_flags('CPPFLAGS'=>'foo')).to eq(
+            'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
+            'CFLAGS'          => '-I/opt/project/embedded/include',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+          )
+        end
+        it 'preserves anything else' do
           expect(subject.with_standard_compiler_flags('numberwang'=>4)).to eq(
             'numberwang'      => 4,
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             'CXXFLAGS'        => '-I/opt/project/embedded/include',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -109,10 +124,36 @@ module Omnibus
             'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             "CXXFLAGS"        => "-I/opt/project/embedded/include",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'LD_OPTIONS'      => '-R/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
+        end
+
+        context 'when loader mapping file is specified' do
+          before do
+            stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+              # For some reason, this isn't set in Fauxhai
+              data['platform'] = 'solaris2'
+            end
+            Config.project_root('/root/project')
+            Config.solaris_linker_mapfile('files/mapfile/solaris')
+            allow(File).to receive(:exist?).and_return(true)
+          end
+
+          it 'sets LD_OPTIONS correctly' do
+            expect(subject.with_standard_compiler_flags).to eq(
+              'CC'              => 'gcc -static-libgcc',
+              'LDFLAGS'         => '-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc',
+              'CFLAGS'          => '-I/opt/project/embedded/include',
+              "CXXFLAGS"        => "-I/opt/project/embedded/include",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include",
+              'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+              'LD_OPTIONS'      => '-R/opt/project/embedded/lib -M /root/project/files/mapfile/solaris',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            )
+          end
         end
       end
 
@@ -124,6 +165,7 @@ module Omnibus
             'LDFLAGS'         => '-L/opt/project/embedded/lib',
             'CFLAGS'          => '-I/opt/project/embedded/include',
             "CXXFLAGS"        => "-I/opt/project/embedded/include",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -144,6 +186,7 @@ module Omnibus
             'CXX'             => 'xlC_r -q64',
             'CFLAGS'          => '-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O',
             "CXXFLAGS"        => "-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O",
+            "CPPFLAGS"        => "-q64 -I/opt/project/embedded/include -D_LARGE_FILES -O",
             'LDFLAGS'         => '-q64 -L/opt/project/embedded/lib -Wl,-blibpath:/opt/project/embedded/lib:/usr/lib:/lib',
             'LD'              => 'ld -b64',
             'OBJECT_MODE'     => '64',
@@ -163,6 +206,7 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             'CFLAGS'  => '-I/opt/project/embedded/include',
             'CXXFLAGS'  => '-I/opt/project/embedded/include',
+            'CPPFLAGS'  => '-I/opt/project/embedded/include',
             'LDFLAGS' => '-L/opt/project/embedded/lib',
             'LD_RUN_PATH' => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
@@ -180,6 +224,7 @@ module Omnibus
               'CXX'             => 'clang++',
               'CFLAGS'          => '-I/opt/project/embedded/include',
               'CXXFLAGS'        => '-I/opt/project/embedded/include',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include',
               'LDFLAGS'         => '-L/opt/project/embedded/lib',
               'LD_RUN_PATH'     => '/opt/project/embedded/lib',
               'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
@@ -274,6 +319,64 @@ module Omnibus
 
       it 'delegates to the Ohai class' do
         expect(subject.ohai).to be(Ohai)
+      end
+    end
+
+    describe "#manifest_entry" do
+      let(:a_source) do
+        { url: 'http://example.com/',
+          md5: 'abcd1234' }
+      end
+
+      let(:manifest_entry) {Omnibus::ManifestEntry.new("software", {locked_version: "1.2.8", locked_source: a_source})}
+      let(:manifest) do
+        m = Omnibus::Manifest.new
+        m.add("software", manifest_entry)
+      end
+
+      let(:project_with_manifest) do
+        described_class.new(project, nil, manifest).evaluate do
+          name 'software'
+          default_version '1.2.3'
+          source url: 'http://example.com/',
+          md5: 'abcd1234'
+        end
+      end
+
+      let(:project_without_manifest) do
+        described_class.new(project, nil, nil).evaluate do
+          name 'software'
+          default_version '1.2.3'
+          source url: 'http://example.com/',
+          md5: 'abcd1234'
+        end
+      end
+
+      let(:another_project) do
+        described_class.new(project, nil, manifest).evaluate do
+          name 'ruroh'
+        end
+      end
+
+      it "constructs a manifest entry if no manifest was provided" do
+        expect(project_without_manifest.manifest_entry).to be_a Omnibus::ManifestEntry
+        expect(project_without_manifest.manifest_entry.locked_version).to eq("1.2.3")
+        expect(project_without_manifest.manifest_entry.locked_source).to eq(a_source)
+      end
+
+      it "constructs a manifest entry with a fully resolved version" do
+        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", a_source).and_return("1.2.8")
+        expect(project_without_manifest.manifest_entry.locked_version).to eq("1.2.8")
+      end
+
+      it "returns the entry from the user-provided manifest if it was given one" do
+        expect(project_with_manifest.manifest_entry).to eq(manifest_entry)
+        expect(project_with_manifest.manifest_entry.locked_version).to eq("1.2.8")
+        expect(project_with_manifest.manifest_entry.locked_source).to eq(a_source)
+      end
+
+      it "raises an error if it was given a manifest but can't find it's entry" do
+        expect{another_project.manifest_entry}.to raise_error
       end
     end
 

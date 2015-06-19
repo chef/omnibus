@@ -75,6 +75,30 @@ module Omnibus
         end
       end
 
+      context 'when destination file exists' do
+
+        let(:source) {
+          s = File.join(tmp_path, 'source')
+          FileUtils.mkdir_p(s)
+          p = create_file(s, 'read-only-file') { 'new' }
+          FileUtils.chmod(0400, p)
+          s
+        }
+
+        let(:destination) {
+          dest = File.join(tmp_path, 'destination')
+          FileUtils.mkdir_p(dest)
+          create_file(dest, 'read-only-file') { 'old' }
+          FileUtils.chmod(0400, File.join(dest, 'read-only-file'))
+          dest
+        }
+
+        it 'copies over a read-only file' do
+          described_class.sync(source, destination)
+          expect("#{destination}/read-only-file").to have_content "new"
+        end
+      end
+
       context 'when the directory exists' do
         before { FileUtils.mkdir_p(destination) }
 
@@ -98,6 +122,30 @@ module Omnibus
           expect("#{destination}/.existing_folder").to_not be_a_directory
           expect("#{destination}/existing_file").to_not be_a_file
           expect("#{destination}/.existing_file").to_not be_a_file
+        end
+      end
+
+      context 'when target files are hard links' do
+        let(:source) do
+          source = File.join(tmp_path, 'source')
+          FileUtils.mkdir_p(source)
+
+          create_directory(source, 'bin')
+               create_file(source, 'bin', 'git')
+               FileUtils.ln("#{source}/bin/git", "#{source}/bin/git-tag")
+               FileUtils.ln("#{source}/bin/git", "#{source}/bin/git-write-tree")
+
+          source
+        end
+
+        it 'copies the first instance and links to that instance thereafter' do
+          FileUtils.mkdir_p("#{destination}/bin")
+
+          described_class.sync(source, destination)
+
+          expect("#{destination}/bin/git").to be_a_file
+          expect("#{destination}/bin/git-tag").to be_a_hardlink
+          expect("#{destination}/bin/git-write-tree").to be_a_hardlink
         end
       end
 

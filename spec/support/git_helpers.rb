@@ -9,10 +9,50 @@ module Omnibus
         "file://#{fake_git_remote("git://github.com/omnibus/#{repo}.git", options)}/.git"
       end
 
+      def local_git_repo(name, options={})
+        path = git_scratch
+        Dir.chdir(path) do
+          # Create a bogus configure file
+          File.open('configure', 'w') { |f| f.write('echo "Done!"') }
+
+          git %|init .|
+          git %|add .|
+          git %|commit -am "Initial commit for #{name}..."|
+          git %|remote add origin "#{options[:remote]}"| if options[:remote]
+          git %|push origin master|
+
+          options[:annotated_tags].each do |tag|
+            File.open('tag', 'w') { |f| f.write(tag) }
+            git %|add tag|
+            git %|commit -am "Create tag #{tag}"|
+            git %|tag "#{tag}" -m "#{tag}"|
+            git %|push origin "#{tag}"| if options[:remote]
+          end if options[:annotated_tags]
+
+          options[:tags].each do |tag|
+            File.open('tag', 'w') { |f| f.write(tag) }
+            git %|add tag|
+            git %|commit -am "Create tag #{tag}"|
+            git %|tag "#{tag}"|
+            git %|push origin "#{tag}"| if options[:remote]
+          end if options[:tags]
+
+          options[:branches].each do |branch|
+            git %|checkout -b #{branch} master|
+            File.open('branch', 'w') { |f| f.write(branch) }
+            git %|add branch|
+            git %|commit -am "Create branch #{branch}"|
+            git %|push origin "#{branch}"| if options[:remote]
+            git %|checkout master|
+          end if options[:branches]
+        end
+        path
+      end
+
       def remote_git_repo(name, options = {})
         path = File.join(remotes, name)
         remote_url = "file://#{path}"
-
+        options[:remote] = remote_url
         # Create a bogus software
         FileUtils.mkdir_p(path)
 
@@ -23,42 +63,7 @@ module Omnibus
           git %|config receive.denyCurrentBranch ignore|
         end
 
-        Dir.chdir(git_scratch) do
-          # Create a bogus configure file
-          File.open('configure', 'w') { |f| f.write('echo "Done!"') }
-
-          git %|init .|
-          git %|add .|
-          git %|commit -am "Initial commit for #{name}..."|
-          git %|remote add origin "#{remote_url}"|
-          git %|push origin master|
-
-          options[:annotated_tags].each do |tag|
-            File.open('tag', 'w') { |f| f.write(tag) }
-            git %|add tag|
-            git %|commit -am "Create tag #{tag}"|
-            git %|tag "#{tag}" -m "#{tag}"|
-            git %|push origin "#{tag}"|
-          end if options[:annotated_tags]
-
-          options[:tags].each do |tag|
-            File.open('tag', 'w') { |f| f.write(tag) }
-            git %|add tag|
-            git %|commit -am "Create tag #{tag}"|
-            git %|tag "#{tag}"|
-            git %|push origin "#{tag}"|
-          end if options[:tags]
-
-          options[:branches].each do |branch|
-            git %|checkout -b #{branch} master|
-            File.open('branch', 'w') { |f| f.write(branch) }
-            git %|add branch|
-            git %|commit -am "Create branch #{branch}"|
-            git %|push origin "#{branch}"|
-            git %|checkout master|
-          end if options[:branches]
-        end
-
+        local_git_repo(name, options)
         path
       end
 

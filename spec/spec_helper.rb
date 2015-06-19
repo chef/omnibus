@@ -1,5 +1,6 @@
 require 'rspec'
 require 'rspec/its'
+require 'webmock/rspec'
 
 require 'cleanroom/rspec'
 
@@ -33,6 +34,9 @@ RSpec.configure do |config|
   require_relative 'support/ohai_helpers'
   config.include(Omnibus::RSpec::OhaiHelpers)
 
+  require_relative 'support/output_helpers'
+  config.include(Omnibus::RSpec::OutputHelpers)
+
   require_relative 'support/path_helpers'
   config.include(Omnibus::RSpec::PathHelpers)
 
@@ -45,12 +49,21 @@ RSpec.configure do |config|
   config.filter_run_excluding(windows_only: true) unless windows?
   config.filter_run_excluding(mac_only: true) unless mac?
 
+  if config.files_to_run.one?
+    # Use the documentation formatter for detailed output,
+    # unless a formatter has already been configured
+    # (e.g. via a command-line flag).
+    config.default_formatter = 'doc'
+    config.color = true
+  end
+
   config.before(:each) do
     # Suppress logging
     Omnibus.logger.level = :nothing
 
     # Reset config
     Omnibus.reset!
+    Omnibus::Config.append_timestamp(false)
 
     # Clear the tmp_path on each run
     FileUtils.rm_rf(tmp_path)
@@ -58,6 +71,9 @@ RSpec.configure do |config|
 
     # Don't run Ohai - tests can still override this
     stub_ohai(platform: 'ubuntu', version: '12.04')
+
+    # Default to real HTTP requests
+    WebMock.allow_net_connect!
   end
 
   config.after(:each) do

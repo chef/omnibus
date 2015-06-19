@@ -16,6 +16,7 @@
 
 require 'fileutils'
 require 'uri'
+require 'omnibus/manifest_entry'
 
 module Omnibus
   class Software
@@ -28,7 +29,7 @@ module Omnibus
       #
       # @return [Software]
       #
-      def load(project, name)
+      def load(project, name, manifest)
         loaded_softwares[name] ||= begin
           filepath = Omnibus.software_path(name)
 
@@ -40,11 +41,11 @@ module Omnibus
             end
           end
 
-          instance = new(project, filepath)
+          instance = new(project, filepath, manifest)
           instance.evaluate_file(filepath)
           instance.load_dependencies
 
-          # Add the loaded compontent to the library
+          # Add the loaded component to the library
           project.library.component_added(instance)
 
           instance
@@ -69,6 +70,8 @@ module Omnibus
     include NullArgumentable
     include Sugarable
 
+    attr_reader :manifest
+
     #
     # Create a new software object.
     #
@@ -76,10 +79,12 @@ module Omnibus
     #   the Omnibus project that instantiated this software definition
     # @param [String] filepath
     #   the path to where this software definition lives on disk
+    # @param [String] manifest
+    #   the user-supplied software manifest
     #
     # @return [Software]
     #
-    def initialize(project, filepath = nil)
+    def initialize(project, filepath = nil, manifest=nil)
       unless project.is_a?(Project)
         raise ArgumentError,
           "`project' must be a kind of `Omnibus::Project', but was `#{project.class.inspect}'!"
@@ -88,9 +93,20 @@ module Omnibus
       # Magical methods
       @filepath = filepath
       @project  = project
+      @manifest = manifest
 
       # Overrides
       @overrides = NULL
+    end
+
+    def manifest_entry
+      @manifest_entry ||= if manifest
+                            log.info(log_key) {"Using user-supplied manifest entry for #{name}"}
+                            manifest.entry_for(name)
+                          else
+                            log.info(log_key) {"Resolving manifest entry for #{name}"}
+                            to_manifest_entry
+                          end
     end
 
     #
@@ -219,7 +235,7 @@ module Omnibus
             "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
-        extra_keys = val.keys - [:git, :path, :url, :md5, :cookie, :warning, :unsafe]
+        extra_keys = val.keys - [:git, :path, :url, :md5, :cookie, :warning, :unsafe, :options]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
@@ -240,13 +256,14 @@ module Omnibus
     expose :source
 
     #
-    # Set or retieve the {#default_version} of the software to build.
+    # Set or retrieve the {#default_version} of the software to build.
     #
     # @example
     #   default_version '1.2.3'
     #
     # @param [String] val
-    #   the default version to set for the software
+    #   the default version to set for the software.
+    #   For a git source, the default version may be a git ref (e.g. tag, branch name, or sha).
     #
     # @return [String]
     #
@@ -435,7 +452,6 @@ module Omnibus
             "CC" => "xlc_r -q64",
             "CXX" => "xlC_r -q64",
             "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
-            "CXXFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
             "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
             "LD" => "ld -b64",
             "OBJECT_MODE" => "64",
@@ -484,21 +500,36 @@ module Omnibus
       extra_linker_flags = {
         "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
       }
-      # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
-      # the linker, to find every way to make it use our rpath.
-      extra_linker_flags.merge!(
-        {
-          "LD_OPTIONS" => "-R#{install_dir}/embedded/lib"
-        }
-      ) if Ohai['platform'] == "solaris2"
+
+      if solaris2?
+        # in order to provide compatibility for earlier versions of libc on solaris 10,
+        # we need to specify a mapfile that restricts the version of system libraries
+        # used. See http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
+        # for more information
+        # use the mapfile if it exists, otherwise ignore it
+        ld_options = "-R#{install_dir}/embedded/lib"
+        mapfile_path = File.expand_path(Config.solaris_linker_mapfile, Config.project_root)
+        ld_options  << " -M #{mapfile_path}" if File.exist?(mapfile_path)
+
+        # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
+        # the linker, to find every way to make it use our rpath. This is also required
+        # to use the aforementioned mapfile.
+        extra_linker_flags.merge!(
+          {
+            "LD_OPTIONS" => ld_options
+          }
+        )
+      end
+
       env.merge(compiler_flags).
         merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
         merge({"PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig"}).
-        # Set default values for CXXFLAGS.
-        merge('CXXFLAGS' => compiler_flags['CFLAGS'])
+        # Set default values for CXXFLAGS and CPPFLAGS.
+        merge('CXXFLAGS' => compiler_flags['CFLAGS']).
+        merge('CPPFLAGS' => compiler_flags['CFLAGS'])
     end
     expose :with_standard_compiler_flags
 
@@ -566,7 +597,7 @@ module Omnibus
     #
     def load_dependencies
       dependencies.each do |dependency|
-        software = Software.load(project, dependency)
+        Software.load(project, dependency, manifest)
       end
 
       true
@@ -579,6 +610,14 @@ module Omnibus
     #
     def builder
       @builder ||= Builder.new(self)
+    end
+
+    def to_manifest_entry
+      Omnibus::ManifestEntry.new(name, {
+                                   source_type: source_type,
+                                   described_version: version,
+                                   locked_version: Fetcher.resolve_version(version, source),
+                                   locked_source: source})
     end
 
     #
@@ -684,25 +723,30 @@ module Omnibus
     end
 
     #
-    # The fetcher for this software, based off of the +source+ attribute.
-    #
-    # - +:url+ - {NetFetcher}
-    # - +:git+ - {GitFetcher}
-    # - +:path+ - {PathFetcher}
+    # The fetcher for this software
     #
     # @return [Fetcher]
     #
     def fetcher
-      @fetcher ||= if source
+      @fetcher ||= Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir)
+    end
+
+    #
+    # The type of source specified for this software defintion.
+    #
+    # @return [String]
+    #
+    def source_type
+      if source
         if source[:url]
-          NetFetcher.new(self)
+          :url
         elsif source[:git]
-          GitFetcher.new(self)
+          :git
         elsif source[:path]
-          PathFetcher.new(self)
+          :path
         end
       else
-        NullFetcher.new(self)
+        :project_local
       end
     end
 
@@ -861,6 +905,10 @@ module Omnibus
     #
     def log_key
       @log_key ||= "#{super}: #{name}"
+    end
+
+    def to_s
+      "#{name}[#{filepath}]"
     end
   end
 end

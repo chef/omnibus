@@ -61,12 +61,47 @@ module Omnibus
     #
     #   $ omnibus build chefdk
     #
+    method_option :output_manifest,
+      desc: "Create version-manifest.json in current directory at the end of the build",
+      type: :boolean,
+      default: true
+    method_option :use_manifest,
+      desc: "Use the given manifest when downloading software sources.",
+      type: :string,
+      default: nil
     desc 'build PROJECT', 'Build the given Omnibus project'
     def build(name)
-      project = Project.load(name)
+      manifest = if @options[:use_manifest]
+                   Omnibus::Manifest.from_file(@options[:use_manifest])
+                 else
+                   nil
+                 end
 
+      project = Project.load(name, manifest)
       say("Building #{project.name} #{project.build_version}...")
-      project.build_me
+      project.download
+      project.build
+
+      if @options[:output_manifest]
+        FileUtils.mkdir_p('pkg')
+        File.open(::File.join('pkg', 'version-manifest.json'), 'w') do |f|
+          f.write(JSON.pretty_generate(project.built_manifest.to_hash))
+        end
+      end
+    end
+
+
+    register(Command::ChangeLog, 'changelog', 'changelog [COMMAND]', 'Create and view changelogs')
+    CLI.tasks['changelog'].options = Command::ChangeLog.class_options
+
+    #
+    # Generate a version manifest for the given project definition
+    #
+    #   $ omnibus manifest PROJECT
+    #
+    desc 'manifest PROJECT', 'Print a manifest for the given Omnibus project'
+    def manifest(name)
+      puts JSON.pretty_generate(Project.load(name).built_manifest.to_hash)
     end
 
     #

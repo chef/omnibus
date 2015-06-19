@@ -17,6 +17,9 @@
 
 require 'time'
 require 'json'
+require 'omnibus/manifest'
+require 'omnibus/manifest_entry'
+require 'omnibus/reports'
 
 module Omnibus
   class Project
@@ -27,7 +30,7 @@ module Omnibus
       #
       # @return [Project]
       #
-      def load(name)
+      def load(name, manifest=nil)
         loaded_projects[name] ||= begin
           filepath = Omnibus.project_path(name)
 
@@ -39,7 +42,7 @@ module Omnibus
             end
           end
 
-          instance = new(filepath)
+          instance = new(filepath, manifest)
           instance.evaluate_file(filepath)
           instance.load_dependencies
           instance
@@ -58,6 +61,8 @@ module Omnibus
       end
     end
 
+    attr_reader :manifest
+
     include Cleanroom
     include Digestable
     include Logging
@@ -65,8 +70,9 @@ module Omnibus
     include Sugarable
     include Util
 
-    def initialize(filepath = nil)
+    def initialize(filepath = nil, manifest=nil)
       @filepath = filepath
+      @manifest = manifest
     end
 
     #
@@ -370,6 +376,24 @@ module Omnibus
     end
     expose :build_version
 
+
+    #
+    # Set or retrieve the git revision of the omnibus
+    # project being built.
+    #
+    # If not set by the user, and the current workding directory is a
+    # git directory, it will return the revision of the current
+    # working directory.
+    #
+    def build_git_revision(val = NULL)
+      if null?(val)
+        @build_git_revision ||= get_local_revision
+      else
+        @build_git_revision = val
+      end
+    end
+    expose :build_git_revision
+
     #
     # Set or retrieve the build iteration of the project. Defaults to +1+ if not
     # otherwise set.
@@ -668,6 +692,46 @@ module Omnibus
     expose :ohai
 
     #
+    # Location of json-formated version manifest, written at at the
+    # end of the build. If no path is specified
+    # +install_dir+/version-manifest.json is used.
+    #
+    # @example
+    #   json_manifest_path
+    #
+    # @return [String]
+    #
+    def json_manifest_path(path = NULL)
+      if null?(path)
+        @json_manifest_path || File.join(install_dir, "version-manifest.json")
+      else
+        @json_manifest_path=path
+      end
+    end
+    expose :json_manifest_path
+
+    #
+    # Location of text-formatted manifest.
+    # (+install_dir+/version-manifest.txt if none is provided)
+    #
+    # This manifest uses the same format used by the
+    # 'version-manifest' software definition in omnibus-software.
+    #
+    # @example
+    #   text_manifest_path
+    #
+    # @return [String]
+    #
+    def text_manifest_path(path = NULL)
+      if null?(path)
+        @test_manifest_path || File.join(install_dir, "version-manifest.txt")
+      else
+        @text_manifest_path = path
+      end
+    end
+    expose :text_manifest_path
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -685,7 +749,7 @@ module Omnibus
     #
     def load_dependencies
       dependencies.each do |dependency|
-        Software.load(self, dependency)
+        Software.load(self, dependency, manifest)
       end
 
       true
@@ -904,35 +968,78 @@ module Omnibus
     end
 
     #
+    # Cache the build order so we don't re-compute
     #
+    # @return [Array<Omnibus::Software>]
     #
-    def build_me
-      FileUtils.rm_rf(install_dir)
-      FileUtils.mkdir_p(install_dir)
+    def softwares
+      @softwares ||= library.build_order
+    end
 
-      # Cache the build order so we don't re-compute
-      softwares = library.build_order
+    #
+    # Generate a version manifest of the loaded software sources.
+    #
+    # @returns [Omnibus::Manifest]
+    #
+    def built_manifest
+      log.info(log_key) { "Building version manifest" }
+      m = Omnibus::Manifest.new(build_version, build_git_revision)
+      softwares.each do |software|
+        m.add(software.name, software.manifest_entry)
+      end
+      m
+    end
 
-      # Download all softwares in parallel
+    def download
       ThreadPool.new(Config.workers) do |pool|
         softwares.each do |software|
           pool.schedule { software.fetch }
         end
       end
+    end
 
-      # Now build each software
+    def build
+      FileUtils.rm_rf(install_dir)
+      FileUtils.mkdir_p(install_dir)
+
       softwares.each do |software|
         software.build_me
       end
 
-      # Health check
+      write_json_manifest
+      write_text_manifest
       HealthCheck.run!(self)
-
-      # Package
       package_me
-
-      # Compress
       compress_me
+    end
+
+    def write_json_manifest
+      File.open(json_manifest_path, 'w') do |f|
+        f.write(JSON.pretty_generate(built_manifest.to_hash))
+      end
+    end
+
+    #
+    # Writes a text manifest to the text_manifest_path.  This uses the
+    # same method as the "version-manifest" software definition in
+    # omnibus-software.
+    #
+    def write_text_manifest
+      File.open(text_manifest_path, 'w') do |f|
+        f.puts "#{name} #{build_version}"
+        f.puts ""
+        f.puts Omnibus::Reports.pretty_version_map(self)
+      end
+    end
+
+    #
+    # Download and build the project. Preserved for backwards
+    # compatibility.
+    #
+    def build_me
+      # Download all softwares in parallel
+      download
+      build
     end
 
     #
@@ -1044,6 +1151,12 @@ module Omnibus
     # --------------------------------------------------
 
     private
+
+    def get_local_revision
+      GitRepository.new("./").revision
+    rescue StandardError
+      "unknown"
+    end
 
     #
     # The log key for this project, overriden to include the name of the

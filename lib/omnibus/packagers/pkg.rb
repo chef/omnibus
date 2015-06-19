@@ -268,7 +268,7 @@ module Omnibus
         converted = project.package_name.downcase.gsub(/[^[:alnum:]+]/, '')
 
         log.warn(log_key) do
-          "The `name' compontent of Mac package names can only include " \
+          "The `name' component of Mac package names can only include " \
           "alphabetical characters (a-z, A-Z), and numbers (0-9). Converting " \
           "`#{project.package_name}' to `#{converted}'."
         end
@@ -314,7 +314,7 @@ module Omnibus
         converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
 
         log.warn(log_key) do
-          "The `version' compontent of Mac package names can only include " \
+          "The `version' component of Mac package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
           "plus signs (+), and dashes (-). Converting " \
           "`#{project.build_version}' to `#{converted}'."

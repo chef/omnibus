@@ -16,6 +16,7 @@
 
 require 'fileutils'
 require 'open-uri'
+require 'ruby-progressbar'
 
 module Omnibus
   class NetFetcher < Fetcher
@@ -25,6 +26,9 @@ module Omnibus
     # tar probably has compression scheme linked in, otherwise for tarballs
     TAR_EXTENSIONS = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
 
+    # Digest types used for verifying file checksums
+    DIGESTS = [:sha512, :sha256, :sha1, :md5]
+
     #
     # A fetch is required if the downloaded_file (such as a tarball) does not
     # exist on disk, or if the checksum of the downloaded file is different
@@ -33,7 +37,7 @@ module Omnibus
     # @return [true, false]
     #
     def fetch_required?
-      !(File.exist?(downloaded_file) && digest(downloaded_file, :md5) == checksum)
+      !(File.exist?(downloaded_file) && digest(downloaded_file, digest_type) == checksum)
     end
 
     #
@@ -43,7 +47,7 @@ module Omnibus
     # @return [String]
     #
     def version_guid
-      "md5:#{checksum}"
+      "#{digest_type}:#{checksum}"
     end
 
     #
@@ -81,13 +85,24 @@ module Omnibus
     end
 
     #
-    # The version for this item in the cache. The is the md5 of downloaded file
-    # and the URL where it was downloaded from.
+    # The version for this item in the cache. This is the digest of downloaded
+    # file and the URL where it was downloaded from.
     #
     # @return [String]
     #
     def version_for_cache
-      "download_url:#{source[:url]}|md5:#{source[:md5]}"
+      "download_url:#{source[:url]}|#{digest_type}:#{checksum}"
+    end
+
+    #
+    # Returned the resolved version for the manifest.  Since this is a
+    # remote URL, there is no resolution, the version is what we said
+    # it is.
+    #
+    # @return [String]
+    #
+    def self.resolve_version(version, source)
+      version
     end
 
     #
@@ -102,12 +117,12 @@ module Omnibus
     end
 
     #
-    # The checksum (+md5+) as defined by the user in the software definition.
+    # The checksum as defined by the user in the software definition.
     #
     # @return [String]
     #
     def checksum
-      source[:md5]
+      source[digest_type]
     end
 
     private
@@ -123,7 +138,7 @@ module Omnibus
     #
     def download_url
       if Config.use_s3_caching
-        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(software)}"
+        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(self)}"
       else
         source[:url]
       end
@@ -147,6 +162,24 @@ module Omnibus
       end
 
       options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
+      fetcher_retries ||= Omnibus::Config.fetcher_retries
+
+      progress_bar = ProgressBar.create(
+        output: $stdout,
+        format: '%e %B %p%% (%r KB/sec)',
+        rate_scale: ->(rate) { rate / 1024 },
+      )
+
+      reported_total = 0
+
+      options[:content_length_proc] = ->(total) {
+        reported_total = total
+        progress_bar.total = total
+      }
+      options[:progress_proc] = ->(step) {
+        downloaded_amount = [step, reported_total].min
+        progress_bar.progress = downloaded_amount
+      }
 
       file = open(download_url, options)
       FileUtils.cp(file.path, downloaded_file)
@@ -155,9 +188,16 @@ module Omnibus
            Errno::ECONNREFUSED,
            Errno::ECONNRESET,
            Errno::ENETUNREACH,
+           Timeout::Error,
            OpenURI::HTTPError => e
-      log.error(log_key) { "Download failed - #{e.class}!" }
-      raise
+      if fetcher_retries != 0
+        log.debug(log_key) { "Retrying failed download (#{fetcher_retries})..." }
+        fetcher_retries -= 1
+        retry
+      else
+        log.error(log_key) { "Download failed - #{e.class}!" }
+        raise
+      end
     end
 
     #
@@ -168,7 +208,7 @@ module Omnibus
     def extract
       if command = extract_command
         log.info(log_key) { "Extracting `#{downloaded_file}' to `#{Config.source_dir}'" }
-        shellout!(extract_command)
+        shellout!(command)
       else
         log.info(log_key) { "`#{downloaded_file}' is not an archive - copying to `#{project_dir}'" }
 
@@ -187,6 +227,17 @@ module Omnibus
     end
 
     #
+    # The digest type defined in the software definition
+    #
+    # @return [Symbol]
+    #
+    def digest_type
+      DIGESTS.each do |digest|
+        return digest if source.key? digest
+      end
+    end
+
+    #
     # Verify the downloaded file has the correct checksum.#
     #
     # @raise [ChecksumMismatch]
@@ -196,10 +247,10 @@ module Omnibus
       log.info(log_key) { 'Verifying checksum' }
 
       expected = checksum
-      actual   = digest(downloaded_file, :md5)
+      actual   = digest(downloaded_file, digest_type)
 
       if expected != actual
-        raise ChecksumMismatch.new(software, expected, actual)
+        raise ChecksumMismatch.new(self, expected, actual)
       end
     end
 

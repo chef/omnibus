@@ -28,6 +28,7 @@ module Omnibus
         path = File.join(*paths)
 
         FileUtils.mkdir_p(File.dirname(path))
+        FileUtils.rm(path) if File.exist?(path)
 
         if block
           File.open(path, 'wb') { |f| f.write(block.call) }

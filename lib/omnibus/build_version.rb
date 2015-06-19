@@ -46,6 +46,10 @@ module Omnibus
       def semver
         new.semver
       end
+
+      def build_start_time
+        new.build_start_time
+      end
     end
 
     # Create a new BuildVersion
@@ -102,7 +106,7 @@ module Omnibus
       #
       # format: YYYYMMDDHHMMSS example: 20130131123345
       if Config.append_timestamp
-        build_version_items << build_start_time.strftime(TIMESTAMP_FORMAT)
+        build_version_items << build_start_time
       end
 
       # We'll append the git describe information unless we are sitting right
@@ -118,6 +122,26 @@ module Omnibus
       end
 
       build_tag
+    end
+
+    # We'll attempt to retrive the timestamp from the Jenkin's set BUILD_ID
+    # environment variable. This will ensure platform specfic packages for the
+    # same build will share the same timestamp.
+    def build_start_time
+      @build_start_time ||= begin
+                              if ENV['BUILD_ID']
+                                begin
+                                  Time.strptime(ENV['BUILD_ID'], '%Y-%m-%d_%H-%M-%S')
+                                rescue ArgumentError
+                                  error_message =  'BUILD_ID environment variable '
+                                  error_message << 'should be in YYYY-MM-DD_hh-mm-ss '
+                                  error_message << 'format.'
+                                  raise ArgumentError, error_message
+                                end
+                              else
+                                Time.now.utc
+                              end
+                            end.strftime(TIMESTAMP_FORMAT)
     end
 
     # Generates a version string by running
@@ -179,9 +203,9 @@ module Omnibus
     # @return [nil] if no pre-release tag was found
     def prerelease_tag
       prerelease_regex = if commits_since_tag > 0
-                           /^\d+\.\d+\.\d+(?:-|\.)([0-9A-Za-z.-]+)-\d+-g[0-9a-f]+$/
+                           /^v?\d+\.\d+\.\d+(?:-|\.)([0-9A-Za-z.-]+)-\d+-g[0-9a-f]+$/
                          else
-                           /^\d+\.\d+\.\d+(?:-|\.)([0-9A-Za-z.-]+)$/
+                           /^v?\d+\.\d+\.\d+(?:-|\.)([0-9A-Za-z.-]+)$/
                          end
       match = prerelease_regex.match(git_describe)
       match ? match[1] : nil
@@ -237,26 +261,6 @@ module Omnibus
 
     private
 
-    # We'll attempt to retrive the timestamp from the Jenkin's set BUILD_ID
-    # environment variable. This will ensure platform specfic packages for the
-    # same build will share the same timestamp.
-    def build_start_time
-      @build_start_time ||= begin
-                              if ENV['BUILD_ID']
-                                begin
-                                  Time.strptime(ENV['BUILD_ID'], '%Y-%m-%d_%H-%M-%S')
-                                rescue ArgumentError
-                                  error_message =  'BUILD_ID environment variable '
-                                  error_message << 'should be in YYYY-MM-DD_hh-mm-ss '
-                                  error_message << 'format.'
-                                  raise ArgumentError, error_message
-                                end
-                              else
-                                Time.now.utc
-                              end
-                            end
-    end
-
     # Pulls out the major, minor, and patch components from the output
     # of {#git_describe}.
     #
@@ -267,8 +271,13 @@ module Omnibus
     #
     # @todo Compute this once and store the result in an instance variable
     def version_composition
-      version_regexp = /^(\d+)\.(\d+)\.(\d+)/
-      version_regexp.match(git_describe)[1..3]
+      version_regexp = /^v?(\d+)\.(\d+)\.(\d+)/
+
+      if match = version_regexp.match(git_describe)
+        match[1..3]
+      else
+        raise "Invalid semver tag `#{git_describe}'!"
+      end
     end
   end
 end

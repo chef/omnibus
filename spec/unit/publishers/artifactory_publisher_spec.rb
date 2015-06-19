@@ -47,6 +47,7 @@ module Omnibus
       before do
         allow(subject).to receive(:packages).and_return(packages)
         Config.artifactory_base_path('com/getchef')
+        Config.publish_retries(1)
       end
 
       it 'validates the package' do
@@ -62,6 +63,26 @@ module Omnibus
         ).once
 
         subject.publish
+      end
+
+      context 'when upload fails' do
+        before do
+          Config.publish_retries(3)
+
+          # This is really ugly but there is no easy way to stub a method to
+          # raise an exception a set number of times.
+          @times = 0
+          allow(artifact).to receive(:upload) do
+            @times += 1;
+            raise Artifactory::Error::HTTPError.new('status' => '409', 'message' => 'CONFLICT') unless @times > 1
+          end
+        end
+
+        it 'retries the upload ' do
+          output = capture_logging { subject.publish }
+          expect(output).to include('Retrying failed publish')
+        end
+
       end
 
       context 'when an alternate platform and platform version are provided' do

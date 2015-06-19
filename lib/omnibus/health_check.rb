@@ -72,12 +72,14 @@ module Omnibus
       /libmd5\.so/,
       /libmd\.so/,
       /libmp\.so/,
+      /libresolv\.so/,
       /libscf\.so/,
       /libsec\.so/,
       /libsocket\.so/,
       /libssl.so/,
       /libthread.so/,
       /libuutil\.so/,
+      /libkstat\.so/,
       # solaris 11 libraries:
       /libc\.so\.1/,
       /libm\.so\.2/,
@@ -177,7 +179,7 @@ module Omnibus
         log.warn(log_key) { 'Skipping health check on Windows' }
         return true
       end
-
+      log.info(log_key) {"Running health on #{project.name}"}
       bad_libs =  case Ohai['platform']
                   when 'mac_os_x'
                     health_check_otool
