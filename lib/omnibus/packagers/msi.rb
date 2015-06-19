@@ -82,7 +82,7 @@ module Omnibus
         EOH
         shellout!(light_command, returns: [0, 204])
 
-        if cert_name
+        if signing_identity
           sign_package(msi_file)
         end
       end
@@ -187,113 +187,58 @@ module Omnibus
     expose :wix_candle_extension
 
     #
-    # Set the name of the certificate store to use when signing packages.
+    # Set the signing certificate name
     #
     # @example
-    #   cert_store_name "MY"
+    #   signing_identity 'FooCert'
+    #   signing_identity 'FooCert', store: 'BarStore'
     #
-    # @param [String] name
-    #   Name of the certificate store
+    # @param [String] cert_name
+    #   the name of the certificate in the certificate store
+    # @param [Hash<Symbol, String>] params
+    #   an optional hash that defines the parameters for the singing identity
     #
-    # @return [String]
-    #   The name of the certificate store to be used
+    # @option params [String] :store (My)
+    #   The name of the certificate store which contains the certificate
+    # @option params [Array<String>, String] :timestamp_servers
+    #   A trusted timestamp server or a list of truested timestamp servers to 
+    #   be tried. They are tried in the order provided.
     #
-    def cert_store_name(name = NULL)
-      if null?(name)
-        @cert_store_name
-      else
-        unless name.is_a?(String)
-          raise InvalidValue.new(:cert_store_name, 'be a String')
+    #   Setting nothing will default to trying ['http://timestamp.digicert.com',
+    #   'http://timestamp.verisign.com/scripts/timestamp.dll']
+    #
+    # @return [Hash{:name => String, :store => String, :timestamp_servers => Array[String]}]
+    #
+    def signing_identity(cert_name = NULL, params = NULL)
+      unless null?(cert_name)
+        @signing_identity = {}
+        unless cert_name.is_a?(String)
+          raise InvalidValue.new(:signing_identity, 'be a String')
         end
-        @cert_store_name = name
-      end
-    end
-    expose :cert_store_name
 
-    #
-    # Set the name of the certificate use when signing packages.
-    #
-    # @example
-    #   cert_name "MySigningCert"
-    #
-    # @param [String] name
-    #   Name of the certificate
-    #
-    # @return [String]
-    #   The name of the certificate store to be used
-    #
-    def cert_name(name = NULL)
-      if null?(name)
-        @cert_name
-      else
-        unless name.is_a?(String)
-          raise InvalidValue.new(:cert_name, 'be a String')
+        @signing_identity[:name] = cert_name
+
+        if !null?(params)
+          unless params.is_a?(Hash)
+            raise InvalidValue.new(:params, 'be a Hash')
+          end
+
+          invalid_keys = params.keys - [:store, :timestamp_servers]
+          unless invalid_keys.empty?
+            raise InvalidValue.new(:params, "contains invalid keys #{invalid_keys.join(',')}")
+          end
+        else
+          params = {}
         end
-        @cert_name = name
-      end
-    end
-    expose :cert_name
 
-
-    #
-    # Add a timestamp server to be tried.
-    #
-    # Setting nothing will default to trying ['http://timestamp.digicert.com', 
-    # 'http://timestamp.verisign.com/scripts/timestamp.dll']
-    #
-    # If you specify multiple timestamp servers, they will be tried in
-    # the order specified until one of them succeeds
-    #
-    # @example
-    #   timestamp_server "http://timestamp.globalsign.com/scripts/timestamp.dll"
-    #
-    # @param [String] url
-    #   Url of the timestamp server
-    #
-    # @return [Array]
-    #   A list of the timestamp servers to be used
-    #
-    def timestamp_server(url)
-      unless url.is_a?(String)
-        raise InvalidValue.new(:timestamp_server, 'be a String')
+        @signing_identity[:store] = params[:store] || 'My'
+        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
+        @signing_identity[:timestamp_servers] = [servers].flatten
       end
-      @timestamp_servers ||= []
-      @timestamp_servers << url
-      @timestamp_servers
-    end
-    expose :timestamp_server
 
-    #
-    # Set the list of timestamp servers to be tried.
-    #
-    # Setting nothing will default to trying ['http://timestamp.digicert.com', 
-    # 'http://timestamp.verisign.com/scripts/timestamp.dll']
-    #
-    # If you specify multiple timestamp servers, they will be tried in
-    # the order specified until one of them succeeds
-    #
-    # @example
-    #   timestamp_server "http://timestamp.globalsign.com/scripts/timestamp.dll"
-    #
-    # @param [Array] url
-    #   Urls of timestamp servers
-    #
-    # @return [Array]
-    #   A list of the timestamp servers to be used
-    #
-    def timestamp_servers(urls = NULL)
-      if null?(urls)
-        @timestamp_servers || DEFAULT_TIMESTAMP_SERVERS
-      else
-        unless urls.is_a?(Array)
-          raise InvalidValue.new(:timestamp_server, 'be an Array')
-        end
-        urls.each do |url|
-          timestamp_server(url)
-        end
-      end
+      @signing_identity
     end
-    expose :timestamp_servers
+    expose :signing_identity
 
     #
     # @!endgroup
@@ -462,13 +407,23 @@ module Omnibus
       "#{arr.map {|e| "-ext '#{e}'"}.join(' ')}"
     end
 
+    def cert_name
+      signing_identity[:name]
+    end
+
+    def cert_store_name
+      signing_identity[:store]
+    end
+
+    def timestamp_servers
+      signing_identity[:timestamp_servers]
+    end
+
     #
     # Takes a path to a msi and uses the set certificate store and 
     # certificate name
     #
     def sign_package(msi_file)
-      raise MissingRequiredAttribute.new(self, :cert_store_name) if !cert_store_name
-      raise MissingRequiredAttribute.new(self, :cert_name) if !cert_name
       shellout!("signtool.exe sign /v /s #{cert_store_name} /n #{cert_name} \"#{msi_file}\"")
       add_timestamp(msi_file)
     end
