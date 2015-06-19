@@ -271,6 +271,20 @@ module Omnibus
     context 'when signing parameters are provided' do
       let(:msi) { 'somemsi.msi' }
 
+      context 'when invalid parameters' do
+        it 'should raise an InvalidValue error when the certificate name is not a String' do
+          expect{subject.signing_identity(Object.new)}.to raise_error(InvalidValue)
+        end
+
+        it 'should raise an InvalidValue error when params is not a Hash' do
+          expect{subject.signing_identity("foo", Object.new)}.to raise_error(InvalidValue)
+        end
+
+        it 'should raise an InvalidValue error when params contains an invalid key' do
+          expect{subject.signing_identity("foo", bar: 'baz')}.to raise_error(InvalidValue)
+        end
+      end
+
       context 'when valid parameters' do
         before do
           allow(subject).to receive(:shellout!)
