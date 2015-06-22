@@ -356,18 +356,33 @@ module Omnibus
         end
       end
 
-      context 'on Raspbian' do
-        before do
-          # There's no Raspbian in Fauxhai :(
-          stub_ohai(platform: 'debian', version: '7.6') do |data|
-            data['platform'] = 'raspbian'
-            data['platform_version'] = '7.6'
-            data['kernel']['machine'] = 'armv6l'
+      context 'Raspberry Pi' do
+        context 'Raspbian on Pi v1' do
+          before do
+            # There's no Raspbian in Fauxhai :(
+            stub_ohai(platform: 'debian', version: '7.6') do |data|
+              data['platform'] = 'raspbian'
+              data['platform_version'] = '7.6'
+              data['kernel']['machine'] = 'armv6l'
+            end
+          end
+
+          it 'returns armhf' do
+            expect(subject.safe_architecture).to eq('armhf')
           end
         end
 
-        it 'returns armhf' do
-          expect(subject.safe_architecture).to eq('armhf')
+        context 'Ubuntu on Pi v2' do
+          before do
+            # There's no Raspbian in Fauxhai :(
+            stub_ohai(platform: 'ubuntu', version: '14.04') do |data|
+              data['kernel']['machine'] = 'armv7l'
+            end
+          end
+
+          it 'returns armhf' do
+            expect(subject.safe_architecture).to eq('armhf')
+          end
         end
       end
     end

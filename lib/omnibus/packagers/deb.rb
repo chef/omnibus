@@ -400,11 +400,11 @@ module Omnibus
         'amd64'
       when 'i686'
         'i386'
-      when 'armv6l'
-        if Ohai['platform'] == 'raspbian'
+      when /armv\dl/
+        if Ohai['platform'] == 'raspbian' || Ohai['platform'] == 'ubuntu'
           'armhf'
         else
-          'armv6l'
+          Ohai['kernel']['machine']
         end
       when 'ppc64le'
         # Debian prefers to use ppc64el for little endian architecture name 
