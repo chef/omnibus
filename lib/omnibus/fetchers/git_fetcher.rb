@@ -124,7 +124,7 @@ module Omnibus
     # @return [void]
     #
     def git_clone
-      git("clone #{source_url} .")
+      git("clone --recursive #{source_url} .")
     end
 
     #
