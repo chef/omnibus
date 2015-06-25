@@ -92,6 +92,15 @@ module Omnibus
     end
 
     #
+    # Determine if submodules should be cloned.
+    #
+    # @return [true, false]
+    #
+    def clone_submodules?
+      source[:submodules] || false
+    end
+
+    #
     # Determine if a directory is empty
     #
     # @return [true, false]
@@ -124,7 +133,7 @@ module Omnibus
     # @return [void]
     #
     def git_clone
-      git("clone --recursive #{source_url} .")
+      git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
     end
 
     #
