@@ -193,8 +193,8 @@ module Omnibus
     #   signing_identity 'FooCert'
     #   signing_identity 'FooCert', store: 'BarStore'
     #
-    # @param [String] cert_name
-    #   the name of the certificate in the certificate store
+    # @param [String] thumbprint
+    #   the thumbprint of the certificate in the certificate store
     # @param [Hash<Symbol, String>] params
     #   an optional hash that defines the parameters for the singing identity
     #
@@ -203,29 +203,40 @@ module Omnibus
     # @option params [Array<String>, String] :timestamp_servers
     #   A trusted timestamp server or a list of truested timestamp servers to 
     #   be tried. They are tried in the order provided.
+    # @option params [TrueClass, FalseClass] :machine_store (false)
+    #   If set to true, the local machine store will be searched for a valid
+    #   certificate. Otherwise, the current user store is used
     #
     #   Setting nothing will default to trying ['http://timestamp.digicert.com',
     #   'http://timestamp.verisign.com/scripts/timestamp.dll']
     #
-    # @return [Hash{:name => String, :store => String, :timestamp_servers => Array[String]}]
+    # @return [Hash{:thumbprint => String, :store => String, :timestamp_servers => Array[String]}]
     #
-    def signing_identity(cert_name = NULL, params = NULL)
-      unless null?(cert_name)
+    def signing_identity(thumbprint= NULL, params = NULL)
+      unless null?(thumbprint)
         @signing_identity = {}
-        unless cert_name.is_a?(String)
+        unless thumbprint.is_a?(String)
           raise InvalidValue.new(:signing_identity, 'be a String')
         end
 
-        @signing_identity[:name] = cert_name
+        @signing_identity[:thumbprint] = thumbprint
 
         if !null?(params)
           unless params.is_a?(Hash)
             raise InvalidValue.new(:params, 'be a Hash')
           end
 
-          invalid_keys = params.keys - [:store, :timestamp_servers]
+          valid_keys = [:store, :timestamp_servers, :machine_store]
+          invalid_keys = params.keys - valid_keys
           unless invalid_keys.empty?
-            raise InvalidValue.new(:params, "contains invalid keys #{invalid_keys.join(',')}")
+            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(', ')}]. "\
+                                   "Found invalid keys [#{invalid_keys.join(', ')}]")
+          end
+
+          if !params[:machine_store].nil? && !(
+             params[:machine_store].is_a?(TrueClass) || 
+             params[:machine_store].is_a?(FalseClass))
+            raise InvalidValue.new(:params, 'contain key :machine_store of type TrueClass or FalseClass')
           end
         else
           params = {}
@@ -234,6 +245,7 @@ module Omnibus
         @signing_identity[:store] = params[:store] || 'My'
         servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
         @signing_identity[:timestamp_servers] = [servers].flatten
+        @signing_identity[:machine_store] = params[:machine_store] || false
       end
 
       @signing_identity
@@ -407,8 +419,8 @@ module Omnibus
       "#{arr.map {|e| "-ext '#{e}'"}.join(' ')}"
     end
 
-    def cert_name
-      signing_identity[:name]
+    def thumbprint
+      signing_identity[:thumbprint]
     end
 
     def cert_store_name
@@ -419,12 +431,24 @@ module Omnibus
       signing_identity[:timestamp_servers]
     end
 
+    def machine_store?
+      signing_identity[:machine_store]
+    end
+
     #
-    # Takes a path to a msi and uses the set certificate store and 
+    # Takes a path to a msi and uses the set certificate store and
     # certificate name
     #
     def sign_package(msi_file)
-      shellout!("signtool.exe sign /v /s #{cert_store_name} /n #{cert_name} \"#{msi_file}\"")
+      cmd = Array.new.tap do |arr|
+        arr << 'signtool.exe'
+        arr << 'sign /v'
+        arr << '/sm' if machine_store?
+        arr << "/s #{cert_store_name}"
+        arr << "/sha1 #{thumbprint}"
+        arr << "\"#{msi_file}\""
+      end
+      shellout!(cmd.join(" "))
       add_timestamp(msi_file)
     end
 
