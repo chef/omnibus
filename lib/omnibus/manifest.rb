@@ -92,7 +92,7 @@ module Omnibus
     end
 
     def self.from_hash_v1(manifest_data)
-      m = Omnibus::Manifest.new
+      m = Omnibus::Manifest.new(manifest_data['build_version'], manifest_data['build_git_revision'])
       manifest_data['software'].each do |name, entry_data|
         m.add(name, Omnibus::ManifestEntry.new(name, keys_to_syms(entry_data)))
       end
