@@ -33,6 +33,10 @@ module Omnibus
       desc: 'The platform version to publish for',
       type: :string
 
+    class_option :version_manifest,
+      desc: 'Path to the version-manifest.json file to publish with',
+      type: :string
+
     #
     # Publish to S3.
     #
