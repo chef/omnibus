@@ -79,6 +79,15 @@ module Omnibus
     end
 
     #
+    # The JSON representation of this build manifest.
+    #
+    # @return [String]
+    #
+    def to_json
+      JSON.pretty_generate(to_hash)
+    end
+
+    #
     # Class Methods
     #
 
