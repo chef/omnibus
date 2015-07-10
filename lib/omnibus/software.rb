@@ -235,7 +235,8 @@ module Omnibus
             "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
-        extra_keys = val.keys - [:git, :path, :url, :md5, :cookie, :warning, :unsafe, :options, :submodules]
+        extra_keys = val.keys - [:git, :path, :url, :md5, :sha1, :sha256, :sha512,
+                                 :cookie, :warning, :unsafe, :options, :submodules]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
