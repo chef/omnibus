@@ -220,11 +220,21 @@ module Omnibus
     # @option val [String] :path (nil)
     #   a fully-qualified local file system path
     # @option val [String] :md5 (nil)
-    #   the checksum of the downloaded artifact
+    #   the MD5 checksum of the downloaded artifact
+    # @option val [String] :sha1 (nil)
+    #   the SHA1 checksum of the downloaded artifact
+    # @option val [String] :sha256 (nil)
+    #   the SHA256 checksum of the downloaded artifact
+    # @option val [String] :sha512 (nil)
+    #   the SHA512 checksum of the downloaded artifact
     # @option val [String] :cookie (nil)
     #   a cookie to set
     # @option val [String] :warning (nil)
     #   a warning message to print when downloading
+    # @option val [Boolean] :submodules (false)
+    #   clone git submodules
+    #
+    # If multiple checksum types are provided, only the strongest will be used.
     #
     # @return [Hash]
     #
