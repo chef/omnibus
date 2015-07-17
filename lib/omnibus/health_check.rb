@@ -138,6 +138,8 @@ module Omnibus
       /libthr\.so/,
       /libutil\.so/,
       /libelf\.so/,
+      /libkvm\.so/,
+      /libprocstat\.so/,
     ].freeze
 
     class << self
