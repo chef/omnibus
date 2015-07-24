@@ -16,6 +16,8 @@
 
 module Omnibus
   class Packager::MSI < Packager::Base
+    DEFAULT_TIMESTAMP_SERVERS = ['http://timestamp.digicert.com',
+                                 'http://timestamp.verisign.com/scripts/timestamp.dll']
     id :msi
 
     setup do
@@ -65,6 +67,9 @@ module Omnibus
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
+
+        msi_file = windows_safe_path(Config.package_dir, package_name)
+
         light_command = <<-EOH.split.join(' ').squeeze(' ').strip
           light.exe
             -nologo
@@ -73,9 +78,13 @@ module Omnibus
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
             project-files.wixobj source.wixobj
-            -out "#{windows_safe_path(Config.package_dir, package_name)}"
+            -out "#{msi_file}"
         EOH
         shellout!(light_command, returns: [0, 204])
+
+        if signing_identity
+          sign_package(msi_file)
+        end
       end
     end
 
@@ -176,6 +185,72 @@ module Omnibus
       wix_candle_extensions << extension
     end
     expose :wix_candle_extension
+
+    #
+    # Set the signing certificate name
+    #
+    # @example
+    #   signing_identity 'FooCert'
+    #   signing_identity 'FooCert', store: 'BarStore'
+    #
+    # @param [String] thumbprint
+    #   the thumbprint of the certificate in the certificate store
+    # @param [Hash<Symbol, String>] params
+    #   an optional hash that defines the parameters for the singing identity
+    #
+    # @option params [String] :store (My)
+    #   The name of the certificate store which contains the certificate
+    # @option params [Array<String>, String] :timestamp_servers
+    #   A trusted timestamp server or a list of truested timestamp servers to 
+    #   be tried. They are tried in the order provided.
+    # @option params [TrueClass, FalseClass] :machine_store (false)
+    #   If set to true, the local machine store will be searched for a valid
+    #   certificate. Otherwise, the current user store is used
+    #
+    #   Setting nothing will default to trying ['http://timestamp.digicert.com',
+    #   'http://timestamp.verisign.com/scripts/timestamp.dll']
+    #
+    # @return [Hash{:thumbprint => String, :store => String, :timestamp_servers => Array[String]}]
+    #
+    def signing_identity(thumbprint= NULL, params = NULL)
+      unless null?(thumbprint)
+        @signing_identity = {}
+        unless thumbprint.is_a?(String)
+          raise InvalidValue.new(:signing_identity, 'be a String')
+        end
+
+        @signing_identity[:thumbprint] = thumbprint
+
+        if !null?(params)
+          unless params.is_a?(Hash)
+            raise InvalidValue.new(:params, 'be a Hash')
+          end
+
+          valid_keys = [:store, :timestamp_servers, :machine_store]
+          invalid_keys = params.keys - valid_keys
+          unless invalid_keys.empty?
+            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(', ')}]. "\
+                                   "Found invalid keys [#{invalid_keys.join(', ')}]")
+          end
+
+          if !params[:machine_store].nil? && !(
+             params[:machine_store].is_a?(TrueClass) || 
+             params[:machine_store].is_a?(FalseClass))
+            raise InvalidValue.new(:params, 'contain key :machine_store of type TrueClass or FalseClass')
+          end
+        else
+          params = {}
+        end
+
+        @signing_identity[:store] = params[:store] || 'My'
+        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
+        @signing_identity[:timestamp_servers] = [servers].flatten
+        @signing_identity[:machine_store] = params[:machine_store] || false
+      end
+
+      @signing_identity
+    end
+    expose :signing_identity
 
     #
     # @!endgroup
@@ -342,6 +417,73 @@ module Omnibus
     #
     def wix_extension_switches(arr)
       "#{arr.map {|e| "-ext '#{e}'"}.join(' ')}"
+    end
+
+    def thumbprint
+      signing_identity[:thumbprint]
+    end
+
+    def cert_store_name
+      signing_identity[:store]
+    end
+
+    def timestamp_servers
+      signing_identity[:timestamp_servers]
+    end
+
+    def machine_store?
+      signing_identity[:machine_store]
+    end
+
+    #
+    # Takes a path to a msi and uses the set certificate store and
+    # certificate name
+    #
+    def sign_package(msi_file)
+      cmd = Array.new.tap do |arr|
+        arr << 'signtool.exe'
+        arr << 'sign /v'
+        arr << '/sm' if machine_store?
+        arr << "/s #{cert_store_name}"
+        arr << "/sha1 #{thumbprint}"
+        arr << "\"#{msi_file}\""
+      end
+      shellout!(cmd.join(" "))
+      add_timestamp(msi_file)
+    end
+
+    #
+    # Iterates through available timestamp servers and tries to timestamp
+    # the file. If non succeed, an exception is raised.
+    #
+    def add_timestamp(msi_file)
+      success = false
+      timestamp_servers.each do |ts|
+        success = try_timestamp(msi_file, ts)
+        break if success
+      end
+      raise FailedToTimestampMSI.new if !success
+    end
+
+    def try_timestamp(msi_file, url)
+      timestamp_command = "signtool.exe timestamp -t #{url} \"#{msi_file}\""
+      status = shellout(timestamp_command)
+      if status.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to add timestamp with timeserver #{url}
+
+                STDOUT
+                ------
+                #{status.stdout}
+
+                STDERR
+                ------
+                #{status.stderr}
+                EOH
+        end
+      end
+      status.exitstatus == 0
     end
   end
 end

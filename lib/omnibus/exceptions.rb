@@ -317,4 +317,10 @@ EOH
 EOF
     end
   end
+
+  class FailedToTimestampMSI < Error
+    def initialize
+      super("Failed to add timestamp to MSI.")
+    end
+  end
 end
