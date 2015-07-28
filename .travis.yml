@@ -1,28 +1,18 @@
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.1
-
-bundler_args: --jobs 7 --without docs local
-
+bundler_args: "--jobs 7 --without docs local"
 branches:
   only:
     - 2.0-stable
     - 3.0-stable
     - master
-
 script: bundle exec rake travis:ci
-
 notifications:
-  hipchat:
+  slack:
     on_change: true
     on_failure: true
     on_success: false
     on_pull_requests: false
     rooms:
-      # Build Statuses
-      - secure: JdLOITSPHW5xk8eoFOmH1Js5PT6iFgswUG8fIqNq69ie2Qws2K58hPDR6HW2NBEsBb7dW1S5jT6V9RHhm0ykekvEJVa5AjebO3EsZa+Cu/VahFMg4DL+SGYgKlKrZQosd+EgVQQ3C9gj0dApGtKqf2Ej7RNESwCPY8SOduTC6d8=
-      # Release Engineering
-      - secure: PmOaqp2DFyy79VpCuvSYILblK6tP0eDa9fDG9X2j+wggoosBkmlGfnSxp3A2TXlUyK62mr6/B89dRkL2aDWTJ/gqaZ34Elx2rV5S2A5YJIx9stA2+4iXeSlOF2YMNKGwBVmF/kp/nNoG2FqUkUBrRurWAOXZnwxKIhQ7+kLVb/0=
-      # Omnibus
-      - secure: urWu6Qp271NbLtEj5yOapeQHM810cMgIO+d9BiNmg+iCNwX+cJWAUumsxS7/V+B3+FJdGwGaCbh5ji5FnBaMh8+DrzNobArGkRgUnAUvf7SABhXAEvMp4mEkIhun2JiFAoy0bAys5xmRRb5+g6Nsu6zP4Ev747O1K1Awgd7UtW4=
+      secure: udLCoBl71xJBsW3P+YqZbA5xfaB8l4IIF6SKEXpjIUYNYyP6m77uoY9PZ/M/5EN1ojPXDxsZ6SiPEJifVpkX5Hqd0eu1MwWyRXvOwiDf/nkg2Y3mqwUQRb3LDYWZxPn+xp5mHePe3mvTICR1zH49yx7fdZs8Qvzhh3Lno/w/qZ4=
