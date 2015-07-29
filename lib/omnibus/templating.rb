@@ -53,7 +53,14 @@ module Omnibus
       end
 
       template = ERB.new(File.read(source), nil, '-')
-      struct   = Struct.new(*variables.keys).new(*variables.values)
+
+      struct =
+        if variables.empty?
+          Struct.new("Empty")
+        else
+          Struct.new(*variables.keys).new(*variables.values)
+        end
+
       result   = template.result(struct.instance_eval { binding })
 
       File.open(destination, 'w', mode) do |file|

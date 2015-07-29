@@ -45,7 +45,6 @@ module Omnibus
       end
 
       context 'when a destination is given' do
-
         it 'renders at the destination' do
           subject.render_template(source, options)
           expect(destination).to be_a_file
@@ -65,7 +64,19 @@ module Omnibus
         let(:contents) { "<%= not_a_real_variable %>" }
 
         it 'raise an exception' do
-          expect { subject.render_template(source, options) }.to raise_error
+          expect do
+            subject.render_template(source, options)
+          end.to raise_error(NameError)
+        end
+      end
+
+      context 'when no variables are present' do
+        let(:content)   { "static content" }
+        let(:variables) { {} }
+
+        it 'renders the template' do
+          subject.render_template(source, options)
+          expect(destination).to be_a_file
         end
       end
     end
