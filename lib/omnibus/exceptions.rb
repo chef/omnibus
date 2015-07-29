@@ -87,7 +87,7 @@ EOH
 
     def to_s
       <<-EOH
-Attempting to evaluate the template `#{@name}', but it was not found at any of
+Attempting to evaluate the template `#{@template}', but it was not found at any of
 the following locations:
 
 #{@search_paths.map { |path| "    #{path}" }.join("\n")}
