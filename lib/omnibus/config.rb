@@ -443,6 +443,16 @@ module Omnibus
     # @return [String, nil]
     default(:solaris_linker_mapfile, "files/mapfiles/solaris")
 
+    # Architecture to target when building on windows.  This option
+    # should affect the bit-ness of Ruby and DevKit used, the platform of
+    # any MSIs generated and package dlls being downloaded.
+    #
+    # See the windows_x86? and windows_x64? software definition dsl
+    # methods.
+    #
+    # @return [:x86, :x64]
+    default(:windows_arch, :x86)
+
     # --------------------------------------------------
     # @!endgroup
     #
