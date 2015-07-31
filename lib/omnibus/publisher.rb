@@ -35,22 +35,27 @@ module Omnibus
     #
     # @param [String] pattern
     #   the path/pattern of the release artifact(s)
+    #
     # @param [Hash] options
     #   the list of options passed to the publisher
+    # @option options [Hash] :platform_mappings A simple
+    #   mapping of build to publish platform(s)
+    # @example
+    #   {
+    #     'ubuntu-10.04' => [
+    #       'ubuntu-10.04',
+    #       'ubuntu-12.04',
+    #       'ubuntu-14.04',
+    #     ],
+    #   }
     #
     def initialize(pattern, options = {})
       @pattern = pattern
       @options = options.dup
 
-      if @options[:platform]
-        log.warn(log_key) do
-          "Publishing platform has been overriden to '#{@options[:platform]}'"
-        end
-      end
-
-      if @options[:platform_version]
-        log.warn(log_key) do
-          "Publishing platform version has been overriden to '#{@options[:platform_version]}'"
+      if @options[:platform_mappings]
+        log.info(log_key) do
+          "Publishing will be performed using provided platform mappings."
         end
       end
     end
@@ -61,7 +66,49 @@ module Omnibus
     # @return [Array<String>]
     #
     def packages
-      @packages ||= FileSyncer.glob(@pattern).map { |path| Package.new(path) }
+      @packages ||= begin
+        publish_packages = Array.new
+        build_packages   = FileSyncer.glob(@pattern).map { |path| Package.new(path) }
+
+        if @options[:platform_mappings]
+          # the platform map is a simple hash with publish to build platform mappings
+          @options[:platform_mappings].each_pair do |build_platform, publish_platforms|
+            # Splits `ubuntu-12.04` into `ubuntu` and `12.04`
+            build_platform, build_platform_version = build_platform.rpartition('-') - %w( - )
+
+            # locate the package for the build platform
+            packages = build_packages.select do |p|
+              p.metadata[:platform] == build_platform &&
+                p.metadata[:platform_version] == build_platform_version
+            end
+
+            raise InvalidBuildPlatform.new("#{build_platform}-#{build_platform_version}", @pattern) if packages.empty?
+
+            publish_platforms.each do |publish_platform|
+              publish_platform, publish_platform_version = publish_platform.rpartition('-') - %w( - )
+
+              packages.each do |p|
+                # create a copy of our package before mucking with its metadata
+                publish_package  = p.dup
+                publish_metadata = p.metadata.dup.to_hash
+
+                # override the platform and platform version in the metadata
+                publish_metadata[:platform]         = publish_platform
+                publish_metadata[:platform_version] = publish_platform_version
+
+                # Set the updated metadata on the package object
+                publish_package.metadata = Metadata.new(publish_package, publish_metadata)
+
+                publish_packages << publish_package
+              end
+            end
+          end
+        else
+          publish_packages.concat(build_packages)
+        end
+
+        publish_packages
+      end
     end
 
     #
@@ -78,45 +125,6 @@ module Omnibus
     end
 
     private
-
-    #
-    # The platform to publish a package for. A publisher can be optionally
-    # initialized with a platform which should be used in all publishing
-    # logic. This allows a package built on one platform to be published
-    # for another platform. For example, one might build on Ubuntu and
-    # test/publish on Ubuntu and Debian.
-    #
-    # @note Even if a glob pattern matches multiple packages (potentially
-    #   across multiple platforms) all packages will be published for the
-    #   same platform.
-    #
-    # @param [Package] package
-    #
-    # @return [String]
-    #
-    def publish_platform(package)
-      @options[:platform] || package.metadata[:platform]
-    end
-
-    #
-    # The platform version to publish a package for. A publisher can be
-    # optionally initialized with a platform version which should be used
-    # in all publishing logic. This allows a package built on one
-    # platform to be published for another platform version. For example,
-    # one might build on Ubuntu 10.04 and test/publish on Ubuntu 10.04
-    # and 12.04.
-    #
-    # @note Even if a glob pattern matches multiple packages (potentially
-    #   across multiple platforms) all packages will be published for the
-    #   same platform version.
-    #
-    # @param [Package] package
-    #
-    # @return [String]
-    #
-    def publish_platform_version(package)
-      @options[:platform_version] || package.metadata[:platform_version]
-    end
 
     def safe_require(name)
       require name

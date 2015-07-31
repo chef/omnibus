@@ -18,19 +18,23 @@ module Omnibus
   class Command::Publish < Command::Base
     namespace :publish
 
-    # These options are useful for publish packages that were built for a
-    # paticluar platform/version and tested on another platform/version.
+    # This option is useful for publish packages that were built for a
+    # particular platform/version but tested on other platform/versions.
     #
     # For example, one might build on Ubuntu 10.04 and test/publish on
-    # Ubuntu 11.04, 12.04 and Debian 7.
+    # Ubuntu 10.04, 12.04, and 14.04.
     #
-    # If these options are used with the glob pattern support all packages
-    # will be published to the same platform/version.
-    class_option :platform,
-      desc: 'The platform to publish for',
-      type: :string
-    class_option :platform_version,
-      desc: 'The platform version to publish for',
+    # @example JSON
+    #   {
+    #     "ubuntu-10.04": [
+    #       "ubuntu-10.04",
+    #       "ubuntu-12.04",
+    #       "ubuntu-14.04"
+    #     ]
+    #   }
+    #
+    class_option :platform_mappings,
+      desc: 'The optional platform mappings JSON file to publish with',
       type: :string
 
     class_option :version_manifest,
@@ -72,8 +76,12 @@ module Omnibus
     # @return [void]
     #
     def publish(klass, pattern, options)
+      if options[:platform_mappings]
+        options[:platform_mappings] = JSON.parse(File.read(File.expand_path(options[:platform_mappings])))
+      end
+
       klass.publish(pattern, options) do |package|
-        say("Uploaded '#{package.name}'", :green)
+        say("Published '#{package.name}' for #{package.metadata[:platform]}-#{package.metadata[:platform_version]}", :green)
       end
     end
   end

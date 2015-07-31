@@ -174,8 +174,8 @@ module Omnibus
     def metadata_for(package)
       {
         'omnibus.project'          => package.metadata[:name],
-        'omnibus.platform'         => publish_platform(package),
-        'omnibus.platform_version' => publish_platform_version(package),
+        'omnibus.platform'         => package.metadata[:platform],
+        'omnibus.platform_version' => package.metadata[:platform_version],
         'omnibus.architecture'     => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
         'omnibus.iteration'        => package.metadata[:iteration],
@@ -222,8 +222,8 @@ module Omnibus
         Config.artifactory_base_path,
         package.metadata[:name],
         package.metadata[:version],
-        publish_platform(package),
-        publish_platform_version(package),
+        package.metadata[:platform],
+        package.metadata[:platform_version],
         package.metadata[:basename],
       )
     end

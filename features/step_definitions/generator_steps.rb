@@ -27,3 +27,15 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
     package_tmp   './local/omnibus/pkg-tmp'
   EOH
 end
+
+Given(/^I have a platform mappings file named "(.+)"$/) do |name|
+  write_file(name, <<-EOH.gsub(/^ {4}/, ''))
+    {
+      "ubuntu-10.04": [
+        "ubuntu-10.04",
+        "ubuntu-12.04",
+        "ubuntu-14.04"
+      ]
+    }
+  EOH
+end

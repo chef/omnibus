@@ -72,8 +72,8 @@ module Omnibus
     #
     def key_for(package, *stuff)
       File.join(
-        publish_platform(package),
-        publish_platform_version(package),
+        package.metadata[:platform],
+        package.metadata[:platform_version],
         package.metadata[:arch],
         package.name,
         *stuff,
