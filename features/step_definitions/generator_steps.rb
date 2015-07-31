@@ -1,7 +1,7 @@
 require 'aruba/api'
 
 Given(/^I have an omnibus project named "(.+)"$/) do |name|
-  create_dir(name)
+  create_directory(name)
   cd(name)
 
   write_file("config/projects/#{name}.rb", <<-EOH.gsub(/^ {4}/, ''))
