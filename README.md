@@ -284,6 +284,10 @@ whitelist_file /libpcrecpp\.so\..+/
 It is typically a good idea to add a conditional to whitelist based on the specific
 platform that requires it.
 
+*Warning: You should only add libraries to the whitelist that are guaranteed to
+be on the system you install to; if a library comes from a non-default package
+you should instead build it into the package.*
+
 Changelog
 ---------
 STATUS: *EXPERIMENTAL*
