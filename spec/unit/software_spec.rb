@@ -376,7 +376,7 @@ module Omnibus
       end
 
       it "raises an error if it was given a manifest but can't find it's entry" do
-        expect{another_project.manifest_entry}.to raise_error
+        expect{another_project.manifest_entry}.to raise_error(Manifest::MissingManifestEntry)
       end
     end
 
