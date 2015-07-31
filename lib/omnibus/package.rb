@@ -104,6 +104,15 @@ module Omnibus
     end
 
     #
+    # Set the metadata for this package
+    #
+    # @param [Metadata] metadata
+    #
+    def metadata=(metadata)
+      @metadata = metadata
+    end
+
+    #
     # Validate the presence of the required components for the package.
     #
     # @raise [NoPackageFile] if the package is not present
