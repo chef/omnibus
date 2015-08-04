@@ -38,7 +38,10 @@ module Omnibus
             artifact_for(package).upload(
               repository,
               remote_path_for(package),
-              metadata_for(package),
+              metadata_for(package).merge(
+                'build.name'   => package.metadata[:name],
+                'build.number' => package.metadata[:version],
+              ),
             )
           end
         rescue Artifactory::Error::HTTPError => e
@@ -55,6 +58,12 @@ module Omnibus
 
         # If a block was given, "yield" the package to the caller
         block.call(package) if block
+      end
+
+      if packages.empty?
+         log.warn(log_key) { "No packages were uploaded, build object will not be created." }
+      else
+        build_for(packages).save
       end
     end
 
@@ -76,6 +85,62 @@ module Omnibus
           'md5'  => package.metadata[:md5],
           'sha1' => package.metadata[:sha1],
         }
+      )
+    end
+
+    #
+    # The build object that corresponds to this package.
+    #
+    # @param [Array<Package>] packages
+    #   the packages to create the build from
+    #
+    # @return [Artifactory::Resource::Build]
+    #
+    def build_for(packages)
+      name = packages.first.metadata[:name]
+      # Attempt to load the version-manifest.json file which represents
+      # the build.
+      manifest = if File.exist?(version_manifest)
+                   Manifest.from_file(version_manifest)
+                 else
+                   Manifest.new(packages.first.metadata[:version])
+                 end
+
+      # Upload the actual package
+      log.info(log_key) { "Saving build info for #{name}, Build ##{manifest.build_version}" }
+
+      Artifactory::Resource::Build.new(
+        client: client,
+        name:   name,
+        number: manifest.build_version,
+        vcs_revision: manifest.build_git_revision,
+        build_agent: {
+          name: 'omnibus',
+          version: Omnibus::VERSION,
+        },
+        properties: {
+          'omnibus.project' => name,
+          'omnibus.version' => manifest.build_version,
+          'omnibus.version_manifest' => manifest.to_json,
+        },
+        modules: [
+          {
+            # com.getchef:chef-server:12.0.0
+            id: [
+              Config.artifactory_base_path.gsub('/', '.'),
+              name,
+              manifest.build_version,
+            ].join(':'),
+            artifacts: packages.map do |package|
+              {
+                type: File.extname(package.path).split('.').last,
+                sha1: package.metadata[:sha1],
+                md5:  package.metadata[:md5],
+                name: package.metadata[:basename],
+              }
+            end
+          }
+        ]
       )
     end
 
@@ -109,8 +174,8 @@ module Omnibus
     def metadata_for(package)
       {
         'omnibus.project'          => package.metadata[:name],
-        'omnibus.platform'         => publish_platform(package),
-        'omnibus.platform_version' => publish_platform_version(package),
+        'omnibus.platform'         => package.metadata[:platform],
+        'omnibus.platform_version' => package.metadata[:platform_version],
         'omnibus.architecture'     => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
         'omnibus.iteration'        => package.metadata[:iteration],
@@ -131,6 +196,15 @@ module Omnibus
     end
 
     #
+    # The path to the builds version-manfest.json file (as supplied as an option).
+    #
+    # @return [String]
+    #
+    def version_manifest
+      @options[:version_manifest] || ''
+    end
+
+    #
     # The path where the package will live inside of the Artifactory repository.
     # This is dynamically computed from the values in the project definition
     # and the package metadata.
@@ -148,8 +222,8 @@ module Omnibus
         Config.artifactory_base_path,
         package.metadata[:name],
         package.metadata[:version],
-        publish_platform(package),
-        publish_platform_version(package),
+        package.metadata[:platform],
+        package.metadata[:platform_version],
         package.metadata[:basename],
       )
     end

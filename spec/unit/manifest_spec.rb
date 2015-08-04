@@ -76,6 +76,8 @@ module Omnibus
     describe "#from_hash" do
       let(:manifest) {
         { "manifest_format" => 1,
+          "build_version" => "12.4.0+20150629082811",
+          "build_git_revision" => "2e763ac957b308ba95cef256c2491a5a55a163cc",
           "software" => {
             "zlib" => {
               "locked_source" => {
@@ -89,6 +91,14 @@ module Omnibus
       let(:v2_manifest) {
         {"manifest_format" => 2}
       }
+
+      it "has a build_version" do
+        expect(Manifest.from_hash(manifest).build_version).to eq('12.4.0+20150629082811')
+      end
+
+      it "has a build_git_revision" do
+        expect(Manifest.from_hash(manifest).build_git_revision).to eq('2e763ac957b308ba95cef256c2491a5a55a163cc')
+      end
 
       it "returns a manifest from a hash" do
         expect(Manifest.from_hash(manifest)).to be_a(Manifest)

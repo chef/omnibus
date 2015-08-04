@@ -14,7 +14,7 @@ module Omnibus
 
     describe "when given nil" do
       it "fails" do
-        expect { subject.build_version }.to raise_error
+        expect { subject.build_version }.to raise_error(RuntimeError)
       end
     end
 
@@ -128,7 +128,7 @@ module Omnibus
         end
 
         it "fails" do
-          expect { subject_with_description.build_version }.to raise_error
+          expect { subject_with_description.build_version }.to raise_error(RuntimeError)
         end
       end
     end
@@ -141,7 +141,7 @@ module Omnibus
       end
 
       it "fails" do
-        expect { subject_with_description.build_version }.to raise_error
+        expect { subject_with_description.build_version }.to raise_error(RuntimeError)
       end
     end
   end

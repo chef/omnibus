@@ -34,11 +34,14 @@ module Omnibus
     let(:packages) { [package] }
     let(:client)   { double('Artifactory::Client') }
     let(:artifact) { double('Artifactory::Resource::Artifact', upload: nil) }
+    let(:build)    { double('Artifactory::Resource::Build') }
 
     before do
       allow(subject).to receive(:client).and_return(client)
       allow(subject).to receive(:artifact_for).and_return(artifact)
+      allow(subject).to receive(:build_for).and_return(build)
       allow(package).to receive(:metadata).and_return(metadata)
+      allow(build).to   receive(:save)
     end
 
     subject { described_class.new(path, repository: repository) }
@@ -65,6 +68,20 @@ module Omnibus
         subject.publish
       end
 
+      it 'it creates a build object for all packages' do
+        expect(build).to receive(:save).once
+        subject.publish
+      end
+
+      context 'when no packages exist' do
+        let(:packages) { [] }
+
+        it 'does nothing' do
+          expect(artifact).to_not receive(:upload)
+          expect(build).to_not    receive(:save)
+        end
+      end
+
       context 'when upload fails' do
         before do
           Config.publish_retries(3)
@@ -83,26 +100,6 @@ module Omnibus
           expect(output).to include('Retrying failed publish')
         end
 
-      end
-
-      context 'when an alternate platform and platform version are provided' do
-        subject do
-          described_class.new(path,
-            repository: repository,
-            platform: 'debian',
-            platform_version: '7',
-          )
-        end
-
-        it 'overrides the platform and platform version used for publishing' do
-          expect(artifact).to receive(:upload).with(
-            repository,
-            'com/getchef/chef/11.0.6/debian/7/chef.deb',
-            an_instance_of(Hash),
-          ).once
-
-          subject.publish
-        end
       end
 
       context 'when a block is given' do

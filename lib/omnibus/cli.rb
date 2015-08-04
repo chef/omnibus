@@ -85,7 +85,7 @@ module Omnibus
       if @options[:output_manifest]
         FileUtils.mkdir_p('pkg')
         File.open(::File.join('pkg', 'version-manifest.json'), 'w') do |f|
-          f.write(JSON.pretty_generate(project.built_manifest.to_hash))
+          f.write(project.built_manifest.to_json)
         end
       end
     end

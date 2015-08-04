@@ -1,13 +1,8 @@
 Feature: omnibus publish
-  Scenario: Overriding publishing platform
-    * I run `omnibus publish artifactory fake * --platform debian`
+  Scenario: Providing platform mappings file
+    * I have a platform mappings file named "platform_mappings.json"
+    * I run `omnibus publish artifactory fake * --platform-mappings platform_mappings.json`
     * the output should contain:
       """
-      Publishing platform has been overriden to 'debian'
-      """
-  Scenario: Overriding publishing platform version
-    * I run `omnibus publish artifactory fake * --platform-version 7`
-    * the output should contain:
-      """
-      Publishing platform version has been overriden to '7'
+      Publishing will be performed using provided platform mappings.
       """

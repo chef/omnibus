@@ -254,6 +254,15 @@ module Omnibus
     end
 
     #
+    # Hash representation of this metadata.
+    #
+    # @return [Hash]
+    #
+    def to_hash
+      @data.dup
+    end
+
+    #
     # The JSON representation of this metadata.
     #
     # @return [String]
