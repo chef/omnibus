@@ -269,6 +269,24 @@ omnibus manifest PROJECT -l warn
 This will output a JSON-formatted manifest containing the resolved
 version of every software definition.
 
+Whitelisting Libraries
+----------------------
+
+Sometimes a platform has libraries that need to be whitelisted so the healthcheck
+can pass. The whitelist found in the [healthcheck](https://github.com/chef/omnibus/blob/master/lib/omnibus/health_check.rb)
+code comprises the minimal required for successful builds on supported platforms.
+
+To add your own whitelisted library, simply add the a regex to your software
+definition in your omnibus project as follows:
+```
+whitelist_file /libpcrecpp\.so\..+/
+```
+It is typically a good idea to add a conditional to whitelist based on the specific
+platform that requires it.
+
+*Warning: You should only add libraries to the whitelist that are guaranteed to
+be on the system you install to; if a library comes from a non-default package
+you should instead build it into the package.*
 
 Changelog
 ---------
