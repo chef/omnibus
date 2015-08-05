@@ -407,11 +407,6 @@ module Omnibus
     end
     expose :build
 
-    def windows_arch_i386?
-        Config.windows_arch == :x86
-    end
-    expose :windows_arch_i386?
-
     #
     # The path to the downloaded file from a NetFetcher.
     #
