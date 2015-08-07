@@ -57,9 +57,12 @@ module Omnibus
         EOH
 
         # Compile with candle.exe
+        log.debug(log_key) { "wix_candle_flags: #{wix_candle_flags}" }
+
         shellout! <<-EOH.split.join(' ').squeeze(' ').strip
           candle.exe
             -nologo
+            #{wix_candle_flags}
             #{wix_extension_switches(wix_candle_extensions)}
             -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
             "#{windows_safe_path(staging_dir, 'source.wxs')}"
@@ -404,6 +407,17 @@ module Omnibus
     #
     def wix_candle_extensions
       @wix_candle_extensions ||= []
+    end
+
+    #
+    # Returns the options to use for candle
+    #
+    # @return [Array]
+    #   the extensions that will be loaded for candle
+    #
+    def wix_candle_flags
+      # we support x86 or x64.  No Itanium support (ia64).
+      @wix_candle_flags ||= "-arch " + (Config.windows_arch == :x86 ? "x86" : "x64")
     end
 
     #

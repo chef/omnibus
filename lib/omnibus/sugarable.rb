@@ -32,10 +32,16 @@ module Omnibus
   module Sugarable
     def self.included(base)
       base.send(:include, Chef::Sugar::DSL)
+      base.send(:include, Omnibus::Sugar)
 
       if base < Cleanroom
         # Make all the "sugars" available in the cleanroom (DSL)
         Chef::Sugar::DSL.instance_methods.each do |instance_method|
+          base.send(:expose, instance_method)
+        end
+
+        # Make all the common "sugars" available in the cleanroom (DSL)
+         Omnibus::Sugar.instance_methods.each do |instance_method|
           base.send(:expose, instance_method)
         end
       end
@@ -47,6 +53,18 @@ module Omnibus
     # all the DSL methods.
     def node
       Ohai
+    end
+  end
+
+  # This module is a wrapper for common Chef::Sugar-like functions that
+  # are common to multiple DSLs (like project and software). The extensions
+  # below will be injected into CleanRoom, and hence visible to the DSLs.
+  module Sugar
+
+    # Returns whether the Windows build target is 32-bit (x86).
+    # If this returns false, the target is x64. Itanium is not supported.
+    def windows_arch_i386?
+      Config.windows_arch == :x86
     end
   end
 end
