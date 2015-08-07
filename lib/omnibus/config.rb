@@ -451,7 +451,13 @@ module Omnibus
     # methods.
     #
     # @return [:x86, :x64]
-    default(:windows_arch, :x86)
+    default(:windows_arch) do
+        if Ohai['kernel']['machine'] == 'x86_64'
+            :x64
+        else
+            :x86
+        end
+    end
 
     # --------------------------------------------------
     # @!endgroup
