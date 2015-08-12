@@ -3,7 +3,7 @@ require 'omnibus/manifest_entry'
 
 module Omnibus
   describe Fetcher do
-        let(:source_path) { '/local/path' }
+    let(:source_path) { '/local/path' }
     let(:project_dir) { '/project/dir' }
     let(:build_dir) { '/build/dir' }
 
@@ -11,6 +11,7 @@ module Omnibus
       double(Software,
         name: 'software',
         locked_version: '31aedfs',
+        described_version: 'mrfancypants',
         locked_source: { path: source_path })
     end
 
@@ -24,6 +25,10 @@ module Omnibus
 
       it "sets the source to the locked_source" do
         expect(subject.source).to eq({ path: source_path})
+      end
+
+      it 'sets the described_version to the described version' do
+        expect(subject.described_version).to eq('mrfancypants')
       end
     end
   end
