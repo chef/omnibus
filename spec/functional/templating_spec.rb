@@ -9,8 +9,8 @@ module Omnibus
     subject { RandomClass.new }
 
     describe '#render_template' do
-      let(:source)      { "#{tmp_path}/source.erb" }
-      let(:destination) { "#{tmp_path}/final" }
+      let(:source)      { File.join(tmp_path, 'source.erb') }
+      let(:destination) { File.join(tmp_path, 'final') }
       let(:mode)        { 0644 }
       let(:variables)   { { name: 'Name' } }
       let(:contents) do
@@ -40,7 +40,7 @@ module Omnibus
 
         it 'renders adjacent, without the erb extension' do
           subject.render_template(source, options)
-          expect("#{tmp_path}/source").to be_a_file
+          expect(File.join(tmp_path, 'source')).to be_a_file
         end
       end
 

@@ -48,6 +48,7 @@ RSpec.configure do |config|
 
   config.filter_run_excluding(windows_only: true) unless windows?
   config.filter_run_excluding(mac_only: true) unless mac?
+  config.filter_run_excluding(not_supported_on_windows: true) if windows?
 
   if config.files_to_run.one?
     # Use the documentation formatter for detailed output,

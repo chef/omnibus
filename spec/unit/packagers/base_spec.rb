@@ -5,7 +5,7 @@ module Omnibus
     let(:project) do
       Project.new.tap do |project|
         project.name('project')
-        project.install_dir('/opt/project')
+        project.install_dir(File.join(tmp_path, 'opt/project'))
         project.homepage('https://example.com')
         project.build_version('1.2.3')
         project.build_iteration('2')
@@ -15,7 +15,7 @@ module Omnibus
 
     before do
       # Force the Dir.mktmpdir call on staging_dir
-      allow(Dir).to receive(:mktmpdir).and_return('/tmp/dir')
+      allow(Dir).to receive(:mktmpdir).and_return(File.join(tmp_path, 'tmp/dir'))
 
       Config.package_dir(tmp_path)
     end
@@ -77,7 +77,7 @@ module Omnibus
       end
 
       it 'returns the project instances install_dir' do
-        expect(subject.install_dir).to eq('/opt/project')
+        expect(subject.install_dir).to eq(project.install_dir)
       end
     end
 
@@ -117,7 +117,7 @@ module Omnibus
       before { allow(subject).to receive(:id).and_return(id) }
 
       context 'when a local resource exists' do
-        let(:resources_path) { '/resources/path' }
+        let(:resources_path) { File.join(tmp_path, '/resources/path') }
 
         before do
           project.resources_path(resources_path)
@@ -130,26 +130,16 @@ module Omnibus
         it 'returns the local path' do
           expect(subject.resource_path('foo/bar.erb')).to eq("#{resources_path}/#{id}/foo/bar.erb")
         end
+
+        it 'returns the path with the id' do
+          expect(subject.resources_path).to eq("#{resources_path}/#{id}")
+        end
       end
 
       context 'when a local resource does not exist' do
         it 'returns the remote path' do
           expect(subject.resource_path('foo/bar.erb')).to eq("#{Omnibus.source_root.join("resources/#{id}/foo/bar.erb")}")
         end
-      end
-    end
-
-    describe '#resoures_path' do
-      let(:id) { :base }
-      let(:resources_path) { '/resources/path' }
-
-      before do
-        project.resources_path(resources_path)
-        allow(subject).to receive(:id).and_return(id)
-      end
-
-      it 'returns the path with the id' do
-        expect(subject.resources_path).to eq("#{resources_path}/#{id}")
       end
     end
   end
