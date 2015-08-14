@@ -51,7 +51,7 @@ module Omnibus
         end
       end
 
-      context 'when a mode is given' do
+      context 'when a mode is given', :not_supported_on_windows do
         let(:mode) { 0755 }
 
         it 'renders the object with the mode' do
