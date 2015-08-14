@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Omnibus
   describe Package do
-    let(:path) { '/path/to/files/thing.deb' }
+    let(:path) { "#{windows? ? 'C:' : ''}/path/to/files/thing.deb" }
 
     subject { described_class.new(path) }
 

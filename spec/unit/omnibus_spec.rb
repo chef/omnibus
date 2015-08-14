@@ -7,14 +7,14 @@ describe Omnibus do
 
     allow(Gem::Specification).to receive(:find_all_by_name)
       .with('omnibus-software')
-      .and_return([double(gem_dir: '/gem/omnibus-software')])
+      .and_return([double(gem_dir: File.join(tmp_path, '/gem/omnibus-software'))])
 
     allow(Gem::Specification).to receive(:find_all_by_name)
       .with('custom-omnibus-software')
-      .and_return([double(gem_dir: '/gem/custom-omnibus-software')])
+      .and_return([double(gem_dir: File.join(tmp_path, '/gem/custom-omnibus-software'))])
 
-    Omnibus::Config.project_root('/foo/bar')
-    Omnibus::Config.local_software_dirs(['/local', '/other'])
+    Omnibus::Config.project_root(File.join(tmp_path, '/foo/bar'))
+    Omnibus::Config.local_software_dirs([File.join(tmp_path, '/local'), File.join(tmp_path, '/other')])
     Omnibus::Config.software_gems(['omnibus-software', 'custom-omnibus-software'])
   end
 
@@ -25,8 +25,11 @@ describe Omnibus do
     end
 
     it 'returns the path when the file exists' do
-      ruby = Bundler.which('ruby')
+
+      ruby_cmd = windows? ? 'ruby.exe' : 'ruby'
+      ruby = Bundler.which(ruby_cmd)
       expect(subject.which(ruby)).to eq(ruby)
+      expect(subject.which(ruby_cmd)).to eq(ruby)
     end
   end
 
@@ -76,7 +79,7 @@ describe Omnibus do
         /other/file
         /gem/omnibus-software/file
         /gem/custom-omnibus-software/file
-      ))
+      ).map { |path| File.join(tmp_path, path) })
     end
   end
 end
