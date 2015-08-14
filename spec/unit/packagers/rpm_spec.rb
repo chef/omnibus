@@ -224,14 +224,17 @@ module Omnibus
 
       context 'when leaf directories owned by the filesystem package are present' do
         before do
-          create_file("#{staging_dir}/BUILD/opt")
+          create_directory("#{staging_dir}/BUILD/usr/lib")
+          create_directory("#{staging_dir}/BUILD/opt")
+          create_file("#{staging_dir}/BUILD/opt/thing")
         end
 
-        it 'does not write them into the spec' do
+        it 'is written into the spec with ownership and permissions' do
           subject.write_rpm_spec
           contents = File.read(spec_file)
 
-          expect(contents).to_not include("/opt")
+          expect(contents).to include("%dir %attr(0755,root,root) /opt")
+          expect(contents).to include("%dir %attr(555,root,root) /usr/lib")
         end
       end
     end
