@@ -9,8 +9,10 @@ module Omnibus
     # for testing methods like +ruby+ and +rake+ without the need to compile
     # a real Ruby just for functional tests.
     #
+    # Haha, this will totally work on windows..  (no it won't).
     def fake_embedded_bin(name)
       create_directory(embedded_bin_dir)
+      name = 'ruby.exe' if windows? && name == 'ruby'
       create_link(Bundler.which(name), File.join(embedded_bin_dir, name))
     end
 
@@ -32,7 +34,7 @@ module Omnibus
       end
     end
 
-    describe '#patch' do
+    describe '#patch', :not_supported_on_windows do
       it 'applies the patch' do
         configure = File.join(project_dir, 'configure')
         File.open(configure, 'w') do |f|
@@ -79,7 +81,7 @@ module Omnibus
       end
     end
 
-    describe '#gem' do
+    describe '#gem', :not_supported_on_windows do
       it 'executes the command as the embedded gem' do
         gemspec = File.join(tmp_path, 'example.gemspec')
         File.open(gemspec, 'w') do |f|
@@ -106,7 +108,7 @@ module Omnibus
       end
     end
 
-    describe '#bundler' do
+    describe '#bundler', :not_supported_on_windows do
       it 'executes the command as the embedded bundler' do
         gemspec = File.join(tmp_path, 'example.gemspec')
         File.open(gemspec, 'w') do |f|
@@ -145,7 +147,7 @@ module Omnibus
       end
     end
 
-    describe '#appbundle' do
+    describe '#appbundle', :not_supported_on_windows do
       it 'executes the command as the embedded appbundler' do
 
         source_dir       = "#{Omnibus::Config.source_dir}/example"
@@ -210,7 +212,7 @@ module Omnibus
       end
     end
 
-    describe '#rake' do
+    describe '#rake', :not_supported_on_windows do
       it 'executes the command as the embedded rake' do
         rakefile = File.join(tmp_path, 'Rakefile')
         File.open(rakefile, 'w') do |f|
@@ -445,7 +447,7 @@ module Omnibus
       end
     end
 
-    describe '#link' do
+    describe '#link', :not_supported_on_windows do
       it 'links the file' do
         path_a = File.join(tmp_path, 'file1')
         path_b = File.join(tmp_path, 'file2')

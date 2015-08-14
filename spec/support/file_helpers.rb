@@ -39,8 +39,12 @@ module Omnibus
         path
       end
 
-      def create_link(a, b)
-        FileUtils.ln_s(a, b)
+      def create_link(src, dest)
+        if windows?
+          FileUtils.ln(src, dest) unless File.exist?(dest)
+        else
+          FileUtils.ln_s(src, dest) unless File.exist?(dest)
+        end
       end
     end
   end

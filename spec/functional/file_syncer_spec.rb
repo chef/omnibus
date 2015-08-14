@@ -144,12 +144,17 @@ module Omnibus
           described_class.sync(source, destination)
 
           expect("#{destination}/bin/git").to be_a_file
-          expect("#{destination}/bin/git-tag").to be_a_hardlink
-          expect("#{destination}/bin/git-write-tree").to be_a_hardlink
+          if windows?
+            expect("#{destination}/bin/git-tag").to be_a_file
+            expect("#{destination}/bin/git-write-tree").to be_a_file
+          else
+            expect("#{destination}/bin/git-tag").to be_a_hardlink
+            expect("#{destination}/bin/git-write-tree").to be_a_hardlink
+          end
         end
       end
 
-      context 'with deeply nested paths and symlinks' do
+      context 'with deeply nested paths and symlinks', :not_supported_on_windows do
         let(:source) do
           source = File.join(tmp_path, 'source')
           FileUtils.mkdir_p(source)
@@ -173,10 +178,10 @@ module Omnibus
           create_directory(source, 'empty_directory')
 
           create_directory(source, 'links')
-                 create_file(source, 'links', 'home.html')
-                 FileUtils.ln_s("./home.html", "#{source}/links/index.html")
-                 FileUtils.ln_s("./home.html", "#{source}/links/default.html")
-                 FileUtils.ln_s("../source/bin/apt", "#{source}/links/apt")
+               create_file(source, 'links', 'home.html')
+               FileUtils.ln_s('./home.html', "#{source}/links/index.html")
+               FileUtils.ln_s('./home.html', "#{source}/links/default.html")
+               FileUtils.ln_s('../source/bin/apt', "#{source}/links/apt")
 
           FileUtils.ln_s('/foo/bar', "#{source}/root")
 
