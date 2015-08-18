@@ -234,7 +234,7 @@ module Omnibus
           contents = File.read(spec_file)
 
           expect(contents).to include("%dir %attr(0755,root,root) /opt")
-          expect(contents).to include("%dir %attr(555,root,root) /usr/lib")
+          expect(contents).to include("%dir %attr(0555,root,root) /usr/lib")
         end
       end
     end
