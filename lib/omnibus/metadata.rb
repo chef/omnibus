@@ -176,6 +176,10 @@ module Omnibus
           #
           #  http://www.jrsoftware.org/ishelp/index.php?topic=winvernotes
           #
+          # Microsoft's version listing (more general than the above) is here:
+          #
+          # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
+          #
           case platform_version
           when '5.0.2195', '2000'   then '2000'
           when '5.1.2600', 'xp'     then 'xp'
@@ -193,6 +197,7 @@ module Omnibus
           # version is the same as Windows 8.1. It's only here for completeness
           # and documentation.
           when /6\.3\.\d+/, '2012r2' then '2012r2'
+          when /^10\.0/ then '10'
           else
             raise UnknownPlatformVersion.new(platform, platform_version)
           end
