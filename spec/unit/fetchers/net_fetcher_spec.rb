@@ -11,7 +11,7 @@ module Omnibus
     let(:manifest_entry) do
       double(Omnibus::ManifestEntry,
              name: 'file',
-             locked_version: "1.2.3",
+             locked_version: '1.2.3',
              described_version: '1.2.3',
              locked_source: source)
     end
@@ -174,22 +174,22 @@ module Omnibus
       end
     end
 
-    describe "downloading the file" do
+    describe 'downloading the file' do
 
       let(:expected_open_opts) do
         {
-          "Accept-Encoding" => "identity",
+          'Accept-Encoding' => 'identity',
           :read_timeout => 60,
           :content_length_proc => an_instance_of(Proc),
           :progress_proc => an_instance_of(Proc)
         }
       end
 
-      let(:tempfile_path) { "/tmp/intermediate_path/tempfile_path.random_garbage.tmp" }
+      let(:tempfile_path) { '/tmp/intermediate_path/tempfile_path.random_garbage.tmp' }
 
-      let(:fetched_file) { instance_double("File", path: tempfile_path) }
+      let(:fetched_file) { instance_double('File', path: tempfile_path) }
 
-      let(:destination_path) { "/cache/file.tar.gz" }
+      let(:destination_path) { '/cache/file.tar.gz' }
 
       let(:progress_bar_output) { StringIO.new }
 
@@ -216,7 +216,7 @@ module Omnibus
         expect(fetched_file).to receive(:close)
       end
 
-      it "downloads the thing" do
+      it 'downloads the thing' do
         capturing_stdout do
           expect { subject.send(:download) }.to_not raise_error
         end
@@ -230,13 +230,13 @@ module Omnibus
       # small fraction greater than the actual total. Since we're gonna verify
       # the checksum of what we downloaded later, we don't want to hear about
       # this error.
-      context "when cumulative downloaded amount exceeds reported content length" do
+      context 'when cumulative downloaded amount exceeds reported content length' do
 
         let(:reported_content_length) { 100 }
 
         let(:cumulative_downloaded_length) { 100.1 }
 
-        it "downloads the thing" do
+        it 'downloads the thing' do
           capturing_stdout do
             expect { subject.send(:download) }.to_not raise_error
           end
@@ -251,7 +251,7 @@ module Omnibus
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
                  name: 'file',
-                 locked_version: "1.2.3",
+                 locked_version: '1.2.3',
                  described_version: '1.2.3',
                  locked_source: { url: "https://get.example.com/file.#{extension}", md5: 'abcd1234' })
         end
@@ -273,9 +273,9 @@ module Omnibus
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
                  name: 'file',
-                 locked_version: "1.2.3",
+                 locked_version: '1.2.3',
                  described_version: '1.2.3',
-                 locked_source: { url: "https://get.example.com/folder", md5: 'abcd1234' })
+                 locked_source: { url: 'https://get.example.com/folder', md5: 'abcd1234' })
         end
 
         subject { described_class.new(manifest_entry, project_dir, build_dir) }
@@ -296,9 +296,9 @@ module Omnibus
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
                  name: 'file',
-                 locked_version: "1.2.3",
+                 locked_version: '1.2.3',
                  described_version: '1.2.3',
-                 locked_source: { url: "https://get.example.com/file", md5: 'abcd1234' })
+                 locked_source: { url: 'https://get.example.com/file', md5: 'abcd1234' })
         end
 
         subject { described_class.new(manifest_entry, project_dir, build_dir) }
