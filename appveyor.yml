@@ -27,5 +27,6 @@ build_script:
   - bundle install
 
 test_script:
+  - bundle exec rake unit
   - bundle exec rake functional
   - bundle exec rake acceptance
