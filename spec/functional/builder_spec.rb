@@ -7,9 +7,15 @@ module Omnibus
     #
     # Fakes the embedded bin path to whatever exists in bundler. This is useful
     # for testing methods like +ruby+ and +rake+ without the need to compile
-    # a real Ruby just for functional tests.
+    # a real Ruby just for functional tests. This strategy does not work on
+    # Windows because a) windows doesn't have symlinks and b) the windows
+    # omnibus installation has a post installation step that fixes up
+    # shebang paths to point to embedded ruby and drops bat files with
+    # the correct path. If we need to invoke bundler/appbundler etc. in a
+    # manner similar to one that omnibus provides, we would need to emulate
+    # the fixup steps here as well, which is a pain the ass.
     #
-    # Haha, this will totally work on windows..  (no it won't).
+    # So just don't run those tests on windows.
     def fake_embedded_bin(name)
       create_directory(embedded_bin_dir)
       name = 'ruby.exe' if windows? && name == 'ruby'

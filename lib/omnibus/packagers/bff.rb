@@ -61,7 +61,7 @@ module Omnibus
     # @return [String]
     #
     def scripts_install_dir
-      File.expand_path('embedded/share/installp', project.install_dir)
+      File.expand_path(File.join(project.install_dir, 'embedded/share/installp'))
     end
 
     #
