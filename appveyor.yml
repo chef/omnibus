@@ -16,12 +16,13 @@ branches:
     - master
 
 install:
-  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
+  - SET PATH=C:\Ruby%ruby_version%\bin;C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin;%PATH%
   - echo %PATH%
   - ruby --version
   - gem --version
   - gem install bundler --quiet --no-ri --no-rdoc
   - bundler --version
+  - cp C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\bsdtar.exe C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\tar.exe
 
 build_script:
   - bundle install
