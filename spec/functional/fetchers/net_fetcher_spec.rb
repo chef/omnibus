@@ -23,6 +23,7 @@ module Omnibus
       double(ManifestEntry,
              name: 'software',
              locked_version: '1.2.8',
+             described_version: '1.2.8',
              locked_source: source)
     end
 

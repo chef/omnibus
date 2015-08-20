@@ -14,6 +14,7 @@ module Omnibus
       double(Omnibus::ManifestEntry,
              name: 'pathelogical',
              locked_version: nil,
+             described_version: nil,
              locked_source: source)
     end
 
