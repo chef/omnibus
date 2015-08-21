@@ -52,6 +52,17 @@ module Omnibus
     ].freeze
 
     WRLINUX_WHITELIST_LIBS = [
+      /libc\.so/,
+      /libcrypt\.so/,
+      /libdb-5\.3\.so/,
+      /libdl\.so/,
+      /libffi\.so/,
+      /libgdbm\.so/,
+      /libm\.so/,
+      /libnsl\.so/,
+      /libpthread\.so/,
+      /librt\.so/,
+      /libutil\.so/,
       /libffi\.so/,
     ].freeze
 
