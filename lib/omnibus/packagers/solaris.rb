@@ -18,27 +18,20 @@ module Omnibus
   class Packager::Solaris < Packager::Base
     id :solaris
 
-    setup do
-      remove_directory('/tmp/pkgmk')
-      create_directory('/tmp/pkgmk')
-    end
-
     build do
-      Dir.chdir(staging_dir) do
-        shellout! "cd #{install_dirname} && find #{install_basename} -print > /tmp/pkgmk/files"
-      end
+      shellout! "cd #{install_dirname} && find #{install_basename} -print > #{staging_dir_path('files')}"
+      
 
       write_prototype_content
 
       write_pkginfo_content
 
-      copy_file("#{project.package_scripts_path}/postinst", '/tmp/pkgmk/postinstall')
-      copy_file("#{project.package_scripts_path}/postrm", '/tmp/pkgmk/postremove')
+      copy_file("#{project.package_scripts_path}/postinst", staging_dir_path('postinstall'))
+      copy_file("#{project.package_scripts_path}/postrm", staging_dir_path('postremove'))
 
-      shellout! "pkgmk -o -r #{install_dirname} -d /tmp/pkgmk -f /tmp/pkgmk/Prototype"
-      shellout! "pkgchk -vd /tmp/pkgmk #{project.package_name}"
-      abs_package_path = File.absolute_path(package_path) 
-      shellout! "pkgtrans /tmp/pkgmk #{abs_package_path} #{project.package_name}"
+      shellout! "pkgmk -o -r #{install_dirname} -d #{staging_dir} -f #{staging_dir_path('Prototype')}"
+      shellout! "pkgchk -vd #{staging_dir} #{project.package_name}"
+      shellout! "pkgtrans #{staging_dir} #{package_path} #{project.package_name}"
     end
 
     # @see Base#package_name
@@ -57,6 +50,10 @@ module Omnibus
     def install_basename
       File.basename(project.install_dir)
     end
+    
+    def staging_dir_path(fileName)
+      File.join(staging_dir,fileName)
+    end
 
     #
     # Generate a Prototype file for solaris build
@@ -69,17 +66,15 @@ module Omnibus
       EOF
 
       # generate list of control files
-      File.open '/tmp/pkgmk/Prototype', 'w+' do |f|
+      File.open staging_dir_path('Prototype'), 'w+' do |f|
         f.write prototype_content
       end
 
-      Dir.chdir(staging_dir) do
-        # generate the prototype's file list
-        shellout! "cd #{install_dirname} && pkgproto < /tmp/pkgmk/files > /tmp/pkgmk/Prototype.files"
+      # generate the prototype's file list
+      shellout! "cd #{install_dirname} && pkgproto < #{staging_dir_path('files')} > #{staging_dir_path('Prototype.files')}"
 
-        # fix up the user and group in the file list to root
-        shellout! "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < /tmp/pkgmk/Prototype.files >> /tmp/pkgmk/Prototype"
-      end
+      # fix up the user and group in the file list to root
+      shellout! "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < #{staging_dir_path('Prototype.files')} >> #{staging_dir_path('Prototype')}"
     end
 
     #
@@ -101,7 +96,7 @@ module Omnibus
         EMAIL=#{project.maintainer}
         PSTAMP=#{`hostname`.chomp + Time.now.utc.iso8601}
       EOF
-      File.open '/tmp/pkgmk/pkginfo', 'w+' do |f|
+      File.open staging_dir_path('pkginfo'), 'w+' do |f|
         f.write pkginfo_content
       end
     end
