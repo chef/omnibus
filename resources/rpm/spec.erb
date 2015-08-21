@@ -19,7 +19,9 @@ Name: <%= name %>
 Version: <%= version %>
 Release: <%= iteration %><%= dist_tag %>
 Summary:  <%= description.split("\n").first.empty? ? "_" : description.split("\n").first %>
+<% if platform != 'wrlinux' -%>
 BuildArch: <%= architecture %>
+<% end -%>
 AutoReqProv: no
 BuildRoot: %buildroot
 Prefix: /

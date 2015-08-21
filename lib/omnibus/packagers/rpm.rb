@@ -303,6 +303,7 @@ module Omnibus
           config_files:   config_files,
           files:          files,
           build_dir:      build_dir,
+          platform:       Omnibus::Metadata.platform_shortname
         }
       )
     end
