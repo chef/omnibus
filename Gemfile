@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'ohai', :path=>'/root/ohai'
+gem 'ohai', :path '/root/ohai'
 
 gemspec
 
