@@ -1,4 +1,7 @@
 source 'https://rubygems.org'
+
+gem 'ohai', :path=>'/root/ohai'
+
 gemspec
 
 group :docs do
