@@ -23,6 +23,8 @@ install:
   - gem install bundler --quiet --no-ri --no-rdoc
   - bundler --version
   - cp C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\bsdtar.exe C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\tar.exe
+  - appveyor DownloadFile http://curl.haxx.se/ca/cacert.pem -FileName C:\cacert.pem
+  - set SSL_CERT_FILE=C:\cacert.pem
 
 build_script:
   - bundle install
