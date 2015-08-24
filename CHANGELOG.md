@@ -1,13 +1,51 @@
 Omnibus CHANGELOG
 =================
 v4.1.0 (Unreleased)
+-------------------------
+### New Features
+- Allow semver prefixes that start with "v"
+- Reset target_shasum in PathFetcher after every fetch, preventing erroneous GitCache misses for builds that produced local artifacts during the previous omnibus run.
+- Allow users to specify options to the underlying FileSyncer in a Software definition
+- Add CPPFLAGS in with_standard_compiler_flags
+- Add a Fedora dist tag to package name and spec release
+- Copy distribution.xml.erb also when creating project with --pkg-assets
+- Manage version manifests with Omnibus. Omnibus now creates a version manifest in text and JSON.
+- Retry failed downloads
+- Support inclusion of email address in Wix template
+- Allow solaris to use mapfiles
+- A new `omnibus generate changelog` command generates an opinionated CHANGELOG entry based on metadata in commit messages.
+- Add warnings on empty globs.
+- Raspberry Pi 2 support
+- Clone git repositories with --recursive flag
+- Add ability to sign MSIs
+- Support running Omnibus with 64-bit ruby on Windows
+- Create an Artifactory build for published packages
+- Add a "windows_arch" omnibus option to choose 32/64 bit builds.
+- Set directory ownership/permissions to match the filesystem package.
+- Allow Windows 10 builders
+
 ### Bug Fixes
 - Config.append_timestamp is now properly handled by the build_version
   DSL.  For some users, this may introduce a change in behavior.  To
   revert to the old behavior set append_timestamp to false in
   `omnibus.rb` or use --override append_timestamp:false at the command
   line.
+- Do not memoize current_revision to avoid returning incorrect data. Memoizing current_revision was previously causing version_for_cache to return the pre-fetch revision of the software, leading us to erroneously restore an older revision from the cache.
+- Clean up "files listed twice" warnings. This should allow signing RPMs on EL 7
+- dpkg uses arch name ppc64el (instead of ppc64le) for little endian
+- Override equality operator for ManifestEntry. Prior to this, we simply tested basic object identity, which would result in many "updated" dependencies
+- Correctly determine git repository when running in a subdirectory
+- Forcibly remove a non-empty project dir before cloning because if multiple projects are using the same maching for building, they might have two different software definitions that share the same name but a different source.
+- Accomidate hardlinks properly
+- When building spec file, handle path names that contain spaces
+- Add libkvm and libprocstat to freebsd whitelist
+- Properly render ERB templates that do not have variables
+- Change git fetcher to correctly fetch when repo name is the same but branch/version is different.
 
+### Potentially Breaking Changes
+- `Omnibus::SemanticVersion.new` now raises `Omnibus::InvalidVersion` instead of `Omnibus::SemanticVersion::InvalidVersion`
+- Cache Builder#shasum before Builder#build to ensure consistent result.
+- Update chef-sugar to 3.0 which adds ppc64le support.
 
 v4.0.0 (December 15, 2014)
 --------------------------
