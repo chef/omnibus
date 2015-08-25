@@ -425,7 +425,7 @@ module Omnibus
       whitelist_libs = case Ohai['platform']
                        when 'arch'
                          ARCH_WHITELIST_LIBS
-                       when 'wrlinux'
+                       when 'nexus'
                          WRLINUX_WHITELIST_LIBS
                        when 'mac_os_x'
                          MAC_WHITELIST_LIBS
