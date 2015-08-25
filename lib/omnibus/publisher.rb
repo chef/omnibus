@@ -82,7 +82,12 @@ module Omnibus
                 p.metadata[:platform_version] == build_platform_version
             end
 
-            raise InvalidBuildPlatform.new("#{build_platform}-#{build_platform_version}", @pattern) if packages.empty?
+            if packages.empty?
+              log.warn(log_key) do
+                "Could not locate a package for build platform #{build_platform}-#{build_platform_version}. " \
+                "Publishing will be skipped for: #{publish_platforms.join(', ')}"
+              end
+            end
 
             publish_platforms.each do |publish_platform|
               publish_platform, publish_platform_version = publish_platform.rpartition('-') - %w( - )

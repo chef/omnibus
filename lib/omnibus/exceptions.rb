@@ -45,24 +45,6 @@ EOH
     end
   end
 
-  class InvalidBuildPlatform < Error
-    def initialize(build_platform, pattern)
-      @build_platform, @pattern = build_platform, pattern
-    end
-
-    def to_s
-      <<-EOH
-Could not locate a package for build platform:
-
-    #{@build_platform}
-
-using pattern of:
-
-    #{@pattern}
-EOH
-    end
-  end
-
   class MissingRequiredAttribute < Error
     def initialize(instance, name, sample = '<VALUE>')
       @instance, @name, @sample = instance, name, sample
