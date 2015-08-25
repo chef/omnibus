@@ -164,7 +164,7 @@ module Omnibus
     # @return [String]
     #
     def package_path
-      File.join(Config.package_dir, package_name)
+      File.expand_path(File.join(Config.package_dir, package_name))
     end
 
     #
