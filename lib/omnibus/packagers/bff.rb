@@ -61,7 +61,7 @@ module Omnibus
     # @return [String]
     #
     def scripts_install_dir
-      File.expand_path("#{project.install_dir}/embedded/share/installp")
+      File.expand_path(File.join(project.install_dir, 'embedded/share/installp'))
     end
 
     #
@@ -70,7 +70,7 @@ module Omnibus
     # @return [String]
     #
     def scripts_staging_dir
-      File.expand_path("#{staging_dir}#{scripts_install_dir}")
+      File.expand_path(File.join(staging_dir, scripts_install_dir))
     end
 
     #
@@ -173,16 +173,16 @@ module Omnibus
       # This implies that if we are in /tmp/staging/project/dir/things,
       # we will chown from 'project' on, rather than 'project/dir', which leaves
       # project owned by the build user (which is incorrect)
-      shellout!("sudo chown -R 0:0 #{staging_dir}/#{project.install_dir.match(/^\/?(\w+)/)}")
+      shellout!("sudo chown -R 0:0 #{File.join(staging_dir, project.install_dir)}")
       log.info(log_key) { "Creating .bff file" }
 
       # Since we want the owner to be root, we need to sudo the mkinstallp
       # command, otherwise it will not have access to the previously chowned
       # directory.
-      shellout!("sudo /usr/sbin/mkinstallp -d #{staging_dir} -T #{staging_dir}/gen.template")
+      shellout!("sudo /usr/sbin/mkinstallp -d #{staging_dir} -T #{File.join(staging_dir, 'gen.template')}")
 
       # Copy the resulting package up to the package_dir
-      FileSyncer.glob("#{staging_dir}/tmp/*.bff").each do |bff|
+      FileSyncer.glob(File.join(staging_dir, 'tmp/*.bff')).each do |bff|
         copy_file(bff, File.join(Config.package_dir, create_bff_file_name))
       end
     end

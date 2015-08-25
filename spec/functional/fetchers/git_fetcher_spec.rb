@@ -179,7 +179,7 @@ module Omnibus
         expect(subject.version_for_cache).to eq("revision:#{revision}")
       end
 
-      it "does not returned cached revision after fetching" do
+      it 'does not returned cached revision after fetching' do
         before_fetch = subject.version_for_cache
         subject.fetch
         after_fetch = revision

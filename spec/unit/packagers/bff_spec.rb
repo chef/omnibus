@@ -15,11 +15,15 @@ module Omnibus
 
     subject { described_class.new(project) }
 
-    let(:project_root) { "#{tmp_path}/project/root" }
-    let(:package_dir)  { "#{tmp_path}/package/dir" }
-    let(:staging_dir)  { "#{tmp_path}/staging/dir" }
+    let(:project_root) { File.join(tmp_path, 'project/root') }
+    let(:package_dir)  { File.join(tmp_path, 'package/dir') }
+    let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
 
     before do
+      # This is here to allow this unit test to run on windows.
+      allow(File).to receive(:expand_path).and_wrap_original do |m, *args|
+        m.call(*args).sub(/^[A-Za-z]:/, '')
+      end
       Config.project_root(project_root)
       Config.package_dir(package_dir)
 
@@ -46,13 +50,13 @@ module Omnibus
 
     describe '#scripts_install_dir' do
       it 'is nested inside the project install_dir' do
-        expect(subject.scripts_install_dir).to eq("#{project.install_dir}/embedded/share/installp")
+        expect(subject.scripts_install_dir).to start_with(project.install_dir)
       end
     end
 
     describe '#scripts_staging_dir' do
       it 'is nested inside the staging_dir' do
-        expect(subject.scripts_staging_dir).to eq("#{staging_dir}#{subject.scripts_install_dir}")
+        expect(subject.scripts_staging_dir).to start_with(staging_dir)
       end
     end
 
