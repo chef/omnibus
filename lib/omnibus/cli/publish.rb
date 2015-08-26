@@ -62,6 +62,10 @@ module Omnibus
     #
     #   $ omnibus publish artifactory libs-omnibus-local pkg/chef*
     #
+    method_option :build_record,
+      type: :boolean,
+      desc: 'Optionally create an Artifactory build record for the published artifacts',
+      default: true
     desc 'artifactory REPOSITORY PATTERN', 'Publish to an Artifactory instance'
     def artifactory(repository, pattern)
       options[:repository] = repository
