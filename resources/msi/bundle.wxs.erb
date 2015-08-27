@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <!-- This is how we include wxi files -->
+  <?include "parameters.wxi" ?>
+
+  <Bundle Version="$(var.VersionNumber)" Manufacturer="!(loc.ManufacturerName)" UpgradeCode="$(var.UpgradeCode)">
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" >
+      <bal:WixStandardBootstrapperApplication LicenseFile="Resources\assets\LICENSE.rtf"/>
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <ExePackage SourceFile="$(var.OmnibusCacheDir)\vcredist_x64.exe" InstallCommand="/Q"
+        DownloadUrl="http://download.microsoft.com/download/d/2/4/d242c3fb-da5a-4542-ad66-f9661d0a8d19/vcredist_x64.exe" />
+      <MsiPackage SourceFile="<%= msi %>" EnableFeatureSelection="no" />
+    </Chain>
+  </Bundle>
+</Wix>

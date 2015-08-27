@@ -30,6 +30,9 @@ module Omnibus
       # Render the source file
       write_source_file
 
+      # Optionally, render the bundle file
+      write_bundle_file if bundle_msi
+
       # Copy all the staging assets from vendored Omnibus into the resources
       # directory.
       create_directory("#{resources_dir}/assets")
@@ -71,7 +74,7 @@ module Omnibus
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
 
-        msi_file = windows_safe_path(Config.package_dir, package_name)
+        msi_file = windows_safe_path(Config.package_dir, msi_name)
 
         light_command = <<-EOH.split.join(' ').squeeze(' ').strip
           light.exe
@@ -87,6 +90,40 @@ module Omnibus
 
         if signing_identity
           sign_package(msi_file)
+        end
+
+        # This assumes, rightly or wrongly, that any installers we want to bundle
+        # into our installer will be downloaded by omnibus and put in the cache dir
+
+        if bundle_msi
+          shellout! <<-EOH.split.join(' ').squeeze(' ').strip
+          candle.exe
+            -nologo
+            #{wix_candle_flags}
+            -ext WixBalExtension
+            #{wix_extension_switches(wix_candle_extensions)}
+            -dOmnibusCacheDir="#{windows_safe_path(File.expand_path(Config.cache_dir))}"
+            "#{windows_safe_path(staging_dir, 'bundle.wxs')}"
+          EOH
+
+          bundle_file = windows_safe_path(Config.package_dir, bundle_name)
+
+          bundle_light_command = <<-EOH.split.join(' ').squeeze(' ').strip
+          light.exe
+            -nologo
+            -ext WixUIExtension
+            -ext WixBalExtension
+            #{wix_extension_switches(wix_light_extensions)}
+            -cultures:en-us
+            -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
+            bundle.wixobj
+            -out "#{bundle_file}"
+          EOH
+          shellout!(bundle_light_command, returns: [0, 204])
+
+          if signing_identity
+            sign_package(bundle_file)
+          end
         end
       end
     end
@@ -190,6 +227,25 @@ module Omnibus
     expose :wix_candle_extension
 
     #
+    # Signal that we're building a bundle rather than a single package
+    #
+    # @example
+    #   bundle_msi true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether we're a bundle or not
+    #
+    # @return [TrueClass, FalseClass]
+    #   whether we're a bundle or not
+    def bundle_msi(val = false)
+      unless (val.is_a?(TrueClass) || val.is_a?(FalseClass))
+        raise InvalidValue.new(:bundle_msi, 'be TrueClass or FalseClass')
+      end
+      @bundle_msi ||= val
+    end
+    expose :bundle_msi
+
+    #
     # Set the signing certificate name
     #
     # @example
@@ -261,7 +317,15 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
+      bundle_msi ? bundle_name : msi_name
+    end
+
+    def msi_name
       "#{project.package_name}-#{project.build_version}-#{project.build_iteration}.msi"
+    end
+
+    def bundle_name
+      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}.exe"
     end
 
     #
@@ -353,6 +417,27 @@ module Omnibus
           hierarchy:     hierarchy,
 
           wix_install_dir: wix_install_dir,
+        }
+      )
+    end
+
+    #
+    # Write the bundle file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_bundle_file
+      render_template(resource_path('bundle.wxs.erb'),
+        destination: "#{staging_dir}/bundle.wxs",
+        variables: {
+          name:            project.package_name,
+          friendly_name:   project.friendly_name,
+          maintainer:      project.maintainer,
+          upgrade_code:    upgrade_code,
+          parameters:      parameters,
+          version:         msi_version,
+          display_version: msi_display_version,
+          msi:             windows_safe_path(Config.package_dir, msi_name),
         }
       )
     end
