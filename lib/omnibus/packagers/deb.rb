@@ -246,8 +246,10 @@ module Omnibus
         path = File.join(project.package_scripts_path, script)
 
         if File.file?(path)
-          log.debug(log_key) { "Adding script `#{script}' to `#{debian_dir}'" }
+          log.debug(log_key) { "Adding script `#{script}' to `#{debian_dir}' from #{path}" }
           copy_file(path, debian_dir)
+          log.debug(log_key)  { "SCRIPT FILE:  #{debian_dir}/#{script}" }
+          FileUtils.chmod(0755, File.join(debian_dir, script))
         end
       end
     end
