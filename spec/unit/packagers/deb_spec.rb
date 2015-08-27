@@ -167,13 +167,18 @@ module Omnibus
         create_file("#{project_root}/package-scripts/project/postrm") { "postrm" }
       end
 
-      it 'copies the scripts into the DEBIAN dir' do
+      it 'copies the scripts into the DEBIAN dir with permissions = 100755' do
         subject.write_scripts
 
         expect("#{staging_dir}/DEBIAN/preinst").to be_a_file
         expect("#{staging_dir}/DEBIAN/postinst").to be_a_file
         expect("#{staging_dir}/DEBIAN/prerm").to be_a_file
         expect("#{staging_dir}/DEBIAN/postrm").to be_a_file
+
+        expect("#{staging_dir}/DEBIAN/preinst").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/postinst").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/prerm").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/postrm").to have_permissions '100755'
       end
 
       it 'logs a message' do
