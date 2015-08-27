@@ -167,7 +167,7 @@ module Omnibus
         create_file("#{project_root}/package-scripts/project/postrm") { "postrm" }
       end
 
-      it 'copies the scripts into the DEBIAN dir with permissions = 100755' do
+      it 'copies the scripts into the DEBIAN dir with permissions = 100755', :not_supported_on_windows do
         subject.write_scripts
 
         expect("#{staging_dir}/DEBIAN/preinst").to be_a_file
