@@ -43,7 +43,7 @@ module Omnibus
       before { allow(S3Cache).to receive(:bucket).and_return(bucket) }
 
       it 'lists the keys on the S3 bucket' do
-        expect(bucket).to receive(:objects).with('/').once
+        expect(bucket).to receive(:objects).once
         S3Cache.keys
       end
     end

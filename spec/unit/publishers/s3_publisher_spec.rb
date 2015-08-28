@@ -30,11 +30,12 @@ module Omnibus
 
     let(:packages) { [package] }
 
-    let(:client) { double('UberS3', store: nil) }
+    let(:client) { double('Aws::S3::Resource') }
 
     before do
       allow(package).to receive(:metadata).and_return(metadata)
       allow(subject).to receive(:client).and_return(client)
+      allow(subject).to receive(:store_object)
     end
 
     subject { described_class.new(path) }
@@ -48,21 +49,22 @@ module Omnibus
       end
 
       it 'uploads the metadata' do
-        expect(client).to receive(:store).with(
+        expect(subject).to receive(:store_object).with(
           'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
           package.metadata.to_json,
-          access: :private,
+          nil,
+          'private',
         ).once
 
         subject.publish
       end
 
       it 'uploads the package' do
-        expect(client).to receive(:store).with(
+        expect(subject).to receive(:store_object).with(
           'ubuntu/14.04/x86_64/chef.deb/chef.deb',
           package.content,
-          access: :private,
-          content_md5: package.metadata[:md5],
+          package.metadata[:md5],
+          'private'
         ).once
 
         subject.publish
@@ -72,10 +74,11 @@ module Omnibus
         subject { described_class.new(path, acl: 'public') }
 
         it 'sets the access control to public_read' do
-          expect(client).to receive(:store).with(
+          expect(subject).to receive(:store_object).with(
             'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
             package.metadata.to_json,
-            access: :public_read,
+            nil,
+            'public-read',
           ).once
 
           subject.publish
@@ -86,10 +89,11 @@ module Omnibus
         subject { described_class.new(path, acl: 'baconbits') }
 
         it 'sets the access control to private' do
-          expect(client).to receive(:store).with(
+          expect(subject).to receive(:store_object).with(
             'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
             package.metadata.to_json,
-            access: :private,
+            nil,
+            'private',
           ).once
 
           subject.publish

@@ -289,6 +289,14 @@ module Omnibus
       raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
     end
 
+    # The region of the S3 bucket you want to cache software artifacts in.
+    # Defaults to 'us-east-1'
+    #
+    # @return [String]
+    default(:s3_region) do
+      'us-east-1'
+    end
+
     # --------------------------------------------------
     # @!endgroup
     #
