@@ -130,7 +130,7 @@ module Omnibus
 
       def s3_configuration
         {
-          region:               'us-east-1',
+          region:               Config.s3_region,
           access_key_id:        Config.s3_access_key,
           secret_access_key:    Config.s3_secret_key,
           bucket_name:          Config.s3_bucket
