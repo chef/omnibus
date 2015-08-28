@@ -28,6 +28,16 @@ module Omnibus
         end
         expect(described_class.arch).to eq('x86_64')
       end
+
+      context 'on windows' do
+        it 'returns the value of Config.windows_arch' do
+          stub_ohai(platform: 'windows', version: '2012R2') do |data|
+            data['kernel']['machine'] = 'x86_64'
+          end
+          allow(Config).to receive(:windows_arch).and_return('some_arch')
+          expect(described_class.arch).to eq('some_arch')
+        end
+      end
     end
 
     describe '.platform_shortname' do
