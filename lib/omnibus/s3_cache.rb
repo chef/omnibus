@@ -15,14 +15,14 @@
 #
 
 require 'fileutils'
-require 'aws-sdk'
-require 'base64'
+require 'omnibus/s3_helpers'
 
 module Omnibus
   class S3Cache
     include Logging
 
     class << self
+      include S3Helpers
       #
       # List all software in the cache.
       #
@@ -77,12 +77,7 @@ module Omnibus
           end
 
           File.open(fetcher.downloaded_file, 'rb') do |file|
-            bucket.put_object({
-              key: key,
-              body: file,
-              content_md5: to_base64_digest(software.fetcher.checksum),
-              acl: 'public-read'
-            })
+            store_object(key, file, software.fetcher.checksum, 'public-read')
           end
         end
 
@@ -133,47 +128,13 @@ module Omnibus
 
       private
 
-      #
-      # The client to connect to S3 with.
-      #
-      # @return [Aws::S3::Resource]
-      #
-      def client
-        @s3 ||= Aws::S3::Resource.new(
-          region: 'us-east-1',
+      def s3_configuration
+        {
+          region:               'us-east-1',
           access_key_id:        Config.s3_access_key,
           secret_access_key:    Config.s3_secret_key,
-        )
-      end
-
-      #
-      # The bucket where the objects live.
-      #
-      # @return [Aws::S3::Bucket]
-      #
-      def bucket
-        @s3_bucket ||= begin
-                         bucket = client.bucket(Config.s3_bucket)
-                         unless bucket.exists?
-                           bucket.create
-                         end
-                         bucket
-                       end
-      end
-
-      #
-      # Convert a hex digest into a base64 hex digest
-      #
-      # For example:
-      # to_base64_digest('c3b5247592ce694f7097873aa07d66fe') => 'w7UkdZLOaU9wl4c6oH1m/g=='
-      #
-      # @param [String] content_md5
-      #
-      # @return [String]
-      #
-      def to_base64_digest(content_md5)
-        md5_digest = content_md5.unpack('a2'*16).collect {|i| i.hex.chr }.join
-        Base64.encode64(md5_digest).strip
+          bucket_name:          Config.s3_bucket
+        }
       end
 
       #
