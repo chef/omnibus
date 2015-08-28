@@ -14,11 +14,14 @@
 # limitations under the License.
 #
 
+require 'omnibus/s3_helpers'
+
 module Omnibus
   class S3Publisher < Publisher
+    include S3Helpers
+
     def publish(&block)
       log.info(log_key) { 'Starting S3 publisher' }
-      safe_require('uber-s3')
 
       packages.each do |package|
         # Make sure the package is good to go!
@@ -27,16 +30,13 @@ module Omnibus
 
         # Upload the metadata first
         log.debug(log_key) { "Uploading '#{package.metadata.name}'" }
-        client.store(key_for(package, package.metadata.name), package.metadata.to_json,
-          access: access_policy,
-        )
+        store_object(key_for(package, package.metadata.name), package.metadata.to_json,
+                     nil, access_policy)
 
         # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
-        client.store(key_for(package, package.name), package.content,
-          access: access_policy,
-          content_md5: package.metadata[:md5],
-        )
+        store_object(key_for(package, package.name), package.content,
+                     package.metadata[:md5], access_policy)
 
         # If a block was given, "yield" the package to the caller
         block.call(package) if block
@@ -45,18 +45,13 @@ module Omnibus
 
     private
 
-    #
-    # The actual S3 client object to communicate with the S3 API.
-    #
-    # @return [UberS3]
-    #
-    def client
-      @client ||= UberS3.new(
-        access_key:        Config.publish_s3_access_key,
+    def s3_configuration
+      {
+        region:            'us-east-1',
+        access_key_id:     Config.publish_s3_access_key,
         secret_access_key: Config.publish_s3_secret_key,
-        bucket:            @options[:bucket],
-        adaper:            :net_http,
-      )
+        bucket_name:       @options[:bucket],
+      }
     end
 
     #
@@ -85,14 +80,14 @@ module Omnibus
     # initializer option. Any access control that is not the strict string
     # +"public"+ is assumed to be private.
     #
-    # @return [Symbol]
-    #   the UberS3-ready access policy
+    # @return [String]
+    #   the access policy
     #
     def access_policy
       if @options[:acl].to_s == 'public'
-        :public_read
+        'public-read'
       else
-        :private
+        'private'
       end
     end
   end
