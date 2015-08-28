@@ -27,7 +27,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'mixlib-versioning'
   gem.add_dependency 'ohai',             '~> 8.0'
   gem.add_dependency 'ruby-progressbar', '~> 1.7'
-  gem.add_dependency 'uber-s3',          '~> 0.2.4'
   gem.add_dependency 'aws-sdk',          '~> 2'
   gem.add_dependency 'thor',             '~> 0.18'
 
