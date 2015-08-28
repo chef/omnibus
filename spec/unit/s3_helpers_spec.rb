@@ -23,6 +23,10 @@ module Omnibus
       it 'turns "c3b5247592ce694f7097873aa07d66fe" into "w7UkdZLOaU9wl4c6oH1m/g=="' do
         expect(to_base64_digest("c3b5247592ce694f7097873aa07d66fe")).to eql('w7UkdZLOaU9wl4c6oH1m/g==')
       end
+
+      it 'allows a nil input without error' do
+        expect(to_base64_digest(nil)).to be_nil
+      end
     end
   end
 end

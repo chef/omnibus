@@ -51,6 +51,10 @@ module Omnibus
       desc: 'The accessibility of the uploaded packages',
       enum: %w(public private),
       default: 'private'
+    method_option :region,
+      type: :string,
+      desc: 'The region in which the bucket is located',
+      default: 'us-east-1'
     desc 's3 BUCKET PATTERN', 'Publish to an S3 bucket'
     def s3(bucket, pattern)
       options[:bucket] = bucket
