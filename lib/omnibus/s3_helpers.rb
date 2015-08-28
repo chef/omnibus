@@ -109,8 +109,10 @@ module Omnibus
       # @return [String]
       #
       def to_base64_digest(content_md5)
-        md5_digest = content_md5.unpack('a2'*16).collect {|i| i.hex.chr }.join
-        Base64.encode64(md5_digest).strip
+        if content_md5
+          md5_digest = content_md5.unpack('a2'*16).collect {|i| i.hex.chr }.join
+          Base64.encode64(md5_digest).strip
+        end
       end
     end
   end
