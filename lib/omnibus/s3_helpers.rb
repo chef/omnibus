@@ -65,7 +65,14 @@ module Omnibus
         @s3_bucket ||= begin
                          bucket = client.bucket(s3_configuration[:bucket_name])
                          unless bucket.exists?
-                           bucket.create
+                           bucket_config = if s3_configuration[:region] == 'us-east-1'
+                                             nil
+                                           else
+                                             {
+                                               location_constraint: s3_configuration[:region]
+                                             }
+                                           end
+                           bucket.create(create_bucket_configuration: bucket_config)
                          end
                          bucket
                        end
