@@ -15,7 +15,8 @@
 #
 
 require 'fileutils'
-require 'uber-s3'
+require 'aws-sdk'
+require 'base64'
 
 module Omnibus
   class S3Cache
@@ -41,7 +42,7 @@ module Omnibus
       # @return [Array<String>]
       #
       def keys
-        bucket.objects('/').map(&:key)
+        bucket.objects.map(&:key)
       end
 
       #
@@ -70,16 +71,19 @@ module Omnibus
 
           key     = key_for(software)
           fetcher = software.fetcher
-          content = IO.read(fetcher.downloaded_file)
 
           log.info(log_key) do
             "Caching '#{fetcher.downloaded_file}' to '#{Config.s3_bucket}/#{key}'"
           end
 
-          client.store(key, content,
-            access: :public_read,
-            content_md5: software.fetcher.checksum
-          )
+          File.open(fetcher.downloaded_file, 'rb') do |file|
+            bucket.put_object({
+              key: key,
+              body: file,
+              content_md5: to_base64_digest(software.fetcher.checksum),
+              acl: 'public-read'
+            })
+          end
         end
 
         true
@@ -132,30 +136,44 @@ module Omnibus
       #
       # The client to connect to S3 with.
       #
-      # @return [UberS3::Client]
+      # @return [Aws::S3::Resource]
       #
       def client
-        @client ||= UberS3.new(
-          access_key:        Config.s3_access_key,
-          secret_access_key: Config.s3_secret_key,
-          bucket:            Config.s3_bucket,
-          adapter:           :net_http,
+        @s3 ||= Aws::S3::Resource.new(
+          region: 'us-east-1',
+          access_key_id:        Config.s3_access_key,
+          secret_access_key:    Config.s3_secret_key,
         )
       end
 
       #
       # The bucket where the objects live.
       #
-      # @return [UberS3::Bucket]
+      # @return [Aws::S3::Bucket]
       #
       def bucket
-        @bucket ||= begin
-          if client.exists?('/')
-            client.bucket
-          else
-            client.connection.put('/')
-          end
-        end
+        @s3_bucket ||= begin
+                         bucket = client.bucket(Config.s3_bucket)
+                         unless bucket.exists?
+                           bucket.create
+                         end
+                         bucket
+                       end
+      end
+
+      #
+      # Convert a hex digest into a base64 hex digest
+      #
+      # For example:
+      # to_base64_digest('c3b5247592ce694f7097873aa07d66fe') => 'w7UkdZLOaU9wl4c6oH1m/g=='
+      #
+      # @param [String] content_md5
+      #
+      # @return [String]
+      #
+      def to_base64_digest(content_md5)
+        md5_digest = content_md5.unpack('a2'*16).collect {|i| i.hex.chr }.join
+        Base64.encode64(md5_digest).strip
       end
 
       #
