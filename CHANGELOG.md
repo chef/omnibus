@@ -23,6 +23,8 @@ v4.1.0 (Unreleased)
 - Add a "windows_arch" omnibus option to choose 32/64 bit builds.
 - Set directory ownership/permissions to match the filesystem package.
 - Allow Windows 10 builders
+- Allow omnibus to build "bundled" Windows installers
+- Set perms on control files per Ubuntu Software Center's lintian checks.
 
 ### Bug Fixes
 - Config.append_timestamp is now properly handled by the build_version
