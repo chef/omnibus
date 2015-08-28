@@ -25,6 +25,7 @@ v4.1.0 (Unreleased)
 - Allow Windows 10 builders
 - Allow omnibus to build "bundled" Windows installers
 - Set perms on control files per Ubuntu Software Center's lintian checks.
+- Replace uber-s3 dependency with aws-sdk
 
 ### Bug Fixes
 - Config.append_timestamp is now properly handled by the build_version
