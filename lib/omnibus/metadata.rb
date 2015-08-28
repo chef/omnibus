@@ -108,7 +108,11 @@ module Omnibus
       # @return [String]
       #
       def arch
-        Ohai['kernel']['machine']
+        if Ohai['platform'] == 'windows'
+          Config.windows_arch
+        else
+          Ohai['kernel']['machine']
+        end
       end
 
       #
