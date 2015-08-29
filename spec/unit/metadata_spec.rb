@@ -30,12 +30,12 @@ module Omnibus
       end
 
       context 'on windows' do
-        it 'returns the value of Config.windows_arch' do
+        it 'returns a 32-bit value based on Config.windows_arch being set to x86' do
           stub_ohai(platform: 'windows', version: '2012R2') do |data|
             data['kernel']['machine'] = 'x86_64'
           end
-          allow(Config).to receive(:windows_arch).and_return('some_arch')
-          expect(described_class.arch).to eq('some_arch')
+          expect(Config).to receive(:windows_arch).and_return(:x86)
+          expect(described_class.arch).to eq('i386')
         end
       end
     end
