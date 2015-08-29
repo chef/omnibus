@@ -108,7 +108,7 @@ module Omnibus
       # @return [String]
       #
       def arch
-        if (Ohai['platform'] == 'windows') && (Config.windows_arch == :x86)
+        if (Ohai['platform'] == 'windows') && (Config.windows_arch.to_sym == :x86)
           'i386'
         else
           Ohai['kernel']['machine']

@@ -502,7 +502,7 @@ module Omnibus
     #
     def wix_candle_flags
       # we support x86 or x64.  No Itanium support (ia64).
-      @wix_candle_flags ||= "-arch " + (Config.windows_arch == :x86 ? "x86" : "x64")
+      @wix_candle_flags ||= "-arch " + (Config.windows_arch.to_sym == :x86 ? "x86" : "x64")
     end
 
     #

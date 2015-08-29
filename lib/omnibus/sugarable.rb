@@ -64,7 +64,7 @@ module Omnibus
     # Returns whether the Windows build target is 32-bit (x86).
     # If this returns false, the target is x64. Itanium is not supported.
     def windows_arch_i386?
-      Config.windows_arch == :x86
+      Config.windows_arch.to_sym == :x86
     end
   end
 end
