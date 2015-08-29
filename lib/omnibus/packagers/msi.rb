@@ -260,7 +260,7 @@ module Omnibus
     # @option params [String] :store (My)
     #   The name of the certificate store which contains the certificate
     # @option params [Array<String>, String] :timestamp_servers
-    #   A trusted timestamp server or a list of truested timestamp servers to 
+    #   A trusted timestamp server or a list of truested timestamp servers to
     #   be tried. They are tried in the order provided.
     # @option params [TrueClass, FalseClass] :machine_store (false)
     #   If set to true, the local machine store will be searched for a valid
@@ -293,7 +293,7 @@ module Omnibus
           end
 
           if !params[:machine_store].nil? && !(
-             params[:machine_store].is_a?(TrueClass) || 
+             params[:machine_store].is_a?(TrueClass) ||
              params[:machine_store].is_a?(FalseClass))
             raise InvalidValue.new(:params, 'contain key :machine_store of type TrueClass or FalseClass')
           end
