@@ -49,6 +49,7 @@ v4.1.0 (Unreleased)
 - `Omnibus::SemanticVersion.new` now raises `Omnibus::InvalidVersion` instead of `Omnibus::SemanticVersion::InvalidVersion`
 - Cache Builder#shasum before Builder#build to ensure consistent result.
 - Update chef-sugar to 3.0 which adds ppc64le support.
+- The MSI packager now adds the architecture to the msi name. The file names go from `package_name-build_version-build_iteration` to `package_name-build_version-build_iteration-arch`.
 
 v4.0.0 (December 15, 2014)
 --------------------------
