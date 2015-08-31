@@ -321,11 +321,11 @@ module Omnibus
     end
 
     def msi_name
-      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}.msi"
+      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}-#{Config.windows_arch}.msi"
     end
 
     def bundle_name
-      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}.exe"
+      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}-#{Config.windows_arch}.exe"
     end
 
     #
