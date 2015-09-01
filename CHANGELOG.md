@@ -1,6 +1,6 @@
 Omnibus CHANGELOG
 =================
-v4.1.0 (Unreleased)
+v4.1.0 (September 1, 2015)
 -------------------------
 ### New Features
 - Allow semver prefixes that start with "v"
