@@ -420,10 +420,10 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      case Ohai['kernel']['machine']
-      when 'x86_64'
+      case `getconf LONG_BIT`
+      when /64\n?/
         'amd64'
-      when 'i686'
+      when /32\n?/
         'i386'
       when 'armv6l'
         if Ohai['platform'] == 'raspbian'
