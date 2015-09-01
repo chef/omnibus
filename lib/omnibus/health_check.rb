@@ -51,6 +51,17 @@ module Omnibus
       /libutil\.so/,
     ].freeze
 
+    WRLINUX_WHITELIST_LIBS = [
+      /libc\.so/,
+      /libcrypt\.so/,
+      /libdl\.so/,
+      /libffi\.so/,
+      /libm\.so/,
+      /libpthread\.so/,
+      /librt\.so/,
+      /libutil\.so/,
+    ].freeze
+
     AIX_WHITELIST_LIBS = [
       /libpthread\.a/,
       /libpthreads\.a/,
@@ -410,6 +421,8 @@ module Omnibus
       whitelist_libs = case Ohai['platform']
                        when 'arch'
                          ARCH_WHITELIST_LIBS
+                       when 'nexus'
+                         WRLINUX_WHITELIST_LIBS
                        when 'mac_os_x'
                          MAC_WHITELIST_LIBS
                        when 'solaris2'

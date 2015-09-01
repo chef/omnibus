@@ -302,6 +302,7 @@ module Omnibus
           config_files:   config_files,
           files:          files,
           build_dir:      build_dir,
+          platform:       Omnibus::Metadata.platform_shortname
         }
       )
     end
@@ -494,7 +495,11 @@ module Omnibus
       #   http://rpm.org/ticket/56
       #
       if version =~ /\-/
-        converted = version.gsub('-', '~')
+        if Ohai['platform_family'] == 'wrlinux'
+          converted = version.gsub('-', '_') #WRL5 has an elderly RPM version
+        else
+          converted = version.gsub('-', '~')
+        end
 
         log.warn(log_key) do
           "Tildes hold special significance in the RPM package versions. " \
