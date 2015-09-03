@@ -144,7 +144,6 @@ module Omnibus
         expect(contents).to include("Version: 1.2.3")
         expect(contents).to include("Release: 2.el6")
         expect(contents).to include("Summary:  The full stack of project")
-        expect(contents).to include("BuildArch: x86_64")
         expect(contents).to include("AutoReqProv: no")
         expect(contents).to include("BuildRoot: %buildroot")
         expect(contents).to include("Prefix: /")
@@ -252,7 +251,7 @@ module Omnibus
 
       it 'uses the correct command' do
         expect(subject).to receive(:shellout!)
-          .with(/rpmbuild -bb --buildroot/)
+          .with(/rpmbuild --target x86_64 -bb --buildroot/)
         subject.create_rpm_file
       end
 

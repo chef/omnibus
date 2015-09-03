@@ -288,7 +288,6 @@ module Omnibus
           vendor:         vendor,
           license:        license,
           dist_tag:       dist_tag,
-          architecture:   safe_architecture,
           maintainer:     project.maintainer,
           homepage:       project.homepage,
           description:    project.description,
@@ -316,6 +315,7 @@ module Omnibus
     #
     def create_rpm_file
       command =  %|fakeroot rpmbuild|
+      command << %| --target #{safe_architecture}|
       command << %| -bb|
       command << %| --buildroot #{staging_dir}/BUILD|
       command << %| --define '_topdir #{staging_dir}'|
