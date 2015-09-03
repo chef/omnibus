@@ -545,6 +545,7 @@ module Omnibus
         arr << '/sm' if machine_store?
         arr << "/s #{cert_store_name}"
         arr << "/sha1 #{thumbprint}"
+        arr << "/d #{project.package_name}"
         arr << "\"#{msi_file}\""
       end
       shellout!(cmd.join(" "))
