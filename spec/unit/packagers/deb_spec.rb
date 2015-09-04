@@ -15,9 +15,9 @@ module Omnibus
 
     subject { described_class.new(project) }
 
-    let(:project_root) { "#{tmp_path}/project/root" }
-    let(:package_dir)  { "#{tmp_path}/package/dir" }
-    let(:staging_dir)  { "#{tmp_path}/staging/dir" }
+    let(:project_root) { File.join(tmp_path, 'project/root') }
+    let(:package_dir)  { File.join(tmp_path, 'package/dir') }
+    let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
 
     before do
       Config.project_root(project_root)
@@ -167,13 +167,18 @@ module Omnibus
         create_file("#{project_root}/package-scripts/project/postrm") { "postrm" }
       end
 
-      it 'copies the scripts into the DEBIAN dir' do
+      it 'copies the scripts into the DEBIAN dir with permissions = 100755', :not_supported_on_windows do
         subject.write_scripts
 
         expect("#{staging_dir}/DEBIAN/preinst").to be_a_file
         expect("#{staging_dir}/DEBIAN/postinst").to be_a_file
         expect("#{staging_dir}/DEBIAN/prerm").to be_a_file
         expect("#{staging_dir}/DEBIAN/postrm").to be_a_file
+
+        expect("#{staging_dir}/DEBIAN/preinst").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/postinst").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/prerm").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/postrm").to have_permissions '100755'
       end
 
       it 'logs a message' do

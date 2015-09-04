@@ -21,6 +21,14 @@ RSpec::Matchers.define :have_content do |content|
   end
 end
 
+# expect('/path/to/file').to have_permissions
+RSpec::Matchers.define :have_permissions do |perm|
+  match do |actual|
+    m = sprintf('%o', File.stat(actual).mode)
+    m == perm 
+  end
+end
+
 # expect('/path/to/directory').to be_a_symlink
 RSpec::Matchers.define :be_a_symlink do
   match do |actual|

@@ -1,4 +1,4 @@
-source 'https://api.berkshelf.com'
+source 'https://supermarket.chef.io'
 
 cookbook 'omnibus'
 
@@ -6,7 +6,7 @@ cookbook 'omnibus'
 # cookbook 'omnibus', github: 'opscode-cookbooks/omnibus'
 
 group :integration do
-  cookbook 'apt',      '~> 2.3'
-  cookbook 'freebsd',  '~> 0.1'
-  cookbook 'yum-epel', '~> 0.3'
+  cookbook 'apt',      '~> 2.8'
+  cookbook 'freebsd',  '~> 0.3'
+  cookbook 'yum-epel', '~> 0.6'
 end

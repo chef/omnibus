@@ -36,12 +36,23 @@ module Omnibus
     attr_reader :source
 
     #
-    # The exact upstream version that a fetcher should fetch. For
-    # sources that allow aliases (branch name, tags, etc). Users
+    # The exact upstream version that a fetcher should fetch.
+    #
+    # @return [String]
+    #
+    # For sources that allow aliases (branch name, tags, etc). Users
     # should use the class method resolve_version to determine this
     # before constructing a fetcher.
-    #
     attr_reader :resolved_version
+
+    #
+    # The upstream version as described before resolution.
+    #
+    # @return [String]
+    #
+    # This will usually be the same as +resolved_version+ but may
+    # refer toa remote ref name or tag for a source such as git.
+    attr_reader :described_version
 
     #
     # The path where extracted software should live.
@@ -64,6 +75,7 @@ module Omnibus
       @name    = manifest_entry.name
       @source  = manifest_entry.locked_source
       @resolved_version = manifest_entry.locked_version
+      @described_version = manifest_entry.described_version
       @project_dir = project_dir
       @build_dir = build_dir
     end

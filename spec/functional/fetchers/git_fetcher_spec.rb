@@ -16,6 +16,7 @@ module Omnibus
       double(ManifestEntry,
         name: 'software',
         locked_version: '45ded6d3b1a35d66ed866b2c3eb418426e6382b0',
+        described_version: version,
         locked_source: source)
     end
 
@@ -96,6 +97,7 @@ module Omnibus
         double(ManifestEntry,
                name: 'software',
                locked_version: 'efde208366abd0f91419d8a54b45e3f6e0540105',
+               described_version: version,
                locked_source: source)
       end
 
@@ -177,7 +179,7 @@ module Omnibus
         expect(subject.version_for_cache).to eq("revision:#{revision}")
       end
 
-      it "does not returned cached revision after fetching" do
+      it 'does not returned cached revision after fetching' do
         before_fetch = subject.version_for_cache
         subject.fetch
         after_fetch = revision

@@ -60,10 +60,12 @@ module Omnibus
         block.call(package) if block
       end
 
-      if packages.empty?
-         log.warn(log_key) { "No packages were uploaded, build object will not be created." }
-      else
-        build_for(packages).save
+      if build_record?
+        if packages.empty?
+          log.warn(log_key) { "No packages were uploaded, build record will not be created." }
+        else
+          build_for(packages).save
+        end
       end
     end
 
@@ -142,6 +144,21 @@ module Omnibus
           }
         ]
       )
+    end
+
+    #
+    # Indicates if an Artifactory build record should be created for the
+    # published set of packages.
+    #
+    # @return [Boolean]
+    #
+    def build_record?
+      # We want to create a build record by default
+      if @options[:build_record].nil?
+        true
+      else
+        @options[:build_record]
+      end
     end
 
     #

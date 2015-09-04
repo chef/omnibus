@@ -68,7 +68,7 @@ module Omnibus
         subject.publish
       end
 
-      it 'it creates a build object for all packages' do
+      it 'it creates a build record for all packages' do
         expect(build).to receive(:save).once
         subject.publish
       end
@@ -107,6 +107,15 @@ module Omnibus
           block = ->(package) { package.do_something! }
           expect(package).to receive(:do_something!).once
           subject.publish(&block)
+        end
+      end
+
+      context 'when the :build_record option is false' do
+        subject { described_class.new(path, repository: repository, build_record: false) }
+
+        it 'does not create a build record at the end of publishing' do
+          expect(build).to_not receive(:save)
+          subject.publish
         end
       end
     end

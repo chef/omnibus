@@ -15,9 +15,9 @@ module Omnibus
 
     subject { described_class.new(project) }
 
-    let(:project_root) { "#{tmp_path}/project/root" }
-    let(:package_dir)  { "#{tmp_path}/package/dir" }
-    let(:staging_dir)  { "#{tmp_path}/staging/dir" }
+    let(:project_root) { File.join(tmp_path, 'project/root') }
+    let(:package_dir)  { File.join(tmp_path, 'package/dir') }
+    let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
 
     before do
       Config.project_root(project_root)
@@ -90,8 +90,17 @@ module Omnibus
     end
 
     describe '#package_name' do
+      before do
+        allow(Config).to receive(:windows_arch).and_return(:foo_arch)
+      end
+
       it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project-1.2.3-2.msi')
+        expect(subject.package_name).to eq('project-1.2.3-2-foo_arch.msi')
+      end
+
+      it 'returns the bundle name when building a bundle' do
+        subject.bundle_msi(true)
+        expect(subject.package_name).to eq('project-1.2.3-2-foo_arch.exe')
       end
     end
 
@@ -169,6 +178,27 @@ module Omnibus
 
         expect(contents).to include('<?include "parameters.wxi" ?>')
         expect(contents).to include('<Property Id="WIXUI_INSTALLDIR" Value="WINDOWSVOLUME" />')
+      end
+    end
+
+    describe '#write_bundle_file' do
+      before do
+        subject.bundle_msi(true)
+        subject.upgrade_code('ABCD-1234')
+        allow(Config).to receive(:windows_arch).and_return(:x86)
+      end
+
+      it 'generates the file' do
+        subject.write_bundle_file
+        expect("#{staging_dir}/bundle.wxs").to be_a_file
+      end
+
+      it 'has the correct content' do
+        outpath = "#{tmp_path}/package/dir/project-1.2.3-2-x86.msi"
+        outpath = outpath.gsub(File::SEPARATOR, File::ALT_SEPARATOR) if windows?
+        subject.write_bundle_file
+        contents = File.read("#{staging_dir}/bundle.wxs")
+        expect(contents).to include("<MsiPackage SourceFile=\"#{outpath}\" EnableFeatureSelection=\"no\" />")
       end
     end
 
@@ -265,6 +295,23 @@ module Omnibus
 
       it 'returns the correct value for many extensions' do
         expect(subject.wix_extension_switches(['a', 'b'])).to eq("-ext 'a' -ext 'b'")
+      end
+    end
+
+    describe "#bundle_msi" do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:bundle_msi)
+      end
+
+      it 'requires the value to be a TrueClass or a FalseClass' do
+        expect {
+          subject.bundle_msi(Object.new)
+        }.to raise_error(InvalidValue)
+      end
+
+      it 'returns the given value' do
+        subject.bundle_msi(true)
+        expect(subject.bundle_msi).to be_truthy
       end
     end
 

@@ -10,6 +10,7 @@ module Omnibus
       double(ManifestEntry,
         name: 'software',
         locked_version: nil,
+        described_version: nil,
         locked_source: { path: source_path })
     end
 

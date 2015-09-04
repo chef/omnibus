@@ -62,11 +62,11 @@ module Omnibus
       create_required_directories
 
       if cloned?
-        git_fetch(resolved_version) unless same_revision?(resolved_version)
+        git_fetch unless same_revision?(resolved_version)
       else
         force_recreate_project_dir! unless dir_empty?(project_dir)
         git_clone
-        git_checkout(resolved_version)
+        git_checkout
       end
     end
 
@@ -113,7 +113,7 @@ module Omnibus
     # Forcibly remove and recreate the project directory
     #
     def force_recreate_project_dir!
-      log.warn(log_key) { "Removing exisitng directory #{project_dir} before cloning" }
+      log.warn(log_key) { "Removing existing directory #{project_dir} before cloning" }
       FileUtils.rm_rf(project_dir)
       Dir.mkdir(project_dir)
     end
@@ -141,9 +141,8 @@ module Omnibus
     #
     # @return [void]
     #
-    def git_checkout(ref=resolved_version)
-      git("fetch --all")
-      git("checkout #{ref}")
+    def git_checkout
+      git("checkout #{resolved_version}")
     end
 
     #
@@ -151,9 +150,11 @@ module Omnibus
     #
     # @return [void]
     #
-    def git_fetch(ref=resolved_version)
-      git("fetch --all")
-      git("reset --hard #{ref}")
+    def git_fetch
+      fetch_cmd = "fetch #{source_url} #{described_version}"
+      fetch_cmd << ' --recurse-submodules=on-demand' if clone_submodules?
+      git(fetch_cmd)
+      git("reset --hard #{resolved_version}")
     end
 
     #
@@ -191,8 +192,22 @@ module Omnibus
     # Class methods
     public
 
+    # Return the SHA1 corresponding to a ref as determined by the remote source.
+    #
+    # @return [String]
+    #
     def self.resolve_version(ref, source)
       if sha_hash?(ref)
+        # A git server negotiates in terms of refs during the info-refs phase
+        # of a fetch. During upload-pack, the client is not allowed to specify
+        # any sha1s in the "wants" unless the server has publicized them during
+        # info-refs. Hence, the server is allowed to drop requests to fetch
+        # particular sha1s, even if it is an otherwise reachable commit object.
+        # Only when the service is specifically configured with
+        # uploadpack.allowReachableSHA1InWant is there any guarantee that it
+        # considers "naked" wants.
+        log.warn(log_key) { 'git fetch on a sha1 is not guaranteed to work' }
+        log.warn(log_key) { "Specify a ref name instead of #{ref} on #{source}" }
         ref
       else
         revision_from_remote_reference(ref, source)
@@ -205,12 +220,14 @@ module Omnibus
     # @return [true, false]
     #
     def self.sha_hash?(rev)
-      rev =~ /^[0-9a-f]{4,40}$/
+      rev =~ /^[0-9a-f]{4,40}$/i
     end
 
     #
-    # Return the SHA corresponding to ref. If ref is an annotated tag,
-    # return the SHA that was tagged not the SHA of the tag itself.
+    # Return the SHA corresponding to ref.
+    #
+    # If ref is an annotated tag, return the SHA that was tagged not the SHA of
+    # the tag itself.
     #
     # @return [String]
     #

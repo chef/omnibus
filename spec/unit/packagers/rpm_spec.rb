@@ -16,9 +16,9 @@ module Omnibus
 
     subject { described_class.new(project) }
 
-    let(:project_root) { "#{tmp_path}/project/root" }
-    let(:package_dir)  { "#{tmp_path}/package/dir" }
-    let(:staging_dir)  { "#{tmp_path}/staging/dir" }
+    let(:project_root) { File.join(tmp_path, 'project/root') }
+    let(:package_dir)  { File.join(tmp_path, 'package/dir') }
+    let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
 
     before do
       Config.project_root(project_root)
@@ -224,14 +224,17 @@ module Omnibus
 
       context 'when leaf directories owned by the filesystem package are present' do
         before do
-          create_file("#{staging_dir}/BUILD/opt")
+          create_directory("#{staging_dir}/BUILD/usr/lib")
+          create_directory("#{staging_dir}/BUILD/opt")
+          create_file("#{staging_dir}/BUILD/opt/thing")
         end
 
-        it 'does not write them into the spec' do
+        it 'is written into the spec with ownership and permissions' do
           subject.write_rpm_spec
           contents = File.read(spec_file)
 
-          expect(contents).to_not include("/opt")
+          expect(contents).to include("%dir %attr(0755,root,root) /opt")
+          expect(contents).to include("%dir %attr(0555,root,root) /usr/lib")
         end
       end
     end

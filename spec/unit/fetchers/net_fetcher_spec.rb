@@ -12,6 +12,7 @@ module Omnibus
       double(Omnibus::ManifestEntry,
              name: 'file',
              locked_version: "1.2.3",
+             described_version: '1.2.3',
              locked_source: source)
     end
 
@@ -251,6 +252,7 @@ module Omnibus
           double(Omnibus::ManifestEntry,
                  name: 'file',
                  locked_version: "1.2.3",
+                 described_version: '1.2.3',
                  locked_source: { url: "https://get.example.com/file.#{extension}", md5: 'abcd1234' })
         end
 
@@ -272,6 +274,7 @@ module Omnibus
           double(Omnibus::ManifestEntry,
                  name: 'file',
                  locked_version: "1.2.3",
+                 described_version: '1.2.3',
                  locked_source: { url: "https://get.example.com/folder", md5: 'abcd1234' })
         end
 
@@ -294,6 +297,7 @@ module Omnibus
           double(Omnibus::ManifestEntry,
                  name: 'file',
                  locked_version: "1.2.3",
+                 described_version: '1.2.3',
                  locked_source: { url: "https://get.example.com/file", md5: 'abcd1234' })
         end
 

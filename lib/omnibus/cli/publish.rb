@@ -51,6 +51,10 @@ module Omnibus
       desc: 'The accessibility of the uploaded packages',
       enum: %w(public private),
       default: 'private'
+    method_option :region,
+      type: :string,
+      desc: 'The region in which the bucket is located',
+      default: 'us-east-1'
     desc 's3 BUCKET PATTERN', 'Publish to an S3 bucket'
     def s3(bucket, pattern)
       options[:bucket] = bucket
@@ -62,6 +66,10 @@ module Omnibus
     #
     #   $ omnibus publish artifactory libs-omnibus-local pkg/chef*
     #
+    method_option :build_record,
+      type: :boolean,
+      desc: 'Optionally create an Artifactory build record for the published artifacts',
+      default: true
     desc 'artifactory REPOSITORY PATTERN', 'Publish to an Artifactory instance'
     def artifactory(repository, pattern)
       options[:repository] = repository

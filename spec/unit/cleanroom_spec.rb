@@ -43,7 +43,7 @@ module Omnibus
         EOH
       end
 
-      let(:filepath) { '/file/path' }
+      let(:filepath) { File.join(tmp_path, '/file/path') }
 
       before do
         allow(IO).to receive(:read).and_call_original

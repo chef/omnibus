@@ -14,6 +14,7 @@ module Omnibus
       double(Omnibus::ManifestEntry,
              name: 'pathelogical',
              locked_version: nil,
+             described_version: nil,
              locked_source: source)
     end
 
@@ -102,8 +103,8 @@ module Omnibus
       end
     end
 
-    describe "#resolve_version" do
-      it "just returns the version" do
+    describe '#resolve_version' do
+      it 'just returns the version' do
         expect(NetFetcher.resolve_version("1.2.3", source)).to eq("1.2.3")
       end
     end
