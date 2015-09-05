@@ -55,7 +55,6 @@ module Omnibus
       /libc\.so/,
       /libcrypt\.so/,
       /libdl\.so/,
-      /libffi\.so/,
       /libm\.so/,
       /libpthread\.so/,
       /librt\.so/,
