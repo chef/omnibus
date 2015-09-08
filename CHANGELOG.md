@@ -1,5 +1,8 @@
 Omnibus CHANGELOG
 =================
+## Unreleased
+- Add description to signed package (Windows) so UAC prompt shows correct package name
+
 v4.1.0 (September 1, 2015)
 -------------------------
 ### New Features
