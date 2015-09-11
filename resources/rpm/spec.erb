@@ -19,9 +19,10 @@ Name: <%= name %>
 Version: <%= version %>
 Release: <%= iteration %><%= dist_tag %>
 Summary:  <%= description.split("\n").first.empty? ? "_" : description.split("\n").first %>
--<% if platform != 'nexus' -%>
+<% # Wind River Linux does not support BuildArch in its RPM spec files -%>
+<% if platform_family != 'wrlinux' -%>
 BuildArch: <%= architecture %>
--<% end -%>
+<% end -%>
 AutoReqProv: no
 BuildRoot: %buildroot
 Prefix: /

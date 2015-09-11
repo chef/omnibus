@@ -282,27 +282,27 @@ module Omnibus
       render_template(resource_path('spec.erb'),
         destination: spec_file,
         variables: {
-          name:           safe_base_package_name,
-          version:        safe_version,
-          iteration:      safe_build_iteration,
-          vendor:         vendor,
-          license:        license,
-          dist_tag:       dist_tag,
-          maintainer:     project.maintainer,
-          homepage:       project.homepage,
-          description:    project.description,
-          priority:       priority,
-          category:       category,
-          conflicts:      project.conflicts,
-          replaces:       project.replaces,
-          dependencies:   project.runtime_dependencies,
-          user:           project.package_user,
-          group:          project.package_group,
-          scripts:        scripts,
-          config_files:   config_files,
-          files:          files,
-          build_dir:      build_dir,
-          platform:       Omnibus::Metadata.platform_shortname
+          name:            safe_base_package_name,
+          version:         safe_version,
+          iteration:       safe_build_iteration,
+          vendor:          vendor,
+          license:         license,
+          dist_tag:        dist_tag,
+          maintainer:      project.maintainer,
+          homepage:        project.homepage,
+          description:     project.description,
+          priority:        priority,
+          category:        category,
+          conflicts:       project.conflicts,
+          replaces:        project.replaces,
+          dependencies:    project.runtime_dependencies,
+          user:            project.package_user,
+          group:           project.package_group,
+          scripts:         scripts,
+          config_files:    config_files,
+          files:           files,
+          build_dir:       build_dir,
+          platform_family: Ohai['platform_family']
         }
       )
     end
@@ -496,18 +496,25 @@ module Omnibus
       #
       if version =~ /\-/
         if Ohai['platform_family'] == 'wrlinux'
-          converted = version.gsub('-', '_') #WRL5 has an elderly RPM version
+          converted = version.gsub('-', '_') #WRL has an elderly RPM version
+          log.warn(log_key) do
+            "Omnibus replaces dashes (-) with tildes (~) so pre-release " \
+            "versions get sorted earlier than final versions.  However, the " \
+            "version of rpmbuild on Wind River Linux does not support this. " \
+            "All dashes will be replaced with underscores (_). Converting " \
+            "`#{project.build_version}' to `#{converged}'."
+          end
         else
           converted = version.gsub('-', '~')
+          log.warn(log_key) do
+            "Tildes hold special significance in the RPM package versions. " \
+            "They mark a version as lower priority in RPM's version compare " \
+            "logic. We'll replace all dashes (-) with tildes (~) so pre-release" \
+            "versions get sorted earlier then final versions. Converting" \
+            "`#{project.build_version}' to `#{converted}'."
+          end
         end
 
-        log.warn(log_key) do
-          "Tildes hold special significance in the RPM package versions. " \
-          "They mark a version as lower priority in RPM's version compare " \
-          "logic. We'll replace all dashes (-) with tildes (~) so pre-release" \
-          "versions get sorted earlier then final versions. Converting" \
-          "`#{project.build_version}' to `#{converted}'."
-        end
 
         version = converted
       end
