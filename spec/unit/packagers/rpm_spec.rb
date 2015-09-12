@@ -241,22 +241,13 @@ module Omnibus
       end
 
       context 'when the platform_family is wrlinux' do
+        let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.nexus5.x86_64.rpm.spec" }
+
         before do
-          # This stub_ohai call to be uncommented once the Fauxhai PR
-          # for adding wrlinux support is merged and a subsequent
-          # release is cut.
-          #
-          # See: https://github.com/customink/fauxhai/pull/161
-          #stub_ohai(platform: 'nexus', version: '7.0.0.2')
+          stub_ohai(platform: 'nexus', version: '5')
         end
 
         it 'writes out a spec file with no BuildArch' do
-          # This test to be removed from pending once the Fauxhai PR
-          # for adding wrlinux support is merged and a subsequent
-          # release is cut.
-          #
-          # See: https://github.com/customink/fauxhai/pull/161
-          pending 'release of Fauxhai that includes wrlinux platform_family support'
           subject.write_rpm_spec
           contents = File.read(spec_file)
 
@@ -396,16 +387,10 @@ module Omnibus
       context 'when the build is for nexus' do
         before do
           project.build_version('1.2-3')
-
-          # The stub_ohai call should be removed once the PR for wrlinux
-          # Fauxhai support is merged and a subsequent release is cut.
-          #
-          # See: https://github.com/customink/fauxhai/pull/161
-          #stub_ohai(platform: 'nexus', version: '5.1')
+          stub_ohai(platform: 'nexus', version: '5')
         end
 
         it 'returns the value while logging a message' do
-          pending 'release of Fauxhai with wrlinux support'
           output = capture_logging do
             expect(subject.safe_version).to eq('1.2_3')
           end
@@ -417,16 +402,10 @@ module Omnibus
       context 'when the build is for ios_xr' do
         before do
           project.build_version('1.2-3')
-
-          # The stub_ohai call should be removed once the PR for wrlinux
-          # Fauxhai support is merged and a subsequent release is cut.
-          #
-          # See: https://github.com/customink/fauxhai/pull/160
-          #stub_ohai(platform: 'ios_xr', version: '6.0.0.14I')
+          stub_ohai(platform: 'ios_xr', version: '6.0.0.14I')
         end
 
         it 'returns the value while logging a message' do
-          pending 'release of Fauxhai with wrlinux support'
           output = capture_logging do
             expect(subject.safe_version).to eq('1.2_3')
           end

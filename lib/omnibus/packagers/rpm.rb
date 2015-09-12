@@ -502,7 +502,7 @@ module Omnibus
             "versions get sorted earlier than final versions.  However, the " \
             "version of rpmbuild on Wind River Linux does not support this. " \
             "All dashes will be replaced with underscores (_). Converting " \
-            "`#{project.build_version}' to `#{converged}'."
+            "`#{project.build_version}' to `#{converted}'."
           end
         else
           converted = version.gsub('-', '~')
