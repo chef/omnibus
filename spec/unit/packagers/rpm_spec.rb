@@ -19,6 +19,7 @@ module Omnibus
     let(:project_root) { File.join(tmp_path, 'project/root') }
     let(:package_dir)  { File.join(tmp_path, 'package/dir') }
     let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
+    let(:architecture) { 'x86_64' }
 
     before do
       Config.project_root(project_root)
@@ -32,7 +33,9 @@ module Omnibus
       create_directory("#{staging_dir}/SOURCES")
       create_directory("#{staging_dir}/SPECS")
 
-      stub_ohai(platform: 'redhat', version: '6.5')
+      stub_ohai(platform: 'redhat', version: '6.5') do |data|
+        data['kernel']['machine'] = architecture
+      end
     end
 
     describe '#signing_passphrase' do
@@ -144,7 +147,6 @@ module Omnibus
         expect(contents).to include("Version: 1.2.3")
         expect(contents).to include("Release: 2.el6")
         expect(contents).to include("Summary:  The full stack of project")
-        expect(contents).to include("BuildArch: x86_64")
         expect(contents).to include("AutoReqProv: no")
         expect(contents).to include("BuildRoot: %buildroot")
         expect(contents).to include("Prefix: /")
@@ -252,7 +254,7 @@ module Omnibus
 
       it 'uses the correct command' do
         expect(subject).to receive(:shellout!)
-          .with(/rpmbuild -bb --buildroot/)
+          .with(/rpmbuild --target #{architecture} -bb --buildroot/)
         subject.create_rpm_file
       end
 
