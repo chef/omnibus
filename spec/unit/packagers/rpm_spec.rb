@@ -239,6 +239,21 @@ module Omnibus
           expect(contents).to include("%dir %attr(0555,root,root) /usr/lib")
         end
       end
+
+      context 'when the platform_family is wrlinux' do
+        let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.nexus5.x86_64.rpm.spec" }
+
+        before do
+          stub_ohai(platform: 'nexus', version: '5')
+        end
+
+        it 'writes out a spec file with no BuildArch' do
+          subject.write_rpm_spec
+          contents = File.read(spec_file)
+
+          expect(contents).not_to include("BuildArch")
+        end
+      end
     end
 
     describe '#create_rpm_file' do
@@ -366,6 +381,36 @@ module Omnibus
           end
 
           expect(output).to include("The `version' component of RPM package names can only include")
+        end
+      end
+
+      context 'when the build is for nexus' do
+        before do
+          project.build_version('1.2-3')
+          stub_ohai(platform: 'nexus', version: '5')
+        end
+
+        it 'returns the value while logging a message' do
+          output = capture_logging do
+            expect(subject.safe_version).to eq('1.2_3')
+          end
+
+          expect(output).to include("rpmbuild on Wind River Linux does not support this")
+        end
+      end
+
+      context 'when the build is for ios_xr' do
+        before do
+          project.build_version('1.2-3')
+          stub_ohai(platform: 'ios_xr', version: '6.0.0.14I')
+        end
+
+        it 'returns the value while logging a message' do
+          output = capture_logging do
+            expect(subject.safe_version).to eq('1.2_3')
+          end
+
+          expect(output).to include("rpmbuild on Wind River Linux does not support this")
         end
       end
     end
