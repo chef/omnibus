@@ -137,6 +137,16 @@ module Omnibus
         end
       end
 
+      context 'source with no checksum' do
+        let(:source) do
+          { url: source_url }
+        end
+
+        it 'raises an exception' do
+          expect { fetch! }.to raise_error(ChecksumMissing)
+        end
+      end
+
       context 'source with sha1' do
         let(:source) do
           { url: source_url, sha1: source_sha1 }
