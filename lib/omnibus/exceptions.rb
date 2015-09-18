@@ -214,6 +214,18 @@ EOH
     end
   end
 
+  class ChecksumMissing < Error
+    def initialize(software)
+      super <<-EOH
+Verification for #{software.name} failed due to a missing checksum.
+
+This added security check is used to prevent MITM attacks when downloading the
+remote file. You must specify a checksum for each version of software downloaded
+from a remote location.
+EOH
+    end
+  end
+
   class ChecksumMismatch < Error
     def initialize(software, expected, actual)
       super <<-EOH
