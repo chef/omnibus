@@ -229,12 +229,16 @@ module Omnibus
     #
     # The digest type defined in the software definition
     #
+    # @raise [ChecksumMissing]
+    #   if the checksum does not exist
+    #
     # @return [Symbol]
     #
     def digest_type
       DIGESTS.each do |digest|
         return digest if source.key? digest
       end
+      raise ChecksumMissing.new(self)
     end
 
     #
