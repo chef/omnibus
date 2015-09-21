@@ -96,7 +96,7 @@ module Omnibus
       when 1
         from_hash_v1(manifest_data)
       else
-        raise InvalidManifestFormat, "Unknown manifest fromat version: #{manifest_data['manifest_format']}"
+        raise InvalidManifestFormat, "Unknown manifest format version: #{manifest_data['manifest_format']}"
       end
     end
 
