@@ -112,6 +112,10 @@ module Omnibus
           publish_packages.concat(build_packages)
         end
 
+        if publish_packages.empty?
+          log.info(log_key) { 'No packages found, skipping publish' }
+        end
+
         publish_packages
       end
     end

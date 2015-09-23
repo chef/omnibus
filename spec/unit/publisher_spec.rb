@@ -107,6 +107,20 @@ module Omnibus
           end
         end
       end
+
+      context 'there are no packages to publish' do
+        before do
+          allow(FileSyncer).to receive(:glob)
+            .with(pattern)
+            .and_return([])
+        end
+
+        it 'prints a warning' do
+          output = capture_logging { subject.packages }
+          expect(output).to include('No packages found, skipping publish')
+        end
+      end
+
     end
 
     describe '#publish' do
