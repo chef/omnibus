@@ -23,6 +23,10 @@ module Omnibus
       log.info(log_key) { 'Starting artifactory publisher' }
       safe_require('artifactory')
 
+      if packages.empty?
+        log.info(log_key) { 'No packages found, skipping publish' }
+      end
+
       packages.each do |package|
         # Make sure the package is good to go!
         log.debug(log_key) { "Validating '#{package.name}'" }
