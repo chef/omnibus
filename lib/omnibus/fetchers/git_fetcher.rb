@@ -37,7 +37,8 @@ module Omnibus
     end
 
     #
-    # Clean the project directory by removing the contents from disk.
+    # Clean the project directory by removing untracked contents from disk and
+    # resetting both index and working tree to original clone.
     #
     # @return [true, false]
     #   true if the project directory was removed, false otherwise
@@ -45,6 +46,7 @@ module Omnibus
     def clean
       if cloned?
         log.info(log_key) { 'Cleaning existing clone' }
+        git("reset --hard #{resolved_version}")
         git('clean -fdx')
         true
       else
