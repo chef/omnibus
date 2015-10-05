@@ -163,6 +163,15 @@ module Omnibus
         allow(Dir).to receive(:chdir) { |_, &b| b.call }
       end
 
+      it 'chowns the directory' do
+        # A note - the /opt/ here is essentially project.install_dir one level up.
+        # There is nothing magical about 'opt' as a directory.
+        expect(subject).to receive(:shellout!)
+          .with(/chown -R 0:0 #{staging_dir}\/opt$/)
+        subject.create_bff_file
+      end
+
+
       it 'logs a message' do
         output = capture_logging { subject.create_bff_file }
         expect(output).to include('Creating .bff file')
