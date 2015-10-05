@@ -36,7 +36,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.package_name}-#{pkgmk_version}.#{Ohai['kernel']['machine']}.solaris"
+      "#{project.package_name}-#{pkgmk_version}.#{safe_architecture}.solaris"
     end
 
     def pkgmk_version
@@ -88,7 +88,7 @@ module Omnibus
         BASEDIR=#{install_dirname}
         PKG=#{project.package_name}
         NAME=#{project.package_name}
-        ARCH=#{`uname -p`.chomp}
+        ARCH=#{safe_architecture}
         VERSION=#{pkgmk_version}
         CATEGORY=application
         DESC=#{project.description}
@@ -98,6 +98,22 @@ module Omnibus
       EOF
       File.open staging_dir_path('pkginfo'), 'w+' do |f|
         f.write pkginfo_content
+      end
+    end
+
+    #
+    # The architecture for this Solaris package.
+    #
+    # @return [String]
+    #
+    def safe_architecture
+      # The #i386? and #intel? helpers come from chef-sugar
+      if intel?
+        'i386'
+      elsif sparc?
+        'sparc'
+      else
+        Ohai['kernel']['machine']
       end
     end
   end
