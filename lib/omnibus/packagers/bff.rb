@@ -173,7 +173,7 @@ module Omnibus
       # This implies that if we are in /tmp/staging/project/dir/things,
       # we will chown from 'project' on, rather than 'project/dir', which leaves
       # project owned by the build user (which is incorrect)
-      shellout!("sudo chown -R 0:0 #{File.join(staging_dir, project.install_dir)}")
+      shellout!("sudo chown -R 0:0 #{File.join(staging_dir, project.install_dir.match(/^\/?(\w+)/).to_s)}")
       log.info(log_key) { "Creating .bff file" }
 
       # Since we want the owner to be root, we need to sudo the mkinstallp
