@@ -22,6 +22,7 @@ module Omnibus
     include Digestable
     include Logging
     include NullArgumentable
+    include Sugarable
     include Templating
     include Util
 
