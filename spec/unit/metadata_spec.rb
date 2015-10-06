@@ -22,18 +22,51 @@ module Omnibus
     subject { described_class.new(package, data) }
 
     describe '.arch' do
-      it 'returns the architecture' do
+      let(:architecture) { 'x86_64' }
+
+      before do
         stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
-          data['kernel']['machine'] = 'x86_64'
+          data['kernel']['machine'] = architecture
         end
+      end
+
+      it 'returns the architecture' do
         expect(described_class.arch).to eq('x86_64')
       end
 
-      context 'on windows' do
-        it 'returns a 32-bit value based on Config.windows_arch being set to x86' do
-          stub_ohai(platform: 'windows', version: '2012R2') do |data|
-            data['kernel']['machine'] = 'x86_64'
+      context 'on solaris' do
+        before do
+          stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+            data['platform'] = 'solaris2'
+            data['kernel']['machine'] = architecture
           end
+        end
+
+        context 'architecture is Intel-based' do
+          let(:architecture) { 'i86pc' }
+
+          it 'returns i386' do
+            expect(described_class.arch).to eq('i386')
+          end
+        end
+
+        context 'architecture is SPARC-based' do
+          let(:architecture) { 'sun4v' }
+
+          it 'returns sparc' do
+            expect(described_class.arch).to eq('sparc')
+          end
+        end
+      end
+
+      context 'on windows' do
+        before do
+          stub_ohai(platform: 'windows', version: '2012R2') do |data|
+            data['kernel']['machine'] = architecture
+          end
+        end
+
+        it 'returns a 32-bit value based on Config.windows_arch being set to x86' do
           expect(Config).to receive(:windows_arch).and_return(:x86)
           expect(described_class.arch).to eq('i386')
         end

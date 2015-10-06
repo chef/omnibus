@@ -30,6 +30,11 @@ require 'chef/sugar/vagrant'
 
 module Omnibus
   module Sugarable
+    def self.extended(base)
+      base.send(:extend, Chef::Sugar::DSL)
+      base.send(:extend, Omnibus::Sugar)
+    end
+
     def self.included(base)
       base.send(:include, Chef::Sugar::DSL)
       base.send(:include, Omnibus::Sugar)
