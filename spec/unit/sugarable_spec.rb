@@ -7,6 +7,22 @@ module Omnibus
     end
   end
 
+  describe Metadata do
+    it 'extends Sugarable' do
+      expect(described_class.singleton_class.included_modules).to include(Sugarable)
+    end
+
+    it 'includes Sugarable' do
+      expect(described_class.ancestors).to include(Sugarable)
+    end
+  end
+
+  describe Packager::Base do
+    it 'is a sugarable' do
+      expect(described_class.ancestors).to include(Sugarable)
+    end
+  end
+
   describe Project do
     it 'is a sugarable' do
       expect(described_class.ancestors).to include(Sugarable)
