@@ -276,27 +276,12 @@ module Omnibus
     def appbundle(app_name, options = {})
       build_commands << BuildCommand.new("appbundle `#{app_name}'") do
         bin_dir            = "#{install_dir}/bin"
-        embedded_apps_root = "#{install_dir}/embedded/apps"
-        embedded_app_dir   = "#{embedded_apps_root}/#{app_name}"
-        gemfile_lock       = "#{embedded_app_dir}/Gemfile.lock"
         appbundler_bin     = windows_safe_path("#{install_dir}/embedded/bin/appbundler")
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
-        # Ensure the embedded app directory exists
-        FileUtils.mkdir_p(embedded_apps_root)
-        # Copy the application code into place
-        FileUtils.cp_r("#{Omnibus::Config.source_dir}/#{app_name}", embedded_apps_root)
-        # Delete any top-level `.git` directory
-        FileUtils.rm_rf("#{embedded_app_dir}/.git")
 
-        # Prepare the environment
-        options[:env] ||= {}
-        env = with_embedded_path || {}
-        env["BUNDLE_GEMFILE"] = gemfile_lock
-        options[:env].merge!(env)
-
-        shellout!("#{appbundler_bin} '#{embedded_app_dir}' '#{bin_dir}'", options)
+        shellout!("#{appbundler_bin} '#{Omnibus::Config.source_dir}/#{app_name}' '#{bin_dir}'", options)
       end
     end
     expose :appbundle

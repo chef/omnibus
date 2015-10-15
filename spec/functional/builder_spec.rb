@@ -15,18 +15,42 @@ module Omnibus
     # manner similar to one that omnibus provides, we would need to emulate
     # the fixup steps here as well, which is a pain the ass.
     #
-    # So just don't run those tests on windows.
+    # Instead we write batch files that redirect to the batch files
+    # corresponding to the system installation and hope it all works out.
     def fake_embedded_bin(name)
-      create_directory(embedded_bin_dir)
-      name = 'ruby.exe' if windows? && name == 'ruby'
-      create_link(Bundler.which(name), File.join(embedded_bin_dir, name))
+      if windows?
+        ext = (name == 'ruby') ? '.exe' : '.bat'
+        source = Bundler.which(name + ext)
+        raise "Could not find #{name} in bundler environment" unless source
+        File.open(File.join(embedded_bin_dir, name + '.bat'), 'w') do |f|
+          f.write <<-EOH.gsub(/^ {12}/, '')
+            @"#{source}" %*
+          EOH
+        end
+      else
+        source = Bundler.which(name)
+        raise "Could not find #{name} in bundler environment" unless source
+        puts(source)
+
+        create_link(source, File.join(embedded_bin_dir, name))
+      end
+    end
+
+    def shellout_opts(subject)
+      # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
+      options = {}
+      options[:env] = {
+          'GEM_HOME' => ENV['GEM_HOME'],
+          'GEM_PATH' => ENV['GEM_PATH'],
+      }
+      options[:env].merge!(subject.with_embedded_path)
+      options
     end
 
     subject { described_class.new(software) }
 
     describe '#command' do
       it 'executes the command' do
-        path = File.join(software.install_dir, 'file.txt')
         subject.command("echo 'Hello World!'")
 
         output = capture_logging { subject.build }
@@ -78,7 +102,7 @@ module Omnibus
 
         fake_embedded_bin('ruby')
 
-        subject.ruby(ruby)
+        subject.ruby(ruby, env: subject.with_embedded_path)
         subject.build
 
         path = "#{software.install_dir}/test.txt"
@@ -87,7 +111,7 @@ module Omnibus
       end
     end
 
-    describe '#gem', :not_supported_on_windows do
+    describe '#gem' do
       it 'executes the command as the embedded gem' do
         gemspec = File.join(tmp_path, 'example.gemspec')
         File.open(gemspec, 'w') do |f|
@@ -105,8 +129,8 @@ module Omnibus
 
         fake_embedded_bin('gem')
 
-        subject.gem("build #{gemspec}")
-        subject.gem("install #{project_dir}/example-1.0.0.gem")
+        subject.gem("build #{gemspec}", shellout_opts(subject))
+        subject.gem("install #{project_dir}/example-1.0.0.gem", shellout_opts(subject))
         output = capture_logging { subject.build }
 
         expect(output).to include('gem build')
@@ -114,7 +138,7 @@ module Omnibus
       end
     end
 
-    describe '#bundler', :not_supported_on_windows do
+    describe '#bundler' do
       it 'executes the command as the embedded bundler' do
         gemspec = File.join(tmp_path, 'example.gemspec')
         File.open(gemspec, 'w') do |f|
@@ -139,25 +163,17 @@ module Omnibus
 
         fake_embedded_bin('bundle')
 
-        # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
-        options = {}
-        options[:env] = {
-          'GEM_HOME' => ENV['GEM_HOME'],
-          'GEM_PATH' => ENV['GEM_PATH'],
-        }
-
-        subject.bundle('install', options)
+        subject.bundle('install', shellout_opts(subject))
         output = capture_logging { subject.build }
 
         expect(output).to include('bundle install')
       end
     end
 
-    describe '#appbundle', :not_supported_on_windows do
+    describe '#appbundle' do
       it 'executes the command as the embedded appbundler' do
 
         source_dir       = "#{Omnibus::Config.source_dir}/example"
-        embedded_app_dir = "#{software.install_dir}/embedded/apps/example"
         bin_dir          = "#{software.install_dir}/bin"
 
         FileUtils.mkdir(source_dir)
@@ -204,21 +220,16 @@ module Omnibus
 
         fake_embedded_bin('appbundler')
 
-        # Pass GEM_HOME and GEM_PATH to subprocess so our fake bin works
-        options = {}
-        options[:env] = {
-          'GEM_HOME' => ENV['GEM_HOME'],
-          'GEM_PATH' => ENV['GEM_PATH'],
-        }
-
-        subject.appbundle('example', options)
+        subject.appbundle('example', shellout_opts(subject))
         output = capture_logging { subject.build }
 
-        expect(output).to include("/opt/chefdk/embedded/bin/appbundler '#{embedded_app_dir}' '#{bin_dir}'")
+        suffix = '/opt/chefdk/embedded/bin/appbundler'
+        suffix.gsub!(/\//,'\\') if windows?
+        expect(output).to include("#{suffix} '#{source_dir}' '#{bin_dir}'")
       end
     end
 
-    describe '#rake', :not_supported_on_windows do
+    describe '#rake' do
       it 'executes the command as the embedded rake' do
         rakefile = File.join(tmp_path, 'Rakefile')
         File.open(rakefile, 'w') do |f|
@@ -229,8 +240,8 @@ module Omnibus
 
         fake_embedded_bin('rake')
 
-        subject.rake('-T')
-        subject.rake('foo')
+        subject.rake('-T', shellout_opts(subject))
+        subject.rake('foo', shellout_opts(subject))
         output = capture_logging { subject.build }
 
         expect(output).to include('rake -T')
