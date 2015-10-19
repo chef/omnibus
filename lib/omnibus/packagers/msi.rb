@@ -80,6 +80,7 @@ module Omnibus
           light.exe
             -nologo
             -ext WixUIExtension
+            -ext WixUtilExtension
             #{wix_extension_switches(wix_light_extensions)}
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
