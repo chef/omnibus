@@ -30,9 +30,9 @@ module Omnibus
       else
         source = Bundler.which(name)
         raise "Could not find #{name} in bundler environment" unless source
-        puts(source)
 
-        create_link(source, File.join(embedded_bin_dir, name))
+        target = File.join(embedded_bin_dir, name)
+        create_link(source, target) unless File.exists?(target)
       end
     end
 
@@ -47,7 +47,59 @@ module Omnibus
       options
     end
 
+
+    def make_gemspec()
+      gemspec = File.join(project_dir, "#{project_name}.gemspec")
+      File.open(gemspec, 'w') do |f|
+        f.write <<-EOH.gsub(/^ {12}/, '')
+            Gem::Specification.new do |gem|
+              gem.name           = '#{project_name}'
+              gem.version        = '1.0.0'
+              gem.author         = 'Chef Software, Inc.'
+              gem.email          = 'info@getchef.com'
+              gem.description    = 'Installs a thing'
+              gem.summary        = gem.description
+            end
+        EOH
+      end
+      gemspec
+    end
+
+    def make_gemfile()
+      gemfile = File.join(project_dir, 'Gemfile')
+      File.open(gemfile, 'w') do |f|
+        f.write <<-EOH.gsub(/^ {12}/, '')
+            gemspec
+        EOH
+      end
+      gemfile
+    end
+
+    def make_gemfile_lock()
+      gemfile_lock = File.join(project_dir, 'Gemfile.lock')
+      File.open(gemfile_lock, 'w') do |f|
+        f.write <<-EOH.gsub(/^ {12}/, '')
+            PATH
+              remote: .
+              specs:
+                #{project_name} (1.0.0)
+
+            GEM
+              specs:
+
+            PLATFORMS
+              ruby
+
+            DEPENDENCIES
+              #{project_name}!
+        EOH
+      end
+      gemfile_lock
+    end
+
     subject { described_class.new(software) }
+    let(:project_name) { 'example' }
+    let(:project_dir) { File.join(source_dir, project_name) }
 
     describe '#command' do
       it 'executes the command' do
@@ -113,125 +165,58 @@ module Omnibus
 
     describe '#gem' do
       it 'executes the command as the embedded gem' do
-        gemspec = File.join(tmp_path, 'example.gemspec')
-        File.open(gemspec, 'w') do |f|
-          f.write <<-EOH.gsub(/^ {12}/, '')
-            Gem::Specification.new do |gem|
-              gem.name           = 'example'
-              gem.version        = '1.0.0'
-              gem.author         = 'Chef Software, Inc.'
-              gem.email          = 'info@getchef.com'
-              gem.description    = 'Installs a thing'
-              gem.summary        = gem.description
-            end
-          EOH
-        end
-
+        make_gemspec
         fake_embedded_bin('gem')
+        gem_file = "#{project_name}-1.0.0.gem"
 
-        subject.gem("build #{gemspec}", shellout_opts(subject))
-        subject.gem("install #{project_dir}/example-1.0.0.gem", shellout_opts(subject))
+        subject.gem("build #{project_name}.gemspec", shellout_opts(subject))
+        subject.gem("install #{gem_file}", shellout_opts(subject))
         output = capture_logging { subject.build }
 
+        expect(File.join(project_dir, gem_file)).to be_a_file
         expect(output).to include('gem build')
         expect(output).to include('gem install')
+
       end
     end
 
     describe '#bundler' do
       it 'executes the command as the embedded bundler' do
-        gemspec = File.join(tmp_path, 'example.gemspec')
-        File.open(gemspec, 'w') do |f|
-          f.write <<-EOH.gsub(/^ {12}/, '')
-            Gem::Specification.new do |gem|
-              gem.name           = 'example'
-              gem.version        = '1.0.0'
-              gem.author         = 'Chef Software, Inc.'
-              gem.email          = 'info@getchef.com'
-              gem.description    = 'Installs a thing'
-              gem.summary        = gem.description
-            end
-          EOH
-        end
-
-        gemfile = File.join(tmp_path, 'Gemfile')
-        File.open(gemfile, 'w') do |f|
-          f.write <<-EOH.gsub(/^ {12}/, '')
-            gemspec
-          EOH
-        end
-
+        make_gemspec
+        make_gemfile
         fake_embedded_bin('bundle')
 
         subject.bundle('install', shellout_opts(subject))
         output = capture_logging { subject.build }
 
+        expect(File.join(project_dir, 'Gemfile.lock')).to be_a_file
         expect(output).to include('bundle install')
       end
     end
 
     describe '#appbundle' do
       it 'executes the command as the embedded appbundler' do
+        make_gemspec
+        make_gemfile
+        make_gemfile_lock
 
-        source_dir       = "#{Omnibus::Config.source_dir}/example"
-        bin_dir          = "#{software.install_dir}/bin"
-
-        FileUtils.mkdir(source_dir)
-
-        gemspec = File.join(source_dir, 'example.gemspec')
-        File.open(gemspec, 'w') do |f|
-          f.write <<-EOH.gsub(/^ {12}/, '')
-            Gem::Specification.new do |gem|
-              gem.name           = 'example'
-              gem.version        = '1.0.0'
-              gem.author         = 'Chef Software, Inc.'
-              gem.email          = 'info@getchef.com'
-              gem.description    = 'Installs a thing'
-              gem.summary        = gem.description
-            end
-          EOH
-        end
-
-        gemfile      = File.join(source_dir, 'Gemfile')
-        File.open(gemfile, 'w') do |f|
-          f.write <<-EOH.gsub(/^ {12}/, '')
-            gemspec
-          EOH
-        end
-
-        gemfile_lock = File.join(source_dir, 'Gemfile.lock')
-        File.open(gemfile_lock, 'w') do |f|
-          f.write <<-EOH.gsub(/^ {12}/, '')
-            PATH
-              remote: .
-              specs:
-                example (1.0.0)
-
-            GEM
-              specs:
-
-            PLATFORMS
-              ruby
-
-            DEPENDENCIES
-              example!
-          EOH
-        end
-
+        fake_embedded_bin('gem')
         fake_embedded_bin('appbundler')
 
-        subject.appbundle('example', shellout_opts(subject))
+        subject.gem("build #{project_name}.gemspec", shellout_opts(subject))
+        subject.gem("install #{project_name}-1.0.0.gem", shellout_opts(subject))
+        subject.appbundle(project_name, shellout_opts(subject))
         output = capture_logging { subject.build }
 
-        suffix = '/opt/chefdk/embedded/bin/appbundler'
-        suffix.gsub!(/\//,'\\') if windows?
-        expect(output).to include("#{suffix} '#{source_dir}' '#{bin_dir}'")
+        appbundler_path = File.join(embedded_bin_dir, 'appbundler')
+        appbundler_path.gsub!(/\//,'\\') if windows?
+        expect(output).to include("#{appbundler_path} '#{project_dir}' '#{bin_dir}'")
       end
     end
 
     describe '#rake' do
       it 'executes the command as the embedded rake' do
-        rakefile = File.join(tmp_path, 'Rakefile')
+        rakefile = File.join(project_dir, 'Rakefile')
         File.open(rakefile, 'w') do |f|
           f.write <<-EOH.gsub(/^ {12}/, '')
             task(:foo) {  }
