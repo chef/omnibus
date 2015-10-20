@@ -53,7 +53,7 @@ module Omnibus
       Dir.chdir(staging_dir) do
         shellout! <<-EOH.split.join(' ').squeeze(' ').strip
           heat.exe dir "#{windows_safe_path(project.install_dir)}"
-            -nologo -srd -gg -cg ProjectDir
+            -nologo -srd -sreg -gg -cg ProjectDir
             -dr PROJECTLOCATION
             -var "var.ProjectSourceDir"
             -out "project-files.wxs"
