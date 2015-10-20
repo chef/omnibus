@@ -6,7 +6,7 @@ module Omnibus
       Project.new.tap do |project|
         project.name('project')
         project.homepage('https://example.com')
-        project.install_dir('C:/project')
+        project.install_dir(install_dir)
         project.build_version('1.2.3')
         project.build_iteration('2')
         project.maintainer('Chef Software <maintainers@chef.io>')
@@ -18,6 +18,7 @@ module Omnibus
     let(:project_root) { File.join(tmp_path, 'project/root') }
     let(:package_dir)  { File.join(tmp_path, 'package/dir') }
     let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
+    let(:install_dir)  { 'C:/project' }
 
     before do
       Config.project_root(project_root)
@@ -298,7 +299,7 @@ module Omnibus
       end
     end
 
-    describe "#bundle_msi" do
+    describe '#bundle_msi' do
       it 'is a DSL method' do
         expect(subject).to have_exposed_method(:bundle_msi)
       end
@@ -312,6 +313,40 @@ module Omnibus
       it 'returns the given value' do
         subject.bundle_msi(true)
         expect(subject.bundle_msi).to be_truthy
+      end
+    end
+
+    describe '#gem_path' do
+      let(:install_dir) { File.join(tmp_path, 'install_dir') }
+
+      before do
+        create_directory(install_dir)
+      end
+
+      after do
+        remove_directory(install_dir)
+      end
+
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:gem_path)
+      end
+
+      it 'requires the value to be a String' do
+        expect {
+          subject.gem_path(Object.new)
+        }.to raise_error(InvalidValue)
+      end
+
+      it 'globs for gems under the install directory' do
+        expected_gem_path = 'something/gems/athing-1.0.0'
+        create_directory(File.join(install_dir, expected_gem_path))
+        expect(subject.gem_path('athing-*')).to eq(expected_gem_path)
+      end
+
+      it 'returns the gem directory when no argument is given' do
+        expected_gem_path = 'foo/bar123/gems'
+        create_directory(File.join(install_dir, expected_gem_path))
+        expect(subject.gem_path).to eq(expected_gem_path)
       end
     end
 
@@ -343,7 +378,7 @@ module Omnibus
           subject.sign_package(msi)
         end
 
-        describe "#timestamp_servers" do
+        describe '#timestamp_servers' do
           it "defaults to using ['http://timestamp.digicert.com','http://timestamp.verisign.com/scripts/timestamp.dll']" do
             subject.signing_identity('foo')
             expect(subject).to receive(:try_timestamp).with(msi, 'http://timestamp.digicert.com').and_return(false)
