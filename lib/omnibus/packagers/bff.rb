@@ -200,6 +200,24 @@ module Omnibus
       "#{safe_base_package_name}-#{project.build_version}-#{project.build_iteration}.#{safe_architecture}.bff"
     end
 
+    #
+    # Remove the directory at the given +path+ for AIX.
+    #
+    # @param [String, Array<String>] paths
+    #   the path or list of paths to join to delete
+    #
+    # @return [String]
+    #   the path to the removed directory
+    #
+    def remove_directory(*paths)
+      path = File.join(*paths)
+      log.debug(log_key) { "Remove directory `#{path}'" }
+      # we've already assumed sudo within
+      # #create_bff and /tmp is owned by
+      # root on AIX.
+      shellout!("sudo rm -rf \"#{path}\"")
+      path
+    end
 
     #
     # Return the BFF-ready base package name, converting any invalid characters to
