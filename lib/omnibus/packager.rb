@@ -23,6 +23,7 @@ module Omnibus
     autoload :DEB,      'omnibus/packagers/deb'
     autoload :Makeself, 'omnibus/packagers/makeself'
     autoload :MSI,      'omnibus/packagers/msi'
+    autoload :FastMSI,  'omnibus/packagers/fastmsi'
     autoload :PKG,      'omnibus/packagers/pkg'
     autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :RPM,      'omnibus/packagers/rpm'
@@ -51,10 +52,19 @@ module Omnibus
     # @example
     #   Packager.for_current_system #=> Packager::RPM
     #
+    # @param [Symbol] override
+    #   Allow the project to override the default packager
+    #
     # @return [~Packager::Base]
     #
-    def for_current_system
+    def for_current_system(override)
       family = Ohai['platform_family']
+
+      if family == 'windows'
+        if override == :fastmsi
+          return FastMSI
+        end
+      end
 
       if klass = PLATFORM_PACKAGER_MAP[family]
         klass
