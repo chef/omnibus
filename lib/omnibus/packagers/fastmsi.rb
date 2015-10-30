@@ -32,6 +32,9 @@ module Omnibus
       # Render the source file
       write_source_file
 
+      # Render the custom action file
+      write_custom_action_file
+
       # Optionally, render the bundle file
       write_bundle_file if bundle_msi
 
@@ -46,6 +49,11 @@ module Omnibus
       # files copied in the previous step, but that's okay :)
       FileSyncer.glob("#{resources_path}/assets/*").each do |file|
         copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
+      end
+
+      # Copy externally built custom action files into the staging directory
+      FileSyncer.glob("#{resources_path}/ext/*").each do |file|
+        copy_file(file, "#{staging_dir}")
       end
     end
 
@@ -72,14 +80,16 @@ module Omnibus
         # Compile with candle.exe
         log.debug(log_key) { "wix_candle_flags: #{wix_candle_flags}" }
 
-        shellout! <<-EOH.split.join(' ').squeeze(' ').strip
+        candle_command = <<-EOH.split.join(' ').squeeze(' ').strip
           candle.exe
             -nologo
             #{wix_candle_flags}
             #{wix_extension_switches(wix_candle_extensions)}
             -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
             "#{windows_safe_path(staging_dir, 'source.wxs')}"
+            "#{windows_safe_path(staging_dir, 'ca.wxs')}"
         EOH
+        shellout!(candle_command, returns: [0])
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
@@ -93,7 +103,7 @@ module Omnibus
             #{wix_extension_switches(wix_light_extensions)}
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
-            project-files.wixobj source.wixobj
+            project-files.wixobj source.wixobj ca.wixobj
             -out "#{msi_file}"
         EOH
         shellout!(light_command, returns: [0, 204])
@@ -458,6 +468,20 @@ module Omnibus
           hierarchy:     hierarchy,
 
           wix_install_dir: wix_install_dir,
+        }
+      )
+    end
+
+    #
+    # Write the custom action file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_custom_action_file
+      render_template(resource_path('ca.wxs.erb'),
+        destination: "#{staging_dir}/ca.wxs",
+        variables: {
+          name:          project.package_name,
         }
       )
     end
