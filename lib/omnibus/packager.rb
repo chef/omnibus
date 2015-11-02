@@ -60,9 +60,11 @@ module Omnibus
     def for_current_system(override)
       family = Ohai['platform_family']
 
-      if family == 'windows'
-        if override == :fastmsi
+      if override != nil
+        if ((family == 'windows') && (override == :fastmsi))
           return FastMSI
+        else
+          raise ArgumentError, "Invalid override: #{override}"
         end
       end
 
