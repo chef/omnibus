@@ -34,6 +34,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :package_user, %|package_user 'chef'|
     it_behaves_like 'a cleanroom setter', :package_group, %|package_group 'chef'|
     it_behaves_like 'a cleanroom setter', :override, %|override :chefdk, source: 'foo.com'|
+    it_behaves_like 'a cleanroom setter', :packager_override, %|packager_override :foopackage|
     it_behaves_like 'a cleanroom setter', :resources_path, %|resources_path '/path'|
     it_behaves_like 'a cleanroom setter', :package_scripts_path, %|package_scripts_path '/path/scripts'|
     it_behaves_like 'a cleanroom setter', :dependency, %|dependency 'libxslt-dev'|
@@ -271,6 +272,20 @@ module Omnibus
         expect(Packager).to receive(:for_current_system)
           .and_call_original
         subject.packager
+      end
+
+      context 'when packager_override is set', :windows_only do
+        before { stub_ohai(platform: 'windows', version: '8.1') }
+
+        it 'raises an exception if the override is unknown' do
+          subject.packager_override(:foo)
+          expect { subject.packager }.to raise_error(ArgumentError)
+        end
+
+        it 'returns the overridden packager object' do
+          subject.packager_override(:fastmsi)
+          expect(subject.packager).to be_a(Packager::FastMSI)
+        end
       end
     end
 

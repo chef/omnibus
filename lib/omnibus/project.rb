@@ -513,6 +513,30 @@ module Omnibus
     expose :override
 
     #
+    # Set or retrieve the packager override
+    # This is required to support having multiple packagers
+    # for a platform
+    #
+    # @example
+    # if windows?
+    #   override :fastmsi
+    # end
+    #
+    # @param [Symbol] id
+    #   the value to override
+    #
+    # @return [Symbol]
+    #
+    def packager_override(id)
+      if null?(id)
+        @packager_override
+      else
+        @packager_override = id
+      end
+    end
+    expose :packager_override
+
+    #
     # Set or retrieve the group the package should install as. This varies with
     # operating system and may  be ignored if the underlying packager does not
     # support it.
@@ -866,7 +890,7 @@ module Omnibus
     # @return [~Packager::Base]
     #
     def packager
-      @packager ||= Packager.for_current_system.new(self)
+      @packager ||= Packager.for_current_system(@packager_override).new(self)
     end
 
     #
