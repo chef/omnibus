@@ -14,6 +14,10 @@
 # limitations under the License.
 #
 
+# NOTE: This packager currently uses/duplicates a significant part of the
+# MSI packager code. Changes/fixes to MSI packaging will need to be made for
+# both MSI and FastMSI packagers for now.
+
 require 'pathname'
 
 module Omnibus
