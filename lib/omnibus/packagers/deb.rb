@@ -408,6 +408,10 @@ module Omnibus
         else
           Ohai['kernel']['machine']
         end
+      when 'aarch64'
+        # Debian prefers amd64 on ARMv8/AArch64 (64bit ARM) platforms
+        # see https://wiki.debian.org/Arm64Port
+        'arm64'
       when 'ppc64le'
         # Debian prefers to use ppc64el for little endian architecture name 
         # where as others like gnutools/rhel use ppc64le( note the last 2 chars)
