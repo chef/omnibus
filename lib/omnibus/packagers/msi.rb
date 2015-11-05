@@ -47,24 +47,46 @@ module Omnibus
       FileSyncer.glob("#{resources_path}/assets/*").each do |file|
         copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
       end
+
+      # If fastmsi, copy externally built custom action DLL into the staging directory
+      copy_file("#{resources_path}/ext/CustomActionFastMsi.CA.dll", "#{staging_dir}") if fast_msi
     end
 
     build do
+      # If fastmsi, zip up the contents of the install directory
+      zip_command = <<-EOH.split.join(' ').squeeze(' ').strip
+        7z a -r
+        #{windows_safe_path(staging_dir)}\\#{project.name}.zip
+        #{windows_safe_path(project.install_dir)}\\*
+      EOH
+      shellout!(zip_command, returns: [0]) if fast_msi
+
       # Harvest the files with heat.exe, recursively generate fragment for
       # project directory
       Dir.chdir(staging_dir) do
-        shellout! <<-EOH.split.join(' ').squeeze(' ').strip
-          heat.exe dir "#{windows_safe_path(project.install_dir)}"
-            -nologo -srd -sreg -gg -cg ProjectDir
-            -dr PROJECTLOCATION
-            -var "var.ProjectSourceDir"
+        if fast_msi
+          heat_command = <<-EOH.split.join(' ').squeeze(' ').strip
+            heat.exe file "#{project.name}.zip"
+            -cg ProjectDir
+            -dr INSTALLLOCATION
+            -nologo -sfrag -srd -sreg -gg
             -out "project-files.wxs"
-        EOH
+          EOH
+        else
+          heat_command = <<-EOH.split.join(' ').squeeze(' ').strip
+            heat.exe dir "#{windows_safe_path(project.install_dir)}"
+              -nologo -srd -sreg -gg -cg ProjectDir
+              -dr PROJECTLOCATION
+              -var "var.ProjectSourceDir"
+              -out "project-files.wxs"
+          EOH
+        end
+        shellout!(heat_command, returns: [0])
 
         # Compile with candle.exe
         log.debug(log_key) { "wix_candle_flags: #{wix_candle_flags}" }
 
-        shellout! <<-EOH.split.join(' ').squeeze(' ').strip
+        candle_command = <<-EOH.split.join(' ').squeeze(' ').strip
           candle.exe
             -nologo
             #{wix_candle_flags}
@@ -72,10 +94,10 @@ module Omnibus
             -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
             "#{windows_safe_path(staging_dir, 'source.wxs')}"
         EOH
+        shellout!(candle_command, returns: [0])
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
-
         msi_file = windows_safe_path(Config.package_dir, msi_name)
 
         light_command = <<-EOH.split.join(' ').squeeze(' ').strip
@@ -151,7 +173,7 @@ module Omnibus
         @upgrade_code || raise(MissingRequiredAttribute.new(self, :upgrade_code, '2CD7259C-776D-4DDB-A4C8-6E544E580AA1'))
       else
         unless val.is_a?(String)
-          raise InvalidValue.new(:parameters, 'be a String')
+          raise InvalidValue.new(:upgrade_code, 'be a String')
         end
 
         @upgrade_code = val
@@ -246,6 +268,25 @@ module Omnibus
       @bundle_msi ||= val
     end
     expose :bundle_msi
+
+    #
+    # Signal that we're building a zip-based MSI
+    #
+    # @example
+    #   fast_msi true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether we're building a zip-based MSI or not
+    #
+    # @return [TrueClass, FalseClass]
+    #   whether we're building a zip-based MSI or not
+    def fast_msi(val = false)
+      unless (val.is_a?(TrueClass) || val.is_a?(FalseClass))
+        raise InvalidValue.new(:fast_msi, 'be TrueClass or FalseClass')
+      end
+      @fast_msi ||= val
+    end
+    expose :fast_msi
 
     #
     # Set the signing certificate name
@@ -448,7 +489,7 @@ module Omnibus
           friendly_name: project.friendly_name,
           maintainer:    project.maintainer,
           hierarchy:     hierarchy,
-
+          fastmsi:       fast_msi,
           wix_install_dir: wix_install_dir,
         }
       )

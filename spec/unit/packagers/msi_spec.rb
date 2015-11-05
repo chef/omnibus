@@ -316,6 +316,23 @@ module Omnibus
       end
     end
 
+    describe '#fast_msi' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:fast_msi)
+      end
+
+      it 'requires the value to be a TrueClass or a FalseClass' do
+        expect {
+          subject.fast_msi(Object.new)
+        }.to raise_error(InvalidValue)
+      end
+
+      it 'returns the given value' do
+        subject.fast_msi(true)
+        expect(subject.fast_msi).to be_truthy
+      end
+    end
+
     describe '#gem_path' do
       let(:install_dir) { File.join(tmp_path, 'install_dir') }
 
