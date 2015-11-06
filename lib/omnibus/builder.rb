@@ -269,11 +269,16 @@ module Omnibus
     #
     # @example
     #   appbundle 'chef'
+    # @example
+    #   appbundle '/opt/chef/embedded/lib/ruby/gems/2.1.0/gems/chef-12.5.1'
     #
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(app_name, options = {})
+    def appbundle(app_path, options = {})
+      # Expand app_path relative to source_dir (if it's absolute, leave it alone)
+      app_path = File.expand_path(app_path, Omnibus::Config.source_dir)
+      app_name = File.basename(app_path)
       build_commands << BuildCommand.new("appbundle `#{app_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = windows_safe_path("#{install_dir}/embedded/bin/appbundler")
@@ -281,7 +286,7 @@ module Omnibus
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
 
-        shellout!("#{appbundler_bin} '#{Omnibus::Config.source_dir}/#{app_name}' '#{bin_dir}'", options)
+        shellout!("#{appbundler_bin} '#{app_path}' '#{bin_dir}'", options)
       end
     end
     expose :appbundle
