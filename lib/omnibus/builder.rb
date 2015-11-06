@@ -632,6 +632,37 @@ module Omnibus
     end
 
     #
+    # Discovers a path to a gem/file included in a gem under the install directory.
+    #
+    # @example
+    #   gem_path 'chef-[0-9]*-mingw32' -> 'some/path/to/gems/chef-version-mingw32'
+    #
+    # @param [String] glob
+    #   a ruby acceptable glob path such as with **, *, [] etc.
+    #
+    # @return [String] path relative to the project's install_dir
+    #
+    # Raises exception the glob matches 0 or more than 1 file/directory.
+    #
+    def gem_path(glob = NULL)
+      unless glob.is_a?(String) || null?(glob)
+        raise InvalidValue.new(:glob, 'be an String')
+      end
+
+      install_path = Pathname.new(install_dir)
+
+      # Find path in which the Chef gem is installed
+      search_pattern = install_path.join('**', 'gems')
+      search_pattern = search_pattern.join(glob) unless null?(glob)
+      file_paths  = Pathname.glob(search_pattern).find
+
+      raise "Could not find `#{search_pattern}'!" if file_paths.none?
+      raise "Multiple possible matches of `#{search_pattern}'! : #{file_paths}" if file_paths.count > 1
+      file_paths.first.relative_path_from(install_path).to_s
+    end
+    expose :gem_path
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
