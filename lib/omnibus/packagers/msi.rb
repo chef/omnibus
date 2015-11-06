@@ -48,69 +48,25 @@ module Omnibus
         copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
       end
 
-      # If fastmsi, copy externally built custom action DLL into the staging directory
-      copy_file("#{resources_path}/ext/CustomActionFastMsi.CA.dll", "#{staging_dir}") if fast_msi
+      copy_file(resource_path('CustomActionFastMsi.CA.dll'), staging_dir) if fast_msi
     end
 
     build do
       # If fastmsi, zip up the contents of the install directory
-      zip_command = <<-EOH.split.join(' ').squeeze(' ').strip
-        7z a -r
-        #{windows_safe_path(staging_dir)}\\#{project.name}.zip
-        #{windows_safe_path(project.install_dir)}\\*
-      EOH
-      shellout!(zip_command, returns: [0]) if fast_msi
+      shellout!(zip_command) if fast_msi
 
       # Harvest the files with heat.exe, recursively generate fragment for
       # project directory
       Dir.chdir(staging_dir) do
-        if fast_msi
-          heat_command = <<-EOH.split.join(' ').squeeze(' ').strip
-            heat.exe file "#{project.name}.zip"
-            -cg ProjectDir
-            -dr INSTALLLOCATION
-            -nologo -sfrag -srd -sreg -gg
-            -out "project-files.wxs"
-          EOH
-        else
-          heat_command = <<-EOH.split.join(' ').squeeze(' ').strip
-            heat.exe dir "#{windows_safe_path(project.install_dir)}"
-              -nologo -srd -sreg -gg -cg ProjectDir
-              -dr PROJECTLOCATION
-              -var "var.ProjectSourceDir"
-              -out "project-files.wxs"
-          EOH
-        end
-        shellout!(heat_command, returns: [0])
+        shellout!(heat_command)
 
         # Compile with candle.exe
-        log.debug(log_key) { "wix_candle_flags: #{wix_candle_flags}" }
-
-        candle_command = <<-EOH.split.join(' ').squeeze(' ').strip
-          candle.exe
-            -nologo
-            #{wix_candle_flags}
-            #{wix_extension_switches(wix_candle_extensions)}
-            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
-            "#{windows_safe_path(staging_dir, 'source.wxs')}"
-        EOH
-        shellout!(candle_command, returns: [0])
+        shellout!(candle_command)
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
         msi_file = windows_safe_path(Config.package_dir, msi_name)
-
-        light_command = <<-EOH.split.join(' ').squeeze(' ').strip
-          light.exe
-            -nologo
-            -ext WixUIExtension
-            #{wix_extension_switches(wix_light_extensions)}
-            -cultures:en-us
-            -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
-            project-files.wixobj source.wixobj
-            -out "#{msi_file}"
-        EOH
-        shellout!(light_command, returns: [0, 204])
+        shellout!(light_command(msi_file), returns: [0, 204])
 
         if signing_identity
           sign_package(msi_file)
@@ -118,32 +74,11 @@ module Omnibus
 
         # This assumes, rightly or wrongly, that any installers we want to bundle
         # into our installer will be downloaded by omnibus and put in the cache dir
-
         if bundle_msi
-          shellout! <<-EOH.split.join(' ').squeeze(' ').strip
-          candle.exe
-            -nologo
-            #{wix_candle_flags}
-            -ext WixBalExtension
-            #{wix_extension_switches(wix_candle_extensions)}
-            -dOmnibusCacheDir="#{windows_safe_path(File.expand_path(Config.cache_dir))}"
-            "#{windows_safe_path(staging_dir, 'bundle.wxs')}"
-          EOH
+          shellout!(candle_command(true))
 
           bundle_file = windows_safe_path(Config.package_dir, bundle_name)
-
-          bundle_light_command = <<-EOH.split.join(' ').squeeze(' ').strip
-          light.exe
-            -nologo
-            -ext WixUIExtension
-            -ext WixBalExtension
-            #{wix_extension_switches(wix_light_extensions)}
-            -cultures:en-us
-            -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
-            bundle.wixobj
-            -out "#{bundle_file}"
-          EOH
-          shellout!(bundle_light_command, returns: [0, 204])
+          shellout!(light_command(bundle_file, true), returns: [0, 204])
 
           if signing_identity
             sign_package(bundle_file)
@@ -534,6 +469,106 @@ module Omnibus
     def msi_version
       versions = project.build_version.split(/[.+-]/)
       "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{project.build_iteration}"
+    end
+
+    #
+    # Get the shell command to create a zip file that contains
+    # the contents of the project install directory
+    #
+    # @return [String]
+    #
+    def zip_command
+      <<-EOH.split.join(' ').squeeze(' ').strip
+      7z a -r
+      #{windows_safe_path(staging_dir)}\\#{project.name}.zip
+      #{windows_safe_path(project.install_dir)}\\*
+      EOH
+    end
+
+    #
+    # Get the shell command to run heat in order to create a
+    # a WIX manifest of project files to be packaged into the MSI
+    #
+    # @return [String]
+    #
+    def heat_command
+      if fast_msi
+        <<-EOH.split.join(' ').squeeze(' ').strip
+          heat.exe file "#{project.name}.zip"
+          -cg ProjectDir
+          -dr INSTALLLOCATION
+          -nologo -sfrag -srd -sreg -gg
+          -out "project-files.wxs"
+        EOH
+      else
+        <<-EOH.split.join(' ').squeeze(' ').strip
+          heat.exe dir "#{windows_safe_path(project.install_dir)}"
+            -nologo -srd -sreg -gg -cg ProjectDir
+            -dr PROJECTLOCATION
+            -var "var.ProjectSourceDir"
+            -out "project-files.wxs"
+        EOH
+      end
+    end
+
+    #
+    # Get the shell command to complie the project WIX files
+    #
+    # @return [String]
+    #
+    def candle_command(is_bundle = false)
+      if is_bundle
+        <<-EOH.split.join(' ').squeeze(' ').strip
+        candle.exe
+          -nologo
+          #{wix_candle_flags}
+          -ext WixBalExtension
+          #{wix_extension_switches(wix_candle_extensions)}
+          -dOmnibusCacheDir="#{windows_safe_path(File.expand_path(Config.cache_dir))}"
+          "#{windows_safe_path(staging_dir, 'bundle.wxs')}"
+        EOH
+      else
+        <<-EOH.split.join(' ').squeeze(' ').strip
+          candle.exe
+            -nologo
+            #{wix_candle_flags}
+            #{wix_extension_switches(wix_candle_extensions)}
+            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
+            "#{windows_safe_path(staging_dir, 'source.wxs')}"
+        EOH
+      end
+    end
+
+    #
+    # Get the shell command to link the project WIX object files
+    #
+    # @return [String]
+    #
+    def light_command(out_file, is_bundle = false)
+      if is_bundle
+        <<-EOH.split.join(' ').squeeze(' ').strip
+        light.exe
+          -nologo
+          -ext WixUIExtension
+          -ext WixBalExtension
+          #{wix_extension_switches(wix_light_extensions)}
+          -cultures:en-us
+          -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
+          bundle.wixobj
+          -out "#{out_file}"
+        EOH
+      else
+        <<-EOH.split.join(' ').squeeze(' ').strip
+          light.exe
+            -nologo
+            -ext WixUIExtension
+            #{wix_extension_switches(wix_light_extensions)}
+            -cultures:en-us
+            -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
+            project-files.wixobj source.wixobj
+            -out "#{out_file}"
+        EOH
+      end
     end
 
     #

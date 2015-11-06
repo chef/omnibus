@@ -180,6 +180,26 @@ module Omnibus
         expect(contents).to include('<?include "parameters.wxi" ?>')
         expect(contents).to include('<Property Id="WIXUI_INSTALLDIR" Value="WINDOWSVOLUME" />')
       end
+
+      context 'when fastmsi is not specified' do
+        it 'does not include a reference to the fast msi custom action' do
+          subject.write_source_file
+          contents = File.read("#{staging_dir}/source.wxs")
+          expect(contents).not_to include("<Binary Id=\"CustomActionFastMsiDLL\"")
+        end
+      end
+
+      context 'when fastmsi is specified' do
+        before do
+          subject.fast_msi(true)
+        end
+
+        it 'includes a reference to the fast msi custom action' do
+          subject.write_source_file
+          contents = File.read("#{staging_dir}/source.wxs")
+          expect(contents).to include("<Binary Id=\"CustomActionFastMsiDLL\"")
+        end
+      end
     end
 
     describe '#write_bundle_file' do
