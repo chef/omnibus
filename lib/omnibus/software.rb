@@ -328,6 +328,46 @@ module Omnibus
     expose :default_version
 
     #
+    # Set or retrieve the {#license} of the software to build.
+    #
+    # @example
+    #   license 'Apache 2.0'
+    #
+    # @param [String] val
+    #   the license to set for the software.
+    #
+    # @return [String]
+    #
+    def license(val = NULL)
+      if null?(val)
+        @license || 'Unspecified'
+      else
+        @license = val
+      end
+    end
+    expose :license
+
+    #
+    # Set or retrieve the location of a {#license_file}
+    # of the software.  It can either be a relative path inside
+    # the source package or a URL.
+    #
+    #
+    # @example
+    #   license_file 'LICENSES/artistic.txt'
+    #
+    # @param [String] val
+    #   the location of the license file for the software.
+    #
+    # @return [String]
+    #
+    def license_file(file)
+      license_files << file
+      license_files.dup
+    end
+    expose :license_file
+
+    #
     # Evaluate a block only if the version matches.
     #
     # @example
@@ -727,7 +767,9 @@ module Omnibus
                                    source_type: source_type,
                                    described_version: version,
                                    locked_version: Fetcher.resolve_version(version, source),
-                                   locked_source: source})
+                                   locked_source: source,
+                                   license: license
+      })
     end
 
     #
@@ -768,6 +810,17 @@ module Omnibus
     #
     def whitelist_files
       @whitelist_files ||= []
+    end
+
+    #
+    # The list of license files for this software
+    #
+    # @see #license_file
+    #
+    # @return [Array<String>]
+    #
+    def license_files
+      @license_files ||= []
     end
 
     #

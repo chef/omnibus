@@ -45,6 +45,9 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :json_manifest_path, %|json_manifest_path '/path/to/manifest.txt'|
     it_behaves_like 'a cleanroom setter', :build_git_revision, %|build_git_revision 'wombats'|
     it_behaves_like 'a cleanroom getter', :files_path
+    it_behaves_like 'a cleanroom setter', :license, %|license 'Apache 2.0'|
+    it_behaves_like 'a cleanroom setter', :license_file, %|license_file 'LICENSES/artistic.txt'|
+    it_behaves_like 'a cleanroom setter', :license_file_path, %|license_file_path 'CHEF_LICENSE'|
 
     describe 'basics' do
       it 'returns a name' do
@@ -139,6 +142,18 @@ module Omnibus
         Dir.chdir(git_repo_subdir_path) do
           expect(subject.build_git_revision).to eq("632501dde2c41f3bdd988b818b4c008e2ff398dc")
         end
+      end
+    end
+
+    describe '#license' do
+      it "sets the default to Unspecified" do
+        expect(subject.license).to eq ('Unspecified')
+      end
+    end
+
+    describe '#license_file_path' do
+      it "sets the default to LICENSE" do
+        expect(subject.license_file_path).to eq ('/sample/LICENSE')
       end
     end
 

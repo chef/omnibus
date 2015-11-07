@@ -692,6 +692,70 @@ module Omnibus
     expose :ohai
 
     #
+    # Set or retrieve the {#license} of the project.
+    #
+    # @example
+    #   license 'Apache 2.0'
+    #
+    # @param [String] val
+    #   the license to set for the project.
+    #
+    # @return [String]
+    #
+    def license(val = NULL)
+      if null?(val)
+        @license || 'Unspecified'
+      else
+        @license = val
+      end
+    end
+    expose :license
+
+    #
+    # Set or retrieve the location of the {#license_file}
+    # of the project.  It can either be a relative path inside
+    # the project source directory or a URL.
+    #
+    #
+    # @example
+    #   license_file 'LICENSES/artistic.txt'
+    #
+    # @param [String] val
+    #   the location of the license file for the project.
+    #
+    # @return [String]
+    #
+    def license_file(val = NULL)
+      if null?(val)
+        @license_file
+      else
+        @license_file = val
+      end
+    end
+    expose :license_file
+
+    #
+    # Location of license file that omnibus will create and that will contain
+    # the information about the license of the project plus the details about
+    # the licenses of the software components included in the project.
+    #
+    # If no path is specified  install_dir/LICENSE is used.
+    #
+    # @example
+    #   license_file_path
+    #
+    # @return [String]
+    #
+    def license_file_path(path = NULL)
+      if null?(path)
+        @license_file_path || File.join(install_dir, "LICENSE")
+      else
+        @license_file_path = File.join(install_dir, path)
+      end
+    end
+    expose :license_file_path
+
+    #
     # Location of json-formated version manifest, written at at the
     # end of the build. If no path is specified
     # +install_dir+/version-manifest.json is used.
@@ -983,7 +1047,7 @@ module Omnibus
     #
     def built_manifest
       log.info(log_key) { "Building version manifest" }
-      m = Omnibus::Manifest.new(build_version, build_git_revision)
+      m = Omnibus::Manifest.new(build_version, build_git_revision, license)
       softwares.each do |software|
         m.add(software.name, software.manifest_entry)
       end
@@ -1008,6 +1072,7 @@ module Omnibus
 
       write_json_manifest
       write_text_manifest
+      Licensing.create!(self)
       HealthCheck.run!(self)
       package_me
       compress_me

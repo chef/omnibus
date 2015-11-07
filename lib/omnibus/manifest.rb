@@ -24,13 +24,14 @@ module Omnibus
 
     include Logging
 
-    LATEST_MANIFEST_FORMAT = 1
+    LATEST_MANIFEST_FORMAT = 2
 
-    attr_reader :build_version, :build_git_revision
-    def initialize(version=nil, git_rev=nil)
+    attr_reader :build_version, :build_git_revision, :license
+    def initialize(version=nil, git_rev=nil, license="Unspecified")
       @data = {}
       @build_version = version
       @build_git_revision = git_rev
+      @license = license
     end
 
     def entry_for(name)
@@ -75,6 +76,7 @@ module Omnibus
       }
       ret['build_version'] = build_version if build_version
       ret['build_git_revision'] = build_git_revision if build_git_revision
+      ret['license'] = license
       ret
     end
 

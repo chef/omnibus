@@ -39,6 +39,8 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :source, %|source url: 'https://source.example.com'|
     it_behaves_like 'a cleanroom setter', :default_version, %|default_version '1.2.3'|
     it_behaves_like 'a cleanroom setter', :version, %|version '1.2.3'|
+    it_behaves_like 'a cleanroom setter', :license, %|license 'Apache 2.0'|
+    it_behaves_like 'a cleanroom setter', :license_file, %|license_file 'LICENSES/artistic.txt'|
     it_behaves_like 'a cleanroom setter', :whitelist_file, %|whitelist_file '/opt/whatever'|
     it_behaves_like 'a cleanroom setter', :relative_path, %|relative_path '/path/to/extracted'|
     it_behaves_like 'a cleanroom setter', :build, %|build {}|
@@ -54,6 +56,12 @@ module Omnibus
       before { allow(subject).to receive(:source_uri).and_return(uri) }
 
       it_behaves_like 'a cleanroom getter', :project_file
+    end
+
+    context 'when no license is present' do
+      it "sets the defaults" do
+        expect(subject.license).to eq ('Unspecified')
+      end
     end
 
     describe "with_standard_compiler_flags helper" do
