@@ -20,6 +20,7 @@ require 'json'
 require 'omnibus/manifest'
 require 'omnibus/manifest_entry'
 require 'omnibus/reports'
+require 'omnibus/licenses'
 
 module Omnibus
   class Project
@@ -732,6 +733,44 @@ module Omnibus
     expose :text_manifest_path
 
     #
+    # Location of NOTICE file containing external software licenses.
+    # 
+    # If no path is specified +install_dir+/NOTICE is used.
+    #
+    # @example
+    #   notice_file_path
+    #
+    # @return [String]
+    #
+    def notice_file_path(path = NULL)
+      if null?(path)
+        @notice_file_path || File.join(install_dir, "NOTICE")
+      else
+        @notice_file_path = path
+      end
+    end
+    expose :notice_file_path
+    
+    #
+    # Location of LICENSE file containing external software licenses.
+    # 
+    # If no path is specified +install_dir+/LICENSE is used.
+    #
+    # @example
+    #   license_file_path
+    #
+    # @return [String]
+    #
+    def license_file_path(path = NULL)
+      if null?(path)
+        @license_file_path || File.join(install_dir, "LICENSE")
+      else
+        @license_file_path = path
+      end
+    end
+    expose :license_file_path
+    
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -1008,6 +1047,8 @@ module Omnibus
 
       write_json_manifest
       write_text_manifest
+      write_notice_file
+      write_license_file
       HealthCheck.run!(self)
       package_me
       compress_me
@@ -1029,6 +1070,22 @@ module Omnibus
         f.puts "#{name} #{build_version}"
         f.puts ""
         f.puts Omnibus::Reports.pretty_version_map(self)
+      end
+    end
+
+    def write_notice_file
+      File.open(notice_file_path, 'w') do |f|
+        f.puts "#{name} #{build_version}"
+        f.puts ""
+        f.puts Omnibus::Licenses.notice_list(self)
+      end
+    end
+
+    def write_license_file
+      File.open(license_file_path, 'w') do |f|
+        f.puts "#{name} #{build_version}"
+        f.puts ""
+        f.puts Omnibus::Licenses.license_list(self)
       end
     end
 

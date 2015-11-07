@@ -17,6 +17,17 @@ module Omnibus
       software
     end
 
+    def generate_software_with_license(p, name, version,
+                                       license = nil, license_file = nil)
+      software = Software.new(p, "#{name}.rb")
+      software.name(name)
+      software.version(version)
+      software.license(license)
+      software.license_file(license_file)
+
+      software
+    end
+
     let(:project) do
       Project.new.evaluate do
         name          'chef-dk'
@@ -127,6 +138,39 @@ module Omnibus
               chefdk, # project dep
            ])
         end
+      end
+    end
+
+    describe '#license_map' do
+      let(:activemq) { generate_software_with_license(project, 'activemq', '1.0.0.alpha', 'Apache 2.0') }
+
+      let(:library) do
+        library = Library.new(project)
+        library.component_added(activemq)
+        library
+      end
+
+      it 'returns an empty map when no default version present' do
+        expect(library.license_map).to eq({})
+      end
+
+      it 'returns correct license info when default version present' do
+        activemq.default_version('1.0.0.alpha')
+        expect(library.license_map).to eq({
+          "activemq" =>  {:license => "Apache 2.0",
+                          :license_file => nil,
+                          :version => '1.0.0.alpha'}
+        })
+      end
+
+      it 'returns default version when multiple versions present' do
+        activemq.version('2.0.0')
+        activemq.default_version('2.0.0')
+        expect(library.license_map).to eq({
+          "activemq" =>  {:license => "Apache 2.0",
+                          :license_file => nil,
+                          :version => '2.0.0'}
+        })
       end
     end
   end

@@ -348,14 +348,16 @@ module Omnibus
     expose :license
 
     #
-    # Set or retrieve the relative location of the {#license_file}
-    # of the software to build inside the source pacakge
+    # Set or retrieve the location of the {#license_file}
+    # of the software.  It can either be a relative path inside
+    # the source package or a URL.
+    #
     #
     # @example
     #   license_file 'LICENSES/artistic.txt'
     #
     # @param [String] val
-    #   the license file location of the software.
+    #   the location of the license file for the software.
     #
     # @return [String]
     #
