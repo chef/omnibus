@@ -25,6 +25,7 @@ module Omnibus
     include Digestable
     include Instrumentation
     include Logging
+    include NullArgumentable
     include Templating
     include Util
 
@@ -277,16 +278,17 @@ module Omnibus
     #
     def appbundle(app_path, options = {})
       # Expand app_path relative to source_dir (if it's absolute, leave it alone)
-      app_path = File.expand_path(app_path, Omnibus::Config.source_dir)
-      app_name = File.basename(app_path)
-      build_commands << BuildCommand.new("appbundle `#{app_name}'") do
+      build_commands << BuildCommand.new("appbundle `#{app_path}'") do
+        app_path = File.expand_path(app_path, Omnibus::Config.source_dir)
+
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = windows_safe_path("#{install_dir}/embedded/bin/appbundler")
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
 
-        shellout!("#{appbundler_bin} '#{app_path}' '#{bin_dir}'", options)
+        arguments = " --name '#{options.delete(:name)}'" if options[:name]
+        shellout!("#{appbundler_bin} '#{app_path}' '#{bin_dir}'#{arguments}", options)
       end
     end
     expose :appbundle
