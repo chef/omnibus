@@ -24,7 +24,7 @@ module Omnibus
 
     include Logging
 
-    LATEST_MANIFEST_FORMAT = 1
+    LATEST_MANIFEST_FORMAT = 2
 
     attr_reader :build_version, :build_git_revision
     def initialize(version=nil, git_rev=nil)
