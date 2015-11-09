@@ -38,7 +38,7 @@ module Omnibus
             artifact_for(package).upload(
               repository,
               remote_path_for(package),
-              metadata_properties_for(package),
+              default_properties.merge(metadata_properties_for(package)),
             )
           end
         rescue Artifactory::Error::HTTPError => e
@@ -117,11 +117,11 @@ module Omnibus
           name: 'omnibus',
           version: Omnibus::VERSION,
         },
-        properties: {
+        properties: default_properties.merge(
           'omnibus.project' => name,
           'omnibus.version' => manifest.build_version,
           'omnibus.version_manifest' => manifest.to_json,
-        },
+        ),
         modules: [
           {
             # com.getchef:chef-server:12.0.0
@@ -204,6 +204,14 @@ module Omnibus
       ) if build_record?
       metadata
     end
+
+    #
+    # Properties to attach to published artifacts (and build record).
+    #
+    # @return [Hash<String, String>]
+    #
+    def default_properties
+      @properties ||= @options[:properties] || {}
     end
 
     #

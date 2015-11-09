@@ -70,6 +70,10 @@ module Omnibus
       type: :boolean,
       desc: 'Optionally create an Artifactory build record for the published artifacts',
       default: true
+    method_option :properties,
+      type: :hash,
+      desc: 'Properites to attach to published artifacts',
+      default: {}
     desc 'artifactory REPOSITORY PATTERN', 'Publish to an Artifactory instance'
     def artifactory(repository, pattern)
       options[:repository] = repository
