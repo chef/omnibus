@@ -48,6 +48,9 @@ module Omnibus
         copy_file(file, "#{resources_dir}/assets/#{File.basename(file)}")
       end
 
+      # Source for the custom action is at https://github.com/chef/fastmsi-custom-action
+      # The dll will be built separately as part of the custom action build process
+      # and made available as a binary for the Omnibus projects to use.
       copy_file(resource_path('CustomActionFastMsi.CA.dll'), staging_dir) if fast_msi
     end
 
@@ -75,10 +78,10 @@ module Omnibus
         # This assumes, rightly or wrongly, that any installers we want to bundle
         # into our installer will be downloaded by omnibus and put in the cache dir
         if bundle_msi
-          shellout!(candle_command(true))
+          shellout!(candle_command(is_bundle: true))
 
           bundle_file = windows_safe_path(Config.package_dir, bundle_name)
-          shellout!(light_command(bundle_file, true), returns: [0, 204])
+          shellout!(light_command(bundle_file, is_bundle: true), returns: [0, 204])
 
           if signing_identity
             sign_package(bundle_file)
@@ -516,7 +519,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def candle_command(is_bundle = false)
+    def candle_command(is_bundle: false)
       if is_bundle
         <<-EOH.split.join(' ').squeeze(' ').strip
         candle.exe
@@ -544,7 +547,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def light_command(out_file, is_bundle = false)
+    def light_command(out_file, is_bundle: false)
       if is_bundle
         <<-EOH.split.join(' ').squeeze(' ').strip
         light.exe

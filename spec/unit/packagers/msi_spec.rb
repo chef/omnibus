@@ -353,6 +353,106 @@ module Omnibus
       end
     end
 
+    describe '#zip_command' do
+      it 'returns a String' do
+        expect(subject.zip_command).to be_a(String)
+      end
+
+      it 'sets zip file location to the staging directory' do
+        expect(subject.zip_command).to include("#{subject.windows_safe_path(staging_dir)}\\#{project.name}.zip")
+      end
+    end
+
+    describe '#candle_command' do
+      it 'returns a String' do
+        expect(subject.candle_command).to be_a(String)
+      end
+
+      context 'default behavior' do
+        it 'defines the ProjectSourceDir property' do
+          expect(subject.candle_command).to include("-dProjectSourceDir=")
+        end
+
+        it 'outputs a source.wxs file to the staging directory' do
+          expect(subject.candle_command).to include("#{subject.windows_safe_path(staging_dir, 'source.wxs')}")
+        end
+      end
+
+      context 'when is_bundle is true' do
+        it 'uses the WIX Bootstrapper/Burn extension' do
+          expect(subject.candle_command(is_bundle: true)).to include("-ext WixBalExtension")
+        end
+
+        it 'defines the OmnibusCacheDir property' do
+          expect(subject.candle_command(is_bundle: true)).to include("-dOmnibusCacheDir=")
+        end
+
+        it 'outputs a bundle.wxs file to the staging directory' do
+          expect(subject.candle_command(is_bundle: true)).to include("#{subject.windows_safe_path(staging_dir, 'bundle.wxs')}")
+        end
+      end
+    end
+
+    describe '#heat_command' do
+      it 'returns a String' do
+        expect(subject.heat_command).to be_a(String)
+      end
+
+      context 'when fast_msi is not set' do
+        it 'operates in directory mode' do
+          expect(subject.heat_command).to include("dir \"#{subject.windows_safe_path(project.install_dir)}\"")
+        end
+
+        it 'sets destination to the project location' do
+          expect(subject.heat_command).to include("-dr PROJECTLOCATION")
+        end
+      end
+
+      context 'when fast_msi is set' do
+        before do
+          subject.fast_msi(true)
+        end
+
+        it 'operates in file mode' do
+          expect(subject.heat_command).to include("file \"#{project.name}.zip\"")
+        end
+
+        it 'sets destination to the install location' do
+          expect(subject.heat_command).to include("-dr INSTALLLOCATION")
+        end
+      end
+    end
+
+    describe '#light_command' do
+      it 'returns a String' do
+        expect(subject.light_command("foo")).to be_a(String)
+      end
+
+      context 'default behavior' do
+        let (:command)  { subject.light_command("foo") }
+
+        it 'uses the WIX UI extension' do
+          expect(command).to include("-ext WixUIExtension")
+        end
+
+        it 'includes the project-files and source wixobj files' do
+          expect(command).to include("project-files.wixobj source.wixobj")
+        end
+      end
+
+      context 'when is_bundle is true' do
+        let (:command)  { subject.light_command("foo", is_bundle: true) }
+
+        it 'uses the WIX Bootstrapper/Burn extension' do
+          expect(command).to include("-ext WixBalExtension")
+        end
+
+        it 'includes the bundle wixobj file' do
+          expect(command).to include("bundle.wixobj")
+        end
+      end
+    end
+
     describe '#gem_path' do
       let(:install_dir) { File.join(tmp_path, 'install_dir') }
 
