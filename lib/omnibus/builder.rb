@@ -664,7 +664,7 @@ module Omnibus
       file_paths  = Pathname.glob(search_pattern).find
 
       raise "Could not find `#{search_pattern}'!" if file_paths.none?
-      raise "Multiple possible matches of `#{search_pattern}'! : #{file_paths}" if file_paths.count > 1
+      raise "Multiple possible matches of `#{search_pattern}'! : #{file_paths.to_a.join(", ")}" if file_paths.count > 1
       file_paths.first.relative_path_from(install_path).to_s
     end
     expose :gem_path
