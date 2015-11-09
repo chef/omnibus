@@ -38,10 +38,7 @@ module Omnibus
             artifact_for(package).upload(
               repository,
               remote_path_for(package),
-              metadata_for(package).merge(
-                'build.name'   => package.metadata[:name],
-                'build.number' => package.metadata[:version],
-              ),
+              metadata_properties_for(package),
             )
           end
         rescue Artifactory::Error::HTTPError => e
@@ -188,8 +185,8 @@ module Omnibus
     #
     # @return [Hash<String, String>]
     #
-    def metadata_for(package)
-      {
+    def metadata_properties_for(package)
+      metadata = {
         'omnibus.project'          => package.metadata[:name],
         'omnibus.platform'         => package.metadata[:platform],
         'omnibus.platform_version' => package.metadata[:platform_version],
@@ -201,6 +198,12 @@ module Omnibus
         'omnibus.sha256'           => package.metadata[:sha256],
         'omnibus.sha512'           => package.metadata[:sha512],
       }
+      metadata.merge!(
+        'build.name'   => package.metadata[:name],
+        'build.number' => package.metadata[:version],
+      ) if build_record?
+      metadata
+    end
     end
 
     #

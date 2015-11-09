@@ -3,8 +3,8 @@ require 'spec_helper'
 module Omnibus
   describe ArtifactoryPublisher do
     let(:path) { '/path/to/files/*.deb' }
-
     let(:repository) { 'REPO' }
+    let(:build_record) { true }
 
     let(:package) do
       double(Package,
@@ -27,6 +27,8 @@ module Omnibus
         platform_version: '14.04',
         arch: 'x86_64',
         sha1: 'SHA1',
+        sha256: 'SHA256',
+        sha512: 'SHA512',
         md5: 'ABCDEF123456',
       )
     end
@@ -44,7 +46,7 @@ module Omnibus
       allow(build).to   receive(:save)
     end
 
-    subject { described_class.new(path, repository: repository) }
+    subject { described_class.new(path, repository: repository, build_record: build_record) }
 
     describe '#publish' do
       before do
@@ -116,6 +118,41 @@ module Omnibus
         it 'does not create a build record at the end of publishing' do
           expect(build).to_not receive(:save)
           subject.publish
+        end
+      end
+    end
+
+    describe '#metadata_properties_for' do
+      let(:transformed_metadata_values) do
+        {
+          "omnibus.architecture" => "x86_64",
+          "omnibus.iteration" => 1,
+          "omnibus.md5" => "ABCDEF123456",
+          "omnibus.platform" => "ubuntu",
+          "omnibus.platform_version" => "14.04",
+          "omnibus.project" => "chef",
+          "omnibus.sha1" => "SHA1",
+          "omnibus.sha256" => "SHA256",
+          "omnibus.sha512" => "SHA512",
+          "omnibus.version" => "11.0.6",
+        }
+      end
+      let(:build_values) do
+        {
+          "build.name" => "chef",
+          "build.number" => "11.0.6",
+        }
+      end
+      it 'returns the transformed package metadata values' do
+        expect(subject.send(:metadata_properties_for, package)).to include(transformed_metadata_values.merge(build_values))
+      end
+
+      context ':build_record is false' do
+        let(:build_record) { false }
+
+        it 'does not include `build.*` values' do
+          expect(subject.send(:metadata_properties_for, package)).to include(transformed_metadata_values)
+          expect(subject.send(:metadata_properties_for, package)).to_not include(build_values)
         end
       end
     end
