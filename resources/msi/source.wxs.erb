@@ -12,18 +12,21 @@
           Version="$(var.VersionNumber)" Manufacturer="!(loc.ManufacturerName)" UpgradeCode="$(var.UpgradeCode)">
 
     <!--
-      Minimum installer version (5.0) - Window 7/Server 2008 R2 and above.
+      Minimum installer version (2.0) - Window XP and above.
       The install scope is per machine, not the current user
     -->
-    <Package InstallerVersion="500" InstallPrivileges="elevated"
+    <Package InstallerVersion="200" InstallPrivileges="elevated"
              Compressed="yes" InstallScope="perMachine" />
 
     <Media Id="1" Cabinet="Project.cab" EmbedCab="yes" CompressionLevel="high" />
 
-    <!-- Launch condition to check for minimum OS: Windows 7/Server 2008R2. -->
-    <Condition Message="!(loc.MinimumOSVersionMessage)">
+    <!--
+      Uncomment launch condition below to check for minimum OS
+      601 = Windows 7/Server 2008R2.
+    -->
+    <!-- Condition Message="!(loc.MinimumOSVersionMessage)">
       <![CDATA[Installed OR VersionNT >= 601]]>
-    </Condition>
+    </Condition -->
 
     <!-- We always do Major upgrades -->
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
