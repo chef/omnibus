@@ -2,6 +2,7 @@ Omnibus CHANGELOG
 =================
 ## Unreleased
 - Add description to signed package (Windows) so UAC prompt shows correct package name
+- Add new Windows 'Fast MSI' installer option to the msi.rb packager
 
 v4.1.0 (September 1, 2015)
 -------------------------
