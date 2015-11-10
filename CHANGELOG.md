@@ -1,8 +1,26 @@
 Omnibus CHANGELOG
 =================
-## Unreleased
-- Add description to signed package (Windows) so UAC prompt shows correct package name
-- Add new Windows 'Fast MSI' installer option to the msi.rb packager
+
+v5.0.0 (November 10, 2015)
+--------------------------
+### New Features
+- Wind River Linux 5 support for Cisco Nexus devices (#539)
+- [artifactory publisher] Support custom properties in Artifactory publishing (#568)
+- [msi packager] New "fast" mode for MSI packager (#565)
+- Change the `appbundler` DSL method to not make an apps dir
+- Unit and functional tests now run on Windows (and are tested by Appveyor) (#556, #557)
+
+### Bug Fixes
+- [msi packager] Fix missing package name in signature (#541)
+- [rpm packager] Fix building RPMs on ARM platforms (#542)
+- [bff packager] Fix regression with AIX package ownership in staging directory (#553)
+- [solaris packager] Use the proper architecture value in Solaris packages (#554, #555)
+- Add info message for publish cli corner case (#551)
+- [net fetcher] missing checksum raises exception (#549)
+
+
+### Potentially Breaking Changes
+- Dropped Ruby 1.9.x support (#567)
 
 v4.1.0 (September 1, 2015)
 -------------------------
