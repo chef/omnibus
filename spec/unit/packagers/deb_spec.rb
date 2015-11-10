@@ -209,9 +209,9 @@ module Omnibus
         subject.write_md5_sums
         contents = File.read("#{staging_dir}/DEBIAN/md5sums")
 
-         expect(contents).to include("9334770d184092f998009806af702c8c .filea")
-         expect(contents).to include("826e8142e6baabe8af779f5f490cf5f5 file1")
-         expect(contents).to include("1c1c96fd2cf8330db0bfa936ce82f3b9 file2")
+        expect(contents).to include("9334770d184092f998009806af702c8c .filea")
+        expect(contents).to include("826e8142e6baabe8af779f5f490cf5f5 file1")
+        expect(contents).to include("1c1c96fd2cf8330db0bfa936ce82f3b9 file2")
       end
     end
 
@@ -243,8 +243,8 @@ module Omnibus
       before do
         project.install_dir(staging_dir)
 
-        create_file("#{staging_dir}/file1") { "1"*10_000 }
-        create_file("#{staging_dir}/file2") { "2"*20_000 }
+        create_file("#{staging_dir}/file1") { "1" * 10_000 }
+        create_file("#{staging_dir}/file2") { "2" * 20_000 }
       end
 
       it 'stats all the files in the install_dir' do
@@ -388,6 +388,18 @@ module Omnibus
           it 'returns armhf' do
             expect(subject.safe_architecture).to eq('armhf')
           end
+        end
+      end
+
+      context '64bit ARM platform' do
+        before do
+          stub_ohai(platform: 'ubuntu', version: '14.04') do |data|
+            data['kernel']['machine'] = 'aarch64'
+          end
+        end
+
+        it 'returns arm64' do
+          expect(subject.safe_architecture).to eq('arm64')
         end
       end
     end
