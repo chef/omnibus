@@ -199,7 +199,7 @@ Additionally, there are a number of DSL methods avaiable inside the `build` bloc
 
 For more DSL methods, please consult the [`Builder` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Builder).
 
-You can support building multiple verisons of the same software in the same software definition file using the `version` method and giving a block:
+You can support building multiple versions of the same software in the same software definition file using the `version` method and giving a block:
 
 ```ruby
 name "ruby"
