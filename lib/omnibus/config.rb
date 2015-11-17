@@ -471,6 +471,12 @@ module Omnibus
       :x86
     end
 
+    # Should FIPS mode be enabled?  This will affect how ruby is build,
+    # how openssl is built and what libraries are vendored.
+    #
+    # @return [true, false]
+    default(:fips_mode, false)
+
     # --------------------------------------------------
     # @!endgroup
     #
