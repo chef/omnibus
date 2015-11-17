@@ -24,7 +24,7 @@ module Omnibus
     WIN_7Z_EXTENSIONS = %w(.7z .zip)
 
     # tar probably has compression scheme linked in, otherwise for tarballs
-    TAR_EXTENSIONS = %w(.tar .tar.gz .tgz .bz2 .tar.xz .txz)
+    TAR_EXTENSIONS = %w(.tar .tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma)
 
     # Digest types used for verifying file checksums
     DIGESTS = [:sha512, :sha256, :sha1, :md5]

@@ -331,10 +331,10 @@ module Omnibus
         it_behaves_like 'an extractor', 'tar',     'tar xf C:\\file.tar -C/tmp/out'
         it_behaves_like 'an extractor', 'tgz',     'tar zxf C:\\file.tgz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.gz',  'tar zxf C:\\file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'bz2',     'tar jxf C:\\file.bz2 -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf C:\\file.tar.bz2 -C/tmp/out'
         it_behaves_like 'an extractor', 'txz',     'tar Jxf C:\\file.txz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf C:\\file.tar.xz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.lzma', 'tar xf C:\\file.tar.lzma -C/tmp/out'
       end
 
       context 'on Linux' do
@@ -349,10 +349,10 @@ module Omnibus
         it_behaves_like 'an extractor', 'tar',     'tar xf /file.tar -C/tmp/out'
         it_behaves_like 'an extractor', 'tgz',     'tar zxf /file.tgz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.gz',  'tar zxf /file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'bz2',     'tar jxf /file.bz2 -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf /file.tar.bz2 -C/tmp/out'
         it_behaves_like 'an extractor', 'txz',     'tar Jxf /file.txz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf /file.tar.xz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.lzma', 'tar xf /file.tar.lzma -C/tmp/out'
       end
 
       context 'when gtar is present' do
@@ -372,10 +372,10 @@ module Omnibus
         it_behaves_like 'an extractor', 'tar',     'gtar xf /file.tar -C/tmp/out'
         it_behaves_like 'an extractor', 'tgz',     'gtar zxf /file.tgz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.gz',  'gtar zxf /file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'bz2',     'gtar jxf /file.bz2 -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.bz2', 'gtar jxf /file.tar.bz2 -C/tmp/out'
         it_behaves_like 'an extractor', 'txz',     'gtar Jxf /file.txz -C/tmp/out'
         it_behaves_like 'an extractor', 'tar.xz',  'gtar Jxf /file.tar.xz -C/tmp/out'
+        it_behaves_like 'an extractor', 'tar.lzma', 'gtar xf /file.tar.lzma -C/tmp/out'
       end
     end
   end

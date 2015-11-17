@@ -494,6 +494,11 @@ module Omnibus
             )
           end
           freebsd_flags
+        when "windows"
+          {
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
+            "CFLAGS" => "-I#{install_dir}/embedded/include",
+          }
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",

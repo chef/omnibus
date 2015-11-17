@@ -19,7 +19,7 @@ module Omnibus
     # corresponding to the system installation and hope it all works out.
     def fake_embedded_bin(name)
       if windows?
-        ext = (name == 'ruby') ? '.exe' : '.bat'
+        ext = name == 'ruby' ? '.exe' : '.bat'
         source = Bundler.which(name + ext)
         raise "Could not find #{name} in bundler environment" unless source
         File.open(File.join(embedded_bin_dir, name + '.bat'), 'w') do |f|
@@ -116,7 +116,7 @@ module Omnibus
       end
     end
 
-    describe '#patch', :not_supported_on_windows do
+    describe '#patch' do
       it 'applies the patch' do
         configure = File.join(project_dir, 'configure')
         File.open(configure, 'w') do |f|
@@ -136,6 +136,13 @@ module Omnibus
             +FOO="bar"
              ZIP="zap"
           EOH
+        end
+
+        if windows?
+          bash_path = Bundler.which('bash.exe')
+          allow(subject).to receive(:embedded_msys_bin)
+            .with('bash.exe')
+            .and_return("#{bash_path}")
         end
 
         subject.patch(source: 'apply.patch')
