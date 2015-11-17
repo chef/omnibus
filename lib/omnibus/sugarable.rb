@@ -71,5 +71,10 @@ module Omnibus
     def windows_arch_i386?
       Config.windows_arch.to_sym == :x86
     end
+
+    # Returns if the global fips mode flag was enabled.
+    def fips_mode?
+      Config.fips_mode
+    end
   end
 end

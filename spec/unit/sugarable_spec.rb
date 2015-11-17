@@ -44,6 +44,8 @@ module Omnibus
         expect(klass).to be_method_defined(:windows?)
         expect(klass).to be_method_defined(:vagrant?)
         expect(klass).to be_method_defined(:_64_bit?)
+        expect(klass).to be_method_defined(:windows_arch_i386?)
+        expect(klass).to be_method_defined(:fips_mode?)
       end
 
       it 'makes the DSL methods available in the cleanroom' do
@@ -51,6 +53,8 @@ module Omnibus
           instance.evaluate <<-EOH.gsub(/^ {12}/, '')
             windows?
             vagrant?
+            windows_arch_i386?
+            fips_mode?
           EOH
         }.to_not raise_error
       end
