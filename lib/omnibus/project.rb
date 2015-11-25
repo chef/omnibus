@@ -693,6 +693,49 @@ module Omnibus
     expose :ohai
 
     #
+    # Set or retrieve the {#license} of the project.
+    #
+    # @example
+    #   license 'Apache 2.0'
+    #
+    # @param [String] val
+    #   the license to set for the project.
+    #
+    # @return [String]
+    #
+    def license(val = NULL)
+      if null?(val)
+        @license || 'Unspecified'
+      else
+        @license = val
+      end
+    end
+    expose :license
+
+    #
+    # Set or retrieve the location of the {#license_file}
+    # of the project.  It can either be a relative path inside
+    # the project source directory or a URL.
+    #
+    #
+    # @example
+    #   license_file 'LICENSES/artistic.txt'
+    #
+    # @param [String] val
+    #   the location of the license file for the software.
+    #
+    # @return [String]
+    #
+    def license_file(val = NULL)
+      if null?(val)
+        @license_file
+      else
+        @license_file = val
+      end
+    end
+    expose :license_file
+
+    #
     # Location of json-formated version manifest, written at at the
     # end of the build. If no path is specified
     # +install_dir+/version-manifest.json is used.
@@ -733,27 +776,8 @@ module Omnibus
     expose :text_manifest_path
 
     #
-    # Location of NOTICE file containing external software licenses.
-    # 
-    # If no path is specified +install_dir+/NOTICE is used.
-    #
-    # @example
-    #   notice_file_path
-    #
-    # @return [String]
-    #
-    def notice_file_path(path = NULL)
-      if null?(path)
-        @notice_file_path || File.join(install_dir, "NOTICE")
-      else
-        @notice_file_path = path
-      end
-    end
-    expose :notice_file_path
-    
-    #
     # Location of LICENSE file containing external software licenses.
-    # 
+    #
     # If no path is specified +install_dir+/LICENSE is used.
     #
     # @example
@@ -769,7 +793,7 @@ module Omnibus
       end
     end
     expose :license_file_path
-    
+
     #
     # @!endgroup
     # --------------------------------------------------
@@ -1047,8 +1071,7 @@ module Omnibus
 
       write_json_manifest
       write_text_manifest
-      write_notice_file
-      write_license_file
+      write_license_files
       HealthCheck.run!(self)
       package_me
       compress_me
@@ -1073,19 +1096,50 @@ module Omnibus
       end
     end
 
-    def write_notice_file
-      File.open(notice_file_path, 'w') do |f|
-        f.puts "#{name} #{build_version}"
-        f.puts ""
-        f.puts Omnibus::Licenses.notice_list(self)
-      end
+    #
+    # Writes out all the various license related files - Top level
+    # license file and also copies any package specific license
+    # files into the package
+    #
+    def write_license_files
+      copy_license_files
+      write_license_file
     end
 
     def write_license_file
       File.open(license_file_path, 'w') do |f|
         f.puts "#{name} #{build_version}"
         f.puts ""
+        f.puts license_text
+        f.puts ""
         f.puts Omnibus::Licenses.license_list(self)
+      end
+    end
+
+    def copy_license_files
+      license_dir = File.expand_path(Omnibus::Licenses.output_dir, install_dir)
+
+      FileUtils.mkdir_p(license_dir)
+      library.license_map.each do |name, values|
+        license_file = values[:license_file]
+        if license_file && is_local(license_file)
+          input_file = File.expand_path(license_file, values[:project_dir])
+          output_file = File.expand_path(Omnibus::Licenses.location(name, license_file), install_dir)
+          FileUtils.cp(input_file, output_file)
+        end
+      end
+    end
+
+    def is_local(license)
+      u = URI(license)
+      return u.scheme.nil?
+    end
+
+    def license_text
+      if license_file
+        IO.read(license_file)
+      else
+        ""
       end
     end
 

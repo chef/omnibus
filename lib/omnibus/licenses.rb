@@ -20,16 +20,9 @@ module Omnibus
   module Licenses
     extend self
 
-    def notice_list(project)
-      out = ''
-
-      out
-    end
-
     def license_list(project)
       licenses = project.library.license_map
-      out = ''
-      out << "\n\n"
+      out = "\n\n"
 
       licenses.keys.sort.each do |name|
         license = licenses[name][:license]
@@ -53,8 +46,12 @@ module Omnibus
         # Is a URI, just return it
         where
       else
-        File.join("LICENSES", name, File.split(where).last)
+        File.join(output_dir, "#{name}-#{File.split(where).last}")
       end
+    end
+
+    def output_dir
+      "LICENSES"
     end
   end
 end

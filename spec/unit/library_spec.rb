@@ -159,7 +159,8 @@ module Omnibus
         expect(library.license_map).to eq({
           "activemq" =>  {:license => "Apache 2.0",
                           :license_file => nil,
-                          :version => '1.0.0.alpha'}
+                          :version => '1.0.0.alpha',
+                          :project_dir => '/var/cache/omnibus/src/activemq'}
         })
       end
 
@@ -169,7 +170,8 @@ module Omnibus
         expect(library.license_map).to eq({
           "activemq" =>  {:license => "Apache 2.0",
                           :license_file => nil,
-                          :version => '2.0.0'}
+                          :version => '2.0.0',
+                          :project_dir => '/var/cache/omnibus/src/activemq'}
         })
       end
     end

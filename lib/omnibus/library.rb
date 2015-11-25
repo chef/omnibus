@@ -110,6 +110,7 @@ module Omnibus
             license: component.license,
             license_file: component.license_file,
             version: component.version,
+            project_dir: component.project_dir,
           }
         end
         map
