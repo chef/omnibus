@@ -446,7 +446,7 @@ module Omnibus
     #
     # For example:
     #
-    #     /PATH/files/my_map_file 
+    #     /PATH/files/my_map_file
     #
     # @return [String, nil]
     default(:solaris_linker_mapfile, "files/mapfiles/solaris")
@@ -498,12 +498,17 @@ module Omnibus
 
     # The number of worker threads for make. If this is not set
     # explicitly in config, it will attempt to determine via Ohai in
-    # the builder, and failing that will default to 3
+    # the builder, and failing that will default to 3. This will
+    # also default to 3 if the count is 0 (like in a Solaris zone)
     #
     # @return [Integer]
     default(:workers) do
-      if Ohai['cpu'] && Ohai['cpu']['total']
-        Ohai['cpu']['total'].to_i + 1
+      count = 0
+      if Ohai['cpu'] && Ohai['cpu'].key?(:total)
+        count = Ohai['cpu']['total'].to_i
+      end
+      if count > 0
+        count + 1
       else
         3
       end
