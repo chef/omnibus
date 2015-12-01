@@ -46,7 +46,7 @@ module Omnibus
     #   @param options [Hash] the options passed to the initializer of the
     #     +Mixlib::ShellOut+ instance.
     # @return [Mixlib::ShellOut] the underlying +Mixlib::ShellOut+ instance
-    #   which which has +stdout+, +stderr+, +status+, and +exitstatus+
+    #   which has +stdout+, +stderr+, +status+, and +exitstatus+
     #   populated with results of the command.
     #
     def shellout(*args)
