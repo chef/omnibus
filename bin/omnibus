@@ -8,4 +8,9 @@ $:.push File.expand_path('../../lib', __FILE__)
 $stdout.sync = true
 
 require 'omnibus/cli'
+
+# Some platforms do not have a UTF-8 locale, so we need to enforce one
+# or else the cacert chain will break among other things
+Encoding.default_external = Encoding::UTF_8
+
 Omnibus::CLI::Runner.new(ARGV.dup).execute!
