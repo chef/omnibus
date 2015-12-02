@@ -137,12 +137,43 @@ module Omnibus
         end
       end
 
+      context 'when paths with colons/commas are present' do
+        let(:contents) do
+          subject.write_gen_template
+          File.read(gen_file)
+        end
+
+        before do
+          create_file("#{staging_dir}/man3/App::Cpan.3")
+          create_file("#{staging_dir}/comma,file")
+          create_directory("#{staging_dir}/colon::dir/file")
+          create_directory("#{staging_dir}/comma,dir/file")
+        end
+
+        it 'renames colon filenames in the template' do
+          expect(contents).to include("/man3/App____Cpan.3")
+        end
+
+        it 'renames colon directory names in the template' do
+          expect(contents).to include("/colon____dir/file")
+        end
+
+        it 'renames comma filenames in the template' do
+          expect(contents).to include("/comma__file")
+        end
+
+        it 'renames comma directory names in the template' do
+          expect(contents).to include("/comma__dir/file")
+        end
+      end
+
       context 'when script files are present' do
         before do
           create_file("#{subject.scripts_staging_dir}/preinst")
           create_file("#{subject.scripts_staging_dir}/postinst")
           create_file("#{subject.scripts_staging_dir}/prerm")
           create_file("#{subject.scripts_staging_dir}/postrm")
+          create_file("#{subject.scripts_staging_dir}/config")
         end
 
         it 'writes them into the template' do
@@ -151,6 +182,7 @@ module Omnibus
 
           expect(contents).to include("    Pre-installation Script: #{subject.scripts_staging_dir}/preinst")
           expect(contents).to include("    Post-installation Script: #{subject.scripts_staging_dir}/postinst")
+          expect(contents).to include("    Configuration Script: #{subject.scripts_staging_dir}/config")
           expect(contents).to include("    Pre_rm Script: #{subject.scripts_staging_dir}/prerm")
           expect(contents).to include("    Unconfiguration Script: #{subject.scripts_staging_dir}/postrm")
         end

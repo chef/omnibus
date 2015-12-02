@@ -21,6 +21,8 @@ module Omnibus
       # Default Omnibus naming
       preinst:  'Pre-installation Script',
       postinst: 'Post-installation Script',
+      config:   'Configuration Script',
+      unconfig: 'Unconfiguration Script',
       prerm:    'Pre_rm Script',
       postrm:   'Unconfiguration Script',
     }.freeze
@@ -86,6 +88,7 @@ module Omnibus
         if File.file?(source_path)
           log.debug(log_key) { "Adding script `#{script}' to `#{scripts_staging_dir}'" }
           copy_file(source_path, scripts_staging_dir)
+          log.debug(log_key) { _installp_name + ":\n" + File.read(File.join(scripts_staging_dir, script.to_s)) }
         end
       end
     end
@@ -139,8 +142,22 @@ module Omnibus
       end
 
       # Get a list of all files
-      files = FileSyncer.glob("#{staging_dir}/**/*")
-                .map { |path| path.gsub(/^#{staging_dir}/, '') }
+      files = FileSyncer.glob("#{staging_dir}/**/*").map do |path|
+        if path.match(/:|,/)
+          alt = path.gsub(/(:|,)/, '__')
+          log.debug(log_key) { "Renaming #{path} to #{alt}" }
+
+          File.rename(path, alt) if File.exists?(path)
+
+          File.open(File.join(scripts_staging_dir, 'config'), 'a') do |file|
+            file.puts "mv #{alt.gsub(/^#{staging_dir}/, '')} #{path.gsub(/^#{staging_dir}/, '')}"
+          end
+
+          path = alt
+        end
+
+        path.gsub(/^#{staging_dir}/, '')
+      end
 
       render_template(resource_path('gen.template.erb'),
         destination: File.join(staging_dir, 'gen.template'),
@@ -154,6 +171,8 @@ module Omnibus
           scripts:        scripts,
         }
       )
+
+      log.debug(log_key) { "Rendered Template:\n" + File.read(File.join(staging_dir, 'gen.template')) }
     end
 
     #
