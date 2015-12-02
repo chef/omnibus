@@ -40,6 +40,9 @@ module Omnibus
     end
 
     build do
+      # Remove invalidly-named files
+      remove_files_with_invalid_names
+
       # Copy scripts
       write_scripts
 
@@ -200,6 +203,25 @@ module Omnibus
       "#{safe_base_package_name}-#{project.build_version}-#{project.build_iteration}.#{safe_architecture}.bff"
     end
 
+    #
+    # Remove files with colons or spaces in their name.
+    #
+    # This is to satisfy the post-install file check done by the "sysck" utility
+    # called by installp. Without this, expect messages similar to the below
+    # (in reference to filename "/opt/harmony/embedded/share/man/man3/Tie::Memoize.3":
+    # sysck: 3001-022 The file .../share/man/man3/Tie was not found."
+    #
+    # @return [void]
+    #
+    def remove_files_with_invalid_names
+      log.info(log_key) { "Removing files with invalid filenames" }
+      files = FileSyncer.glob("#{staging_dir}/opt/**/*").select do |file|
+        if match = file.match(/.*(?<character>:| ).*/)
+          log.debug(log_key) { "Removing `#{file}' due to `#{match[:character]}'s in its filename" }
+          FileUtils.rm(file)
+        end
+      end
+    end
 
     #
     # Return the BFF-ready base package name, converting any invalid characters to

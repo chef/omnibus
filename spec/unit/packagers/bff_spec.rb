@@ -184,6 +184,22 @@ module Omnibus
       end
     end
 
+    describe '#remove_files_with_invalid_names' do
+      before do
+        create_file("#{staging_dir}/opt/Colon::Filename")
+        create_file("#{staging_dir}/opt/NonColonFilename")
+        create_file("#{staging_dir}/opt/Single\ Space")
+      end
+
+      context 'when file list contains double colon filenames' do
+
+        it 'deletes those files from the staging_dir' do
+          subject.remove_files_with_invalid_names
+          expect(Dir.glob("#{staging_dir}/opt/**/*").select { |path| path.match(/.*(:| ).*/) }).to be_empty
+        end
+      end
+    end
+
     describe '#safe_base_package_name' do
       context 'when the project name is "safe"' do
         it 'returns the value without logging a message' do
