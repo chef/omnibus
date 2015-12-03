@@ -271,10 +271,11 @@ module Omnibus
       elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.zip')
         "unzip #{windows_safe_path(downloaded_file)} -d #{Config.source_dir}"
       elsif downloaded_file.end_with?(*TAR_EXTENSIONS)
-        compression_switch = 'z' if downloaded_file.end_with?('gz')
-        compression_switch = 'j' if downloaded_file.end_with?('bz2')
-        compression_switch = 'J' if downloaded_file.end_with?('xz')
-        compression_switch = ''  if downloaded_file.end_with?('tar')
+        compression_switch = 'z'        if downloaded_file.end_with?('gz')
+        compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
+        compression_switch = 'j'        if downloaded_file.end_with?('bz2')
+        compression_switch = 'J'        if downloaded_file.end_with?('xz')
+        compression_switch = ''         if downloaded_file.end_with?('tar')
 
         "#{tar} #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
       end

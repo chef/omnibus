@@ -137,7 +137,7 @@ module Omnibus
         end
       end
 
-      context 'when paths with colons/commas are present' do
+      context 'when paths with colons/commas are present', if: !windows? do
         let(:contents) do
           subject.write_gen_template
           File.read(gen_file)
