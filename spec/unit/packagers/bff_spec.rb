@@ -165,6 +165,30 @@ module Omnibus
         it 'renames comma directory names in the template' do
           expect(contents).to include("/comma__dir/file")
         end
+
+        context 'creates a config script' do
+          it 'when there wasn\'t one provided' do
+            FileUtils.rm_f("#{subject.scripts_staging_dir}/config")
+            subject.write_gen_template
+            expect(File).to exist("#{subject.scripts_staging_dir}/config")
+          end
+
+          it 'when one is provided in the project\'s def' do
+            create_file("#{project_root}/package-scripts/project/config")
+            subject.write_gen_template
+            contents = File.read("#{subject.scripts_staging_dir}/config")
+            expect(contents).to include("mv '/man3/App____Cpan.3' '/man3/App::Cpan.3'")
+          end
+
+          it 'with mv commands for all the renamed files' do
+            subject.write_gen_template
+            contents = File.read("#{subject.scripts_staging_dir}/config")
+            expect(contents).to include("mv '/man3/App____Cpan.3' '/man3/App::Cpan.3'")
+            expect(contents).to include("mv '/comma__file' '/comma,file'")
+            expect(contents).to include("mv '/colon____dir/file' '/colon::dir/file'")
+            expect(contents).to include("mv '/comma__dir/file' '/comma,dir/file'")
+          end
+        end
       end
 
       context 'when script files are present' do

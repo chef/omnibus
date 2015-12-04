@@ -143,12 +143,17 @@ module Omnibus
 
           # Create a config script if needed based on resources/bff/config.erb
           config_script_path = File.join(scripts_staging_dir, 'config')
-          render_template(resource_path('config.erb'),
-            destination: config_script_path,
-          ) unless File.exists? config_script_path
+          unless File.exists? config_script_path
+            render_template(resource_path('config.erb'),
+              destination: "#{scripts_staging_dir}/config",
+              variables: {
+                name: project.name
+              }
+            )
+          end
 
           File.open(File.join(scripts_staging_dir, 'config'), 'a') do |file|
-            file.puts "mv #{alt.gsub(/^#{staging_dir}/, '')} #{path.gsub(/^#{staging_dir}/, '')}"
+            file.puts "mv '#{alt.gsub(/^#{staging_dir}/, '')}' '#{path.gsub(/^#{staging_dir}/, '')}'"
           end
 
           path = alt
