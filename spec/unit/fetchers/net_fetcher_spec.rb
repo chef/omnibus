@@ -286,7 +286,7 @@ module Omnibus
         end
 
         it 'copies the entire directory to project_dir' do
-          allow(subject).to receive(:extract_command)
+          allow(subject).to receive(:extract_command).and_return([])
           expect(FileUtils).to receive(:cp_r).with("#{cache_dir}/folder", project_dir)
           subject.extract
         end
@@ -310,7 +310,7 @@ module Omnibus
         end
 
         it 'copies the file into the project_dir' do
-          allow(subject).to receive(:extract_command)
+          allow(subject).to receive(:extract_command).and_return([])
           expect(FileUtils).to receive(:cp).with("#{cache_dir}/file", "#{project_dir}/")
           subject.extract
         end
@@ -318,64 +318,73 @@ module Omnibus
     end
 
     describe '#extract_command' do
-      before { Config.source_dir('/tmp/out') }
 
       context 'on Windows' do
         before do
+          Config.source_dir('C:\\tmp\\out')
           Config.cache_dir('C:')
           stub_ohai(platform: 'windows', version: '2012')
         end
 
-        it_behaves_like 'an extractor', '7z',      '7z.exe x C:\\file.7z -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'zip',     '7z.exe x C:\\file.zip -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'tar',     'tar xf C:\\file.tar -C/tmp/out'
-        it_behaves_like 'an extractor', 'tgz',     'tar zxf C:\\file.tgz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.gz',  'tar zxf C:\\file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf C:\\file.tar.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'txz',     'tar Jxf C:\\file.txz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf C:\\file.tar.xz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.lzma', 'tar --lzma -xf C:\\file.tar.lzma -C/tmp/out'
+        it_behaves_like 'an extractor', '7z',       ['7z.exe x C:\\file.7z -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'zip',      ['7z.exe x C:\\file.zip -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'tar',      ['7z.exe x C:\\file.tar -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'tgz',      ['7z.exe x C:\\file.tgz -oC:\\tmp\\out -r -y',
+                                                     '7z.exe x C:\\tmp\\out\\file.tar -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'tar.gz',   ['7z.exe x C:\\file.tar.gz -oC:\\tmp\\out -r -y',
+                                                     '7z.exe x C:\\tmp\\out\\file.tar -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'tar.bz2',  ['7z.exe x C:\\file.tar.bz2 -oC:\\tmp\\out -r -y',
+                                                     '7z.exe x C:\\tmp\\out\\file.tar -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'txz',      ['7z.exe x C:\\file.txz -oC:\\tmp\\out -r -y',
+                                                     '7z.exe x C:\\tmp\\out\\file.tar -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'tar.xz',   ['7z.exe x C:\\file.tar.xz -oC:\\tmp\\out -r -y',
+                                                     '7z.exe x C:\\tmp\\out\\file.tar -oC:\\tmp\\out -r -y']
+        it_behaves_like 'an extractor', 'tar.lzma', ['7z.exe x C:\\file.tar.lzma -oC:\\tmp\\out -r -y',
+                                                     '7z.exe x C:\\tmp\\out\\file.tar -oC:\\tmp\\out -r -y']
       end
 
       context 'on Linux' do
         before do
+          Config.source_dir('/tmp/out')
           Config.cache_dir('/')
           stub_ohai(platform: 'ubuntu', version: '12.04')
           stub_const('File::ALT_SEPARATOR', nil)
         end
 
-        it_behaves_like 'an extractor', '7z',      '7z x /file.7z -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'zip',     'unzip /file.zip -d /tmp/out'
-        it_behaves_like 'an extractor', 'tar',     'tar xf /file.tar -C/tmp/out'
-        it_behaves_like 'an extractor', 'tgz',     'tar zxf /file.tgz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.gz',  'tar zxf /file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.bz2', 'tar jxf /file.tar.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'txz',     'tar Jxf /file.txz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.xz',  'tar Jxf /file.tar.xz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.lzma', 'tar --lzma -xf /file.tar.lzma -C/tmp/out'
-      end
+        context 'when gtar is not present' do
+          it_behaves_like 'an extractor', '7z',      ['7z x /file.7z -o/tmp/out -r -y']
+          it_behaves_like 'an extractor', 'zip',     ['unzip /file.zip -d /tmp/out']
+          it_behaves_like 'an extractor', 'tar',     ['tar xf /file.tar -C/tmp/out']
+          it_behaves_like 'an extractor', 'tgz',     ['tar zxf /file.tgz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.gz',  ['tar zxf /file.tar.gz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.bz2', ['tar jxf /file.tar.bz2 -C/tmp/out']
+          it_behaves_like 'an extractor', 'txz',     ['tar Jxf /file.txz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.xz',  ['tar Jxf /file.tar.xz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.lzma', ['tar --lzma -xf /file.tar.lzma -C/tmp/out']
+        end
 
-      context 'when gtar is present' do
-        before do
-          Config.cache_dir('/')
+        context 'when gtar is present' do
+          before do
+            Config.cache_dir('/')
 
-          stub_ohai(platform: 'ubuntu', version: '12.04')
-          stub_const('File::ALT_SEPARATOR', nil)
+            stub_ohai(platform: 'ubuntu', version: '12.04')
+            stub_const('File::ALT_SEPARATOR', nil)
 
-          allow(Omnibus).to receive(:which)
+            allow(Omnibus).to receive(:which)
             .with('gtar')
             .and_return('/path/to/gtar')
-        end
+          end
 
-        it_behaves_like 'an extractor', '7z',      '7z x /file.7z -o/tmp/out -r -y'
-        it_behaves_like 'an extractor', 'zip',     'unzip /file.zip -d /tmp/out'
-        it_behaves_like 'an extractor', 'tar',     'gtar xf /file.tar -C/tmp/out'
-        it_behaves_like 'an extractor', 'tgz',     'gtar zxf /file.tgz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.gz',  'gtar zxf /file.tar.gz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.bz2', 'gtar jxf /file.tar.bz2 -C/tmp/out'
-        it_behaves_like 'an extractor', 'txz',     'gtar Jxf /file.txz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.xz',  'gtar Jxf /file.tar.xz -C/tmp/out'
-        it_behaves_like 'an extractor', 'tar.lzma', 'gtar --lzma -xf /file.tar.lzma -C/tmp/out'
+          it_behaves_like 'an extractor', '7z',      ['7z x /file.7z -o/tmp/out -r -y']
+          it_behaves_like 'an extractor', 'zip',     ['unzip /file.zip -d /tmp/out']
+          it_behaves_like 'an extractor', 'tar',     ['gtar xf /file.tar -C/tmp/out']
+          it_behaves_like 'an extractor', 'tgz',     ['gtar zxf /file.tgz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.gz',  ['gtar zxf /file.tar.gz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.bz2', ['gtar jxf /file.tar.bz2 -C/tmp/out']
+          it_behaves_like 'an extractor', 'txz',     ['gtar Jxf /file.txz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.xz',  ['gtar Jxf /file.tar.xz -C/tmp/out']
+          it_behaves_like 'an extractor', 'tar.lzma', ['gtar --lzma -xf /file.tar.lzma -C/tmp/out']
+        end
       end
     end
   end
