@@ -168,7 +168,7 @@ module Omnibus
 
         if File.file?(staging_path)
           hash[installp_key] = staging_path
-          log.debug(log_key) { _installp_name + ":\n" + File.read(staging_path) }
+          log.debug(log_key) { installp_key + ":\n" + File.read(staging_path) }
         end
 
         hash
