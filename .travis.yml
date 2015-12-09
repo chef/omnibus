@@ -8,6 +8,7 @@ branches:
     - 2.0-stable
     - 3.0-stable
     - master
+before_install: gem install bundler
 script: bundle exec rake travis:ci
 notifications:
   slack:

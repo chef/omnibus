@@ -206,9 +206,12 @@ module Omnibus
     # is copied over as a raw file.
     #
     def extract
-      if command = extract_command
+      commands = extract_command
+      if commands.length > 0
         log.info(log_key) { "Extracting `#{downloaded_file}' to `#{Config.source_dir}'" }
-        shellout!(command)
+        commands.each do |command|
+          shellout!(command)
+        end
       else
         log.info(log_key) { "`#{downloaded_file}' is not an archive - copying to `#{project_dir}'" }
 
@@ -261,15 +264,32 @@ module Omnibus
     #
     # The command to use for extracting this piece of software.
     #
-    # @return [String, nil]
+    # @return [[String]]
     #
     def extract_command
       if Ohai['platform'] == 'windows' && downloaded_file.end_with?(*WIN_7Z_EXTENSIONS)
-        "7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"
+        ["7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"]
       elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.7z')
-        "7z x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"
+        ["7z x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"]
       elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.zip')
-        "unzip #{windows_safe_path(downloaded_file)} -d #{Config.source_dir}"
+        ["unzip #{windows_safe_path(downloaded_file)} -d #{Config.source_dir}"]
+      elsif Ohai['platform'] == 'windows' && downloaded_file.end_with?(*TAR_EXTENSIONS)
+        commands = ["7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"]
+        if !downloaded_file.end_with?('tar')
+          fname = if downloaded_file.end_with?('tgz', 'txz')
+                        s = File.basename(downloaded_file,
+                                      File.extname(downloaded_file))
+                        "#{s}.tar"
+                      else
+                        File.basename(downloaded_file,
+                                      File.extname(downloaded_file))
+                      end
+
+         next_file = File.join(Config.source_dir, fname)
+
+          commands << "7z.exe x #{windows_safe_path(next_file)} -o#{windows_safe_path(Config.source_dir)} -r -y"
+        end
+        commands
       elsif downloaded_file.end_with?(*TAR_EXTENSIONS)
         compression_switch = 'z'        if downloaded_file.end_with?('gz')
         compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
@@ -277,7 +297,9 @@ module Omnibus
         compression_switch = 'J'        if downloaded_file.end_with?('xz')
         compression_switch = ''         if downloaded_file.end_with?('tar')
 
-        "#{tar} #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"
+        ["#{tar} #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"]
+      else
+        []
       end
     end
 
