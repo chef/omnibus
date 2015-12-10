@@ -218,11 +218,6 @@ module Omnibus
         expect(retry_count).to eq(Omnibus::Config.fetcher_retries)
       end
 
-      it 'extracts the file' do
-        fetch!
-        expect(extracted).to be_a_directory
-      end
-
       context 'when the file is less than 10240 bytes' do
         let(:source_url) { 'https://downloads.chef.io/packages-chef-io-public.key' }
         let(:source_md5) { '369efc3a19b9118cdf51c7e87a34f266' }
