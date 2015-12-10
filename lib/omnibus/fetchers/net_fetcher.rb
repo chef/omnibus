@@ -24,7 +24,10 @@ module Omnibus
     WIN_7Z_EXTENSIONS = %w(.7z .zip)
 
     # tar probably has compression scheme linked in, otherwise for tarballs
-    TAR_EXTENSIONS = %w(.tar .tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma)
+    COMPRESSED_TAR_EXTENSIONS = %w(.tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma)
+    TAR_EXTENSIONS = COMPRESSED_TAR_EXTENSIONS + ['.tar']
+
+    ALL_EXTENSIONS = WIN_7Z_EXTENSIONS + TAR_EXTENSIONS
 
     # Digest types used for verifying file checksums
     DIGESTS = [:sha512, :sha256, :sha1, :md5]
@@ -51,21 +54,21 @@ module Omnibus
     end
 
     #
-    # Clean the project directory by removing the contents from disk.
+    # Clean the project directory if it exists and actually extract
+    # the downloaded file.
     #
     # @return [true, false]
     #   true if the project directory was removed, false otherwise
     #
     def clean
-      if File.exist?(project_dir)
+      needs_cleaning = File.exist?(project_dir)
+      if needs_cleaning
         log.info(log_key) { "Cleaning project directory `#{project_dir}'" }
         FileUtils.rm_rf(project_dir)
-        extract
-        true
-      else
-        extract
-        false
       end
+      create_required_directories
+      deploy
+      needs_cleaning
     end
 
     #
@@ -81,7 +84,6 @@ module Omnibus
       create_required_directories
       download
       verify_checksum!
-      extract
     end
 
     #
@@ -205,27 +207,64 @@ module Omnibus
     # ending file extension. In the rare event the file cannot be extracted, it
     # is copied over as a raw file.
     #
-    def extract
-      commands = extract_command
-      if commands.length > 0
-        log.info(log_key) { "Extracting `#{downloaded_file}' to `#{Config.source_dir}'" }
-        commands.each do |command|
-          shellout!(command)
-        end
+    def deploy
+      if downloaded_file.end_with?(*ALL_EXTENSIONS)
+        log.info(log_key) { "Extracting `#{safe_downloaded_file}' to `#{safe_project_dir}'" }
+        extract
       else
-        log.info(log_key) { "`#{downloaded_file}' is not an archive - copying to `#{project_dir}'" }
+        log.info(log_key) { "`#{safe_downloaded_file}' is not an archive - copying to `#{safe_project_dir}'" }
 
-        if File.directory?(project_dir)
+        if File.directory?(downloaded_file)
           # If the file itself was a directory, copy the whole thing over. This
           # seems unlikely, because I do not think it is a possible to download
           # a folder, but better safe than sorry.
-          FileUtils.cp_r(downloaded_file, project_dir)
+          FileUtils.cp_r("#{downloaded_file}/.", project_dir)
         else
           # In the more likely case that we got a "regular" file, we want that
-          # file to live **inside** the project directory.
-          FileUtils.mkdir_p(project_dir)
-          FileUtils.cp(downloaded_file, "#{project_dir}/")
+          # file to live **inside** the project directory. project_dir should already
+          # exist due to create_required_directories
+          FileUtils.cp(downloaded_file, project_dir)
         end
+      end
+    end
+
+    #
+    # Extracts the downloaded archive file into project_dir.
+    #
+    def extract
+      if Ohai['platform'] == 'windows' && downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
+        # On windows, always use 7z because bsdtar has problems with extracting
+        # files that are marked as read-only inside the tar. Unfortunately,
+        # this means that we need to perform this in multiple steps as 7z
+        # doesn't extract and untar at the same time. The extracted tar is
+        # moved out of the project_dir and then extracted once again into
+        # project_dir.
+        Dir.mktmpdir do |temp_dir|
+          log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
+
+          shellout!("7z.exe x #{safe_downloaded_file} -o#{windows_safe_path(temp_dir)} -r -y")
+
+          fname = File.basename(downloaded_file, File.extname(downloaded_file))
+          fname << ".tar" if downloaded_file.end_with?('tgz', 'txz')
+          next_file = windows_safe_path(File.join(temp_dir, fname))
+
+          log.debug(log_key) { "Temporarily extracting `#{next_file}' to `#{safe_project_dir}'" }
+          shellout!("7z.exe x #{next_file} -o#{safe_project_dir} -r -y")
+        end
+      elsif Ohai['platform'] == 'windows'
+        shellout!("7z.exe x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
+      elsif downloaded_file.end_with?('.7z')
+        shellout!("7z x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
+      elsif downloaded_file.end_with?('.zip')
+        shellout!("unzip #{safe_downloaded_file} -d #{safe_project_dir}")
+      else
+        compression_switch = 'z'        if downloaded_file.end_with?('gz')
+        compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
+        compression_switch = 'j'        if downloaded_file.end_with?('bz2')
+        compression_switch = 'J'        if downloaded_file.end_with?('xz')
+        compression_switch = ''         if downloaded_file.end_with?('tar')
+
+        shellout!("#{tar} #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}")
       end
     end
 
@@ -245,7 +284,7 @@ module Omnibus
     end
 
     #
-    # Verify the downloaded file has the correct checksum.#
+    # Verify the downloaded file has the correct checksum.
     #
     # @raise [ChecksumMismatch]
     #   if the checksum does not match
@@ -261,46 +300,20 @@ module Omnibus
       end
     end
 
+    def safe_project_dir
+      windows_safe_path(project_dir)
+    end
+
+    def safe_downloaded_file
+      windows_safe_path(downloaded_file)
+    end
+
     #
     # The command to use for extracting this piece of software.
     #
     # @return [[String]]
     #
     def extract_command
-      if Ohai['platform'] == 'windows' && downloaded_file.end_with?(*WIN_7Z_EXTENSIONS)
-        ["7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"]
-      elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.7z')
-        ["7z x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"]
-      elsif Ohai['platform'] != 'windows' && downloaded_file.end_with?('.zip')
-        ["unzip #{windows_safe_path(downloaded_file)} -d #{Config.source_dir}"]
-      elsif Ohai['platform'] == 'windows' && downloaded_file.end_with?(*TAR_EXTENSIONS)
-        commands = ["7z.exe x #{windows_safe_path(downloaded_file)} -o#{Config.source_dir} -r -y"]
-        if !downloaded_file.end_with?('tar')
-          fname = if downloaded_file.end_with?('tgz', 'txz')
-                        s = File.basename(downloaded_file,
-                                      File.extname(downloaded_file))
-                        "#{s}.tar"
-                      else
-                        File.basename(downloaded_file,
-                                      File.extname(downloaded_file))
-                      end
-
-         next_file = File.join(Config.source_dir, fname)
-
-          commands << "7z.exe x #{windows_safe_path(next_file)} -o#{windows_safe_path(Config.source_dir)} -r -y"
-        end
-        commands
-      elsif downloaded_file.end_with?(*TAR_EXTENSIONS)
-        compression_switch = 'z'        if downloaded_file.end_with?('gz')
-        compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
-        compression_switch = 'j'        if downloaded_file.end_with?('bz2')
-        compression_switch = 'J'        if downloaded_file.end_with?('xz')
-        compression_switch = ''         if downloaded_file.end_with?('tar')
-
-        ["#{tar} #{compression_switch}xf #{windows_safe_path(downloaded_file)} -C#{Config.source_dir}"]
-      else
-        []
-      end
     end
 
     #
