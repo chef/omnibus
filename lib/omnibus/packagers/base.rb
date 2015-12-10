@@ -138,7 +138,7 @@ module Omnibus
     #
     def run!
       # Ensure the package directory exists
-      create_directory(Config.package_dir)
+      create_directory(Config.package_dir) unless Dir.exists?(Config.package_dir)
 
       # Run the setup and build sequences
       instance_eval(&self.class.setup) if self.class.setup
