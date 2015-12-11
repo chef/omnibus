@@ -21,6 +21,8 @@ module Omnibus
     end
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
+    
+    let(:revision) { shellout!('git rev-parse HEAD', cwd: project_dir).stdout.strip }
 
     describe '#fetch_required?' do
       context 'when the repo is not cloned' do
@@ -32,15 +34,16 @@ module Omnibus
       context 'when the repo is cloned' do
         before { subject.fetch }
 
-        context 'when the revisions are different' do
-          it 'return true' do
-            # Dirty the project_dir to differ the revisions
-            Dir.chdir(project_dir) do
-              FileUtils.touch("file-#{Time.now.to_i}")
-              git %|add .|
-              git %|commit -am "Add new file"|
-            end
+        context 'when the revision is not available' do
+          let(:manifest_entry) do
+            double(ManifestEntry,
+              name: 'software',
+              locked_version: 'abcdefabcdef5d66ed866b2c3eb418426e6382b0',
+              described_version: version,
+              locked_source: source)
+          end
 
+          it 'return true' do
             expect(subject.fetch_required?).to be_truthy
           end
         end
@@ -60,37 +63,49 @@ module Omnibus
     end
 
     describe '#clean' do
-      context 'when the project directory exists' do
-        before do
-          subject.fetch
+      before do
+        subject.fetch
+      end
+
+      it 'returns true' do
+        expect(subject.clean).to be_truthy
+      end
+
+      context 'when the project directory has extra files in it' do
+        it 'cleans the git repo' do
           create_file("#{project_dir}/file_a")
           create_file("#{project_dir}/.file_b")
-        end
-
-        it 'cleans the git repo' do
           subject.clean
           expect("#{project_dir}/file_a").to_not be_a_file
           expect("#{project_dir}/.file_b").to_not be_a_file
         end
-
-        it 'returns true' do
-          expect(subject.clean).to be_truthy
-        end
       end
 
-      context 'when the project directory does not exist' do
+      context 'when the project directory is at a different version' do
         before do
-          remove_directory(project_dir)
+          # Dirty the project_dir by giving it a conflicting commit.
+          create_file("#{project_dir}/file_a") { 'some new file' }
+          create_file("#{project_dir}/configure") { 'LALALALA' }
+          shellout!('git add .', cwd: project_dir)
+          shellout!('git commit -am "Some commit"', cwd: project_dir)
+          create_file("#{project_dir}/.file_b")
         end
 
-        it 'returns false' do
-          expect(subject.clean).to be(false)
+        it 'checks out the right version' do
+          subject.clean
+          expect(revision).to eq(manifest_entry.locked_version)
+        end
+
+        it 'resets the working tree' do
+          subject.clean
+          expect("#{project_dir}/file_a").to_not be_a_file
+          expect("#{project_dir}/.file_b").to_not be_a_file
+          expect(File.read("#{project_dir}/configure")).to_not match('LA')
         end
       end
     end
 
     describe '#fetch'  do
-      let(:revision) { shellout!('git rev-parse HEAD', cwd: project_dir).stdout.strip }
       let(:version)  { 'v1.2.4' }
       let(:remote)   { remote_git_repo('zlib', annotated_tags: [version]) }
       let(:manifest_entry) do
@@ -107,11 +122,6 @@ module Omnibus
       it 'clones the repository' do
         subject.fetch
         expect("#{project_dir}/.git").to be_a_directory
-      end
-
-      it 'fetches the locked_version from the manifest' do
-        subject.fetch
-        expect(revision).to eq(manifest_entry.locked_version)
       end
     end
 
@@ -173,8 +183,6 @@ module Omnibus
     end
 
     describe '#version_for_cache' do
-      let(:revision) { shellout!('git rev-parse HEAD', cwd: project_dir).stdout.strip }
-
       it 'includes the revision' do
         expect(subject.version_for_cache).to eq("revision:#{revision}")
       end
