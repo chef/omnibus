@@ -47,39 +47,8 @@ module Omnibus
     end
 
     describe '#clean' do
-      before do
-        allow(FileUtils).to receive(:rm_rf)
-        allow(subject).to receive(:fetch)
-      end
-
-      context 'when the directory exists' do
-        before do
-          allow(File).to receive(:exist?).with(project_dir).and_return(true)
-        end
-
-        it 'removes the directory' do
-          expect(FileUtils).to receive(:rm_rf).with(project_dir).once
-          subject.clean
-        end
-
-        it 'returns true' do
-          expect(subject.clean).to be_truthy
-        end
-      end
-
-      context 'when the directory does not exist' do
-        before do
-          allow(File).to receive(:exist?).with(project_dir).and_return(false)
-        end
-
-        it 'does not remove the directory' do
-          expect(FileUtils).to_not receive(:rm_rf)
-          subject.clean
-        end
-
-        it 'returns false' do
-          expect(subject.clean).to be(false)
-        end
+      it 'returns true' do
+        expect(subject.clean).to be_truthy
       end
     end
 
