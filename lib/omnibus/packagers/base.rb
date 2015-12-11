@@ -30,6 +30,9 @@ module Omnibus
     attr_reader :project
 
     class << self
+
+      INVALID_CHARS = /:|,|\s/
+
       #
       # Set the unique of this packager.
       #
