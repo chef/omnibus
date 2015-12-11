@@ -495,9 +495,18 @@ module Omnibus
           end
           freebsd_flags
         when "windows"
+          if windows_arch_i386?
+            arch_flag = "-m32"
+            bfd_target = "pe-i386"
+          else
+            arch_flag = "-m64"
+            bfd_target = "pe-x86-64"
+          end
           {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag} -Wl,#{arch_flag}",
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}",
+            "RCFLAGS" => "--target=#{bfd_target}",
+            "ARFLAGS" => "--target=#{bfd_target}",
           }
         else
           {
