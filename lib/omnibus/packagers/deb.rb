@@ -123,6 +123,29 @@ module Omnibus
     expose :license
 
     #
+    # Sets or return the epoch for this package
+    #
+    # @example
+    #   epoch 1
+    # @param [Integer] val
+    #   the epoch number
+    #
+    # @return [Integer]
+    #   the epoch of the current package
+    def epoch(val = NULL)
+      if null?(val)
+        @epoch || NULL
+      else
+        unless val.is_a?(Integer)
+          raise InvalidValue.new(:epoch, 'be an Integer')
+        end
+
+        @epoch = val
+      end
+    end
+    expose :epoch
+
+    #
     # Set or return the priority for this package.
     #
     # @example
@@ -358,6 +381,15 @@ module Omnibus
     end
 
     #
+    # Returns the string to prepend to the version if needed.
+    #
+    # @return [String]
+    #
+    def safe_epoch
+      null?(epoch) ? '' : "#{epoch}:"
+    end
+
+    #
     # Return the Debian-ready version, replacing all dashes (+-+) with tildes
     # (+~+) and converting any invalid characters to underscores (+_+).
     #
@@ -380,6 +412,9 @@ module Omnibus
 
         version = converted
       end
+
+      # Prepend epoch when it exists
+      version = safe_epoch + version
 
       if version =~ /\A[a-zA-Z0-9\.\+\:\~]+\z/
         version

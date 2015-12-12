@@ -17,6 +17,9 @@
 # Metadata
 Name: <%= name %>
 Version: <%= version %>
+<% unless epoch.empty? -%>
+Epoch: <%= epoch %>
+<% end -%>
 Release: <%= iteration %><%= dist_tag ? dist_tag : '' %>
 Summary:  <%= description.split("\n").first.empty? ? "_" : description.split("\n").first %>
 AutoReqProv: no
