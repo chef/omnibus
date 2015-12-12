@@ -32,6 +32,7 @@ module Omnibus
       /ld-linux/,
       /libc\.so/,
       /libcrypt\.so/,
+      /libdb-4.7\.so/,
       /libdl/,
       /libfreebl\d\.so/,
       /libgcc_s\.so/,
@@ -40,10 +41,12 @@ module Omnibus
       /libpthread/,
       /libresolv\.so/,
       /librt\.so/,
+      /librrd\.so/,
       /libstdc\+\+\.so/,
       /libutil\.so/,
       /linux-vdso.+/,
       /linux-gate\.so/,
+      /rrdtoolmodule\.so/,
     ].freeze
 
     ARCH_WHITELIST_LIBS = [
@@ -129,6 +132,8 @@ module Omnibus
     MAC_WHITELIST_LIBS = [
       /libobjc\.A\.dylib/,
       /libSystem\.B\.dylib/,
+      # Symlink of the previous one
+      /libgcc_s\.1\.dylib/,
       /CoreFoundation/,
       /CoreServices/,
       /Tcl$/,
