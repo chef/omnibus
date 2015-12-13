@@ -87,6 +87,21 @@ module Omnibus
     end
     expose :command
 
+    # Calls the embedded pip (Datadog specific function)
+    #
+    # @param [String] subcommand
+    #   the pip subcommand to execute
+    #
+    # @return [void]
+    def pip(subcommand, options = {})
+     pip_path = "\"#{install_dir}/embedded/bin/pip\""
+     if Ohai['platform'] == "windows"
+       pip_path = "\"#{windows_safe_path(install_dir)}\\embedded\\Scripts\\pip.exe\""
+     end
+     command("#{pip_path} #{subcommand}", options)
+    end
+    expose :pip
+
     #
     # Execute the given make command. When present, this method will prefer the
     # use of +gmake+ over +make+. If applicable, this method will also set
