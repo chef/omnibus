@@ -57,18 +57,49 @@ module Omnibus
       # If fastmsi, zip up the contents of the install directory
       shellout!(zip_command) if fast_msi
 
+      # If there are extra package files let's Harvest them hard
+      dir_refs = []
+      candle_vars = ''
+      wxs_list = ''
+      wixobj_list = ''
+      if File.directory?("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES")
+        # Let's collect the DirectoryRefs
+        Dir.foreach("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES") do |item|
+          next if item == '.' or item == '..'
+          dir_refs.push(item)
+        end
+      end
+
       # Harvest the files with heat.exe, recursively generate fragment for
       # project directory
       Dir.chdir(staging_dir) do
         shellout!(heat_command)
 
+        # Let's also harvest our extras
+        dir_refs.each do |dirref|
+          shellout! <<-EOH.split.join(' ').squeeze(' ').strip
+            heat.exe dir
+              "#{windows_safe_path("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES\\#{dirref}")}"
+              -nologo -srd -gg -cg Extra#{dirref}
+              -dr #{dirref}
+              -var "var.Extra#{dirref}"
+              -out "extra-#{dirref}.wxs"
+          EOH
+
+          candle_vars += "-dExtra#{dirref}=\""\
+            "#{windows_safe_path("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES\\#{dirref}")}"\
+            "\" "
+          wxs_list += "extra-#{dirref}.wxs "
+          wixobj_list += "extra-#{dirref}.wixobj "
+        end
+
         # Compile with candle.exe
-        shellout!(candle_command)
+        shellout!(candle_command(candle_vars: candle_vars, wxs_list: wxs_list))
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
         msi_file = windows_safe_path(Config.package_dir, msi_name)
-        shellout!(light_command(msi_file), returns: [0, 204])
+        shellout!(light_command(msi_file, wixobj_list: wixobj_list), returns: [0, 204])
 
         if signing_identity
           sign_package(msi_file)
@@ -432,7 +463,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def candle_command(is_bundle: false)
+    def candle_command(is_bundle: false, candle_vars: '', wxs_list: '')
       if is_bundle
         <<-EOH.split.join(" ").squeeze(" ").strip
         candle.exe
@@ -449,7 +480,10 @@ module Omnibus
             -nologo
             #{wix_candle_flags}
             #{wix_extension_switches(wix_candle_extensions)}
-            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
+            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}"
+            #{candle_vars}
+            "project-files.wxs"
+            #{wxs_list}
             "#{windows_safe_path(staging_dir, 'source.wxs')}"
         EOH
       end
@@ -460,7 +494,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def light_command(out_file, is_bundle: false)
+    def light_command(out_file, is_bundle: false, wixobj_list: '')
       if is_bundle
         <<-EOH.split.join(" ").squeeze(" ").strip
         light.exe
@@ -481,7 +515,7 @@ module Omnibus
             #{wix_extension_switches(wix_light_extensions)}
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
-            project-files.wixobj source.wixobj
+            project-files.wixobj #{wixobj_list} source.wixobj
             -out "#{out_file}"
         EOH
       end
