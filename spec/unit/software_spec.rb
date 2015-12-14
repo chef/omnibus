@@ -28,6 +28,7 @@ module Omnibus
     it_behaves_like 'a cleanroom setter', :version, %|version '1.2.3'|
     it_behaves_like 'a cleanroom setter', :whitelist_file, %|whitelist_file '/opt/whatever'|
     it_behaves_like 'a cleanroom setter', :relative_path, %|relative_path '/path/to/extracted'|
+    it_behaves_like 'a cleanroom setter', :package_dir, %|package_dir '/path/to/extracted'|
     it_behaves_like 'a cleanroom setter', :build, %|build {}|
     it_behaves_like 'a cleanroom getter', :project_dir
     it_behaves_like 'a cleanroom getter', :build_dir

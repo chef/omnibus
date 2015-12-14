@@ -55,7 +55,17 @@ module Omnibus
     attr_reader :described_version
 
     #
-    # The path where extracted software should live.
+    # The path where fetched software should live.
+    #
+    # Only files under this directory are modified. If the source to fetch
+    # is a directory, it is staged rooted here. If it's a file, it's copied
+    # underneath this directory. If it's a tarball, it's extracted here. If
+    # it's a repo, its checkout is rooted here. You get the idea.
+    #
+    # It's named project_dir instead of extract_dir/extract_path because of
+    # legacy reasons. This has nothing to do with project definitions or the
+    # underlying relative_path for a software definition (except for legacy
+    # behavior).
     #
     # @return [String]
     #
@@ -66,11 +76,14 @@ module Omnibus
     #
     # Create a new Fetcher object from the given software.
     #
-    # @param [Software] software
+    # The parameters correspond to the relevant portions of a software
+    # definition that a fetcher needs access to. This avoids strongly coupling
+    # the software object with all fetchers.
     #
-    # To preserve the original interface, this still takes a software-like
-    # argument, but to avoid coupling with the software object, we pull out
-    # what we need and don't touch it again.
+    # @param [ManifestEntry] manifest_entry
+    # @param [String] project_dir
+    # @param [String] build_dir
+    #
     def initialize(manifest_entry, project_dir, build_dir)
       @name    = manifest_entry.name
       @source  = manifest_entry.locked_source

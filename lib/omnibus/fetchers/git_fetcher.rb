@@ -23,7 +23,7 @@ module Omnibus
     # @return [true, false]
     #
     def fetch_required?
-      !(cloned? && same_revision?(resolved_version))
+      !(cloned? && contains_revision?(resolved_version))
     end
 
     #
@@ -37,19 +37,19 @@ module Omnibus
     end
 
     #
-    # Clean the project directory by removing the contents from disk.
+    # Clean the project directory by resetting the current working tree to
+    # the required revision.
     #
     # @return [true, false]
-    #   true if the project directory was removed, false otherwise
+    #   true if the project directory was cleaned, false otherwise.
+    #   In our case, we always return true because we always call
+    #   git checkout/clean.
     #
     def clean
-      if cloned?
-        log.info(log_key) { 'Cleaning existing clone' }
-        git('clean -fdx')
-        true
-      else
-        false
-      end
+      log.info(log_key) { 'Cleaning existing clone' }
+      git_checkout
+      git('clean -fdx')
+      true
     end
 
     #
@@ -62,11 +62,10 @@ module Omnibus
       create_required_directories
 
       if cloned?
-        git_fetch unless same_revision?(resolved_version)
+        git_fetch
       else
         force_recreate_project_dir! unless dir_empty?(project_dir)
         git_clone
-        git_checkout
       end
     end
 
@@ -142,7 +141,7 @@ module Omnibus
     # @return [void]
     #
     def git_checkout
-      git("checkout #{resolved_version}")
+      git("checkout --detach #{resolved_version} -f -q")
     end
 
     #
@@ -154,7 +153,6 @@ module Omnibus
       fetch_cmd = "fetch #{source_url} #{described_version}"
       fetch_cmd << ' --recurse-submodules=on-demand' if clone_submodules?
       git(fetch_cmd)
-      git("reset --hard #{resolved_version}")
     end
 
     #
@@ -163,9 +161,24 @@ module Omnibus
     # @return [String]
     #
     def current_revision
-      git('rev-parse HEAD').stdout.strip
+      cmd = git('rev-parse HEAD')
+      cmd.stdout.strip
     rescue CommandFailed
+      log.debug(log_key) { "unable to determine current revision: #{cmd.stderr.strip}" }
       nil
+    end
+
+    #
+    # Check if the current clone has the requested commit id.
+    #
+    # @return [true, false]
+    #
+    def contains_revision?(rev=resolved_version)
+      cmd = git("cat-file -t #{resolved_version}")
+      cmd.stdout.strip == 'commit'
+    rescue CommandFailed
+      log.debug(log_key) { "unable to determine presence of commit #{resolve_version}: #{cmd.stderr.strip}" }
+      false
     end
 
     #

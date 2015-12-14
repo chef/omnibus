@@ -42,17 +42,14 @@ module Omnibus
     # Clean the given path by removing the project directory.
     #
     # @return [true, false]
-    #   true if the directory was cleaned, false otherwise
+    #   true if the directory was cleaned, false otherwise.
+    #   Since we do not currently use the cache to sync files and
+    #   always fetch from source, there is no need to clean anything.
+    #   The fetch step (which needs to be called before clean) would
+    #   have already removed anything extraneous.
     #
     def clean
-      if File.exist?(project_dir)
-        log.info(log_key) { "Cleaning project directory `#{project_dir}'" }
-        FileUtils.rm_rf(project_dir)
-        fetch
-        true
-      else
-        false
-      end
+      return true
     end
 
     #

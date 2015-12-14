@@ -55,37 +55,37 @@ module Omnibus
       end
     end
 
-    describe '#clean' do
-      context 'when the project directory exists' do
-        before do
-          create_file("#{source_path}/file_a")
-          create_file("#{source_path}/file_b")
-          create_file("#{source_path}/.file_c")
+    describe "#fetch" do
+      before do
+        create_file("#{source_path}/file_a")
+        create_file("#{source_path}/file_b")
+        create_file("#{source_path}/.file_c")
+        remove_file("#{source_path}/file_d")
 
-          create_file("#{project_dir}/file_a")
-        end
-
-        it 'fetches new files' do
-          subject.clean
-
-          expect("#{project_dir}/file_a").to be_a_file
-          expect("#{project_dir}/file_b").to be_a_file
-          expect("#{project_dir}/.file_c").to be_a_file
-        end
-
-        it 'returns true' do
-          expect(subject.clean).to be_truthy
-        end
+        create_file("#{project_dir}/file_a")
+        remove_file("#{project_dir}/file_b")
+        remove_file("#{project_dir}/.file_c")
+        create_file("#{project_dir}/file_d")
       end
 
-      context 'when the project directory does not exist' do
-        before do
-          remove_directory(project_dir)
-        end
+      it 'fetches new files' do
+        subject.fetch
 
-        it 'returns false' do
-          expect(subject.clean).to be(false)
-        end
+        expect("#{project_dir}/file_a").to be_a_file
+        expect("#{project_dir}/file_b").to be_a_file
+        expect("#{project_dir}/.file_c").to be_a_file
+      end
+
+      it 'removes extraneous files' do
+        subject.fetch
+
+        expect("#{project_dir}/file_d").to_not be_a_file
+      end
+    end
+
+    describe '#clean' do
+      it 'returns true' do
+        expect(subject.clean).to be_truthy
       end
     end
 
