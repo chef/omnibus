@@ -338,11 +338,11 @@ module Omnibus
     expose :whitelist_file
 
     #
-    # The path relative to package_dir where relevant project files are
+    # The path relative to fetch_dir where relevant project files are
     # stored. This applies to all sources.
     #
     # Any command executed in the build step are run after cwd-ing into
-    # this path. The default is to stay at the top level of package_dir
+    # this path. The default is to stay at the top level of fetch_dir
     # where the source tar-ball/git repo/file/directory has been staged.
     #
     # @example
@@ -350,6 +350,12 @@ module Omnibus
     #
     # @param [String] val
     #   the relative path inside the source directory. default: '.'
+    #
+    # Due to back-compat reasons, relative_path works completely
+    # differently for anything other than tar-balls/archives. In those
+    # situations, the source is checked out rooted at relative_path
+    # instead 'cause reasons.
+    # TODO: Fix this in omnibus 6.
     #
     # @return [String]
     #
@@ -363,33 +369,6 @@ module Omnibus
     expose :relative_path
 
     #
-    # Path to where any source is extracted to.
-    # When setting this field, provide a value relative to the root omnibus
-    # source directory (using / for separators).
-    #
-    # By default, this is simply the name of the software definition.
-    # Files in a source directory are staged underneath here. Files from
-    # a url are fetched and extracted here. Look outside this directory
-    # at your own peril.
-    #
-    # @example
-    #   package_dir 'my_tar_ball'
-    #
-    # @param [String] val
-    #   a path relative to the omnibus source_dir.
-    #
-    # @return [String] the full absolute path to the package root directory.
-    #
-    def package_dir(val = NULL)
-      if null?(val)
-        @package_dir || File.expand_path("#{Config.source_dir}/#{name}")
-      else
-        @package_dir = File.expand_path(val, Config.source_dir)
-      end
-    end
-    expose :package_dir
-
-    #
     # The path where the extracted software lives. All build commands
     # associated with this software definition are run for under this path.
     #
@@ -398,14 +377,14 @@ module Omnibus
     # underneath the global omnibus source directory that you have focused
     # into using relative_path above.
     #
-    # These are not the only files your project fetches.i They are merely the
+    # These are not the only files your project fetches. They are merely the
     # files that your project cares about. A source tarball may contain more
     # directories that are not under your project_dir.
     #
     # @return [String]
     #
     def project_dir
-      File.expand_path("#{package_dir}/#{relative_path}")
+      File.expand_path("#{fetch_dir}/#{relative_path}")
     end
     expose :project_dir
 
@@ -767,6 +746,20 @@ module Omnibus
     # @!endgroup
     # --------------------------------------------------
 
+    #
+    # Path to where any source is extracted to.
+    #
+    # Files in a source directory are staged underneath here. Files from
+    # a url are fetched and extracted here. Look outside this directory
+    # at your own peril.
+    #
+    # @return [String] the full absolute path to the software root fetch
+    #   directory.
+    #
+    def fetch_dir
+      File.expand_path("#{Config.source_dir}/#{name}")
+    end
+
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
     def version_guid
       fetcher.version_guid
@@ -792,11 +785,29 @@ module Omnibus
     #
     # The fetcher for this software
     #
+    # This is where we handle all the crazy back-compat on relative_path.
+    # All fetchers in omnibus 4 use relative_path incorrectly. net_fetcher was
+    # the only one to use to sensibly, and even then only if fetch_dir was
+    # Config.source_dir and the source was an archive. Therefore, to not break
+    # everyone ever, we will still pass project_dir for all other fetchers.
+    # There is still one issue where other omnibus software (such as the
+    # appbundler dsl) currently assume that fetch_dir the same as source_dir.
+    # Therefore, we make one extra concession - when relative_path is set in a
+    # software definition to be the same as name (a very common scenario), we
+    # land the source into the fetch directory instead of project_dir. This
+    # is to avoid fiddling with the appbundler dsl until it gets sorted out.
+    #
     # @return [Fetcher]
     #
     def fetcher
       @fetcher ||=
-        Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, package_dir, build_dir)
+        if source_type == :url && File.basename(source[:url], '?*').end_with?(*NetFetcher::ALL_EXTENSIONS)
+          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir)
+        elsif File.expand_path("#{Config.source_dir}/#{relative_path}") == fetch_dir
+          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir)
+        else
+          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir)
+        end
     end
 
     #
