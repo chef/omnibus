@@ -211,12 +211,36 @@ module Omnibus
           expect(contents).to include("    Unconfiguration Script: #{subject.scripts_staging_dir}/postrm")
         end
       end
+
+      context 'when the log_level is :debug, it' do
+        before do
+          Omnibus.logger.level = :debug
+        end
+
+        it 'prints the rendered template' do
+          output = capture_logging { subject.write_gen_template }
+          expect(output).to include("Package Name: project")
+        end
+      end
     end
 
     describe '#create_bff_file' do
       before do
         allow(subject).to receive(:shellout!)
         allow(Dir).to receive(:chdir) { |_, &b| b.call }
+        create_file(File.join(staging_dir, '.info', "#{project.name}.inventory")) {
+          <<-INVENTORY.gsub(/^\s{12}/, '')
+            /opt/project/version-manifest.txt:
+                      owner = root
+                      group = system
+                      mode = 644
+                      type = FILE
+                      class = apply,inventory,angry-omnibus-toolchain
+                      size = 1906
+                      checksum = "02776    2 "
+          INVENTORY
+        }
+        create_file("#{staging_dir}/file") { "http://goo.gl/TbkO01" }
       end
 
       it 'chowns the directory' do
@@ -237,6 +261,17 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with(/\/usr\/sbin\/mkinstallp -d/)
         subject.create_bff_file
+      end
+
+      context 'when the log_level is :debug, it' do
+        before do
+          Omnibus.logger.level = :debug
+        end
+
+        it 'prints the inventory file' do
+          output = capture_logging { subject.create_bff_file }
+          expect(output).to match(%r{^/opt/project})
+        end
       end
     end
 
