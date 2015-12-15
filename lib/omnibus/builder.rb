@@ -18,7 +18,6 @@ require 'fileutils'
 require 'mixlib/shellout'
 require 'ostruct'
 require 'pathname'
-require 'shellwords'
 
 module Omnibus
   class Builder
@@ -765,10 +764,11 @@ module Omnibus
           # we're using devkit or older chef-dk.
           bash_bin = embedded_bin('bash.exe')
         end
-        # Mixlib will handle escaping characters for cmd but we need to escape
-        # the command for bash itself. Since we're using Shellwords to escape
-        # the command, we should not quote the string at all.
-        command_string = "\"#{bash_bin}\" -c #{Shellwords.escape(command_string)}"
+        # Mixlib will handle escaping characters for cmd but our command might
+        # contain '. For now, assume that won't happen because I don't know
+        # whether this command is going to be played via cmd or through
+        # ProcessCreate.
+        command_string = "\"#{bash_bin}\" -c \'#{command_string}\'"
       end
       # Make sure the PWD is set to the correct directory
       options = { cwd: software.project_dir }.merge(options)
