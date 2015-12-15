@@ -585,11 +585,15 @@ module Omnibus
     # for the platform is used to join the paths.
     #
     # @param [Hash] env
+    # @param [Hash] opts
+    #   :msys => true  add the embedded msys path if building on windows.
     #
     # @return [Hash]
     #
-    def with_embedded_path(env = {})
-      path_value = prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+    def with_embedded_path(env = {}, opts = {})
+      paths = ["#{install_dir}/bin", "#{install_dir}/embedded/bin"]
+      paths << "#{install_dir}/embedded/msys/1.0/bin" if opts[:msys] && windows?
+      path_value = prepend_path(paths)
       env.merge(path_key => path_value)
     end
     expose :with_embedded_path
