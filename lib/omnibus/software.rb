@@ -524,7 +524,7 @@ module Omnibus
             bfd_target = "pe-x86-64"
           end
           {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag} -Wl,#{arch_flag}",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
             "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}",
             "RCFLAGS" => "--target=#{bfd_target}",
             "ARFLAGS" => "--target=#{bfd_target}",
