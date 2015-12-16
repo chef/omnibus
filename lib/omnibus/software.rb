@@ -756,8 +756,12 @@ module Omnibus
     # @return [String] the full absolute path to the software root fetch
     #   directory.
     #
-    def fetch_dir
-      File.expand_path("#{Config.source_dir}/#{name}")
+    def fetch_dir(val = NULL)
+      if null?(val)
+        @fetch_dir || File.expand_path("#{Config.source_dir}/#{name}")
+      else
+        @fetch_dir = val
+      end
     end
 
     # @todo see comments on {Omnibus::Fetcher#without_caching_for}
@@ -803,9 +807,10 @@ module Omnibus
       @fetcher ||=
         if source_type == :url && File.basename(source[:url], '?*').end_with?(*NetFetcher::ALL_EXTENSIONS)
           Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir)
-        elsif File.expand_path("#{Config.source_dir}/#{relative_path}") == fetch_dir
-          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir)
         else
+          if File.expand_path("#{Config.source_dir}/#{relative_path}") == fetch_dir
+            fetch_dir(Config.source_dir)
+          end
           Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir)
         end
     end
