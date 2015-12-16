@@ -9,13 +9,25 @@ module Omnibus
       end
     end
 
+    let(:source) do
+      {
+        url: 'http://example.com/',
+        md5: 'abcd1234'
+      }
+    end
+
+    let(:rel_path) { 'software' }
+
     subject do
+      local_source = source
+      local_rel_path = rel_path
+
       described_class.new(project).evaluate do
         name 'software'
         default_version '1.2.3'
 
-        source url: 'http://example.com/',
-               md5: 'abcd1234'
+        source local_source
+        relative_path local_rel_path
       end
     end
 
@@ -442,6 +454,116 @@ module Omnibus
 
           it 'returns the correct source' do
             expect(subject.source).to eq(source)
+          end
+        end
+      end
+    end
+
+    describe '#fetcher' do
+      before do
+        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", source).and_return("1.2.8")
+      end
+
+      context 'when given a source url to an archive' do
+        let(:source) do
+          {
+            url: 'http://example.com/foo.tar.gz',
+            md5: 'abcd1234'
+          }
+        end
+
+        context 'when relative_path is the same as name' do
+          let(:rel_path) { 'software' }
+          
+          it 'ignores back-compat and leaves fetch_dir alone' do
+            subject.send(:fetcher)
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/software"))
+          end
+          
+          it 'sets the fetcher project_dir to fetch_dir' do
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+          end
+        end
+
+        context 'when relative_path is different from name' do
+          let(:rel_path) { 'foo' }
+          
+          it 'ignores back-compat and leaves fetch_dir alone' do
+            subject.send(:fetcher)
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
+          end
+          
+          it 'sets the fetcher project_dir to fetch_dir' do
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+          end
+        end
+      end
+
+      context 'when given source url is not an archive' do
+        let(:source) do
+          {
+            url: 'http://example.com/foo.txt',
+            md5: 'abcd1234'
+          }
+        end
+
+        context 'when relative_path is the same as name' do
+          let(:rel_path) { 'software' }
+          
+          it 'for back-compat, changes fetch_dir' do
+            subject.send(:fetcher)
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+          end
+          
+          it 'sets the fetcher project_dir to project_dir' do
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+          end
+        end
+
+        context 'when relative_path is different from name' do
+          let(:rel_path) { 'foo' }
+          
+          it 'ignores back-compat and leaves fetch_dir alone' do
+            subject.send(:fetcher)
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
+          end
+          
+          it 'sets the fetcher project_dir to project_dir' do
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
+          end
+        end
+      end
+
+      context 'when given source is a git repo' do
+        let(:source) do
+          {
+            git: 'http://example.com/my/git/repo',
+          }
+        end
+
+        context 'when relative_path is the same as name' do
+          let(:rel_path) { 'software' }
+          
+          it 'for back-compat, changes fetch_dir' do
+            subject.send(:fetcher)
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+          end
+          
+          it 'sets the fetcher project_dir to project_dir' do
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+          end
+        end
+
+        context 'when relative_path is different from name' do
+          let(:rel_path) { 'foo' }
+          
+          it 'ignores back-compat and leaves fetch_dir alone' do
+            subject.send(:fetcher)
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
+          end
+          
+          it 'sets the fetcher project_dir to project_dir' do
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
           end
         end
       end
