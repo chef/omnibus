@@ -164,7 +164,7 @@ module Omnibus
       cmd = git('rev-parse HEAD')
       cmd.stdout.strip
     rescue CommandFailed
-      log.debug(log_key) { "unable to determine current revision: #{cmd.stderr.strip}" }
+      log.debug(log_key) { "unable to determine current revision" }
       nil
     end
 
@@ -173,21 +173,12 @@ module Omnibus
     #
     # @return [true, false]
     #
-    def contains_revision?(rev=resolved_version)
-      cmd = git("cat-file -t #{resolved_version}")
+    def contains_revision?(rev)
+      cmd = git("cat-file -t #{rev}")
       cmd.stdout.strip == 'commit'
     rescue CommandFailed
-      log.debug(log_key) { "unable to determine presence of commit #{resolve_version}: #{cmd.stderr.strip}" }
+      log.debug(log_key) { "unable to determine presence of commit #{rev}" }
       false
-    end
-
-    #
-    # Determine if the given revision matches the current revision.
-    #
-    # @return [true, false]
-    #
-    def same_revision?(rev=resolved_version)
-      current_revision == rev
     end
 
     #
