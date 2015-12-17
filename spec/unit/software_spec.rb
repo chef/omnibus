@@ -285,6 +285,12 @@ module Omnibus
           )
         end
 
+        it 'with_embedded_path ignores option to add msys to path' do
+          expect(subject.with_embedded_path({}, msys: true)).to eq(
+            'PATH' => prepended_path
+          )
+        end
+
         it 'prepends multiple paths to PATH' do
           expect(subject.prepend_path('/foo/bar', '/foo/baz')).to eq(
             ['/foo/bar', separator, '/foo/baz', separator, path].join
@@ -300,6 +306,10 @@ module Omnibus
         let(:separator) { ';' }
         let(:path) { 'c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem' }
         let(:install_dir) { 'c:/opt/project' }
+        let(:prepended_path_msys) do
+          [ "#{install_dir}/bin", separator, "#{install_dir}/embedded/bin", separator,
+            "#{install_dir}/embedded/msys/1.0/bin", separator, path].join
+        end
 
         context '`Path` exists in the environment' do
           before do
@@ -318,11 +328,19 @@ module Omnibus
           before do
             allow(ENV).to receive(:keys).and_return(['PATH'])
           end
+
           it 'returns a path key of `PATH`' do
             expect(subject.with_embedded_path).to eq(
               'PATH' => prepended_path
             )
           end
+
+          it 'with_embedded_path accepts option to add msys to path' do
+            expect(subject.with_embedded_path({}, msys: true)).to eq(
+              'PATH' => prepended_path_msys
+            )
+          end
+
         end
       end
     end
