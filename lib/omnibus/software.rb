@@ -524,7 +524,7 @@ module Omnibus
             bfd_target = "pe-x86-64"
           end
           {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag} -Wl,#{arch_flag}",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
             "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}",
             "RCFLAGS" => "--target=#{bfd_target}",
             "ARFLAGS" => "--target=#{bfd_target}",
@@ -585,11 +585,15 @@ module Omnibus
     # for the platform is used to join the paths.
     #
     # @param [Hash] env
+    # @param [Hash] opts
+    #   :msys => true  add the embedded msys path if building on windows.
     #
     # @return [Hash]
     #
-    def with_embedded_path(env = {})
-      path_value = prepend_path("#{install_dir}/bin", "#{install_dir}/embedded/bin")
+    def with_embedded_path(env = {}, opts = {})
+      paths = ["#{install_dir}/bin", "#{install_dir}/embedded/bin"]
+      paths << "#{install_dir}/embedded/msys/1.0/bin" if opts[:msys] && windows?
+      path_value = prepend_path(paths)
       env.merge(path_key => path_value)
     end
     expose :with_embedded_path
