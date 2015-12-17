@@ -492,7 +492,7 @@ module Omnibus
         when "mac_os_x"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
         when "solaris2"
           {
@@ -505,7 +505,7 @@ module Omnibus
         when "freebsd"
           freebsd_flags = {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
           # Clang became the default compiler in FreeBSD 10+
           if Ohai['os_version'].to_i >= 1000024
@@ -532,7 +532,7 @@ module Omnibus
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
         end
 
