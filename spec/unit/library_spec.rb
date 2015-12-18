@@ -8,7 +8,7 @@ module Omnibus
     def generate_software(name, version, dependencies = [])
       software = Software.new(project, "#{name}.rb")
       software.name(name)
-      software.version(version)
+      software.default_version(version)
 
       dependencies.each do |dependency|
         software.dependency(dependency)
