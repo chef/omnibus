@@ -635,6 +635,37 @@ module Omnibus
     end
     expose :sync
 
+
+    def update_config_guess(target = '', version = 'master', options = {})
+      destination = File.join(software.project_dir, target)
+
+      c_g_data = {
+        :locked_version => version,
+        :locked_source => {
+          :git=>"http://git.savannah.gnu.org/r/config.git"
+        },
+        :source_type => 'git',
+        :described_version => version
+      }
+
+      config_guess_manifest = ManifestEntry.new('config_guess', c_g_data)
+
+      config_guess_dir = File.join(Config.source_dir, "config_guess-#{version}")
+      config_guess_fetcher = GitFetcher.new(config_guess_manifest, config_guess_dir, destination)
+
+      config_guess_fetcher.fetch
+
+      if options[:config_guess_only] == true
+        copy("#{config_guess_dir}/config.guess", destination)
+      elsif options[:config_sub_only] == true
+        copy("#{config_guess_dir}/config.sub", destination)
+      else
+        copy("#{config_guess_dir}/config.guess", destination)
+        copy("#{config_guess_dir}/config.sub", destination)
+      end
+    end
+    expose :update_config_guess
+
     #
     # @!endgroup
     # --------------------------------------------------
