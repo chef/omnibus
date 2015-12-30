@@ -198,6 +198,8 @@ module Omnibus
         create_file("#{staging_dir}/.filea") { ".filea" }
         create_file("#{staging_dir}/file1") { "file1" }
         create_file("#{staging_dir}/file2") { "file2" }
+        create_file("#{staging_dir}/DEBIAN/preinst") { "preinst" }
+        create_file("#{staging_dir}/DEBIAN/postrm") { "postrm" }
       end
 
       it 'generates the file' do
@@ -213,6 +215,8 @@ module Omnibus
         expect(contents).to include("826e8142e6baabe8af779f5f490cf5f5  file1")
         expect(contents).to include("1c1c96fd2cf8330db0bfa936ce82f3b9  file2")
         expect(contents).to_not include("1c1c96fd2cf8330db0bfa936ce82f3b9 file2")
+        expect(contents).to_not include("DEBIAN/preinst")
+        expect(contents).to_not include("DEBIAN/postrm")
       end
     end
 
