@@ -202,6 +202,8 @@ module Omnibus
     end
 
     describe '#appbundle' do
+      let(:project) { double("Project") }
+      let(:project_softwares) { [ double("Software", name: project_name, project_dir: project_dir) ] }
       it 'executes the command as the embedded appbundler' do
         make_gemspec
         make_gemfile
@@ -213,6 +215,10 @@ module Omnibus
         subject.gem("build #{project_name}.gemspec", shellout_opts(subject))
         subject.gem("install #{project_name}-1.0.0.gem", shellout_opts(subject))
         subject.appbundle(project_name, shellout_opts(subject))
+
+        expect(subject).to receive(:project).and_return(project)
+        expect(project).to receive(:softwares).and_return(project_softwares)
+
         output = capture_logging { subject.build }
 
         appbundler_path = File.join(embedded_bin_dir, 'appbundler')

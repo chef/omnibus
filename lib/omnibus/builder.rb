@@ -340,18 +340,26 @@ module Omnibus
     # @example
     #   appbundle 'chef'
     #
+    # @param software_name [String]
+    #  The omnibus software definition name that you want to appbundle.  We
+    #  assume that this software definition is a gem that already has `bundle
+    #  install` ran on it so it has a Gemfile.lock to appbundle.
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(app_name, options = {})
-      build_commands << BuildCommand.new("appbundle `#{app_name}'") do
+    def appbundle(software_name, options = {})
+      build_commands << BuildCommand.new("appbundle `#{software_name}'") do
+        app_software = project.softwares.find do |p|
+          p.name == software_name
+        end
+
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin('appbundler')
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
 
-        shellout!("#{appbundler_bin} '#{Omnibus::Config.source_dir}/#{app_name}' '#{bin_dir}'", options)
+        shellout!("#{appbundler_bin} '#{app_software.project_dir}' '#{bin_dir}'", options)
       end
     end
     expose :appbundle
