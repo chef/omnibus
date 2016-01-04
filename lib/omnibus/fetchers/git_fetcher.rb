@@ -141,7 +141,10 @@ module Omnibus
     # @return [void]
     #
     def git_checkout
-      git("checkout --detach #{resolved_version} -f -q")
+      # We are hoping to perform a checkout with detached HEAD (that's the
+      # default when a sha1 is provided).  git older than 1.7.5 doesn't
+      # support the --detach flag.
+      git("checkout #{resolved_version} -f -q")
     end
 
     #
