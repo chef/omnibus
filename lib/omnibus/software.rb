@@ -812,9 +812,6 @@ module Omnibus
         if source_type == :url && File.basename(source[:url], '?*').end_with?(*NetFetcher::ALL_EXTENSIONS)
           Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir)
         else
-          if File.expand_path("#{Config.source_dir}/#{relative_path}") == fetch_dir
-            fetch_dir(Config.source_dir)
-          end
           Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir)
         end
     end

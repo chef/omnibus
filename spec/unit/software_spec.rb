@@ -492,12 +492,12 @@ module Omnibus
 
         context 'when relative_path is the same as name' do
           let(:rel_path) { 'software' }
-          
+
           it 'ignores back-compat and leaves fetch_dir alone' do
             subject.send(:fetcher)
             expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/software"))
           end
-          
+
           it 'sets the fetcher project_dir to fetch_dir' do
             expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
           end
@@ -505,12 +505,12 @@ module Omnibus
 
         context 'when relative_path is different from name' do
           let(:rel_path) { 'foo' }
-          
+
           it 'ignores back-compat and leaves fetch_dir alone' do
             subject.send(:fetcher)
             expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
           end
-          
+
           it 'sets the fetcher project_dir to fetch_dir' do
             expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
           end
@@ -527,25 +527,25 @@ module Omnibus
 
         context 'when relative_path is the same as name' do
           let(:rel_path) { 'software' }
-          
+
           it 'for back-compat, changes fetch_dir' do
             subject.send(:fetcher)
-            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/software"))
           end
-          
+
           it 'sets the fetcher project_dir to project_dir' do
-            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software/software"))
           end
         end
 
         context 'when relative_path is different from name' do
           let(:rel_path) { 'foo' }
-          
+
           it 'ignores back-compat and leaves fetch_dir alone' do
             subject.send(:fetcher)
             expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
           end
-          
+
           it 'sets the fetcher project_dir to project_dir' do
             expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
           end
@@ -561,25 +561,25 @@ module Omnibus
 
         context 'when relative_path is the same as name' do
           let(:rel_path) { 'software' }
-          
+
           it 'for back-compat, changes fetch_dir' do
             subject.send(:fetcher)
-            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+            expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/software"))
           end
-          
+
           it 'sets the fetcher project_dir to project_dir' do
-            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software"))
+            expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software/software"))
           end
         end
 
         context 'when relative_path is different from name' do
           let(:rel_path) { 'foo' }
-          
+
           it 'ignores back-compat and leaves fetch_dir alone' do
             subject.send(:fetcher)
             expect(subject.project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
           end
-          
+
           it 'sets the fetcher project_dir to project_dir' do
             expect(subject.send(:fetcher).project_dir).to eq(File.expand_path("#{Config.source_dir}/software/foo"))
           end
