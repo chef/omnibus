@@ -525,9 +525,7 @@ module Omnibus
           end
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}",
-            "RCFLAGS" => "--target=#{bfd_target}",
-            "ARFLAGS" => "--target=#{bfd_target}",
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}"
           }
         else
           {
