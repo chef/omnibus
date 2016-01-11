@@ -140,7 +140,7 @@ module Omnibus
       /libelf\.so/,
       /libkvm\.so/,
       /libprocstat\.so/,
-      /libmd\.so/
+      /libmd\.so/,
     ].freeze
 
     class << self
