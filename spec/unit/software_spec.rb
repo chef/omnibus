@@ -62,9 +62,9 @@ module Omnibus
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            'CXXFLAGS'        => '-I/opt/project/embedded/include',
-            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -72,9 +72,9 @@ module Omnibus
         it 'overrides LDFLAGS' do
           expect(subject.with_standard_compiler_flags('LDFLAGS'        => 'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            'CXXFLAGS'        => '-I/opt/project/embedded/include',
-            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -82,9 +82,9 @@ module Omnibus
         it 'overrides CFLAGS' do
           expect(subject.with_standard_compiler_flags('CFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            'CXXFLAGS'        => '-I/opt/project/embedded/include',
-            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -92,9 +92,9 @@ module Omnibus
         it 'overrides CXXFLAGS' do
           expect(subject.with_standard_compiler_flags('CXXFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            'CXXFLAGS'        => '-I/opt/project/embedded/include',
-            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -102,9 +102,9 @@ module Omnibus
         it 'overrides CPPFLAGS' do
           expect(subject.with_standard_compiler_flags('CPPFLAGS'=>'foo')).to eq(
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            'CXXFLAGS'        => '-I/opt/project/embedded/include',
-            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -113,9 +113,9 @@ module Omnibus
           expect(subject.with_standard_compiler_flags('numberwang'=>4)).to eq(
             'numberwang'      => 4,
             'LDFLAGS'         => '-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            'CXXFLAGS'        => '-I/opt/project/embedded/include',
-            'CPPFLAGS'        => '-I/opt/project/embedded/include',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -177,9 +177,9 @@ module Omnibus
         it 'sets the defaults' do
           expect(subject.with_standard_compiler_flags).to eq(
             'LDFLAGS'         => '-L/opt/project/embedded/lib',
-            'CFLAGS'          => '-I/opt/project/embedded/include',
-            "CXXFLAGS"        => "-I/opt/project/embedded/include",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include",
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             'LD_RUN_PATH'     => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
           )
@@ -218,9 +218,9 @@ module Omnibus
 
         it 'sets the defaults' do
           expect(subject.with_standard_compiler_flags).to eq(
-            'CFLAGS'  => '-I/opt/project/embedded/include',
-            'CXXFLAGS'  => '-I/opt/project/embedded/include',
-            'CPPFLAGS'  => '-I/opt/project/embedded/include',
+            'CFLAGS'  => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'  => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'  => '-I/opt/project/embedded/include -O2',
             'LDFLAGS' => '-L/opt/project/embedded/lib',
             'LD_RUN_PATH' => '/opt/project/embedded/lib',
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
@@ -236,9 +236,9 @@ module Omnibus
             expect(subject.with_standard_compiler_flags).to eq(
               'CC'              => 'clang',
               'CXX'             => 'clang++',
-              'CFLAGS'          => '-I/opt/project/embedded/include',
-              'CXXFLAGS'        => '-I/opt/project/embedded/include',
-              'CPPFLAGS'        => '-I/opt/project/embedded/include',
+              'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
               'LDFLAGS'         => '-L/opt/project/embedded/lib',
               'LD_RUN_PATH'     => '/opt/project/embedded/lib',
               'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
