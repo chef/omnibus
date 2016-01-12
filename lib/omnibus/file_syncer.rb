@@ -106,9 +106,13 @@ module Omnibus
           # duplicate them, provided their source is in place already
           if hardlink? source_stat
             if existing = hardlink_sources[[source_stat.dev, source_stat.ino]]
-              FileUtils.ln(existing, "#{destination}/#{relative_path}")
+              FileUtils.ln(existing, "#{destination}/#{relative_path}", force: true)
             else
-              FileUtils.cp(source_file, "#{destination}/#{relative_path}")
+              begin
+                FileUtils.cp(source_file, "#{destination}/#{relative_path}")
+              rescue Errno::EACCES
+                FileUtils.cp_r(source_file, "#{destination}/#{relative_path}", remove_destination: true)
+              end
               hardlink_sources.store([source_stat.dev, source_stat.ino], "#{destination}/#{relative_path}")
             end
           else
@@ -120,8 +124,7 @@ module Omnibus
             begin
               FileUtils.cp(source_file, "#{destination}/#{relative_path}")
             rescue Errno::EACCES
-              FileUtils.cp_r(source_file, "#{destination}/#{relative_path}",
-                             :remove_destination => true)
+              FileUtils.cp_r(source_file, "#{destination}/#{relative_path}", remove_destination: true)
             end
           end
         else
