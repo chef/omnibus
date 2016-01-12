@@ -16,11 +16,7 @@
 
 require 'chef/sugar/architecture'
 require 'chef/sugar/cloud'
-# NOTE: We cannot include the constraints library because of the conflicting
-# +version+ attribute would screw things up. You can still use the
-# +Chef::Sugar::Constraint.version('1.2.3') for comparing versions.
-#
-# require 'chef/sugar/constraints'
+require 'chef/sugar/constraints'
 require 'chef/sugar/ip'
 require 'chef/sugar/platform'
 require 'chef/sugar/platform_family'

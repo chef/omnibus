@@ -303,18 +303,30 @@ module Omnibus
     # @return [String, Proc]
     #
     def version(val = NULL, &block)
+      final_version = apply_overrides(:version)
+
       if block_given?
         if val.equal?(NULL)
           raise InvalidValue.new(:version,
             'pass a block when given a version argument')
         else
-          if val == apply_overrides(:version)
+          if val == final_version
             block.call
           end
         end
       end
 
-      apply_overrides(:version)
+      return if final_version.nil?
+
+      begin
+        Chef::Sugar::Constraints::Version.new(final_version)
+      rescue ArgumentError
+        log.warn(log_key) do
+          "Version #{final_version} for software #{name} was not parseable. " \
+          'Comparison methods such as #satisfies? will not be available for this version.'
+        end
+        final_version
+      end
     end
     expose :version
 
