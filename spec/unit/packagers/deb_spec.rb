@@ -209,9 +209,10 @@ module Omnibus
         subject.write_md5_sums
         contents = File.read("#{staging_dir}/DEBIAN/md5sums")
 
-        expect(contents).to include("9334770d184092f998009806af702c8c .filea")
-        expect(contents).to include("826e8142e6baabe8af779f5f490cf5f5 file1")
-        expect(contents).to include("1c1c96fd2cf8330db0bfa936ce82f3b9 file2")
+        expect(contents).to include("9334770d184092f998009806af702c8c  .filea")
+        expect(contents).to include("826e8142e6baabe8af779f5f490cf5f5  file1")
+        expect(contents).to include("1c1c96fd2cf8330db0bfa936ce82f3b9  file2")
+        expect(contents).to_not include("1c1c96fd2cf8330db0bfa936ce82f3b9 file2")
       end
     end
 
