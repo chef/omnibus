@@ -183,16 +183,15 @@ module Omnibus
     end
 
     describe '#version_for_cache' do
-      it 'includes the revision' do
-        expect(subject.version_for_cache).to eq("revision:#{revision}")
+      it 'includes the resolved revision' do
+        expect(subject.version_for_cache).to eq('revision:45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
       end
 
-      it 'does not returned cached revision after fetching' do
-        before_fetch = subject.version_for_cache
+      it 'not use the current version on disk after fetching' do
+        expect(subject.version_for_cache).to eq('revision:45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
         subject.fetch
-        after_fetch = revision
-        expect(subject.version_for_cache).to eq("revision:#{after_fetch}")
-        expect(subject.version_for_cache).not_to eq("revision:#{before_fetch}")
+        expect(subject.version_for_cache).to eq('revision:45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
+        expect(revision).to_not eq('revision:45ded6d3b1a35d66ed866b2c3eb418426e6382b0')
       end
     end
   end

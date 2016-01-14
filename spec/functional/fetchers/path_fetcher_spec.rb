@@ -91,9 +91,9 @@ module Omnibus
 
     describe '#version_for_cache' do
       before do
-        create_file("#{project_dir}/file_a")
-        create_file("#{project_dir}/file_b")
-        create_file("#{project_dir}/.file_c")
+        create_file("#{source_path}/file_a")
+        create_file("#{source_path}/file_b")
+        create_file("#{source_path}/.file_c")
       end
 
       let(:sha) { '69553b23b84e69e095b4a231877b38022b1ffb41ae0ecbba6bb2625410c49f7e' }

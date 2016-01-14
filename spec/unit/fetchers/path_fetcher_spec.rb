@@ -69,11 +69,11 @@ module Omnibus
 
       before do
         allow(subject).to receive(:digest_directory)
-          .with(project_dir, :sha256)
+          .with(source_path, :sha256)
           .and_return(shasum)
       end
 
-      it 'returns the shasum of the project_dir' do
+      it 'returns the shasum of the source directory' do
         expect(subject.version_for_cache).to eq("path:#{source_path}|shasum:#{shasum}")
       end
     end
