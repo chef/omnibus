@@ -145,6 +145,7 @@ module Omnibus
       # default when a sha1 is provided).  git older than 1.7.5 doesn't
       # support the --detach flag.
       git("checkout #{resolved_version} -f -q")
+      git("submodule update --recursive") if clone_submodules?
     end
 
     #
