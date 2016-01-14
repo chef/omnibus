@@ -119,12 +119,8 @@ module Omnibus
     end
 
     describe '#version_for_cache' do
-      let(:revision) { 'abcd1234' }
-
-      before { allow(subject).to receive(:current_revision).and_return(revision) }
-
-      it 'returns the shasum of the project_dir' do
-        expect(subject.version_for_cache).to eq("revision:#{revision}")
+      it 'returns the shasum of the commit that we expect to be at' do
+        expect(subject.version_for_cache).to eq('revision:123abcd1234')
       end
     end
   end

@@ -70,13 +70,22 @@ module Omnibus
     end
 
     #
-    # The version for this item in the cache. The is the parsed revision of the
-    # item on disk.
+    # The version for this item in the cache.
+    #
+    # This method is called *before* clean but *after* fetch. Do not ever
+    # use the contents of the project_dir here.
+    #
+    # We aren't including the source/repo path here as there could be
+    # multiple branches/tags that all point to the same commit. We're
+    # assuming that we won't realistically ever get two git commits
+    # that are unique but share sha1s.
+    #
+    # TODO: Does this work with submodules?
     #
     # @return [String]
     #
     def version_for_cache
-      "revision:#{current_revision}"
+      "revision:#{resolved_version}"
     end
 
     private

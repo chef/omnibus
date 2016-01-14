@@ -90,6 +90,9 @@ module Omnibus
     # The version for this item in the cache. This is the digest of downloaded
     # file and the URL where it was downloaded from.
     #
+    # This method is called *before* clean but *after* fetch. Do not ever
+    # use the contents of the project_dir here.
+    #
     # @return [String]
     #
     def version_for_cache
