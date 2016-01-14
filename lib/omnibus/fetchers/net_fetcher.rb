@@ -234,39 +234,66 @@ module Omnibus
     #
     # Extracts the downloaded archive file into project_dir.
     #
+    # On windows, this is a fuster cluck and we allow users to specify the
+    # preferred extractor to be used. The default is to use tar. User overrides
+    # can be set in source[:extract] as:
+    #   :tar - use tar.exe and fail on errors (default strategy).
+    #   :seven_zip - use 7zip for all tar/compressed tar files on windows.
+    #   :lax_tar - use tar.exe on windows but ignore errors.
+    #
+    # Both 7z and bsdtar have issues on windows.
+    #
+    # 7z cannot extract and untar at the same time. You need to extract to a
+    # temporary location and then extract again into project_dir.
+    #
+    # 7z also doesn't handle symlinks well. A symlink to a non-existent
+    # location simply results in a text file with the target path written in
+    # it. It does this without throwing any errors.
+    #
+    # bsdtar will exit(1) if it is encounters symlinks on windows. So we can't
+    # use shellout! directly.
+    #
+    # bsdtar will also exit(1) and fail to overwrite files at the destination
+    # during extraction if a file already exists at the destination and is
+    # marked read-only. This used to be a problem when we weren't properly
+    # cleaning an existing project_dir. It should be less of a problem now...
+    # but who knows.
+    #
     def extract
-      if Ohai['platform'] == 'windows' && downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
-        # On windows, always use 7z because bsdtar has problems with extracting
-        # files that are marked as read-only inside the tar. Unfortunately,
-        # this means that we need to perform this in multiple steps as 7z
-        # doesn't extract and untar at the same time. The extracted tar is
-        # moved out of the project_dir and then extracted once again into
-        # project_dir.
-        Dir.mktmpdir do |temp_dir|
-          log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
+      # Only used by tar
+      compression_switch = ''
+      compression_switch = 'z'        if downloaded_file.end_with?('gz')
+      compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
+      compression_switch = 'j'        if downloaded_file.end_with?('bz2')
+      compression_switch = 'J'        if downloaded_file.end_with?('xz')
 
-          shellout!("7z.exe x #{safe_downloaded_file} -o#{windows_safe_path(temp_dir)} -r -y")
+      if Ohai['platform'] == 'windows'
+        if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
+          returns = [0]
+          returns << 1 if source[:extract] == :lax_tar
 
-          fname = File.basename(downloaded_file, File.extname(downloaded_file))
-          fname << ".tar" if downloaded_file.end_with?('tgz', 'txz')
-          next_file = windows_safe_path(File.join(temp_dir, fname))
+          shellout!("tar.exe #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}", returns: returns)
+        elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
+          Dir.mktmpdir do |temp_dir|
+            log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
 
-          log.debug(log_key) { "Temporarily extracting `#{next_file}' to `#{safe_project_dir}'" }
-          shellout!("7z.exe x #{next_file} -o#{safe_project_dir} -r -y")
+            shellout!("7z.exe x #{safe_downloaded_file} -o#{windows_safe_path(temp_dir)} -r -y")
+
+            fname = File.basename(downloaded_file, File.extname(downloaded_file))
+            fname << ".tar" if downloaded_file.end_with?('tgz', 'txz')
+            next_file = windows_safe_path(File.join(temp_dir, fname))
+
+            log.debug(log_key) { "Temporarily extracting `#{next_file}' to `#{safe_project_dir}'" }
+            shellout!("7z.exe x #{next_file} -o#{safe_project_dir} -r -y")
+          end
+        else
+          shellout!("7z.exe x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
         end
-      elsif Ohai['platform'] == 'windows'
-        shellout!("7z.exe x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
       elsif downloaded_file.end_with?('.7z')
         shellout!("7z x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
       elsif downloaded_file.end_with?('.zip')
         shellout!("unzip #{safe_downloaded_file} -d #{safe_project_dir}")
       else
-        compression_switch = 'z'        if downloaded_file.end_with?('gz')
-        compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
-        compression_switch = 'j'        if downloaded_file.end_with?('bz2')
-        compression_switch = 'J'        if downloaded_file.end_with?('xz')
-        compression_switch = ''         if downloaded_file.end_with?('tar')
-
         shellout!("#{tar} #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}")
       end
     end

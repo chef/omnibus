@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 module Omnibus
+  module RSpec
+    module OhaiHelpers
+      # Turn off the mandatory Ohai helper.
+      def stub_ohai(options = {}, &block)
+      end
+    end
+  end
+
   describe NetFetcher do
     include_examples 'a software', 'zlib'
 
@@ -119,6 +127,35 @@ module Omnibus
           expect(subject.clean).to be(false)
         end
       end
+
+      context 'when the source has read-only files' do
+        let(:source_url) { 'http://dl.bintray.com/oneclick/OpenKnapsack/x86/openssl-1.0.0q-x86-windows.tar.lzma' }
+        let(:source_md5) { '577dbe528415c6f178a9431fd0554df4' }
+        
+        it 'extracts the asset without crashing' do
+          subject.clean
+          expect(extracted).to_not be_a_file
+          subject.clean
+          expect(extracted).to_not be_a_file
+        end
+      end
+
+      context 'when the source has broken symlinks' do
+        let(:source_url) { 'http://www.openssl.org/source/openssl-1.0.1q.tar.gz' }
+        let(:source_md5) { '54538d0cdcb912f9bc2b36268388205e' }
+
+        let(:source) do
+          { url: source_url, md5: source_md5, extract: :lax_tar }
+        end
+
+        it 'extracts the asset without crashing' do
+          subject.clean
+          expect(extracted).to_not be_a_file
+          subject.clean
+          expect(extracted).to_not be_a_file
+        end
+      end
+
     end
 
     describe '#fetch' do
