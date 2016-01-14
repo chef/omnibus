@@ -71,10 +71,14 @@ module Omnibus
     # The version for this item in the cache. The is the shasum of the directory
     # on disk.
     #
+    # This method is called *before* clean but *after* fetch. Since fetch
+    # automatically cleans, target vs. destination sha doesn't matter. Change this
+    # if that assumption changes.
+    #
     # @return [String]
     #
     def version_for_cache
-      "path:#{source_path}|shasum:#{target_shasum}"
+      "path:#{source_path}|shasum:#{destination_shasum}"
     end
 
     #
