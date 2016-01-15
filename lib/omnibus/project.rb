@@ -199,7 +199,7 @@ module Omnibus
 
     #
     # Path to the +/files+ directory in the omnibus project. This directory can
-    # contain arbritary files used by the project.
+    # contain arbitrary files used by the project.
     #
     # @example
     #   patch = File.join(files_path, 'rubygems', 'patch.rb')
