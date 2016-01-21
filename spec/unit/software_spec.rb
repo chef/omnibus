@@ -211,7 +211,7 @@ module Omnibus
         end
       end
 
-      context 'on freebsd' do
+      context 'on freebsd 9' do
         before do
           stub_ohai(platform: 'freebsd', version: '9.2')
         end
@@ -226,22 +226,85 @@ module Omnibus
             'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
           )
         end
+      end
 
-        context 'on freebsd' do
-          before do
-            stub_ohai(platform: 'freebsd', version: '10.0')
+      context 'on freebsd 10' do
+        before do
+          stub_ohai(platform: 'freebsd', version: '10.0')
+        end
+
+        it 'Clang as the default compiler' do
+          expect(subject.with_standard_compiler_flags).to eq(
+            'CC'              => 'clang',
+            'CXX'             => 'clang++',
+            'CFLAGS'          => '-I/opt/project/embedded/include -O2',
+            'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
+            'LDFLAGS'         => '-L/opt/project/embedded/lib',
+            'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+            'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+          )
+        end
+      end
+
+      context 'on Windows' do
+        let(:win_arch_i386) { true }
+        
+        before do
+          stub_ohai(platform: 'windows', version: '2012')
+          allow(subject).to receive(:windows_arch_i386?).and_return(win_arch_i386)
+        end
+
+        context 'in 32-bit mode' do
+          it 'sets the default' do
+            expect(subject.with_standard_compiler_flags).to eq(
+              'CFLAGS'          => '-I/opt/project/embedded/include -m32',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m32',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m32',
+              'LDFLAGS'         => '-L/opt/project/embedded/lib -m32',
+              'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            )
           end
 
-          it 'Clang as the default compiler' do
-            expect(subject.with_standard_compiler_flags).to eq(
-              'CC'              => 'clang',
-              'CXX'             => 'clang++',
-              'CFLAGS'          => '-I/opt/project/embedded/include -O2',
-              'CXXFLAGS'        => '-I/opt/project/embedded/include -O2',
-              'CPPFLAGS'        => '-I/opt/project/embedded/include -O2',
-              'LDFLAGS'         => '-L/opt/project/embedded/lib',
+          it 'sets BFD flags if requested' do
+            expect(subject.with_standard_compiler_flags({}, bfd_flags: true)).to eq(
+              'CFLAGS'          => '-I/opt/project/embedded/include -m32',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m32',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m32',
+              'LDFLAGS'         => '-L/opt/project/embedded/lib -m32',
+              'RCFLAGS'         => '--target=pe-i386',
+              'ARFLAGS'         => '--target=pe-i386',
               'LD_RUN_PATH'     => '/opt/project/embedded/lib',
-              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            )
+          end
+        end
+
+        context 'in 64-bit mode' do
+          let(:win_arch_i386) { false }
+
+          it 'sets the default' do
+            expect(subject.with_standard_compiler_flags).to eq(
+              'CFLAGS'          => '-I/opt/project/embedded/include -m64',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m64',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m64',
+              'LDFLAGS'         => '-L/opt/project/embedded/lib -m64',
+              'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
+            )
+          end
+
+          it 'sets BFD flags if requested' do
+            expect(subject.with_standard_compiler_flags({}, bfd_flags: true)).to eq(
+              'CFLAGS'          => '-I/opt/project/embedded/include -m64',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m64',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m64',
+              'LDFLAGS'         => '-L/opt/project/embedded/lib -m64',
+              'RCFLAGS'         => '--target=pe-x86-64',
+              'ARFLAGS'         => '--target=pe-x86-64',
+              'LD_RUN_PATH'     => '/opt/project/embedded/lib',
+              'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
             )
           end
         end

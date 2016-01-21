@@ -227,10 +227,23 @@ module Omnibus
     #   the SHA256 checksum of the downloaded artifact
     # @option val [String] :sha512 (nil)
     #   the SHA512 checksum of the downloaded artifact
+    #
+    # Only used in net_fetcher:
+    #
     # @option val [String] :cookie (nil)
     #   a cookie to set
     # @option val [String] :warning (nil)
     #   a warning message to print when downloading
+    # @option val [Symbol] :extract (nil)
+    #   either :tar, :lax_tar :seven_zip
+    #
+    # Only used in path_fetcher:
+    #
+    # @option val [Hash] :options (nil)
+    #   flags/options that are passed through to file_syncer in path_fetcher
+    #
+    # Only used in git_fetcher:
+    #
     # @option val [Boolean] :submodules (false)
     #   clone git submodules
     #
@@ -245,8 +258,13 @@ module Omnibus
             "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
-        extra_keys = val.keys - [:git, :path, :url, :md5, :sha1, :sha256, :sha512,
-                                 :cookie, :warning, :unsafe, :options, :submodules]
+        extra_keys = val.keys - [
+          :git, :path, :url, # fetcher types
+          :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
+          :cookie, :warning, :unsafe, :extract, # used by net_fetcher
+          :options, # used by path_fetcher
+          :submodules # used by git_fetcher
+        ]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
@@ -480,6 +498,8 @@ module Omnibus
     #
     # Supported options:
     #    :aix => :use_gcc    force using gcc/g++ compilers on aix
+    #    :bfd_flags => true   the default build targets for windows based on
+    #       the current platform architecture are added ARFLAGS and RCFLAGS.
     #
     # @param [Hash] env
     # @param [Hash] opts
@@ -528,13 +548,7 @@ module Omnibus
           end
           freebsd_flags
         when "windows"
-          if windows_arch_i386?
-            arch_flag = "-m32"
-            bfd_target = "pe-i386"
-          else
-            arch_flag = "-m64"
-            bfd_target = "pe-x86-64"
-          end
+          arch_flag = windows_arch_i386? ? "-m32" : "-m64"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
             "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}"
@@ -546,6 +560,18 @@ module Omnibus
           }
         end
 
+      # There are some weird, misbehaving makefiles on windows that hate ARFLAGS because it
+      # replaces the "rcs" flags in some build steps.  So we provide this flag behind an
+      # optional flag.
+      if opts[:bfd_flags] && windows?
+        bfd_target = windows_arch_i386? ? "pe-i386" : "pe-x86-64"
+        compiler_flags.merge!(
+          {
+            "RCFLAGS" => "--target=#{bfd_target}",
+            "ARFLAGS" => "--target=#{bfd_target}",
+          }
+        )
+      end
       # merge LD_RUN_PATH into the environment.  most unix distros will fall
       # back to this if there is no LDFLAGS passed to the linker that sets
       # the rpath.  the LDFLAGS -R or -Wl,-rpath will override this, but in

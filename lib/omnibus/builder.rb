@@ -762,6 +762,10 @@ module Omnibus
     # @see (Util#shellout!)
     #
     def shellout!(command_string, options = {})
+      # Make sure the PWD is set to the correct directory
+      # Also make a clone of options so that we can mangle it safely below.
+      options = { cwd: software.project_dir }.merge(options)
+
       if options.delete(:in_msys_bash) && windows?
         # The command needs to be run within an msys bash environment.
         # TODO: Eventually, have command search through "build time dependencies"
@@ -778,8 +782,6 @@ module Omnibus
         # ProcessCreate.
         command_string = "\"#{bash_bin}\" -c \'#{command_string}\'"
       end
-      # Make sure the PWD is set to the correct directory
-      options = { cwd: software.project_dir }.merge(options)
 
       # Set the log level to :info so users will see build commands
       options[:log_level] ||= :info

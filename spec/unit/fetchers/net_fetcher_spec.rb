@@ -248,21 +248,26 @@ module Omnibus
 
     end
 
-    shared_examples 'an extractor' do |extension, commands|
+    shared_examples 'an extractor' do |extension, source_options, commands|
       context "when the file is a .#{extension}" do
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
                  name: 'file',
                  locked_version: "1.2.3",
                  described_version: '1.2.3',
-                 locked_source: { url: "https://get.example.com/file.#{extension}", md5: 'abcd1234' })
+                 locked_source: { url: "https://get.example.com/file.#{extension}", md5: 'abcd1234' }.merge(source_options)
+                )
         end
 
         subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
         it 'shells out with the right commands' do
           commands.each do |command|
-            expect(subject).to receive(:shellout!).with(command)
+            if command.is_a?(String)
+              expect(subject).to receive(:shellout!).with(command)
+            else
+              expect(subject).to receive(:shellout!).with(*command)
+            end
           end
           subject.send(:extract)
         end
@@ -328,21 +333,74 @@ module Omnibus
           allow(Dir).to receive(:mktmpdir).and_yield('C:/tmp_dir')
         end
 
-        it_behaves_like 'an extractor', '7z',       ['7z.exe x C:\\file.7z -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'zip',      ['7z.exe x C:\\file.zip -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'tar',      ['7z.exe x C:\\file.tar -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'tgz',      ['7z.exe x C:\\file.tgz -oC:\\tmp_dir -r -y',
-                                                     '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'tar.gz',   ['7z.exe x C:\\file.tar.gz -oC:\\tmp_dir -r -y',
-                                                     '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'tar.bz2',  ['7z.exe x C:\\file.tar.bz2 -oC:\\tmp_dir -r -y',
-                                                     '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'txz',      ['7z.exe x C:\\file.txz -oC:\\tmp_dir -r -y',
-                                                     '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'tar.xz',   ['7z.exe x C:\\file.tar.xz -oC:\\tmp_dir -r -y',
-                                                     '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
-        it_behaves_like 'an extractor', 'tar.lzma', ['7z.exe x C:\\file.tar.lzma -oC:\\tmp_dir -r -y',
-                                                     '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+        context 'when no extract overrides are present' do
+          it_behaves_like 'an extractor', '7z', {},
+            ['7z.exe x C:\\file.7z -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'zip', {},
+            ['7z.exe x C:\\file.zip -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar', {},
+            [['tar.exe xf C:\\file.tar -CC:\\tmp\\project', {returns: [0]}]]
+          it_behaves_like 'an extractor', 'tgz', {},
+            [['tar.exe zxf C:\\file.tgz -CC:\\tmp\\project', {returns: [0]}]]
+          it_behaves_like 'an extractor', 'tar.gz', {},
+            [['tar.exe zxf C:\\file.tar.gz -CC:\\tmp\\project', {returns: [0]}]]
+          it_behaves_like 'an extractor', 'tar.bz2', {},
+            [['tar.exe jxf C:\\file.tar.bz2 -CC:\\tmp\\project', {returns: [0]}]]
+          it_behaves_like 'an extractor', 'txz', {},
+            [['tar.exe Jxf C:\\file.txz -CC:\\tmp\\project', {returns: [0]}]]
+          it_behaves_like 'an extractor', 'tar.xz', {},
+            [['tar.exe Jxf C:\\file.tar.xz -CC:\\tmp\\project', {returns: [0]}]]
+          it_behaves_like 'an extractor', 'tar.lzma', {},
+            [['tar.exe --lzma -xf C:\\file.tar.lzma -CC:\\tmp\\project', {returns: [0]}]]
+        end
+
+        context 'when seven_zip extract strategy is chosen' do
+          it_behaves_like 'an extractor', '7z', { extract: :seven_zip },
+            ['7z.exe x C:\\file.7z -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'zip', { extract: :seven_zip },
+            ['7z.exe x C:\\file.zip -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar', { extract: :seven_zip },
+            ['7z.exe x C:\\file.tar -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tgz', { extract: :seven_zip },
+            ['7z.exe x C:\\file.tgz -oC:\\tmp_dir -r -y',
+             '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar.gz', { extract: :seven_zip },
+            ['7z.exe x C:\\file.tar.gz -oC:\\tmp_dir -r -y',
+             '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar.bz2', { extract: :seven_zip },
+            ['7z.exe x C:\\file.tar.bz2 -oC:\\tmp_dir -r -y',
+             '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'txz', { extract: :seven_zip },
+            ['7z.exe x C:\\file.txz -oC:\\tmp_dir -r -y',
+             '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar.xz', { extract: :seven_zip },
+            ['7z.exe x C:\\file.tar.xz -oC:\\tmp_dir -r -y',
+             '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar.lzma', { extract: :seven_zip },
+            ['7z.exe x C:\\file.tar.lzma -oC:\\tmp_dir -r -y',
+             '7z.exe x C:\\tmp_dir\\file.tar -oC:\\tmp\\project -r -y']
+        end
+
+        context 'when lax_tar extract strategy is chosen' do
+          it_behaves_like 'an extractor', '7z', { extract: :lax_tar },
+            ['7z.exe x C:\\file.7z -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'zip', { extract: :lax_tar },
+            ['7z.exe x C:\\file.zip -oC:\\tmp\\project -r -y']
+          it_behaves_like 'an extractor', 'tar', { extract: :lax_tar },
+            [['tar.exe xf C:\\file.tar -CC:\\tmp\\project', {returns: [0, 1]}]]
+          it_behaves_like 'an extractor', 'tgz', { extract: :lax_tar },
+            [['tar.exe zxf C:\\file.tgz -CC:\\tmp\\project', {returns: [0, 1]}]]
+          it_behaves_like 'an extractor', 'tar.gz', { extract: :lax_tar },
+            [['tar.exe zxf C:\\file.tar.gz -CC:\\tmp\\project', {returns: [0, 1]}]]
+          it_behaves_like 'an extractor', 'tar.bz2', { extract: :lax_tar },
+            [['tar.exe jxf C:\\file.tar.bz2 -CC:\\tmp\\project', {returns: [0, 1]}]]
+          it_behaves_like 'an extractor', 'txz', { extract: :lax_tar },
+            [['tar.exe Jxf C:\\file.txz -CC:\\tmp\\project', {returns: [0, 1]}]]
+          it_behaves_like 'an extractor', 'tar.xz', { extract: :lax_tar },
+            [['tar.exe Jxf C:\\file.tar.xz -CC:\\tmp\\project', {returns: [0, 1]}]]
+          it_behaves_like 'an extractor', 'tar.lzma', { extract: :lax_tar },
+            [['tar.exe --lzma -xf C:\\file.tar.lzma -CC:\\tmp\\project', {returns: [0, 1]}]]
+        end
       end
 
       context 'on Linux' do
@@ -353,15 +411,24 @@ module Omnibus
         end
 
         context 'when gtar is not present' do
-          it_behaves_like 'an extractor', '7z',      ['7z x /file.7z -o/tmp/project -r -y']
-          it_behaves_like 'an extractor', 'zip',     ['unzip /file.zip -d /tmp/project']
-          it_behaves_like 'an extractor', 'tar',     ['tar xf /file.tar -C/tmp/project']
-          it_behaves_like 'an extractor', 'tgz',     ['tar zxf /file.tgz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.gz',  ['tar zxf /file.tar.gz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.bz2', ['tar jxf /file.tar.bz2 -C/tmp/project']
-          it_behaves_like 'an extractor', 'txz',     ['tar Jxf /file.txz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.xz',  ['tar Jxf /file.tar.xz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.lzma', ['tar --lzma -xf /file.tar.lzma -C/tmp/project']
+          it_behaves_like 'an extractor', '7z', {},
+            ['7z x /file.7z -o/tmp/project -r -y']
+          it_behaves_like 'an extractor', 'zip', {},
+            ['unzip /file.zip -d /tmp/project']
+          it_behaves_like 'an extractor', 'tar', {},
+            ['tar xf /file.tar -C/tmp/project']
+          it_behaves_like 'an extractor', 'tgz', {},
+            ['tar zxf /file.tgz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.gz', {},
+            ['tar zxf /file.tar.gz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.bz2', {},
+            ['tar jxf /file.tar.bz2 -C/tmp/project']
+          it_behaves_like 'an extractor', 'txz', {},
+            ['tar Jxf /file.txz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.xz', {},
+            ['tar Jxf /file.tar.xz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.lzma', {},
+            ['tar --lzma -xf /file.tar.lzma -C/tmp/project']
         end
 
         context 'when gtar is present' do
@@ -376,15 +443,24 @@ module Omnibus
             .and_return('/path/to/gtar')
           end
 
-          it_behaves_like 'an extractor', '7z',      ['7z x /file.7z -o/tmp/project -r -y']
-          it_behaves_like 'an extractor', 'zip',     ['unzip /file.zip -d /tmp/project']
-          it_behaves_like 'an extractor', 'tar',     ['gtar xf /file.tar -C/tmp/project']
-          it_behaves_like 'an extractor', 'tgz',     ['gtar zxf /file.tgz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.gz',  ['gtar zxf /file.tar.gz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.bz2', ['gtar jxf /file.tar.bz2 -C/tmp/project']
-          it_behaves_like 'an extractor', 'txz',     ['gtar Jxf /file.txz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.xz',  ['gtar Jxf /file.tar.xz -C/tmp/project']
-          it_behaves_like 'an extractor', 'tar.lzma', ['gtar --lzma -xf /file.tar.lzma -C/tmp/project']
+          it_behaves_like 'an extractor', '7z', {},
+            ['7z x /file.7z -o/tmp/project -r -y']
+          it_behaves_like 'an extractor', 'zip', {},
+            ['unzip /file.zip -d /tmp/project']
+          it_behaves_like 'an extractor', 'tar', {},
+            ['gtar xf /file.tar -C/tmp/project']
+          it_behaves_like 'an extractor', 'tgz', {},
+            ['gtar zxf /file.tgz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.gz', {},
+            ['gtar zxf /file.tar.gz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.bz2', {},
+            ['gtar jxf /file.tar.bz2 -C/tmp/project']
+          it_behaves_like 'an extractor', 'txz', {},
+            ['gtar Jxf /file.txz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.xz', {},
+            ['gtar Jxf /file.tar.xz -C/tmp/project']
+          it_behaves_like 'an extractor', 'tar.lzma', {},
+            ['gtar --lzma -xf /file.tar.lzma -C/tmp/project']
         end
 
       end
