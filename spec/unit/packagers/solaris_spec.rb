@@ -116,6 +116,12 @@ module Omnibus
 
       before do
         allow(subject).to receive(:shellout!)
+        File.open("#{staging_dir}/files", "w+") do |f|
+          f.write <<-EOF
+/foo/bar/baz
+/a file with spaces
+          EOF
+        end
       end
 
       it 'creates the prototype file' do
@@ -135,11 +141,17 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with("cd /opt && find project -print > #{File.join(staging_dir, 'files')}")
         expect(subject).to receive(:shellout!)
-          .with("cd /opt && pkgproto < #{File.join(staging_dir, 'files')} > #{File.join(staging_dir, 'Prototype.files')}")
+          .with("cd /opt && pkgproto < #{File.join(staging_dir, 'files.clean')} > #{File.join(staging_dir, 'Prototype.files')}")
         expect(subject).to receive(:shellout!)
           .with("awk '{ $5 = \"root\"; $6 = \"root\"; print }' < #{File.join(staging_dir, 'Prototype.files')} >> #{File.join(staging_dir, 'Prototype')}")
-
         subject.write_prototype_file
+      end
+
+      it 'strips out the file with spaces from files.clean' do
+        subject.write_prototype_file
+        contents = File.read(File.join(staging_dir, 'files.clean'))
+        expect(contents).not_to include("a file with spaces")
+        expect(contents).to include("/foo/bar/baz")
       end
     end
 
