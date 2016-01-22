@@ -20,6 +20,7 @@ require 'omnibus/s3_helpers'
 module Omnibus
   class S3Cache
     include Logging
+    extend Digestable
 
     class << self
       include S3Helpers
@@ -75,9 +76,14 @@ module Omnibus
           log.info(log_key) do
             "Caching '#{fetcher.downloaded_file}' to '#{Config.s3_bucket}/#{key}'"
           end
+          
+          # Fetcher has already verified the downloaded file in software.fetch.
+          # Compute the md5 from scratch because the fetcher may have been
+          # specified with a different hashing algorithm.
+          md5 = digest(fetcher.downloaded_file, :md5)
 
           File.open(fetcher.downloaded_file, 'rb') do |file|
-            store_object(key, file, software.fetcher.checksum, 'public-read')
+            store_object(key, file, md5, 'public-read')
           end
         end
 
@@ -101,7 +107,7 @@ module Omnibus
       # @private
       #
       # The key with which to cache the package on S3. This is the name of the
-      # package, the version of the package, and its checksum.
+      # package, the version of the package, and its md5 checksum.
       #
       # @example
       #   "zlib-1.2.6-618e944d7c7cd6521551e30b32322f4a"

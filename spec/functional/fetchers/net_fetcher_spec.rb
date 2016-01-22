@@ -155,7 +155,6 @@ module Omnibus
           expect(extracted).to_not be_a_file
         end
       end
-
     end
 
     describe '#fetch' do
