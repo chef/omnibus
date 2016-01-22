@@ -30,14 +30,14 @@ module Omnibus
       # @return [Software]
       #
       def load(project, name, manifest)
-        loaded_softwares[name] ||= begin
+        loaded_softwares["#{project.name}:#{name}"] ||= begin
           filepath = Omnibus.software_path(name)
 
           if filepath.nil?
             raise MissingSoftware.new(name)
           else
             log.internal(log_key) do
-              "Loading software `#{name}' from `#{filepath}'."
+              "Loading software `#{name}' from `#{filepath}' using overrides from #{project.name}."
             end
           end
 
