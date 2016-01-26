@@ -549,9 +549,11 @@ module Omnibus
           freebsd_flags
         when "windows"
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
+          opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag}"
+            # If we're happy with these flags, enable SSE for other platforms running x86 too.
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 -mfpmath=sse -msse2 #{opt_flag}"
           }
         else
           {
