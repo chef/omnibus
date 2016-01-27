@@ -230,7 +230,7 @@ module Omnibus
         destination: File.join(debian_dir, "control"),
         variables: {
           name:           safe_base_package_name,
-          version:        safe_version,
+          version:        safe_epoch + safe_version,
           iteration:      safe_build_iteration,
           vendor:         vendor,
           license:        license,
@@ -412,9 +412,6 @@ module Omnibus
 
         version = converted
       end
-
-      # Prepend epoch when it exists
-      version = safe_epoch + version
 
       if version =~ /\A[a-zA-Z0-9\.\+\:\~]+\z/
         version
