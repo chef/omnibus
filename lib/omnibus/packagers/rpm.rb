@@ -306,7 +306,7 @@ module Omnibus
     # @return [String]
     #
     def mark_filesystem_directories(fsdir)
-      if fsdir.eql?("/") || fsdir.eql?("/usr/lib") || fsdir.eql?("/usr/share/empty")
+      if fsdir.eql?("/") || fsdir.eql?("/usr/bin") || fsdir.eql?("/usr/lib") || fsdir.eql?("/usr/share/empty")
         return "%dir %attr(0555,root,root) #{fsdir}"
       elsif filesystem_directories.include?(fsdir)
         return "%dir %attr(0755,root,root) #{fsdir}"
