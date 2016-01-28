@@ -64,7 +64,7 @@ module Omnibus
         false
       else
         create_directory(File.dirname(cache_path))
-        shellout!("git --git-dir=#{cache_path} init -q")
+        git_cmd('init -q')
         true
       end
     end
@@ -113,15 +113,15 @@ module Omnibus
       create_cache_path
       remove_git_dirs
 
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f))
+      git_cmd('add -A -f')
 
       begin
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{tag}"))
+        git_cmd(%Q(commit -q -m "Backup of #{tag}"))
       rescue CommandFailed => e
         raise unless e.message.include?('nothing to commit')
       end
 
-      shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{tag}"))
+      git_cmd(%Q(tag -f "#{tag}"))
     end
 
     def restore
@@ -129,16 +129,16 @@ module Omnibus
 
       create_cache_path
 
-      cmd = shellout(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{tag}"))
-
       restore_me = false
+      cmd = git_cmd(%Q(tag -l "#{tag}"))
+
       cmd.stdout.each_line do |line|
         restore_me = true if tag == line.chomp
       end
 
       if restore_me
         log.internal(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
-        shellout!(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{tag}"))
+        git_cmd(%Q(checkout -f "#{tag}"))
         true
       else
         log.internal(log_key) { "Could not find tag `#{tag}', skipping restore" }
@@ -168,6 +168,19 @@ module Omnibus
     end
 
     private
+
+    #
+    # Shell out and invoke a git command in the context of the git cache.
+    #
+    # We explicitly disable autocrlf because we want bit-for-bit storage and
+    # recovery of build output. Hashes calculated on output files will be
+    # invalid if we muck around with files after they have been produced.
+    #
+    # @return [Mixlib::Shellout] the underlying command object.
+    #
+    def git_cmd(command)
+      shellout!("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} #{command}")
+    end
 
     #
     #
