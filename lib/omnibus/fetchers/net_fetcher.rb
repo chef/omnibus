@@ -196,7 +196,7 @@ module Omnibus
            Timeout::Error,
            OpenURI::HTTPError => e
       if fetcher_retries != 0
-        log.debug(log_key) { "Retrying failed download (#{fetcher_retries})..." }
+        log.info(log_key) { "Retrying failed download due to #{e} (#{fetcher_retries} retries left)..." }
         fetcher_retries -= 1
         retry
       else
