@@ -2,7 +2,7 @@
 
 # Trap interrupts to quit cleanly. See
 # https://twitter.com/mitchellh/status/283014103189053442
-Signal.trap('INT') { Process.kill(:KILL, -Process.getpgid(Process.pid()) }
+Signal.trap('INT') { Process.kill(:KILL, -Process.getpgid(Process.pid()); exit 1 }
 
 $:.push File.expand_path('../../lib', __FILE__)
 $stdout.sync = true
