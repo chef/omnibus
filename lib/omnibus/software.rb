@@ -557,7 +557,7 @@ module Omnibus
           }
         else
           {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -O2",
             "CFLAGS" => "-I#{install_dir}/embedded/include",
           }
         end
