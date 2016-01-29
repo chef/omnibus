@@ -189,7 +189,7 @@ module Omnibus
 
       let(:tempfile_path) { "/tmp/intermediate_path/tempfile_path.random_garbage.tmp" }
 
-      let(:fetched_file) { instance_double("File", path: tempfile_path) }
+      let(:fetched_file) { instance_double("TempFile", path: tempfile_path) }
 
       let(:destination_path) { "/cache/file.tar.gz" }
 
@@ -214,8 +214,9 @@ module Omnibus
 
           fetched_file
         end
-        expect(FileUtils).to receive(:cp).with(tempfile_path, destination_path)
         expect(fetched_file).to receive(:close)
+        expect(FileUtils).to receive(:cp).with(tempfile_path, destination_path)
+        expect(fetched_file).to receive(:unlink)
       end
 
       it "downloads the thing" do
