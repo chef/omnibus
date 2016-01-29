@@ -187,8 +187,11 @@ module Omnibus
       }
 
       file = open(download_url, options)
-      FileUtils.cp(file.path, downloaded_file)
+      # This is a temporary file. Close and flush it before attempting to copy
+      # it over.
       file.close
+      FileUtils.cp(file.path, downloaded_file)
+      file.unlink
     rescue SocketError,
            Errno::ECONNREFUSED,
            Errno::ECONNRESET,
