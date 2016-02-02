@@ -83,7 +83,7 @@ module Omnibus
         expect(FileUtils).to receive(:mkdir_p)
           .with(File.dirname(ipc.cache_path))
         expect(ipc).to receive(:shellout!)
-          .with("git --git-dir=#{cache_path} init -q")
+          .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} init -q")
         ipc.create_cache_path
       end
 
@@ -95,7 +95,6 @@ module Omnibus
           .with(File.dirname(ipc.cache_path))
           .and_return(true)
         expect(ipc).to_not receive(:shellout!)
-          .with("git --git-dir=#{cache_path} init -q")
         ipc.create_cache_path
       end
     end
@@ -114,19 +113,19 @@ module Omnibus
       it 'adds all the changes to git removing git directories' do
         expect(ipc).to receive(:remove_git_dirs)
         expect(ipc).to receive(:shellout!)
-          .with("git --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f")
+          .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f")
         ipc.incremental
       end
 
       it 'commits the backup for the software' do
         expect(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{ipc.tag}"))
+          .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{ipc.tag}"))
         ipc.incremental
       end
 
       it 'tags the software backup' do
         expect(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{ipc.tag}"))
+          .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{ipc.tag}"))
         ipc.incremental
       end
     end
@@ -165,11 +164,11 @@ module Omnibus
       end
 
       before(:each) do
-        allow(ipc).to receive(:shellout)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
+        allow(ipc).to receive(:shellout!)
+          .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
           .and_return(tag_cmd)
         allow(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
+          .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
         allow(ipc).to receive(:create_cache_path)
       end
 
@@ -179,11 +178,11 @@ module Omnibus
       end
 
       it 'checks for a tag with the software and version, and if it finds it, checks it out' do
-        expect(ipc).to receive(:shellout)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
+        expect(ipc).to receive(:shellout!)
+          .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
           .and_return(tag_cmd)
         expect(ipc).to receive(:shellout!)
-          .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
+          .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
         ipc.restore
       end
 
@@ -191,11 +190,11 @@ module Omnibus
         let(:git_tag_output) { "\n" }
 
         it 'does nothing' do
-          expect(ipc).to receive(:shellout)
-            .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
+          expect(ipc).to receive(:shellout!)
+            .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"))
             .and_return(tag_cmd)
           expect(ipc).to_not receive(:shellout!)
-            .with(%Q(git --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
+            .with(%Q(git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"))
           ipc.restore
         end
       end
