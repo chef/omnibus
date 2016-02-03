@@ -225,9 +225,21 @@ module Omnibus
     end
 
     describe '#create_bff_file' do
+      # Need to mock out the id calls
+      let(:id_shellout) {
+        shellout_mock = double("shellout_mock")
+        allow(shellout_mock).to receive(:stdout).and_return("300")
+        shellout_mock
+      }
+
       before do
         allow(subject).to receive(:shellout!)
         allow(Dir).to receive(:chdir) { |_, &b| b.call }
+        allow(subject).to receive(:shellout!)
+          .with("id -u").and_return(id_shellout)
+        allow(subject).to receive(:shellout!)
+          .with("id -g").and_return(id_shellout)
+
         create_file(File.join(staging_dir, '.info', "#{project.name}.inventory")) {
           <<-INVENTORY.gsub(/^\s{12}/, '')
             /opt/project/version-manifest.txt:
@@ -243,14 +255,25 @@ module Omnibus
         create_file("#{staging_dir}/file") { "http://goo.gl/TbkO01" }
       end
 
-      it 'chowns the directory' do
-        # A note - the /opt/ here is essentially project.install_dir one level up.
-        # There is nothing magical about 'opt' as a directory.
+      it 'gets the build uid' do
         expect(subject).to receive(:shellout!)
-          .with(/chown -R 0:0 #{staging_dir}\/opt$/)
+          .with("id -u")
         subject.create_bff_file
       end
 
+      it 'gets the build gid' do
+        expect(subject).to receive(:shellout!)
+          .with("id -g")
+        subject.create_bff_file
+      end
+
+      it 'chowns the directory to root' do
+        # A note - the /opt/ here is essentially project.install_dir one level up.
+        # There is nothing magical about 'opt' as a directory.
+        expect(subject).to receive(:shellout!)
+          .with(/chown -Rh 0:0 #{staging_dir}\/opt$/)
+        subject.create_bff_file
+      end
 
       it 'logs a message' do
         output = capture_logging { subject.create_bff_file }
@@ -260,6 +283,15 @@ module Omnibus
       it 'uses the correct command' do
         expect(subject).to receive(:shellout!)
           .with(/\/usr\/sbin\/mkinstallp -d/)
+        subject.create_bff_file
+      end
+
+      it 'chowns the directory back to the build user' do
+        # A note - the /opt/ here is essentially project.install_dir one level up.
+        # There is nothing magical about 'opt' as a directory.
+        # 300 is just what we set the mock for the build uid/gid to return.
+        expect(subject).to receive(:shellout!)
+          .with(/chown -Rh 300:300 #{staging_dir}/)
         subject.create_bff_file
       end
 
