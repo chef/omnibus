@@ -176,6 +176,28 @@ module Omnibus
     end
     expose :description
 
+
+    #
+    # Sets the maintainer of the software.  Currently this is for
+    # human consumption only and the tool doesn't do anything with it.
+    #
+    # @example
+    #   maintainer "Joe Bob <joeb@chef.io>"
+    #
+    # @param [String] val
+    #   the maintainer of this sofware def
+    #
+    # @return [String]
+    #
+    def maintainer(val = NULL)
+      if null?(val)
+        @maintainer
+      else
+        @description = val
+      end
+    end
+    expose :maintainer
+
     #
     # Add a software dependency to this software.
     #
