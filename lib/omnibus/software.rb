@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2017, Chef Software Inc.
+# Copyright 2012-2018, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -990,20 +990,20 @@ module Omnibus
       fetcher.version_guid
     end
 
+    def resolved_version
+      @resolved_version ||= fetcher.version_for_cache || version
+    end
+
     # Returns the version to be used in cache.
     def version_for_cache
-      @version_for_cache ||= if fetcher.version_for_cache
-                               fetcher.version_for_cache
-                             elsif version
-                               version
+      @version_for_cache ||= if resolved_version
+                               resolved_version
                              else
                                log.warn(log_key) do
-                                 "No version given! This is probably a bad thing. I am going to " \
-                                 "assume the version `0.0.0', but that is most certainly not your " \
-                                 "desired behavior. If git caching seems off, this is probably why."
+                                 "No version given! Git caching disabled." \
                                end
 
-                               "0.0.0"
+                               '0.0.0'
                              end
     end
 
@@ -1073,7 +1073,12 @@ module Omnibus
     #
     def build_me(build_wrappers = [])
       if Config.use_git_caching
-        if project.dirty?
+        if !resolved_version
+          log.info(log_key) do
+            "Forcing a build because resolved version is nil"
+          end
+          execute_build
+        elsif project.dirty?
           log.info(log_key) do
             "Building because `#{project.culprit.name}' dirtied the cache"
           end
