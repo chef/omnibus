@@ -209,8 +209,6 @@ module Omnibus
       # we will chown from 'project' on, rather than 'project/dir', which leaves
       # project owned by the build user (which is incorrect)
       # First - let's find out who we are.
-      original_uid = shellout!("id -u").stdout.chomp
-      original_gid = shellout!("id -g").stdout.chomp
       shellout!("sudo chown -Rh 0:0 #{File.join(staging_dir, project.install_dir.match(/^\/?(\w+)/).to_s)}")
       log.info(log_key) { "Creating .bff file" }
 
@@ -233,7 +231,11 @@ module Omnibus
         copy_file(bff, File.join(Config.package_dir, create_bff_file_name))
       end
 
+    ensure
       # chown back to original user's uid/gid so cleanup works correctly
+      original_uid = shellout!("id -u").stdout.chomp
+      original_gid = shellout!("id -g").stdout.chomp
+
       shellout!("sudo chown -Rh #{original_uid}:#{original_gid} #{staging_dir}")
     end
 
