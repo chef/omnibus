@@ -252,7 +252,7 @@ module Omnibus
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      remote_list = shellout!("git ls-remote \"#{source[:git]}\" #{ref}*").stdout
+      remote_list = shellout!("git ls-remote \"#{source[:git]}\" \"#{ref}*\"").stdout
       commit_ref = dereference_annotated_tag(remote_list, ref)
 
       unless commit_ref
