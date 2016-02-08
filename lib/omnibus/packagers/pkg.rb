@@ -262,14 +262,14 @@ module Omnibus
     # @return [String]
     #
     def safe_base_package_name
-      if project.package_name =~ /\A[[:alnum:]]+\z/
+      if project.package_name =~ /\A[[:alnum:]-]+\z/
         project.package_name.dup
       else
         converted = project.package_name.downcase.gsub(/[^[:alnum:]+]/, '')
 
         log.warn(log_key) do
           "The `name' component of Mac package names can only include " \
-          "alphabetical characters (a-z, A-Z), and numbers (0-9). Converting " \
+          "alphabetical characters (a-z, A-Z), numbers (0-9), and -. Converting " \
           "`#{project.package_name}' to `#{converted}'."
         end
 
