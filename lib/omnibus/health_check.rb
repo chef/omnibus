@@ -14,10 +14,14 @@
 # limitations under the License.
 #
 
+require 'omnibus/sugarable'
+require 'pedump'
+
 module Omnibus
   class HealthCheck
     include Logging
     include Util
+    include Sugarable
 
     WHITELIST_LIBS = [
       /ld-linux/,
@@ -178,16 +182,18 @@ module Omnibus
     #   if the healthchecks pass
     #
     def run!
-      if Ohai['platform'] == 'windows'
-        log.warn(log_key) { 'Skipping health check on Windows' }
-        return true
-      end
       log.info(log_key) {"Running health on #{project.name}"}
       bad_libs =  case Ohai['platform']
                   when 'mac_os_x'
                     health_check_otool
                   when 'aix'
                     health_check_aix
+                  when 'windows'
+                    # TODO: objdump -p will provided a very limited check of
+                    # explicit dependencies on windows. Most dependencies are
+                    # implicit and hence not detected.
+                    log.warn(log_key) { 'Skipping dependency health checks on Windows.' }
+                    {}
                   else
                     health_check_ldd
                   end
@@ -278,14 +284,98 @@ module Omnibus
         raise HealthCheckFailed
       end
 
+      conflict_map = {}
+      conflict_map = relocation_check if windows?
+
+      if conflict_map.keys.length > 0
+        log.warn(log_key) { 'Multiple dlls with overlapping images detected' }
+
+        conflict_map.each do |lib_name, detail|
+          base = detail[:base]
+          size = detail[:size]
+          next_valid_base = detail[:base] + detail[:size]
+
+          log.warn(log_key) do
+            out =  "Overlapping dll detected:\n"
+            out << "    #{lib_name} :\n"
+            out << "    IMAGE BASE: #{hex}\n" % base
+            out << "    IMAGE SIZE: #{hex} (#{size} bytes)\n" % size
+            out << "    NEXT VALID BASE: #{hex}\n" % next_valid_base
+            out << "    CONFLICTS:\n"
+
+            detail[:conflicts].each do |conflict_name|
+              cbase = conflict_map[conflict_name][:base]
+              csize = conflict_map[conflict_name][:size]
+              out << "    - #{conflict_name} #{hex} + #{hex}\n" % [cbase, csize]
+            end
+
+            out
+          end
+        end
+
+        # Don't raise an error yet. This is only bad for FIPS mode.
+      end
+
       true
+    end
+
+    # Check dll image location overlap/conflicts on windows.
+    #
+    # @return [Hash<String, Hash<Symbol, ...>>]
+    #   library_name ->
+    #     :base -> base address
+    #     :size -> the total image size in bytes
+    #     :conflicts -> array of library names that overlap
+    #
+    def relocation_check
+      conflict_map = {}
+
+      embedded_bin = "#{project.install_dir}/embedded/bin"
+      Dir.glob("#{embedded_bin}/*.dll") do |lib_path|
+        log.debug(log_key) { "Analyzing dependencies for #{lib_path}" }
+
+        File.open(lib_path, 'rb') do |f|
+          dump = PEdump.new(lib_path)
+          pe = dump.pe f
+
+          # Don't scan dlls for a different architecture.
+          next if windows_arch_i386? == pe.x64?
+
+          lib_name = File.basename(lib_path)
+          base = pe.ioh.ImageBase
+          size = pe.ioh.SizeOfImage
+          conflicts = []
+
+          # This can be done more smartly but O(n^2) is just fine for n = small
+          conflict_map.each do |candidate_name, details|
+            unless details[:base] >= base + size ||
+                  details[:base] + details[:size] <= base
+              details[:conflicts] << lib_name
+              conflicts << candidate_name
+            end
+          end
+
+          conflict_map[lib_name] = {
+            base: base,
+            size: size,
+            conflicts: conflicts,
+          }
+
+          log.debug(log_key) { "Discovered #{lib_name} at #{hex} + #{hex}" % [ base, size ] }
+        end
+      end
+
+      # Filter out non-conflicting entries.
+      conflict_map.delete_if do |lib_name, details|
+        details[:conflicts].empty?
+      end
     end
 
     #
     # Run healthchecks against otool.
     #
-    # @return [Array<String>]
-    #   the bad libraries
+    # @return [Hash<String, Hash<String, Hash<String, Int>>>]
+    #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
     #
     def health_check_otool
       current_library = nil
@@ -308,8 +398,8 @@ module Omnibus
     #
     # Run healthchecks against aix.
     #
-    # @return [Array<String>]
-    #   the bad libraries
+    # @return [Hash<String, Hash<String, Hash<String, Int>>>]
+    #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
     #
     def health_check_aix
       current_library = nil
@@ -335,9 +425,9 @@ module Omnibus
 
     #
     # Run healthchecks against ldd.
-    #
-    # @return [Array<String>]
-    #   the bad libraries
+    # 
+    # @return [Hash<String, Hash<String, Hash<String, Int>>>]
+    #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
     #
     def health_check_ldd
       current_library = nil
@@ -376,6 +466,16 @@ module Omnibus
     private
 
     #
+    # This is the printf style format string to render a pointer/size_t on the
+    # current platform.
+    #
+    # @return [String]
+    #
+    def hex
+      windows_arch_i386? ? "0x%08x" : "0x%016x"
+    end
+
+    #
     # The list of whitelisted (ignored) files from the project and softwares.
     #
     # @return [Array<String, Regexp>]
@@ -404,6 +504,17 @@ module Omnibus
 
     #
     # Check the given path and library for "bad" libraries.
+    #
+    # @param [Hash<String, Hash<String, Hash<String, Int>>>]
+    #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
+    # @param [String]
+    #   the library being analyzed
+    # @param [String]
+    #   dependency library name
+    # @param [String]
+    #   actual path of library satisfying the dependency
+    #
+    # @return the modified bad_library hash
     #
     def check_for_bad_library(bad_libs, current_library, name, linked)
       safe = nil
