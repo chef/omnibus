@@ -118,7 +118,7 @@ module Omnibus
     # @return [String]
     #
     def target_shasum
-      @target_shasum ||= digest_directory(project_dir, :sha256)
+      @target_shasum ||= digest_directory(project_dir, :sha256, source_options)
     end
 
     #
@@ -127,7 +127,7 @@ module Omnibus
     # @return [String]
     #
     def destination_shasum
-      @destination_shasum ||= digest_directory(source_path, :sha256)
+      @destination_shasum ||= digest_directory(source_path, :sha256, source_options)
     end
   end
 end
