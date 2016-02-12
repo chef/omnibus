@@ -29,6 +29,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'ruby-progressbar', '~> 1.7'
   gem.add_dependency 'aws-sdk',          '~> 2'
   gem.add_dependency 'thor',             '~> 0.18'
+  gem.add_dependency 'pedump',           '~> 0.5'
 
   gem.add_development_dependency 'bundler'
   gem.add_development_dependency 'artifactory', '~> 2.0'

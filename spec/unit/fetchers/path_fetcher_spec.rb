@@ -69,7 +69,7 @@ module Omnibus
 
       before do
         allow(subject).to receive(:digest_directory)
-          .with(source_path, :sha256)
+          .with(source_path, :sha256, {})
           .and_return(shasum)
       end
 
