@@ -775,6 +775,9 @@ module Omnibus
           # Fallback to just looking at the embedded_bin directory in case
           # we're using devkit or older chef-dk.
           bash_bin = embedded_bin('bash.exe')
+          unless File.exist?(bash_bin)
+            bash_bin = "bash.exe"
+          end
         end
         # Mixlib will handle escaping characters for cmd but our command might
         # contain '. For now, assume that won't happen because I don't know
