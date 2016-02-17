@@ -619,5 +619,29 @@ module Omnibus
         Ohai["kernel"]["machine"]
       end
     end
+
+    #
+    # Install the specified packages
+    #
+    # @return [void]
+    #
+    def install(packages, enablerepo = NULL)
+      if null?(enablerepo)
+        enablerepo_string = ''
+      else
+        enablerepo_string = "--disablerepo='*' --enablerepo='#{enablerepo}'"
+      end
+      shellout!('yum clean expire-cache')
+      shellout!("yum -y #{enablerepo_string} install #{packages}")
+    end
+
+    #
+    # Remove the specified package
+    #
+    # @return [void]
+    #
+    def remove(packages)
+      `yum -y remove #{packages}`
+    end
   end
 end
