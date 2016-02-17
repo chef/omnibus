@@ -259,9 +259,9 @@ module Omnibus
         context 'in 32-bit mode' do
           it 'sets the default' do
             expect(subject.with_standard_compiler_flags).to eq(
-              'CFLAGS'          => '-I/opt/project/embedded/include -m32 -O3 -mfpmath=sse -msse2 -march=i686',
-              'CXXFLAGS'        => '-I/opt/project/embedded/include -m32 -O3 -mfpmath=sse -msse2 -march=i686',
-              'CPPFLAGS'        => '-I/opt/project/embedded/include -m32 -O3 -mfpmath=sse -msse2 -march=i686',
+              'CFLAGS'          => '-I/opt/project/embedded/include -m32 -O3',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m32 -O3',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m32 -O3',
               'LDFLAGS'         => '-L/opt/project/embedded/lib -m32',
               'LD_RUN_PATH'     => '/opt/project/embedded/lib',
               'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
@@ -270,9 +270,9 @@ module Omnibus
 
           it 'sets BFD flags if requested' do
             expect(subject.with_standard_compiler_flags({}, bfd_flags: true)).to eq(
-              'CFLAGS'          => '-I/opt/project/embedded/include -m32 -O3 -mfpmath=sse -msse2 -march=i686',
-              'CXXFLAGS'        => '-I/opt/project/embedded/include -m32 -O3 -mfpmath=sse -msse2 -march=i686',
-              'CPPFLAGS'        => '-I/opt/project/embedded/include -m32 -O3 -mfpmath=sse -msse2 -march=i686',
+              'CFLAGS'          => '-I/opt/project/embedded/include -m32 -O3',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m32 -O3',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m32 -O3',
               'LDFLAGS'         => '-L/opt/project/embedded/lib -m32',
               'RCFLAGS'         => '--target=pe-i386',
               'ARFLAGS'         => '--target=pe-i386',
@@ -287,9 +287,9 @@ module Omnibus
 
           it 'sets the default' do
             expect(subject.with_standard_compiler_flags).to eq(
-              'CFLAGS'          => '-I/opt/project/embedded/include -m64 -O3 -mfpmath=sse -msse2 -march=x86-64',
-              'CXXFLAGS'        => '-I/opt/project/embedded/include -m64 -O3 -mfpmath=sse -msse2 -march=x86-64',
-              'CPPFLAGS'        => '-I/opt/project/embedded/include -m64 -O3 -mfpmath=sse -msse2 -march=x86-64',
+              'CFLAGS'          => '-I/opt/project/embedded/include -m64 -O3',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m64 -O3',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m64 -O3',
               'LDFLAGS'         => '-L/opt/project/embedded/lib -m64',
               'LD_RUN_PATH'     => '/opt/project/embedded/lib',
               'PKG_CONFIG_PATH' => '/opt/project/embedded/lib/pkgconfig'
@@ -298,9 +298,9 @@ module Omnibus
 
           it 'sets BFD flags if requested' do
             expect(subject.with_standard_compiler_flags({}, bfd_flags: true)).to eq(
-              'CFLAGS'          => '-I/opt/project/embedded/include -m64 -O3 -mfpmath=sse -msse2 -march=x86-64',
-              'CXXFLAGS'        => '-I/opt/project/embedded/include -m64 -O3 -mfpmath=sse -msse2 -march=x86-64',
-              'CPPFLAGS'        => '-I/opt/project/embedded/include -m64 -O3 -mfpmath=sse -msse2 -march=x86-64',
+              'CFLAGS'          => '-I/opt/project/embedded/include -m64 -O3',
+              'CXXFLAGS'        => '-I/opt/project/embedded/include -m64 -O3',
+              'CPPFLAGS'        => '-I/opt/project/embedded/include -m64 -O3',
               'LDFLAGS'         => '-L/opt/project/embedded/lib -m64',
               'RCFLAGS'         => '--target=pe-x86-64',
               'ARFLAGS'         => '--target=pe-x86-64',

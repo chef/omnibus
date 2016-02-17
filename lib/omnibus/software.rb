@@ -571,11 +571,22 @@ module Omnibus
           freebsd_flags
         when "windows"
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
-          opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
+          # XXX: OpenSSL explicitly sets -march=i486 and expects that to be
+          # honored. We may be able to enable this in other libraries
+          # but for the sake of stability, let's turn this off across all
+          # builds until we are sure that it doesn't introduce any
+          # regressions.
+          #opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
-            # If we're happy with these flags, enable SSE for other platforms running x86 too.
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 -mfpmath=sse -msse2 #{opt_flag}"
+            # If we're happy with these flags, enable SSE for other platforms
+            # running x86 too.
+            # XXX: OpenSSL does not like the SSE flags. It already builds with
+            # OPENSSL_IA32_SSE2 and -O3 - so it's some assumption inside its
+            # assembly code that's broken when -fpmath=sse -msse2 is enabled
+            # generally.
+            #"CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 -mfpmath=sse -msse2 #{opt_flag}"
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3"
           }
         else
           {
