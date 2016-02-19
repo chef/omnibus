@@ -89,7 +89,6 @@ module Omnibus
           })
         end
       end
-      
     end
 
     context 'on linux' do
@@ -145,6 +144,19 @@ module Omnibus
           .and_return(good_healthcheck)
 
         expect { subject.run! }.to_not raise_error
+      end
+
+      context 'when relocation_check should not be used' do
+        it 'will return false for linux' do
+          expect(subject.relocation_checkable?).to be false
+        end
+      end
+    end
+
+    context 'on windows checking pedump' do
+      it 'will return true for windows' do
+        stub_ohai(platform: 'windows', version: '2012')
+        expect(subject.relocation_checkable?).to be true
       end
     end
   end

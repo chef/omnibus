@@ -329,7 +329,7 @@ module Omnibus
     # @return [Boolean]
     #
     def relocation_checkable?
-      return false if windows?
+      return false unless windows?
 
       begin
         require 'pedump'
