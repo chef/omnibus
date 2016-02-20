@@ -29,64 +29,73 @@ module Omnibus
     subject { described_class.new(project) }
 
     context 'on windows' do
-      let(:pmdumps) do
-        {
-          'a' => mkdump(0x10000000, 0x00001000),
-          'b/b' => mkdump(0x20000000, 0x00002000),
-          'c/c/c' => mkdump(0x30000000, 0x00004000),
-        }
-      end
-
-      let(:search_dir) { "#{project.install_dir}/embedded/bin" }
-
       before do
         stub_ohai(platform: 'windows', version: '2012')
-
-        r = allow(Dir).to receive(:glob).with("#{search_dir}/*.dll")
-        pmdumps.each do |file, dump|
-          path = File.join(search_dir, file)
-          r.and_yield(path)
-          expect(File).to receive(:open).with(path, 'rb').and_yield(double(File))
-          expect(PEdump).to receive(:new).with(path).and_return(dump)
-        end
       end
 
-      context 'when given non-overlapping dlls' do
-        it 'should always return true' do
-          expect(subject.run!).to eq(true)
-        end
-
-        it 'should not identify conflicts' do
-          expect(subject.relocation_check).to eq({})
-        end
+      it 'will perform dll base relocation checks' do
+        stub_ohai(platform: 'windows', version: '2012')
+        expect(subject.relocation_checkable?).to be true
       end
 
-      context 'when presented with overlapping dlls' do
+      context 'when performing dll base relocation checks' do
         let(:pmdumps) do
           {
             'a' => mkdump(0x10000000, 0x00001000),
-            'b/b' => mkdump(0x10000500, 0x00002000),
+            'b/b' => mkdump(0x20000000, 0x00002000),
             'c/c/c' => mkdump(0x30000000, 0x00004000),
           }
         end
 
-        it 'should always return true' do
-          expect(subject.run!).to eq(true)
+        let(:search_dir) { "#{project.install_dir}/embedded/bin" }
+
+        before do
+          r = allow(Dir).to receive(:glob).with("#{search_dir}/*.dll")
+          pmdumps.each do |file, dump|
+            path = File.join(search_dir, file)
+            r.and_yield(path)
+            expect(File).to receive(:open).with(path, 'rb').and_yield(double(File))
+            expect(PEdump).to receive(:new).with(path).and_return(dump)
+          end
         end
 
-        it 'should identify two conflicts' do
-          expect(subject.relocation_check).to eq({
-            'a' => {
-              base: 0x10000000,
-              size: 0x00001000,
-              conflicts: [ 'b' ],
-            },
-            'b' => {
-              base: 0x10000500,
-              size: 0x00002000,
-              conflicts: [ 'a' ],
-            },
-          })
+        context 'when given non-overlapping dlls' do
+          it 'should always return true' do
+            expect(subject.run!).to eq(true)
+          end
+
+          it 'should not identify conflicts' do
+            expect(subject.relocation_check).to eq({})
+          end
+        end
+
+        context 'when presented with overlapping dlls' do
+          let(:pmdumps) do
+            {
+              'a' => mkdump(0x10000000, 0x00001000),
+              'b/b' => mkdump(0x10000500, 0x00002000),
+              'c/c/c' => mkdump(0x30000000, 0x00004000),
+            }
+          end
+
+          it 'should always return true' do
+            expect(subject.run!).to eq(true)
+          end
+
+          it 'should identify two conflicts' do
+            expect(subject.relocation_check).to eq({
+              'a' => {
+                base: 0x10000000,
+                size: 0x00001000,
+                conflicts: [ 'b' ],
+              },
+              'b' => {
+                base: 0x10000500,
+                size: 0x00002000,
+                conflicts: [ 'a' ],
+              },
+            })
+          end
         end
       end
     end
@@ -146,17 +155,8 @@ module Omnibus
         expect { subject.run! }.to_not raise_error
       end
 
-      context 'when relocation_check should not be used' do
-        it 'will return false for linux' do
-          expect(subject.relocation_checkable?).to be false
-        end
-      end
-    end
-
-    context 'on windows checking pedump' do
-      it 'will return true for windows' do
-        stub_ohai(platform: 'windows', version: '2012')
-        expect(subject.relocation_checkable?).to be true
+      it 'will not perform dll base relocation checks' do
+        expect(subject.relocation_checkable?).to be false
       end
     end
   end
