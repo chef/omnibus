@@ -1,4 +1,4 @@
-#
+
 # Copyright 2012-2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,11 @@
 #
 
 require 'omnibus/sugarable'
-require 'pedump'
+begin
+  require 'pedump'
+rescue LoadError
+  STDERR.puts "pedump not found - windows health checks disabled"
+end
 
 module Omnibus
   class HealthCheck
@@ -285,15 +289,16 @@ module Omnibus
       end
 
       conflict_map = {}
-      conflict_map = relocation_check if windows?
+
+      conflict_map = relocation_check if relocation_checkable?
 
       if conflict_map.keys.length > 0
         log.warn(log_key) { 'Multiple dlls with overlapping images detected' }
 
-        conflict_map.each do |lib_name, detail|
-          base = detail[:base]
-          size = detail[:size]
-          next_valid_base = detail[:base] + detail[:size]
+        conflict_map.each do |lib_name, data|
+          base = data[:base]
+          size = data[:size]
+          next_valid_base = data[:base] + data[:size]
 
           log.warn(log_key) do
             out =  "Overlapping dll detected:\n"
@@ -303,7 +308,7 @@ module Omnibus
             out << "    NEXT VALID BASE: #{hex}\n" % next_valid_base
             out << "    CONFLICTS:\n"
 
-            detail[:conflicts].each do |conflict_name|
+            data[:conflicts].each do |conflict_name|
               cbase = conflict_map[conflict_name][:base]
               csize = conflict_map[conflict_name][:size]
               out << "    - #{conflict_name} #{hex} + #{hex}\n" % [cbase, csize]
@@ -317,6 +322,21 @@ module Omnibus
       end
 
       true
+    end
+
+    # Ensure the method relocation_check is able to run
+    #
+    # @return [Boolean]
+    #
+    def relocation_checkable?
+      return false unless windows?
+
+      begin
+        require 'pedump'
+        true
+      rescue LoadError
+        false
+      end
     end
 
     # Check dll image location overlap/conflicts on windows.
