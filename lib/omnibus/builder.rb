@@ -857,6 +857,9 @@ module Omnibus
     # @see (Util#shellout!)
     #
     def shellout!(command_string, options = {})
+      # check command for acceptable output before raising - even if command fails
+      acceptable_output = options.delete(:acceptable_output) || false
+
       # Make sure the PWD is set to the correct directory
       # Also make a clone of options so that we can mangle it safely below.
       options = { cwd: software.project_dir }.merge(options)
@@ -876,7 +879,17 @@ module Omnibus
       options[:live_stream] ||= log.live_stream(:debug)
 
       # Use Util's shellout
-      super(command_string, options)
+      if not acceptable_output
+        super(command_string, options)
+      else
+        cmd = shellout(command_string, options)
+        if cmd.stdout.include? acceptable_output or cmd.stderr.include? acceptable_output
+          cmd
+        else
+          cmd.error!
+          cmd
+        end
+      end
     end
 
     #
