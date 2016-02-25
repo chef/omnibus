@@ -24,7 +24,7 @@ module Omnibus
     autoload :Makeself, 'omnibus/packagers/makeself'
     autoload :MSI,      'omnibus/packagers/msi'
     autoload :PKG,      'omnibus/packagers/pkg'
-    autoload :Solaris,  'omnibus/packagers/solaris'
+    autoload :IPS,  'omnibus/packagers/ips'
     autoload :RPM,      'omnibus/packagers/rpm'
 
     #
@@ -39,7 +39,7 @@ module Omnibus
       'rhel'     => RPM,
       'wrlinux'  => RPM,
       'aix'      => BFF,
-      'solaris2' => Solaris,
+      'solaris2' => IPS,
       'windows'  => MSI,
       'mac_os_x' => PKG,
     }.freeze
