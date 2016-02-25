@@ -18,8 +18,6 @@ require 'pry'
 
 module Omnibus
   class Packager::IPS < Packager::Base
-    # @return [Hash]
-
     id :ips
 
     setup do
@@ -27,66 +25,34 @@ module Omnibus
       # any excluded files.
       #
       # /opt/hamlet => /tmp/daj29013/opt/hamlet
-      destination = File.join(staging_dir, project.install_dir)
-
-      # Create the scripts staging directory
-      create_directory(scripts_staging_dir)
+      destination = staging_path(project.install_dir)
     end
 
     build do
-
-      # Generate package manifest
-        generate_pkg_manifest
-
-      # Setting up an IPS repository
-        create_ips_repo
-
-      # Publish the IPS package
-        publish_ips_pkg
+      generate_pkg_manifest
+      create_ips_repo
+      publish_ips_pkg
     end
 
-    # @see Base#package_name
     def package_name
-      "#{safe_base_package_name}@#{project.build_version},#{project.build_version}-#{project.build_iteration}:timestamp"
-    end
 
-    # The path where the package scripts in the install directory.
-    #
-    # @return [String]
-    #
-    def scripts_install_dir
-      File.expand_path(File.join(project.install_dir, 'embedded/share/installp'))
-    end
-
-    #
-    # The path where the package scripts will staged.
-    #
-    # @return [String]
-    #
-    def scripts_staging_dir
-      File.expand_path(File.join(staging_dir, scripts_install_dir))
     end
 
     #
     # Generate package manifest
-    # 
+    #
     # Package manifest is generally divided into three different parts:
-    # 1) Package metadata 
-    # 2) Package contents 
-    # 3) Package dependencies 
+    # 1) Package metadata
+    # 2) Package contents
+    # 3) Package dependencies
     #
     def generate_pkg_manifest
-      # 1) Generate Package metadata 
-      generate_pkg_metadata  
-
-      # 2) Generate Package contents 
+      generate_pkg_metadata
       generate_pkg_contents
+      generate_pkg_deps
 
-      # 3) Generate Package dependencies 
-      generate_pkg_deps 
-
-      # 4) Check the final manifest
-      check_pkg_manifest 
+      # Let's check the manifest and make sure all is right.
+      check_pkg_manifest
     end
 
     # Generate package metadata
@@ -97,19 +63,19 @@ module Omnibus
     #
     def generate_pkg_metadata
       render_template(resource_path('gen.manifestfile.erb'),
-        destination: File.join(staging_dir, 'gen.manifestfile'),
+        destination: staging_path('gen.manifestfile'),
         variables: {
-          name:           safe_base_package_name,
-          install_dir:    project.install_dir,
-          version:        ips_version,
-          description:    project.description,
-          summary:	  project.friendly_name,
-          arch:		  safe_architecture, 
+          name:        safe_base_package_name,
+          install_dir: project.install_dir,
+          fmri_package_name: fmri_package_name,
+          description: project.description,
+          summary:	   project.friendly_name,
+          arch:		     safe_architecture,
         }
       )
 
       # Print the full contents of the rendered template file for mkinstallp's use
-      log.debug(log_key) { "Rendered Template:\n" + File.read(File.join(staging_dir, 'gen.manifestfile')) }
+      log.debug(log_key) { "Rendered Template:\n" + File.read(staging_path('gen.manifestfile')) }
       binding.pry
     end
 
@@ -119,13 +85,13 @@ module Omnibus
     # @return [void]
     #
     def generate_pkg_contents
-      shellout!("/usr/bin/pkgsend generate #{project.install_dir}|pkgfmt > #{File.join(staging_dir, '#{safe_base_package_name}.p5m.1')}")
-      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p`  #{File.join(staging_dir, '#{safe_base_package_name}.p5m.1', 'gen_manifestfile')} |pkgfmt > #{File.join(staging_dir, '#{safe_base_package_name}.p5m.2')}")
+      shellout!("/usr/bin/pkgsend generate #{project.install_dir}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
+      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen_manifestfile')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
       binding.pry
     end
 
-    def generate_pkg_deps 
-      shellout!("/usr/bin/pkgdepend -md #{project.install_dir} #{safe_base_package_name}.p5m.2 |pkgfmt > #{File.join(staging_dir, "#{safe_base_package_name}.p5m.3")}")
+    def generate_pkg_deps
+      shellout!("/usr/bin/pkgdepend -md #{project.install_dir} #{safe_base_package_name}.p5m.2 |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
       shellout!("/usr/bin/pkgdepend resolve -m #{safe_base_package_name}.p5m.3")
       binding.pry
     end
@@ -134,13 +100,13 @@ module Omnibus
       shellout!("/usr/bin/pkglint -c ./lint-cache -r http://pkg.oracle.com/solaris/release #{safe_base_package_name}.p5m.3.res")
       binding.pry
     end
-    
+
     def create_ips_repo
       shellout!("/usr/bin/pkgrepo create #{ENV['HOME']}/publish/repo")
       shellout!("/usr/bin/pkgsend publish -s #{ENV['HOME']}/publish/repo -d #{project.install_dir} #{safe_base_package_name}.p5m.3.res")
       binding.pry
     end
-      
+
     def publish_ips_pkg
       shellout!("/usr/bin/pkgrepo add-publisher -s #{ENV['HOME']}/publish/repo #{ENV['LOGNAME']}")
       binding.pry
@@ -169,9 +135,16 @@ module Omnibus
       end
     end
 
-    def ips_version
+    # For more info about fmri see:
+    # http://docs.oracle.com/cd/E23824_01/html/E21796/pkg-5.html#scrolltoc
+    def fmri_package_name
+      # TODO: still need to implement timestamp.
       version = project.build_version.split(/[^\d]/)[0..2].join('.')
-      "#{version}.#{project.build_iteration}"
+      "#{safe_base_package_name}@#{version},#{version}-#{project.build_iteration}:timestamp"
+    end
+
+    def staging_path(file_name)
+      File.join(staging_dir, file_name)
     end
 
     #

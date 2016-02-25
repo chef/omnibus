@@ -24,7 +24,7 @@ module Omnibus
     autoload :Makeself, 'omnibus/packagers/makeself'
     autoload :MSI,      'omnibus/packagers/msi'
     autoload :PKG,      'omnibus/packagers/pkg'
-    autoload :IPS,  'omnibus/packagers/ips'
+    autoload :IPS,      'omnibus/packagers/ips'
     autoload :RPM,      'omnibus/packagers/rpm'
 
     #
