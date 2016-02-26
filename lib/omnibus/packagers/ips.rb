@@ -68,14 +68,17 @@ module Omnibus
           name:        safe_base_package_name,
           install_dir: project.install_dir,
           fmri_package_name: fmri_package_name,
-          description: project.description,
-          summary:	   project.friendly_name,
-          arch:		     safe_architecture,
+          description: "\"#{project.description}\"",
+          summary:	   "\"#{project.friendly_name}\"",
+          arch:		     safe_architecture
         }
       )
 
       # Print the full contents of the rendered template file for mkinstallp's use
       log.debug(log_key) { "Rendered Template:\n" + File.read(staging_path('gen.manifestfile')) }
+
+      # Create the proto_install directory inside staging_dir
+      Dir.mkdir("#{staging_dir}/proto_install")
       binding.pry
     end
 
@@ -85,19 +88,21 @@ module Omnibus
     # @return [void]
     #
     def generate_pkg_contents
-      shellout!("/usr/bin/pkgsend generate #{project.install_dir}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
-      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen_manifestfile')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
+      shellout!("/usr/bin/cd #{staging_dir}")
+      shellout!("/usr/bin/pkgsend generate #{project.install_dir} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
+      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen.manifestfile')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
       binding.pry
     end
 
     def generate_pkg_deps
-      shellout!("/usr/bin/pkgdepend -md #{project.install_dir} #{safe_base_package_name}.p5m.2 |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
-      shellout!("/usr/bin/pkgdepend resolve -m #{safe_base_package_name}.p5m.3")
+      shellout!("/usr/bin/pkgdepend generate -md #{project.install_dir} #{staging_path("#{safe_base_package_name}.p5m.2")}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
+      binding.binding.pry
+      shellout!("/usr/bin/pkgdepend resolve -m #{staging_path("#{safe_base_package_name}.p5m.3")}")
       binding.pry
     end
 
     def check_pkg_manifest
-      shellout!("/usr/bin/pkglint -c ./lint-cache -r http://pkg.oracle.com/solaris/release #{safe_base_package_name}.p5m.3.res")
+      shellout!("/usr/bin/pkglint -c #{staging_path('lint-cache')} -r http://pkg.oracle.com/solaris/release #{staging_path("#{safe_base_package_name}.p5m.3.res")}")
       binding.pry
     end
 
@@ -130,7 +135,6 @@ module Omnibus
           "plus signs (+), and dashes (-). Converting `#{project.package_name}' to " \
           "`#{converted}'."
         end
-
         converted
       end
     end
@@ -139,8 +143,9 @@ module Omnibus
     # http://docs.oracle.com/cd/E23824_01/html/E21796/pkg-5.html#scrolltoc
     def fmri_package_name
       # TODO: still need to implement timestamp.
-      version = project.build_version.split(/[^\d]/)[0..2].join('.')
-      "#{safe_base_package_name}@#{version},#{version}-#{project.build_iteration}:timestamp"
+      version = project.build_version.split(/[^\d]/)[1..2].join('.')
+      #version = project.build_version
+      "#{safe_base_package_name}@#{version},#{version}-#{project.build_iteration}:20160226T100948Z"
     end
 
     def staging_path(file_name)
@@ -153,7 +158,14 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      Ohai['kernel']['machine']
+      # The #i386? and #intel? helpers come from chef-sugar
+      if intel?
+        'i386'
+      elsif sparc?
+        'sparc'
+      else
+        Ohai['kernel']['machine']
+      end
     end
   end
 end
