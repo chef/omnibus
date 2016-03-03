@@ -24,18 +24,19 @@ module Omnibus
       # Copy the full-stack installer into our scratch directory, accounting for
       # any excluded files.
       #
-      # /opt/hamlet => /tmp/daj29013/opt/hamlet
-      destination = staging_path(project.install_dir)
+      # /opt/hamlet => /tmp/daj29013/proto_install/opt/hamlet
+      # Create the proto_install directory inside staging_dir
+      Dir.mkdir("#{staging_dir}/proto_install")
+      destination = File.join(staging_path('proto_install'), project.install_dir)
+      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
+      create_transform_file
     end
 
     build do
       generate_pkg_manifest
       create_ips_repo
       publish_ips_pkg
-    end
-
-    def package_name
-
+      view_repo_info
     end
 
     #
@@ -51,8 +52,10 @@ module Omnibus
       generate_pkg_contents
       generate_pkg_deps
 
-      # Let's check the manifest and make sure all is right.
+    ##   Let's check the manifest and make sure all is right.
       check_pkg_manifest
+
+      #publish_package_file
     end
 
     # Generate package metadata
@@ -66,8 +69,8 @@ module Omnibus
         destination: staging_path('gen.manifestfile'),
         variables: {
           name:        safe_base_package_name,
-          install_dir: project.install_dir,
-          fmri_package_name: fmri_package_name,
+          #install_dir: project.install_dir,
+          fmri_package_name: package_name,
           description: "\"#{project.description}\"",
           summary:	   "\"#{project.friendly_name}\"",
           arch:		     safe_architecture
@@ -77,8 +80,6 @@ module Omnibus
       # Print the full contents of the rendered template file for mkinstallp's use
       log.debug(log_key) { "Rendered Template:\n" + File.read(staging_path('gen.manifestfile')) }
 
-      # Create the proto_install directory inside staging_dir
-      Dir.mkdir("#{staging_dir}/proto_install")
       binding.pry
     end
 
@@ -88,36 +89,40 @@ module Omnibus
     # @return [void]
     #
     def generate_pkg_contents
-      shellout!("/usr/bin/cd #{staging_dir}")
-      shellout!("/usr/bin/pkgsend generate #{project.install_dir} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
+      shellout!("/usr/bin/pkgsend generate #{source_dir} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
       shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen.manifestfile')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
       binding.pry
     end
 
     def generate_pkg_deps
-      shellout!("/usr/bin/pkgdepend generate -md #{project.install_dir} #{staging_path("#{safe_base_package_name}.p5m.2")}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
-      binding.binding.pry
+      shellout!("/usr/bin/pkgdepend generate -md #{source_dir} #{staging_path("#{safe_base_package_name}.p5m.2")}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
       shellout!("/usr/bin/pkgdepend resolve -m #{staging_path("#{safe_base_package_name}.p5m.3")}")
+      shellout!("/usr/bin/pkgmogrify #{staging_path("#{safe_base_package_name}.p5m.3.res")} #{staging_path('doc-transform')} | pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
       binding.pry
     end
 
     def check_pkg_manifest
-      shellout!("/usr/bin/pkglint -c #{staging_path('lint-cache')} -r http://pkg.oracle.com/solaris/release #{staging_path("#{safe_base_package_name}.p5m.3.res")}")
+      shellout!("/usr/bin/pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
       binding.pry
     end
 
+    ########## Need to add validation check if the repo already exist###########
     def create_ips_repo
-      shellout!("/usr/bin/pkgrepo create #{ENV['HOME']}/publish/repo")
-      shellout!("/usr/bin/pkgsend publish -s #{ENV['HOME']}/publish/repo -d #{project.install_dir} #{safe_base_package_name}.p5m.3.res")
+      shellout!("/usr/bin/pkgrepo create #{repo_dir}")
       binding.pry
     end
 
     def publish_ips_pkg
-      shellout!("/usr/bin/pkgrepo add-publisher -s #{ENV['HOME']}/publish/repo #{ENV['LOGNAME']}")
+      shellout!("/usr/bin/pkgrepo add-publisher -s #{repo_dir} #{ENV['LOGNAME']}")
+      shellout!("/usr/bin/pkgsend publish -s #{repo_dir} -d #{source_dir} #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
       binding.pry
     end
 
-    #
+    def view_repo_info
+      shellout!("/usr/bin/pkgrepo info -s #{repo_dir}")
+      binding.pry
+    end
+
     # Return the IPS-ready base package name, converting any invalid characters to
     # dashes (+-+).
     #
@@ -139,24 +144,40 @@ module Omnibus
       end
     end
 
+    # @see Base#package_name
+    #
     # For more info about fmri see:
-    # http://docs.oracle.com/cd/E23824_01/html/E21796/pkg-5.html#scrolltoc
-    def fmri_package_name
+    # http://doc.oracle.com/cd/E23824_01/html/E21796/pkg-5.html#scrolltoc
+    def package_name
       # TODO: still need to implement timestamp.
       version = project.build_version.split(/[^\d]/)[1..2].join('.')
       #version = project.build_version
-      "#{safe_base_package_name}@#{version},#{version}-#{project.build_iteration}:20160226T100948Z"
+      "#{safe_base_package_name}@#{version},#{version}-#{project.build_iteration}"
+    end
+
+    #docfile = staging_path('doc-transform')
+    #File.open("#{staging_dir}/doc-transform", "w+") do |f|
+    def create_transform_file
+      pathdir = project.install_dir.split('/')[1]
+      File.open("#{staging_path("doc-transform")}", "w+") do |f|
+        f.write <<-EOF
+        <transform dir path=#{pathdir}$ -> edit group bin sys>
+        EOF
+      end
     end
 
     def staging_path(file_name)
       File.join(staging_dir, file_name)
     end
 
-    #
-    # The architecture for this RPM package.
-    #
-    # @return [String]
-    #
+    def source_dir
+      staging_path('proto_install')
+    end
+
+    def repo_dir
+      staging_path('publish/repo')
+    end
+
     def safe_architecture
       # The #i386? and #intel? helpers come from chef-sugar
       if intel?
