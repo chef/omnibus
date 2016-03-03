@@ -607,5 +607,79 @@ module Omnibus
         end
       end
     end
+
+    describe '#update_config_guess', :not_supported_on_windows, :focus => true do
+      let(:config_guess_dir) { "#{install_dir}/embedded/lib/config_guess" }
+
+      before do
+        FileUtils.mkdir_p(config_guess_dir)
+      end
+
+      context 'with no config.guess' do
+        before do
+          File.open("#{config_guess_dir}/config.sub", "w+") do |f|
+            f.write("This is config.sub")
+          end
+        end
+
+        it 'fails' do
+          subject.update_config_guess
+          expect{subject.build}.to raise_error(RuntimeError)
+        end
+      end
+
+      context 'with no config.sub' do
+        before do
+          File.open("#{config_guess_dir}/config.guess", "w+") do |f|
+            f.write("This is config.guess")
+          end
+        end
+
+        it 'fails' do
+          subject.update_config_guess
+          expect{subject.build}.to raise_error(RuntimeError)
+        end
+      end
+
+      context 'with config_guess dependency' do
+        before do
+          File.open("#{config_guess_dir}/config.guess", "w+") do |f|
+            f.write("This is config.guess")
+          end
+
+          File.open("#{config_guess_dir}/config.sub", "w+") do |f|
+            f.write("This is config.sub")
+          end
+        end
+
+        it 'update config_guess with defaults' do
+          subject.update_config_guess
+          subject.build
+          expect(File.read("#{project_dir}/config.guess")).to match /config.guess/
+          expect(File.read("#{project_dir}/config.sub")).to match /config.sub/
+        end
+
+        it 'honors :target option' do
+          subject.update_config_guess(target: "sub_dir")
+          subject.build
+          expect(File.read("#{project_dir}/sub_dir/config.guess")).to match /config.guess/
+          expect(File.read("#{project_dir}/sub_dir/config.sub")).to match /config.sub/
+        end
+
+        it 'honors :config_guess in :install option' do
+          subject.update_config_guess(install: [:config_guess])
+          subject.build
+          expect(File.read("#{project_dir}/config.guess")).to match /config.guess/
+          expect(File.exist?("#{project_dir}/config.sub")).to be false
+        end
+
+        it 'honors :config_sub in :install option' do
+          subject.update_config_guess(install: [:config_sub])
+          subject.build
+          expect(File.read("#{project_dir}/config.sub")).to match /config.sub/
+          expect(File.exist?("#{project_dir}/config.guess")).to be false
+        end
+      end
+    end
   end
 end

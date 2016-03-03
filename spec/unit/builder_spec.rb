@@ -19,7 +19,7 @@ module Omnibus
     end
 
     subject { described_class.new(software) }
-    
+
     before do
       allow(subject).to receive(:windows?).and_return(on_windows)
       allow(subject).to receive(:windows_safe_path) do |*args|
@@ -115,6 +115,12 @@ module Omnibus
     describe '#sync' do
       it 'is a DSL method' do
         expect(subject).to have_exposed_method(:sync)
+      end
+    end
+
+    describe '#update_config_guess' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:update_config_guess)
       end
     end
 

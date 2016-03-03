@@ -644,6 +644,35 @@ module Omnibus
     expose :sync
 
     #
+    # Helper method to update config_guess in the software's source
+    # directory.
+    # You should add a dependency on the +config_guess+ software definition if you
+    # want to use this command.
+    # @param [Hash] options
+    #   Supported options are:
+    #     target [String] subdirectory under the software source to copy
+    #       config.guess.to. Default: "."
+    #     install [Array<Symbol>] parts of config.guess to copy.
+    #       Default: [:config_guess, :config_sub]
+    def update_config_guess(target: ".", install: [:config_guess, :config_sub])
+      build_commands << BuildCommand.new("update_config_guess `target: #{target} install: #{install.inspect}'") do
+        config_guess_dir = "#{install_dir}/embedded/lib/config_guess"
+        %w{config.guess config.sub}.each do |c|
+          unless File.exist?(File.join(config_guess_dir, c))
+            raise "Can not find #{c}. Make sure you add a dependency on 'config_guess' in your software definition"
+          end
+        end
+
+        destination = File.join(software.project_dir, target)
+        FileUtils.mkdir_p(destination)
+
+        FileUtils.cp_r("#{config_guess_dir}/config.guess", destination) if install.include? :config_guess
+        FileUtils.cp_r("#{config_guess_dir}/config.sub", destination) if install.include? :config_sub
+      end
+    end
+    expose :update_config_guess
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
