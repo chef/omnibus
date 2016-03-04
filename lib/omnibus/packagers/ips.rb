@@ -37,6 +37,7 @@ module Omnibus
       create_ips_repo
       publish_ips_pkg
       view_repo_info
+      publish_as_pkg_archive
     end
 
     #
@@ -70,7 +71,7 @@ module Omnibus
         variables: {
           name:        safe_base_package_name,
           #install_dir: project.install_dir,
-          fmri_package_name: package_name,
+          fmri_package_name: fmri_package_name,
           description: "\"#{project.description}\"",
           summary:	   "\"#{project.friendly_name}\"",
           arch:		     safe_architecture
@@ -123,6 +124,11 @@ module Omnibus
       binding.pry
     end
 
+    def publish_as_pkg_archive
+      dest_dir = File.join(Config.package_dir, "#{safe_base_package_name}.p5p")
+      shellout!("/usr/bin/pkgrecv -s #{repo_dir} -a -d #{dest_dir} #{safe_base_package_name}")
+    end  
+
     # Return the IPS-ready base package name, converting any invalid characters to
     # dashes (+-+).
     #
@@ -146,9 +152,13 @@ module Omnibus
 
     # @see Base#package_name
     #
+    def package_name
+      "#{safe_base_package_name}.p5p"
+    end
+
     # For more info about fmri see:
     # http://doc.oracle.com/cd/E23824_01/html/E21796/pkg-5.html#scrolltoc
-    def package_name
+    def fmri_package_name
       # TODO: still need to implement timestamp.
       version = project.build_version.split(/[^\d]/)[1..2].join('.')
       #version = project.build_version
