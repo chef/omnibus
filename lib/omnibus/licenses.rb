@@ -26,12 +26,13 @@ module Omnibus
 
       licenses.keys.sort.each do |name|
         license = licenses[name][:license]
-        license_file = licenses[name][:license_file]
+        license_files = licenses[name][:license_files]
         version = licenses[name][:version]
 
         out << "This product bundles #{name} #{version},\n"
         out << "which is available under a \"#{license}\" License.\n"
-        if license_file
+
+        license_files.each do |license_file|
           out << "For details, see #{location(name, license_file)}\n"
         end
         out << "\n"

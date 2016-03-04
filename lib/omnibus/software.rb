@@ -348,7 +348,7 @@ module Omnibus
     expose :license
 
     #
-    # Set or retrieve the location of the {#license_file}
+    # Set or retrieve the location of a {#license_file}
     # of the software.  It can either be a relative path inside
     # the source package or a URL.
     #
@@ -361,12 +361,9 @@ module Omnibus
     #
     # @return [String]
     #
-    def license_file(val = NULL)
-      if null?(val)
-        @license_file
-      else
-        @license_file = val
-      end
+    def license_file(file)
+      license_files << file
+      license_files.dup
     end
     expose :license_file
 
@@ -813,6 +810,17 @@ module Omnibus
     #
     def whitelist_files
       @whitelist_files ||= []
+    end
+
+    #
+    # The list of license files for this software
+    #
+    # @see #license_file
+    #
+    # @return [Array<String>]
+    #
+    def license_files
+      @license_files ||= []
     end
 
     #

@@ -22,8 +22,8 @@ module Omnibus
       software = Software.new(p, "#{name}.rb")
       software.name(name)
       software.version(version)
-      software.license(license)
-      software.license_file(license_file)
+      software.license(license) if license
+      software.license_file(license_file) if license_file
 
       software
     end
@@ -158,7 +158,7 @@ module Omnibus
         activemq.default_version('1.0.0.alpha')
         expect(library.license_map).to eq({
           "activemq" =>  {:license => "Apache 2.0",
-                          :license_file => nil,
+                          :license_files => [],
                           :version => '1.0.0.alpha',
                           :project_dir => '/var/cache/omnibus/src/activemq'}
         })
@@ -169,7 +169,7 @@ module Omnibus
         activemq.default_version('2.0.0')
         expect(library.license_map).to eq({
           "activemq" =>  {:license => "Apache 2.0",
-                          :license_file => nil,
+                          :license_files => [],
                           :version => '2.0.0',
                           :project_dir => '/var/cache/omnibus/src/activemq'}
         })

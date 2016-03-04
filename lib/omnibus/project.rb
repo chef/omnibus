@@ -1121,11 +1121,13 @@ module Omnibus
 
       FileUtils.mkdir_p(license_dir)
       library.license_map.each do |name, values|
-        license_file = values[:license_file]
-        if license_file && is_local(license_file)
-          input_file = File.expand_path(license_file, values[:project_dir])
-          output_file = File.expand_path(Omnibus::Licenses.location(name, license_file), install_dir)
-          FileUtils.cp(input_file, output_file)
+        license_files = values[:license_files]
+        license_files.each do |license_file|
+          if license_file && is_local(license_file)
+            input_file = File.expand_path(license_file, values[:project_dir])
+            output_file = File.expand_path(Omnibus::Licenses.location(name, license_file), install_dir)
+            FileUtils.cp(input_file, output_file)
+          end
         end
       end
     end

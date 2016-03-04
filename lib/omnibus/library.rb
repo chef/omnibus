@@ -108,7 +108,7 @@ module Omnibus
         if component.default_version
           map[component.name] = {
             license: component.license,
-            license_file: component.license_file,
+            license_files: component.license_files,
             version: component.version,
             project_dir: component.project_dir,
           }
