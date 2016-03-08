@@ -306,10 +306,16 @@ module Omnibus
     # @return [String]
     #
     def mark_filesystem_directories(fsdir)
+      # Workaround for datadog-agent: do not list `filesystem` directories in the package because some packages
+      # installed by default on some distros have a complete disregard for the permissions defined by their
+      # own `filesystem` pkg, and then conflict with the datadog-agent pkg
+      # Example: the `service-nanny` pkg on Amazon Linux EMR, which defines `755` perms on `/usr/bin`
       if fsdir.eql?("/") || fsdir.eql?("/usr/bin") || fsdir.eql?("/usr/lib") || fsdir.eql?("/usr/share/empty")
-        return "%dir %attr(0555,root,root) #{fsdir}"
+        # return "%dir %attr(0555,root,root) #{fsdir}"
+        return ""
       elsif filesystem_directories.include?(fsdir)
-        return "%dir %attr(0755,root,root) #{fsdir}"
+        # return "%dir %attr(0755,root,root) #{fsdir}"
+        return ""
       else
         return "%dir #{fsdir}"
       end
@@ -335,7 +341,8 @@ module Omnibus
 
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
-                .map { |path| build_filepath(path) }
+                .map    { |path| build_filepath(path) }
+                .reject { |path| path.empty? }
 
       render_template(resource_path("spec.erb"),
         destination: spec_file,
