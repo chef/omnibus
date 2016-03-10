@@ -105,6 +105,20 @@ module Omnibus
       end
     end
 
+    describe '#dist_tag' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:dist_tag)
+      end
+
+      it 'has a default value' do
+        expect(subject.dist_tag).to eq('.el6')
+      end
+
+      it 'must be a string' do
+        expect { subject.dist_tag(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
     describe '#id' do
       it 'is :rpm' do
         expect(subject.id).to eq(:rpm)
@@ -316,12 +330,6 @@ module Omnibus
 
       it 'escapes %' do
         expect(subject.rpm_safe('%foo')).to eq('[%]foo')
-      end
-    end
-
-    describe '#dist_tag' do
-      it 'returns the Fedora packaging guidelines dist tag for the package' do
-        expect(subject.dist_tag).to eq('.el6')
       end
     end
 

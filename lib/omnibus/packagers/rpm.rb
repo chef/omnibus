@@ -203,6 +203,35 @@ module Omnibus
     expose :category
 
     #
+    # Set or return the dist_tag for this package
+    #
+    # The Dist Tag for this RPM package as per the Fedora packaging guidlines.
+    #
+    # @see http://fedoraproject.org/wiki/Packaging:DistTag
+    #
+    # @example
+    #   dist_tag ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
+    #
+    # @param [String] val
+    #   the dist_tag for this package
+    #
+    # @return [String]
+    #   the dist_tag for this package
+    #
+    def dist_tag(val = NULL)
+      if null?(val)
+        @dist_tag || ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:dist_tag, 'be a String')
+        end
+
+        @dist_tag = val
+      end
+    end
+    expose :dist_tag
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -210,7 +239,11 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+      if dist_tag
+        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+      else
+        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+      end
     end
 
     #
@@ -433,17 +466,6 @@ module Omnibus
         .gsub("*", "[*]")
         .gsub("?", "[?]")
         .gsub("%", "[%]")
-    end
-
-    #
-    # The Dist Tag for this RPM package per the Fedora packaging guidlines.
-    #
-    # @see http://fedoraproject.org/wiki/Packaging:DistTag
-    #
-    # @return [String]
-    #
-    def dist_tag
-      ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
     end
 
     #
