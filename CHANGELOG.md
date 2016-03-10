@@ -1,6 +1,32 @@
 Omnibus CHANGELOG
 =================
 
+v5.1.0 (March 10, 2016)
+-----------------------
+### New Features
+- New `configure` dsl method. (#572)
+- New `maintainer` dsl method. (#618)
+- New `update_config_guess` dsl method. (#632)
+- Ability to enable building software components from source on windows. (#572, #583, #584, #586, #612)
+
+### Bug Fixes
+- Default to UTF-8 external encoding globally. (#573)
+- Restore invalid file names on AIX. (#575)
+- Fix bff log loop. (#579)
+- Use 7z.exe instead of tar.exe on windows. (#578)
+- Make generated package scripts old-school Unix friendly. (#582)
+- Fix directory cleanup logic in `git_fetcher`. (#509)
+- Use -O2 when building with standard compiler flags. (#591)
+- Cache software sources under `.../src/<software name>/<package>`. (#597)
+- Add libmd.so.* to freebsd whitelist. (#600)
+- Remove existing links in the destination when syncing files. (#602)
+- Skip adding DEBIAN directory to md5sums file. (#595)
+- Autoprunes files with spaces on Solaris. (#609)
+- Allow assets with non-md5 checksums to be cached in s3. (#611)
+- Print NetFetcher retries at the info level. (#614)
+- Do not modify CRLF when git caching. (#616)
+- Ensure we always swap chown back to default. (#617)
+
 v5.0.0 (November 10, 2015)
 --------------------------
 ### New Features
