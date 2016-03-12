@@ -222,10 +222,6 @@ module Omnibus
       if null?(val)
         @dist_tag || ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
       else
-        unless val.is_a?(String)
-          raise InvalidValue.new(:dist_tag, 'be a String')
-        end
-
         @dist_tag = val
       end
     end

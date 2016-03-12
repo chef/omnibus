@@ -113,10 +113,6 @@ module Omnibus
       it 'has a default value' do
         expect(subject.dist_tag).to eq('.el6')
       end
-
-      it 'must be a string' do
-        expect { subject.dist_tag(Object.new) }.to raise_error(InvalidValue)
-      end
     end
 
     describe '#id' do
@@ -126,12 +122,24 @@ module Omnibus
     end
 
     describe '#package_name' do
-      before do
-        allow(subject).to receive(:safe_architecture).and_return('x86_64')
+      context 'when dist_tag is enabled' do
+        before do
+          allow(subject).to receive(:safe_architecture).and_return('x86_64')
+        end
+
+        it 'includes the name, version, and build iteration' do
+          expect(subject.package_name).to eq('project-1.2.3-2.el6.x86_64.rpm')
+        end
       end
 
-      it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project-1.2.3-2.el6.x86_64.rpm')
+      context 'when dist_tag is disabled' do
+        before do
+          allow(subject).to receive(:dist_tag).and_return(false)
+        end
+
+        it 'excludes dist tag' do
+          expect(subject.package_name).to eq('project-1.2.3-2.x86_64.rpm')
+        end
       end
     end
 
