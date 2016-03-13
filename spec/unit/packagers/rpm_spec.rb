@@ -91,6 +91,20 @@ module Omnibus
       end
     end
 
+    describe '#epoch' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:epoch)
+      end
+
+      it 'has no default value' do
+        expect(subject.epoch).to eq(nil)
+      end
+
+      it 'must be a Fixnum' do
+        expect { subject.epoch(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
     describe '#category' do
       it 'is a DSL method' do
         expect(subject).to have_exposed_method(:category)
@@ -156,6 +170,14 @@ module Omnibus
         expect(contents).to include("URL: https://example.com")
         expect(contents).to include("Packager: Chef Software")
         expect(contents).to include("Obsoletes: old-project")
+      end
+
+      it 'supports the epoch tag' do
+        allow(subject).to receive(:epoch).and_return(42)
+        subject.write_rpm_spec
+        contents = File.read(spec_file)
+
+        expect(contents).to include("Epoch: 42")
       end
 
       context 'when scripts are given' do

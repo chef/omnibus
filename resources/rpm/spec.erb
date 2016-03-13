@@ -25,6 +25,9 @@ Prefix: /
 Group: <%= category %>
 License: <%= license %>
 Vendor: <%= vendor %>
+<% if epoch -%>
+Epoch: <%= epoch %>
+<% end -%>
 URL: <%= homepage %>
 Packager: <%= maintainer %>
 <% dependencies.each do |name| -%>
