@@ -7,6 +7,7 @@ require "omnibus/packagers/ips"
 context "ips packager" do
   let(:project_root) { File.join(tmp_path, 'project/root') }
   let(:package_dir)  { File.join(tmp_path, 'package/dir') }
+  let(:install_dir)  { File.join(tmp_path, 'install_dir')}
 
   let(:project) do
     # p = instance_double(Omnibus::Project)
@@ -15,7 +16,7 @@ context "ips packager" do
     Omnibus::Project.new.tap do |project|
       project.name('project')
       project.homepage('https://example.com')
-      project.install_dir('/opt/project')
+      project.install_dir(install_dir)
       project.build_version('1.2.3')
       project.build_iteration('2')
       project.maintainer('Chef Software')
@@ -29,6 +30,7 @@ context "ips packager" do
   before do
     Omnibus::Config.project_root(project_root)
     Omnibus::Config.package_dir(package_dir)
+    FileUtils.mkdir_p(install_dir)
   end
 
   context "with a basic project" do
