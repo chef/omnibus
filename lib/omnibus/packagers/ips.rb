@@ -81,7 +81,7 @@ module Omnibus
       # Print the full contents of the rendered template file for mkinstallp's use
       log.debug(log_key) { "Rendered Template:\n" + File.read(staging_path('gen.manifestfile')) }
 
-      binding.pry
+#      binding.pry
     end
 
     #
@@ -92,41 +92,42 @@ module Omnibus
     def generate_pkg_contents
       shellout!("/usr/bin/pkgsend generate #{source_dir} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
       shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen.manifestfile')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
-      binding.pry
+#      binding.pry
     end
 
     def generate_pkg_deps
       shellout!("/usr/bin/pkgdepend generate -md #{source_dir} #{staging_path("#{safe_base_package_name}.p5m.2")}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
       shellout!("/usr/bin/pkgdepend resolve -m #{staging_path("#{safe_base_package_name}.p5m.3")}")
       shellout!("/usr/bin/pkgmogrify #{staging_path("#{safe_base_package_name}.p5m.3.res")} #{staging_path('doc-transform')} | pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
-      binding.pry
+#      binding.pry
     end
 
     def check_pkg_manifest
       shellout!("/usr/bin/pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
-      binding.pry
+#      binding.pry
     end
 
     ########## Need to add validation check if the repo already exist###########
     def create_ips_repo
       shellout!("/usr/bin/pkgrepo create #{repo_dir}")
-      binding.pry
+#      binding.pry
     end
 
     def publish_ips_pkg
       shellout!("/usr/bin/pkgrepo add-publisher -s #{repo_dir} #{ENV['LOGNAME']}")
       shellout!("/usr/bin/pkgsend publish -s #{repo_dir} -d #{source_dir} #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
-      binding.pry
+#      binding.pry
     end
 
     def view_repo_info
       shellout!("/usr/bin/pkgrepo info -s #{repo_dir}")
-      binding.pry
+#      binding.pry
     end
 
     def publish_as_pkg_archive
       dest_dir = File.join(Config.package_dir, "#{safe_base_package_name}.p5p")
       shellout!("/usr/bin/pkgrecv -s #{repo_dir} -a -d #{dest_dir} #{safe_base_package_name}")
+      binding.pry
     end  
 
     # Return the IPS-ready base package name, converting any invalid characters to

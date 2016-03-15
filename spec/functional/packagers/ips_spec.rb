@@ -7,14 +7,15 @@ require "omnibus/packagers/ips"
 context "ips packager" do
   let(:project_root) { File.join(tmp_path, 'project/root') }
   let(:package_dir)  { File.join(tmp_path, 'package/dir') }
-  let(:install_dir)  { File.join(tmp_path, 'install_dir')}
+#  let(:install_dir)  { File.join(tmp_path, 'install_dir')}
+  let(:install_dir)  { '/opt/projectchef' }
 
   let(:project) do
     # p = instance_double(Omnibus::Project)
     # allow(p).to receive(:name).and_return("project")
 
     Omnibus::Project.new.tap do |project|
-      project.name('project')
+      project.name('projectchef')
       project.homepage('https://example.com')
       project.install_dir(install_dir)
       project.build_version('1.2.3')
@@ -31,12 +32,14 @@ context "ips packager" do
     Omnibus::Config.project_root(project_root)
     Omnibus::Config.package_dir(package_dir)
     FileUtils.mkdir_p(install_dir)
+    FileUtils.mkdir_p(package_dir)
   end
 
   context "with a basic project" do
     it "should build a package" do
       packager.run!
-      expect(File.exist?(File.join(Config.package_dir, packager.package_name)))
+      binding.pry
+      expect(File.exist?(File.join(package_dir, packager.package_name)))
     end
   end
 end
