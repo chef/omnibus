@@ -608,7 +608,7 @@ module Omnibus
       end
     end
 
-    describe '#update_config_guess', :not_supported_on_windows, :focus => true do
+    describe '#update_config_guess', :not_supported_on_windows do
       let(:config_guess_dir) { "#{install_dir}/embedded/lib/config_guess" }
 
       before do

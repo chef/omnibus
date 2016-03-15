@@ -71,6 +71,10 @@ module Omnibus
       it "returns a build_git_revision if one was passed in" do
         expect(Omnibus::Manifest.new("1.2.3", "e8e8e8").to_hash["build_git_revision"]).to eq("e8e8e8")
       end
+
+      it "returns a license if one was passed in" do
+        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache").to_hash["license"]).to eq("Apache")
+      end
     end
 
     describe "#from_hash" do
