@@ -1,6 +1,28 @@
 Omnibus CHANGELOG
 =================
 
+v5.2.0 (March 15, 2016)
+-----------------------
+### New Features
+
+- License reporting (#635):
+  - Add `license` & `license_file` DSL methods to software.
+    - `license` (String): Sets the license of the software component.
+    - `license_file` (String): The relative path or the url of the license file of the software to be included in `"LICENSES"` directory.
+      - Can be used multiple times.
+      - You can use `:project_license` as a special value if the software is build related code and if it is using project's license.
+  - Add `license`, `license_file` and `license_file_path` DSL methods to project.
+    - `license` (String): Sets the license of the project.
+    - `license_file` (String): The relative path or the url of the license file of the project to be included in the file that will be created at project.license_file_path.
+    - `license_file_path` (String): The relative path of the main license file that will be created for the project. Default: `"LICENSE"`.
+
+  With this omnibus will:
+
+  1. Collect all the license files specified in software components into `install_dir/LICENSES` directory.
+  2. Create a license file at `install_dir/LICENSE` which will contain license of the project and license information for all the software components that are being included.
+- Ability to change `dist_tag` in RPM packager. (#634)
+- Ability to update submodules during git checkout. (#603)
+
 v5.1.0 (March 10, 2016)
 -----------------------
 ### New Features
