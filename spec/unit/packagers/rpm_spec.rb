@@ -276,6 +276,20 @@ module Omnibus
           expect(contents).not_to include("BuildArch")
         end
       end
+
+      context 'when dist_tag is disabled' do
+        let(:spec_file) { "#{staging_dir}/SPECS/project-1.2.3-2.x86_64.rpm.spec" }
+
+        before do
+          allow(subject).to receive(:dist_tag).and_return(false)
+        end
+
+        it 'has the correct release' do
+          subject.write_rpm_spec
+          contents = File.read(spec_file)
+          expect(contents).to include("Release: 2")
+        end
+      end
     end
 
     describe '#create_rpm_file' do
