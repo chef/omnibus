@@ -33,6 +33,10 @@ module Omnibus
     end
 
     build do
+      build_me
+    end
+
+    def build_me
       generate_pkg_manifest
       create_ips_repo
       publish_ips_pkg
@@ -128,7 +132,7 @@ module Omnibus
       dest_dir = File.join(Config.package_dir, "#{safe_base_package_name}.p5p")
       shellout!("/usr/bin/pkgrecv -s #{repo_dir} -a -d #{dest_dir} #{safe_base_package_name}")
       binding.pry
-    end  
+    end
 
     # Return the IPS-ready base package name, converting any invalid characters to
     # dashes (+-+).

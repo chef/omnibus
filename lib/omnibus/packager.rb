@@ -24,7 +24,9 @@ module Omnibus
     autoload :Makeself, 'omnibus/packagers/makeself'
     autoload :MSI,      'omnibus/packagers/msi'
     autoload :PKG,      'omnibus/packagers/pkg'
+    autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :IPS,      'omnibus/packagers/ips'
+    autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :RPM,      'omnibus/packagers/rpm'
 
     #
@@ -39,7 +41,8 @@ module Omnibus
       'rhel'     => RPM,
       'wrlinux'  => RPM,
       'aix'      => BFF,
-      'solaris2' => IPS,
+      'solaris'  => Solaris,
+      'ips'      => IPS,
       'windows'  => MSI,
       'mac_os_x' => PKG,
     }.freeze
@@ -55,6 +58,15 @@ module Omnibus
     #
     def for_current_system
       family = Ohai['platform_family']
+      version = Ohai['platform_version']
+
+      if family == 'solaris2' && version >= '5.11'
+        family = "ips"
+      end
+
+      if family == 'solaris2' && version < '5.10'
+        family = "solaris"
+      end
 
       if klass = PLATFORM_PACKAGER_MAP[family]
         klass
