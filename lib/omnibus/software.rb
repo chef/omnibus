@@ -614,8 +614,16 @@ module Omnibus
           opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
-            # If we're happy with these flags, enable SSE for other platforms running x86 too.
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 -mfpmath=sse -msse2 #{opt_flag}"
+            # We do not wish to enable SSE even though we target i686 because
+            # of a stack alignment issue with some libraries. We have not
+            # exactly ascertained the cause but some compiled library/binary
+            # violates gcc's assumption that the stack is going to be 16-byte
+            # aligned which is just fine as long as one is pushing 32-bit
+            # values from general purpose registers but stuff hits the fan as
+            # soon as gcc emits aligned SSE xmm register spills which generate
+            # GPEs and terminate the application very rudely with very little
+            # to debug with.
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 #{opt_flag}"
           }
         else
           {
