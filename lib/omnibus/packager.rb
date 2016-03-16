@@ -61,9 +61,7 @@ module Omnibus
 
       if family == 'solaris2' && version >= '5.11'
         family = "ips"
-      end
-
-      if family == 'solaris2' && version < '5.10'
+      elsif family == 'solaris2' && version <= '5.10'
         family = "solaris"
       end
 
