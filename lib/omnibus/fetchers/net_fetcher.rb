@@ -15,11 +15,12 @@
 #
 
 require 'fileutils'
-require 'open-uri'
-require 'ruby-progressbar'
+require 'omnibus/download_helpers'
 
 module Omnibus
   class NetFetcher < Fetcher
+    include DownloadHelpers
+
     # Use 7-zip to extract 7z/zip for Windows
     WIN_7Z_EXTENSIONS = %w(.7z .zip)
 
@@ -159,53 +160,17 @@ module Omnibus
     def download
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
-      options = download_headers
+      options = {}
 
       if source[:unsafe]
         log.warn(log_key) { "Permitting unsafe redirects!" }
         options[:allow_unsafe_redirects] = true
       end
 
-      options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
-      fetcher_retries ||= Omnibus::Config.fetcher_retries
+      # Set the cookie if one was given
+      options['Cookie'] = source[:cookie] if source[:cookie]
 
-      progress_bar = ProgressBar.create(
-        output: $stdout,
-        format: '%e %B %p%% (%r KB/sec)',
-        rate_scale: ->(rate) { rate / 1024 },
-      )
-
-      reported_total = 0
-
-      options[:content_length_proc] = ->(total) {
-        reported_total = total
-        progress_bar.total = total
-      }
-      options[:progress_proc] = ->(step) {
-        downloaded_amount = [step, reported_total].min
-        progress_bar.progress = downloaded_amount
-      }
-
-      file = open(download_url, options)
-      # This is a temporary file. Close and flush it before attempting to copy
-      # it over.
-      file.close
-      FileUtils.cp(file.path, downloaded_file)
-      file.unlink
-    rescue SocketError,
-           Errno::ECONNREFUSED,
-           Errno::ECONNRESET,
-           Errno::ENETUNREACH,
-           Timeout::Error,
-           OpenURI::HTTPError => e
-      if fetcher_retries != 0
-        log.info(log_key) { "Retrying failed download due to #{e} (#{fetcher_retries} retries left)..." }
-        fetcher_retries -= 1
-        retry
-      else
-        log.error(log_key) { "Download failed - #{e.class}!" }
-        raise
-      end
+      download_file!(download_url, downloaded_file, options)
     end
 
     #
@@ -357,44 +322,6 @@ module Omnibus
     #
     def tar
       Omnibus.which('gtar') ? 'gtar' : 'tar'
-    end
-
-    #
-    # The list of headers to pass to the download.
-    #
-    # @return [Hash]
-    #
-    def download_headers
-      {}.tap do |h|
-        # Alright kids, sit down while grandpa tells you a story. Back when the
-        # Internet was just a series of tubes, and you had to "dial in" using
-        # this thing called a "modem", ancient astronaunt theorists (computer
-        # scientists) invented gzip to compress requests sent over said tubes
-        # and make the Internet faster.
-        #
-        # Fast forward to the year of broadband - ungzipping these files was
-        # tedious and hard, so Ruby and other client libraries decided to do it
-        # for you:
-        #
-        #   https://github.com/ruby/ruby/blob/c49ae7/lib/net/http.rb#L1031-L1033
-        #
-        # Meanwhile, software manufacturers began automatically compressing
-        # their software for distribution as a +.tar.gz+, publishing the
-        # appropriate checksums accordingly.
-        #
-        # But consider... If a software manufacturer is publishing the checksum
-        # for a gzipped tarball, and the client is automatically ungzipping its
-        # responses, then checksums can (read: should) never match! Herein lies
-        # the bug that took many hours away from the lives of a once-happy
-        # developer.
-        #
-        # TL;DR - Do not let Ruby ungzip our file
-        #
-        h['Accept-Encoding'] = 'identity'
-
-        # Set the cookie if one was given
-        h['Cookie'] = source[:cookie] if source[:cookie]
-      end
     end
   end
 end

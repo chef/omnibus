@@ -16,10 +16,12 @@
 
 require 'uri'
 require 'fileutils'
+require 'omnibus/download_helpers'
 
 module Omnibus
   class Licensing
     include Logging
+    include DownloadHelpers
 
     OUTPUT_DIRECTORY = "LICENSES".freeze
 
@@ -97,10 +99,28 @@ module Omnibus
         license_files = values[:license_files]
 
         license_files.each do |license_file|
-          if license_file && local?(license_file)
-            input_file = File.expand_path(license_file, values[:project_dir])
+          if license_file
             output_file = license_package_location(name, license_file)
-            FileUtils.cp(input_file, output_file) if File.exist?(input_file)
+
+            if local?(license_file)
+              input_file = File.expand_path(license_file, values[:project_dir])
+              if File.exist?(input_file)
+                FileUtils.cp(input_file, output_file)
+              else
+                licensing_warning("License file '#{input_file}' does not exist for software '#{name}'.")
+              end
+            else
+              begin
+                download_file!(license_file, output_file, enable_progress_bar: false)
+              rescue SocketError,
+                     Errno::ECONNREFUSED,
+                     Errno::ECONNRESET,
+                     Errno::ENETUNREACH,
+                     Timeout::Error,
+                     OpenURI::HTTPError
+                licensing_warning("Can not download license file '#{license_file}' for software '#{name}'.")
+              end
+            end
           end
         end
       end
@@ -201,7 +221,8 @@ module Omnibus
       if local?(where)
         File.join(output_dir, "#{component_name}-#{File.split(where).last}")
       else
-        where
+        u = URI(where)
+        File.join(output_dir, "#{component_name}-#{File.basename(u.path)}")
       end
     end
 
@@ -222,6 +243,15 @@ module Omnibus
     def local?(license)
       u = URI(license)
       return u.scheme.nil?
+    end
+
+    #
+    # Logs the given message as warning.
+    #
+    # @param [String] message
+    #   message to log as warning
+    def licensing_warning(message)
+      log.warn(log_key) { message }
     end
   end
 end
