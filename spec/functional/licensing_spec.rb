@@ -58,6 +58,16 @@ module Omnibus
         expect(File.exist?(remote_license_file)).to be(true)
         expect(remote_license_file_contents).to match /The "Artistic License" - dev.perl.org/
       end
+
+      it "warns for non-standard software license info" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Software 'snoopy' uses license 'GPL v2' which is not one of the standard licenses")
+      end
+
+      it "warns for missing software license info" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Software 'private_code' does not contain licensing information.")
+      end
     end
 
     let(:project) do
@@ -119,6 +129,11 @@ module Omnibus
 
     describe "without license definitions in the project" do
       it_behaves_like "correctly created licenses"
+
+      it "warns for missing project license" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Project 'test-project' does not contain licensing information.")
+      end
     end
 
     describe "with license definitions in the project" do
@@ -141,6 +156,11 @@ module Omnibus
       end
 
       it_behaves_like "correctly created licenses"
+
+      it "warns for non-standard project license" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Project 'test-project' is using 'Custom Chef' which is not one of the standard licenses")
+      end
     end
 
     describe "with a local license file that does not exist" do
@@ -179,6 +199,38 @@ module Omnibus
         output = capture_logging { create_licenses }
         expect(output).to match(/Retrying failed download/)
         expect(output).to match(/Can not download license file 'https:\/\/downloads.chef.io\/LICENSE' for software 'problematic'./)
+      end
+    end
+
+    describe "with a software with no license files" do
+      let(:software_with_warnings) do
+        Software.new(project, 'problematic.rb').evaluate do
+          name 'problematic'
+          default_version '0.10.2'
+          license "Zlib"
+        end
+      end
+
+      it_behaves_like "correctly created licenses"
+
+      it "should log a warning for the missing file pointers" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Software 'problematic' does not point to any license files.")
+      end
+    end
+
+    describe "with a project with no license files" do
+      let(:license) { "Zlib" }
+
+      let(:expected_project_license_path) { "LICENSE" }
+      let(:expected_project_license) { license }
+      let(:expected_project_license_content) { "" }
+
+      it_behaves_like "correctly created licenses"
+
+      it "warns for missing license files" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Project 'test-project' does not point to a license file.")
       end
     end
   end
