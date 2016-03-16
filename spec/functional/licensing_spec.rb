@@ -9,11 +9,16 @@ module Omnibus
     let(:install_dir) { File.join(tmp_path, "install_dir")}
     let(:software_project_dir) { File.join(tmp_path, "software_project_dir")}
 
+    let(:expected_project_license_path) { "LICENSE" }
+    let(:expected_project_license) { "Unspecified" }
+    let(:expected_project_license_content) { "" }
+
     before do
       FileUtils.mkdir_p(install_dir)
       FileUtils.mkdir_p(software_project_dir)
+
       allow_any_instance_of(Software).to receive(:project_dir).and_return(software_project_dir)
-      %w{README LICENSE NOTICE}.each do |file|
+      %w{LICENSE NOTICE}.each do |file|
         File.open(File.join(software_project_dir, file), "w+") do |f|
           f.puts "This file is #{file}."
         end
@@ -22,6 +27,7 @@ module Omnibus
 
     shared_examples "correctly created licenses" do
       it "creates the main license file for the project correctly" do
+        create_licenses
         project_license = File.join(install_dir, expected_project_license_path)
         expect(File.exist?(project_license)).to be(true)
         project_license = File.read(project_license)
@@ -31,20 +37,26 @@ module Omnibus
         expect(project_license).to match /This product bundles snoopy 1.0.0,\nwhich is available under a "GPL v2"/
         expect(project_license).to match /This product bundles zlib 1.7.2,\nwhich is available under a "Zlib"/
         expect(project_license).not_to match /preparation/
-        expect(project_license).to match /LICENSES\/snoopy-README/
+        expect(project_license).to match /LICENSES\/snoopy-artistic.html/
         expect(project_license).to match /LICENSES\/snoopy-NOTICE/
         expect(project_license).to match /LICENSES\/zlib-LICENSE/
       end
 
       it "creates the license files of software components correctly" do
+        create_licenses
         license_dir = File.join(install_dir, "LICENSES")
         expect(Dir.glob("#{license_dir}/**/*").length).to be(3)
 
-        %w{snoopy-NOTICE snoopy-README zlib-LICENSE}.each do |software_license|
+        %w{snoopy-NOTICE zlib-LICENSE}.each do |software_license|
           license_path = File.join(license_dir, software_license)
           expect(File.exist?(license_path)).to be(true)
           expect(File.read(license_path)).to match /#{software_license.split("-").last}/
         end
+
+        remote_license_file = File.join(license_dir, "snoopy-artistic.html")
+        remote_license_file_contents = File.read(remote_license_file)
+        expect(File.exist?(remote_license_file)).to be(true)
+        expect(remote_license_file_contents).to match /The "Artistic License" - dev.perl.org/
       end
     end
 
@@ -80,7 +92,7 @@ module Omnibus
         name 'snoopy'
         default_version '1.0.0'
         license "GPL v2"
-        license_file "README"
+        license_file "http://dev.perl.org/licenses/artistic.html"
         license_file "NOTICE"
       end
     end
@@ -93,24 +105,19 @@ module Omnibus
       end
     end
 
+    let(:software_with_warnings) { nil }
+
     def create_licenses
       project.library.component_added(preparation)
       project.library.component_added(snoopy)
       project.library.component_added(zlib)
       project.library.component_added(private_code)
+      project.library.component_added(software_with_warnings) if software_with_warnings
 
       Licensing.create!(project)
     end
 
     describe "without license definitions in the project" do
-      let(:expected_project_license_path) { "LICENSE" }
-      let(:expected_project_license) { "Unspecified" }
-      let(:expected_project_license_content) { "" }
-
-      before do
-        create_licenses
-      end
-
       it_behaves_like "correctly created licenses"
     end
 
@@ -127,8 +134,6 @@ module Omnibus
         File.open(File.join(Config.project_root, license_file), "w+") do |f|
           f.puts "Chef Custom License is awesome."
         end
-
-        create_licenses
       end
 
       after do
@@ -136,6 +141,45 @@ module Omnibus
       end
 
       it_behaves_like "correctly created licenses"
+    end
+
+    describe "with a local license file that does not exist" do
+      let(:software_with_warnings) do
+        Software.new(project, 'problematic.rb').evaluate do
+          name 'problematic'
+          default_version '0.10.2'
+          license_file "NOT_EXISTS"
+        end
+      end
+
+      it_behaves_like "correctly created licenses"
+
+      it "should log a warning for the missing file" do
+        output = capture_logging { create_licenses }
+        expect(output).to match /License file (.*)NOT_EXISTS' does not exist for software 'problematic'./
+      end
+    end
+
+    describe "with a remote license file that does not exist" do
+      before do
+        Omnibus::Config.fetcher_retries(1)
+      end
+
+      let(:software_with_warnings) do
+        Software.new(project, 'problematic.rb').evaluate do
+          name 'problematic'
+          default_version '0.10.2'
+          license_file "https://downloads.chef.io/LICENSE"
+        end
+      end
+
+      it_behaves_like "correctly created licenses"
+
+      it "should log a warning for the missing file" do
+        output = capture_logging { create_licenses }
+        expect(output).to match(/Retrying failed download/)
+        expect(output).to match(/Can not download license file 'https:\/\/downloads.chef.io\/LICENSE' for software 'problematic'./)
+      end
     end
   end
 end
