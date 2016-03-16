@@ -26,7 +26,6 @@ module Omnibus
     autoload :PKG,      'omnibus/packagers/pkg'
     autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :IPS,      'omnibus/packagers/ips'
-    autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :RPM,      'omnibus/packagers/rpm'
 
     #
