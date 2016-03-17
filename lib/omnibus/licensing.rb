@@ -389,6 +389,7 @@ module Omnibus
       "Erlang-Public", # http://www.erlang.org/EPLICENSE
       "Oracle-Binary", # http://www.oracle.com/technetwork/java/javase/terms/license/index.html
       "OpenSSL",       # https://www.openssl.org/source/license.html
+      "Chef-MLSA",     # https://www.chef.io/online-master-agreement/
     ].freeze
   end
 end
