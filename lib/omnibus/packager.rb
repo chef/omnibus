@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require 'pry'
 
 module Omnibus
   module Packager
@@ -64,7 +65,7 @@ module Omnibus
       elsif family == 'solaris2' && version <= '5.10'
         family = "solaris"
       end
-
+      binding.pry
       if klass = PLATFORM_PACKAGER_MAP[family]
         klass
       else

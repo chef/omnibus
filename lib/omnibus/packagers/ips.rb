@@ -39,6 +39,7 @@ module Omnibus
     def build_me
       generate_pkg_manifest
       create_ips_repo
+      binding.pry
       publish_ips_pkg
       view_repo_info
       publish_as_pkg_archive
@@ -54,8 +55,11 @@ module Omnibus
     #
     def generate_pkg_manifest
       generate_pkg_metadata
+      binding.pry
       generate_pkg_contents
+      binding.pry
       generate_pkg_deps
+      binding.pry
 
     ##   Let's check the manifest and make sure all is right.
       check_pkg_manifest
@@ -93,13 +97,13 @@ module Omnibus
     #
     def generate_pkg_contents
       shellout!("/usr/bin/pkgsend generate #{source_dir} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.1")}")
-      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen.manifestfile')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
+      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.1")} #{staging_path('gen.manifestfile')} #{staging_path('doc-transform')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.2")}")
     end
 
     def generate_pkg_deps
       shellout!("/usr/bin/pkgdepend generate -md #{source_dir} #{staging_path("#{safe_base_package_name}.p5m.2")}|pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.3")}")
-      shellout!("/usr/bin/pkgdepend resolve -m #{staging_path("#{safe_base_package_name}.p5m.3")}")
-      shellout!("/usr/bin/pkgmogrify #{staging_path("#{safe_base_package_name}.p5m.3.res")} #{staging_path('doc-transform')} | pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
+      shellout!("/usr/bin/pkgmogrify -DARCH=`uname -p` #{staging_path("#{safe_base_package_name}.p5m.3")} #{staging_path('doc-transform')} |pkgfmt > #{staging_path("#{safe_base_package_name}.p5m.4")}")
+      shellout!("/usr/bin/pkgdepend resolve -m #{staging_path("#{safe_base_package_name}.p5m.4")}")
     end
 
     def check_pkg_manifest
@@ -168,6 +172,7 @@ module Omnibus
       File.open("#{staging_path("doc-transform")}", "w+") do |f|
         f.write <<-EOF
         <transform dir path=#{pathdir}$ -> edit group bin sys>
+        <transform file depend -> edit pkg.debug.depend.file ruby env>
         EOF
       end
     end

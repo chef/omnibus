@@ -237,6 +237,8 @@ module Omnibus
     #
     # @option val [String] :git (nil)
     #   a git URL
+    # @option val [String] :github (nil)
+    #   a github ORG/REPO pair (e.g. chef/chef) that will be transformed to https://github.com/ORG/REPO.git
     # @option val [String] :url (nil)
     #   general URL
     # @option val [String] :path (nil)
@@ -280,6 +282,8 @@ module Omnibus
             "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
+        val = canonicalize_source(val)
+
         extra_keys = val.keys - [
           :git, :path, :url, # fetcher types
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
@@ -302,7 +306,8 @@ module Omnibus
         @source.merge!(val)
       end
 
-      apply_overrides(:source)
+      override = canonicalize_source(overrides[:source])
+      apply_overrides(:source, override)
     end
     expose :source
 
@@ -589,13 +594,22 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
         when "solaris2"
-          {
-            # this override is due to a bug in libtool documented here:
-            # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
-            "CC" => "gcc -static-libgcc",
-            "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
-          }
+          if platform_version.satisfies?('<= 5.10')
+            solaris_flags = {
+              # this override is due to a bug in libtool documented here:
+              # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
+              "CC" => "gcc -static-libgcc",
+              "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+              "CFLAGS" => "-I#{install_dir}/embedded/include",
+            }
+          elsif platform_version.satisfies?('>= 5.11')
+            solaris_flags = {
+              "CC" => "gcc -m64 -static-libgcc",
+              "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            }
+          end
+          solaris_flags
         when "freebsd"
           freebsd_flags = {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
@@ -614,8 +628,16 @@ module Omnibus
           opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
-            # If we're happy with these flags, enable SSE for other platforms running x86 too.
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 -mfpmath=sse -msse2 #{opt_flag}"
+            # We do not wish to enable SSE even though we target i686 because
+            # of a stack alignment issue with some libraries. We have not
+            # exactly ascertained the cause but some compiled library/binary
+            # violates gcc's assumption that the stack is going to be 16-byte
+            # aligned which is just fine as long as one is pushing 32-bit
+            # values from general purpose registers but stuff hits the fan as
+            # soon as gcc emits aligned SSE xmm register spills which generate
+            # GPEs and terminate the application very rudely with very little
+            # to debug with.
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 #{opt_flag}"
           }
         else
           {
@@ -648,14 +670,17 @@ module Omnibus
       }
 
       if solaris2?
-        # in order to provide compatibility for earlier versions of libc on solaris 10,
-        # we need to specify a mapfile that restricts the version of system libraries
-        # used. See http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
-        # for more information
-        # use the mapfile if it exists, otherwise ignore it
         ld_options = "-R#{install_dir}/embedded/lib"
-        mapfile_path = File.expand_path(Config.solaris_linker_mapfile, Config.project_root)
-        ld_options  << " -M #{mapfile_path}" if File.exist?(mapfile_path)
+
+        if platform_version.satisfies?('<= 5.10')
+          # in order to provide compatibility for earlier versions of libc on solaris 10,
+          # we need to specify a mapfile that restricts the version of system libraries
+          # used. See http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
+          # for more information
+          # use the mapfile if it exists, otherwise ignore it
+          mapfile_path = File.expand_path(Config.solaris_linker_mapfile, Config.project_root)
+          ld_options  << " -M #{mapfile_path}" if File.exist?(mapfile_path)
+        end
 
         # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
         # the linker, to find every way to make it use our rpath. This is also required
@@ -1069,15 +1094,27 @@ module Omnibus
     # Apply overrides in the @overrides hash that mask instance variables
     # that are set by parsing the DSL
     #
-    def apply_overrides(attr)
+    def apply_overrides(attr, override=overrides[attr])
       val = instance_variable_get(:"@#{attr}")
-      if val.is_a?(Hash) || overrides[attr].is_a?(Hash)
+      if val.is_a?(Hash) || override.is_a?(Hash)
         val ||= {}
-        override = overrides[attr] || {}
+        override ||= {}
         val.merge(override)
       else
-        overrides[attr] || val
+        override || val
       end
+    end
+
+    #
+    # Transform github -> git in source
+    #
+    def canonicalize_source(source)
+      if source.is_a?(Hash) && source[:github]
+        source = source.dup
+        source[:git] = "https://github.com/#{source[:github]}.git"
+        source.delete(:github)
+      end
+      source
     end
 
     #
