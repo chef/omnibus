@@ -197,13 +197,20 @@ module Omnibus
     #
     # Execute the given git command, inside the +project_dir+.
     #
+    # autcrlf is a hack to help support windows and posix clients using the
+    # same repository but canonicalizing files as they are committed to the
+    # repo but converting line endings when they are actually checked out
+    # into a working tree. We do not want to change the on-disk representation
+    # of our sources regardless of the platform we are building on unless
+    # explicitly asked for. Hence, we disable autocrlf.
+    #
     # @see Util#shellout!
     #
     # @return [Mixlib::ShellOut]
     #   the shellout object
     #
     def git(command)
-      shellout!("git #{command}", cwd: project_dir)
+      shellout!("git -c core.autocrlf=false #{command}", cwd: project_dir)
     end
 
     # Class methods
