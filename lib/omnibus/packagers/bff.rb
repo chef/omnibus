@@ -133,7 +133,7 @@ module Omnibus
       # Get a list of all files
       files = FileSyncer.glob("#{staging_dir}/**/*").reject do |path|
         # remove any files with spaces.
-        if path =~ /\s+/
+        if path =~ /[[:space:]]/
           log.warn(log_key) { "Skipping packaging '#{path}' file due to whitespace in filename" }
           true
         end
