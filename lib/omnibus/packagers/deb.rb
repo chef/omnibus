@@ -397,29 +397,7 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      case Ohai['kernel']['machine']
-      when 'x86_64'
-        'amd64'
-      when 'i686'
-        'i386'
-      when /armv\dl/
-        if Ohai['platform'] == 'raspbian' || Ohai['platform'] == 'ubuntu'
-          'armhf'
-        else
-          Ohai['kernel']['machine']
-        end
-      when 'aarch64'
-        # Debian prefers amd64 on ARMv8/AArch64 (64bit ARM) platforms
-        # see https://wiki.debian.org/Arm64Port
-        'arm64'
-      when 'ppc64le'
-        # Debian prefers to use ppc64el for little endian architecture name
-        # where as others like gnutools/rhel use ppc64le( note the last 2 chars)
-        # see http://linux.debian.ports.powerpc.narkive.com/8eeWSBtZ/switching-ppc64el-port-name-to-ppc64le
-        'ppc64el'  #dpkg --print-architecture = ppc64el
-      else
-        Ohai['kernel']['machine']
-      end
+      @safe_architecture ||= shellout!("dpkg --print-architecture").stdout.split("\n").first || "noarch"
     end
   end
 end
