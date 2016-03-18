@@ -131,8 +131,14 @@ module Omnibus
     def write_gen_template
 
       # Get a list of all files
-      files = FileSyncer.glob("#{staging_dir}/**/*").map do |path|
-
+      files = FileSyncer.glob("#{staging_dir}/**/*").reject do |path|
+        # remove any files with spaces.
+        if path =~ /\s+/
+          log.warn(log_key) { "Skipping packaging '#{path}' file due to whitespace in filename" }
+          true
+        end
+      end
+      files.map! do |path|
         # If paths have colons or commas, rename them and add them to a post-install,
         # post-sysck renaming script ('config') which is created if needed
         if path.match(/:|,/)
