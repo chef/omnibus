@@ -36,6 +36,7 @@ module Omnibus
     PLATFORM_PACKAGER_MAP = {
       'debian'   => DEB,
       'fedora'   => RPM,
+      'suse'     => RPM,
       'rhel'     => RPM,
       'wrlinux'  => RPM,
       'aix'      => BFF,
