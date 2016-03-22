@@ -49,6 +49,9 @@ module Omnibus
         end
       end
 
+      #
+      # Reset cached project information.
+      #
       def reset!
         @loaded_projects = nil
       end

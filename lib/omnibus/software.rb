@@ -52,6 +52,9 @@ module Omnibus
         end
       end
 
+      #
+      # Reset cached software information.
+      #
       def reset!
         @loaded_softwares = nil
       end
