@@ -589,13 +589,22 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
         when "solaris2"
-          {
-            # this override is due to a bug in libtool documented here:
-            # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
-            "CC" => "gcc -static-libgcc",
-            "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-            "CFLAGS" => "-I#{install_dir}/embedded/include",
-          }
+          if platform_version.satisfies?('<= 5.10') 
+            solaris_flags = {
+              # this override is due to a bug in libtool documented here:
+              # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
+              "CC" => "gcc -static-libgcc",
+              "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+              "CFLAGS" => "-I#{install_dir}/embedded/include",
+            }
+          elsif platform_version.satisfies?('>= 5.11')
+            solaris_flags = {
+              "CC" => "gcc -m64 -static-libgcc",
+              "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            }
+          end
+          solaris_flags
         when "freebsd"
           freebsd_flags = {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
@@ -655,15 +664,18 @@ module Omnibus
         "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
       }
 
-      if solaris2? && Ohai['os_version'].to_i <= 5.10
-        # in order to provide compatibility for earlier versions of libc on solaris 10,
-        # we need to specify a mapfile that restricts the version of system libraries
-        # used. See http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
-        # for more information
-        # use the mapfile if it exists, otherwise ignore it
+      if solaris2?
         ld_options = "-R#{install_dir}/embedded/lib"
-        mapfile_path = File.expand_path(Config.solaris_linker_mapfile, Config.project_root)
-        ld_options  << " -M #{mapfile_path}" if File.exist?(mapfile_path)
+
+        if Ohai['os_version'].to_i <= 5.10
+          # in order to provide compatibility for earlier versions of libc on solaris 10,
+          # we need to specify a mapfile that restricts the version of system libraries
+          # used. See http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
+          # for more information
+          # use the mapfile if it exists, otherwise ignore it
+          mapfile_path = File.expand_path(Config.solaris_linker_mapfile, Config.project_root)
+          ld_options  << " -M #{mapfile_path}" if File.exist?(mapfile_path)
+        end
 
         # solaris linker can also use LD_OPTIONS, so we throw the kitchen sink against
         # the linker, to find every way to make it use our rpath. This is also required
