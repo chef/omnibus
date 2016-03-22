@@ -1,14 +1,21 @@
 require 'aruba/api'
 
 Given(/^I have an omnibus project named "(.+)"$/) do |name|
+  # Make an omnibus config per project
   create_directory(name)
   cd(name)
+
+  # Build target dir must be created
+  abs_path = expand_path(".")
+
+  # Single top level output dir
+  create_directory("output")
 
   write_file("config/projects/#{name}.rb", <<-EOH.gsub(/^ {4}/, ''))
     name '#{name}'
     maintainer 'Mrs. Maintainer'
     homepage 'https://example.com'
-    install_dir './local/build/#{name}'
+    install_dir "#{abs_path}/output"
 
     build_version '1.0.0'
 
@@ -26,6 +33,11 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
     package_dir   './local/omnibus/pkg'
     package_tmp   './local/omnibus/pkg-tmp'
   EOH
+end
+
+Given(/^I debug$/) do
+  require 'pry'
+  binding.pry
 end
 
 Given(/^I have a platform mappings file named "(.+)"$/) do |name|

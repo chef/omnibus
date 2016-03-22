@@ -52,6 +52,10 @@ module Omnibus
         end
       end
 
+      def reset!
+        @loaded_softwares = nil
+      end
+
       private
 
       #

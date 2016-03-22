@@ -1,8 +1,44 @@
 Feature: omnibus build
+  Background:
+    Given I have an omnibus project named "hamlet"
+
   Scenario: When the project does not exist
-    * I have an omnibus project named "hamlet"
-    * I run `omnibus build bacon`
-    * the output should contain:
-      """
-      I could not find a project named `bacon' in any of the project locations:
-      """
+    When I run `omnibus build bacon`
+
+    Then the output should contain:
+         """
+         I could not find a project named `bacon' in any of the project locations:
+         """
+    And  the exit status should not be 0
+
+  Scenario: When the project has no software definitions
+    When I run `omnibus build hamlet`
+
+    Then the output should contain "[Project: hamlet] I | Building version manifest"
+    And  the output should contain "[Packager::PKG] I | Rendering"
+    And  the file "output/version-manifest.json" should exist
+    And  the file "output/version-manifest.txt" should exist
+    And  the file "output/LICENSE" should exist
+    And  the directory "output/LICENSES" should exist
+    And  the exit status should be 0
+
+  Scenario: When the project has a software definition
+    Given a file "config/software/ophelia.rb" with:
+          """
+          name "ophelia"
+          default_version "1.0.0"
+          build do
+            command "echo true > #{install_dir}/blah.txt"
+          end
+          """
+    And   I append to "config/projects/hamlet.rb" with "dependency 'ophelia'"
+
+    When  I run `omnibus build hamlet`
+
+    Then the output should contain "[Builder: ophelia] I | $ echo true"
+    And  the exit status should be 0
+    And  the file "output/blah.txt" should contain "true"
+    And  the file "output/version-manifest.json" should exist
+    And  the file "output/version-manifest.txt" should exist
+    And  the file "output/LICENSE" should exist
+    And  the directory "output/LICENSES" should exist

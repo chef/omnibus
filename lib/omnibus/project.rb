@@ -49,6 +49,10 @@ module Omnibus
         end
       end
 
+      def reset!
+        @loaded_projects = nil
+      end
+
       private
 
       #
