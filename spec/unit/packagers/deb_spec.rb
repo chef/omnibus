@@ -84,6 +84,20 @@ module Omnibus
       end
     end
 
+    describe '#base_name' do
+      it 'is a DSL method' do
+        expect(subject).to have_exposed_method(:base_name)
+      end
+
+      it 'defaults to nil' do
+        expect(subject.base_name).to be_nil
+      end
+
+      it 'must be a string' do
+        expect { subject.base_name(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
     describe '#id' do
       it 'is :deb' do
         expect(subject.id).to eq(:deb)
@@ -97,6 +111,11 @@ module Omnibus
 
       it 'includes the name, version, and build iteration' do
         expect(subject.package_name).to eq('project_1.2.3-2_amd64.deb')
+      end
+
+      it 'uses the provided base name' do
+        subject.base_name('my-software')
+        expect(subject.package_name).to eq('my-software_1.2.3-2_amd64.deb')
       end
     end
 
