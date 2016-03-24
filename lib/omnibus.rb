@@ -112,6 +112,9 @@ module Omnibus
       end
 
       Config.reset!
+      # Clear caches on Project and Software
+      Project.reset!
+      Software.reset!
     end
 
     #

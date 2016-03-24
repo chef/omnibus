@@ -99,8 +99,28 @@ module Omnibus
     #
     #   $ omnibus manifest PROJECT
     #
+    method_option :os,
+      desc: "An os name in Ohai form. Defaults to the current os.",
+      type: :string
+    method_option :platform_family,
+      desc: "A platform family string in Ohai form. Defaults to the current platform_family.",
+      type: :string
+    method_option :platform,
+      desc: "A platform string in Ohai form. Defaults to the current platform.",
+      type: :string
+    method_option :platform_version,
+      desc: "A platform version string in Ohai form. Defaults to the current platform.",
+      type: :string
+    method_option :architecture,
+      desc: "The target architecture: x86, x64, powerpc. Defaults to the current architecture."
     desc 'manifest PROJECT', 'Print a manifest for the given Omnibus project'
     def manifest(name)
+      # Override ohai information
+      Ohai['os'] = @options[:os] if @options[:os]
+      Ohai['platform_family'] = @options[:platform_family] if @options[:platform_family]
+      Ohai['platform'] = @options[:platform] if @options[:platform]
+      Ohai['platform_version'] = @options[:platform_version] if @options[:platform_version]
+      Ohai['kernel']['machine'] = @options[:architecture] if @options[:architecture]
       puts JSON.pretty_generate(Project.load(name).built_manifest.to_hash)
     end
 

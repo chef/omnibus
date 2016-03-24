@@ -25,6 +25,8 @@ install:
   - cp C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\bsdtar.exe C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\tar.exe
   - appveyor DownloadFile http://curl.haxx.se/ca/cacert.pem -FileName C:\cacert.pem
   - set SSL_CERT_FILE=C:\cacert.pem
+  - git config --global user.email "clouseau@chef.io"
+  - git config --global user.name "Pink Panther"
 
 build_script:
   - bundle install

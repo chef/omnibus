@@ -10,12 +10,12 @@ Feature: omnibus clean
   Scenario: When the --purge option is given
     * I have an omnibus project named "hamlet"
     * I successfully run `omnibus clean hamlet --purge`
-    * the output should contain "remove  local/build/hamlet"
+    * the output should contain "remove  output"
 
   Scenario: When no options are given
     * I have an omnibus project named "hamlet"
     * I successfully run `omnibus clean hamlet`
     * the output should not contain:
       """
-      remove  local/build/hamlet
+      remove  output
       """
