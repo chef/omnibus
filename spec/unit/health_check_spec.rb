@@ -139,9 +139,11 @@ module Omnibus
         )
       end
 
+      let(:regexp) {".*(\\.[ch]|\\.e*rb|\\.gemspec|\\.gitignore|\\.h*h|\\.java|\\.js|\\.json|\\.lock|\\.log|\\.lua|\\.md|\\.mkd|\\.out|\\.pl|\\.pm|\\.png|\\.py[oc]*|\\.r*html|\\.rdoc|\\.ri|\\.sh|\\.sql|\\.toml|\\.ttf|\\.txt|\\.xml|\\.yml|Gemfile|LICENSE|README|Rakefile|VERSION)$|.*\\/share\\/doc\\/.*|.*\\/share\\/postgresql\\/.*|.*\\/share\\/terminfo\\/.*|.*\\/terminfo\\/.*"}
+
       it 'raises an exception when there are external dependencies' do
         allow(subject).to receive(:shellout)
-          .with("find #{project.install_dir}/ -type f | xargs ldd")
+          .with("find #{project.install_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}' | xargs ldd")
           .and_return(bad_healthcheck)
 
         expect { subject.run! }.to raise_error(HealthCheckFailed)
@@ -149,7 +151,7 @@ module Omnibus
 
       it 'does not raise an exception when the healthcheck passes' do
         allow(subject).to receive(:shellout)
-          .with("find #{project.install_dir}/ -type f | xargs ldd")
+          .with("find #{project.install_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}' | xargs ldd")
           .and_return(good_healthcheck)
 
         expect { subject.run! }.to_not raise_error
