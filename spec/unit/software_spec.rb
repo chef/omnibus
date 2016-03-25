@@ -131,11 +131,60 @@ module Omnibus
         end
       end
 
-      context 'on solaris2' do
+      context 'on solaris_11' do
+              before do
+                stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+                  # For some reason, this isn't set in Fauxhai
+                  data['platform'] = 'solaris'
+                end
+              end
+
+              it 'sets the defaults' do
+                expect(subject.with_standard_compiler_flags).to eq(
+                  "CC"              => "gcc -m64 -static-libgcc",
+                  "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+                  "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+                  "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+                  "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
+                  "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
+                  "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+                  "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+                )
+              end
+
+              context 'when loader mapping file is specified' do
+                # Let the unit tests run on windows where auto-path translation occurs.
+                let(:project_root) { File.join(tmp_path, '/root/project') }
+                before do
+                  stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+                    # For some reason, this isn't set in Fauxhai
+                    data['platform'] = 'solaris'
+                  end
+                  Config.project_root(project_root)
+                  Config.solaris_linker_mapfile('files/mapfile/solaris')
+                  allow(File).to receive(:exist?).and_return(true)
+                end
+
+                it 'sets LD_OPTIONS correctly' do
+                  expect(subject.with_standard_compiler_flags).to eq(
+                    "CC"              => "gcc -m64 -static-libgcc",
+                    "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+                    "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+                    "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+                    "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
+                    "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
+                    "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+                    "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+                  )
+                end
+              end
+            end
+
+      context 'on solaris_10' do
         before do
-          stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+          stub_ohai(platform: 'solaris2', version: '5.10') do |data|
             # For some reason, this isn't set in Fauxhai
-            data['platform'] = 'solaris2'
+            data['platform'] = 'solaris'
           end
         end
 
@@ -156,9 +205,9 @@ module Omnibus
           # Let the unit tests run on windows where auto-path translation occurs.
           let(:project_root) { File.join(tmp_path, '/root/project') }
           before do
-            stub_ohai(platform: 'solaris2', version: '5.11') do |data|
+            stub_ohai(platform: 'solaris2', version: '5.10') do |data|
               # For some reason, this isn't set in Fauxhai
-              data['platform'] = 'solaris2'
+              data['platform'] = 'solaris'
             end
             Config.project_root(project_root)
             Config.solaris_linker_mapfile('files/mapfile/solaris')
