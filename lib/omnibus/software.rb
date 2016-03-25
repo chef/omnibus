@@ -667,7 +667,7 @@ module Omnibus
         "LD_RUN_PATH" => "#{install_dir}/embedded/lib"
       }
 
-      if solaris2?
+      if solaris2? && Ohai['os_version'].to_i <= 5.10
         # in order to provide compatibility for earlier versions of libc on solaris 10,
         # we need to specify a mapfile that restricts the version of system libraries
         # used. See http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
