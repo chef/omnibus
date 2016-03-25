@@ -107,6 +107,10 @@ module Omnibus
     end
 
     describe '#write_control_file' do
+      before do
+        allow(subject).to receive(:safe_architecture).and_return("amd64")
+      end
+
       it 'generates the file' do
         subject.write_control_file
         expect("#{staging_dir}/DEBIAN/control").to be_a_file
@@ -224,6 +228,7 @@ module Omnibus
       before do
         allow(subject).to receive(:shellout!)
         allow(Dir).to receive(:chdir) { |_, &b| b.call }
+        allow(subject).to receive(:safe_architecture).and_return("amd64")
       end
 
       it 'logs a message' do
@@ -318,94 +323,20 @@ module Omnibus
     end
 
     describe '#safe_architecture' do
-      context 'when 64-bit' do
-        before do
-          stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
-            data['kernel']['machine'] = 'x86_64'
-          end
-        end
+      let(:shellout) { double("Mixlib::ShellOut", :run_command => true, :error! => nil) }
 
-        it 'returns amd64' do
-          expect(subject.safe_architecture).to eq('amd64')
-        end
+      before do
+        allow(Mixlib::ShellOut).to receive(:new).and_return(shellout)
+      end
+      
+      it "shells out to dpkg and returns the output" do
+        allow(shellout).to receive(:stdout).and_return("test_arch\n")
+        expect(subject.safe_architecture).to eq("test_arch")
       end
 
-      context 'when not 64-bit' do
-        before do
-          stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
-            data['kernel']['machine'] = 'i386'
-          end
-        end
-
-        it 'returns the value' do
-          expect(subject.safe_architecture).to eq('i386')
-        end
-      end
-
-      context 'when i686' do
-        before do
-          stub_ohai(platform: 'ubuntu', version: '12.04') do |data|
-            data['kernel']['machine'] = 'i686'
-          end
-        end
-
-        it 'returns i386' do
-          expect(subject.safe_architecture).to eq('i386')
-        end
-      end
-
-      context 'when ppc64le' do
-        before do
-          stub_ohai(platform: 'ubuntu', version: '14.04') do |data|
-            data['kernel']['machine'] = 'ppc64le'
-          end
-        end
-
-        it 'returns ppc64el' do
-          expect(subject.safe_architecture).to eq('ppc64el')
-        end
-      end
-
-      context 'Raspberry Pi' do
-        context 'Raspbian on Pi v1' do
-          before do
-            # There's no Raspbian in Fauxhai :(
-            stub_ohai(platform: 'debian', version: '7.6') do |data|
-              data['platform'] = 'raspbian'
-              data['platform_version'] = '7.6'
-              data['kernel']['machine'] = 'armv6l'
-            end
-          end
-
-          it 'returns armhf' do
-            expect(subject.safe_architecture).to eq('armhf')
-          end
-        end
-
-        context 'Ubuntu on Pi v2' do
-          before do
-            # There's no Raspbian in Fauxhai :(
-            stub_ohai(platform: 'ubuntu', version: '14.04') do |data|
-              data['kernel']['machine'] = 'armv7l'
-            end
-          end
-
-          it 'returns armhf' do
-            expect(subject.safe_architecture).to eq('armhf')
-          end
-        end
-      end
-
-      context '64bit ARM platform' do
-        before do
-          stub_ohai(platform: 'ubuntu', version: '14.04') do |data|
-            data['kernel']['machine'] = 'aarch64'
-          end
-        end
-
-        it 'returns arm64' do
-          expect(subject.safe_architecture).to eq('arm64')
-        end
+      it "returns noarch if no architecture is returned by dpkg" do
+        allow(shellout).to receive(:stdout).and_return("")
+        expect(subject.safe_architecture).to eq("noarch")
       end
     end
   end
