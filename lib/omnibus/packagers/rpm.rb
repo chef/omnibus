@@ -141,7 +141,7 @@ module Omnibus
     #
     def license(val = NULL)
       if null?(val)
-        @license || 'unknown'
+        @license || project.license
       else
         unless val.is_a?(String)
           raise InvalidValue.new(:license, 'be a String')

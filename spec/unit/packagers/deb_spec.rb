@@ -10,11 +10,13 @@ module Omnibus
         project.build_version('1.2.3')
         project.build_iteration('2')
         project.maintainer('Chef Software')
+        project.license(project_license) if project_license
       end
     end
 
     subject { described_class.new(project) }
 
+    let(:project_license) { nil }
     let(:project_root) { File.join(tmp_path, 'project/root') }
     let(:package_dir)  { File.join(tmp_path, 'package/dir') }
     let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
@@ -48,11 +50,19 @@ module Omnibus
       end
 
       it 'has a default value' do
-        expect(subject.license).to eq('unknown')
+        expect(subject.license).to eq('Unspecified')
       end
 
       it 'must be a string' do
         expect { subject.license(Object.new) }.to raise_error(InvalidValue)
+      end
+
+      context 'with project license' do
+        let(:project_license) { 'custom-license' }
+
+        it 'uses project license' do
+          expect(subject.license).to eq('custom-license')
+        end
       end
     end
 
@@ -122,7 +132,7 @@ module Omnibus
 
         expect(contents).to include("Package: project")
         expect(contents).to include("Version: 1.2.3")
-        expect(contents).to include("License: unknown")
+        expect(contents).to include("License: Unspecified")
         expect(contents).to include("Vendor: Omnibus <omnibus@getchef.com>")
         expect(contents).to include("Architecture: amd64")
         expect(contents).to include("Maintainer: Chef Software")
@@ -328,7 +338,7 @@ module Omnibus
       before do
         allow(Mixlib::ShellOut).to receive(:new).and_return(shellout)
       end
-      
+
       it "shells out to dpkg and returns the output" do
         allow(shellout).to receive(:stdout).and_return("test_arch\n")
         expect(subject.safe_architecture).to eq("test_arch")
