@@ -11,11 +11,13 @@ module Omnibus
         project.build_iteration('2')
         project.maintainer('Chef Software')
         project.replace('old-project')
+        project.license(project_license) if project_license
       end
     end
 
     subject { described_class.new(project) }
 
+    let(:project_license) { nil }
     let(:project_root) { File.join(tmp_path, 'project/root') }
     let(:package_dir)  { File.join(tmp_path, 'package/dir') }
     let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
@@ -69,11 +71,19 @@ module Omnibus
       end
 
       it 'has a default value' do
-        expect(subject.license).to eq('unknown')
+        expect(subject.license).to eq('Unspecified')
       end
 
       it 'must be a string' do
         expect { subject.license(Object.new) }.to raise_error(InvalidValue)
+      end
+
+      context 'with project license' do
+        let(:project_license) { 'custom-license' }
+
+        it 'uses project license' do
+          expect(subject.license).to eq('custom-license')
+        end
       end
     end
 
@@ -173,7 +183,7 @@ module Omnibus
         expect(contents).to include("BuildRoot: %buildroot")
         expect(contents).to include("Prefix: /")
         expect(contents).to include("Group: default")
-        expect(contents).to include("License: unknown")
+        expect(contents).to include("License: Unspecified")
         expect(contents).to include("Vendor: Omnibus <omnibus@getchef.com>")
         expect(contents).to include("URL: https://example.com")
         expect(contents).to include("Packager: Chef Software")
