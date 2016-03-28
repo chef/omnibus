@@ -97,6 +97,12 @@ module Omnibus
       /librt\.so\.1/,
       /libcrypt\.so\.1/,
       /libgdbm\.so\.3/,
+      /libgcc_s\.so\.1/,
+      /libcryptoutil\.so\.1/,
+      /libucrypto\.so\.1/,
+      /libz\.so\.1/, # while we package our own libz, this get dragged along from Solaris 11's libelf library for some reason...
+      /libelf\.so\.1/,
+      /libssp\.so\.0/,
       # solaris 9 libraries:
       /libm\.so\.1/,
       /libc_psr\.so\.1/,
