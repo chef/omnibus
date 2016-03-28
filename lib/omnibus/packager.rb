@@ -17,6 +17,7 @@
 module Omnibus
   module Packager
     include Logging
+    include Sugarable
 
     autoload :Base,     'omnibus/packagers/base'
     autoload :BFF,      'omnibus/packagers/bff'
@@ -25,6 +26,7 @@ module Omnibus
     autoload :MSI,      'omnibus/packagers/msi'
     autoload :PKG,      'omnibus/packagers/pkg'
     autoload :Solaris,  'omnibus/packagers/solaris'
+    autoload :IPS,      'omnibus/packagers/ips'
     autoload :RPM,      'omnibus/packagers/rpm'
 
     #
@@ -40,7 +42,8 @@ module Omnibus
       'rhel'     => RPM,
       'wrlinux'  => RPM,
       'aix'      => BFF,
-      'solaris2' => Solaris,
+      'solaris'  => Solaris,
+      'ips'      => IPS,
       'windows'  => MSI,
       'mac_os_x' => PKG,
     }.freeze
@@ -56,7 +59,13 @@ module Omnibus
     #
     def for_current_system
       family = Ohai['platform_family']
+      version = Ohai['platform_version']
 
+      if family == 'solaris2' && Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 5.11')
+        family = "ips"
+      elsif family == 'solaris2' && Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 5.10')
+        family = "solaris"
+      end
       if klass = PLATFORM_PACKAGER_MAP[family]
         klass
       else
@@ -64,7 +73,6 @@ module Omnibus
           "Could not determine packager for `#{family}', defaulting " \
           "to `makeself'!"
         end
-
         Makeself
       end
     end
