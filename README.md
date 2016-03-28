@@ -4,7 +4,7 @@
 [![Build Status](http://img.shields.io/travis/chef/omnibus.svg)][travis]
 
 [gem]: https://rubygems.org/gems/omnibus
-[travis]: http://travis-ci.org/chef/omnibus
+[travis]: https://travis-ci.org/chef/omnibus
 
 Easily create full-stack installers for your project across a variety of platforms.
 
@@ -341,7 +341,7 @@ use_git_caching false
 License
 -------
 ```text
-Copyright 2012-2014 Chef Software, Inc.
+Copyright 2012-2016 Chef Software, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
