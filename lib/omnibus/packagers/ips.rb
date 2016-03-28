@@ -14,8 +14,6 @@
 # limitations under the License.
 #
 
-require 'pry'
-
 module Omnibus
   class Packager::IPS < Packager::Base
     id :ips
@@ -39,7 +37,6 @@ module Omnibus
     def build_me
       generate_pkg_manifest
       create_ips_repo
-      binding.pry
       publish_ips_pkg
       view_repo_info
       publish_as_pkg_archive
@@ -55,16 +52,10 @@ module Omnibus
     #
     def generate_pkg_manifest
       generate_pkg_metadata
-      binding.pry
       generate_pkg_contents
-      binding.pry
       generate_pkg_deps
-      binding.pry
-
     ##   Let's check the manifest and make sure all is right.
       check_pkg_manifest
-
-      #publish_package_file
     end
 
     # Generate package metadata
@@ -110,7 +101,6 @@ module Omnibus
       shellout!("/usr/bin/pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_path("#{safe_base_package_name}.p5m.4.res")}")
     end
 
-    ########## Need to add validation check if the repo already exist###########
     def create_ips_repo
       shellout!("/usr/bin/pkgrepo create #{repo_dir}")
     end
