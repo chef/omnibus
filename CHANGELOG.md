@@ -1,6 +1,30 @@
 Omnibus CHANGELOG
 =================
 
+v5.3.0 (March 25, 2016)
+-----------------------
+### New Features
+
+- Get correct architecture name for Debian environments from `dpkg` (#646)
+- Update fauxhai to latest (#652)
+- Use project.license in deb and rpm packagers if available (#653)
+- Whitelist additional Solaris11 libraries (#650)
+- Use gcc 4.9 on freebsd (#649)
+- Per-Platform manifest generation (#645)
+  - Support omnibus manifest arguments: `omnibus manifest --os=OS --platform-family=FAMILY --platform=PLATFORM --platform-version=VERSION`
+  - Can be used to generate manifests for other platforms than the one you are on, allowing a multi-platform build to be quickly set up.
+  - Affects chef-sugar's `windows?`, `solaris?` and similar functions, which are used by software in `omnibus-software`
+- Performance: Ignore non-libraries in health checks (#642)
+- Add `github` source (#643)
+- Add `suse` support (#647)
+- Exclude files with whitespace names from AIX packages (#641)
+- Fix compilation problems on Windows (#640)
+  - Disable `sse` to avoid compilation segfaults
+  - Don't change newlines when `git pull`ing
+- Warn when software licenses are missing for software components (#638)
+- Add Chef MLSA to the list of recognized licenses (#639)
+- Download remote license files into the LICENSES directory (#637)
+
 v5.2.0 (March 15, 2016)
 -----------------------
 ### New Features
