@@ -31,6 +31,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'ohai',             '~> 8.0'
   gem.add_dependency 'ruby-progressbar', '~> 1.7'
   gem.add_dependency 'aws-sdk',          '~> 2'
+  # aws-sdk brings this in, and jmespath 1.2+ brings in json_pure, which fails the build
+  gem.add_dependency 'jmespath',         '< 1.2'
   gem.add_dependency 'thor',             '~> 0.18'
 
   gem.add_development_dependency 'bundler'
