@@ -76,6 +76,11 @@ module Omnibus
       default: {}
     desc 'artifactory REPOSITORY PATTERN', 'Publish to an Artifactory instance'
     def artifactory(repository, pattern)
+
+      Omnibus.logger.deprecated('ArtifactoryPublisher') do
+        "The `--version-manifest' option has been deprecated. Version manifest data is now part of the `*.metadata.json' file"
+      end if options[:version_manifest]
+
       options[:repository] = repository
       publish(ArtifactoryPublisher, pattern, options)
     end
