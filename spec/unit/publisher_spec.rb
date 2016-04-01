@@ -67,11 +67,27 @@ module Omnibus
             version: '11.0.6',
             iteration: 1,
             basename: 'chef.deb',
+            license: 'Apache-2.0',
             platform: 'ubuntu',
             platform_version: '12.04',
             arch: 'x86_64',
             sha1: 'SHA1',
             md5: 'ABCDEF123456',
+            version_manifest: {
+              'manifest_format' => 1,
+              'build_version' => '11.0.6',
+              'build_git_revision' => '2e763ac957b308ba95cef256c2491a5a55a163cc',
+              'software' => {
+                'zlib' => {
+                  'locked_source' => {
+                    'url' => 'an_url'
+                  },
+                  'locked_version' => 'new.newer',
+                  'source_type' => 'url',
+                  'described_version' => 'new.newer'
+                }
+              }
+            }
           )
         end
 
