@@ -96,13 +96,20 @@ module Omnibus
     # @return [Artifactory::Resource::Build]
     #
     def build_for(packages)
-      name = packages.first.metadata[:name]
-      # Attempt to load the version-manifest.json file which represents
-      # the build.
-      manifest = if File.exist?(version_manifest)
-                   Manifest.from_file(version_manifest)
+      metadata = packages.first.metadata
+      name     = metadata[:name]
+
+      # Attempt to load the version manifest data from the packages metadata
+      manifest = if version_manifest = metadata[:version_manifest]
+                   Manifest.from_hash(version_manifest)
                  else
-                   Manifest.new(packages.first.metadata[:version])
+                   Manifest.new(
+                     metadata[:version],
+                     # we already know the `version_manifest` entry is
+                     # missing so we can't pull in the `build_git_revision`
+                     nil,
+                     metadata[:license],
+                   )
                  end
 
       # Upload the actual package
@@ -193,15 +200,19 @@ module Omnibus
         'omnibus.architecture'     => package.metadata[:arch],
         'omnibus.version'          => package.metadata[:version],
         'omnibus.iteration'        => package.metadata[:iteration],
+        'omnibus.license'          => package.metadata[:license],
         'omnibus.md5'              => package.metadata[:md5],
         'omnibus.sha1'             => package.metadata[:sha1],
         'omnibus.sha256'           => package.metadata[:sha256],
         'omnibus.sha512'           => package.metadata[:sha512],
-      }
-      metadata.merge!(
-        'build.name'   => package.metadata[:name],
-        'build.number' => package.metadata[:version],
-      ) if build_record?
+        'omnibus.version_manifest' => package.metadata[:version_manifest] || '',
+      }.tap do |h|
+        if build_record?
+          h['build.name'] = package.metadata[:name]
+          h['build.number'] = package.metadata[:version]
+        end
+      end
+
       metadata
     end
 
@@ -221,15 +232,6 @@ module Omnibus
     #
     def repository
       @options[:repository]
-    end
-
-    #
-    # The path to the builds version-manfest.json file (as supplied as an option).
-    #
-    # @return [String]
-    #
-    def version_manifest
-      @options[:version_manifest] || ''
     end
 
     #

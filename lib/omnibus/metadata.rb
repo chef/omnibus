@@ -61,6 +61,8 @@ module Omnibus
           homepage:         project.homepage,
           version:          project.build_version,
           iteration:        project.build_iteration,
+          license:          project.license,
+          version_manifest: project.built_manifest.to_hash,
         }
 
         instance = new(package, data)
