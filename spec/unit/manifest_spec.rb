@@ -92,10 +92,6 @@ module Omnibus
               "described_version" => "new.newer"}}}
       }
 
-      let(:v2_manifest) {
-        {"manifest_format" => 2}
-      }
-
       it "has a build_version" do
         expect(Manifest.from_hash(manifest).build_version).to eq('12.4.0+20150629082811')
       end
@@ -112,8 +108,36 @@ module Omnibus
         expect(Manifest.from_hash(manifest).entry_for("zlib").locked_source).to eq({:url => "an_url"})
       end
 
-      it "raises an error if it doesn't recognize the manifest version" do
-        expect{Manifest.from_hash(v2_manifest)}.to raise_error Manifest::InvalidManifestFormat
+      context "v2 manifest" do
+        let(:manifest) {
+          { "manifest_format" => 2,
+            "build_version" => "12.4.0+20150629082811",
+            "build_git_revision" => "2e763ac957b308ba95cef256c2491a5a55a163cc",
+            "license" => "Unspecified",
+            "software" => {
+              "zlib" => {
+                "locked_source" => {
+                  "url" => "an_url"
+                },
+                "locked_version" => "new.newer",
+                "source_type" => "url",
+                "described_version" => "new.newer",
+                "license" => "Zlib"}}}
+        }
+
+        it "has a license" do
+          expect(Manifest.from_hash(manifest).license).to eq('Unspecified')
+        end
+      end
+
+      context "unsupported manifest" do
+        let(:manifest) {
+          {"manifest_format" => 99}
+        }
+
+        it "raises an error if it doesn't recognize the manifest version" do
+          expect{Manifest.from_hash(manifest)}.to raise_error Manifest::InvalidManifestFormat
+        end
       end
     end
   end

@@ -97,6 +97,8 @@ module Omnibus
       case manifest_data['manifest_format'].to_i
       when 1
         from_hash_v1(manifest_data)
+      when 2
+        from_hash_v2(manifest_data)
       else
         raise InvalidManifestFormat, "Unknown manifest format version: #{manifest_data['manifest_format']}"
       end
@@ -104,6 +106,14 @@ module Omnibus
 
     def self.from_hash_v1(manifest_data)
       m = Omnibus::Manifest.new(manifest_data['build_version'], manifest_data['build_git_revision'])
+      manifest_data['software'].each do |name, entry_data|
+        m.add(name, Omnibus::ManifestEntry.new(name, keys_to_syms(entry_data)))
+      end
+      m
+    end
+
+    def self.from_hash_v2(manifest_data)
+      m = Omnibus::Manifest.new(manifest_data['build_version'], manifest_data['build_git_revision'], manifest_data['license'])
       manifest_data['software'].each do |name, entry_data|
         m.add(name, Omnibus::ManifestEntry.new(name, keys_to_syms(entry_data)))
       end
