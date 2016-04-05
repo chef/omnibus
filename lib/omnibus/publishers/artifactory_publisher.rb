@@ -16,7 +16,6 @@
 
 require 'uri'
 require 'benchmark'
-require 'ffi_yajl'
 
 module Omnibus
   class ArtifactoryPublisher < Publisher
@@ -29,17 +28,28 @@ module Omnibus
         log.debug(log_key) { "Validating '#{package.name}'" }
         package.validate!
 
-        # Upload the actual package
-        log.info(log_key) { "Uploading '#{package.name}'" }
-
         retries = Config.publish_retries
 
         begin
           upload_time = Benchmark.realtime do
+            remote_path = remote_path_for(package)
+            properties  = default_properties.merge(metadata_properties_for(package))
+
+            # Upload the package
+            log.info(log_key) { "Uploading '#{package.name}'" }
             artifact_for(package).upload(
               repository,
-              remote_path_for(package),
-              default_properties.merge(metadata_properties_for(package)),
+              remote_path,
+              properties,
+            )
+            # Upload the package's assoacited `*.metadata.json` file
+            log.info(log_key) { "Uploading '#{package.name}.metadata.json'" }
+            artifact_for(package.metadata).upload(
+              repository,
+              "#{remote_path}.metadata.json",
+              # *.metadata.json files should not include
+              # the checksum properties
+              properties.dup.delete_if { |k,v| k =~ /^omnibus\.(md5|sha)/ },
             )
           end
         rescue Artifactory::Error::HTTPError => e
@@ -72,18 +82,21 @@ module Omnibus
     #
     # The artifact object that corresponds to this package.
     #
-    # @param [Package] package
-    #   the package to create the artifact from
+    # @param [Package,Metadata] artifact
+    #   the package or metadata file to create the artifact from
     #
     # @return [Artifactory::Resource::Artifact]
     #
-    def artifact_for(package)
+    def artifact_for(artifact)
+      md5  = artifact.respond_to?(:metadata) ? artifact.metadata[:md5] : digest(artifact.path, :md5)
+      sha1 = artifact.respond_to?(:metadata) ? artifact.metadata[:sha1] : digest(artifact.path, :sha1)
+
       Artifactory::Resource::Artifact.new(
-        local_path: package.path,
+        local_path: artifact.path,
         client:     client,
         checksums: {
-          'md5'  => package.metadata[:md5],
-          'sha1' => package.metadata[:sha1],
+          'md5'  => md5,
+          'sha1' => sha1,
         }
       )
     end
@@ -126,9 +139,10 @@ module Omnibus
           version: Omnibus::VERSION,
         },
         properties: default_properties.merge(
-          'omnibus.project' => name,
-          'omnibus.version' => manifest.build_version,
-          'omnibus.version_manifest' => FFI_Yajl::Encoder.encode(manifest.to_hash, pretty: true),
+          'omnibus.project'            => name,
+          'omnibus.version'            => manifest.build_version,
+          'omnibus.build_git_revision' => manifest.build_git_revision,
+          'omnibus.license'            => manifest.license,
         ),
         modules: [
           {
@@ -139,13 +153,21 @@ module Omnibus
               manifest.build_version,
             ].join(':'),
             artifacts: packages.map do |package|
-              {
-                type: File.extname(package.path).split('.').last,
-                sha1: package.metadata[:sha1],
-                md5:  package.metadata[:md5],
-                name: package.metadata[:basename],
-              }
-            end
+              [
+                {
+                  type: File.extname(package.path).split('.').last,
+                  sha1: package.metadata[:sha1],
+                  md5:  package.metadata[:md5],
+                  name: package.metadata[:basename],
+                },
+                {
+                  type: File.extname(package.metadata.path).split('.').last,
+                  sha1: digest(package.metadata.path, :sha1),
+                  md5:  digest(package.metadata.path, :md5),
+                  name: File.basename(package.metadata.path),
+                }
+              ]
+            end.flatten
           }
         ]
       )
@@ -205,8 +227,7 @@ module Omnibus
         'omnibus.md5'              => package.metadata[:md5],
         'omnibus.sha1'             => package.metadata[:sha1],
         'omnibus.sha256'           => package.metadata[:sha256],
-        'omnibus.sha512'           => package.metadata[:sha512],
-        'omnibus.version_manifest' => package.metadata[:version_manifest] || '',
+        'omnibus.sha512'           => package.metadata[:sha512]
       }.tap do |h|
         if build_record?
           h['build.name'] = package.metadata[:name]

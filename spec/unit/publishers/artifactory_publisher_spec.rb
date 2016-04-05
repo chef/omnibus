@@ -31,18 +31,64 @@ module Omnibus
         sha512: 'SHA512',
         md5: 'ABCDEF123456',
         version_manifest: {
-          'manifest_format' => 1,
-          'build_version' => '11.0.6',
-          'build_git_revision' => '2e763ac957b308ba95cef256c2491a5a55a163cc',
-          'software' => {
-            'zlib' => {
-              'locked_source' => {
-                'url' => 'an_url'
+          manifest_format: 1,
+          build_version: '11.0.6',
+          build_git_revision: '2e763ac957b308ba95cef256c2491a5a55a163cc',
+          software: {
+            zlib: {
+              locked_source: {
+                md5: '44d667c142d7cda120332623eab69f40',
+                url: 'http://iweb.dl.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz',
               },
-              'locked_version' => 'new.newer',
-              'source_type' => 'url',
-              'described_version' => 'new.newer',
-            }
+              locked_version: '1.2.8',
+              source_type: 'url',
+              described_version: '1.2.8',
+              license: 'Zlib',
+            },
+            openssl: {
+              locked_source: {
+                md5: '562986f6937aabc7c11a6d376d8a0d26',
+                extract: 'lax_tar',
+                url: 'http://iweb.dl.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz',
+              },
+              locked_version: '1.0.1s',
+              source_type: 'url',
+              described_version: '1.0.1s',
+              license: 'OpenSSL',
+            },
+            ruby: {
+              locked_source: {
+                md5: '091b62f0a9796a3c55de2a228a0e6ef3',
+                url: 'https://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.8.tar.gz',
+              },
+              locked_version: '2.1.8',
+              source_type: 'url',
+              described_version: '2.1.8',
+              license: 'BSD-2-Clause',
+            },
+            ohai: {
+              locked_source: {
+                git: 'https://github.com/opscode/ohai.git'
+              },
+              locked_version: 'fec0959aa5da5ce7ba0e07740dbc08546a8f53f0',
+              source_type: 'git',
+              described_version: 'master',
+              license: 'Apache-2.0',
+            },
+            chef: {
+              locked_source: {
+                path: '/home/jenkins/workspace/chef-build/architecture/x86_64/platform/ubuntu-10.04/project/chef/role/builder/omnibus/files/../..',
+                options: {
+                  exclude: [
+                    'omnibus/vendor',
+                  ],
+                },
+              },
+              locked_version: 'local_source',
+              source_type: 'path',
+              described_version: 'local_source',
+              license: 'Apache-2.0',
+            },
           }
         }
       )
@@ -53,7 +99,7 @@ module Omnibus
     let(:artifact) { double('Artifactory::Resource::Artifact', upload: nil) }
     let(:build)    { double('Artifactory::Resource::Build') }
 
-    let(:transformed_metadata_values) do
+    let(:package_properties) do
       {
         "omnibus.architecture" => "x86_64",
         "omnibus.iteration" => 1,
@@ -66,20 +112,11 @@ module Omnibus
         "omnibus.sha512" => "SHA512",
         "omnibus.version" => "11.0.6",
         "omnibus.license" => "Apache-2.0",
-        "omnibus.version_manifest" => {
-          "manifest_format" => 1,
-          "build_version" => "11.0.6",
-          "build_git_revision" => "2e763ac957b308ba95cef256c2491a5a55a163cc",
-          "software" => {
-            "zlib" => {
-              "locked_source" => {
-                "url" => "an_url"
-              },
-              "locked_version" => "new.newer",
-              "source_type" => "url",
-              "described_version" => "new.newer"}}
-        }
       }
+    end
+    let(:metadata_json_properites) do
+      # we don't attache checksum properties to the *.metadata.json
+      package_properties.delete_if { |k,v| k =~ /md5|sha/ }
     end
     let(:build_values) do
       {
@@ -116,7 +153,17 @@ module Omnibus
         expect(artifact).to receive(:upload).with(
           repository,
           'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
-          hash_including(transformed_metadata_values),
+          hash_including(package_properties),
+        ).once
+
+        subject.publish
+      end
+
+      it "uploads the package's associated *.metadata.json" do
+        expect(artifact).to receive(:upload).with(
+          repository,
+          'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb.metadata.json',
+          hash_including(metadata_json_properites),
         ).once
 
         subject.publish
@@ -191,7 +238,7 @@ module Omnibus
           expect(artifact).to receive(:upload).with(
             repository,
             'com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb',
-            hash_including(transformed_metadata_values.merge(delivery_props)),
+            hash_including(package_properties.merge(delivery_props)),
           ).once
 
           subject.publish
@@ -201,7 +248,7 @@ module Omnibus
 
     describe '#metadata_properties_for' do
       it 'returns the transformed package metadata values' do
-        expect(subject.send(:metadata_properties_for, package)).to include(transformed_metadata_values.merge(build_values))
+        expect(subject.send(:metadata_properties_for, package)).to include(package_properties.merge(build_values))
       end
 
       context ':build_record is false' do
@@ -213,7 +260,7 @@ module Omnibus
         end
 
         it 'does not include `build.*` values' do
-          expect(subject.send(:metadata_properties_for, package)).to include(transformed_metadata_values)
+          expect(subject.send(:metadata_properties_for, package)).to include(package_properties)
           expect(subject.send(:metadata_properties_for, package)).to_not include(build_values)
         end
       end
