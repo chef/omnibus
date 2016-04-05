@@ -205,7 +205,7 @@ module Omnibus
         'omnibus.sha1'             => package.metadata[:sha1],
         'omnibus.sha256'           => package.metadata[:sha256],
         'omnibus.sha512'           => package.metadata[:sha512],
-        'omnibus.version_manifest' => package.metadata[:version_manifest] || '',
+        'omnibus.dependencies'     => dependency_data_for(package),
       }.tap do |h|
         if build_record?
           h['build.name'] = package.metadata[:name]
@@ -256,6 +256,28 @@ module Omnibus
         package.metadata[:platform_version],
         package.metadata[:basename],
       )
+    end
+
+    #
+    # Dependency data for all of a package
+    #
+    # @param [Package] package
+    #   the package to generate the dependency data for
+    #
+    # @return [Hash<String, String>]
+    #
+    def dependency_data_for(package)
+      dependency_data = {}
+      dep_list = package.metadata.to_hash.fetch(:version_manifest, {}).fetch(:software, {})
+      dep_list.each do |name, data|
+        dependency_data[name.to_s] = {
+          'source_type'       => data[:source_type],
+          'described_version' => data[:described_version],
+          'locked_version'    => data[:locked_version],
+          'license'           => data[:license],
+        }
+      end
+      dependency_data
     end
   end
 end
