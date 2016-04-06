@@ -505,7 +505,7 @@ module Omnibus
       let(:manifest_entry) {Omnibus::ManifestEntry.new("software", {locked_version: "1.2.8", locked_source: a_source})}
       let(:manifest) do
         m = Omnibus::Manifest.new
-        m.add("software", manifest_entry)
+        m.add(:software, manifest_entry)
       end
 
       let(:project_with_manifest) do
