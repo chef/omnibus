@@ -39,6 +39,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'aruba',       '~> 0.5'
   gem.add_development_dependency 'fauxhai',     '~> 3.2'
   gem.add_development_dependency 'rspec',       '~> 3.0'
+  gem.add_development_dependency 'rspec-json_expectations'
   gem.add_development_dependency 'rspec-its'
   gem.add_development_dependency 'webmock'
   gem.add_development_dependency 'rake'

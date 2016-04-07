@@ -6,10 +6,13 @@ module Omnibus
       double(described_class, path: '/path/to/package.deb.metadata.json')
     end
 
+    let(:package_path) { '/path/to/package.deb' }
+    let(:license_path) { '/opt/project/LICENSE' }
+
     let(:package) do
       double(Package,
         name:   'package',
-        path:   '/path/to/package.deb',
+        path:   package_path,
         md5:    'abc123',
         sha1:   'abc123',
         sha256: 'abcd1234',
@@ -17,9 +20,111 @@ module Omnibus
       )
     end
 
+    let(:project) do
+      double(Project,
+        name:             'some-project',
+        friendly_name:    'Some Project',
+        homepage:         'https://some.project.io',
+        build_version:    '1.2.3',
+        build_iteration:  '1',
+        license:          'Apache-2.0',
+        built_manifest:    double(Manifest,
+                                  to_hash: {
+                                    manifest_format: 2,
+                                    build_version: '1.2.3',
+                                    build_git_revision: 'SHA',
+                                    license: 'Apache-2.0'
+                                  }
+                                ),
+        license_file_path: license_path,
+      )
+    end
+
     let(:data) { { foo: 'bar' } }
+    let(:license_file_content) do
+      <<-EOH
+some_project 1.2.3 license: "Apache-2.0"
+
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+...
+      EOH
+    end
 
     subject { described_class.new(package, data) }
+
+    describe '.generate' do
+      let(:metadata_json_content) { StringIO.new }
+      let(:package_path) { '/path/to/package.deb' }
+
+      before do
+        allow(File).to receive(:exist?).with(package_path).and_return(true)
+        allow(Package).to receive(:new).with(package_path).and_return(package)
+        allow(File).to receive(:exist?).with(license_path).and_return(true)
+        allow(File).to receive(:read).with(license_path).and_return(license_file_content)
+        # mock out `Metadata#save`
+        allow(File).to receive(:open).with("#{package_path}.metadata.json", 'w+').and_yield(metadata_json_content)
+      end
+
+      it 'creates a *.metadata.json file with the correct content' do
+
+        described_class.generate(package_path, project)
+
+        expect(metadata_json_content.string).to include_json(
+          basename: 'package',
+          md5:      'abc123',
+          sha1:     'abc123',
+          sha256:   'abcd1234',
+          sha512:   'abcdef123456',
+          platform: 'ubuntu',
+          platform_version: '12.04',
+          arch: 'x86_64',
+          name: 'some-project',
+          friendly_name: 'Some Project',
+          homepage: 'https://some.project.io',
+          version: '1.2.3',
+          iteration: '1',
+          version_manifest: {
+            manifest_format: 2,
+            build_version: '1.2.3',
+            build_git_revision: 'SHA',
+            license: 'Apache-2.0',
+          },
+          license_content: license_file_content,
+        )
+      end
+
+      context 'the package file does not exist' do
+        before do
+          allow(File).to receive(:exist?).with(package_path).and_return(false)
+        end
+
+        it 'raises an exception' do
+          expect { described_class.generate(package_path, project) }.to raise_error(Omnibus::NoPackageFile)
+        end
+      end
+
+      context 'the license file does not exist' do
+        before do
+          allow(File).to receive(:exist?).with(license_path).and_return(false)
+        end
+
+        it 'does not include the license content' do
+          described_class.generate(package_path, project)
+          expect(metadata_json_content.string).to include_json(
+            license_content: '',
+          )
+        end
+      end
+    end
 
     describe '.arch' do
       let(:architecture) { 'x86_64' }
