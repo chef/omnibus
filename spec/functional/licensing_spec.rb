@@ -163,6 +163,19 @@ module Omnibus
       end
     end
 
+    describe "without license file for the project" do
+      let(:license) { "Custom Chef" }
+      let(:license_file_path) { "CHEF.LICENSE" }
+      let(:license_file) { "CUSTOM_CHEF" }
+
+      # Note that we are not creating the license file before running create_licenses
+
+      it "warns not existing license file" do
+        output = capture_logging { create_licenses }
+        expect(output).to include("Specified license file '#{File.join(Config.project_root, license_file)}' does not exist for the project.")
+      end
+    end
+
     describe "with a local license file that does not exist" do
       let(:software_with_warnings) do
         Software.new(project, 'problematic.rb').evaluate do

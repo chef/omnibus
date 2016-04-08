@@ -176,7 +176,15 @@ module Omnibus
     # @return [String]
     #
     def project_license_content
-      project.license_file.nil? ? "" : IO.read(File.join(Config.project_root,project.license_file))
+      return "" if project.license_file.nil?
+
+      full_license_file_path = File.join(Config.project_root,project.license_file)
+
+      if File.exist?(full_license_file_path)
+        IO.read(full_license_file_path)
+      else
+        licensing_warning("Specified license file '#{full_license_file_path}' does not exist for the project.")
+      end
     end
 
     #
