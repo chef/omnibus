@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'json'
+require 'ffi_yajl'
 
 module Omnibus
   class Manifest
@@ -88,7 +88,7 @@ module Omnibus
     # @return [String]
     #
     def to_json
-      JSON.pretty_generate(to_hash)
+      FFI_Yajl::Encoder.encode(to_hash, pretty: true)
     end
 
     #
@@ -124,7 +124,7 @@ module Omnibus
 
     def self.from_file(filename)
       data = File.read(File.expand_path(filename))
-      hash = JSON.parse(data, symbolize_names: true)
+      hash = FFI_Yajl::Parser.parse(data, symbolize_names: true)
       from_hash(hash)
     end
 

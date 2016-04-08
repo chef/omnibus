@@ -51,7 +51,7 @@ module Omnibus
       it 'uploads the metadata' do
         expect(subject).to receive(:store_object).with(
           'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
-          package.metadata.to_json,
+          FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
           nil,
           'private',
         ).once
@@ -76,7 +76,7 @@ module Omnibus
         it 'sets the access control to public_read' do
           expect(subject).to receive(:store_object).with(
             'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
-            package.metadata.to_json,
+            FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
             nil,
             'public-read',
           ).once
@@ -91,7 +91,7 @@ module Omnibus
         it 'sets the access control to private' do
           expect(subject).to receive(:store_object).with(
             'ubuntu/14.04/x86_64/chef.deb/chef.deb.metadata.json',
-            package.metadata.to_json,
+            FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
             nil,
             'private',
           ).once

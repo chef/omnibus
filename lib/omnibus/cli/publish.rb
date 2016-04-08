@@ -94,7 +94,7 @@ module Omnibus
     #
     def publish(klass, pattern, options)
       if options[:platform_mappings]
-        options[:platform_mappings] = JSON.parse(File.read(File.expand_path(options[:platform_mappings])))
+        options[:platform_mappings] = FFI_Yajl::Parser.parse(File.read(File.expand_path(options[:platform_mappings])))
       end
 
       klass.publish(pattern, options) do |package|
