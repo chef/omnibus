@@ -16,7 +16,7 @@
 #
 
 require 'time'
-require 'json'
+require 'ffi_yajl'
 require 'omnibus/manifest'
 require 'omnibus/manifest_entry'
 require 'omnibus/reports'
@@ -1087,7 +1087,7 @@ module Omnibus
 
     def write_json_manifest
       File.open(json_manifest_path, 'w') do |f|
-        f.write(JSON.pretty_generate(built_manifest.to_hash))
+        f.write(FFI_Yajl::Encoder.encode(built_manifest.to_hash, pretty: true))
       end
     end
 
@@ -1206,7 +1206,7 @@ module Omnibus
 
         update_with_string(digest, name)
         update_with_string(digest, install_dir)
-        update_with_string(digest, JSON.fast_generate(overrides))
+        update_with_string(digest, FFI_Yajl::Encoder.encode(overrides))
 
         if filepath && File.exist?(filepath)
           update_with_file_contents(digest, filepath)

@@ -18,6 +18,7 @@ Feature: omnibus manifest
     And  the output should contain:
          """
            "software": {
+
            },
          """
 

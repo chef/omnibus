@@ -18,6 +18,7 @@ require 'omnibus/changelog'
 require 'omnibus/changelog_printer'
 require 'omnibus/manifest_diff'
 require 'omnibus/semantic_version'
+require 'ffi_yajl'
 
 module Omnibus
   class Command::ChangeLog < Command::Base
@@ -104,7 +105,7 @@ module Omnibus
     end
 
     def manifest_for_revision(rev)
-      Omnibus::Manifest.from_hash(JSON.parse(local_git_repo.file_at_revision("version-manifest.json", rev)))
+      Omnibus::Manifest.from_hash(FFI_Yajl::Parser.parse(local_git_repo.file_at_revision("version-manifest.json", rev)))
     end
 
 

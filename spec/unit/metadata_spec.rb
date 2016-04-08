@@ -250,7 +250,7 @@ module Omnibus
 
     describe '#to_json' do
       it 'generates pretty JSON' do
-        expect(subject.to_json).to eq <<-EOH.gsub(/^ {10}/, '').strip
+        expect(subject.to_json.strip).to eq <<-EOH.gsub(/^ {10}/, '').strip
           {
             "foo": "bar"
           }

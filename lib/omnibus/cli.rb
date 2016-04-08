@@ -16,6 +16,7 @@
 
 require 'thor'
 require 'omnibus'
+require "ffi_yajl"
 
 module Omnibus
   class CLI < Command::Base
@@ -85,7 +86,7 @@ module Omnibus
       if @options[:output_manifest]
         FileUtils.mkdir_p('pkg')
         File.open(::File.join('pkg', 'version-manifest.json'), 'w') do |f|
-          f.write(project.built_manifest.to_json)
+          f.write(FFI_Yajl::Encoder.encode(project.built_manifest.to_hash))
         end
       end
     end
@@ -121,7 +122,7 @@ module Omnibus
       Ohai['platform'] = @options[:platform] if @options[:platform]
       Ohai['platform_version'] = @options[:platform_version] if @options[:platform_version]
       Ohai['kernel']['machine'] = @options[:architecture] if @options[:architecture]
-      puts JSON.pretty_generate(Project.load(name).built_manifest.to_hash)
+      puts FFI_Yajl::Encoder.encode(Project.load(name).built_manifest.to_hash, pretty: true)
     end
 
     #

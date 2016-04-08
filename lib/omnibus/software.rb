@@ -1059,7 +1059,7 @@ module Omnibus
         update_with_string(digest, builder.shasum)
         update_with_string(digest, name)
         update_with_string(digest, version_for_cache)
-        update_with_string(digest, JSON.fast_generate(overrides))
+        update_with_string(digest, FFI_Yajl::Encoder.encode(overrides))
 
         if filepath && File.exist?(filepath)
           update_with_file_contents(digest, filepath)

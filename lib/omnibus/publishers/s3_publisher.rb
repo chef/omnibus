@@ -30,7 +30,7 @@ module Omnibus
 
         # Upload the metadata first
         log.debug(log_key) { "Uploading '#{package.metadata.name}'" }
-        store_object(key_for(package, package.metadata.name), package.metadata.to_json,
+        store_object(key_for(package, package.metadata.name), FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
                      nil, access_policy)
 
         # Upload the actual package

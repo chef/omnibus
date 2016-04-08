@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'json'
+require 'ffi_yajl'
 
 module Omnibus
   class Metadata
@@ -80,7 +80,7 @@ module Omnibus
       #
       def for_package(package)
         data = File.read(path_for(package))
-        hash = JSON.parse(data, symbolize_names: true)
+        hash = FFI_Yajl::Parser.parse(data, symbolize_names: true)
 
          # Ensure Platform version has been truncated
          if hash[:platform_version] && hash[:platform]
@@ -267,7 +267,7 @@ module Omnibus
     #
     def save
       File.open(path, 'w+')  do |f|
-        f.write(to_json)
+        f.write(FFI_Yajl::Encoder.encode(to_hash, pretty: true))
       end
 
       true
@@ -288,7 +288,7 @@ module Omnibus
     # @return [String]
     #
     def to_json
-      JSON.pretty_generate(@data)
+      FFI_Yajl::Encoder.encode(@data, pretty: true)
     end
   end
 end

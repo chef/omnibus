@@ -18,7 +18,6 @@ require 'omnibus/core_extensions'
 
 require 'cleanroom'
 require 'pathname'
-require 'json'
 
 require 'omnibus/exceptions'
 require 'omnibus/version'

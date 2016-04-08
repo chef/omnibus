@@ -16,6 +16,7 @@
 
 require 'uri'
 require 'benchmark'
+require 'ffi_yajl'
 
 module Omnibus
   class ArtifactoryPublisher < Publisher
@@ -127,7 +128,7 @@ module Omnibus
         properties: default_properties.merge(
           'omnibus.project' => name,
           'omnibus.version' => manifest.build_version,
-          'omnibus.version_manifest' => manifest.to_json,
+          'omnibus.version_manifest' => FFI_Yajl::Encoder.encode(manifest.to_hash, pretty: true),
         ),
         modules: [
           {
