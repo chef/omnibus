@@ -16,6 +16,8 @@
 
 module Omnibus
   class Publisher
+    include Digestable
+
     class << self
       #
       # Shortcut class method for creating a new instance of this class and

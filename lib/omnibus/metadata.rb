@@ -63,6 +63,7 @@ module Omnibus
           iteration:        project.build_iteration,
           license:          project.license,
           version_manifest: project.built_manifest.to_hash,
+          license_content:  File.exist?(project.license_file_path) ? File.read(project.license_file_path) : ''
         }
 
         instance = new(package, data)
