@@ -391,12 +391,12 @@ module Omnibus
 
     #
     # Convert the path of a file in the staging directory to an entry for use in the spec file.
-    #
+    # Exclude directories owned by the filesystem package.
     # @return [String]
     #
     def build_filepath(path)
       filepath = rpm_safe('/' + path.gsub("#{build_dir}/", ''))
-      return if config_files.include?(filepath)
+      return if config_files.include?(filepath) || filesystem_directories.include?(filepath)
       full_path = build_dir + filepath.gsub('[%]','%')
       # FileSyncer.glob quotes pathnames that contain spaces, which is a problem on el7
       full_path.gsub!('"', '')
