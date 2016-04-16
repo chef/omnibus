@@ -6,7 +6,9 @@ platform:
 
 environment:
   matrix:
-    - ruby_version: "200"
+    - RUBY_VERSION: 22
+    - RUBY_VERSION: 21
+    - RUBY_VERSION: 200
 
 clone_folder: c:\projects\omnibus
 clone_depth: 1
@@ -16,13 +18,13 @@ branches:
     - master
 
 install:
-  - SET PATH=C:\Ruby%ruby_version%\bin;C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin;%PATH%
+  - SET PATH=C:\Ruby%RUBY_VERSION%\bin;C:\Ruby23-x64\DevKit\mingw\bin;%PATH%
   - echo %PATH%
   - ruby --version
   - gem --version
   - gem install bundler -v 1.10.6 --quiet --no-ri --no-rdoc
   - bundler --version
-  - cp C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\bsdtar.exe C:\Ruby21%ruby_version:~3%\Devkit\mingw\bin\tar.exe
+  - cp C:\Ruby23-x64\DevKit\mingw\bin\bsdtar.exe C:\Ruby23-x64\DevKit\mingw\bin\tar.exe
   - appveyor DownloadFile http://curl.haxx.se/ca/cacert.pem -FileName C:\cacert.pem
   - set SSL_CERT_FILE=C:\cacert.pem
   - git config --global user.email "clouseau@chef.io"
