@@ -1,6 +1,20 @@
 Omnibus CHANGELOG
 =================
 
+v5.4.0 (April 18, 2016)
+-----------------------
+### New Features
+- Include license and version manifest in generated `*.metadata.json` (#656)
+- Deprecate the `--version-manifest` on `omnibus publish` (#656)
+- Create Solaris IPS package (#654)
+- Use symbolized keys for all Manifest hashes (#657)
+- Publish a package’s `*.metadata.json` to Artifactory (#664)
+- Add the build’s `LICENSE` content to `*.metadata.json` (#664)
+
+### Bug Fixes
+- Add proper support for loading v2 manifests (#657)
+- Replacing the use of JSON gem with FFI_yajl (#661)
+
 v5.3.0 (March 25, 2016)
 -----------------------
 ### New Features
