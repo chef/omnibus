@@ -403,7 +403,26 @@ module Omnibus
             'pass a block when given a version argument')
         else
           if val == final_version
+            #
+            # Unfortunately we need to make a specific logic here for license files.
+            # We support multiple calls `license_file` and we support overriding the
+            # license files inside a version block. We can not differentiate whether
+            # `license_file` is being called from a version block or not. So we need
+            # to check if the license files are being overridden during the call to
+            # block.
+            #
+            # If so we use the new set, otherwise we restore the old license files.
+            #
+            current_license_files = @license_files
+            @license_files = []
+
             block.call
+
+            new_license_files = @license_files
+
+            if new_license_files.empty?
+              @license_files = current_license_files
+            end
           end
         end
       end
