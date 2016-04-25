@@ -5,6 +5,7 @@ module Omnibus
     let(:license) { nil }
     let(:license_file_path) { nil }
     let(:license_file) { nil }
+    let(:zlib_version_override) { nil }
 
     let(:install_dir) { File.join(tmp_path, "install_dir")}
     let(:software_project_dir) { File.join(tmp_path, "software_project_dir")}
@@ -18,7 +19,7 @@ module Omnibus
       FileUtils.mkdir_p(software_project_dir)
 
       allow_any_instance_of(Software).to receive(:project_dir).and_return(software_project_dir)
-      %w{LICENSE NOTICE}.each do |file|
+      %w{LICENSE NOTICE APACHE}.each do |file|
         File.open(File.join(software_project_dir, file), "w+") do |f|
           f.puts "This file is #{file}."
         end
@@ -35,11 +36,16 @@ module Omnibus
         expect(project_license).to match /#{expected_project_license_content}/
         expect(project_license).to match /This product bundles private_code 1.7.2,\nwhich is available under a "Unspecified"/
         expect(project_license).to match /This product bundles snoopy 1.0.0,\nwhich is available under a "GPL v2"/
-        expect(project_license).to match /This product bundles zlib 1.7.2,\nwhich is available under a "Zlib"/
         expect(project_license).not_to match /preparation/
         expect(project_license).to match /LICENSES\/snoopy-artistic.html/
         expect(project_license).to match /LICENSES\/snoopy-NOTICE/
-        expect(project_license).to match /LICENSES\/zlib-LICENSE/
+        if zlib_version_override
+          expect(project_license).to match /This product bundles zlib 1.8.0,\nwhich is available under a "Apache-2.0"/
+          expect(project_license).to match /LICENSES\/zlib-APACHE/
+        else
+          expect(project_license).to match /This product bundles zlib 1.7.2,\nwhich is available under a "Zlib"/
+          expect(project_license).to match /LICENSES\/zlib-LICENSE/
+        end
       end
 
       it "creates the license files of software components correctly" do
@@ -47,7 +53,14 @@ module Omnibus
         license_dir = File.join(install_dir, "LICENSES")
         expect(Dir.glob("#{license_dir}/**/*").length).to be(3)
 
-        %w{snoopy-NOTICE zlib-LICENSE}.each do |software_license|
+        license_names = [ "snoopy-NOTICE" ]
+        if zlib_version_override
+          license_names << "zlib-APACHE"
+        else
+          license_names << "zlib-LICENSE"
+        end
+
+        license_names.each do |software_license|
           license_path = File.join(license_dir, software_license)
           expect(File.exist?(license_path)).to be(true)
           expect(File.read(license_path)).to match /#{software_license.split("-").last}/
@@ -78,6 +91,9 @@ module Omnibus
         project.license_file_path(license_file_path) unless license_file_path.nil?
         project.license_file(license_file) unless license_file.nil?
         project.build_version('1.2.3')
+        if zlib_version_override
+          project.override :zlib, version: zlib_version_override
+        end
       end
     end
 
@@ -94,6 +110,11 @@ module Omnibus
         default_version '1.7.2'
         license "Zlib"
         license_file "LICENSE"
+
+        version '1.8.0' do
+          license "Apache-2.0"
+          license_file "APACHE"
+        end
       end
     end
 
@@ -160,6 +181,12 @@ module Omnibus
       it "warns for non-standard project license" do
         output = capture_logging { create_licenses }
         expect(output).to include("Project 'test-project' is using 'Custom Chef' which is not one of the standard licenses")
+      end
+
+      context "with a version override" do
+        let(:zlib_version_override) { "1.8.0" }
+
+        it_behaves_like "correctly created licenses"
       end
     end
 
