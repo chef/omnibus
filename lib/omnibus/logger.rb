@@ -24,7 +24,7 @@ module Omnibus
     #
     # @return [Fixnum]
     #
-    LEFT = 40
+    LEFT = 30
 
     #
     # Our custom log levels, in order of severity
