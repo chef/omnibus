@@ -16,6 +16,9 @@
 
 module Omnibus
   class Logger
+
+    require 'time'
+
     #
     # The amount of padding on the left column.
     #
@@ -135,7 +138,7 @@ module Omnibus
       else
         left = "#{format_severity(severity)} | "
       end
-      "#{left.rjust(LEFT)}#{message}\n"
+      "#{left.rjust(LEFT)}#{Time.now.iso8601()} | #{message}\n"
     end
 
     #
