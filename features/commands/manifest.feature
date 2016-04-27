@@ -14,7 +14,10 @@ Feature: omnibus manifest
   Scenario: When the project has no software definitions
     When I run `omnibus manifest hamlet`
 
-    Then it should pass with "[Project: hamlet] I | Building version manifest"
+    Then it should pass with "[Project: hamlet] I | "
+
+    And the output should match /^[Project: hamlet] I | \d\d\d\d-[0-1]\d-[0-3]\dT[0-2]\d:[0-6]\d:[0-6]\d(\+|\-)\d\d:\d\d | Building version manifest$/
+
     And  the output should contain:
          """
            "software": {
@@ -35,7 +38,9 @@ Feature: omnibus manifest
 
     When  I run `omnibus manifest hamlet`
 
-    Then it should pass with "[Project: hamlet] I | Building version manifest"
+    Then it should pass with "[Project: hamlet] I | "
+
+    And the output should match /^[Project: hamlet] I | \d\d\d\d-[0-1]\d-[0-3]\dT[0-2]\d:[0-6]\d:[0-6]\d(\+|\-)\d\d:\d\d | Building version manifest$/
     And  the output should contain:
          """
            "software": {
@@ -62,7 +67,10 @@ Feature: omnibus manifest
 
     When  I run `omnibus manifest hamlet`
 
-    Then it should pass with "[Project: hamlet] I | Building version manifest"
+    Then it should pass with "[Project: hamlet] I | "
+
+    And the output should match /^[Project: hamlet] I | \d\d\d\d-[0-1]\d-[0-3]\dT[0-2]\d:[0-6]\d:[0-6]\d(\+|\-)\d\d:\d\d | Building version manifest$/
+
     And  the output should contain:
          """
            "software": {
@@ -90,7 +98,10 @@ Feature: omnibus manifest
 
     When  I run `omnibus manifest hamlet --os=linux --platform_family=debian --platform=ubuntu --platform_version=14.04`
 
-    Then it should pass with "[Project: hamlet] I | Building version manifest"
+    Then it should pass with "[Project: hamlet] I "
+
+    And the output should match /^[Project: hamlet] I | \d\d\d\d-[0-1]\d-[0-3]\dT[0-2]\d:[0-6]\d:[0-6]\d(\+|\-)\d\d:\d\d | Building version manifest$/
+
     And  the output should contain:
          """
            "software": {
@@ -117,7 +128,10 @@ Feature: omnibus manifest
 
     When  I run `omnibus manifest hamlet --os=windows --platform_family=windows --platform=windows --platform_version=2012r2`
 
-    Then it should pass with "[Project: hamlet] I | Building version manifest"
+    Then it should pass with "[Project: hamlet] I | "
+
+    And the output should match /^[Project: hamlet] I | \d\d\d\d-[0-1]\d-[0-3]\dT[0-2]\d:[0-6]\d:[0-6]\d(\+|\-)\d\d:\d\d | Building version manifest$/
+
     And  the output should contain:
          """
            "software": {

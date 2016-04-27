@@ -16,12 +16,15 @@
 
 module Omnibus
   class Logger
+
+    require 'time'
+
     #
     # The amount of padding on the left column.
     #
     # @return [Fixnum]
     #
-    LEFT = 40
+    LEFT = 30
 
     #
     # Our custom log levels, in order of severity
@@ -135,7 +138,7 @@ module Omnibus
       else
         left = "#{format_severity(severity)} | "
       end
-      "#{left.rjust(LEFT)}#{message}\n"
+      "#{left.rjust(LEFT)}#{Time.now.iso8601()} | #{message}\n"
     end
 
     #

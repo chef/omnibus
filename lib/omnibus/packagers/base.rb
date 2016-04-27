@@ -20,6 +20,7 @@ module Omnibus
   class Packager::Base
     include Cleanroom
     include Digestable
+    include Instrumentation
     include Logging
     include NullArgumentable
     include Sugarable
@@ -140,21 +141,23 @@ module Omnibus
       # Ensure the package directory exists
       create_directory(Config.package_dir)
 
-      # Run the setup and build sequences
-      instance_eval(&self.class.setup) if self.class.setup
-      instance_eval(&self.class.build) if self.class.build
+      measure("Packaging time") do
+        # Run the setup and build sequences
+        instance_eval(&self.class.setup) if self.class.setup
+        instance_eval(&self.class.build) if self.class.build
 
-      # Render the metadata
-      Metadata.generate(package_path, project)
+        # Render the metadata
+        Metadata.generate(package_path, project)
 
-      # Ensure the temporary directory is removed at the end of a successful
-      # run. Without removal, successful builds will "leak" in /tmp and cause
-      # increased disk usage.
-      #
-      # Instead of having this as an +ensure+ block, failed builds will persist
-      # this directory so developers can go poke around and figure out why the
-      # build failed.
-      remove_directory(staging_dir)
+        # Ensure the temporary directory is removed at the end of a successful
+        # run. Without removal, successful builds will "leak" in /tmp and cause
+        # increased disk usage.
+        #
+        # Instead of having this as an +ensure+ block, failed builds will persist
+        # this directory so developers can go poke around and figure out why the
+        # build failed.
+        remove_directory(staging_dir)
+      end
     end
 
     #
