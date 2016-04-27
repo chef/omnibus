@@ -23,6 +23,7 @@ end
 
 module Omnibus
   class HealthCheck
+    include Instrumentation
     include Logging
     include Util
     include Sugarable
@@ -235,142 +236,144 @@ module Omnibus
     #   if the healthchecks pass
     #
     def run!
-      log.info(log_key) {"Running health on #{project.name}"}
-      bad_libs =  case Ohai['platform']
-                  when 'mac_os_x'
-                    health_check_otool
-                  when 'aix'
-                    health_check_aix
-                  when 'windows'
-                    # TODO: objdump -p will provided a very limited check of
-                    # explicit dependencies on windows. Most dependencies are
-                    # implicit and hence not detected.
-                    log.warn(log_key) { 'Skipping dependency health checks on Windows.' }
-                    {}
-                  else
-                    health_check_ldd
-                  end
+      measure("Health check time") do
+        log.info(log_key) {"Running health on #{project.name}"}
+        bad_libs =  case Ohai['platform']
+                    when 'mac_os_x'
+                      health_check_otool
+                    when 'aix'
+                      health_check_aix
+                    when 'windows'
+                      # TODO: objdump -p will provided a very limited check of
+                      # explicit dependencies on windows. Most dependencies are
+                      # implicit and hence not detected.
+                      log.warn(log_key) { 'Skipping dependency health checks on Windows.' }
+                      {}
+                    else
+                      health_check_ldd
+                    end
 
-      unresolved = []
-      unreliable = []
-      detail = []
+        unresolved = []
+        unreliable = []
+        detail = []
 
-      if bad_libs.keys.length > 0
-        bad_libs.each do |name, lib_hash|
-          lib_hash.each do |lib, linked_libs|
-            linked_libs.each do |linked, count|
-              if linked =~ /not found/
-                unresolved << lib unless unresolved.include? lib
-              else
-                unreliable << linked unless unreliable.include? linked
+        if bad_libs.keys.length > 0
+          bad_libs.each do |name, lib_hash|
+            lib_hash.each do |lib, linked_libs|
+              linked_libs.each do |linked, count|
+                if linked =~ /not found/
+                  unresolved << lib unless unresolved.include? lib
+                else
+                  unreliable << linked unless unreliable.include? linked
+                end
+                detail << "#{name}|#{lib}|#{linked}|#{count}"
               end
-              detail << "#{name}|#{lib}|#{linked}|#{count}"
             end
           end
-        end
 
-        log.error(log_key) { 'Failed!' }
-        bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
+          log.error(log_key) { 'Failed!' }
+          bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
 
-        log.error(log_key) do
-          out = "The following libraries have unsafe or unmet dependencies:\n"
-
-          bad_omnibus_libs.each do |lib|
-            out << "    --> #{lib}\n"
-          end
-
-          out
-        end
-
-        log.error(log_key) do
-          out = "The following binaries have unsafe or unmet dependencies:\n"
-
-          bad_omnibus_bins.each do |bin|
-            out << "    --> #{bin}\n"
-          end
-
-          out
-        end
-
-        if unresolved.length > 0
           log.error(log_key) do
-            out = "The following requirements could not be resolved:\n"
+            out = "The following libraries have unsafe or unmet dependencies:\n"
 
-            unresolved.each do |lib|
+            bad_omnibus_libs.each do |lib|
               out << "    --> #{lib}\n"
             end
 
             out
           end
-        end
 
-        if unreliable.length > 0
           log.error(log_key) do
-            out =  "The following libraries cannot be guaranteed to be on "
-            out << "target systems:\n"
+            out = "The following binaries have unsafe or unmet dependencies:\n"
 
-            unreliable.each do |lib|
-              out << "    --> #{lib}\n"
+            bad_omnibus_bins.each do |bin|
+              out << "    --> #{bin}\n"
             end
 
             out
           end
-        end
 
-        log.error(log_key) do
-          out = "The precise failures were:\n"
+          if unresolved.length > 0
+            log.error(log_key) do
+              out = "The following requirements could not be resolved:\n"
 
-          detail.each do |line|
-            item, dependency, location, count = line.split('|')
-            reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
+              unresolved.each do |lib|
+                out << "    --> #{lib}\n"
+              end
 
-            out << "    --> #{item}\n"
-            out << "    DEPENDS ON: #{dependency}\n"
-            out << "      COUNT: #{count}\n"
-            out << "      PROVIDED BY: #{location}\n"
-            out << "      FAILED BECAUSE: #{reason}\n"
+              out
+            end
           end
 
-          out
-        end
+          if unreliable.length > 0
+            log.error(log_key) do
+              out =  "The following libraries cannot be guaranteed to be on "
+              out << "target systems:\n"
 
-        raise HealthCheckFailed
-      end
+              unreliable.each do |lib|
+                out << "    --> #{lib}\n"
+              end
 
-      conflict_map = {}
+              out
+            end
+          end
 
-      conflict_map = relocation_check if relocation_checkable?
+          log.error(log_key) do
+            out = "The precise failures were:\n"
 
-      if conflict_map.keys.length > 0
-        log.warn(log_key) { 'Multiple dlls with overlapping images detected' }
+            detail.each do |line|
+              item, dependency, location, count = line.split('|')
+              reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
 
-        conflict_map.each do |lib_name, data|
-          base = data[:base]
-          size = data[:size]
-          next_valid_base = data[:base] + data[:size]
-
-          log.warn(log_key) do
-            out =  "Overlapping dll detected:\n"
-            out << "    #{lib_name} :\n"
-            out << "    IMAGE BASE: #{hex}\n" % base
-            out << "    IMAGE SIZE: #{hex} (#{size} bytes)\n" % size
-            out << "    NEXT VALID BASE: #{hex}\n" % next_valid_base
-            out << "    CONFLICTS:\n"
-
-            data[:conflicts].each do |conflict_name|
-              cbase = conflict_map[conflict_name][:base]
-              csize = conflict_map[conflict_name][:size]
-              out << "    - #{conflict_name} #{hex} + #{hex}\n" % [cbase, csize]
+              out << "    --> #{item}\n"
+              out << "    DEPENDS ON: #{dependency}\n"
+              out << "      COUNT: #{count}\n"
+              out << "      PROVIDED BY: #{location}\n"
+              out << "      FAILED BECAUSE: #{reason}\n"
             end
 
             out
           end
+
+          raise HealthCheckFailed
         end
 
-        # Don't raise an error yet. This is only bad for FIPS mode.
-      end
+        conflict_map = {}
 
-      true
+        conflict_map = relocation_check if relocation_checkable?
+
+        if conflict_map.keys.length > 0
+          log.warn(log_key) { 'Multiple dlls with overlapping images detected' }
+
+          conflict_map.each do |lib_name, data|
+            base = data[:base]
+            size = data[:size]
+            next_valid_base = data[:base] + data[:size]
+
+            log.warn(log_key) do
+              out =  "Overlapping dll detected:\n"
+              out << "    #{lib_name} :\n"
+              out << "    IMAGE BASE: #{hex}\n" % base
+              out << "    IMAGE SIZE: #{hex} (#{size} bytes)\n" % size
+              out << "    NEXT VALID BASE: #{hex}\n" % next_valid_base
+              out << "    CONFLICTS:\n"
+
+              data[:conflicts].each do |conflict_name|
+                cbase = conflict_map[conflict_name][:base]
+                csize = conflict_map[conflict_name][:size]
+                out << "    - #{conflict_name} #{hex} + #{hex}\n" % [cbase, csize]
+              end
+
+              out
+            end
+          end
+
+          # Don't raise an error yet. This is only bad for FIPS mode.
+        end
+
+        true
+      end
     end
 
     # Ensure the method relocation_check is able to run
