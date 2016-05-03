@@ -161,7 +161,8 @@ module Omnibus
                      Errno::ECONNRESET,
                      Errno::ENETUNREACH,
                      Timeout::Error,
-                     OpenURI::HTTPError
+                     OpenURI::HTTPError,
+                     OpenSSL::SSL::SSLError
                 licensing_warning("Can not download license file '#{license_file}' for software '#{name}'.")
               end
             end
