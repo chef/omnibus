@@ -63,6 +63,7 @@ module Omnibus
         license_names.each do |software_license|
           license_path = File.join(license_dir, software_license)
           expect(File.exist?(license_path)).to be(true)
+          expect(File.world_readable?(license_path)).to be_truthy
           expect(File.read(license_path)).to match /#{software_license.split("-").last}/
         end
 
