@@ -1,10 +1,12 @@
 ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 ===========================================================
 [![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
-[![Build Status](http://img.shields.io/travis/chef/omnibus.svg)][travis]
+[![Travis Build Status](http://img.shields.io/travis/chef/omnibus.svg?label=Travis CI)][travis]
+[![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
 
 [gem]: https://rubygems.org/gems/omnibus
 [travis]: https://travis-ci.org/chef/omnibus
+[appveyor]: https://ci.appveyor.com/project/chef/omnibus
 
 Easily create full-stack installers for your project across a variety of platforms.
 
