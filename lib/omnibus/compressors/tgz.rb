@@ -89,6 +89,7 @@ module Omnibus
         while chunk = contents.read(1024)
           tgz.write(chunk)
         end
+        tgz.fsync if tgz.respond_to?(:fsync)
       end
 
       # Copy the .tar.gz into the package directory

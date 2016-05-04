@@ -77,9 +77,14 @@ module Omnibus
         end
 
         file = open(from_url, options)
-        # This is a temporary file. Close and flush it before attempting to copy
-        # it over.
+        # This is a temporary file. You must fsync a file before you can copy it
+        # directly. Just closing/flushing is insufficient as the file-system can
+        # decide to buffer your write and (depending on the ordering-guarantee
+        # flags you have chosen) choose to execute the copy operation before
+        # the contents are written out.
+        file.fsync if file.respond_to?(:fsync)
         file.close
+
         FileUtils.cp(file.path, to_path)
         file.unlink
       rescue SocketError,
