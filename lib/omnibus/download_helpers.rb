@@ -58,7 +58,8 @@ module Omnibus
 
         fetcher_retries ||= Omnibus::Config.fetcher_retries
 
-        reported_total = 0
+        content_length = 0
+        downloaded_amount = 0
         if enable_progress_bar
           progress_bar = ProgressBar.create(
             output: $stdout,
@@ -67,13 +68,24 @@ module Omnibus
           )
 
           options[:content_length_proc] = ->(total) {
-            reported_total = total
+            content_length = total
             progress_bar.total = total
           }
           options[:progress_proc] = ->(step) {
-            downloaded_amount = [step, reported_total].min
-            progress_bar.progress = downloaded_amount
+            downloaded_amount = step
+            progress_bar.progress = [step, content_length].min
           }
+        end
+
+        if downloaded_amount != content_length
+          if fetcher_retries != 0
+            log.info(log_key) { "Retrying truncated download (#{fetcher_retries} retries left)..." }
+            fetcher_retries -= 1
+            retry
+          else
+            log.error(log_key) { "Download failed - Truncated download!" }
+            raise "truncated download"
+          end
         end
 
         file = open(from_url, options)
