@@ -22,6 +22,7 @@ module Omnibus
   class Licensing
     include Logging
     include DownloadHelpers
+    include Sugarable
 
     OUTPUT_DIRECTORY = "LICENSES".freeze
 
@@ -150,12 +151,14 @@ module Omnibus
               input_file = File.expand_path(license_file, values[:project_dir])
               if File.exist?(input_file)
                 FileUtils.cp(input_file, output_file)
+                File.chmod 0644, output_file unless windows?
               else
                 licensing_warning("License file '#{input_file}' does not exist for software '#{name}'.")
               end
             else
               begin
                 download_file!(license_file, output_file, enable_progress_bar: false)
+                File.chmod 0644, output_file unless windows?
               rescue SocketError,
                      Errno::ECONNREFUSED,
                      Errno::ECONNRESET,
