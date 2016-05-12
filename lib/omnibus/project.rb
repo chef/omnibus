@@ -932,12 +932,12 @@ module Omnibus
     end
 
     #
-    # Instantiate a new instance of the best packager for this system.
+    # Instantiate new instances of the best packagers for this system.
     #
-    # @return [~Packager::Base]
+    # @return [[~Packager::Base]]
     #
-    def packager
-      @packager ||= Packager.for_current_system.new(self)
+    def packagers_for_system
+      @packagers_for_system ||= Packager.for_current_system.map { |p| p.new(self) }
     end
 
     #
@@ -1125,18 +1125,20 @@ module Omnibus
         FileUtils.mkdir_p(destination)
       end
 
-      # Evaluate any packager-specific blocks, in order.
-      packagers[packager.id].each do |block|
-        packager.evaluate(&block)
+      packagers_for_system.each do |packager|
+        # Evaluate any packager-specific blocks, in order.
+        packagers[packager.id].each do |block|
+          packager.evaluate(&block)
+        end
+
+        # Run the actual packager
+        packager.run!
+
+        # Copy the generated package and metadata back into the workspace
+        package_path = File.join(Config.package_dir, packager.package_name)
+        FileUtils.cp(package_path, destination, preserve: true)
+        FileUtils.cp("#{package_path}.metadata.json", destination, preserve: true)
       end
-
-      # Run the actual packager
-      packager.run!
-
-      # Copy the generated package and metadata back into the workspace
-      package_path = File.join(Config.package_dir, packager.package_name)
-      FileUtils.cp(package_path, destination, preserve: true)
-      FileUtils.cp("#{package_path}.metadata.json", destination, preserve: true)
     end
 
     #

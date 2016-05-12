@@ -20,8 +20,8 @@ module Omnibus
     let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
 
     before do
-      allow(project).to receive(:packager)
-        .and_return(Packager::PKG.new(project))
+      allow(project).to receive(:packagers_for_system)
+        .and_return([Packager::PKG.new(project)])
 
       Config.project_root(project_root)
       Config.package_dir(package_dir)
@@ -272,7 +272,7 @@ module Omnibus
 
       it 'reflects the packager\'s modified package_name' do
         package_basename = 'projectsub-1.2.3-3'
-        allow(project.packager).to receive(:package_name)
+        allow(project.packagers_for_system[0]).to receive(:package_name)
           .and_return("#{package_basename}.pkg")
 
         expect(subject.package_name).to eq("#{package_basename}.dmg")

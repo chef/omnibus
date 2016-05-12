@@ -330,9 +330,9 @@ EOF
     end
   end
 
-  class FailedToTimestampMSI < Error
+  class FailedToSignWindowsPackage < Error
     def initialize
-      super("Failed to add timestamp to MSI.")
+      super("Failed to sign Windows Package.")
     end
   end
 end

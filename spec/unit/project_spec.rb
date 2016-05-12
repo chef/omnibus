@@ -277,15 +277,17 @@ module Omnibus
       end
     end
 
-    describe '#packager' do
-      it 'returns a packager object' do
-        expect(subject.packager).to be_a(Packager::Base)
+    describe '#packagers_for_system' do
+      it 'returns array of packager objects' do
+        subject.packagers_for_system.each do |packager|
+          expect(packager).to be_a(Packager::Base)
+        end
       end
 
       it 'calls Packager#for_current_system' do
         expect(Packager).to receive(:for_current_system)
           .and_call_original
-        subject.packager
+        subject.packagers_for_system
       end
     end
 

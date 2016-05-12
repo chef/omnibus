@@ -3,7 +3,7 @@ require 'spec_helper'
 module Omnibus
   describe Compressor::Null do
     let(:packager) { double(Packager::Base) }
-    let(:project)  { double(Project, packager: packager) }
+    let(:project)  { double(Project, packagers_for_system: [packager]) }
 
     subject { described_class.new(project) }
 

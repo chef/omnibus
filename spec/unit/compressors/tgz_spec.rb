@@ -24,8 +24,8 @@ module Omnibus
       create_directory(package_dir)
       create_directory(staging_dir)
 
-      allow(project).to receive(:packager)
-        .and_return(Packager::PKG.new(project))
+      allow(project).to receive(:packagers_for_system)
+        .and_return([Packager::PKG.new(project)])
 
       Config.project_root(project_root)
       Config.package_dir(package_dir)

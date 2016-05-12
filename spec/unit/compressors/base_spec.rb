@@ -3,7 +3,7 @@ require 'stringio'
 module Omnibus
   describe Compressor::Base do
     let(:packager) { double(Packager::Base) }
-    let(:project)  { double(Project, packager: packager) }
+    let(:project)  { double(Project, packagers_for_system: [packager]) }
 
     describe '.initialize' do
       subject { described_class.new(project) }
