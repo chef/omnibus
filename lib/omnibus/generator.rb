@@ -35,6 +35,11 @@ module Omnibus
       type: :string,
       default: '.'
 
+    class_option :appx_assets,
+      desc: 'Generate Windows APPX assets',
+      type: :boolean,
+      default: false
+
     class_option :bff_assets,
       desc: 'Generate AIX bff assets',
       type: :boolean,
@@ -101,6 +106,13 @@ module Omnibus
         # Ensure the package script is executable
         chmod(script_path, 0755)
       end
+    end
+
+    def create_appx_assets
+      return unless options[:appx_assets]
+
+      copy_file(resource_path('appx/AppxManifest.xml.erb'), "#{target}/resources/#{name}/appx/AppxManifest.xml.erb")
+      copy_file(resource_path('appx/assets/clear.png'), "#{target}/resources/#{name}/appx/assets/clear.png")
     end
 
     def create_bff_assets

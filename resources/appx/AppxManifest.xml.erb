@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+  <Identity Name="<%= name %>" 
+            Version="<%= version %>" 
+            Publisher="<%= certificate_subject %>" />
+  <Properties>
+    <DisplayName><%= friendly_name %></DisplayName>
+    <PublisherDisplayName><%= maintainer.encode(:xml => :attr) %></PublisherDisplayName>
+    <Logo>clear.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.3</OSMinVersion>
+    <OSMaxVersionTested>99.99</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+</Package>

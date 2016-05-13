@@ -15,11 +15,10 @@
 #
 
 require 'pathname'
+require 'omnibus/packagers/windows_base'
 
 module Omnibus
-  class Packager::MSI < Packager::Base
-    DEFAULT_TIMESTAMP_SERVERS = ['http://timestamp.digicert.com',
-                                 'http://timestamp.verisign.com/scripts/timestamp.dll']
+  class Packager::MSI < Packager::WindowsBase
     id :msi
 
     setup do
@@ -226,71 +225,6 @@ module Omnibus
     end
     expose :fast_msi
 
-    #
-    # Set the signing certificate name
-    #
-    # @example
-    #   signing_identity 'FooCert'
-    #   signing_identity 'FooCert', store: 'BarStore'
-    #
-    # @param [String] thumbprint
-    #   the thumbprint of the certificate in the certificate store
-    # @param [Hash<Symbol, String>] params
-    #   an optional hash that defines the parameters for the singing identity
-    #
-    # @option params [String] :store (My)
-    #   The name of the certificate store which contains the certificate
-    # @option params [Array<String>, String] :timestamp_servers
-    #   A trusted timestamp server or a list of truested timestamp servers to
-    #   be tried. They are tried in the order provided.
-    # @option params [TrueClass, FalseClass] :machine_store (false)
-    #   If set to true, the local machine store will be searched for a valid
-    #   certificate. Otherwise, the current user store is used
-    #
-    #   Setting nothing will default to trying ['http://timestamp.digicert.com',
-    #   'http://timestamp.verisign.com/scripts/timestamp.dll']
-    #
-    # @return [Hash{:thumbprint => String, :store => String, :timestamp_servers => Array[String]}]
-    #
-    def signing_identity(thumbprint= NULL, params = NULL)
-      unless null?(thumbprint)
-        @signing_identity = {}
-        unless thumbprint.is_a?(String)
-          raise InvalidValue.new(:signing_identity, 'be a String')
-        end
-
-        @signing_identity[:thumbprint] = thumbprint
-
-        if !null?(params)
-          unless params.is_a?(Hash)
-            raise InvalidValue.new(:params, 'be a Hash')
-          end
-
-          valid_keys = [:store, :timestamp_servers, :machine_store]
-          invalid_keys = params.keys - valid_keys
-          unless invalid_keys.empty?
-            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(', ')}]. "\
-                                   "Found invalid keys [#{invalid_keys.join(', ')}]")
-          end
-
-          if !params[:machine_store].nil? && !(
-             params[:machine_store].is_a?(TrueClass) ||
-             params[:machine_store].is_a?(FalseClass))
-            raise InvalidValue.new(:params, 'contain key :machine_store of type TrueClass or FalseClass')
-          end
-        else
-          params = {}
-        end
-
-        @signing_identity[:store] = params[:store] || 'My'
-        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
-        @signing_identity[:timestamp_servers] = [servers].flatten
-        @signing_identity[:machine_store] = params[:machine_store] || false
-      end
-
-      @signing_identity
-    end
-    expose :signing_identity
 
     #
     # Discovers a path to a gem/file included in a gem under the install directory.
@@ -379,7 +313,7 @@ module Omnibus
           maintainer:      project.maintainer,
           upgrade_code:    upgrade_code,
           parameters:      parameters,
-          version:         msi_version,
+          version:         windows_package_version,
           display_version: msi_display_version,
         }
       )
@@ -447,31 +381,11 @@ module Omnibus
           maintainer:      project.maintainer,
           upgrade_code:    upgrade_code,
           parameters:      parameters,
-          version:         msi_version,
+          version:         windows_package_version,
           display_version: msi_display_version,
           msi:             windows_safe_path(Config.package_dir, msi_name),
         }
       )
-    end
-
-    #
-    # Parse and return the MSI version from the {Project#build_version}.
-    #
-    # A project's +build_version+ looks something like:
-    #
-    #     dev builds => 11.14.0-alpha.1+20140501194641.git.94.561b564
-    #                => 0.0.0+20140506165802.1
-    #
-    #     rel builds => 11.14.0.alpha.1 || 11.14.0
-    #
-    # The MSI version spec expects a version that looks like X.Y.Z.W where
-    # X, Y, Z & W are all 32 bit integers.
-    #
-    # @return [String]
-    #
-    def msi_version
-      versions = project.build_version.split(/[.+-]/)
-      "#{versions[0]}.#{versions[1]}.#{versions[2]}.#{project.build_iteration}"
     end
 
     #
@@ -577,7 +491,7 @@ module Omnibus
     #
     # The display version calculated from the {Project#build_version}.
     #
-    # @see #msi_version an explanation of the breakdown
+    # @see #windows_package_version an explanation of the breakdown
     #
     # @return [String]
     #
@@ -628,74 +542,6 @@ module Omnibus
     #
     def wix_extension_switches(arr)
       "#{arr.map {|e| "-ext '#{e}'"}.join(' ')}"
-    end
-
-    def thumbprint
-      signing_identity[:thumbprint]
-    end
-
-    def cert_store_name
-      signing_identity[:store]
-    end
-
-    def timestamp_servers
-      signing_identity[:timestamp_servers]
-    end
-
-    def machine_store?
-      signing_identity[:machine_store]
-    end
-
-    #
-    # Takes a path to a msi and uses the set certificate store and
-    # certificate name
-    #
-    def sign_package(msi_file)
-      cmd = Array.new.tap do |arr|
-        arr << 'signtool.exe'
-        arr << 'sign /v'
-        arr << '/sm' if machine_store?
-        arr << "/s #{cert_store_name}"
-        arr << "/sha1 #{thumbprint}"
-        arr << "/d #{project.package_name}"
-        arr << "\"#{msi_file}\""
-      end
-      shellout!(cmd.join(" "))
-      add_timestamp(msi_file)
-    end
-
-    #
-    # Iterates through available timestamp servers and tries to timestamp
-    # the file. If non succeed, an exception is raised.
-    #
-    def add_timestamp(msi_file)
-      success = false
-      timestamp_servers.each do |ts|
-        success = try_timestamp(msi_file, ts)
-        break if success
-      end
-      raise FailedToTimestampMSI.new if !success
-    end
-
-    def try_timestamp(msi_file, url)
-      timestamp_command = "signtool.exe timestamp -t #{url} \"#{msi_file}\""
-      status = shellout(timestamp_command)
-      if status.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to add timestamp with timeserver #{url}
-
-                STDOUT
-                ------
-                #{status.stdout}
-
-                STDERR
-                ------
-                #{status.stderr}
-                EOH
-        end
-      end
-      status.exitstatus == 0
     end
   end
 end

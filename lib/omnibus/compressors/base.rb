@@ -31,7 +31,12 @@ module Omnibus
     #
     def initialize(project)
       @project  = project
-      @packager = project.packager
+
+      # There can now be multiple packagers per platform
+      # but windows is the only platform that uses multiple
+      # packagers and it does not use a compressor. So for now,
+      # we ignore this multi packaging reality in compressors
+      @packager = project.packagers_for_system[0]
     end
   end
 end
