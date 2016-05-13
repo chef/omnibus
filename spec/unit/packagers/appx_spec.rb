@@ -48,7 +48,8 @@ module Omnibus
 
     describe '#write_manifest_file' do
       before do
-        allow(subject).to receive(:certificate_subject).and_return('CN=Chef')
+        allow(subject).to receive(:shellout!).and_return(double('output', stdout: 'CN=Chef '))
+        allow(subject).to receive(:signing_identity).and_return({})
       end
 
       it 'generates the file' do

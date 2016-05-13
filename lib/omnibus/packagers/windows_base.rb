@@ -166,7 +166,7 @@ module Omnibus
         arr << "-Command (Get-Item Cert:/#{store}/#{cert_store_name}/#{thumbprint}).Subject"
       end.join(" ")
 
-      shellout!(cmd).stdout
+      shellout!(cmd).stdout.strip
     end
 
     #
