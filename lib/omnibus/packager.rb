@@ -68,7 +68,15 @@ module Omnibus
         family = "solaris"
       end
       if klass = PLATFORM_PACKAGER_MAP[family]
-        klass.is_a?(Array) ? klass : [ klass ]
+        package_types = klass.is_a?(Array) ? klass : [ klass ]
+
+        if package_types.include?(APPX) &&
+          !Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 6.2')
+          log.warn(log_key) { "APPX generation is only supported on Windows versions 2012 and above" }
+          package_types = package_types - [APPX]
+        end
+
+        package_types
       else
         log.warn(log_key) do
           "Could not determine packager for `#{family}', defaulting " \
