@@ -41,11 +41,19 @@ module Omnibus
     attr_reader :project
 
     #
+    # The warnings encountered while preparing the licensing information
+    #
+    # @return [Array<String>]
+    #
+    attr_reader :licensing_warnings
+
+    #
     # @param [Project] project
     #   the project to create licenses for.
     #
     def initialize(project)
       @project = project
+      @licensing_warnings = []
     end
 
     #
@@ -59,6 +67,10 @@ module Omnibus
       validate_license_info
       create_software_license_files
       create_project_license_file
+
+      if Config.fatal_licensing_warnings && !licensing_warnings.empty?
+        raise LicensingError.new(licensing_warnings)
+      end
     end
 
     #
@@ -92,7 +104,7 @@ module Omnibus
 
       # Check used license is a standard license
       if project.license != "Unspecified" && !STANDARD_LICENSES.include?(project.license)
-        licensing_warning("Project '#{project.name}' is using '#{project.license}' which is not one of the standard licenses identified in https://opensource.org/licenses/alphabetical. Consider using one of the standard licenses.")
+        licensing_info("Project '#{project.name}' is using '#{project.license}' which is not one of the standard licenses identified in https://opensource.org/licenses/alphabetical. Consider using one of the standard licenses.")
       end
 
       # Now let's check the licensing info for software components
@@ -109,7 +121,7 @@ module Omnibus
 
         # Check if the software license is one of the standard licenses
         if license_info[:license] != "Unspecified" && !STANDARD_LICENSES.include?(license_info[:license])
-          licensing_warning("Software '#{software_name}' uses license '#{license_info[:license]}' which is not one of the standard licenses identified in https://opensource.org/licenses/alphabetical. Consider using one of the standard licenses.")
+          licensing_info("Software '#{software_name}' uses license '#{license_info[:license]}' which is not one of the standard licenses identified in https://opensource.org/licenses/alphabetical. Consider using one of the standard licenses.")
         end
       end
     end
@@ -294,11 +306,26 @@ module Omnibus
     end
 
     #
-    # Logs the given message as warning.
+    # Logs the given message as info.
+    #
+    # This method should only be used for detecting in a license is known or not.
+    # In the future, we will introduce a configurable way to whitelist or blacklist
+    # the allowed licenses. Once we implement that we need to stop using this method.
+    #
+    # @param [String] message
+    #   message to log as warning
+    def licensing_info(message)
+      log.info(log_key) { message }
+    end
+
+    #
+    # Logs the given message as warning or fails the build depending on the
+    # :fatal_licensing_warnings configuration setting.
     #
     # @param [String] message
     #   message to log as warning
     def licensing_warning(message)
+      licensing_warnings << message
       log.warn(log_key) { message }
     end
 

@@ -335,4 +335,20 @@ EOF
       super("Failed to sign Windows Package.")
     end
   end
+
+  class LicensingError < Error
+    def initialize(errors)
+      @errors = errors
+    end
+
+    def to_s
+      <<-EOH
+Encountered error(s) with project's licensing information.
+Failing the build because :fatal_licensing_warnings is set in the configuration.
+Error(s):
+
+    #{@errors.join("\n    ")}
+EOH
+    end
+  end
 end

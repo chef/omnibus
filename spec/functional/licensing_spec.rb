@@ -261,5 +261,15 @@ module Omnibus
         expect(output).to include("Project 'test-project' does not point to a license file.")
       end
     end
+
+    describe "with :fatal_licensing_warnings set and without license definitions in the project" do
+      before do
+        Omnibus::Config.fatal_licensing_warnings(true)
+      end
+
+      it "fails the omnibus build" do
+        expect{create_licenses}.to raise_error(Omnibus::LicensingError, /Project 'test-project' does not contain licensing information.\s{1,}Software 'private_code' does not contain licensing information./)
+      end
+    end
   end
 end
