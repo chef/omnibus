@@ -446,7 +446,7 @@ module Omnibus
     #
     # For example:
     #
-    #     /PATH/files/my_map_file 
+    #     /PATH/files/my_map_file
     #
     # @return [String, nil]
     default(:solaris_linker_mapfile, "files/mapfiles/solaris")
@@ -508,6 +508,11 @@ module Omnibus
         3
       end
     end
+
+    # Fail the build or warn when build encounters a licensing warning.
+    #
+    # @return [true, false]
+    default(:fatal_licensing_warnings, false)
 
     # --------------------------------------------------
     # @!endgroup
