@@ -9,12 +9,18 @@ module Omnibus
           expect(described_class.for_current_system).to eq([Packager::PKG])
         end
     describe '.for_current_system' do
-      before { stub_ohai(platform: 'mac_os_x', version: '10.9.2') }
-      it 'delegates to PackageType' do
+      it 'delegates to PackageType', :focus => true do
+        platform = 'mac_os_x'
+        version = '10.9.2'
+        stub_ohai(platform: 'mac_os_x', version: '10.9.2')
+
         package_type_instance = double("package_type_instance")
-        expect(Packager::PackageType).to receive(:create).and_return(package_type_instance)
-        expect(package_type_instance).to receive(:supported_packager)
-        described_class.for_current_system
+        supported_packager = ['the polka']
+        expect(Packager::PackageType).to receive(:create).with(platform).
+            and_return(package_type_instance)
+        expect(package_type_instance).to receive(:supported_packager).with(version).
+            and_return(supported_packager)
+        expect(described_class.for_current_system).to eq(supported_packager)
       end
 
       context 'on Mac OS X' do

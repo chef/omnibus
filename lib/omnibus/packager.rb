@@ -72,9 +72,9 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      PackageType.create.supported_packager
       family = Ohai['platform_family']
       version = Ohai['platform_version']
+      return PackageType.create(family).supported_packager(version)
 
       if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
         family = "ips"
