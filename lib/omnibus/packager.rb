@@ -18,8 +18,15 @@ module Omnibus
   module Packager
     class PackageType
       def self.create
+        PackageTypeImpl.new()
       end
     end
+
+    class PackageTypeImpl
+      def supported_packager
+      end
+    end
+
 
 
     include Logging
@@ -65,7 +72,7 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      PackageType.create
+      PackageType.create.supported_packager
       family = Ohai['platform_family']
       version = Ohai['platform_version']
 
