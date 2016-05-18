@@ -16,6 +16,12 @@
 
 module Omnibus
   module Packager
+    class PackageType
+      def self.create
+      end
+    end
+
+
     include Logging
     include Sugarable
 
@@ -59,8 +65,9 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      family = Ohai["platform_family"]
-      version = Ohai["platform_version"]
+      PackageType.create
+      family = Ohai['platform_family']
+      version = Ohai['platform_version']
 
       if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
         family = "ips"

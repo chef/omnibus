@@ -8,6 +8,18 @@ module Omnibus
         it "prefers PKG" do
           expect(described_class.for_current_system).to eq([Packager::PKG])
         end
+    describe '.for_current_system' do
+      before { stub_ohai(platform: 'mac_os_x', version: '10.9.2') }
+      it 'delegates to PackageType' do
+        expect(Packager::PackageType).to receive(:create)
+        described_class.for_current_system
+      end
+
+      context 'on Mac OS X' do
+        before { stub_ohai(platform: 'mac_os_x', version: '10.9.2') }
+        it 'prefers PKG' do
+            expect(described_class.for_current_system).to eq([Packager::PKG])
+          end
       end
 
       context "on Windows 2012" do
