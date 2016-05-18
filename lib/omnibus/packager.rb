@@ -18,27 +18,34 @@ module Omnibus
   module Packager
     class DancePackageType
     end
+    include Logging
+    include Sugarable
 
-    class PackageType
-      def self.create(platform)
-        name = Packager.const_get("#{platform.capitalize}PackageType")
+    class Platform
+      def self.create(platform_information)
+        platform_name = platform_information['platform_family'].capitalize
+        begin
+          name = Packager.const_get("#{platform_name}Platform")
+        rescue NameError
+          name = DefaultPlatform
+        end
         name.new()
       end
     end
 
-    include Logging
-    include Sugarable
+    class DefaultPlatform
+    end
 
-    autoload :Base,     "omnibus/packagers/base"
-    autoload :BFF,      "omnibus/packagers/bff"
-    autoload :DEB,      "omnibus/packagers/deb"
-    autoload :Makeself, "omnibus/packagers/makeself"
-    autoload :MSI,      "omnibus/packagers/msi"
-    autoload :APPX,     "omnibus/packagers/appx"
-    autoload :PKG,      "omnibus/packagers/pkg"
-    autoload :Solaris,  "omnibus/packagers/solaris"
-    autoload :IPS,      "omnibus/packagers/ips"
-    autoload :RPM,      "omnibus/packagers/rpm"
+    autoload :Base,     'omnibus/packagers/base'
+    autoload :BFF,      'omnibus/packagers/bff'
+    autoload :DEB,      'omnibus/packagers/deb'
+    autoload :Makeself, 'omnibus/packagers/makeself'
+    autoload :MSI,      'omnibus/packagers/msi'
+    autoload :APPX,     'omnibus/packagers/appx'
+    autoload :PKG,      'omnibus/packagers/pkg'
+    autoload :Solaris,  'omnibus/packagers/solaris'
+    autoload :IPS,      'omnibus/packagers/ips'
+    autoload :RPM,      'omnibus/packagers/rpm'
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -71,7 +78,7 @@ module Omnibus
     def for_current_system
       family = Ohai['platform_family']
       version = Ohai['platform_version']
-      return PackageType.create(family).supported_packager(version)
+      return Platform.create(Ohai).supported_packagers
 
       if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
         family = "ips"
