@@ -23,6 +23,11 @@ module Omnibus
         instance = Packager::Platform.create({'platform_family' => 'fedora'})
          expect(instance).to be_a Packager::FedoraPlatform
       end
+
+      it 'respects the platform packager map for auto generated classes' do
+        instance = Packager::Platform.create({'platform_family' => 'dance'}, {'dance' => 'pkg'})
+        expect(instance.supported_packagers).to eq [Packager::PKG]
+      end
     end
   end
 
