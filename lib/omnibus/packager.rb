@@ -21,7 +21,6 @@ module Omnibus
     include Logging
     include Sugarable
 
-    autoload :Base,     'omnibus/packagers/base'
     autoload :BFF,      'omnibus/packagers/bff'
     autoload :DEB,      'omnibus/packagers/deb'
     autoload :Makeself, 'omnibus/packagers/makeself'
@@ -33,14 +32,31 @@ module Omnibus
     autoload :RPM,      'omnibus/packagers/rpm'
 
     class Platform
+
+      PLATFORM_PACKAGER_MAP = {
+        'debian'   => 'deb',
+        'fedora'   => 'rpm',
+        'suse'     => 'rpm',
+        'rhel'     => 'rpm',
+        'wrlinux'  => 'rpm',
+        'aix'      => 'bff',
+        'mac_os_x' => 'pkg'
+      }
+
       def initialize(platform_information)
         @platform_info = platform_information
       end
 
       def self.create(platform_information)
-        platform_name = platform_information['platform_family'].capitalize
+        platform_name = platform_information['platform_family']
+
+        # Autogenerate the requested platform class if it just supports a single packager
+        if PLATFORM_PACKAGER_MAP.has_key?(platform_name)
+          create_class(platform_name)
+        end
+
         begin
-          name = Packager.const_get("#{platform_name}Platform")
+          name = Packager.const_get(class_name(platform_name))
         rescue NameError
           name = DefaultPlatform
         end
@@ -51,10 +67,33 @@ module Omnibus
       def supported_packagers
         raise Exception.new("Not implimented")
       end
+
+      # Only relevant to the auto-generated classes
+      def packager
+        PLATFORM_PACKAGER_MAP[@platform_info['platform_family']]
+      end
+
+      private
+      def self.class_name(platform_name)
+        "#{platform_name.capitalize}Platform"
+      end
+
+      def self.create_class(platform_name)
+        klass = Class.new(Platform) do
+          require 'omnibus/packagers/base'
+          def supported_packagers
+            require "omnibus/packagers/#{packager}"
+            [Packager.const_get(packager.upcase)]
+          end
+        end
+        Packager.const_set class_name(platform_name), klass
+      end
+
     end
 
     class DefaultPlatform < Platform
       include Logging
+      require 'omnibus/packagers/base'
       require 'omnibus/packagers/makeself'
 
       def supported_packagers
@@ -64,14 +103,6 @@ module Omnibus
         end
 
         [Makeself]
-      end
-    end
-
-    class DebianPlatform < Platform
-      require 'omnibus/packagers/deb'
-
-      def supported_packagers
-        [DEB]
       end
     end
 

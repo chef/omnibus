@@ -18,6 +18,11 @@ module Omnibus
         instance = Packager::Platform.create({'platform_family' => 'nonexistant'})
         expect(instance).to be_a Packager::DefaultPlatform
       end
+
+      it 'returns an instance of PlatformNamePlatform for recognized platforms' do
+        instance = Packager::Platform.create({'platform_family' => 'fedora'})
+         expect(instance).to be_a Packager::FedoraPlatform
+      end
     end
   end
 
@@ -27,15 +32,6 @@ module Omnibus
         platform_info = {'platform_family' => 'nonexistant', 'platform_version' => '0.1.1'}
         instance = Packager::DefaultPlatform.new(platform_info)
         expect(instance.supported_packagers).to eq([Packager::Makeself])
-      end
-    end
-  end
-
-  describe Packager::DebianPlatform do
-    describe '.supported_packagers' do
-      it 'returns DEB' do
-        instance = Packager::DebianPlatform.new({})
-        expect(instance.supported_packagers).to eq([Packager::DEB])
       end
     end
   end
@@ -58,12 +54,12 @@ module Omnibus
         expect(described_class.for_current_system).to eq(supported_packager)
       end
 
-  #    context 'on Mac OS X' do
-  #      before { stub_ohai(platform: 'mac_os_x', version: '10.9.2') }
-  #      it 'prefers PKG' do
-  #          expect(described_class.for_current_system).to eq([Packager::PKG])
-  #        end
-  #    end
+      context 'on Mac OS X' do
+        before { stub_ohai(platform: 'mac_os_x', version: '10.9.2') }
+        it 'prefers PKG' do
+            expect(described_class.for_current_system).to eq([Packager::PKG])
+          end
+      end
 
   #    context 'on Windows 2012' do
   #      before { stub_ohai(platform: 'windows', version: '2012') }
@@ -94,19 +90,19 @@ module Omnibus
   #    end
 
 
-  #    context 'on aix' do
-  #      before { stub_ohai(platform: 'aix', version: '7.1') }
-  #        it 'prefers BFF' do
-  #          expect(described_class.for_current_system).to eq([Packager::BFF])
-  #        end
-  #    end
+      context 'on aix' do
+        before { stub_ohai(platform: 'aix', version: '7.1') }
+          it 'prefers BFF' do
+            expect(described_class.for_current_system).to eq([Packager::BFF])
+          end
+      end
 
-  #    context 'on fedora' do
-  #      before { stub_ohai(platform: 'fedora', version: '20') }
-  #        it 'prefers RPM' do
-  #          expect(described_class.for_current_system).to eq([Packager::RPM])
-  #        end
-  #    end
+      context 'on fedora' do
+        before { stub_ohai(platform: 'fedora', version: '20') }
+          it 'prefers RPM' do
+            expect(described_class.for_current_system).to eq([Packager::RPM])
+          end
+      end
 
       context 'on debian' do
         before { stub_ohai(platform: 'debian', version: '7.2') }
@@ -115,12 +111,12 @@ module Omnibus
           end
       end
 
-  #    context 'on suse' do
-  #      before { stub_ohai(platform: 'suse', version: '12.0') }
-  #        it 'prefers RPM' do
-  #          expect(described_class.for_current_system).to eq([Packager::RPM])
-  #        end
-  #    end
+      context 'on suse' do
+        before { stub_ohai(platform: 'suse', version: '12.0') }
+          it 'prefers RPM' do
+            expect(described_class.for_current_system).to eq([Packager::RPM])
+          end
+      end
     end
   end
 end
