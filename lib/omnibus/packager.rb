@@ -49,9 +49,15 @@ module Omnibus
     end
 
     class DefaultPlatform < Platform
+      include Logging
       require 'omnibus/packagers/makeself'
 
       def supported_packagers
+        platform = @platform_info['platform_family']
+        log.warn(log_key) do
+          "Could not determine packager for `#{platform}', defaulting to `makeself'!"
+        end
+
         [Makeself]
       end
     end
