@@ -5,7 +5,7 @@ module Omnibus
     describe '.create' do
 
       module Packager
-        class DancePlatform
+        class DancePlatform < Platform
         end
       end
 
@@ -21,14 +21,15 @@ module Omnibus
     end
   end
 
- # describe Packager::DefaultPlatform do
- #   describe '.supported_packagers' do
- #     it 'returns Makeself' do
- #       instance = Packager::DefaultPlatform.new('nonexistant', '0.1.1')
- #       expect(instance.suppored_package_types).to eq([Makeself])
- #     end
- #   end
- # end
+  describe Packager::DefaultPlatform do
+    describe '.supported_packagers' do
+      it 'returns Makeself' do
+        platform_info = {'platform_family' => 'nonexistant', 'platform_version' => '0.1.1'}
+        instance = Packager::DefaultPlatform.new(platform_info)
+        expect(instance.supported_packagers).to eq([Packager::Makeself])
+      end
+    end
+  end
 
   describe Packager do
     describe ".for_current_system" do

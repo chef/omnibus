@@ -21,21 +21,6 @@ module Omnibus
     include Logging
     include Sugarable
 
-    class Platform
-      def self.create(platform_information)
-        platform_name = platform_information['platform_family'].capitalize
-        begin
-          name = Packager.const_get("#{platform_name}Platform")
-        rescue NameError
-          name = DefaultPlatform
-        end
-        name.new()
-      end
-    end
-
-    class DefaultPlatform
-    end
-
     autoload :Base,     'omnibus/packagers/base'
     autoload :BFF,      'omnibus/packagers/bff'
     autoload :DEB,      'omnibus/packagers/deb'
@@ -46,6 +31,30 @@ module Omnibus
     autoload :Solaris,  'omnibus/packagers/solaris'
     autoload :IPS,      'omnibus/packagers/ips'
     autoload :RPM,      'omnibus/packagers/rpm'
+
+    class Platform
+      def initialize(platform_information)
+        @platform_info = platform_information
+      end
+
+      def self.create(platform_information)
+        platform_name = platform_information['platform_family'].capitalize
+        begin
+          name = Packager.const_get("#{platform_name}Platform")
+        rescue NameError
+          name = DefaultPlatform
+        end
+        name.new(platform_information)
+      end
+    end
+
+    class DefaultPlatform < Platform
+      require 'omnibus/packagers/makeself'
+
+      def supported_packagers
+        [Makeself]
+      end
+    end
 
     #
     # The list of Ohai platform families mapped to the respective packager
