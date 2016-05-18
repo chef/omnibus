@@ -46,6 +46,11 @@ module Omnibus
         end
         name.new(platform_information)
       end
+
+      # This function should be overritten by its child class
+      def supported_packagers
+        raise Exception.new("Not implimented")
+      end
     end
 
     class DefaultPlatform < Platform
@@ -59,6 +64,14 @@ module Omnibus
         end
 
         [Makeself]
+      end
+    end
+
+    class DebianPlatform < Platform
+      require 'omnibus/packagers/deb'
+
+      def supported_packagers
+        [DEB]
       end
     end
 

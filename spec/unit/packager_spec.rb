@@ -31,6 +31,15 @@ module Omnibus
     end
   end
 
+  describe Packager::DebianPlatform do
+    describe '.supported_packagers' do
+      it 'returns DEB' do
+        instance = Packager::DebianPlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::DEB])
+      end
+    end
+  end
+
   describe Packager do
     describe ".for_current_system" do
       context "on Mac OS X" do
@@ -99,12 +108,12 @@ module Omnibus
   #        end
   #    end
 
-  #    context 'on debian' do
-  #      before { stub_ohai(platform: 'debian', version: '7.2') }
-  #        it 'prefers RPM' do
-  #          expect(described_class.for_current_system).to eq([Packager::DEB])
-  #        end
-  #    end
+      context 'on debian' do
+        before { stub_ohai(platform: 'debian', version: '7.2') }
+          it 'prefers RPM' do
+            expect(described_class.for_current_system).to eq([Packager::DEB])
+          end
+      end
 
   #    context 'on suse' do
   #      before { stub_ohai(platform: 'suse', version: '12.0') }
