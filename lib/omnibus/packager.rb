@@ -16,18 +16,15 @@
 
 module Omnibus
   module Packager
+    class DancePackageType
+    end
+
     class PackageType
-      def self.create
-        PackageTypeImpl.new()
+      def self.create(platform)
+        name = Packager.const_get("#{platform.capitalize}PackageType")
+        name.new()
       end
     end
-
-    class PackageTypeImpl
-      def supported_packager
-      end
-    end
-
-
 
     include Logging
     include Sugarable

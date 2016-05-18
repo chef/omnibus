@@ -1,6 +1,21 @@
 require "spec_helper"
 
 module Omnibus
+  describe Packager::PackageType do
+    describe '.create', :focus => true do
+
+      module Packager
+        class DancePackageType
+        end
+      end
+
+      it 'returns a class instance based on platform type' do
+        instance = Packager::PackageType.create('dance')
+        expect(instance).to be_a Packager::DancePackageType
+      end
+    end
+  end
+
   describe Packager do
     describe ".for_current_system" do
       context "on Mac OS X" do
