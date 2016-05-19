@@ -108,6 +108,19 @@ module Omnibus
       end
     end
 
+    class Solaris2Platform < Platform
+      require 'omnibus/packagers/base'
+      require 'omnibus/packagers/solaris'
+      require 'omnibus/packagers/ips'
+
+      def supported_packagers
+        version = @platform_info['platform_version']
+        return [IPS] if Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 5.11')
+        return [Solaris] if Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 5.10')
+        #TODO Determine how to handle Versions under 5.10
+      end
+    end
+
     #
     # The list of Ohai platform families mapped to the respective packager
     # class.
