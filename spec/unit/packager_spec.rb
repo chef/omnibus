@@ -73,6 +73,16 @@ module Omnibus
     end
   end
 
+  describe Packager::DebianPlatform do
+    describe '.supported_packagers' do
+      it 'returns DEB' do
+        platform_info = {'platform_family' => 'debian'}
+        instance = Packager::DebianPlatform.new(platform_info)
+        expect(instance.supported_packagers).to eq([Packager::DEB])
+      end
+    end
+  end
+
   describe Packager do
     describe '.for_current_system' do
       it 'delegates to Platform' do

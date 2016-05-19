@@ -29,6 +29,7 @@ module Omnibus
     autoload :RPM,      'omnibus/packagers/rpm'
 
     class Platform
+      require 'omnibus/packagers/base'
 
       PLATFORM_PACKAGER_MAP = {
         'debian'   => 'deb',
@@ -97,7 +98,6 @@ module Omnibus
 
     class DefaultPlatform < Platform
       include Logging
-      require 'omnibus/packagers/base'
       require 'omnibus/packagers/makeself'
 
       def supported_packagers
@@ -111,7 +111,6 @@ module Omnibus
     end
 
     class Solaris2Platform < Platform
-      require 'omnibus/packagers/base'
       require 'omnibus/packagers/solaris'
       require 'omnibus/packagers/ips'
 
@@ -123,13 +122,20 @@ module Omnibus
     end
 
     class WindowsPlatform < Platform
-      require 'omnibus/packagers/base'
       require 'omnibus/packagers/msi'
       require 'omnibus/packagers/APPX'
 
       def supported_packagers
         return [MSI, APPX] if satisfies_version_constraint?('>= 6.2')
         [MSI]
+      end
+    end
+
+    class DebianPlatform < Platform
+      require 'omnibus/packagers/DEB'
+
+      def supported_packagers
+        [DEB]
       end
     end
 
