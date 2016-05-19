@@ -121,6 +121,15 @@ module Omnibus
       end
     end
 
+    class WindowsPlatform < Platform
+      require 'omnibus/packagers/base'
+      require 'omnibus/packagers/msi'
+
+      def supported_packagers
+        return [MSI]
+      end
+    end
+
     #
     # The list of Ohai platform families mapped to the respective packager
     # class.

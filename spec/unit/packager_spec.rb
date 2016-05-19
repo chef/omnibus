@@ -57,6 +57,16 @@ module Omnibus
     end
   end
 
+  describe Packager::WindowsPlatform do
+    describe '.supported_packagers' do
+      it 'returns MSI for versions before 6.2' do
+        platform_info = {'platform_family' => 'windows', 'platform_version' => '6.1'}
+        instance = Packager::WindowsPlatform.new(platform_info)
+        expect(instance.supported_packagers).to eq([Packager::MSI])
+      end
+    end
+  end
+
   describe Packager do
     describe ".for_current_system" do
       context "on Mac OS X" do
@@ -89,12 +99,12 @@ module Omnibus
   #        end
   #    end
 
-  #    context 'on Windows 2008 R2' do
-  #      before { stub_ohai(platform: 'windows', version: '2008R2') }
-  #        it 'prefers MSI only' do
-  #          expect(described_class.for_current_system).to eq([Packager::MSI])
-  #        end
-  #    end
+      context 'on Windows 2008 R2' do
+        before { stub_ohai(platform: 'windows', version: '2008R2') }
+          it 'prefers MSI only' do
+            expect(described_class.for_current_system).to eq([Packager::MSI])
+          end
+      end
 
       context 'on Solaris 11' do
         before { stub_ohai(platform: 'solaris2', version: '5.11') }
