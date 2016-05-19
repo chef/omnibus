@@ -83,6 +83,60 @@ module Omnibus
     end
   end
 
+  describe Packager::FedoraPlatform do
+    describe '.supported_packagers' do
+      it 'returns RPM' do
+        instance = Packager::FedoraPlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::RPM])
+      end
+    end
+  end
+
+  describe Packager::SusePlatform do
+    describe '.supported_packagers' do
+      it 'returns RPM' do
+        instance = Packager::SusePlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::RPM])
+      end
+    end
+  end
+
+  describe Packager::RhelPlatform do
+    describe '.supported_packagers' do
+      it 'returns RPM' do
+        instance = Packager::RhelPlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::RPM])
+      end
+    end
+  end
+
+  describe Packager::WrlinuxPlatform do
+    describe '.supported_packagers' do
+      it 'returns RPM' do
+        instance = Packager::WrlinuxPlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::RPM])
+      end
+    end
+  end
+
+  describe Packager::AixPlatform do
+    describe '.supported_packagers' do
+      it 'returns BFF' do
+        instance = Packager::AixPlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::BFF])
+      end
+    end
+  end
+
+  describe Packager::Mac_os_xPlatform do
+    describe '.supported_packagers' do
+      it 'returns PKG' do
+        instance = Packager::Mac_os_xPlatform.new({})
+        expect(instance.supported_packagers).to eq([Packager::PKG])
+      end
+    end
+  end
+
   describe Packager do
     describe '.for_current_system' do
       it 'delegates to Platform' do

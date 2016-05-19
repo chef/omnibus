@@ -139,6 +139,54 @@ module Omnibus
       end
     end
 
+    class FedoraPlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class SusePlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class RhelPlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class WrlinuxPlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class AixPlatform < Platform
+      require 'omnibus/packagers/BFF'
+
+      def supported_packagers
+        [BFF]
+      end
+    end
+
+    class Mac_os_xPlatform < Platform
+      require 'omnibus/packagers/PKG'
+
+      def supported_packagers
+        [PKG]
+      end
+    end
+
     #
     # Determine the packager(s) for the current system. This method returns the
     # class, not an instance of the class.
