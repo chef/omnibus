@@ -203,16 +203,16 @@ module Omnibus
           when '6.0.6001', '2008'   then '2008'
           when '6.1.7600', '7'      then '7'
           when '6.1.7601', '2008r2' then '2008r2'
-          when '6.2.9200', '8'      then '8'
-          # The following `when` will never match since Windows 2012's platform
-          # version is the same as Windows 8. It's only here for completeness and
-          # documentation.
           when '6.2.9200', '2012'   then '2012'
-          when /6\.3\.\d+/, '8.1' then '8.1'
-          # The following `when` will never match since Windows 2012R2's platform
-          # version is the same as Windows 8.1. It's only here for completeness
-          # and documentation.
+          # The following `when` will never match since Windows 8's platform
+          # version is the same as Windows 2012. It's only here for completeness and
+          # documentation.
+          when '6.2.9200', '8'      then '8'
           when /6\.3\.\d+/, '2012r2' then '2012r2'
+          # The following `when` will never match since Windows 8.1's platform
+          # version is the same as Windows 2012R2. It's only here for completeness
+          # and documentation.
+          when /6\.3\.\d+/, '8.1' then '8.1'
           when /^10\.0/ then '10'
           else
             raise UnknownPlatformVersion.new(platform, platform_version)
