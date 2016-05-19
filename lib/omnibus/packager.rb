@@ -16,9 +16,6 @@
 
 module Omnibus
   module Packager
-    class DancePackageType
-    end
-    include Logging
     include Sugarable
 
     autoload :BFF,      'omnibus/packagers/bff'
@@ -137,25 +134,6 @@ module Omnibus
     end
 
     #
-    # The list of Ohai platform families mapped to the respective packager
-    # class.
-    #
-    # @return [Hash<String, Class>]
-    #
-    PLATFORM_PACKAGER_MAP = {
-      "debian"   => DEB,
-      "fedora"   => RPM,
-      "suse"     => RPM,
-      "rhel"     => RPM,
-      "wrlinux"  => RPM,
-      "aix"      => BFF,
-      "solaris"  => Solaris,
-      "ips"      => IPS,
-      "windows"  => [MSI, APPX],
-      "mac_os_x" => PKG,
-    }.freeze
-
-    #
     # Determine the packager(s) for the current system. This method returns the
     # class, not an instance of the class.
     #
@@ -165,32 +143,7 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      family = Ohai['platform_family']
-      version = Ohai['platform_version']
       return Platform.create(Ohai).supported_packagers
-
-      if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
-        family = "ips"
-      elsif family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.10")
-        family = "solaris"
-      end
-      if klass = PLATFORM_PACKAGER_MAP[family]
-        package_types = klass.is_a?(Array) ? klass : [ klass ]
-
-        if package_types.include?(APPX) &&
-            !Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 6.2")
-          log.warn(log_key) { "APPX generation is only supported on Windows versions 2012 and above" }
-          package_types = package_types - [APPX]
-        end
-
-        package_types
-      else
-        log.warn(log_key) do
-          "Could not determine packager for `#{family}', defaulting " \
-          "to `makeself'!"
-        end
-        [Makeself]
-      end
     end
     module_function :for_current_system
   end
