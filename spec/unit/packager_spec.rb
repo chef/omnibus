@@ -64,6 +64,12 @@ module Omnibus
         instance = Packager::WindowsPlatform.new(platform_info)
         expect(instance.supported_packagers).to eq([Packager::MSI])
       end
+
+      it 'returns MSI and APPX for 6.2 and above' do
+        platform_info = {'platform_family' => 'windows', 'platform_version' => '6.2.19'}
+        instance = Packager::WindowsPlatform.new(platform_info)
+        expect(instance.supported_packagers).to eq([Packager::MSI, Packager::APPX])
+      end
     end
   end
 
@@ -92,12 +98,12 @@ module Omnibus
           end
       end
 
-  #    context 'on Windows 2012' do
-  #      before { stub_ohai(platform: 'windows', version: '2012') }
-  #        it 'prefers MSI and APPX' do
-  #          expect(described_class.for_current_system).to eq([Packager::MSI, Packager::APPX])
-  #        end
-  #    end
+      context 'on Windows 2012' do
+        before { stub_ohai(platform: 'windows', version: '2012') }
+          it 'prefers MSI and APPX' do
+            expect(described_class.for_current_system).to eq([Packager::MSI, Packager::APPX])
+          end
+      end
 
       context 'on Windows 2008 R2' do
         before { stub_ohai(platform: 'windows', version: '2008R2') }

@@ -75,6 +75,11 @@ module Omnibus
         @platform_packager_map[@platform_info['platform_family']]
       end
 
+      def satisfies_version_constraint?(version_constraint)
+        version = @platform_info['platform_version']
+        Chef::Sugar::Constraints::Version.new(version).satisfies?(version_constraint)
+      end
+
       private
       def self.class_name(platform_name)
         "#{platform_name.capitalize}Platform"
@@ -114,9 +119,8 @@ module Omnibus
       require 'omnibus/packagers/ips'
 
       def supported_packagers
-        version = @platform_info['platform_version']
-        return [IPS] if Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 5.11')
-        return [Solaris] if Chef::Sugar::Constraints::Version.new(version).satisfies?('>= 5.10')
+        return [IPS] if satisfies_version_constraint?('>= 5.11')
+        return [Solaris] if satisfies_version_constraint?('>= 5.10')
         #TODO Determine how to handle Versions under 5.10
       end
     end
@@ -124,9 +128,11 @@ module Omnibus
     class WindowsPlatform < Platform
       require 'omnibus/packagers/base'
       require 'omnibus/packagers/msi'
+      require 'omnibus/packagers/APPX'
 
       def supported_packagers
-        return [MSI]
+        return [MSI, APPX] if satisfies_version_constraint?('>= 6.2')
+        [MSI]
       end
     end
 
