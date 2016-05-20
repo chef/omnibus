@@ -1,5 +1,5 @@
-require 'fauxhai'
-require 'omnibus/ohai'
+require "fauxhai"
+require "omnibus/ohai"
 
 module Omnibus
   module RSpec
@@ -13,8 +13,8 @@ module Omnibus
 
         # If we asked for Windows, we should also specify that magical
         # +File::ALT_SEPARATOR+ variable
-        if options[:platform] && options[:platform] == 'windows'
-          stub_const('File::ALT_SEPARATOR', '\\')
+        if options[:platform] && options[:platform] == "windows"
+          stub_const("File::ALT_SEPARATOR", '\\')
         end
       end
     end

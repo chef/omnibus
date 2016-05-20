@@ -19,11 +19,11 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  'preinstall',
-      postinst: 'postinstall',
+      preinst:  "preinstall",
+      postinst: "postinstall",
       # Default PKG naming
-      preinstall:  'preinstall',
-      postinstall: 'postinstall',
+      preinstall:  "preinstall",
+      postinstall: "postinstall",
     }.freeze
 
     id :pkg
@@ -36,7 +36,7 @@ module Omnibus
       create_directory(scripts_dir)
 
       # Render the license
-      render_template(resource_path('license.html.erb'),
+      render_template(resource_path("license.html.erb"),
         destination: "#{resources_dir}/license.html",
         variables: {
           name:          project.name,
@@ -48,7 +48,7 @@ module Omnibus
       )
 
       # Render the welcome template
-      render_template(resource_path('welcome.html.erb'),
+      render_template(resource_path("welcome.html.erb"),
         destination: "#{resources_dir}/welcome.html",
         variables: {
           name:          project.name,
@@ -60,7 +60,7 @@ module Omnibus
       )
 
       # "Render" the assets
-      copy_file(resource_path('background.png'), "#{resources_dir}/background.png")
+      copy_file(resource_path("background.png"), "#{resources_dir}/background.png")
     end
 
     build do
@@ -187,7 +187,7 @@ module Omnibus
     # @return [void]
     #
     def build_component_pkg
-      command = <<-EOH.gsub(/^ {8}/, '')
+      command = <<-EOH.gsub(/^ {8}/, "")
         pkgbuild \\
           --identifier "#{safe_identifier}" \\
           --version "#{safe_version}" \\
@@ -213,7 +213,7 @@ module Omnibus
     # @return [void]
     #
     def write_distribution_file
-      render_template(resource_path('distribution.xml.erb'),
+      render_template(resource_path("distribution.xml.erb"),
         destination: "#{staging_dir}/Distribution",
         mode: 0600,
         variables: {
@@ -232,15 +232,15 @@ module Omnibus
     # @return [void]
     #
     def build_product_pkg
-      command = <<-EOH.gsub(/^ {8}/, '')
+      command = <<-EOH.gsub(/^ {8}/, "")
         productbuild \\
           --distribution "#{staging_dir}/Distribution" \\
           --resources "#{resources_dir}" \\
       EOH
 
-      command << %Q(  --sign "#{signing_identity}" \\\n) if signing_identity
-      command << %Q(  "#{final_pkg}")
-      command << %Q(\n)
+      command << %Q{  --sign "#{signing_identity}" \\\n} if signing_identity
+      command << %Q{  "#{final_pkg}"}
+      command << %Q{\n}
 
       Dir.chdir(staging_dir) do
         shellout!(command)
@@ -265,7 +265,7 @@ module Omnibus
       if project.package_name =~ /\A[[:alnum:]-]+\z/
         project.package_name.dup
       else
-        converted = project.package_name.downcase.gsub(/[^[:alnum:]+]/, '')
+        converted = project.package_name.downcase.gsub(/[^[:alnum:]+]/, "")
 
         log.warn(log_key) do
           "The `name' component of Mac package names can only include " \
@@ -287,7 +287,7 @@ module Omnibus
     def safe_identifier
       return identifier if identifier
 
-      maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, '').downcase
+      maintainer = project.maintainer.gsub(/[^[:alnum:]+]/, "").downcase
       "test.#{maintainer}.pkg.#{safe_base_package_name}"
     end
 
@@ -311,7 +311,7 @@ module Omnibus
       if project.build_version =~ /\A[a-zA-Z0-9\.\+\-]+\z/
         project.build_version.dup
       else
-        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, '-')
+        converted = project.build_version.gsub(/[^a-zA-Z0-9\.\+\-]+/, "-")
 
         log.warn(log_key) do
           "The `version' component of Mac package names can only include " \

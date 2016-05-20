@@ -19,7 +19,7 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      postinst: 'postinst',
+      postinst: "postinst",
     }.freeze
 
     id :makeself
@@ -55,7 +55,7 @@ module Omnibus
     # @return [String]
     #
     def makeself
-      resource_path('makeself.sh')
+      resource_path("makeself.sh")
     end
 
     #
@@ -65,7 +65,7 @@ module Omnibus
     # @return [String]
     #
     def makeself_header
-      resource_path('makeself-header.sh')
+      resource_path("makeself-header.sh")
     end
 
     #
@@ -76,8 +76,8 @@ module Omnibus
     # @return [void]
     #
     def write_makeselfinst
-      makeselfinst_staging_path = File.join(staging_dir, 'makeselfinst')
-      render_template(resource_path('makeselfinst.erb'),
+      makeselfinst_staging_path = File.join(staging_dir, "makeselfinst")
+      render_template(resource_path("makeselfinst.erb"),
         destination: makeselfinst_staging_path,
         variables: {
           install_dir: project.install_dir,
@@ -113,7 +113,7 @@ module Omnibus
       log.info(log_key) { "Creating makeself package" }
 
       Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, '')
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           #{makeself} \\
             --header "#{makeself_header}" \\
             --gzip \\
@@ -135,7 +135,7 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      Ohai['kernel']['machine']
+      Ohai["kernel"]["machine"]
     end
   end
 end

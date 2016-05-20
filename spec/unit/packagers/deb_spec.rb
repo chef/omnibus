@@ -1,15 +1,15 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Omnibus
   describe Packager::DEB do
     let(:project) do
       Project.new.tap do |project|
-        project.name('project')
-        project.homepage('https://example.com')
-        project.install_dir('/opt/project')
-        project.build_version('1.2.3')
-        project.build_iteration('2')
-        project.maintainer('Chef Software')
+        project.name("project")
+        project.homepage("https://example.com")
+        project.install_dir("/opt/project")
+        project.build_version("1.2.3")
+        project.build_iteration("2")
+        project.maintainer("Chef Software")
         project.license(project_license) if project_license
       end
     end
@@ -17,9 +17,9 @@ module Omnibus
     subject { described_class.new(project) }
 
     let(:project_license) { nil }
-    let(:project_root) { File.join(tmp_path, 'project/root') }
-    let(:package_dir)  { File.join(tmp_path, 'package/dir') }
-    let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
+    let(:project_root) { File.join(tmp_path, "project/root") }
+    let(:package_dir)  { File.join(tmp_path, "package/dir") }
+    let(:staging_dir)  { File.join(tmp_path, "staging/dir") }
 
     before do
       Config.project_root(project_root)
@@ -31,87 +31,87 @@ module Omnibus
     end
 
     describe '#vendor' do
-      it 'is a DSL method' do
+      it "is a DSL method" do
         expect(subject).to have_exposed_method(:vendor)
       end
 
-      it 'has a default value' do
-        expect(subject.vendor).to eq('Omnibus <omnibus@getchef.com>')
+      it "has a default value" do
+        expect(subject.vendor).to eq("Omnibus <omnibus@getchef.com>")
       end
 
-      it 'must be a string' do
+      it "must be a string" do
         expect { subject.vendor(Object.new) }.to raise_error(InvalidValue)
       end
     end
 
     describe '#license' do
-      it 'is a DSL method' do
+      it "is a DSL method" do
         expect(subject).to have_exposed_method(:license)
       end
 
-      it 'has a default value' do
-        expect(subject.license).to eq('Unspecified')
+      it "has a default value" do
+        expect(subject.license).to eq("Unspecified")
       end
 
-      it 'must be a string' do
+      it "must be a string" do
         expect { subject.license(Object.new) }.to raise_error(InvalidValue)
       end
 
-      context 'with project license' do
-        let(:project_license) { 'custom-license' }
+      context "with project license" do
+        let(:project_license) { "custom-license" }
 
-        it 'uses project license' do
-          expect(subject.license).to eq('custom-license')
+        it "uses project license" do
+          expect(subject.license).to eq("custom-license")
         end
       end
     end
 
     describe '#priority' do
-      it 'is a DSL method' do
+      it "is a DSL method" do
         expect(subject).to have_exposed_method(:priority)
       end
 
-      it 'has a default value' do
-        expect(subject.priority).to eq('extra')
+      it "has a default value" do
+        expect(subject.priority).to eq("extra")
       end
 
-      it 'must be a string' do
+      it "must be a string" do
         expect { subject.priority(Object.new) }.to raise_error(InvalidValue)
       end
     end
 
     describe '#section' do
-      it 'is a DSL method' do
+      it "is a DSL method" do
         expect(subject).to have_exposed_method(:section)
       end
 
-      it 'has a default value' do
-        expect(subject.section).to eq('misc')
+      it "has a default value" do
+        expect(subject.section).to eq("misc")
       end
 
-      it 'must be a string' do
+      it "must be a string" do
         expect { subject.section(Object.new) }.to raise_error(InvalidValue)
       end
     end
 
     describe '#id' do
-      it 'is :deb' do
+      it "is :deb" do
         expect(subject.id).to eq(:deb)
       end
     end
 
     describe '#package_name' do
       before do
-        allow(subject).to receive(:safe_architecture).and_return('amd64')
+        allow(subject).to receive(:safe_architecture).and_return("amd64")
       end
 
-      it 'includes the name, version, and build iteration' do
-        expect(subject.package_name).to eq('project_1.2.3-2_amd64.deb')
+      it "includes the name, version, and build iteration" do
+        expect(subject.package_name).to eq("project_1.2.3-2_amd64.deb")
       end
     end
 
     describe '#debian_dir' do
-      it 'is nested inside the staging_dir' do
+      it "is nested inside the staging_dir" do
         expect(subject.debian_dir).to eq("#{staging_dir}/DEBIAN")
       end
     end
@@ -121,12 +121,12 @@ module Omnibus
         allow(subject).to receive(:safe_architecture).and_return("amd64")
       end
 
-      it 'generates the file' do
+      it "generates the file" do
         subject.write_control_file
         expect("#{staging_dir}/DEBIAN/control").to be_a_file
       end
 
-      it 'has the correct content' do
+      it "has the correct content" do
         subject.write_control_file
         contents = File.read("#{staging_dir}/DEBIAN/control")
 
@@ -146,25 +146,25 @@ module Omnibus
 
     describe '#write_conffiles_file' do
       before do
-        project.config_file('/opt/project/file1')
-        project.config_file('/opt/project/file2')
+        project.config_file("/opt/project/file1")
+        project.config_file("/opt/project/file2")
       end
 
-      context 'when there are no files' do
+      context "when there are no files" do
         before { project.config_files.clear }
 
-        it 'does not render the file' do
+        it "does not render the file" do
           subject.write_conffiles_file
           expect("#{staging_dir}/DEBIAN/conffiles").to_not be_a_file
         end
       end
 
-      it 'generates the file' do
+      it "generates the file" do
         subject.write_conffiles_file
         expect("#{staging_dir}/DEBIAN/conffiles").to be_a_file
       end
 
-      it 'has the correct content' do
+      it "has the correct content" do
         subject.write_conffiles_file
         contents = File.read("#{staging_dir}/DEBIAN/conffiles")
 
@@ -181,7 +181,7 @@ module Omnibus
         create_file("#{project_root}/package-scripts/project/postrm") { "postrm" }
       end
 
-      it 'copies the scripts into the DEBIAN dir with permissions = 100755', :not_supported_on_windows do
+      it "copies the scripts into the DEBIAN dir with permissions = 100755", :not_supported_on_windows do
         subject.write_scripts
 
         expect("#{staging_dir}/DEBIAN/preinst").to be_a_file
@@ -189,13 +189,13 @@ module Omnibus
         expect("#{staging_dir}/DEBIAN/prerm").to be_a_file
         expect("#{staging_dir}/DEBIAN/postrm").to be_a_file
 
-        expect("#{staging_dir}/DEBIAN/preinst").to have_permissions '100755'
-        expect("#{staging_dir}/DEBIAN/postinst").to have_permissions '100755'
-        expect("#{staging_dir}/DEBIAN/prerm").to have_permissions '100755'
-        expect("#{staging_dir}/DEBIAN/postrm").to have_permissions '100755'
+        expect("#{staging_dir}/DEBIAN/preinst").to have_permissions "100755"
+        expect("#{staging_dir}/DEBIAN/postinst").to have_permissions "100755"
+        expect("#{staging_dir}/DEBIAN/prerm").to have_permissions "100755"
+        expect("#{staging_dir}/DEBIAN/postrm").to have_permissions "100755"
       end
 
-      it 'logs a message' do
+      it "logs a message" do
         output = capture_logging do
           subject.write_scripts
         end
@@ -216,12 +216,12 @@ module Omnibus
         create_file("#{staging_dir}/DEBIAN/postrm") { "postrm" }
       end
 
-      it 'generates the file' do
+      it "generates the file" do
         subject.write_md5_sums
         expect("#{staging_dir}/DEBIAN/md5sums").to be_a_file
       end
 
-      it 'has the correct content' do
+      it "has the correct content" do
         subject.write_md5_sums
         contents = File.read("#{staging_dir}/DEBIAN/md5sums")
 
@@ -241,18 +241,18 @@ module Omnibus
         allow(subject).to receive(:safe_architecture).and_return("amd64")
       end
 
-      it 'logs a message' do
+      it "logs a message" do
         output = capture_logging { subject.create_deb_file }
-        expect(output).to include('Creating .deb file')
+        expect(output).to include("Creating .deb file")
       end
 
-      it 'executes the command using `fakeroot`' do
+      it "executes the command using `fakeroot`" do
         expect(subject).to receive(:shellout!)
           .with(/\Afakeroot/)
         subject.create_deb_file
       end
 
-      it 'uses the correct command' do
+      it "uses the correct command" do
         expect(subject).to receive(:shellout!)
           .with(/dpkg-deb -z9 -Zgzip -D --build/)
         subject.create_deb_file
@@ -267,25 +267,25 @@ module Omnibus
         create_file("#{staging_dir}/file2") { "2" * 20_000 }
       end
 
-      it 'stats all the files in the install_dir' do
+      it "stats all the files in the install_dir" do
         expect(subject.package_size).to eq(29)
       end
     end
 
     describe '#safe_base_package_name' do
       context 'when the project name is "safe"' do
-        it 'returns the value without logging a message' do
-          expect(subject.safe_base_package_name).to eq('project')
+        it "returns the value without logging a message" do
+          expect(subject.safe_base_package_name).to eq("project")
           expect(subject).to_not receive(:log)
         end
       end
 
-      context 'when the project name has invalid characters' do
+      context "when the project name has invalid characters" do
         before { project.name("Pro$ject123.for-realz_2") }
 
-        it 'returns the value while logging a message' do
+        it "returns the value while logging a message" do
           output = capture_logging do
-            expect(subject.safe_base_package_name).to eq('pro-ject123.for-realz-2')
+            expect(subject.safe_base_package_name).to eq("pro-ject123.for-realz-2")
           end
 
           expect(output).to include("The `name' component of Debian package names can only include")
@@ -294,37 +294,37 @@ module Omnibus
     end
 
     describe '#safe_build_iteration' do
-      it 'returns the build iteration' do
+      it "returns the build iteration" do
         expect(subject.safe_build_iteration).to eq(project.build_iteration)
       end
     end
 
     describe '#safe_version' do
       context 'when the project build_version is "safe"' do
-        it 'returns the value without logging a message' do
-          expect(subject.safe_version).to eq('1.2.3')
+        it "returns the value without logging a message" do
+          expect(subject.safe_version).to eq("1.2.3")
           expect(subject).to_not receive(:log)
         end
       end
 
-      context 'when the project build_version has dashes' do
-        before { project.build_version('1.2-rc.1') }
+      context "when the project build_version has dashes" do
+        before { project.build_version("1.2-rc.1") }
 
-        it 'returns the value while logging a message' do
+        it "returns the value while logging a message" do
           output = capture_logging do
-            expect(subject.safe_version).to eq('1.2~rc.1')
+            expect(subject.safe_version).to eq("1.2~rc.1")
           end
 
           expect(output).to include("Dashes hold special significance in the Debian package versions.")
         end
       end
 
-      context 'when the project build_version has invalid characters' do
+      context "when the project build_version has invalid characters" do
         before { project.build_version("1.2$alpha.~##__2") }
 
-        it 'returns the value while logging a message' do
+        it "returns the value while logging a message" do
           output = capture_logging do
-            expect(subject.safe_version).to eq('1.2_alpha.~_2')
+            expect(subject.safe_version).to eq("1.2_alpha.~_2")
           end
 
           expect(output).to include("The `version' component of Debian package names can only include")

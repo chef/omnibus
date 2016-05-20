@@ -1,1 +1,1 @@
-require 'omnibus/core_extensions/open_uri'
+require "omnibus/core_extensions/open_uri"

@@ -72,7 +72,6 @@ module Omnibus
     attr_reader :project_dir
     attr_reader :build_dir
 
-
     #
     # Create a new Fetcher object from the given software.
     #

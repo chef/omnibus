@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'thor'
+require "thor"
 
 module Omnibus
   class Cleaner < Thor::Group
@@ -23,13 +23,13 @@ module Omnibus
     namespace :clean
 
     argument :name,
-      banner: 'NAME',
-      desc: 'The name of the Omnibus project',
+      banner: "NAME",
+      desc: "The name of the Omnibus project",
       type: :string,
       required: true
 
     class_option :purge,
-      desc: 'Purge the packages and caches',
+      desc: "Purge the packages and caches",
       type: :boolean,
       default: false
 

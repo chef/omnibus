@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Omnibus
   describe ChangeLog do
@@ -18,7 +18,7 @@ module Omnibus
         repo = double(GitRepository, :commit_messages => ["ChangeLog-Entry: foobar\n",
                                                           "ChangeLog-Entry: wombat\n"])
         changelog = ChangeLog.new("0.0.1", "0.0.2", repo)
-        expect(changelog.changelog_entries).to eq(["foobar\n", "wombat\n"])
+        expect(changelog.changelog_entries).to eq(%W{foobar\n wombat\n})
       end
 
       it "returns an empty array if there were no changelog entries" do
@@ -28,13 +28,13 @@ module Omnibus
       end
 
       it "does not return git messages without a ChangeLog: tag" do
-        repo = double(GitRepository, :commit_messages => ["foobar\n", "wombat\n"])
+        repo = double(GitRepository, :commit_messages => %W{foobar\n wombat\n})
         changelog = ChangeLog.new("0.0.1", "0.0.2", repo)
         expect(changelog.changelog_entries).to eq([])
       end
 
       it "does not return blank lines" do
-        repo = double(GitRepository, :commit_messages => ["\n", "\n"])
+        repo = double(GitRepository, :commit_messages => %W{\n \n})
         changelog = ChangeLog.new("0.0.1", "0.0.2", repo)
         expect(changelog.changelog_entries).to eq([])
       end

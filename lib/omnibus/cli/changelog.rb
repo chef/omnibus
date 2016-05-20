@@ -14,11 +14,11 @@
 # limitations under the License.
 #
 
-require 'omnibus/changelog'
-require 'omnibus/changelog_printer'
-require 'omnibus/manifest_diff'
-require 'omnibus/semantic_version'
-require 'ffi_yajl'
+require "omnibus/changelog"
+require "omnibus/changelog_printer"
+require "omnibus/manifest_diff"
+require "omnibus/semantic_version"
+require "ffi_yajl"
 
 module Omnibus
   class Command::ChangeLog < Command::Base
@@ -67,8 +67,8 @@ module Omnibus
     desc: "Explicit version for this changelog",
     type: :string
 
-    desc 'generate [START] [END]', 'Generate a changelog for a new release'
-    def generate(start_ref=nil, end_ref=nil)
+    desc "generate [START] [END]", "Generate a changelog for a new release"
+    def generate(start_ref = nil, end_ref = nil)
       @start_ref = start_ref
       @end_ref = end_ref
       diff = if @options[:skip_components]
@@ -108,7 +108,6 @@ module Omnibus
       Omnibus::Manifest.from_hash(FFI_Yajl::Parser.parse(local_git_repo.file_at_revision("version-manifest.json", rev)))
     end
 
-
     def new_version
       if @options[:version]
         @options[:version]
@@ -143,7 +142,7 @@ module Omnibus
       @end_ref ||= if @options[:ending_manifest]
                      new_manifest.build_git_revision
                    else
-                     'HEAD'
+                     "HEAD"
                    end
     end
   end

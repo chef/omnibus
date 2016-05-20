@@ -14,16 +14,15 @@
 # limitations under the License.
 #
 
-require 'ohai'
+require "ohai"
 
 module Omnibus
   class Ohai
-    PLUGINS = [
-      'cpu',
-      'kernel',
-      'os',
-      'platform',
-    ].freeze
+    PLUGINS = %w{
+cpu
+kernel
+os
+platform}.freeze
 
     class << self
       def method_missing(m, *args, &block)

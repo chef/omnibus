@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require 'aws-sdk'
-require 'base64'
+require "aws-sdk"
+require "base64"
 
 module Omnibus
   module S3Helpers
@@ -25,9 +25,10 @@ module Omnibus
 
     module InstanceMethods
       private
+
       #
       # Returns the configuration for S3. You must provide keys
-      # :region, 
+      # :region,
       #
       # @example
       #   {
@@ -65,11 +66,11 @@ module Omnibus
         @s3_bucket ||= begin
                          bucket = client.bucket(s3_configuration[:bucket_name])
                          unless bucket.exists?
-                           bucket_config = if s3_configuration[:region] == 'us-east-1'
+                           bucket_config = if s3_configuration[:region] == "us-east-1"
                                              nil
                                            else
                                              {
-                                               location_constraint: s3_configuration[:region]
+                                               location_constraint: s3_configuration[:region],
                                              }
                                            end
                            bucket.create(create_bucket_configuration: bucket_config)
@@ -93,7 +94,7 @@ module Omnibus
           key: key,
           body: content,
           content_md5: to_base64_digest(content_md5),
-          acl: acl
+          acl: acl,
         })
         true
       end
@@ -110,7 +111,7 @@ module Omnibus
       #
       def to_base64_digest(content_md5)
         if content_md5
-          md5_digest = content_md5.unpack('a2'*16).collect {|i| i.hex.chr }.join
+          md5_digest = content_md5.unpack("a2" * 16).collect { |i| i.hex.chr }.join
           Base64.encode64(md5_digest).strip
         end
       end

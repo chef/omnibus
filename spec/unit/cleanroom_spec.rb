@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Omnibus
   describe Cleanroom do
@@ -18,43 +18,43 @@ module Omnibus
     let(:instance) { klass.new }
 
     describe '#evaluate' do
-      it 'exposes public methods' do
+      it "exposes public methods" do
         expect {
-          instance.evaluate('exposed_method')
+          instance.evaluate("exposed_method")
         }.to_not raise_error
       end
 
-      it 'calls exposed methods on the instance' do
-        instance.evaluate('exposed_method')
+      it "calls exposed methods on the instance" do
+        instance.evaluate("exposed_method")
         expect(instance.instance_variable_get(:@called)).to be_truthy
       end
 
-      it 'does not expose unexposed methods' do
+      it "does not expose unexposed methods" do
         expect {
-          instance.evaluate('unexposed_method')
+          instance.evaluate("unexposed_method")
         }.to raise_error(NameError)
       end
     end
 
     describe '#evaluate_file' do
       let(:contents) do
-        <<-EOH.gsub(/^ {10}/, '')
+        <<-EOH.gsub(/^ {10}/, "")
           exposed_method
         EOH
       end
 
-      let(:filepath) { File.join(tmp_path, '/file/path') }
+      let(:filepath) { File.join(tmp_path, "/file/path") }
 
       before do
         allow(IO).to receive(:read).and_call_original
         allow(IO).to receive(:read).with(filepath).and_return(contents)
       end
 
-      it 'evaluates the file and exposes public methods' do
+      it "evaluates the file and exposes public methods" do
         expect { instance.evaluate_file(filepath) }.to_not raise_error
       end
 
-      it 'calls exposed methods on the instance' do
+      it "calls exposed methods on the instance" do
         instance.evaluate_file(filepath)
         expect(instance.instance_variable_get(:@called)).to be_truthy
       end

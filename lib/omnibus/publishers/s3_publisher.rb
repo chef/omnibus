@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 
-require 'omnibus/s3_helpers'
+require "omnibus/s3_helpers"
 
 module Omnibus
   class S3Publisher < Publisher
     include S3Helpers
 
     def publish(&block)
-      log.info(log_key) { 'Starting S3 publisher' }
+      log.info(log_key) { "Starting S3 publisher" }
 
       packages.each do |package|
         # Make sure the package is good to go!
@@ -39,7 +39,7 @@ module Omnibus
                      package.metadata[:md5], access_policy)
 
         # If a block was given, "yield" the package to the caller
-        block.call(package) if block
+        yield(package) if block
       end
     end
 
@@ -71,7 +71,7 @@ module Omnibus
         package.metadata[:platform_version],
         package.metadata[:arch],
         package.name,
-        *stuff,
+        *stuff
       )
     end
 
@@ -84,10 +84,10 @@ module Omnibus
     #   the access policy
     #
     def access_policy
-      if @options[:acl].to_s == 'public'
-        'public-read'
+      if @options[:acl].to_s == "public"
+        "public-read"
       else
-        'private'
+        "private"
       end
     end
   end

@@ -2,12 +2,12 @@
 
 # Trap interrupts to quit cleanly. See
 # https://twitter.com/mitchellh/status/283014103189053442
-Signal.trap('INT') { exit 1 }
+Signal.trap("INT") { exit 1 }
 
-$:.push File.expand_path('../../lib', __FILE__)
+$:.push File.expand_path("../../lib", __FILE__)
 $stdout.sync = true
 
-require 'omnibus/cli'
+require "omnibus/cli"
 
 # Some platforms do not have a UTF-8 locale, so we need to enforce one
 # or else the cacert chain will break among other things

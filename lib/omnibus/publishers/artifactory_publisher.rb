@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 
-require 'uri'
-require 'benchmark'
+require "uri"
+require "benchmark"
 
 module Omnibus
   class ArtifactoryPublisher < Publisher
     def publish(&block)
-      log.info(log_key) { 'Starting artifactory publisher' }
-      safe_require('artifactory')
+      log.info(log_key) { "Starting artifactory publisher" }
+      safe_require("artifactory")
 
       packages.each do |package|
         # Make sure the package is good to go!
@@ -40,7 +40,7 @@ module Omnibus
             artifact_for(package).upload(
               repository,
               remote_path,
-              properties,
+              properties
             )
             # Upload the package's assoacited `*.metadata.json` file
             log.info(log_key) { "Uploading '#{package.name}.metadata.json'" }
@@ -49,12 +49,12 @@ module Omnibus
               "#{remote_path}.metadata.json",
               # *.metadata.json files should not include
               # the checksum properties
-              properties.dup.delete_if { |k,v| k =~ /^omnibus\.(md5|sha)/ },
+              properties.dup.delete_if { |k, v| k =~ /^omnibus\.(md5|sha)/ }
             )
           end
         rescue Artifactory::Error::HTTPError => e
           if (retries -= 1) != 0
-            log.info(log_key) { "Upload failed with exception: #{e}"}
+            log.info(log_key) { "Upload failed with exception: #{e}" }
             log.info(log_key) { "Retrying failed publish #{retries} more time(s)..." }
             retry
           else
@@ -62,10 +62,10 @@ module Omnibus
           end
         end
 
-        log.debug(log_key)  { "Elapsed time to publish #{package.name}:  #{1000*upload_time} ms" }
+        log.debug(log_key) { "Elapsed time to publish #{package.name}:  #{1000 * upload_time} ms" }
 
         # If a block was given, "yield" the package to the caller
-        block.call(package) if block
+        yield(package) if block
       end
 
       if build_record?
@@ -95,8 +95,8 @@ module Omnibus
         local_path: artifact.path,
         client:     client,
         checksums: {
-          'md5'  => md5,
-          'sha1' => sha1,
+          "md5"  => md5,
+          "sha1" => sha1,
         }
       )
     end
@@ -122,7 +122,7 @@ module Omnibus
                      # we already know the `version_manifest` entry is
                      # missing so we can't pull in the `build_git_revision`
                      nil,
-                     metadata[:license],
+                     metadata[:license]
                    )
                  end
 
@@ -135,40 +135,40 @@ module Omnibus
         number: manifest.build_version,
         vcs_revision: manifest.build_git_revision,
         build_agent: {
-          name: 'omnibus',
+          name: "omnibus",
           version: Omnibus::VERSION,
         },
         properties: default_properties.merge(
-          'omnibus.project'            => name,
-          'omnibus.version'            => manifest.build_version,
-          'omnibus.build_git_revision' => manifest.build_git_revision,
-          'omnibus.license'            => manifest.license,
+          "omnibus.project"            => name,
+          "omnibus.version"            => manifest.build_version,
+          "omnibus.build_git_revision" => manifest.build_git_revision,
+          "omnibus.license"            => manifest.license
         ),
         modules: [
           {
             # com.getchef:chef-server:12.0.0
             id: [
-              Config.artifactory_base_path.gsub('/', '.'),
+              Config.artifactory_base_path.tr("/", "."),
               name,
               manifest.build_version,
-            ].join(':'),
+            ].join(":"),
             artifacts: packages.map do |package|
               [
                 {
-                  type: File.extname(package.path).split('.').last,
+                  type: File.extname(package.path).split(".").last,
                   sha1: package.metadata[:sha1],
                   md5:  package.metadata[:md5],
                   name: package.metadata[:basename],
                 },
                 {
-                  type: File.extname(package.metadata.path).split('.').last,
+                  type: File.extname(package.metadata.path).split(".").last,
                   sha1: digest(package.metadata.path, :sha1),
                   md5:  digest(package.metadata.path, :md5),
                   name: File.basename(package.metadata.path),
-                }
+                },
               ]
-            end.flatten
-          }
+            end.flatten,
+          },
         ]
       )
     end
@@ -203,7 +203,7 @@ module Omnibus
         proxy_username: Config.artifactory_proxy_username,
         proxy_password: Config.artifactory_proxy_password,
         proxy_address:  Config.artifactory_proxy_address,
-        proxy_port:     Config.artifactory_proxy_port,
+        proxy_port:     Config.artifactory_proxy_port
       )
     end
 
@@ -217,21 +217,21 @@ module Omnibus
     #
     def metadata_properties_for(package)
       metadata = {
-        'omnibus.project'          => package.metadata[:name],
-        'omnibus.platform'         => package.metadata[:platform],
-        'omnibus.platform_version' => package.metadata[:platform_version],
-        'omnibus.architecture'     => package.metadata[:arch],
-        'omnibus.version'          => package.metadata[:version],
-        'omnibus.iteration'        => package.metadata[:iteration],
-        'omnibus.license'          => package.metadata[:license],
-        'omnibus.md5'              => package.metadata[:md5],
-        'omnibus.sha1'             => package.metadata[:sha1],
-        'omnibus.sha256'           => package.metadata[:sha256],
-        'omnibus.sha512'           => package.metadata[:sha512]
+        "omnibus.project"          => package.metadata[:name],
+        "omnibus.platform"         => package.metadata[:platform],
+        "omnibus.platform_version" => package.metadata[:platform_version],
+        "omnibus.architecture"     => package.metadata[:arch],
+        "omnibus.version"          => package.metadata[:version],
+        "omnibus.iteration"        => package.metadata[:iteration],
+        "omnibus.license"          => package.metadata[:license],
+        "omnibus.md5"              => package.metadata[:md5],
+        "omnibus.sha1"             => package.metadata[:sha1],
+        "omnibus.sha256"           => package.metadata[:sha256],
+        "omnibus.sha512"           => package.metadata[:sha512],
       }.tap do |h|
         if build_record?
-          h['build.name'] = package.metadata[:name]
-          h['build.number'] = package.metadata[:version]
+          h["build.name"] = package.metadata[:name]
+          h["build.number"] = package.metadata[:version]
         end
       end
 
@@ -276,7 +276,7 @@ module Omnibus
         package.metadata[:version],
         package.metadata[:platform],
         package.metadata[:platform_version],
-        package.metadata[:basename],
+        package.metadata[:basename]
       )
     end
   end

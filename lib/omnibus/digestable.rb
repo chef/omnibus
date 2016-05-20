@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-require 'openssl'
-require 'pathname'
-require 'omnibus/logging'
+require "openssl"
+require "pathname"
+require "omnibus/logging"
 
 module Omnibus
   module Digestable
@@ -24,6 +24,7 @@ module Omnibus
     def self.included(other)
       other.send(:include, Logging)
     end
+
     #
     # Calculate the digest of the file at the given path. Files are read in
     # binary chunks to prevent Ruby from exploding.
@@ -78,7 +79,7 @@ module Omnibus
         relative = Pathname.new(filename).relative_path_from(Pathname.new(path))
 
         case ftype = File.ftype(filename)
-        when 'file'
+        when "file"
           update_with_string(digest, "#{ftype} #{relative}")
           update_with_file_contents(digest, filename)
         else

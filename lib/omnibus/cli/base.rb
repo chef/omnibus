@@ -27,7 +27,7 @@ module Omnibus
         # argument and blows up...
         if args.length > 1 && !(args & Thor::HELP_MAPPINGS).empty?
           args = args - Thor::HELP_MAPPINGS
-          args.insert(-2, 'help')
+          args.insert(-2, "help")
         end
 
         super
@@ -45,8 +45,8 @@ module Omnibus
       end
 
       # Do not load the Omnibus config if we are asking for help or the version
-      if %w(help version).include?(config[:current_command].name)
-        log.debug(log_key) { 'Skipping Omnibus loading (detected help or version)' }
+      if %w{help version}.include?(config[:current_command].name)
+        log.debug(log_key) { "Skipping Omnibus loading (detected help or version)" }
         return
       end
 
@@ -55,16 +55,16 @@ module Omnibus
         Omnibus.load_configuration(@options[:config])
       else
         if @options[:config] == Omnibus::DEFAULT_CONFIG
-          log.debug(log_key) { 'Config file not given - using defaults' }
+          log.debug(log_key) { "Config file not given - using defaults" }
         else
           raise "The given config file '#{@options[:config]}' does not exist!"
         end
       end
 
       @options[:override].each do |key, value|
-        if %w(true false nil).include?(value)
+        if %w{true false nil}.include?(value)
           log.debug(log_key) { "Detected #{value.inspect} should be an object" }
-          value = { 'true' => true, 'false' => false, 'nil' => nil }[value]
+          value = { "true" => true, "false" => false, "nil" => nil }[value]
         end
 
         if value =~ /\A[[:digit:]]+\Z/
@@ -76,25 +76,25 @@ module Omnibus
           log.debug(log_key) { "Setting Config.#{key} = #{value.inspect}" }
           Config.send(key, value)
         else
-          log.debug (log_key){ "Skipping option '#{key}' - not a config option" }
+          log.debug (log_key) { "Skipping option '#{key}' - not a config option" }
         end
       end
     end
 
     class_option :config,
-      desc: 'Path to the Omnibus config file',
-      aliases: '-c',
+      desc: "Path to the Omnibus config file",
+      aliases: "-c",
       type: :string,
       default: Omnibus::DEFAULT_CONFIG
     class_option :log_level,
-      desc: 'The log level',
-      aliases: '-l',
+      desc: "The log level",
+      aliases: "-l",
       type: :string,
       enum: Logger::LEVELS.map(&:downcase),
-      default: 'info'
+      default: "info"
     class_option :override,
-      desc: 'Override one or more Omnibus config options',
-      aliases: '-o',
+      desc: "Override one or more Omnibus config options",
+      aliases: "-o",
       type: :hash,
       default: {}
 
@@ -102,7 +102,7 @@ module Omnibus
     # Hide the default help task to encourage people to use +-h+ instead of
     # Thor's dumb way of asking for help.
     #
-    desc 'help [COMMAND]', 'Show help output', hide: true
+    desc "help [COMMAND]", "Show help output", hide: true
     def help(*)
       super
     end

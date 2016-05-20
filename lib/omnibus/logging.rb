@@ -39,7 +39,7 @@ module Omnibus
       # @return [String]
       #
       def log_key
-        @log_key ||= (name || '(Anonymous)').split('::')[1..-1].join('::')
+        @log_key ||= (name || "(Anonymous)").split("::")[1..-1].join("::")
       end
     end
 

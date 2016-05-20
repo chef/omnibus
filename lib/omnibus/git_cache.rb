@@ -14,22 +14,21 @@
 # limitations under the License.
 #
 
-require 'digest'
-require 'fileutils'
+require "digest"
+require "fileutils"
 
 module Omnibus
   class GitCache
     include Util
     include Logging
 
-    REQUIRED_GIT_FILES = [
-      'HEAD',
-      'description',
-      'hooks',
-      'info',
-      'objects',
-      'refs',
-    ].freeze
+    REQUIRED_GIT_FILES = %w{
+HEAD
+description
+hooks
+info
+objects
+refs}.freeze
 
     #
     # @return [Software]
@@ -64,7 +63,7 @@ module Omnibus
         false
       else
         create_directory(File.dirname(cache_path))
-        git_cmd('init -q')
+        git_cmd("init -q")
         true
       end
     end
@@ -98,7 +97,7 @@ module Omnibus
       # This is the list of all the unqiue shasums of all the software build
       # dependencies, including the on currently being acted upon.
       shasums = [dep_list.map(&:shasum), software.shasum].flatten
-      suffix  = Digest::SHA256.hexdigest(shasums.join('|'))
+      suffix  = Digest::SHA256.hexdigest(shasums.join("|"))
       @tag    = "#{software.name}-#{suffix}"
 
       log.internal(log_key) { "tag: #{@tag}" }
@@ -108,29 +107,29 @@ module Omnibus
 
     # Create an incremental install path cache for the software step
     def incremental
-      log.internal(log_key) { 'Performing incremental cache' }
+      log.internal(log_key) { "Performing incremental cache" }
 
       create_cache_path
       remove_git_dirs
 
-      git_cmd('add -A -f')
+      git_cmd("add -A -f")
 
       begin
-        git_cmd(%Q(commit -q -m "Backup of #{tag}"))
+        git_cmd(%Q{commit -q -m "Backup of #{tag}"})
       rescue CommandFailed => e
-        raise unless e.message.include?('nothing to commit')
+        raise unless e.message.include?("nothing to commit")
       end
 
-      git_cmd(%Q(tag -f "#{tag}"))
+      git_cmd(%Q{tag -f "#{tag}"})
     end
 
     def restore
-      log.internal(log_key) { 'Performing cache restoration' }
+      log.internal(log_key) { "Performing cache restoration" }
 
       create_cache_path
 
       restore_me = false
-      cmd = git_cmd(%Q(tag -l "#{tag}"))
+      cmd = git_cmd(%Q{tag -l "#{tag}"})
 
       cmd.stdout.each_line do |line|
         restore_me = true if tag == line.chomp
@@ -138,7 +137,7 @@ module Omnibus
 
       if restore_me
         log.internal(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
-        git_cmd(%Q(checkout -f "#{tag}"))
+        git_cmd(%Q{checkout -f "#{tag}"})
         true
       else
         log.internal(log_key) { "Could not find tag `#{tag}', skipping restore" }
@@ -190,7 +189,7 @@ module Omnibus
     # @return [String]
     #
     def install_dir
-      @install_dir ||= software.project.install_dir.sub(/^([A-Za-z]:)/, '')
+      @install_dir ||= software.project.install_dir.sub(/^([A-Za-z]:)/, "")
     end
 
     # Override the log_key for this class to include the software name

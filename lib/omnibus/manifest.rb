@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'ffi_yajl'
+require "ffi_yajl"
 
 module Omnibus
   class Manifest
@@ -27,7 +27,7 @@ module Omnibus
     LATEST_MANIFEST_FORMAT = 2
 
     attr_reader :build_version, :build_git_revision, :license
-    def initialize(version=nil, git_rev=nil, license="Unspecified")
+    def initialize(version = nil, git_rev = nil, license = "Unspecified")
       @data = {}
       @build_version = version
       @build_git_revision = git_rev
@@ -68,13 +68,13 @@ module Omnibus
     end
 
     def to_hash
-      software_hash = @data.inject({}) do |memo, (k,v)|
+      software_hash = @data.inject({}) do |memo, (k, v)|
         memo[k] = v.to_hash
         memo
       end
       ret = {
         manifest_format: LATEST_MANIFEST_FORMAT,
-        software: software_hash
+        software: software_hash,
       }
       ret[:build_version] = build_version if build_version
       ret[:build_git_revision] = build_git_revision if build_git_revision

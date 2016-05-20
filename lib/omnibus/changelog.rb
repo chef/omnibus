@@ -1,11 +1,11 @@
-require 'omnibus/git_repository'
+require "omnibus/git_repository"
 
 module Omnibus
   class ChangeLog
     CHANGELOG_TAG = "ChangeLog-Entry"
 
     attr_reader :end_ref
-    def initialize(start_ref=nil, end_ref="HEAD", git_repo=GitRepository.new('./'))
+    def initialize(start_ref = nil, end_ref = "HEAD", git_repo = GitRepository.new("./"))
       @start_ref = start_ref
       @end_ref = end_ref
       @git_repo = git_repo

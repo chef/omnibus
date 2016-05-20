@@ -1,6 +1,6 @@
-require 'spec_helper'
-require 'omnibus/manifest'
-require 'omnibus/manifest_entry'
+require "spec_helper"
+require "omnibus/manifest"
+require "omnibus/manifest_entry"
 
 module Omnibus
   describe Manifest do
@@ -9,11 +9,11 @@ module Omnibus
     describe "#add" do
       it "stores manifest entries" do
         me = ManifestEntry.new("womabt", {})
-        expect {subject.add("wombat", me)}.to_not raise_error
+        expect { subject.add("wombat", me) }.to_not raise_error
       end
 
       it "raises an error if it isn't given a ManifestEntry" do
-        expect {subject.add("foobar", {})}.to raise_error Manifest::NotAManifestEntry
+        expect { subject.add("foobar", {}) }.to raise_error Manifest::NotAManifestEntry
       end
     end
 
@@ -25,7 +25,7 @@ module Omnibus
       end
 
       it "raises an error if no such manifest entry exists" do
-        expect {subject.entry_for("non-existant-entry")}.to raise_error Manifest::MissingManifestEntry
+        expect { subject.entry_for("non-existant-entry") }.to raise_error Manifest::MissingManifestEntry
       end
     end
 
@@ -35,7 +35,7 @@ module Omnibus
         second = ManifestEntry.new("wombat", {})
         subject.add("foobar", first)
         subject.add("wombat", second)
-        expect{ |b| subject.each &b }.to yield_successive_args(first, second)
+        expect { |b| subject.each(&b) }.to yield_successive_args(first, second)
       end
     end
 
@@ -90,17 +90,17 @@ module Omnibus
               locked_version: "new.newer",
               source_type: "url",
               described_version: "new.newer",
-            }
-          }
+            },
+          },
         }
       }
 
       it "has a build_version" do
-        expect(Manifest.from_hash(manifest).build_version).to eq('12.4.0+20150629082811')
+        expect(Manifest.from_hash(manifest).build_version).to eq("12.4.0+20150629082811")
       end
 
       it "has a build_git_revision" do
-        expect(Manifest.from_hash(manifest).build_git_revision).to eq('2e763ac957b308ba95cef256c2491a5a55a163cc')
+        expect(Manifest.from_hash(manifest).build_git_revision).to eq("2e763ac957b308ba95cef256c2491a5a55a163cc")
       end
 
       it "returns a manifest from a hash" do
@@ -108,7 +108,7 @@ module Omnibus
       end
 
       it "normalizes the source to use symbols" do
-        expect(Manifest.from_hash(manifest).entry_for(:zlib).locked_source).to eq({url: "an_url"})
+        expect(Manifest.from_hash(manifest).entry_for(:zlib).locked_source).to eq({ url: "an_url" })
       end
 
       context "v2 manifest" do
@@ -120,19 +120,19 @@ module Omnibus
             software: {
               zlib: {
                 locked_source: {
-                  url: "an_url"
+                  url: "an_url",
                 },
                 locked_version: "new.newer",
                 source_type: "url",
                 described_version: "new.newer",
                 license: "Zlib",
-              }
-            }
+              },
+            },
           }
         }
 
         it "has a license" do
-          expect(Manifest.from_hash(manifest).license).to eq('Unspecified')
+          expect(Manifest.from_hash(manifest).license).to eq("Unspecified")
         end
       end
 
@@ -144,7 +144,7 @@ module Omnibus
         }
 
         it "raises an error if it doesn't recognize the manifest version" do
-          expect{Manifest.from_hash(manifest)}.to raise_error Manifest::InvalidManifestFormat
+          expect { Manifest.from_hash(manifest) }.to raise_error Manifest::InvalidManifestFormat
         end
       end
     end

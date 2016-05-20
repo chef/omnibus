@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 
-require 'fileutils'
+require "fileutils"
 
 module Omnibus
   module FileSyncer
     extend self
 
     # Files to be ignored during a directory globbing
-    IGNORED_FILES = %w(. ..).freeze
+    IGNORED_FILES = %w{. ..}.freeze
 
     #
     # Glob across the given pattern, accounting for dotfiles, removing Ruby's
@@ -58,7 +58,7 @@ module Omnibus
         [exclude, "#{exclude}/*"]
       end.flatten
 
-      source_files = glob(File.join(source, '**/*'))
+      source_files = glob(File.join(source, "**/*"))
       source_files = source_files.reject do |source_file|
         basename = relative_path_for(source_file, source)
         excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH) }

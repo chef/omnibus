@@ -1,4 +1,4 @@
-require 'aruba/api'
+require "aruba/api"
 
 Given(/^I have an omnibus project named "(.+)"$/) do |name|
   create_directory(name)
@@ -10,7 +10,7 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
   # Single top level output dir
   create_directory("output")
 
-  write_file("config/projects/#{name}.rb", <<-EOH.gsub(/^ {4}/, ''))
+  write_file("config/projects/#{name}.rb", <<-EOH.gsub(/^ {4}/, ""))
     name '#{name}'
     maintainer 'Mrs. Maintainer'
     homepage 'https://example.com'
@@ -27,7 +27,7 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
     end
   EOH
 
-  write_file('omnibus.rb', <<-EOH.gsub(/^ {4}/, ''))
+  write_file("omnibus.rb", <<-EOH.gsub(/^ {4}/, ""))
     # Build configuration
     append_timestamp false
     cache_dir     '#{abs_path}/local/omnibus/cache'
@@ -40,12 +40,11 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
 end
 
 Given(/^I debug$/) do
-  require 'pry'
-  binding.pry
+  require "pry"
 end
 
 Given(/^I have a platform mappings file named "(.+)"$/) do |name|
-  write_file(name, <<-EOH.gsub(/^ {4}/, ''))
+  write_file(name, <<-EOH.gsub(/^ {4}/, ""))
     {
       "ubuntu-10.04": [
         "ubuntu-10.04",

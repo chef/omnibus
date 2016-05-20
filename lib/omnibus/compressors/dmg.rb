@@ -30,7 +30,7 @@ module Omnibus
 
       # Copy support files
       support = create_directory("#{resources_dir}/.support")
-      copy_file(resource_path('background.png'), "#{support}/background.png")
+      copy_file(resource_path("background.png"), "#{support}/background.png")
     end
 
     build do
@@ -63,7 +63,7 @@ module Omnibus
     #
     def window_bounds(val = NULL)
       if null?(val)
-        @window_bounds || '100, 100, 750, 600'
+        @window_bounds || "100, 100, 750, 600"
       else
         @window_bounds = val
       end
@@ -85,7 +85,7 @@ module Omnibus
     #
     def pkg_position(val = NULL)
       if null?(val)
-        @pkg_position || '535, 50'
+        @pkg_position || "535, 50"
       else
         @pkg_position = val
       end
@@ -136,7 +136,7 @@ module Omnibus
     def create_writable_dmg
       log.info(log_key) { "Creating writable dmg" }
 
-      shellout! <<-EOH.gsub(/^ {8}/, '')
+      shellout! <<-EOH.gsub(/^ {8}/, "")
         hdiutil create \\
           -srcfolder "#{resources_dir}" \\
           -volname "#{volume_name}" \\
@@ -158,7 +158,7 @@ module Omnibus
       @device ||= Dir.chdir(staging_dir) do
         log.info(log_key) { "Attaching dmg as disk" }
 
-        cmd = shellout! <<-EOH.gsub(/^ {10}/, '')
+        cmd = shellout! <<-EOH.gsub(/^ {10}/, "")
           hdiutil attach \\
             -readwrite \\
             -noverify \\
@@ -178,10 +178,10 @@ module Omnibus
     def set_volume_icon
       log.info(log_key) { "Setting volume icon" }
 
-      icon = resource_path('icon.png')
+      icon = resource_path("icon.png")
 
       Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, '')
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           # Generate the icns
           mkdir tmp.iconset
           sips -z 16 16     #{icon} --out tmp.iconset/icon_16x16.png
@@ -213,7 +213,7 @@ module Omnibus
     def prettify_dmg
       log.info(log_key) { "Making the dmg all pretty and stuff" }
 
-      render_template(resource_path('create_dmg.osascript.erb'),
+      render_template(resource_path("create_dmg.osascript.erb"),
         destination: "#{staging_dir}/create_dmg.osascript",
         variables: {
           volume_name:   volume_name,
@@ -224,7 +224,7 @@ module Omnibus
       )
 
       Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, '')
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           osascript "#{staging_dir}/create_dmg.osascript"
         EOH
       end
@@ -239,7 +239,7 @@ module Omnibus
       log.info(log_key) { "Compressing dmg" }
 
       Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, '')
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           chmod -Rf go-w /Volumes/#{volume_name}
           sync
           hdiutil detach "#{@device}"
@@ -263,7 +263,7 @@ module Omnibus
       log.info(log_key) { "Setting dmg icon" }
 
       Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, '')
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           # Convert the png to an icon
           sips -i "#{resource_path('icon.png')}"
 
@@ -282,7 +282,7 @@ module Omnibus
     # @see Base#package_name
     def package_name
       extname = File.extname(packager.package_name)
-      packager.package_name.sub(extname, '.dmg')
+      packager.package_name.sub(extname, ".dmg")
     end
 
     # The path to the writable dmg on disk.

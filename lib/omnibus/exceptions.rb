@@ -46,9 +46,9 @@ EOH
   end
 
   class MissingRequiredAttribute < Error
-    def initialize(instance, name, sample = '<VALUE>')
+    def initialize(instance, name, sample = "<VALUE>")
       @instance, @name, @sample = instance, name, sample
-      @class = instance.class.name.split('::').last
+      @class = instance.class.name.split("::").last
     end
 
     def to_s
@@ -105,7 +105,7 @@ EOH
       <<-EOH
 I could not find a project named `#{@name}' in any of the project locations:"
 
-#{@possible_paths.map { |path| "    #{path}"}.join("\n")}
+#{@possible_paths.map { |path| "    #{path}" }.join("\n")}
 EOH
     end
   end
@@ -120,7 +120,7 @@ EOH
       <<-EOH
 I could not find a software named `#{@name}' in any of the software locations:"
 
-#{@possible_paths.map { |path| "    #{path}"}.join("\n")}
+#{@possible_paths.map { |path| "    #{path}" }.join("\n")}
 EOH
     end
   end
@@ -249,14 +249,14 @@ EOH
       if cmd.environment.nil? || cmd.environment.empty?
         env = nil
       else
-        env = cmd.environment.sort.map { |k,v| "#{k}=#{v}" }.join(' ')
+        env = cmd.environment.sort.map { |k, v| "#{k}=#{v}" }.join(" ")
       end
 
       command = cmd.command
-      command_with_env = [env, command].compact.join(' ')
+      command_with_env = [env, command].compact.join(" ")
 
-      stdout = cmd.stdout.empty? ? '(nothing)' : cmd.stdout.strip
-      stderr = cmd.stderr.empty? ? '(nothing)' : cmd.stderr.strip
+      stdout = cmd.stdout.empty? ? "(nothing)" : cmd.stdout.strip
+      stderr = cmd.stderr.empty? ? "(nothing)" : cmd.stderr.strip
 
       super <<-EOH
 The following shell command exited with status #{status}:
@@ -281,13 +281,13 @@ EOH
       if cmd.environment.nil? || cmd.environment.empty?
         env = nil
       else
-        env = cmd.environment.sort.map { |k,v| "#{k}=#{v}" }.join(' ')
+        env = cmd.environment.sort.map { |k, v| "#{k}=#{v}" }.join(" ")
       end
 
       command = cmd.command
-      command_with_env = [env, command].compact.join(' ')
+      command_with_env = [env, command].compact.join(" ")
 
-      timeout = cmd.timeout.to_s.reverse.gsub(/...(?=.)/,'\&,').reverse
+      timeout = cmd.timeout.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse
 
       super <<-EOH
 The following shell command timed out at #{timeout} seconds:
