@@ -20,9 +20,16 @@ Cucumber::Rake::Task.new(:acceptance) do |t|
   end.join(' ')
 end
 
+require "chefstyle"
+require "rubocop/rake_task"
+desc ' Run ChefStyle'
+RuboCop::RakeTask.new(:chefstyle) do |task|
+  task.options << "--display-cop-names"
+end
+
 namespace :travis do
   desc 'Run tests on Travis'
-  task ci: %w(unit functional acceptance)
+  task ci: %w(chefstyle unit functional acceptance)
 end
 
 task default: %w(travis:ci)
