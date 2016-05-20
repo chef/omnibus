@@ -27,8 +27,8 @@ module Omnibus
       @updated ||=
         begin
           (first.entry_names & second.entry_names).collect do |name|
-          diff(first.entry_for(name), second.entry_for(name))
-        end.compact
+            diff(first.entry_for(name), second.entry_for(name))
+          end.compact
         end
     end
 
@@ -36,8 +36,8 @@ module Omnibus
       @removed ||=
         begin
           (first.entry_names - second.entry_names).collect do |name|
-          removed_entry(first.entry_for(name))
-        end
+            removed_entry(first.entry_for(name))
+          end
         end
     end
 
@@ -45,8 +45,8 @@ module Omnibus
       @added ||=
         begin
           (second.entry_names - first.entry_names).collect do |name|
-          new_entry(second.entry_for(name))
-        end
+            new_entry(second.entry_for(name))
+          end
         end
     end
 
@@ -64,7 +64,6 @@ module Omnibus
         source_type: entry.source_type,
         source: entry.locked_source }
     end
-
 
     def removed_entry(entry)
       { name: entry.name,

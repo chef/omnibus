@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 module Omnibus
   describe GitRepository do
@@ -21,7 +21,7 @@ module Omnibus
       end
 
       it "returns an error if the tags don't exist" do
-        expect{git_repo.authors("1.0", "WUT")}.to raise_error(RuntimeError)
+        expect { git_repo.authors("1.0", "WUT") }.to raise_error(RuntimeError)
       end
     end
 

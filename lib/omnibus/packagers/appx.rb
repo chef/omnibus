@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'omnibus/packagers/windows_base'
+require "omnibus/packagers/windows_base"
 
 module Omnibus
   class Packager::APPX < Packager::WindowsBase
@@ -61,7 +61,7 @@ module Omnibus
     # @return [void]
     #
     def write_manifest_file
-      render_template(resource_path('AppxManifest.xml.erb'),
+      render_template(resource_path("AppxManifest.xml.erb"),
         destination: "#{windows_safe_path(project.install_dir)}/AppxManifest.xml",
         variables: {
           name:            project.package_name,

@@ -1,8 +1,8 @@
-require 'aruba'
-require 'aruba/cucumber'
-require 'aruba/in_process'
+require "aruba"
+require "aruba/cucumber"
+require "aruba/in_process"
 
-require 'omnibus/cli'
+require "omnibus/cli"
 
 Aruba.configure do |config|
   config.command_launcher = :in_process

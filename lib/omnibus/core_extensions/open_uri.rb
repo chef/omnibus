@@ -1,4 +1,4 @@
-require 'open-uri'
+require "open-uri"
 
 module OpenURI
   class << self
@@ -13,7 +13,7 @@ module OpenURI
     def default_redirectable?(uri1, uri2)
       a, b = uri1.scheme.downcase, uri2.scheme.downcase
 
-      a == b || (a == 'http' && b == 'https')
+      a == b || (a == "http" && b == "https")
     end
     alias_method :redirectable?, :default_redirectable?
 
@@ -28,7 +28,7 @@ module OpenURI
     def unsafe_redirectable?(uri1, uri2)
       a, b = uri1.scheme.downcase, uri2.scheme.downcase
 
-      a == b || (a == 'http' && b == 'https') || (a == 'https' && b == 'http')
+      a == b || (a == "http" && b == "https") || (a == "https" && b == "http")
     end
 
     #

@@ -1,27 +1,27 @@
-require 'spec_helper'
-require 'pry'
+require "spec_helper"
+require "pry"
 
 module Omnibus
   describe Packager::IPS do
     let(:project) do
       Project.new.tap do |project|
-        project.name('project')
-        project.homepage('https://example.com')
-        project.install_dir('/opt/project')
-        project.build_version('1.2.3')
-        project.build_iteration('2')
-        project.maintainer('Chef Software')
+        project.name("project")
+        project.homepage("https://example.com")
+        project.install_dir("/opt/project")
+        project.build_version("1.2.3")
+        project.build_iteration("2")
+        project.maintainer("Chef Software")
       end
     end
 
     subject { described_class.new(project) }
 
-    let(:project_root) { File.join(tmp_path, 'project/root') }
-    let(:package_dir)  { File.join(tmp_path, 'package/dir') }
-    let(:staging_dir)  { File.join(tmp_path, 'staging/dir') }
-    let(:source_dir)   { File.join(staging_dir, 'proto_install')}
-    let(:repo_dir)     { File.join(staging_dir, 'publish/repo')}
-    let(:architecture) { 'i86pc' }
+    let(:project_root) { File.join(tmp_path, "project/root") }
+    let(:package_dir)  { File.join(tmp_path, "package/dir") }
+    let(:staging_dir)  { File.join(tmp_path, "staging/dir") }
+    let(:source_dir)   { File.join(staging_dir, "proto_install") }
+    let(:repo_dir)     { File.join(staging_dir, "publish/repo") }
+    let(:architecture) { "i86pc" }
     let(:shellout) { double("Mixlib::ShellOut", :run_command => true, :error! => nil) }
 
     before do
@@ -34,18 +34,18 @@ module Omnibus
       create_directory(source_dir)
       create_directory(repo_dir)
 
-      stub_ohai(platform: 'solaris2', version: '5.11') do |data|
-        data['kernel']['machine'] = architecture
+      stub_ohai(platform: "solaris2", version: "5.11") do |data|
+        data["kernel"]["machine"] = architecture
       end
     end
 
     describe '#publisher_prefix' do
-      it 'is a DSL method' do
+      it "is a DSL method" do
         expect(subject).to have_exposed_method(:publisher_prefix)
       end
 
-      it 'has a default value' do
-        expect(subject.publisher_prefix).to eq('Omnibus')
+      it "has a default value" do
+        expect(subject.publisher_prefix).to eq("Omnibus")
       end
     end
 
@@ -54,55 +54,55 @@ module Omnibus
     end
 
     describe '#package_name' do
-      it 'should create correct package name' do
-        expect(subject.package_name).to eq('project.p5p')
+      it "should create correct package name" do
+        expect(subject.package_name).to eq("project.p5p")
       end
     end
 
     describe '#fmri_package_name' do
-      it 'should create correct fmri package name' do
-        expect(subject.fmri_package_name).to eq ('project@1.2.3,5.11-2')
+      it "should create correct fmri package name" do
+        expect(subject.fmri_package_name).to eq ("project@1.2.3,5.11-2")
       end
     end
 
     describe '#pkg_metadata_file' do
-      it 'is created inside the staging_dir' do
+      it "is created inside the staging_dir" do
         expect(subject.pkg_metadata_file).to eq("#{subject.staging_dir}/gen.manifestfile")
       end
     end
 
     describe '#pkg_manifest_file' do
-      it 'is created inside the staging_dir' do
+      it "is created inside the staging_dir" do
         expect(subject.pkg_manifest_file).to eq("#{subject.staging_dir}/#{subject.safe_base_package_name}.p5m")
       end
     end
 
     describe '#repo_dir' do
-      it 'is created inside the staging_dir' do
+      it "is created inside the staging_dir" do
         expect(subject.repo_dir).to eq("#{subject.staging_dir}/publish/repo")
       end
     end
 
     describe '#source_dir' do
-      it 'is created inside the staging_dir' do
+      it "is created inside the staging_dir" do
         expect(subject.source_dir).to eq("#{subject.staging_dir}/proto_install")
       end
     end
 
     describe '#safe_base_package_name' do
       context 'when the project name is "safe"' do
-        it 'returns the value without logging a message' do
-          expect(subject.safe_base_package_name).to eq('project')
+        it "returns the value without logging a message" do
+          expect(subject.safe_base_package_name).to eq("project")
           expect(subject).to_not receive(:log)
         end
       end
 
-      context 'when the project name has invalid characters' do
+      context "when the project name has invalid characters" do
         before { project.name("Pro$ject123.for-realz_2") }
 
-        it 'returns the value while logging a message' do
+        it "returns the value while logging a message" do
           output = capture_logging do
-            expect(subject.safe_base_package_name).to eq('pro-ject123.for-realz-2')
+            expect(subject.safe_base_package_name).to eq("pro-ject123.for-realz-2")
           end
 
           expect(output).to include("The `name' component of IPS package names can only include")
@@ -111,27 +111,27 @@ module Omnibus
     end
 
     describe '#safe_architecture' do
-      context 'the architecture is Intel-based' do
-        let(:architecture) { 'i86pc' }
+      context "the architecture is Intel-based" do
+        let(:architecture) { "i86pc" }
 
-        it 'returns `i386`' do
-          expect(subject.safe_architecture).to eq('i386')
+        it "returns `i386`" do
+          expect(subject.safe_architecture).to eq("i386")
         end
       end
 
-      context 'the architecture is SPARC-based' do
-        let(:architecture) { 'sun4v' }
+      context "the architecture is SPARC-based" do
+        let(:architecture) { "sun4v" }
 
-        it 'returns `sparc`' do
-          expect(subject.safe_architecture).to eq('sparc')
+        it "returns `sparc`" do
+          expect(subject.safe_architecture).to eq("sparc")
         end
       end
 
-      context 'anything else' do
-        let(:architecture) { 'FOO' }
+      context "anything else" do
+        let(:architecture) { "FOO" }
 
-        it 'returns the value from Ohai' do
-          expect(subject.safe_architecture).to eq('FOO')
+        it "returns the value from Ohai" do
+          expect(subject.safe_architecture).to eq("FOO")
         end
       end
     end

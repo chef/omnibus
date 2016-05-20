@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-require 'uri'
-require 'fileutils'
-require 'omnibus/download_helpers'
+require "uri"
+require "fileutils"
+require "omnibus/download_helpers"
 
 module Omnibus
   class Licensing
@@ -136,7 +136,7 @@ module Omnibus
     # @return [void]
     #
     def create_project_license_file
-      File.open(project.license_file_path, 'w') do |f|
+      File.open(project.license_file_path, "w") do |f|
         f.puts "#{project.name} #{project.build_version} license: \"#{project.license}\""
         f.puts ""
         f.puts project_license_content
@@ -192,7 +192,7 @@ module Omnibus
     # @return [String]
     #
     def project_license_content
-      project.license_file.nil? ? "" : IO.read(File.join(Config.project_root,project.license_file))
+      project.license_file.nil? ? "" : IO.read(File.join(Config.project_root, project.license_file))
     end
 
     #

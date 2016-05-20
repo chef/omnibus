@@ -14,19 +14,19 @@
 # limitations under the License.
 #
 
-require 'fileutils'
-require 'omnibus/download_helpers'
+require "fileutils"
+require "omnibus/download_helpers"
 
 module Omnibus
   class NetFetcher < Fetcher
     include DownloadHelpers
 
     # Use 7-zip to extract 7z/zip for Windows
-    WIN_7Z_EXTENSIONS = %w(.7z .zip)
+    WIN_7Z_EXTENSIONS = %w{.7z .zip}
 
     # tar probably has compression scheme linked in, otherwise for tarballs
-    COMPRESSED_TAR_EXTENSIONS = %w(.tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma)
-    TAR_EXTENSIONS = COMPRESSED_TAR_EXTENSIONS + ['.tar']
+    COMPRESSED_TAR_EXTENSIONS = %w{.tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma}
+    TAR_EXTENSIONS = COMPRESSED_TAR_EXTENSIONS + [".tar"]
 
     ALL_EXTENSIONS = WIN_7Z_EXTENSIONS + TAR_EXTENSIONS
 
@@ -118,7 +118,7 @@ module Omnibus
     # @return [String]
     #
     def downloaded_file
-      filename = File.basename(source[:url], '?*')
+      filename = File.basename(source[:url], "?*")
       File.join(Config.cache_dir, filename)
     end
 
@@ -168,7 +168,7 @@ module Omnibus
       end
 
       # Set the cookie if one was given
-      options['Cookie'] = source[:cookie] if source[:cookie]
+      options["Cookie"] = source[:cookie] if source[:cookie]
 
       download_file!(download_url, downloaded_file, options)
     end
@@ -229,13 +229,13 @@ module Omnibus
     #
     def extract
       # Only used by tar
-      compression_switch = ''
-      compression_switch = 'z'        if downloaded_file.end_with?('gz')
-      compression_switch = '--lzma -' if downloaded_file.end_with?('lzma')
-      compression_switch = 'j'        if downloaded_file.end_with?('bz2')
-      compression_switch = 'J'        if downloaded_file.end_with?('xz')
+      compression_switch = ""
+      compression_switch = "z"        if downloaded_file.end_with?("gz")
+      compression_switch = "--lzma -" if downloaded_file.end_with?("lzma")
+      compression_switch = "j"        if downloaded_file.end_with?("bz2")
+      compression_switch = "J"        if downloaded_file.end_with?("xz")
 
-      if Ohai['platform'] == 'windows'
+      if Ohai["platform"] == "windows"
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
@@ -248,7 +248,7 @@ module Omnibus
             shellout!("7z.exe x #{safe_downloaded_file} -o#{windows_safe_path(temp_dir)} -r -y")
 
             fname = File.basename(downloaded_file, File.extname(downloaded_file))
-            fname << ".tar" if downloaded_file.end_with?('tgz', 'txz')
+            fname << ".tar" if downloaded_file.end_with?("tgz", "txz")
             next_file = windows_safe_path(File.join(temp_dir, fname))
 
             log.debug(log_key) { "Temporarily extracting `#{next_file}' to `#{safe_project_dir}'" }
@@ -257,9 +257,9 @@ module Omnibus
         else
           shellout!("7z.exe x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
         end
-      elsif downloaded_file.end_with?('.7z')
+      elsif downloaded_file.end_with?(".7z")
         shellout!("7z x #{safe_downloaded_file} -o#{safe_project_dir} -r -y")
-      elsif downloaded_file.end_with?('.zip')
+      elsif downloaded_file.end_with?(".zip")
         shellout!("unzip #{safe_downloaded_file} -d #{safe_project_dir}")
       else
         shellout!("#{tar} #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}")
@@ -288,7 +288,7 @@ module Omnibus
     #   if the checksum does not match
     #
     def verify_checksum!
-      log.info(log_key) { 'Verifying checksum' }
+      log.info(log_key) { "Verifying checksum" }
 
       expected = checksum
       actual   = digest(downloaded_file, digest_type)
@@ -321,7 +321,7 @@ module Omnibus
     # @return [String]
     #
     def tar
-      Omnibus.which('gtar') ? 'gtar' : 'tar'
+      Omnibus.which("gtar") ? "gtar" : "tar"
     end
   end
 end

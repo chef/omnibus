@@ -1,4 +1,4 @@
-require 'rspec/expectations'
+require "rspec/expectations"
 
 # expect('/path/to/directory').to be_a_directory
 RSpec::Matchers.define :be_a_directory do
@@ -24,8 +24,8 @@ end
 # expect('/path/to/file').to have_permissions
 RSpec::Matchers.define :have_permissions do |perm|
   match do |actual|
-    m = sprintf('%o', File.stat(actual).mode)
-    m == perm 
+    m = sprintf("%o", File.stat(actual).mode)
+    m == perm
   end
 end
 

@@ -19,7 +19,7 @@ module Omnibus
     id :null
 
     def package_name
-      ''
+      ""
     end
 
     def run!

@@ -21,18 +21,18 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  'pre',
-      postinst: 'post',
-      prerm:    'preun',
-      postrm:   'postun',
+      preinst:  "pre",
+      postinst: "post",
+      prerm:    "preun",
+      postrm:   "postun",
       # Default RPM naming
-      pre:          'pre',
-      post:         'post',
-      preun:        'preun',
-      postun:       'postun',
-      verifyscript: 'verifyscript',
-      pretans:      'pretans',
-      posttrans:    'posttrans',
+      pre:          "pre",
+      post:         "post",
+      preun:        "preun",
+      postun:       "postun",
+      verifyscript: "verifyscript",
+      pretans:      "pretans",
+      posttrans:    "posttrans",
     }.freeze
 
     id :rpm
@@ -116,10 +116,10 @@ module Omnibus
     #
     def vendor(val = NULL)
       if null?(val)
-        @vendor || 'Omnibus <omnibus@getchef.com>'
+        @vendor || "Omnibus <omnibus@getchef.com>"
       else
         unless val.is_a?(String)
-          raise InvalidValue.new(:vendor, 'be a String')
+          raise InvalidValue.new(:vendor, "be a String")
         end
 
         @vendor = val
@@ -144,7 +144,7 @@ module Omnibus
         @license || project.license
       else
         unless val.is_a?(String)
-          raise InvalidValue.new(:license, 'be a String')
+          raise InvalidValue.new(:license, "be a String")
         end
 
         @license = val
@@ -166,10 +166,10 @@ module Omnibus
     #
     def priority(val = NULL)
       if null?(val)
-        @priority || 'extra'
+        @priority || "extra"
       else
         unless val.is_a?(String)
-          raise InvalidValue.new(:priority, 'be a String')
+          raise InvalidValue.new(:priority, "be a String")
         end
 
         @priority = val
@@ -191,10 +191,10 @@ module Omnibus
     #
     def category(val = NULL)
       if null?(val)
-        @category || 'default'
+        @category || "default"
       else
         unless val.is_a?(String)
-          raise InvalidValue.new(:category, 'be a String')
+          raise InvalidValue.new(:category, "be a String")
         end
 
         @category = val
@@ -248,7 +248,7 @@ module Omnibus
     # @return [String]
     #
     def build_dir
-      @build_dir ||= File.join(staging_dir, 'BUILD')
+      @build_dir ||= File.join(staging_dir, "BUILD")
     end
 
     #
@@ -267,7 +267,7 @@ module Omnibus
     # @return [Array]
     #
     def filesystem_directories
-      @filesystem_directories ||= IO.readlines(resource_path('filesystem_list')).map { |f| f.chomp }
+      @filesystem_directories ||= IO.readlines(resource_path("filesystem_list")).map { |f| f.chomp }
     end
 
     #
@@ -277,7 +277,7 @@ module Omnibus
     # @return [String]
     #
     def mark_filesystem_directories(fsdir)
-      if fsdir.eql?('/') || fsdir.eql?('/usr/lib') || fsdir.eql?('/usr/share/empty')
+      if fsdir.eql?("/") || fsdir.eql?("/usr/lib") || fsdir.eql?("/usr/share/empty")
         return "%dir %attr(0555,root,root) #{fsdir}"
       elsif filesystem_directories.include?(fsdir)
         return "%dir %attr(0755,root,root) #{fsdir}"
@@ -306,9 +306,9 @@ module Omnibus
 
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
-                .map    { |path| build_filepath(path) }
+                .map { |path| build_filepath(path) }
 
-      render_template(resource_path('spec.erb'),
+      render_template(resource_path("spec.erb"),
         destination: spec_file,
         variables: {
           name:            safe_base_package_name,
@@ -331,7 +331,7 @@ module Omnibus
           config_files:    config_files,
           files:           files,
           build_dir:       build_dir,
-          platform_family: Ohai['platform_family']
+          platform_family: Ohai["platform_family"],
         }
       )
     end
@@ -344,25 +344,25 @@ module Omnibus
     # @return [void]
     #
     def create_rpm_file
-      command =  %|fakeroot rpmbuild|
-      command << %| --target #{safe_architecture}|
-      command << %| -bb|
-      command << %| --buildroot #{staging_dir}/BUILD|
-      command << %| --define '_topdir #{staging_dir}'|
+      command =  %{fakeroot rpmbuild}
+      command << %{ --target #{safe_architecture}}
+      command << %{ -bb}
+      command << %{ --buildroot #{staging_dir}/BUILD}
+      command << %{ --define '_topdir #{staging_dir}'}
 
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
 
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
-          home = ENV['HOME']
+          home = ENV["HOME"]
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
 
           # Generate a temporary home directory
           home = Dir.mktmpdir
 
-          render_template(resource_path('rpmmacros.erb'),
+          render_template(resource_path("rpmmacros.erb"),
             destination: "#{home}/.rpmmacros",
             variables: {
               gpg_name: project.maintainer,
@@ -376,7 +376,7 @@ module Omnibus
 
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Creating .rpm file" }
-          shellout!("#{signing_script} \"#{command}\"", environment: { 'HOME' => home })
+          shellout!("#{signing_script} \"#{command}\"", environment: { "HOME" => home })
         end
       else
         log.info(log_key) { "Creating .rpm file" }
@@ -395,11 +395,11 @@ module Omnibus
     # @return [String]
     #
     def build_filepath(path)
-      filepath = rpm_safe('/' + path.gsub("#{build_dir}/", ''))
+      filepath = rpm_safe("/" + path.gsub("#{build_dir}/", ""))
       return if config_files.include?(filepath)
-      full_path = build_dir + filepath.gsub('[%]','%')
+      full_path = build_dir + filepath.gsub("[%]", "%")
       # FileSyncer.glob quotes pathnames that contain spaces, which is a problem on el7
-      full_path.gsub!('"', '')
+      full_path.delete!('"')
       # Mark directories with the %dir directive to prevent rpmbuild from counting their contents twice.
       return mark_filesystem_directories(filepath) if !File.symlink?(full_path) && File.directory?(full_path)
       filepath
@@ -428,7 +428,7 @@ module Omnibus
       directory   = Dir.mktmpdir
       destination = "#{directory}/sign-rpm"
 
-      render_template(resource_path('signing.erb'),
+      render_template(resource_path("signing.erb"),
         destination: destination,
         mode: 0700,
         variables: {
@@ -437,7 +437,7 @@ module Omnibus
       )
 
       # Yield the destination to the block
-      block.call(destination)
+      yield(destination)
     ensure
       remove_file(destination)
       remove_directory(directory)
@@ -474,7 +474,7 @@ module Omnibus
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
-        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
+        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, "-")
 
         log.warn(log_key) do
           "The `name' component of RPM package names can only include " \
@@ -513,8 +513,8 @@ module Omnibus
       #   http://rpm.org/ticket/56
       #
       if version =~ /\-/
-        if Ohai['platform_family'] == 'wrlinux'
-          converted = version.gsub('-', '_') #WRL has an elderly RPM version
+        if Ohai["platform_family"] == "wrlinux"
+          converted = version.tr("-", "_") #WRL has an elderly RPM version
           log.warn(log_key) do
             "Omnibus replaces dashes (-) with tildes (~) so pre-release " \
             "versions get sorted earlier than final versions.  However, the " \
@@ -523,7 +523,7 @@ module Omnibus
             "`#{project.build_version}' to `#{converted}'."
           end
         else
-          converted = version.gsub('-', '~')
+          converted = version.tr("-", "~")
           log.warn(log_key) do
             "Tildes hold special significance in the RPM package versions. " \
             "They mark a version as lower priority in RPM's version compare " \
@@ -533,14 +533,13 @@ module Omnibus
           end
         end
 
-
         version = converted
       end
 
       if version =~ /\A[a-zA-Z0-9\.\+\~]+\z/
         version
       else
-        converted = version.gsub(/[^a-zA-Z0-9\.\+\~]+/, '_')
+        converted = version.gsub(/[^a-zA-Z0-9\.\+\~]+/, "_")
 
         log.warn(log_key) do
           "The `version' component of RPM package names can only include " \
@@ -559,17 +558,17 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      case Ohai['kernel']['machine']
-      when 'i686'
-        'i386'
-      when 'armv6l'
-        if Ohai['platform'] == 'pidora'
-          'armv6hl'
+      case Ohai["kernel"]["machine"]
+      when "i686"
+        "i386"
+      when "armv6l"
+        if Ohai["platform"] == "pidora"
+          "armv6hl"
         else
-          'armv6l'
+          "armv6l"
         end
       else
-        Ohai['kernel']['machine']
+        Ohai["kernel"]["machine"]
       end
     end
   end

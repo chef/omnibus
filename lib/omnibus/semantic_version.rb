@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'mixlib/versioning'
+require "mixlib/versioning"
 
 module Omnibus
   class SemanticVersion

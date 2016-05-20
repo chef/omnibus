@@ -20,7 +20,7 @@ module Omnibus
 
     def measure(label, &block)
       start = Time.now
-      block.call
+      yield
     ensure
       elapsed = Time.now - start
       log.info(log_key) { "#{label}: #{elapsed.to_f.round(4)}s" }

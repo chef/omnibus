@@ -66,7 +66,7 @@ module Omnibus
     #
     def publisher_prefix(val = NULL)
       if null?(val)
-        @publisher_prefix || 'Omnibus'
+        @publisher_prefix || "Omnibus"
       else
         @publisher_prefix = val
       end
@@ -90,8 +90,8 @@ module Omnibus
     #   http://docs.oracle.com/cd/E23824_01/html/E21796/pkg-5.html
     #
     def fmri_package_name
-      version = project.build_version.split(/[^\d]/)[0..2].join('.')
-      platform =  Ohai['platform_version']
+      version = project.build_version.split(/[^\d]/)[0..2].join(".")
+      platform = Ohai["platform_version"]
       "#{safe_base_package_name}@#{version},#{platform}-#{project.build_iteration}"
     end
 
@@ -101,7 +101,7 @@ module Omnibus
     # @return [String]
     #
     def transform_file
-      @transform_file ||= File.join(staging_dir, 'doc-transform')
+      @transform_file ||= File.join(staging_dir, "doc-transform")
     end
 
     #
@@ -110,7 +110,7 @@ module Omnibus
     # @return [String]
     #
     def pkg_metadata_file
-      @pkg_metadata_file ||= File.join(staging_dir, 'gen.manifestfile')
+      @pkg_metadata_file ||= File.join(staging_dir, "gen.manifestfile")
     end
 
     #
@@ -128,7 +128,7 @@ module Omnibus
     # @return [String]
     #
     def repo_dir
-      @repo_dir ||= File.join(staging_dir, 'publish', 'repo')
+      @repo_dir ||= File.join(staging_dir, "publish", "repo")
     end
 
     #
@@ -137,7 +137,7 @@ module Omnibus
     # @return [String]
     #
     def source_dir
-      @source_dir ||= File.join(staging_dir, 'proto_install')
+      @source_dir ||= File.join(staging_dir, "proto_install")
     end
 
     #
@@ -150,7 +150,7 @@ module Omnibus
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
-        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
+        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, "-")
 
         log.warn(log_key) do
           "The `name' component of IPS package names can only include " \
@@ -169,11 +169,11 @@ module Omnibus
     #
     def safe_architecture
       if intel?
-        'i386'
+        "i386"
       elsif sparc?
-        'sparc'
+        "sparc"
       else
-        Ohai['kernel']['machine']
+        Ohai["kernel"]["machine"]
       end
     end
 
@@ -184,10 +184,10 @@ module Omnibus
     # @return [void]
     #
     def write_transform_file
-      render_template(resource_path('doc-transform.erb'),
+      render_template(resource_path("doc-transform.erb"),
         destination: transform_file,
         variables: {
-          pathdir: project.install_dir.split('/')[1],
+          pathdir: project.install_dir.split("/")[1],
         }
       )
     end
@@ -200,7 +200,7 @@ module Omnibus
     # @return [void]
     #
     def write_pkg_metadata
-      render_template(resource_path('gen.manifestfile.erb'),
+      render_template(resource_path("gen.manifestfile.erb"),
         destination: pkg_metadata_file,
         variables: {
           name:              safe_base_package_name,
@@ -264,7 +264,7 @@ module Omnibus
     def publish_ips_pkg
       shellout!("pkgrepo -s #{repo_dir} set publisher/prefix=#{publisher_prefix}")
       shellout!("pkgsend publish -s #{repo_dir} -d #{source_dir} #{pkg_manifest_file}.4.res")
-      log.info(log_key) { "Published IPS package to repo: #{repo_dir}"}
+      log.info(log_key) { "Published IPS package to repo: #{repo_dir}" }
 
       repo_info = shellout("pkg list -afv -g #{repo_dir}").stdout
       log.debug(log_key) do
@@ -286,7 +286,7 @@ module Omnibus
       # The destination file cannot already exist
       File.delete(package_path) if File.exist?(package_path)
       shellout!("pkgrecv -s #{repo_dir} -a -d #{package_path} #{safe_base_package_name}")
-      log.info(log_key) { "Exported IPS package archive: #{package_path}"}
+      log.info(log_key) { "Exported IPS package archive: #{package_path}" }
 
       list_pkgarchive = shellout("pkgrepo list -s #{package_path} '*@latest'").stdout
       log.debug(log_key) do

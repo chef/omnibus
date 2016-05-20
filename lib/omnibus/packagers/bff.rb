@@ -19,12 +19,12 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  'Pre-installation Script',
-      postinst: 'Post-installation Script',
-      config:   'Configuration Script',
-      unconfig: 'Unconfiguration Script',
-      prerm:    'Pre_rm Script',
-      postrm:   'Unconfiguration Script',
+      preinst:  "Pre-installation Script",
+      postinst: "Post-installation Script",
+      config:   "Configuration Script",
+      unconfig: "Unconfiguration Script",
+      prerm:    "Pre_rm Script",
+      postrm:   "Unconfiguration Script",
     }.freeze
 
     id :bff
@@ -63,7 +63,7 @@ module Omnibus
     # @return [String]
     #
     def scripts_install_dir
-      File.expand_path(File.join(project.install_dir, 'embedded/share/installp'))
+      File.expand_path(File.join(project.install_dir, "embedded/share/installp"))
     end
 
     #
@@ -129,7 +129,6 @@ module Omnibus
     #   Unconfiguration Script: /path/script
     #
     def write_gen_template
-
       # Get a list of all files
       files = FileSyncer.glob("#{staging_dir}/**/*").reject do |path|
         # remove any files with spaces.
@@ -141,36 +140,36 @@ module Omnibus
       files.map! do |path|
         # If paths have colons or commas, rename them and add them to a post-install,
         # post-sysck renaming script ('config') which is created if needed
-        if path.match(/:|,/)
-          alt = path.gsub(/(:|,)/, '__')
+        if path =~ /:|,/
+          alt = path.gsub(/(:|,)/, "__")
           log.debug(log_key) { "Renaming #{path} to #{alt}" }
 
           File.rename(path, alt) if File.exists?(path)
 
           # Create a config script if needed based on resources/bff/config.erb
-          config_script_path = File.join(scripts_staging_dir, 'config')
+          config_script_path = File.join(scripts_staging_dir, "config")
           unless File.exists? config_script_path
-            render_template(resource_path('config.erb'),
+            render_template(resource_path("config.erb"),
               destination: "#{scripts_staging_dir}/config",
               variables: {
-                name: project.name
+                name: project.name,
               }
             )
           end
 
-          File.open(File.join(scripts_staging_dir, 'config'), 'a') do |file|
+          File.open(File.join(scripts_staging_dir, "config"), "a") do |file|
             file.puts "mv '#{alt.gsub(/^#{staging_dir}/, '')}' '#{path.gsub(/^#{staging_dir}/, '')}'"
           end
 
           path = alt
         end
 
-        path.gsub(/^#{staging_dir}/, '')
+        path.gsub(/^#{staging_dir}/, "")
       end
 
       # Create a map of scripts that exist to inject into the template
       scripts = SCRIPT_MAP.inject({}) do |hash, (script, installp_key)|
-        staging_path =  File.join(scripts_staging_dir, script.to_s)
+        staging_path = File.join(scripts_staging_dir, script.to_s)
 
         if File.file?(staging_path)
           hash[installp_key] = staging_path
@@ -180,8 +179,8 @@ module Omnibus
         hash
       end
 
-      render_template(resource_path('gen.template.erb'),
-        destination: File.join(staging_dir, 'gen.template'),
+      render_template(resource_path("gen.template.erb"),
+        destination: File.join(staging_dir, "gen.template"),
         variables: {
           name:           safe_base_package_name,
           install_dir:    project.install_dir,
@@ -194,7 +193,7 @@ module Omnibus
       )
 
       # Print the full contents of the rendered template file for mkinstallp's use
-      log.debug(log_key) { "Rendered Template:\n" + File.read(File.join(staging_dir, 'gen.template')) }
+      log.debug(log_key) { "Rendered Template:\n" + File.read(File.join(staging_dir, "gen.template")) }
     end
 
     #
@@ -233,7 +232,7 @@ module Omnibus
       end
 
       # Copy the resulting package up to the package_dir
-      FileSyncer.glob(File.join(staging_dir, 'tmp/*.bff')).each do |bff|
+      FileSyncer.glob(File.join(staging_dir, "tmp/*.bff")).each do |bff|
         copy_file(bff, File.join(Config.package_dir, create_bff_file_name))
       end
 
@@ -258,7 +257,6 @@ module Omnibus
       "#{safe_base_package_name}-#{project.build_version}-#{project.build_iteration}.#{safe_architecture}.bff"
     end
 
-
     #
     # Return the BFF-ready base package name, converting any invalid characters to
     # dashes (+-+).
@@ -269,7 +267,7 @@ module Omnibus
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
-        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, '-')
+        converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, "-")
 
         log.warn(log_key) do
           "The `name' component of BFF package names can only include " \
@@ -293,7 +291,7 @@ module Omnibus
     # @return [String]
     #
     def bff_version
-      version = project.build_version.split(/[^\d]/)[0..2].join('.')
+      version = project.build_version.split(/[^\d]/)[0..2].join(".")
       "#{version}.#{project.build_iteration}"
     end
 
@@ -303,7 +301,7 @@ module Omnibus
     # @return [String]
     #
     def safe_architecture
-      Ohai['kernel']['machine']
+      Ohai["kernel"]["machine"]
     end
   end
 end

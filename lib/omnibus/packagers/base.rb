@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'fileutils'
+require "fileutils"
 
 module Omnibus
   class Packager::Base
@@ -99,12 +99,12 @@ module Omnibus
     # @return [Array<String>]
     #
     def exclusions
-      project.exclusions + %w(
+      project.exclusions + %w{
         **/.git
         **/.hg
         **/.svn
         **/.gitkeep
-      )
+      }
     end
 
     #

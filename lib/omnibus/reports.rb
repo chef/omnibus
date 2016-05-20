@@ -39,7 +39,7 @@ module Omnibus
     end
 
     def pretty_version_map(project)
-      out = ''
+      out = ""
       version_map = project.library.version_map
 
       # Pull out data to print out
@@ -52,20 +52,20 @@ module Omnibus
       overridden_versions = non_nil_values(version_map.values.select { |v| v[:overridden] }, :default_version)
 
       # Determine how wide the printed table columns need to be
-      name_width = column_width(version_map.keys, 'Component')
-      version_width = column_width(versions, 'Installed Version')
-      guid_width = column_width(guids, 'Version GUID')
-      override_width = column_width(overridden_versions, 'Overridden From')
+      name_width = column_width(version_map.keys, "Component")
+      version_width = column_width(versions, "Installed Version")
+      guid_width = column_width(guids, "Version GUID")
+      override_width = column_width(overridden_versions, "Overridden From")
 
       total_width = name_width + version_width + guid_width + override_width
-      divider = '-' * total_width
+      divider = "-" * total_width
 
       # Print out the column headers
-      out << 'Component'.ljust(name_width)
-      out << 'Installed Version'.ljust(version_width)
-      out << 'Version GUID'.ljust(guid_width)
+      out << "Component".ljust(name_width)
+      out << "Installed Version".ljust(version_width)
+      out << "Version GUID".ljust(guid_width)
       # Only print out column if something was overridden
-      out << 'Overridden From'.ljust(override_width) if override_width > 0
+      out << "Overridden From".ljust(override_width) if override_width > 0
       out << "\n"
       out << divider << "\n"
 

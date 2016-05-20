@@ -7,8 +7,8 @@ module Omnibus
     let(:license_file) { nil }
     let(:zlib_version_override) { nil }
 
-    let(:install_dir) { File.join(tmp_path, "install_dir")}
-    let(:software_project_dir) { File.join(tmp_path, "software_project_dir")}
+    let(:install_dir) { File.join(tmp_path, "install_dir") }
+    let(:software_project_dir) { File.join(tmp_path, "software_project_dir") }
 
     let(:expected_project_license_path) { "LICENSE" }
     let(:expected_project_license) { "Unspecified" }
@@ -86,12 +86,12 @@ module Omnibus
 
     let(:project) do
       Project.new.tap do |project|
-        project.name('test-project')
+        project.name("test-project")
         project.install_dir(install_dir)
         project.license(license) unless license.nil?
         project.license_file_path(license_file_path) unless license_file_path.nil?
         project.license_file(license_file) unless license_file.nil?
-        project.build_version('1.2.3')
+        project.build_version("1.2.3")
         if zlib_version_override
           project.override :zlib, version: zlib_version_override
         end
@@ -99,20 +99,20 @@ module Omnibus
     end
 
     let(:private_code) do
-      Software.new(project, 'private_code.rb').evaluate do
-        name 'private_code'
-        default_version '1.7.2'
+      Software.new(project, "private_code.rb").evaluate do
+        name "private_code"
+        default_version "1.7.2"
       end
     end
 
     let(:zlib) do
-      Software.new(project, 'zlib.rb').evaluate do
-        name 'zlib'
-        default_version '1.7.2'
+      Software.new(project, "zlib.rb").evaluate do
+        name "zlib"
+        default_version "1.7.2"
         license "Zlib"
         license_file "LICENSE"
 
-        version '1.8.0' do
+        version "1.8.0" do
           license "Apache-2.0"
           license_file "APACHE"
         end
@@ -120,9 +120,9 @@ module Omnibus
     end
 
     let(:snoopy) do
-      Software.new(project, 'snoopy.rb').evaluate do
-        name 'snoopy'
-        default_version '1.0.0'
+      Software.new(project, "snoopy.rb").evaluate do
+        name "snoopy"
+        default_version "1.0.0"
         license "GPL v2"
         license_file "http://dev.perl.org/licenses/artistic.html"
         license_file "NOTICE"
@@ -130,9 +130,9 @@ module Omnibus
     end
 
     let(:preparation) do
-      Software.new(project, 'preparation.rb').evaluate do
-        name 'preparation'
-        default_version '1.0.0'
+      Software.new(project, "preparation.rb").evaluate do
+        name "preparation"
+        default_version "1.0.0"
         license :project_license
       end
     end
@@ -193,9 +193,9 @@ module Omnibus
 
     describe "with a local license file that does not exist" do
       let(:software_with_warnings) do
-        Software.new(project, 'problematic.rb').evaluate do
-          name 'problematic'
-          default_version '0.10.2'
+        Software.new(project, "problematic.rb").evaluate do
+          name "problematic"
+          default_version "0.10.2"
           license_file "NOT_EXISTS"
         end
       end
@@ -214,9 +214,9 @@ module Omnibus
       end
 
       let(:software_with_warnings) do
-        Software.new(project, 'problematic.rb').evaluate do
-          name 'problematic'
-          default_version '0.10.2'
+        Software.new(project, "problematic.rb").evaluate do
+          name "problematic"
+          default_version "0.10.2"
           license_file "https://downloads.chef.io/LICENSE"
         end
       end
@@ -232,9 +232,9 @@ module Omnibus
 
     describe "with a software with no license files" do
       let(:software_with_warnings) do
-        Software.new(project, 'problematic.rb').evaluate do
-          name 'problematic'
-          default_version '0.10.2'
+        Software.new(project, "problematic.rb").evaluate do
+          name "problematic"
+          default_version "0.10.2"
           license "Zlib"
         end
       end
@@ -268,7 +268,7 @@ module Omnibus
       end
 
       it "fails the omnibus build" do
-        expect{create_licenses}.to raise_error(Omnibus::LicensingError, /Project 'test-project' does not contain licensing information.\s{1,}Software 'private_code' does not contain licensing information./)
+        expect { create_licenses }.to raise_error(Omnibus::LicensingError, /Project 'test-project' does not contain licensing information.\s{1,}Software 'private_code' does not contain licensing information./)
       end
     end
   end

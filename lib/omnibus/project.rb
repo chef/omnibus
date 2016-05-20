@@ -15,11 +15,11 @@
 # limitations under the License.
 #
 
-require 'time'
-require 'ffi_yajl'
-require 'omnibus/manifest'
-require 'omnibus/manifest_entry'
-require 'omnibus/reports'
+require "time"
+require "ffi_yajl"
+require "omnibus/manifest"
+require "omnibus/manifest_entry"
+require "omnibus/reports"
 
 module Omnibus
   class Project
@@ -30,7 +30,7 @@ module Omnibus
       #
       # @return [Project]
       #
-      def load(name, manifest=nil)
+      def load(name, manifest = nil)
         loaded_projects[name] ||= begin
           filepath = Omnibus.project_path(name)
 
@@ -77,7 +77,7 @@ module Omnibus
     include Sugarable
     include Util
 
-    def initialize(filepath = nil, manifest=nil)
+    def initialize(filepath = nil, manifest = nil)
       @filepath = filepath
       @manifest = manifest
     end
@@ -105,7 +105,7 @@ module Omnibus
     #
     def name(val = NULL)
       if null?(val)
-        @name || raise(MissingRequiredAttribute.new(self, :name, 'hamlet'))
+        @name || raise(MissingRequiredAttribute.new(self, :name, "hamlet"))
       else
         @name = val
       end
@@ -177,9 +177,9 @@ module Omnibus
     #
     def install_dir(val = NULL)
       if null?(val)
-        @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, '/opt/chef'))
+        @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, "/opt/chef"))
       else
-        @install_dir = val.gsub('\\', '/').squeeze('/').chomp('/')
+        @install_dir = val.tr('\\', "/").squeeze("/").chomp("/")
       end
     end
     expose :install_dir
@@ -197,9 +197,9 @@ module Omnibus
     #
     def default_root
       if windows?
-        'C:'
+        "C:"
       else
-        '/opt'
+        "/opt"
       end
     end
     expose :default_root
@@ -235,7 +235,7 @@ module Omnibus
     #
     def maintainer(val = NULL)
       if null?(val)
-        @maintainer || raise(MissingRequiredAttribute.new(self, :maintainer, 'Chef Software, Inc.'))
+        @maintainer || raise(MissingRequiredAttribute.new(self, :maintainer, "Chef Software, Inc."))
       else
         @maintainer = val
       end
@@ -258,7 +258,7 @@ module Omnibus
     #
     def homepage(val = NULL)
       if null?(val)
-        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, 'https://www.getchef.com'))
+        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, "https://www.getchef.com"))
       else
         @homepage = val
       end
@@ -367,7 +367,7 @@ module Omnibus
     #
     def build_version(val = NULL, &block)
       if block && !null?(val)
-        raise Error, 'You cannot specify additional parameters to ' \
+        raise Error, "You cannot specify additional parameters to " \
           '#build_version when a block is given!'
       end
 
@@ -382,7 +382,6 @@ module Omnibus
       end
     end
     expose :build_version
-
 
     #
     # Set or retrieve the git revision of the omnibus
@@ -437,7 +436,7 @@ module Omnibus
     #
     def package(id, &block)
       unless block
-        raise InvalidValue.new(:package, 'have a block')
+        raise InvalidValue.new(:package, "have a block")
       end
 
       packagers[id] << block
@@ -490,7 +489,7 @@ module Omnibus
     #
     def package_user(val = NULL)
       if null?(val)
-        @package_user || 'root'
+        @package_user || "root"
       else
         @package_user = val
       end
@@ -537,7 +536,7 @@ module Omnibus
     #
     def package_group(val = NULL)
       if null?(val)
-        @package_group || Ohai['root_group'] || 'root'
+        @package_group || Ohai["root_group"] || "root"
       else
         @package_group = val
       end
@@ -711,7 +710,7 @@ module Omnibus
     #
     def license(val = NULL)
       if null?(val)
-        @license || 'Unspecified'
+        @license || "Unspecified"
       else
         @license = val
       end
@@ -776,7 +775,7 @@ module Omnibus
       if null?(path)
         @json_manifest_path || File.join(install_dir, "version-manifest.json")
       else
-        @json_manifest_path=path
+        @json_manifest_path = path
       end
     end
     expose :json_manifest_path
@@ -1086,7 +1085,7 @@ module Omnibus
     end
 
     def write_json_manifest
-      File.open(json_manifest_path, 'w') do |f|
+      File.open(json_manifest_path, "w") do |f|
         f.write(FFI_Yajl::Encoder.encode(built_manifest.to_hash, pretty: true))
       end
     end
@@ -1097,7 +1096,7 @@ module Omnibus
     # omnibus-software.
     #
     def write_text_manifest
-      File.open(text_manifest_path, 'w') do |f|
+      File.open(text_manifest_path, "w") do |f|
         f.puts "#{name} #{build_version}"
         f.puts ""
         f.puts Omnibus::Reports.pretty_version_map(self)
@@ -1118,7 +1117,7 @@ module Omnibus
     #
     #
     def package_me
-      destination = File.expand_path('pkg', Config.project_root)
+      destination = File.expand_path("pkg", Config.project_root)
 
       # Create the destination directory
       unless File.directory?(destination)
@@ -1145,7 +1144,7 @@ module Omnibus
     #
     #
     def compress_me
-      destination = File.expand_path('pkg', Config.project_root)
+      destination = File.expand_path("pkg", Config.project_root)
 
       # Create the destination directory
       unless File.directory?(destination)
@@ -1213,7 +1212,7 @@ module Omnibus
         if filepath && File.exist?(filepath)
           update_with_file_contents(digest, filepath)
         else
-          update_with_string(digest, '<DYNAMIC>')
+          update_with_string(digest, "<DYNAMIC>")
         end
 
         digest.hexdigest

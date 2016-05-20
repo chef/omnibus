@@ -46,9 +46,9 @@ module Omnibus
     #   git checkout/clean.
     #
     def clean
-      log.info(log_key) { 'Cleaning existing clone' }
+      log.info(log_key) { "Cleaning existing clone" }
       git_checkout
-      git('clean -fdx')
+      git("clean -fdx")
       true
     end
 
@@ -114,7 +114,7 @@ module Omnibus
     # @return [true, false]
     #
     def dir_empty?(dir)
-      Dir.entries(dir).reject {|d| ['.', '..'].include?(d) }.empty?
+      Dir.entries(dir).reject { |d| [".", ".."].include?(d) }.empty?
     end
 
     #
@@ -164,7 +164,7 @@ module Omnibus
     #
     def git_fetch
       fetch_cmd = "fetch #{source_url} #{described_version}"
-      fetch_cmd << ' --recurse-submodules=on-demand' if clone_submodules?
+      fetch_cmd << " --recurse-submodules=on-demand" if clone_submodules?
       git(fetch_cmd)
     end
 
@@ -174,7 +174,7 @@ module Omnibus
     # @return [String]
     #
     def current_revision
-      cmd = git('rev-parse HEAD')
+      cmd = git("rev-parse HEAD")
       cmd.stdout.strip
     rescue CommandFailed
       log.debug(log_key) { "unable to determine current revision" }
@@ -188,7 +188,7 @@ module Omnibus
     #
     def contains_revision?(rev)
       cmd = git("cat-file -t #{rev}")
-      cmd.stdout.strip == 'commit'
+      cmd.stdout.strip == "commit"
     rescue CommandFailed
       log.debug(log_key) { "unable to determine presence of commit #{rev}" }
       false
@@ -230,7 +230,7 @@ module Omnibus
         # Only when the service is specifically configured with
         # uploadpack.allowReachableSHA1InWant is there any guarantee that it
         # considers "naked" wants.
-        log.warn(log_key) { 'git fetch on a sha1 is not guaranteed to work' }
+        log.warn(log_key) { "git fetch on a sha1 is not guaranteed to work" }
         log.warn(log_key) { "Specify a ref name instead of #{ref} on #{source}" }
         ref
       else

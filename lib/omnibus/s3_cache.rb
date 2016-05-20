@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require 'fileutils'
-require 'omnibus/s3_helpers'
+require "fileutils"
+require "omnibus/s3_helpers"
 
 module Omnibus
   class S3Cache
@@ -76,14 +76,14 @@ module Omnibus
           log.info(log_key) do
             "Caching '#{fetcher.downloaded_file}' to '#{Config.s3_bucket}/#{key}'"
           end
-          
+
           # Fetcher has already verified the downloaded file in software.fetch.
           # Compute the md5 from scratch because the fetcher may have been
           # specified with a different hashing algorithm.
           md5 = digest(fetcher.downloaded_file, :md5)
 
-          File.open(fetcher.downloaded_file, 'rb') do |file|
-            store_object(key, file, md5, 'public-read')
+          File.open(fetcher.downloaded_file, "rb") do |file|
+            store_object(key, file, md5, "public-read")
           end
         end
 
@@ -126,7 +126,7 @@ module Omnibus
         end
 
         unless software.fetcher.checksum
-          raise InsufficientSpecification.new('source md5 checksum', software)
+          raise InsufficientSpecification.new("source md5 checksum", software)
         end
 
         "#{software.name}-#{software.version}-#{software.fetcher.checksum}"
@@ -139,7 +139,7 @@ module Omnibus
           region:               Config.s3_region,
           access_key_id:        Config.s3_access_key,
           secret_access_key:    Config.s3_secret_key,
-          bucket_name:          Config.s3_bucket
+          bucket_name:          Config.s3_bucket,
         }
       end
 

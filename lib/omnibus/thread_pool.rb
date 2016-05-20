@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-require 'thread'
+require "thread"
 
 module Omnibus
   class ThreadPool

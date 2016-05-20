@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require 'rubygems/package'
-require 'zlib'
+require "rubygems/package"
+require "zlib"
 
 module Omnibus
   class Compressor::TGZ < Compressor::Base
@@ -51,11 +51,11 @@ module Omnibus
         @compression_level || Zlib::BEST_COMPRESSION
       else
         unless val.is_a?(Integer)
-          raise InvalidValue.new(:compression_level, 'be an Integer')
+          raise InvalidValue.new(:compression_level, "be an Integer")
         end
 
         unless val.between?(1, 9)
-          raise InvalidValue.new(:compression_level, 'be between 1-9')
+          raise InvalidValue.new(:compression_level, "be between 1-9")
         end
 
         @compression_level = val
@@ -85,7 +85,7 @@ module Omnibus
       contents = gzipped_tarball
 
       # Write the .tar.gz into the staging directory
-      File.open("#{staging_dir}/#{package_name}", 'wb') do |tgz|
+      File.open("#{staging_dir}/#{package_name}", "wb") do |tgz|
         while chunk = contents.read(1024)
           tgz.write(chunk)
         end
@@ -103,14 +103,14 @@ module Omnibus
     # @return [StringIO]
     #
     def tarball
-      tarfile = StringIO.new('')
+      tarfile = StringIO.new("")
       Gem::Package::TarWriter.new(tarfile) do |tar|
         path = "#{staging_dir}/#{packager.package_name}"
         name = packager.package_name
         mode = File.stat(path).mode
 
         tar.add_file(name, mode) do |tf|
-          File.open(path, 'rb') do |file|
+          File.open(path, "rb") do |file|
             tf.write(file.read)
           end
         end
@@ -128,7 +128,7 @@ module Omnibus
     # @return [StringIO]
     #
     def gzipped_tarball
-      gz = StringIO.new('')
+      gz = StringIO.new("")
       z = Zlib::GzipWriter.new(gz, compression_level)
       z.write(tarball.string)
       z.close

@@ -1,23 +1,23 @@
-RSpec.shared_examples 'a software' do |name = 'chefdk'|
-  let(:project_root) { File.join(tmp_path, 'software') }
+RSpec.shared_examples "a software" do |name = "chefdk"|
+  let(:project_root) { File.join(tmp_path, "software") }
 
   let(:name)    { name }
   let(:source)  { nil }
-  let(:version) { '1.0.0' }
+  let(:version) { "1.0.0" }
 
-  let(:build_dir)   { File.join(project_root, 'local', 'build') }
-  let(:cache_dir)   { File.join(project_root, 'local', 'cache') }
-  let(:source_dir)  { File.join(project_root, 'local', 'source') }
-  let(:project_dir) { File.join(source_dir, 'project_dir') }
+  let(:build_dir)   { File.join(project_root, "local", "build") }
+  let(:cache_dir)   { File.join(project_root, "local", "cache") }
+  let(:source_dir)  { File.join(project_root, "local", "source") }
+  let(:project_dir) { File.join(source_dir, "project_dir") }
 
-  let(:patches_dir)   { File.join(project_root, 'config', 'patches', name) }
-  let(:scripts_dir)   { File.join(project_root, 'config', 'scripts', name) }
-  let(:softwares_dir) { File.join(project_root, 'config', 'software', name) }
-  let(:templates_dir) { File.join(project_root, 'config', 'templates', name) }
+  let(:patches_dir)   { File.join(project_root, "config", "patches", name) }
+  let(:scripts_dir)   { File.join(project_root, "config", "scripts", name) }
+  let(:softwares_dir) { File.join(project_root, "config", "software", name) }
+  let(:templates_dir) { File.join(project_root, "config", "templates", name) }
 
-  let(:install_dir)      { File.join(project_root, 'opt', name) }
-  let(:bin_dir)          { File.join(install_dir, 'bin') }
-  let(:embedded_bin_dir) { File.join(install_dir, 'embedded', 'bin') }
+  let(:install_dir)      { File.join(project_root, "opt", name) }
+  let(:bin_dir)          { File.join(install_dir, "bin") }
+  let(:embedded_bin_dir) { File.join(install_dir, "embedded", "bin") }
 
   let(:software) do
     double(Omnibus::Software,
@@ -27,7 +27,7 @@ RSpec.shared_examples 'a software' do |name = 'chefdk'|
       install_dir: install_dir,
       project_dir: project_dir,
       source:      source,
-      overridden?: false,
+      overridden?: false
     )
   end
 

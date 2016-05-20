@@ -31,7 +31,7 @@ module Omnibus
         FileUtils.rm(path) if File.exist?(path)
 
         if block
-          File.open(path, 'wb') { |f| f.write(block.call) }
+          File.open(path, "wb") { |f| f.write(yield) }
         else
           FileUtils.touch(path)
         end
