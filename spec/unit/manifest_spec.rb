@@ -35,7 +35,7 @@ module Omnibus
         second = ManifestEntry.new("wombat", {})
         subject.add("foobar", first)
         subject.add("wombat", second)
-        expect { |b| subject.each &b }.to yield_successive_args(first, second)
+        expect { |b| subject.each(&b) }.to yield_successive_args(first, second)
       end
     end
 

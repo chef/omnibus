@@ -351,7 +351,7 @@ module Omnibus
                           hierarchy.to_a[-2][1]
                         else
                           "WINDOWSVOLUME"
-      end
+                        end
 
       render_template(resource_path("source.wxs.erb"),
         destination: "#{staging_dir}/source.wxs",
