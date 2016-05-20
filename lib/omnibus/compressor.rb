@@ -18,10 +18,10 @@ module Omnibus
   module Compressor
     include Logging
 
-    autoload :Base, 'omnibus/compressors/base'
-    autoload :DMG,  'omnibus/compressors/dmg'
-    autoload :Null, 'omnibus/compressors/null'
-    autoload :TGZ,  'omnibus/compressors/tgz'
+    autoload :Base, "omnibus/compressors/base"
+    autoload :DMG,  "omnibus/compressors/dmg"
+    autoload :Null, "omnibus/compressors/null"
+    autoload :TGZ,  "omnibus/compressors/tgz"
 
     #
     # Determine the best compressor for the current system. This method returns
@@ -36,9 +36,9 @@ module Omnibus
     # @return [~Compressor::Base]
     #
     def for_current_system(compressors)
-      family = Ohai['platform_family']
+      family = Ohai["platform_family"]
 
-      if family == 'mac_os_x'
+      if family == "mac_os_x"
         if compressors.include?(:dmg)
           return DMG
         end

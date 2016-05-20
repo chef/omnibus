@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'singleton'
+require "singleton"
 
 module Omnibus
   class Config
@@ -100,10 +100,10 @@ module Omnibus
     #
     # @return [String]
     default(:base_dir) do
-      if Ohai['platform'] == 'windows'
-        'C:/omnibus-ruby'
+      if Ohai["platform"] == "windows"
+        "C:/omnibus-ruby"
       else
-        '/var/cache/omnibus'
+        "/var/cache/omnibus"
       end
     end
 
@@ -111,39 +111,39 @@ module Omnibus
     # code will be cached.
     #
     # @return [String]
-    default(:cache_dir) { File.join(base_dir, 'cache') }
+    default(:cache_dir) { File.join(base_dir, "cache") }
 
     # The absolute path to the directory on the virtual machine where
     # git caching will occur and software's will be progressively cached.
     #
     # @return [String]
     default(:git_cache_dir) do
-      File.join(base_dir, 'cache', 'git_cache')
+      File.join(base_dir, "cache", "git_cache")
     end
 
     # The absolute path to the directory on the virtual machine where
     # source code will be downloaded.
     #
     # @return [String]
-    default(:source_dir) { File.join(base_dir, 'src') }
+    default(:source_dir) { File.join(base_dir, "src") }
 
     # The absolute path to the directory on the virtual machine where
     # software will be built.
     #
     # @return [String]
-    default(:build_dir) { File.join(base_dir, 'build') }
+    default(:build_dir) { File.join(base_dir, "build") }
 
     # The absolute path to the directory on the virtual machine where
     # packages will be constructed.
     #
     # @return [String]
-    default(:package_dir) { File.join(base_dir, 'pkg') }
+    default(:package_dir) { File.join(base_dir, "pkg") }
 
     # @deprecated Do not use this method.
     #
     # @return [String]
     default(:package_tmp) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.package_tmp. This value is no longer used."
       end
     end
@@ -152,13 +152,13 @@ module Omnibus
     # DSL files.  This is relative to {#project_root}.
     #
     # @return [String]
-    default(:project_dir, 'config/projects')
+    default(:project_dir, "config/projects")
 
     # The relative path of the directory containing {Omnibus::Software}
     # DSL files.  This is relative {#project_root}.
     #
     # @return [String]
-    default(:software_dir, 'config/software')
+    default(:software_dir, "config/software")
 
     # The root directory in which to look for {Omnibus::Project} and
     # {Omnibus::Software} DSL files.
@@ -178,7 +178,7 @@ module Omnibus
     #
     # @return [true, false]
     default(:build_dmg) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.build_dmg. This value is no longer part of the " \
         "config and is implied when defining a `compressor' block in the project."
       end
@@ -188,7 +188,7 @@ module Omnibus
     #
     # @return [String]
     default(:dmg_window_bounds) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.dmg_window_bounds. This value is no longer part of the " \
         "config and should be defined in the `compressor' block in the project."
       end
@@ -199,7 +199,7 @@ module Omnibus
     #
     # @return [String]
     default(:dmg_pkg_position) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.dmg_pkg_position. This value is no longer part of the " \
         "config and should be defined in the `compressor' block in the project."
       end
@@ -209,7 +209,7 @@ module Omnibus
     #
     # @return [true, false]
     default(:sign_pkg) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.sign_pkg. This value is no longer part of the config and " \
         "should be defined in the `package' block in the project."
       end
@@ -219,7 +219,7 @@ module Omnibus
     #
     # @return [String]
     default(:signing_identity) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.signing_identity. This value is no longer part of the " \
         "config and should be defined in the `package' block in the project."
       end
@@ -237,7 +237,7 @@ module Omnibus
     #
     # @return [true, false]
     default(:sign_rpm) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.sign_rpm. This value is no longer part of the config and " \
         "should be defined in the `package' block in the project."
       end
@@ -247,7 +247,7 @@ module Omnibus
     #
     # @return [String]
     default(:rpm_signing_passphrase) do
-      Omnibus.logger.deprecated('Config') do
+      Omnibus.logger.deprecated("Config") do
         "Config.rpm_signing_passphrase. This value is no longer part of the " \
         "config and should be defined in the `package' block in the project."
       end
@@ -290,11 +290,11 @@ module Omnibus
     end
 
     # The region of the S3 bucket you want to cache software artifacts in.
-    # Defaults to 'us-east-1'
+    # Defaults to "us-east-1"
     #
     # @return [String]
     default(:s3_region) do
-      'us-east-1'
+      "us-east-1"
     end
 
     # --------------------------------------------------
@@ -437,16 +437,16 @@ module Omnibus
     #
     # @return [Array<String>]
     default(:software_gems) do
-      ['omnibus-software']
+      ["omnibus-software"]
     end
 
     # Solaris linker mapfile to use, if needed
     # see http://docs.oracle.com/cd/E23824_01/html/819-0690/chapter5-1.html
-    # Path is relative to the 'files' directory in your omnibus project
+    # Path is relative to the "files" directory in your omnibus project
     #
     # For example:
     #
-    #     /PATH/files/my_map_file 
+    #     /PATH/files/my_map_file
     #
     # @return [String, nil]
     default(:solaris_linker_mapfile, "files/mapfiles/solaris")
@@ -460,8 +460,8 @@ module Omnibus
     #
     # @return [:x86, :x64]
     default(:windows_arch) do
-      if Ohai['kernel']['machine'] == 'x86_64'
-        Omnibus.logger.deprecated('Config') do
+      if Ohai["kernel"]["machine"] == "x86_64"
+        Omnibus.logger.deprecated("Config") do
           "windows_arch is defaulting to :x86. In Omnibus 5, it will " \
           "default to :x64 if the machine architecture is x86_64. " \
           "If you would like to continue building 32 bit packages, please "\
@@ -502,8 +502,8 @@ module Omnibus
     #
     # @return [Integer]
     default(:workers) do
-      if Ohai['cpu'] && Ohai['cpu']['total']
-        Ohai['cpu']['total'].to_i + 1
+      if Ohai["cpu"] && Ohai["cpu"]["total"]
+        Ohai["cpu"]["total"].to_i + 1
       else
         3
       end

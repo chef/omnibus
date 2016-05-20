@@ -14,13 +14,13 @@
 # limitations under the License.
 #
 
-require 'omnibus/core_extensions'
+require "omnibus/core_extensions"
 
-require 'cleanroom'
-require 'pathname'
+require "cleanroom"
+require "pathname"
 
-require 'omnibus/exceptions'
-require 'omnibus/version'
+require "omnibus/exceptions"
+require "omnibus/version"
 
 module Omnibus
   #
@@ -28,64 +28,64 @@ module Omnibus
   #
   # @return [String]
   #
-  DEFAULT_CONFIG = 'omnibus.rb'.freeze
+  DEFAULT_CONFIG = "omnibus.rb".freeze
 
-  autoload :Builder,          'omnibus/builder'
-  autoload :BuildVersion,     'omnibus/build_version'
-  autoload :BuildVersionDSL,  'omnibus/build_version_dsl'
-  autoload :Cleaner,          'omnibus/cleaner'
-  autoload :Compressor,       'omnibus/compressor'
-  autoload :Config,           'omnibus/config'
-  autoload :Digestable,       'omnibus/digestable'
-  autoload :Error,            'omnibus/exceptions'
-  autoload :Fetcher,          'omnibus/fetcher'
-  autoload :FileSyncer,       'omnibus/file_syncer'
-  autoload :Generator,        'omnibus/generator'
-  autoload :GitCache,         'omnibus/git_cache'
-  autoload :HealthCheck,      'omnibus/health_check'
-  autoload :Instrumentation,  'omnibus/instrumentation'
-  autoload :Library,          'omnibus/library'
-  autoload :Logger,           'omnibus/logger'
-  autoload :Logging,          'omnibus/logging'
-  autoload :Metadata,         'omnibus/metadata'
-  autoload :NullArgumentable, 'omnibus/null_argumentable'
-  autoload :Ohai,             'omnibus/ohai'
-  autoload :Package,          'omnibus/package'
-  autoload :Packager,         'omnibus/packager'
-  autoload :Project,          'omnibus/project'
-  autoload :Publisher,        'omnibus/publisher'
-  autoload :Reports,          'omnibus/reports'
-  autoload :S3Cache,          'omnibus/s3_cache'
-  autoload :Software,         'omnibus/software'
-  autoload :Sugarable,        'omnibus/sugarable'
-  autoload :Templating,       'omnibus/templating'
-  autoload :ThreadPool,       'omnibus/thread_pool'
-  autoload :Util,             'omnibus/util'
-  autoload :Licensing,        'omnibus/licensing'
+  autoload :Builder,          "omnibus/builder"
+  autoload :BuildVersion,     "omnibus/build_version"
+  autoload :BuildVersionDSL,  "omnibus/build_version_dsl"
+  autoload :Cleaner,          "omnibus/cleaner"
+  autoload :Compressor,       "omnibus/compressor"
+  autoload :Config,           "omnibus/config"
+  autoload :Digestable,       "omnibus/digestable"
+  autoload :Error,            "omnibus/exceptions"
+  autoload :Fetcher,          "omnibus/fetcher"
+  autoload :FileSyncer,       "omnibus/file_syncer"
+  autoload :Generator,        "omnibus/generator"
+  autoload :GitCache,         "omnibus/git_cache"
+  autoload :HealthCheck,      "omnibus/health_check"
+  autoload :Instrumentation,  "omnibus/instrumentation"
+  autoload :Library,          "omnibus/library"
+  autoload :Logger,           "omnibus/logger"
+  autoload :Logging,          "omnibus/logging"
+  autoload :Metadata,         "omnibus/metadata"
+  autoload :NullArgumentable, "omnibus/null_argumentable"
+  autoload :Ohai,             "omnibus/ohai"
+  autoload :Package,          "omnibus/package"
+  autoload :Packager,         "omnibus/packager"
+  autoload :Project,          "omnibus/project"
+  autoload :Publisher,        "omnibus/publisher"
+  autoload :Reports,          "omnibus/reports"
+  autoload :S3Cache,          "omnibus/s3_cache"
+  autoload :Software,         "omnibus/software"
+  autoload :Sugarable,        "omnibus/sugarable"
+  autoload :Templating,       "omnibus/templating"
+  autoload :ThreadPool,       "omnibus/thread_pool"
+  autoload :Util,             "omnibus/util"
+  autoload :Licensing,        "omnibus/licensing"
 
-  autoload :GitFetcher,  'omnibus/fetchers/git_fetcher'
-  autoload :NetFetcher,  'omnibus/fetchers/net_fetcher'
-  autoload :NullFetcher, 'omnibus/fetchers/null_fetcher'
-  autoload :PathFetcher, 'omnibus/fetchers/path_fetcher'
+  autoload :GitFetcher,  "omnibus/fetchers/git_fetcher"
+  autoload :NetFetcher,  "omnibus/fetchers/net_fetcher"
+  autoload :NullFetcher, "omnibus/fetchers/null_fetcher"
+  autoload :PathFetcher, "omnibus/fetchers/path_fetcher"
 
-  autoload :ArtifactoryPublisher, 'omnibus/publishers/artifactory_publisher'
-  autoload :NullPublisher,        'omnibus/publishers/null_publisher'
-  autoload :S3Publisher,          'omnibus/publishers/s3_publisher'
+  autoload :ArtifactoryPublisher, "omnibus/publishers/artifactory_publisher"
+  autoload :NullPublisher,        "omnibus/publishers/null_publisher"
+  autoload :S3Publisher,          "omnibus/publishers/s3_publisher"
 
-  autoload :Manifest,      'omnibus/manifest'
-  autoload :ManifestEntry, 'omnibus/manifest_entry'
-  autoload :ManifestDiff,  'omnibus/manifest_diff'
+  autoload :Manifest,      "omnibus/manifest"
+  autoload :ManifestEntry, "omnibus/manifest_entry"
+  autoload :ManifestDiff,  "omnibus/manifest_diff"
 
-  autoload :ChangeLog, 'omnibus/changelog'
-  autoload :GitRepository, 'omnibus/git_repository'
+  autoload :ChangeLog, "omnibus/changelog"
+  autoload :GitRepository, "omnibus/git_repository"
 
-  autoload :SemanticVersion, 'omnibus/semantic_version'
+  autoload :SemanticVersion, "omnibus/semantic_version"
 
   module Command
-    autoload :Base,    'omnibus/cli/base'
-    autoload :Cache,   'omnibus/cli/cache'
-    autoload :Publish, 'omnibus/cli/publish'
-    autoload :ChangeLog, 'omnibus/cli/changelog'
+    autoload :Base,    "omnibus/cli/base"
+    autoload :Cache,   "omnibus/cli/cache"
+    autoload :Publish, "omnibus/cli/publish"
+    autoload :ChangeLog, "omnibus/cli/changelog"
   end
 
   class << self
@@ -120,7 +120,7 @@ module Omnibus
     # The logger for this Omnibus instance.
     #
     # @example
-    #   Omnibus.logger.debug { 'This is a message!' }
+    #   Omnibus.logger.debug { "This is a message!" }
     #
     # @return [Logger]
     #
@@ -169,8 +169,8 @@ module Omnibus
     def which(executable)
       if File.file?(executable) && File.executable?(executable)
         executable
-      elsif ENV['PATH']
-        path = ENV['PATH'].split(File::PATH_SEPARATOR).find do |path|
+      elsif ENV["PATH"]
+        path = ENV["PATH"].split(File::PATH_SEPARATOR).find do |path|
           File.executable?(File.join(path, executable))
         end
 
@@ -207,7 +207,7 @@ module Omnibus
     # @return [Pathname]
     #
     def source_root
-      @source_root ||= Pathname.new(File.expand_path('../..', __FILE__))
+      @source_root ||= Pathname.new(File.expand_path("../..", __FILE__))
     end
 
     #
@@ -271,14 +271,14 @@ module Omnibus
     # extension removed.
     #
     # @example
-    #   { 'foo' => '/path/to/foo' }
+    #   { "foo" => "/path/to/foo" }
     #
     # @return [Hash<String, String>]
     #
     def basename_map(paths)
       paths.inject({}) do |hash, directory|
         Dir.glob("#{directory}/*.rb").each do |path|
-          name = File.basename(path, '.rb')
+          name = File.basename(path, ".rb")
           hash[name] ||= path
         end
 
@@ -293,7 +293,7 @@ module Omnibus
     # encountered a second time, it will be skipped.
     #
     # @example
-    #   { 'preparation' => '/home/omnibus/project/config/software/preparation.rb' }
+    #   { "preparation" => "/home/omnibus/project/config/software/preparation.rb" }
     #
     # @return [Hash<String, String>]
     #
@@ -308,7 +308,7 @@ module Omnibus
     # encountered a second time, it will be skipped.
     #
     # @example
-    #   { 'chefdk' => '/home/omnibus/project/config/projects/chefdk.rb' }
+    #   { "chefdk" => "/home/omnibus/project/config/projects/chefdk.rb" }
     #
     # @return [Hash<String, String>]
     #

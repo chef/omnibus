@@ -32,7 +32,7 @@ module Omnibus
         locked_source: @locked_source,
         source_type: @source_type,
         described_version: @described_version,
-        license: @license
+        license: @license,
       }
     end
 

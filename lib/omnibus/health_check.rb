@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-require 'omnibus/sugarable'
+require "omnibus/sugarable"
 begin
-  require 'pedump'
+  require "pedump"
 rescue LoadError
   STDERR.puts "pedump not found - windows health checks disabled"
 end
@@ -157,7 +157,7 @@ module Omnibus
       /libmd\.so/,
     ].freeze
 
-    IGNORED_ENDINGS = %w(
+    IGNORED_ENDINGS = %w{
       .[ch]
       .e*rb
       .gemspec
@@ -191,14 +191,14 @@ module Omnibus
       README
       Rakefile
       VERSION
-    ).freeze
+    }.freeze
 
-    IGNORED_PATTERNS = %w(
+    IGNORED_PATTERNS = %w{
       /share/doc/
       /share/postgresql/
       /share/terminfo/
       /terminfo/
-    ).freeze
+    }.freeze
 
     class << self
       # @see (HealthCheck#new)
@@ -235,17 +235,17 @@ module Omnibus
     #   if the healthchecks pass
     #
     def run!
-      log.info(log_key) {"Running health on #{project.name}"}
-      bad_libs =  case Ohai['platform']
-                  when 'mac_os_x'
+      log.info(log_key) { "Running health on #{project.name}" }
+      bad_libs =  case Ohai["platform"]
+                  when "mac_os_x"
                     health_check_otool
-                  when 'aix'
+                  when "aix"
                     health_check_aix
-                  when 'windows'
+                  when "windows"
                     # TODO: objdump -p will provided a very limited check of
                     # explicit dependencies on windows. Most dependencies are
                     # implicit and hence not detected.
-                    log.warn(log_key) { 'Skipping dependency health checks on Windows.' }
+                    log.warn(log_key) { "Skipping dependency health checks on Windows." }
                     {}
                   else
                     health_check_ldd
@@ -269,8 +269,8 @@ module Omnibus
           end
         end
 
-        log.error(log_key) { 'Failed!' }
-        bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? 'embedded/lib' }
+        log.error(log_key) { "Failed!" }
+        bad_omnibus_libs, bad_omnibus_bins = bad_libs.keys.partition { |k| k.include? "embedded/lib" }
 
         log.error(log_key) do
           out = "The following libraries have unsafe or unmet dependencies:\n"
@@ -321,8 +321,8 @@ module Omnibus
           out = "The precise failures were:\n"
 
           detail.each do |line|
-            item, dependency, location, count = line.split('|')
-            reason = location =~ /not found/ ? 'Unresolved dependency' : 'Unsafe dependency'
+            item, dependency, location, count = line.split("|")
+            reason = location =~ /not found/ ? "Unresolved dependency" : "Unsafe dependency"
 
             out << "    --> #{item}\n"
             out << "    DEPENDS ON: #{dependency}\n"
@@ -342,7 +342,7 @@ module Omnibus
       conflict_map = relocation_check if relocation_checkable?
 
       if conflict_map.keys.length > 0
-        log.warn(log_key) { 'Multiple dlls with overlapping images detected' }
+        log.warn(log_key) { "Multiple dlls with overlapping images detected" }
 
         conflict_map.each do |lib_name, data|
           base = data[:base]
@@ -381,7 +381,7 @@ module Omnibus
       return false unless windows?
 
       begin
-        require 'pedump'
+        require "pedump"
         true
       rescue LoadError
         false
@@ -403,7 +403,7 @@ module Omnibus
       Dir.glob("#{embedded_bin}/*.dll") do |lib_path|
         log.debug(log_key) { "Analyzing dependencies for #{lib_path}" }
 
-        File.open(lib_path, 'rb') do |f|
+        File.open(lib_path, "rb") do |f|
           dump = PEdump.new(lib_path)
           pe = dump.pe f
 
@@ -418,7 +418,7 @@ module Omnibus
           # This can be done more smartly but O(n^2) is just fine for n = small
           conflict_map.each do |candidate_name, details|
             unless details[:base] >= base + size ||
-                  details[:base] + details[:size] <= base
+                details[:base] + details[:size] <= base
               details[:conflicts] << lib_name
               conflicts << candidate_name
             end
@@ -494,14 +494,14 @@ module Omnibus
 
     #
     # Run healthchecks against ldd.
-    # 
+    #
     # @return [Hash<String, Hash<String, Hash<String, Int>>>]
     #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
     #
     def health_check_ldd
-      regexp_ends = '.*(' + IGNORED_ENDINGS.map { |e| e.gsub(/\./, '\.') }.join('|') + ')$'
-      regexp_patterns = IGNORED_PATTERNS.map { |e| '.*' + e.gsub(/\//, '\/') + '.*' }.join('|')
-      regexp = regexp_ends + '|' + regexp_patterns
+      regexp_ends = ".*(" + IGNORED_ENDINGS.map { |e| e.tr(/\./, "\.") }.join("|") + ")$"
+      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(/\//, "\/") + ".*" }.join("|")
+      regexp = regexp_ends + "|" + regexp_patterns
 
       current_library = nil
       bad_libs = {}
@@ -592,18 +592,18 @@ module Omnibus
     def check_for_bad_library(bad_libs, current_library, name, linked)
       safe = nil
 
-      whitelist_libs = case Ohai['platform']
-                       when 'arch'
+      whitelist_libs = case Ohai["platform"]
+                       when "arch"
                          ARCH_WHITELIST_LIBS
-                       when 'mac_os_x'
+                       when "mac_os_x"
                          MAC_WHITELIST_LIBS
-                       when 'solaris2'
+                       when "solaris2"
                          SOLARIS_WHITELIST_LIBS
-                       when 'smartos'
+                       when "smartos"
                          SMARTOS_WHITELIST_LIBS
-                       when 'freebsd'
+                       when "freebsd"
                          FREEBSD_WHITELIST_LIBS
-                       when 'aix'
+                       when "aix"
                          AIX_WHITELIST_LIBS
                        else
                          WHITELIST_LIBS

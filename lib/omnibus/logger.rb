@@ -28,7 +28,7 @@ module Omnibus
     #
     # @return [Array]
     #
-    LEVELS = %w(UNKNOWN INTERNAL DEBUG INFO WARN ERROR FATAL NOTHING).freeze
+    LEVELS = %w{UNKNOWN INTERNAL DEBUG INFO WARN ERROR FATAL NOTHING}.freeze
 
     #
     # The mutex lock for synchronizing IO writing.
@@ -48,7 +48,7 @@ module Omnibus
     #
     def initialize(io = $stdout)
       @io = io
-      @level = LEVELS.index('WARN')
+      @level = LEVELS.index("WARN")
     end
 
     LEVELS.each.with_index do |level, index|
@@ -66,8 +66,8 @@ module Omnibus
     # @see (Logger#add)
     #
     def deprecated(progname, &block)
-      meta = Proc.new { "DEPRECATED: #{block.call}" }
-      add(LEVELS.index('WARN'), progname, &meta)
+      meta = Proc.new { "DEPRECATED: #{block.yield}" }
+      add(LEVELS.index("WARN"), progname, &meta)
     end
 
     #
@@ -145,9 +145,9 @@ module Omnibus
     #
     def format_severity(severity)
       if severity == 0
-        '_'
+        "_"
       else
-        (LEVELS[severity] || '?')[0]
+        (LEVELS[severity] || "?")[0]
       end
     end
 
@@ -167,7 +167,7 @@ module Omnibus
       def initialize(log, level = :debug)
         @log = log
         @level = level
-        @buffer = ''
+        @buffer = ""
       end
 
       #

@@ -15,11 +15,11 @@
 # limitations under the License.
 #
 
-require 'time'
-require 'ffi_yajl'
-require 'omnibus/manifest'
-require 'omnibus/manifest_entry'
-require 'omnibus/reports'
+require "time"
+require "ffi_yajl"
+require "omnibus/manifest"
+require "omnibus/manifest_entry"
+require "omnibus/reports"
 
 module Omnibus
   class Project
@@ -30,7 +30,7 @@ module Omnibus
       #
       # @return [Project]
       #
-      def load(name, manifest=nil)
+      def load(name, manifest = nil)
         loaded_projects[name] ||= begin
           filepath = Omnibus.project_path(name)
 
@@ -77,7 +77,7 @@ module Omnibus
     include Sugarable
     include Util
 
-    def initialize(filepath = nil, manifest=nil)
+    def initialize(filepath = nil, manifest = nil)
       @filepath = filepath
       @manifest = manifest
     end
@@ -93,7 +93,7 @@ module Omnibus
     # **[Required]** Set or retrieve the name of the project.
     #
     # @example
-    #   name 'chef'
+    #   name "chef"
     #
     # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
@@ -105,7 +105,7 @@ module Omnibus
     #
     def name(val = NULL)
       if null?(val)
-        @name || raise(MissingRequiredAttribute.new(self, :name, 'hamlet'))
+        @name || raise(MissingRequiredAttribute.new(self, :name, "hamlet"))
       else
         @name = val
       end
@@ -117,7 +117,7 @@ module Omnibus
     # capitalized name if not specified.
     #
     # @example
-    #   friendly_name 'Chef'
+    #   friendly_name "Chef"
     #
     # @param [String] val
     #   the name to set
@@ -138,7 +138,7 @@ module Omnibus
     # name defaults to the project name.
     #
     # @example
-    #   package_name 'com.chef.project'
+    #   package_name "com.chef.project"
     #
     # @param [String] val
     #   the package name to set
@@ -165,7 +165,7 @@ module Omnibus
     # interpolation.
     #
     # @example
-    #   install_dir '/opt/chef'
+    #   install_dir "/opt/chef"
     #
     # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
@@ -177,9 +177,9 @@ module Omnibus
     #
     def install_dir(val = NULL)
       if null?(val)
-        @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, '/opt/chef'))
+        @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, "/opt/chef"))
       else
-        @install_dir = val.gsub('\\', '/').squeeze('/').chomp('/')
+        @install_dir = val.tr("\\", "/").squeeze("/").chomp("/")
       end
     end
     expose :install_dir
@@ -197,9 +197,9 @@ module Omnibus
     #
     def default_root
       if windows?
-        'C:'
+        "C:"
       else
-        '/opt'
+        "/opt"
       end
     end
     expose :default_root
@@ -209,7 +209,7 @@ module Omnibus
     # contain arbitrary files used by the project.
     #
     # @example
-    #   patch = File.join(files_path, 'rubygems', 'patch.rb')
+    #   patch = File.join(files_path, "rubygems", "patch.rb")
     #
     # @return [String]
     #   path to the files directory
@@ -223,7 +223,7 @@ module Omnibus
     # **[Required]** Set or retrieve the the package maintainer.
     #
     # @example
-    #   maintainer 'Chef Software, Inc.'
+    #   maintainer "Chef Software, Inc."
     #
     # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
@@ -235,7 +235,7 @@ module Omnibus
     #
     def maintainer(val = NULL)
       if null?(val)
-        @maintainer || raise(MissingRequiredAttribute.new(self, :maintainer, 'Chef Software, Inc.'))
+        @maintainer || raise(MissingRequiredAttribute.new(self, :maintainer, "Chef Software, Inc."))
       else
         @maintainer = val
       end
@@ -246,7 +246,7 @@ module Omnibus
     # **[Required]** Set or retrive the package homepage.
     #
     # @example
-    #   homepage 'https://www.getchef.com'
+    #   homepage "https://www.getchef.com"
     #
     # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
@@ -258,7 +258,7 @@ module Omnibus
     #
     def homepage(val = NULL)
       if null?(val)
-        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, 'https://www.getchef.com'))
+        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, "https://www.getchef.com"))
       else
         @homepage = val
       end
@@ -269,7 +269,7 @@ module Omnibus
     # Set or retrieve the project description.
     #
     # @example
-    #   description 'This is my description'
+    #   description "This is my description"
     #
     # @param [String] val
     #   the project description
@@ -293,7 +293,7 @@ module Omnibus
     # cause RPM upgrades to fail.**
     #
     # @example
-    #   replace 'the-old-package'
+    #   replace "the-old-package"
     #
     # @param [String] val
     #   the name of the package to replace
@@ -310,8 +310,8 @@ module Omnibus
     # Add to the list of packages this one conflicts with.
     #
     # @example
-    #   conflicts 'foo'
-    #   conflicts 'bar'
+    #   conflicts "foo"
+    #   conflicts "bar"
     #
     # @param [String] val
     #   the conflict to add
@@ -329,7 +329,7 @@ module Omnibus
     # Set or retrieve the version of the project.
     #
     # @example Using a string
-    #   build_version '1.0.0'
+    #   build_version "1.0.0"
     #
     # @example From git
     #   build_version do
@@ -338,12 +338,12 @@ module Omnibus
     #
     # @example From the version of a dependency
     #   build_version do
-    #     source :version, from_dependency: 'chef'
+    #     source :version, from_dependency: "chef"
     #   end
     #
     # @example From git of a dependency
     #   build_version do
-    #     source :git, from_dependency: 'chef'
+    #     source :git, from_dependency: "chef"
     #   end
     #
     # When using the +:git+ source, by default the output format of the
@@ -351,7 +351,7 @@ module Omnibus
     # parameter to any of the methods of +BuildVersion+. For example:
     #
     #   build version do
-    #     source :git, from_dependency: 'chef'
+    #     source :git, from_dependency: "chef"
     #     output_format :git_describe
     #   end
     #
@@ -367,8 +367,8 @@ module Omnibus
     #
     def build_version(val = NULL, &block)
       if block && !null?(val)
-        raise Error, 'You cannot specify additional parameters to ' \
-          '#build_version when a block is given!'
+        raise Error, "You cannot specify additional parameters to " \
+          "#build_version when a block is given!"
       end
 
       if block
@@ -382,7 +382,6 @@ module Omnibus
       end
     end
     expose :build_version
-
 
     #
     # Set or retrieve the git revision of the omnibus
@@ -429,7 +428,7 @@ module Omnibus
     #
     # @example
     #   package :id do
-    #     key 'value'
+    #     key "value"
     #   end
     #
     # @param [Symbol] id
@@ -437,7 +436,7 @@ module Omnibus
     #
     def package(id, &block)
       unless block
-        raise InvalidValue.new(:package, 'have a block')
+        raise InvalidValue.new(:package, "have a block")
       end
 
       packagers[id] << block
@@ -452,7 +451,7 @@ module Omnibus
     #
     # @example With customization
     #   compress :dmg do
-    #     window_bounds '10, 20, 30, 40'
+    #     window_bounds "10, 20, 30, 40"
     #   end
     #
     # @example Without customization
@@ -481,7 +480,7 @@ module Omnibus
     # Defaults to +"root"+.
     #
     # @example
-    #   package_user 'build'
+    #   package_user "build"
     #
     # @param [String] val
     #   the user to use for the package build
@@ -490,7 +489,7 @@ module Omnibus
     #
     def package_user(val = NULL)
       if null?(val)
-        @package_user || 'root'
+        @package_user || "root"
       else
         @package_user = val
       end
@@ -503,7 +502,7 @@ module Omnibus
     # set all the overrides for a given software definition.
     #
     # @example
-    #   override 'chef', version: '1.2.3'
+    #   override "chef", version: "1.2.3"
     #
     # @param [Hash] val
     #   the value to override
@@ -524,11 +523,11 @@ module Omnibus
     # operating system and may  be ignored if the underlying packager does not
     # support it.
     #
-    # Defaults to +Ohai['root_group']+. If +Ohai['root_group']+ is +nil+, it
+    # Defaults to +Ohai["root_group"]+. If +Ohai["root_group"]+ is +nil+, it
     # defaults to +"root"+.
     #
     # @example
-    #   package_group 'build'
+    #   package_group "build"
     #
     # @param [String] val
     #   the group to use for the package build
@@ -537,7 +536,7 @@ module Omnibus
     #
     def package_group(val = NULL)
       if null?(val)
-        @package_group || Ohai['root_group'] || 'root'
+        @package_group || Ohai["root_group"] || "root"
       else
         @package_group = val
       end
@@ -548,7 +547,7 @@ module Omnibus
     # Set or retrieve the path to the resources on disk for use in packagers.
     #
     # @example
-    #   resources_path '/path/to/resources'
+    #   resources_path "/path/to/resources"
     #
     # @param [String] val
     #   the path where resources live
@@ -590,8 +589,8 @@ module Omnibus
     # instead.
     #
     # @example
-    #   dependency 'foo'
-    #   dependency 'bar'
+    #   dependency "foo"
+    #   dependency "bar"
     #
     # @param [String] val
     #   the name of a Software dependency
@@ -612,7 +611,7 @@ module Omnibus
     # a software definition.
     #
     # @example
-    #   runtime_dependency 'foo'
+    #   runtime_dependency "foo"
     #
     # @param [String] val
     #   the name of the runtime dependency
@@ -631,7 +630,7 @@ module Omnibus
     # when making the package.
     #
     # @example
-    #   exclude '.git'
+    #   exclude ".git"
     #
     # @param [String] pattern
     #   the thing to exclude
@@ -649,7 +648,7 @@ module Omnibus
     # Add a config file.
     #
     # @example
-    #   config_file '/path/to/config.rb'
+    #   config_file "/path/to/config.rb"
     #
     # @param [String] val
     #   the name of a config file of your software
@@ -671,7 +670,7 @@ module Omnibus
     #
     #
     # @example
-    #   extra_package_file '/path/to/file'
+    #   extra_package_file "/path/to/file"
     #
     # @param [String] val
     #   the name of a dir or file to include in build
@@ -689,7 +688,7 @@ module Omnibus
     # A proxy method to the underlying Ohai system.
     #
     # @example
-    #   ohai['platform_family']
+    #   ohai["platform_family"]
     #
     # @return [Ohai]
     #
@@ -702,7 +701,7 @@ module Omnibus
     # Set or retrieve the {#license} of the project.
     #
     # @example
-    #   license 'Apache 2.0'
+    #   license "Apache 2.0"
     #
     # @param [String] val
     #   the license to set for the project.
@@ -711,7 +710,7 @@ module Omnibus
     #
     def license(val = NULL)
       if null?(val)
-        @license || 'Unspecified'
+        @license || "Unspecified"
       else
         @license = val
       end
@@ -725,7 +724,7 @@ module Omnibus
     #
     #
     # @example
-    #   license_file 'LICENSES/artistic.txt'
+    #   license_file "LICENSES/artistic.txt"
     #
     # @param [String] val
     #   the location of the license file for the project.
@@ -776,7 +775,7 @@ module Omnibus
       if null?(path)
         @json_manifest_path || File.join(install_dir, "version-manifest.json")
       else
-        @json_manifest_path=path
+        @json_manifest_path = path
       end
     end
     expose :json_manifest_path
@@ -786,7 +785,7 @@ module Omnibus
     # (+install_dir+/version-manifest.txt if none is provided)
     #
     # This manifest uses the same format used by the
-    # 'version-manifest' software definition in omnibus-software.
+    # "version-manifest" software definition in omnibus-software.
     #
     # @example
     #   text_manifest_path
@@ -1086,7 +1085,7 @@ module Omnibus
     end
 
     def write_json_manifest
-      File.open(json_manifest_path, 'w') do |f|
+      File.open(json_manifest_path, "w") do |f|
         f.write(FFI_Yajl::Encoder.encode(built_manifest.to_hash, pretty: true))
       end
     end
@@ -1097,7 +1096,7 @@ module Omnibus
     # omnibus-software.
     #
     def write_text_manifest
-      File.open(text_manifest_path, 'w') do |f|
+      File.open(text_manifest_path, "w") do |f|
         f.puts "#{name} #{build_version}"
         f.puts ""
         f.puts Omnibus::Reports.pretty_version_map(self)
@@ -1118,7 +1117,7 @@ module Omnibus
     #
     #
     def package_me
-      destination = File.expand_path('pkg', Config.project_root)
+      destination = File.expand_path("pkg", Config.project_root)
 
       # Create the destination directory
       unless File.directory?(destination)
@@ -1143,7 +1142,7 @@ module Omnibus
     #
     #
     def compress_me
-      destination = File.expand_path('pkg', Config.project_root)
+      destination = File.expand_path("pkg", Config.project_root)
 
       # Create the destination directory
       unless File.directory?(destination)
@@ -1211,7 +1210,7 @@ module Omnibus
         if filepath && File.exist?(filepath)
           update_with_file_contents(digest, filepath)
         else
-          update_with_string(digest, '<DYNAMIC>')
+          update_with_string(digest, "<DYNAMIC>")
         end
 
         digest.hexdigest

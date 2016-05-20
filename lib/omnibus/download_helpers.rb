@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require 'open-uri'
-require 'ruby-progressbar'
+require "open-uri"
+require "ruby-progressbar"
 
 module Omnibus
   module DownloadHelpers
@@ -25,6 +25,7 @@ module Omnibus
 
     module InstanceMethods
       private
+
       #
       # Downloads a from a given url to a given path using Ruby's
       # +OpenURI+ implementation.
@@ -62,8 +63,8 @@ module Omnibus
         if enable_progress_bar
           progress_bar = ProgressBar.create(
             output: $stdout,
-            format: '%e %B %p%% (%r KB/sec)',
-            rate_scale: ->(rate) { rate / 1024 },
+            format: "%e %B %p%% (%r KB/sec)",
+            rate_scale: ->(rate) { rate / 1024 }
           )
 
           options[:content_length_proc] = ->(total) {
@@ -129,7 +130,7 @@ module Omnibus
           #
           # TL;DR - Do not let Ruby ungzip our file
           #
-          h['Accept-Encoding'] = 'identity'
+          h["Accept-Encoding"] = "identity"
         end
       end
     end

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require 'ffi_yajl'
+require "ffi_yajl"
 
 module Omnibus
   class Metadata
@@ -63,7 +63,7 @@ module Omnibus
           iteration:        project.build_iteration,
           license:          project.license,
           version_manifest: project.built_manifest.to_hash,
-          license_content:  File.exist?(project.license_file_path) ? File.read(project.license_file_path) : ''
+          license_content:  File.exist?(project.license_file_path) ? File.read(project.license_file_path) : "",
         }
 
         instance = new(package, data)
@@ -83,10 +83,10 @@ module Omnibus
         data = File.read(path_for(package))
         hash = FFI_Yajl::Parser.parse(data, symbolize_names: true)
 
-         # Ensure Platform version has been truncated
-         if hash[:platform_version] && hash[:platform]
-           hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
-         end
+        # Ensure Platform version has been truncated
+        if hash[:platform_version] && hash[:platform]
+          hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
+        end
 
         # Ensure an interation exists
         hash[:iteration] ||= 1
@@ -115,15 +115,15 @@ module Omnibus
       #
       def arch
         if windows? && windows_arch_i386?
-          'i386'
+          "i386"
         elsif solaris?
           if intel?
-            'i386'
+            "i386"
           elsif sparc?
-            'sparc'
+            "sparc"
           end
         else
-          Ohai['kernel']['machine']
+          Ohai["kernel"]["machine"]
         end
       end
 
@@ -134,7 +134,7 @@ module Omnibus
       #   the platform version
       #
       def platform_version
-        truncate_platform_version(Ohai['platform_version'], platform_shortname)
+        truncate_platform_version(Ohai["platform_version"], platform_shortname)
       end
 
       #
@@ -145,11 +145,11 @@ module Omnibus
       #
       def platform_shortname
         if rhel?
-          'el'
+          "el"
         elsif suse?
-          'sles'
+          "sles"
         else
-          Ohai['platform']
+          Ohai["platform"]
         end
       end
 
@@ -158,7 +158,7 @@ module Omnibus
       #
       # On certain platforms we don't care about the full MAJOR.MINOR.PATCH platform
       # version. This method will properly truncate the version down to a more human
-      # friendly version. This version can also be thought of as a 'marketing'
+      # friendly version. This version can also be thought of as a "marketing"
       # version.
       #
       # @param [String] platform_version
@@ -169,16 +169,16 @@ module Omnibus
       #
       def truncate_platform_version(platform_version, platform)
         case platform
-        when 'centos', 'debian', 'el', 'fedora', 'freebsd', 'omnios', 'pidora', 'raspbian', 'rhel', 'sles', 'suse', 'smartos', 'nexus', 'ios_xr'
+        when "centos", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos", "nexus", "ios_xr"
           # Only want MAJOR (e.g. Debian 7, OmniOS r151006, SmartOS 20120809T221258Z)
-          platform_version.split('.').first
-        when 'aix', 'gentoo', 'mac_os_x', 'openbsd', 'slackware', 'solaris2', 'opensuse', 'ubuntu'
+          platform_version.split(".").first
+        when "aix", "gentoo", "mac_os_x", "openbsd", "slackware", "solaris2", "opensuse", "ubuntu"
           # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
-          platform_version.split('.')[0..1].join('.')
-        when 'arch'
+          platform_version.split(".")[0..1].join(".")
+        when "arch"
           # Arch Linux does not have a platform_version ohai attribute, it is rolling release (lsb_release -r)
-          'rolling'
-        when 'windows'
+          "rolling"
+        when "windows"
           # Windows has this really awesome "feature", where their version numbers
           # internally do not match the "marketing" name.
           #
@@ -197,23 +197,23 @@ module Omnibus
           # https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
           #
           case platform_version
-          when '5.0.2195', '2000'   then '2000'
-          when '5.1.2600', 'xp'     then 'xp'
-          when '5.2.3790', '2003r2' then '2003r2'
-          when '6.0.6001', '2008'   then '2008'
-          when '6.1.7600', '7'      then '7'
-          when '6.1.7601', '2008r2' then '2008r2'
-          when '6.2.9200', '8'      then '8'
+          when "5.0.2195", "2000"   then "2000"
+          when "5.1.2600", "xp"     then "xp"
+          when "5.2.3790", "2003r2" then "2003r2"
+          when "6.0.6001", "2008"   then "2008"
+          when "6.1.7600", "7"      then "7"
+          when "6.1.7601", "2008r2" then "2008r2"
+          when "6.2.9200", "8"      then "8"
           # The following `when` will never match since Windows 2012's platform
           # version is the same as Windows 8. It's only here for completeness and
           # documentation.
-          when '6.2.9200', '2012'   then '2012'
-          when /6\.3\.\d+/, '8.1' then '8.1'
+          when "6.2.9200", "2012"   then "2012"
+          when /6\.3\.\d+/, "8.1" then "8.1"
           # The following `when` will never match since Windows 2012R2's platform
           # version is the same as Windows 8.1. It's only here for completeness
           # and documentation.
-          when /6\.3\.\d+/, '2012r2' then '2012r2'
-          when /^10\.0/ then '10'
+          when /6\.3\.\d+/, "2012r2" then "2012r2"
+          when /^10\.0/ then "10"
           else
             raise UnknownPlatformVersion.new(platform, platform_version)
           end
@@ -267,7 +267,7 @@ module Omnibus
     # @return [true]
     #
     def save
-      File.open(path, 'w+')  do |f|
+      File.open(path, "w+") do |f|
         f.write(FFI_Yajl::Encoder.encode(to_hash, pretty: true))
       end
 
