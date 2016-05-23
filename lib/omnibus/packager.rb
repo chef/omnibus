@@ -37,29 +37,26 @@ module Omnibus
 
       def self.create(platform_information)
         platform_name = platform_information['platform_family']
+        class_name = "#{platform_name.capitalize}Platform"
 
         begin
-          name = Packager.const_get(class_name(platform_name))
+          name = Packager.const_get(class_name)
         rescue NameError
           name = DefaultPlatform
         end
         name.new(platform_information)
       end
 
-      # This function should be overritten by its child class
+      # Returns an array of supported packager types for this platform
+      # @abstract
       def supported_packagers
-        raise Exception.new("Not implimented")
+        raise AbstractMethodException.new
       end
 
       protected
       def satisfies_version_constraint?(version_constraint)
         version = @platform_info['platform_version']
         Chef::Sugar::Constraints::Version.new(version).satisfies?(version_constraint)
-      end
-
-      private
-      def self.class_name(platform_name)
-        "#{platform_name.capitalize}Platform"
       end
     end
 
