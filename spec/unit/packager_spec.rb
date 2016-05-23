@@ -49,6 +49,12 @@ module Omnibus
         instance = Packager::Solaris2Platform.new(platform_info)
         expect(instance.supported_packagers).to eq([Packager::IPS])
       end
+
+      it 'defaults to Makeself before 5.10' do
+        platform_info = {'platform_family' => 'solaris2', 'platform_version' => '5.9'}
+        instance = Packager::Solaris2Platform.new(platform_info)
+        expect(instance.supported_packagers).to eq([Packager::Makeself])
+      end
     end
   end
 

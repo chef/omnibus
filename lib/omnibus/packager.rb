@@ -80,11 +80,17 @@ module Omnibus
     class Solaris2Platform < Platform
       require 'omnibus/packagers/solaris'
       require 'omnibus/packagers/ips'
+      require 'omnibus/packagers/makeself'
 
       def supported_packagers
-        return [IPS] if satisfies_version_constraint?('>= 5.11')
-        return [Solaris] if satisfies_version_constraint?('>= 5.10')
-        #TODO Determine how to handle Versions under 5.10
+        case
+        when satisfies_version_constraint?('>= 5.11')
+          [IPS]
+        when satisfies_version_constraint?('>= 5.10')
+          [Solaris]
+        else
+          [Makeself]
+        end
       end
     end
 
@@ -164,7 +170,7 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      return Platform.create(Ohai).supported_packagers
+      Platform.create(Ohai).supported_packagers
     end
     module_function :for_current_system
   end
