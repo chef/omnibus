@@ -93,7 +93,7 @@ module Omnibus
 
     class WindowsPlatform < Platform
       require 'omnibus/packagers/msi'
-      require 'omnibus/packagers/APPX'
+      require 'omnibus/packagers/appx'
 
       def supported_packagers
         return [MSI, APPX] if satisfies_version_constraint?('>= 6.2')
