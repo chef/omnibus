@@ -799,7 +799,8 @@ module Omnibus
         # contain '. For now, assume that won't happen because I don't know
         # whether this command is going to be played via cmd or through
         # ProcessCreate.
-        command_string = "bash -c \'#{command_string}\'"
+        cwd = options[:cwd].sub('C:/', '/c/')
+        command_string = "bash -c \'cd #{cwd} && #{command_string}\'"
       end
 
       # Set the log level to :info so users will see build commands
