@@ -62,9 +62,9 @@ module Omnibus
       candle_vars = ''
       wxs_list = ''
       wixobj_list = ''
-      if File.directory?("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES")
+      if File.directory?("#{Config.source_dir}\\extra_package_files")
         # Let's collect the DirectoryRefs
-        Dir.foreach("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES") do |item|
+        Dir.foreach("#{Config.source_dir}\\extra_package_files") do |item|
           next if item == '.' or item == '..'
           dir_refs.push(item)
         end
@@ -79,7 +79,7 @@ module Omnibus
         dir_refs.each do |dirref|
           shellout! <<-EOH.split.join(' ').squeeze(' ').strip
             heat.exe dir
-              "#{windows_safe_path("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES\\#{dirref}")}"
+              "#{windows_safe_path("#{Config.source_dir}\\extra_package_files\\#{dirref}")}"
               -nologo -srd -gg -cg Extra#{dirref}
               -dr #{dirref}
               -var "var.Extra#{dirref}"
@@ -87,7 +87,7 @@ module Omnibus
           EOH
 
           candle_vars += "-dExtra#{dirref}=\""\
-            "#{windows_safe_path("#{Config.source_dir}\\OMNIBUS_EXTRA_PACKAGE_FILES\\#{dirref}")}"\
+            "#{windows_safe_path("#{Config.source_dir}\\extra_package_files\\#{dirref}")}"\
             "\" "
           wxs_list += "extra-#{dirref}.wxs "
           wixobj_list += "extra-#{dirref}.wixobj "
