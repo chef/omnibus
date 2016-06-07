@@ -167,7 +167,10 @@ module Omnibus
 
       # Pass the host platform as well. msys is configured for 32-bits even
       # if the actual installed compiler has 64-bit support.
-      configure_cmd << "--host=x86_64-w64-mingw32" if windows? && !windows_arch_i386?
+      if windows?
+        host = windows_arch_i386? ? "i686-w64-mingw32" : "x86_64-w64-mingw32"
+        configure_cmd << "--host=#{host}"
+      end
 
       # Accept a prefix override if provided. Can be set to '' to suppress
       # this functionality.
@@ -748,10 +751,6 @@ module Omnibus
       windows_safe_path("#{install_dir}/embedded/bin/#{bin}")
     end
 
-    def embedded_msys_bin(bin)
-      windows_safe_path("#{install_dir}/embedded/msys/1.0/bin/#{bin}")
-    end
-
     #
     # The **in-order** list of {BuildCommand} for this builder.
     #
@@ -796,23 +795,11 @@ module Omnibus
       options = { cwd: software.project_dir }.merge(options)
 
       if options.delete(:in_msys_bash) && windows?
-        # The command needs to be run within an msys bash environment.
-        # TODO: Eventually, have command search through "build time dependencies"
-        # for bash instead.
-        bash_bin = embedded_msys_bin("bash.exe")
-        unless File.exist?(bash_bin)
-          # Fallback to just looking at the embedded_bin directory in case
-          # we're using devkit or older chef-dk.
-          bash_bin = embedded_bin("bash.exe")
-          unless File.exist?(bash_bin)
-            bash_bin = "bash.exe"
-          end
-        end
         # Mixlib will handle escaping characters for cmd but our command might
         # contain '. For now, assume that won't happen because I don't know
         # whether this command is going to be played via cmd or through
         # ProcessCreate.
-        command_string = "\"#{bash_bin}\" -c \'#{command_string}\'"
+        command_string = "bash -c \'#{command_string}\'"
       end
 
       # Set the log level to :info so users will see build commands

@@ -240,7 +240,7 @@ module Omnibus
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
 
-          shellout!("tar.exe #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}", returns: returns)
+          shellout!("tar #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
             log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
