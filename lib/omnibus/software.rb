@@ -590,8 +590,6 @@ module Omnibus
     #
     # Supported options:
     #    :aix => :use_gcc    force using gcc/g++ compilers on aix
-    #    :bfd_flags => true   the default build targets for windows based on
-    #       the current platform architecture are added ARFLAGS and RCFLAGS.
     #
     # @param [Hash] env
     # @param [Hash] opts
@@ -665,6 +663,9 @@ module Omnibus
             # soon as gcc emits aligned SSE xmm register spills which generate
             # GPEs and terminate the application very rudely with very little
             # to debug with.
+            #
+            # TODO: This was true of our old TDM gcc 4.7 compilers. Is it still
+            # true with mingw-w64?
             "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 #{opt_flag}",
           }
         else
@@ -674,14 +675,6 @@ module Omnibus
           }
         end
 
-      # There are some weird, misbehaving makefiles on windows that hate ARFLAGS because it
-      # replaces the "rcs" flags in some build steps.  So we provide this flag behind an
-      # optional flag.
-      if opts[:bfd_flags] && windows?
-        bfd_target = windows_arch_i386? ? "pe-i386" : "pe-x86-64"
-        compiler_flags["RCFLAGS"] = "--target=#{bfd_target}"
-        compiler_flags["ARFLAGS"] = "--target=#{bfd_target}"
-      end
       # merge LD_RUN_PATH into the environment.  most unix distros will fall
       # back to this if there is no LDFLAGS passed to the linker that sets
       # the rpath.  the LDFLAGS -R or -Wl,-rpath will override this, but in
@@ -730,14 +723,11 @@ module Omnibus
     # for the platform is used to join the paths.
     #
     # @param [Hash] env
-    # @param [Hash] opts
-    #   :msys => true  add the embedded msys path if building on windows.
     #
     # @return [Hash]
     #
-    def with_embedded_path(env = {}, opts = {})
+    def with_embedded_path(env = {})
       paths = ["#{install_dir}/bin", "#{install_dir}/embedded/bin"]
-      paths << "#{install_dir}/embedded/msys/1.0/bin" if opts[:msys] && windows?
       path_value = prepend_path(paths)
       env.merge(path_key => path_value)
     end
