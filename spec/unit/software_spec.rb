@@ -344,13 +344,11 @@ module Omnibus
           end
 
           it "sets BFD flags if requested" do
-            expect(subject.with_standard_compiler_flags({}, bfd_flags: true)).to eq(
+            expect(subject.with_standard_compiler_flags).to eq(
               "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
               "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
               "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m32",
-              "RCFLAGS"         => "--target=pe-i386",
-              "ARFLAGS"         => "--target=pe-i386",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
             )
@@ -372,13 +370,11 @@ module Omnibus
           end
 
           it "sets BFD flags if requested" do
-            expect(subject.with_standard_compiler_flags({}, bfd_flags: true)).to eq(
+            expect(subject.with_standard_compiler_flags).to eq(
               "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
               "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
               "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m64",
-              "RCFLAGS"         => "--target=pe-x86-64",
-              "ARFLAGS"         => "--target=pe-x86-64",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
             )
@@ -420,12 +416,6 @@ module Omnibus
         it "with_embedded_path merges with a hash argument" do
           expect(subject.with_embedded_path("numberwang" => 4)).to eq(
             "numberwang" => 4,
-            "PATH" => prepended_path
-          )
-        end
-
-        it "with_embedded_path ignores option to add msys to path" do
-          expect(subject.with_embedded_path({}, msys: true)).to eq(
             "PATH" => prepended_path
           )
         end
@@ -473,13 +463,6 @@ module Omnibus
               "PATH" => prepended_path
             )
           end
-
-          it "with_embedded_path accepts option to add msys to path" do
-            expect(subject.with_embedded_path({}, msys: true)).to eq(
-              "PATH" => prepended_path_msys
-            )
-          end
-
         end
       end
     end

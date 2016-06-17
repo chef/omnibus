@@ -223,9 +223,25 @@ module Omnibus
             .and_return(windows_i386)
         end
 
-        it "invokes appends platform host to the options" do
+        it "appends platform host to the options" do
           expect(subject).to receive(:command)
-            .with("./configure --host=x86_64-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
+            .with("./configure --build=x86_64-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
+          subject.configure()
+        end
+      end
+
+      context "on 32-bit windows" do
+        let(:on_windows) { true }
+        let(:windows_i386) { true }
+
+        before do
+          allow(subject).to receive(:windows_arch_i386?)
+            .and_return(windows_i386)
+        end
+
+        it "appends platform host to the options" do
+          expect(subject).to receive(:command)
+            .with("./configure --build=i686-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
           subject.configure()
         end
       end
