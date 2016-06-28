@@ -49,8 +49,8 @@ module Omnibus
       diff.updated.each do |entry|
         puts sprintf("* %s (%.8s -> %.8s)",
                      entry[:name], entry[:old_version], entry[:new_version])
-        repo_path = ::File.join(source_path, entry[:name])
-        if entry[:source_type] == "git" && ::File.directory?("#{repo_path}/.git")
+        repo_path = ::File.join(source_path, entry[:name].to_s)
+        if entry[:source_type] == :git && ::File.directory?("#{repo_path}/.git")
           cl = ChangeLog.new(entry[:old_version], entry[:new_version], GitRepository.new("#{repo_path}"))
           print_changelog(cl, 2)
         end
