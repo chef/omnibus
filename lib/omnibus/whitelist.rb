@@ -59,13 +59,24 @@ AIX_WHITELIST_LIBS = [
 ].freeze
 
 OMNIOS_WHITELIST_LIBS = [
-  /libge/,
+  /libc\.so\.1/,
+  /libcrypt\./,
+  /libcrypt\.so\.1/,
+  /libdl\.so\.1/,
+  /libgcc_s\.so\.1/,
   /libgen\.so\.1/,
+  /libm\.so\.2/,
   /libmd\.so\.1/,
+  /libmp\.so/,
   /libmp\.so\.2/,
+  /libnsl\.so\.1/,
+  /libpthread\.so\.1/,
+  /librt\.so\.1/,
   /libsocket\.so\.1/,
-  /lib\/libssp\.s/,
-  /lib\/libssp\.so\.0/,
+  /libssp\.s/,
+  /libssp\.so./,
+  /libssp\.so\.0/,
+  /libgcc_s\.so\.1/,
 ].freeze
 
 SOLARIS_WHITELIST_LIBS = [
