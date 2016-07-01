@@ -58,6 +58,16 @@ AIX_WHITELIST_LIBS = [
   /unix$/,
 ].freeze
 
+OMNIOS_WHITELIST_LIBS = [
+  /libge/,
+  /libgen\.so\.1/,
+  /libmd\.so\.1/,
+  /libmp\.so\.2/,
+  /libsocket\.so\.1/,
+  /lib\/libssp\.s/,
+  /lib\/libssp\.so\.0/,
+].freeze
+
 SOLARIS_WHITELIST_LIBS = [
   /libaio\.so/,
   /libavl\.so/,
