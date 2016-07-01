@@ -70,6 +70,16 @@ module Omnibus
       /unix$/,
     ].freeze
 
+    OMNIOS_WHITELIST_LIBS = [
+      /libge/,
+      /libgen\.so\.1/,
+      /libmd\.so\.1/,
+      /libmp\.so\.2/,
+      /libsocket\.so\.1/,
+      /lib\/libssp\.s/,
+      /lib\/libssp\.so\.0/,
+    ].freeze
+
     SOLARIS_WHITELIST_LIBS = [
       /libaio\.so/,
       /libavl\.so/,
@@ -600,6 +610,8 @@ module Omnibus
                          ARCH_WHITELIST_LIBS
                        when "mac_os_x"
                          MAC_WHITELIST_LIBS
+                       when "omnios"
+                         OMNIOS_WHITELIST_LIBS
                        when "solaris2"
                          SOLARIS_WHITELIST_LIBS
                        when "smartos"
