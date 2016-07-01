@@ -44,6 +44,7 @@ module Omnibus
       "wrlinux"  => RPM,
       "aix"      => BFF,
       "solaris"  => Solaris,
+      "omnios"   => IPS,
       "ips"      => IPS,
       "windows"  => [MSI, APPX],
       "mac_os_x" => PKG,
