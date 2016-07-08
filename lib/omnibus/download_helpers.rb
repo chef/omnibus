@@ -72,7 +72,7 @@ module Omnibus
             progress_bar.total = total
           }
           options[:progress_proc] = ->(step) {
-            downloaded_amount = [step, reported_total].min
+            downloaded_amount = reported_total ? [step, reported_total].min : step
             progress_bar.progress = downloaded_amount
           }
         end
