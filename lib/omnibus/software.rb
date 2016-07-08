@@ -653,7 +653,7 @@ module Omnibus
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
           opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
           {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag}",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag} -fno-lto",
             # We do not wish to enable SSE even though we target i686 because
             # of a stack alignment issue with some libraries. We have not
             # exactly ascertained the cause but some compiled library/binary
@@ -666,7 +666,10 @@ module Omnibus
             #
             # TODO: This was true of our old TDM gcc 4.7 compilers. Is it still
             # true with mingw-w64?
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 #{opt_flag}",
+            #
+            # XXX: Temporarily turning -O3 into -O2 -fno-lto to work around some
+            # weird linker issues.
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O2 -fno-lto #{opt_flag}",
           }
         else
           {
