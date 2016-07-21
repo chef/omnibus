@@ -335,12 +335,13 @@ module Omnibus
         context "in 32-bit mode" do
           it "sets the default" do
             expect(subject.with_standard_compiler_flags).to eq(
-              "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "LDFLAGS"         => "-L/opt/project/embedded/lib -m32 -fno-lto",
+              "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "LDFLAGS"         => "-L/opt/project/embedded/lib -m32 -Wl,-rpath,/opt/project/embedded/lib",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "PREMSYS2_PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
             )
           end
         end
@@ -350,12 +351,13 @@ module Omnibus
 
           it "sets the default" do
             expect(subject.with_standard_compiler_flags).to eq(
-              "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "LDFLAGS"         => "-L/opt/project/embedded/lib -m64 -fno-lto",
+              "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "LDFLAGS"         => "-L/opt/project/embedded/lib -m64 -Wl,-rpath,/opt/project/embedded/lib",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "PREMSYS2_PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
             )
           end
         end
@@ -414,21 +416,28 @@ module Omnibus
         let(:separator) { ";" }
         let(:path) { "c:/Ruby193/bin;c:/Windows/system32;c:/Windows;c:/Windows/System32/Wbem" }
         let(:install_dir) { "c:/opt/project" }
-        let(:prepended_path_msys) do
-          [ "#{install_dir}/bin", separator, "#{install_dir}/embedded/bin", separator,
-            "#{install_dir}/embedded/msys/1.0/bin", separator, path].join
+
+        context "`Path` exists in the environment instead of PATH" do
+          before do
+            stub_env("Path", path)
+            allow(ENV).to receive(:keys).and_return(%w{ Path })
+          end
+
+          it "returns a path key of `Path`" do
+            expect(subject.with_embedded_path).to include(
+              "Path" => prepended_path
+            )
+          end
         end
 
-        context "`Path` exists in the environment" do
+        context "Multiple Paths exist" do
           before do
             stub_env("Path", path)
             allow(ENV).to receive(:keys).and_return(%w{ Path PATH })
           end
 
-          it "returns a path key of `Path`" do
-            expect(subject.with_embedded_path).to eq(
-              "Path" => prepended_path
-            )
+          it "raises an error" do
+            expect { subject.with_embedded_path }.to raise_error("The current omnibus environment has duplicate PATHs")
           end
         end
 
@@ -438,7 +447,7 @@ module Omnibus
           end
 
           it "returns a path key of `PATH`" do
-            expect(subject.with_embedded_path).to eq(
+            expect(subject.with_embedded_path).to include(
               "PATH" => prepended_path
             )
           end
