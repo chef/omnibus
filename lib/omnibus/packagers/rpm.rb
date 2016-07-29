@@ -337,14 +337,14 @@ module Omnibus
     end
 
     #
-    # Generate the RPM file using +rpmbuild+.  The use of the +fakeroot+ command
-    # is required so that the package is owned by +root:root+, but the build
-    # user does not need to have sudo permissions.
+    # Generate the RPM file using +rpmbuild+. Unlike debian,the +fakeroot+
+    # command is not required for the package to be owned by +root:root+. The
+    # rpmuser specified in the spec file dictates this.
     #
     # @return [void]
     #
     def create_rpm_file
-      command =  %{fakeroot rpmbuild}
+      command =  %{rpmbuild}
       command << %{ --target #{safe_architecture}}
       command << %{ -bb}
       command << %{ --buildroot #{staging_dir}/BUILD}
