@@ -1097,10 +1097,6 @@ module Omnibus
 
     private
 
-    def to_msys2_path(path)
-      path.sub(/^([A-Za-z]):\//, "/\\1/")
-    end
-
     #
     # The git caching implementation for this software.
     #

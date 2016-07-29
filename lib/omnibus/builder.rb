@@ -281,6 +281,14 @@ module Omnibus
     expose :windows_safe_path
 
     #
+    # (see Util#to_msys2_path)
+    #
+    def to_msys2_path(*pieces)
+      super
+    end
+    expose :to_msys2_path
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
