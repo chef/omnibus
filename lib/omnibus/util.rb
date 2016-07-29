@@ -192,6 +192,18 @@ module Omnibus
     end
 
     #
+    # Takes a ruby style path (e.g. C:/foo/bar) and coverts it to an msys path (/C/foo/bar).
+    #
+    # @param [String, Array<String>] pieces
+    #   the pieces of the path to join and fix
+    # @return [String]
+    #
+    def to_msys2_path(*pieces)
+      path = File.join(*pieces)
+      path.sub(/^([A-Za-z]):\//, "/\\1/")
+    end
+
+    #
     # Create a directory at the given +path+.
     #
     # @param [String, Array<String>] paths
