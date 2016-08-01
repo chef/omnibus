@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.description    = gem.summary
   gem.homepage       = "https://github.com/opscode/omnibus"
 
-  gem.required_ruby_version = ">= 2"
+  gem.required_ruby_version = ">= 2.1"
 
   gem.files = `git ls-files`.split($/)
   gem.bindir = "bin"
