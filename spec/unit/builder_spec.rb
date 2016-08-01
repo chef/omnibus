@@ -303,28 +303,28 @@ module Omnibus
       it "invokes patch with patch level 1 unless specified" do
         expect { subject.patch(source: "good_patch") }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", in_msys_bash: true)
+          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", in_msys_bash: true, clean_ruby_path: true)
         run_build_command
       end
 
       it "invokes patch with patch level provided" do
         expect { subject.patch(source: "good_patch", plevel: 0) }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("patch -p0 -i #{project_dir}/patch_location2/good_patch", in_msys_bash: true)
+          .with("patch -p0 -i #{project_dir}/patch_location2/good_patch", in_msys_bash: true, clean_ruby_path: true)
         run_build_command
       end
 
       it "invokes patch differently if target is provided" do
         expect { subject.patch(source: "good_patch", target: "target/path") }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("cat #{project_dir}/patch_location2/good_patch | patch -p1 target/path", in_msys_bash: true)
+          .with("cat #{project_dir}/patch_location2/good_patch | patch -p1 target/path", in_msys_bash: true, clean_ruby_path: true)
         run_build_command
       end
 
       it "persists other options" do
         expect { subject.patch(source: "good_patch", timeout: 3600) }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", timeout: 3600, in_msys_bash: true)
+          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", timeout: 3600, in_msys_bash: true, clean_ruby_path: true)
         run_build_command
       end
     end
