@@ -114,7 +114,7 @@ module Omnibus
         path_dirs = path_dirs.map { |p| windows_safe_path(p) }
         safe_install_dir = windows_safe_path(install_dir)
         path_dirs = path_dirs.reject do |p|
-          !p.start_with?(safe_install_dir) && filter_paths.any? { |f| safe_p.start_with?(f) }
+          !p.start_with?(safe_install_dir) && filter_paths.any? { |f| p.start_with?(f) }
         end
         options[:environment][path_key] = path_dirs.join(File::PATH_SEPARATOR || ":")
       end
