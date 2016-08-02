@@ -111,8 +111,10 @@ module Omnibus
       # chef-client/chef-dk installations from the path.
       if options.delete(:clean_ruby_path)
         path_dirs = options[:environment].fetch(path_key, "").split(File::PATH_SEPARATOR || ":")
+        path_dirs = path_dirs.map { |p| windows_safe_path(p) }
+        safe_install_dir = windows_safe_path(install_dir)
         path_dirs = path_dirs.reject do |p|
-          filter_paths.any? { |f| windows_safe_path(p).start_with?(f) }
+          !p.start_with?(safe_install_dir) && filter_paths.any? { |f| safe_p.start_with?(f) }
         end
         options[:environment][path_key] = path_dirs.join(File::PATH_SEPARATOR || ":")
       end
@@ -310,12 +312,9 @@ module Omnibus
         begin
           # Any alternate binaries or gems from the users environment.
           filters = Gem.paths.path.dup
-          # Any possible embedded ruby in chef products.
-          if windows?
-            filters << "C:/opscode"
-          else
-            filters << "/opt/chef" << "/opt/chefdk" << "/opt/delivery-cli"
-          end
+          # Be more paranoid and remove other any possible alternate
+          # embedded ruby in chef products.
+          filters << "C:/opscode" if windows?
           # Current ruby - this is the ruby that omnibus itself uses.
           filters << File.expand_path(File.join(RbConfig.ruby, "../.."))
           filters.map { |p| windows_safe_path(p) }
