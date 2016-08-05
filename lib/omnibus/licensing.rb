@@ -27,9 +27,39 @@ module Omnibus
     OUTPUT_DIRECTORY = "LICENSES".freeze
 
     class << self
-      # @see (Licensing#create!)
-      def create!(project)
-        new(project).create!
+
+      # Creates a new instance of Licensing, executes preparation steps, then
+      # yields control to a given block, and then creates a summary of the
+      # included licenses.
+      #
+      # @example Building a project:
+      #
+      #   Licensing.create_incrementally(self) do |license_collector|
+      #     softwares.each do |software|
+      #       software.build_me([license_collector])
+      #     end
+      #   end
+      #
+      # @param [Project] project
+      #   The project being built.
+      #
+      # @yieldparam [Licensing] license_collector
+      #   Yields an instance of Licensing. Call #execute_post_build to copy the
+      #   license files for a Software definition.
+      #
+      # @return [Licensing]
+      #
+      def create_incrementally(project)
+        new(project).tap do |license_collector|
+
+          license_collector.prepare
+          license_collector.validate_license_info
+
+          yield license_collector
+
+          license_collector.create_project_license_file
+          license_collector.raise_if_warnings_fatal!
+        end
       end
     end
 
@@ -57,23 +87,6 @@ module Omnibus
     end
 
     #
-    # Creates the license files for given project.
-    # It is assumed that the project has already been built.
-    #
-    # @return [void]
-    #
-    def create!
-      prepare
-      validate_license_info
-      create_software_license_files
-      create_project_license_file
-
-      if Config.fatal_licensing_warnings && !licensing_warnings.empty?
-        raise LicensingError.new(licensing_warnings)
-      end
-    end
-
-    #
     # Creates the required directories for licenses.
     #
     # @return [void]
@@ -81,6 +94,31 @@ module Omnibus
     def prepare
       FileUtils.rm_rf(output_dir)
       FileUtils.mkdir_p(output_dir)
+    end
+
+    # Required callback to use instances of this class as a build wrapper for
+    # Software#build_me. Licensing doesn't need to do anything pre-build, so
+    # this does nothing.
+    #
+    # @param [Software] software
+    #
+    # @return [void]
+    #
+    def execute_pre_build(software)
+    end
+
+    # Callback that gets called by Software#build_me after the build is done.
+    # Invokes license copying for the given software. This ensures that
+    # licenses are copied before a git cache snapshot is taken, so that the
+    # license files are correctly restored when a build is skipped due to a
+    # cache hit.
+    #
+    # @param [Software] software
+    #
+    # @return [void]
+    #
+    def execute_post_build(software)
+      collect_licenses_for(software)
     end
 
     #
@@ -142,47 +180,6 @@ module Omnibus
         f.puts project_license_content
         f.puts ""
         f.puts components_license_summary
-      end
-    end
-
-    #
-    # Copies the license files specified by the software components into the
-    # output directory.
-    #
-    # @return [void]
-    #
-    def create_software_license_files
-      license_map.each do |name, values|
-        license_files = values[:license_files]
-
-        license_files.each do |license_file|
-          if license_file
-            output_file = license_package_location(name, license_file)
-
-            if local?(license_file)
-              input_file = File.expand_path(license_file, values[:project_dir])
-              if File.exist?(input_file)
-                FileUtils.cp(input_file, output_file)
-                File.chmod 0644, output_file unless windows?
-              else
-                licensing_warning("License file '#{input_file}' does not exist for software '#{name}'.")
-              end
-            else
-              begin
-                download_file!(license_file, output_file, enable_progress_bar: false)
-                File.chmod 0644, output_file unless windows?
-              rescue SocketError,
-                     Errno::ECONNREFUSED,
-                     Errno::ECONNRESET,
-                     Errno::ENETUNREACH,
-                     Timeout::Error,
-                     OpenURI::HTTPError,
-                     OpenSSL::SSL::SSLError
-                licensing_warning("Can not download license file '#{license_file}' for software '#{name}'.")
-              end
-            end
-          end
-        end
       end
     end
 
@@ -329,6 +326,52 @@ module Omnibus
       log.warn(log_key) { message }
     end
 
+    def raise_if_warnings_fatal!
+      if Config.fatal_licensing_warnings && !licensing_warnings.empty?
+        raise LicensingError.new(licensing_warnings)
+      end
+    end
+
+    private
+
+    # Collect the license files for the software.
+    def collect_licenses_for(software)
+      return nil if software.license == :project_license
+
+      software_name = software.name
+      license_data = license_map[software_name]
+      license_files = license_data[:license_files]
+
+      license_files.each do |license_file|
+        if license_file
+          output_file = license_package_location(software_name, license_file)
+
+          if local?(license_file)
+            input_file = File.expand_path(license_file, license_data[:project_dir])
+            if File.exist?(input_file)
+              FileUtils.cp(input_file, output_file)
+              File.chmod 0644, output_file unless windows?
+            else
+              licensing_warning("License file '#{input_file}' does not exist for software '#{software_name}'.")
+            end
+          else
+            begin
+              download_file!(license_file, output_file, enable_progress_bar: false)
+              File.chmod 0644, output_file unless windows?
+            rescue SocketError,
+                   Errno::ECONNREFUSED,
+                   Errno::ECONNRESET,
+                   Errno::ENETUNREACH,
+                   Timeout::Error,
+                   OpenURI::HTTPError,
+                   OpenSSL::SSL::SSLError
+              licensing_warning("Can not download license file '#{license_file}' for software '#{software_name}'.")
+            end
+          end
+        end
+      end
+    end
+
     STANDARD_LICENSES = [
       #
       # Below licenses are compiled based on https://opensource.org/licenses/alphabetical
@@ -423,4 +466,5 @@ module Omnibus
       "Chef-MLSA",     # https://www.chef.io/online-master-agreement/
     ].freeze
   end
+
 end

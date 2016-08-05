@@ -1072,13 +1072,14 @@ module Omnibus
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
 
-      softwares.each do |software|
-        software.build_me
+      Licensing.create_incrementally(self) do |license_collector|
+        softwares.each do |software|
+          software.build_me([license_collector])
+        end
       end
 
       write_json_manifest
       write_text_manifest
-      Licensing.create!(self)
       HealthCheck.run!(self)
       package_me
       compress_me

@@ -146,7 +146,11 @@ module Omnibus
       project.library.component_added(private_code)
       project.library.component_added(software_with_warnings) if software_with_warnings
 
-      Licensing.create!(project)
+      Licensing.create_incrementally(project) do |licensing|
+        project.softwares.each do |software|
+          licensing.execute_post_build(software)
+        end
+      end
     end
 
     describe "without license definitions in the project" do
