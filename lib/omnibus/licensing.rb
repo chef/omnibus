@@ -377,6 +377,10 @@ module Omnibus
               File.chmod 0644, output_file unless windows?
             else
               licensing_warning("License file '#{input_file}' does not exist for software '#{software_name}'.")
+              # If we got here, we need to fail now so we don't take a git
+              # cache snapshot, or else the software build could be restored
+              # from cache without fixing the license issue.
+              raise_if_warnings_fatal!
             end
           else
             begin
@@ -390,6 +394,10 @@ module Omnibus
                    OpenURI::HTTPError,
                    OpenSSL::SSL::SSLError
               licensing_warning("Can not download license file '#{license_file}' for software '#{software_name}'.")
+              # If we got here, we need to fail now so we don't take a git
+              # cache snapshot, or else the software build could be restored
+              # from cache without fixing the license issue.
+              raise_if_warnings_fatal!
             end
           end
         end
