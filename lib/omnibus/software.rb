@@ -993,25 +993,33 @@ module Omnibus
     # be restored (if the tag does not exist), the actual build steps are
     # executed.
     #
+    # @param [Array<#execute_pre_build, #execute_post_build>] build_wrappers
+    #   Build wrappers inject behavior before or after the software is built.
+    #   They can be any object that implements `#execute_pre_build` and
+    #   `#execute_post_build`, taking this Software as an argument. Note that
+    #   these callbacks are only triggered when the software actually gets
+    #   built; if the build is skipped by the git cache, the callbacks DO NOT
+    #   run.
+    #
     # @return [true]
     #
-    def build_me
+    def build_me(build_wrappers = [])
       if Config.use_git_caching
         if project.dirty?
           log.info(log_key) do
             "Building because `#{project.culprit.name}' dirtied the cache"
           end
-          execute_build
+          execute_build(build_wrappers)
         elsif git_cache.restore
           log.info(log_key) { "Restored from cache" }
         else
           log.info(log_key) { "Could not restore from cache" }
-          execute_build
+          execute_build(build_wrappers)
           project.dirty!(self)
         end
       else
         log.debug(log_key) { "Forcing build because git caching is off" }
-        execute_build
+        execute_build(build_wrappers)
       end
 
       project.build_version_dsl.resolve(self)
@@ -1134,11 +1142,19 @@ module Omnibus
     # Actually build this software, executing the steps provided in the
     # {#build} block and dirtying the cache.
     #
+    # @param [Array<#execute_pre_build, #execute_post_build>] build_wrappers
+    #   Build wrappers inject behavior before or after the software is built.
+    #   They can be any object that implements `#execute_pre_build` and
+    #   `#execute_post_build`
+    #
     # @return [void]
     #
-    def execute_build
+    def execute_build(build_wrappers)
       fetcher.clean
+
+      build_wrappers.each { |wrapper| wrapper.execute_pre_build(self) }
       builder.build
+      build_wrappers.each { |wrapper| wrapper.execute_post_build(self) }
 
       if Config.use_git_caching
         git_cache.incremental
