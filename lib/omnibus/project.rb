@@ -761,6 +761,14 @@ module Omnibus
     end
     expose :license_file_path
 
+    def license_compiled_output(val = NULL)
+      if null?(val)
+        @license_compiled_output
+      else
+        @license_compiled_output = val
+      end
+    end
+    expose :license_compiled_output
     #
     # Location of json-formated version manifest, written at at the
     # end of the build. If no path is specified
