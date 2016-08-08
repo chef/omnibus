@@ -37,7 +37,7 @@
     -->
     <% if fastmsi %>
     <SetProperty Id="FastUnzip"
-                 Value="FASTZIPDIR=[INSTALLLOCATION];FASTZIPAPPNAME=chefdk"
+                 Value="FASTZIPDIR=[INSTALLLOCATION];FASTZIPAPPNAME=<%= name %>"
                  Sequence="execute"
                  Before="FastUnzip" />
 
@@ -52,7 +52,7 @@
 
     <CustomAction Id="Cleanup"
                   Directory="INSTALLLOCATION"
-                  ExeCommand="cmd /C &quot;rd /S /Q chefdk&quot;"
+                  ExeCommand="cmd /C &quot;rd /S /Q <%= name %>&quot;"
                   Execute="deferred"
                   Return="ignore" />
 
