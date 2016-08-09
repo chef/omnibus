@@ -94,6 +94,7 @@ module Omnibus
     def prepare
       FileUtils.rm_rf(output_dir)
       FileUtils.mkdir_p(output_dir)
+      FileUtils.touch(output_dir_gitkeep_file)
     end
 
     # Required callback to use instances of this class as a build wrapper for
@@ -290,6 +291,16 @@ module Omnibus
     #
     def output_dir
       File.expand_path(OUTPUT_DIRECTORY, project.install_dir)
+    end
+
+    #
+    # Path to a .gitkeep file we create in the output dir so git caching
+    # doesn't delete the directory.
+    #
+    # @return [String]
+    #
+    def output_dir_gitkeep_file
+      File.join(output_dir, ".gitkeep")
     end
 
     #

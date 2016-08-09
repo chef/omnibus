@@ -153,6 +153,20 @@ module Omnibus
       end
     end
 
+    describe "prepare step" do
+
+      let(:licenses_dir) { File.join(install_dir, "LICENSES") }
+
+      let(:dot_gitkeep) { File.join(licenses_dir, ".gitkeep") }
+
+      it "creates a LICENSES dir with a .gitkeep file inside the install directory" do
+        Licensing.new(project).prepare
+        expect(File).to exist(licenses_dir)
+        expect(File).to exist(dot_gitkeep)
+      end
+
+    end
+
     describe "without license definitions in the project" do
       it_behaves_like "correctly created licenses"
 
