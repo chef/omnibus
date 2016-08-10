@@ -76,6 +76,7 @@ module Omnibus
     include Logging
     include NullArgumentable
     include Sugarable
+    include Util
 
     attr_reader :manifest
 
@@ -377,6 +378,26 @@ module Omnibus
       license_files.dup
     end
     expose :license_file
+
+    #
+    # Skip collecting licenses of transitive dependencies for this software
+    #
+    # @example
+    #   skip_transitive_dependency_licensing true
+    #
+    # @param [Boolean] val
+    #   set or reset transitive dependency license collection
+    #
+    # @return [Boolean]
+    #
+    def skip_transitive_dependency_licensing(val = NULL)
+      if null?(val)
+        @skip_transitive_dependency_licensing || false
+      else
+        @skip_transitive_dependency_licensing = val
+      end
+    end
+    expose :skip_transitive_dependency_licensing
 
     #
     # Evaluate a block only if the version matches.
@@ -735,6 +756,20 @@ module Omnibus
       env.merge(path_key => path_value)
     end
     expose :with_embedded_path
+
+    #
+    # Returns the platform safe full path under embedded/bin directory to the
+    # given binary
+    #
+    # @param [String] bin
+    #   Name of the binary under embedded/bin
+    #
+    # @return [String]
+    #
+    def embedded_bin(bin)
+      windows_safe_path("#{install_dir}/embedded/bin/#{bin}")
+    end
+    expose :embedded_bin
 
     #
     # A PATH variable format string representing the current PATH with the

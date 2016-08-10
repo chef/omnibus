@@ -33,6 +33,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency "aws-sdk",          "~> 2"
   gem.add_dependency "thor",             "~> 0.18"
   gem.add_dependency "ffi-yajl",         "~> 2.2"
+  # FIXME: Release license_scout and version pin.
+  gem.add_dependency "license_scout"
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"

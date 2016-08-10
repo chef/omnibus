@@ -1,0 +1,32 @@
+{
+  "license_manifest_version": 1,
+  "project_name": "zlib",
+  "dependency_managers": {
+    "ruby_bundler": [
+      {
+        "name": "inifile",
+        "version": "3.0.0",
+        "license": "MIT",
+        "license_files": [
+          "ruby_bundler-inifile-3.0.0-README.md"
+        ]
+      },
+      {
+        "name": "mime-types",
+        "version": "3.1",
+        "license": "MIT",
+        "license_files": [
+          "ruby_bundler-mime-types-3.1-Licence.rdoc"
+        ]
+      },
+      {
+        "name": "mini_portile2",
+        "version": "2.1.0",
+        "license": "MIT",
+        "license_files": [
+          "ruby_bundler-mini_portile2-2.1.0-LICENSE.txt"
+        ]
+      }
+    ]
+  }
+}
