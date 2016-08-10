@@ -514,6 +514,12 @@ module Omnibus
     # @return [true, false]
     default(:fatal_licensing_warnings, false)
 
+    # Fail the build or warn when build encounters a transitive dependency
+    # licensing warning.
+    #
+    # @return [true, false]
+    default(:fatal_transitive_dependency_licensing_warnings, false)
+
     # --------------------------------------------------
     # @!endgroup
     #

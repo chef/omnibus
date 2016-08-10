@@ -771,10 +771,6 @@ module Omnibus
 
     private
 
-    def embedded_bin(bin)
-      windows_safe_path("#{install_dir}/embedded/bin/#{bin}")
-    end
-
     #
     # The **in-order** list of {BuildCommand} for this builder.
     #
