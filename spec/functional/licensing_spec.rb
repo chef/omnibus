@@ -6,6 +6,7 @@ module Omnibus
     let(:license_file_path) { nil }
     let(:license_file) { nil }
     let(:zlib_version_override) { nil }
+    let(:license_compiled_output) { nil }
 
     let(:install_dir) { File.join(tmp_path, "install_dir") }
     let(:software_project_dir) { File.join(tmp_path, "software_project_dir") }
@@ -95,6 +96,8 @@ module Omnibus
         if zlib_version_override
           project.override :zlib, version: zlib_version_override
         end
+        project.license_compiled_output(license_compiled_output) unless license_compiled_output.nil?
+        project.build_version('1.2.3')
       end
     end
 
@@ -287,6 +290,18 @@ module Omnibus
 
       it "fails the omnibus build" do
         expect { create_licenses }.to raise_error(Omnibus::LicensingError, /Project 'test-project' does not contain licensing information.\s{1,}Software 'private_code' does not contain licensing information./)
+      end
+    end
+
+    describe "with license_compiled_output set" do
+      let(:license_compiled_output) { true }
+
+      it "creates the main license file for the project correctly" do
+        create_licenses
+        project_license = File.join(install_dir, expected_project_license_path)
+        expect(File.exist?(project_license)).to be(true)
+        project_license = File.read(project_license)
+        expect(project_license).to match /THIS PACKAGE IS PROVIDED \"AS IS\" AND WITHOUT ANY EXPRESS OR\nIMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED\nWARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE./
       end
     end
   end

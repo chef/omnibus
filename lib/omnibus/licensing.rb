@@ -202,7 +202,8 @@ module Omnibus
     # For details, see:
     # /opt/opscode/LICENSES/python-LICENSE
     # ...
-    #
+    # If #{project.license_compiled_output} is set
+    # it will append the license contents
     # @return [String]
     #
     def components_license_summary
@@ -216,15 +217,38 @@ module Omnibus
         out << "This product bundles #{name} #{version},\n"
         out << "which is available under a \"#{license}\" License.\n"
         if !license_files.empty?
-          out << "For details, see:\n"
+          out << "Details:\n\n"
           license_files.each do |license_file|
-            out << "#{license_package_location(name, license_file)}\n"
+            path = license_package_location(name, license_file)
+            if project.license_compiled_output
+              out << "#{license_content(path)}"
+            else
+              out << "#{path}\n"
+            end
           end
         end
         out << "\n"
       end
 
       out
+    end
+
+    #
+    # Reads the content of the license file
+    # It is in the form of:
+    # ...
+    # MIT License
+    # Permission is hereby granted, free of charge, to any person obtaining
+    # ...
+    #
+    # @return [String]
+    #
+    def license_content(path)
+      if File.exist?(path)
+        File.read(path)
+      else
+        path
+      end
     end
 
     #
