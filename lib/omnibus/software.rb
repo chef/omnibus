@@ -644,7 +644,7 @@ module Omnibus
               # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
               "CC" => "gcc -static-libgcc",
               "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-              "CFLAGS" => "-I#{install_dir}/embedded/include",
+              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
             }
           elsif platform_version.satisfies?(">= 5.11")
             solaris_flags = {
