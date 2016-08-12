@@ -43,6 +43,8 @@ module Omnibus
 
     let(:cache_path) { File.join("/var/cache/omnibus/cache/git_cache", install_dir) }
 
+    let(:cache_serial_number) { described_class::SERIAL_NUMBER }
+
     let(:ipc) do
       project.library.component_added(preparation)
       project.library.component_added(snoopy)
@@ -58,7 +60,7 @@ module Omnibus
 
     describe '#tag' do
       it "returns the correct tag" do
-        expect(ipc.tag).to eql("zlib-24a8ec71da04059dcf7ed3c6e8e0fd9d155476abe4b5156d1f13c42e85478c2b")
+        expect(ipc.tag).to eql("zlib-24a8ec71da04059dcf7ed3c6e8e0fd9d155476abe4b5156d1f13c42e85478c2b-#{cache_serial_number}")
       end
 
       describe "with no deps" do
@@ -67,7 +69,7 @@ module Omnibus
         end
 
         it "returns the correct tag" do
-          expect(ipc.tag).to eql("zlib-ee71fc1a512f03b9dd46c1fd9b5ab71fcc51b638857bf328496a31abb2654c2b")
+          expect(ipc.tag).to eql("zlib-ee71fc1a512f03b9dd46c1fd9b5ab71fcc51b638857bf328496a31abb2654c2b-#{cache_serial_number}")
         end
       end
     end
