@@ -1,6 +1,27 @@
 Omnibus CHANGELOG
 =================
 
+v5.5.0 (August 16, 2016)
+-----------------------
+### New Features
+- Add build timings to the local output (#669)
+- Add `appx` packager (#675, #676, #677)
+- `fatal_licensing_warnings` configuration to fail the build when there are licensing problems (#678)
+- Ensure consistent code style using Chefstyle \o/ (#681)
+- Drop Ruby 2.0 support (#697)
+- Remove fakeroot from RPM packager (#698)
+- Support license collection with git cache (#700)
+- Add `SERIAL_NUMBER` to omnibus code, which is used in git caching to invalidate caches when omnibus code changes require it to be invalidated  (#704)
+- Support license collection of transitive dependencies (via license_scout gem) (#705)
+- Add `skip_transitive_dependency_licensing` dsl method to Software. Use this when the software does not use any dependency manager. (#705)
+
+### Bug Fixes
+- Make license files readable inside the packages (#673)
+- Prefer server marketing names on windows (#679)
+- Instead of exe, use bat if present on windows (#684)
+- Fix changelog generation with symbolized keys (#687)
+
+
 v5.4.0 (April 18, 2016)
 -----------------------
 ### New Features
