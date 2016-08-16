@@ -538,6 +538,15 @@ the list of supported languages and dependency managers. If this project does \
 not have any transitive dependencies, consider setting \
 'skip_transitive_dependency_licensing' to 'true' in order to correct this error.
 EOH
+      rescue LicenseScout::Exceptions::Error => e
+        transitive_dependency_licensing_warning(<<-EOH)
+Can not automatically detect licensing information for '#{software.name}' using \
+license_scout. Error is: '#{e}'
+EOH
+      rescue Exception => e
+        transitive_dependency_licensing_warning(<<-EOH)
+Unexpected error while running license_scout for '#{software.name}': '#{e}'
+EOH
       end
     end
 
