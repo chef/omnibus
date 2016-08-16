@@ -17,6 +17,8 @@
 require "uri"
 require "fileutils"
 require "omnibus/download_helpers"
+require "license_scout/collector"
+require "license_scout/options"
 
 module Omnibus
   class Licensing
@@ -25,6 +27,7 @@ module Omnibus
     include Sugarable
 
     OUTPUT_DIRECTORY = "LICENSES".freeze
+    CACHE_DIRECTORY = "license-cache".freeze
 
     class << self
 
@@ -57,6 +60,7 @@ module Omnibus
 
           yield license_collector
 
+          license_collector.process_transitive_dependency_licensing_info
           license_collector.create_project_license_file
           license_collector.raise_if_warnings_fatal!
         end
@@ -78,12 +82,29 @@ module Omnibus
     attr_reader :licensing_warnings
 
     #
+    # The warnings encountered while preparing the licensing information for
+    # transitive dependencies.
+    #
+    # @return [Array<String>]
+    #
+    attr_reader :transitive_dependency_licensing_warnings
+
+    #
+    # Manifest data of transitive dependency licensing information
+    #
+    # @return Hash
+    #
+    attr_reader :dep_license_map
+
+    #
     # @param [Project] project
     #   the project to create licenses for.
     #
     def initialize(project)
       @project = project
       @licensing_warnings = []
+      @transitive_dependency_licensing_warnings = []
+      @dep_license_map = {}
     end
 
     #
@@ -95,6 +116,9 @@ module Omnibus
       FileUtils.rm_rf(output_dir)
       FileUtils.mkdir_p(output_dir)
       FileUtils.touch(output_dir_gitkeep_file)
+      FileUtils.rm_rf(cache_dir)
+      FileUtils.mkdir_p(cache_dir)
+      FileUtils.touch(cache_dir_gitkeep_file)
     end
 
     # Required callback to use instances of this class as a build wrapper for
@@ -120,6 +144,10 @@ module Omnibus
     #
     def execute_post_build(software)
       collect_licenses_for(software)
+
+      unless software.skip_transitive_dependency_licensing
+        collect_transitive_dependency_licenses_for(software)
+      end
     end
 
     #
@@ -181,6 +209,8 @@ module Omnibus
         f.puts project_license_content
         f.puts ""
         f.puts components_license_summary
+        f.puts ""
+        f.puts dependencies_license_summary
       end
     end
 
@@ -222,6 +252,41 @@ module Omnibus
           end
         end
         out << "\n"
+      end
+
+      out
+    end
+
+    #
+    # Summary of the licenses of the transitive dependencies of the project.
+    # It is in the form of:
+    # ...
+    # This product includes inifile 3.0.0
+    # which is a 'ruby_bundler' dependency of 'chef',
+    # and which is available under a 'MIT' License.
+    # For details, see:
+    # /opt/opscode/LICENSES/ruby_bundler-inifile-3.0.0-README.md
+    # ...
+    #
+    # @return [String]
+    #
+    def dependencies_license_summary
+      out = "\n\n"
+
+      dep_license_map.each do |dep_mgr_name, data|
+        data.each do |dep_name, data|
+          data.each do |dep_version, dep_data|
+            projects = dep_data["dependency_of"].sort.map { |p| "'#{p}'" }.join(", ")
+            files = dep_data["license_files"].map { |f| File.join(output_dir, f) }
+
+            out << "This product includes #{dep_name} #{dep_version}\n"
+            out << "which is a '#{dep_mgr_name}' dependency of #{projects},\n"
+            out << "and which is available under a '#{dep_data["license"]}' License.\n"
+            out << "For details, see:\n"
+            out << files.join("\n")
+            out << "\n\n"
+          end
+        end
       end
 
       out
@@ -303,6 +368,24 @@ module Omnibus
       File.join(output_dir, ".gitkeep")
     end
 
+    # Cache directory where transitive dependency licenses will be collected in.
+    #
+    # @return [String]
+    #
+    def cache_dir
+      File.expand_path(CACHE_DIRECTORY, project.install_dir)
+    end
+
+    #
+    # Path to a .gitkeep file we create in the cache dir so git caching
+    # doesn't delete the directory.
+    #
+    # @return [String]
+    #
+    def cache_dir_gitkeep_file
+      File.join(cache_dir, ".gitkeep")
+    end
+
     #
     # Returns if the given path to a license is local or a remote url.
     #
@@ -337,13 +420,124 @@ module Omnibus
       log.warn(log_key) { message }
     end
 
+    #
+    # Logs the given message as warning or fails the build depending on the
+    # :fatal_transitive_dependency_licensing_warnings configuration setting.
+    #
+    # @param [String] message
+    #   message to log as warning
+    def transitive_dependency_licensing_warning(message)
+      transitive_dependency_licensing_warnings << message
+      log.warn(log_key) { message }
+    end
+
     def raise_if_warnings_fatal!
+      warnings_to_raise = []
       if Config.fatal_licensing_warnings && !licensing_warnings.empty?
-        raise LicensingError.new(licensing_warnings)
+        warnings_to_raise << licensing_warnings
       end
+
+      if Config.fatal_transitive_dependency_licensing_warnings && !transitive_dependency_licensing_warnings.empty?
+        warnings_to_raise << transitive_dependency_licensing_warnings
+      end
+
+      warnings_to_raise.flatten!
+      raise LicensingError.new(warnings_to_raise) unless warnings_to_raise.empty?
+    end
+
+    # 1. Parse all the licensing information for all software from 'cache_dir'
+    # 2. Merge and drop the duplicates
+    # 3. Add these licenses to the main manifest, to be merged with the main
+    # licensing information from software definitions.
+    def process_transitive_dependency_licensing_info
+      Dir.glob("#{cache_dir}/*/*-dependency-licenses.json").each do |license_manifest_path|
+        license_manifest_data = FFI_Yajl::Parser.parse(File.read(license_manifest_path))
+        project_name = license_manifest_data["project_name"]
+        dependency_license_dir = File.dirname(license_manifest_path)
+
+        license_manifest_data["dependency_managers"].each do |dep_mgr_name, dependencies|
+          dep_license_map[dep_mgr_name] ||= {}
+
+          dependencies.each do |dependency|
+            # Copy dependency files
+            dependency["license_files"].each do |f|
+              license_path = File.join(dependency_license_dir, f)
+              output_path = File.join(output_dir, f)
+              FileUtils.cp(license_path, output_path)
+            end
+
+            dep_name = dependency["name"]
+            dep_version = dependency["version"]
+
+            # If we already have this dependency we do not need to add it again.
+            if dep_license_map[dep_mgr_name][dep_name] && dep_license_map[dep_mgr_name][dep_name][dep_version]
+              dep_license_map[dep_mgr_name][dep_name][dep_version]["dependency_of"] << project_name
+            else
+              dep_license_map[dep_mgr_name][dep_name] ||= {}
+              dep_license_map[dep_mgr_name][dep_name][dep_version] = {
+                "license" => dependency["license"],
+                "license_files" => dependency["license_files"],
+                "dependency_of" => [ project_name ],
+              }
+            end
+          end
+        end
+      end
+
+      FileUtils.rm_rf(cache_dir)
     end
 
     private
+
+    # Uses license_scout to collect the licenses for transitive dependencies
+    # into #{output_dir}/license-cache/#{software.name}
+    def collect_transitive_dependency_licenses_for(software)
+      # We collect the licenses of the transitive dependencies of this software
+      # with LicenseScout. We place these files under
+      # /opt/project-name/license-cache for them to be cached in git_cache. Once
+      # the build completes we will process these license files but we need to
+      # perform this step after build, before git_cache to be able to operate
+      # correctly with the git_cache.
+      license_output_dir = File.join(cache_dir, software.name)
+
+      collector = LicenseScout::Collector.new(
+        software.project.name,
+        software.project_dir,
+        license_output_dir,
+        LicenseScout::Options.new(
+          environment: software.with_embedded_path,
+          ruby_bin: software.embedded_bin("ruby")
+        )
+      )
+
+      begin
+        collector.run
+        collector.issue_report.each { |i| transitive_dependency_licensing_warning(i) }
+      rescue LicenseScout::Exceptions::UnsupportedProjectType => e
+        # Looks like this project is not supported by LicenseScout. Either the
+        # language and the dependency manager used by the project is not
+        # supported, or the software definition does not have any transitive
+        # dependencies.  In the latter case software definition should set
+        # 'skip_transitive_dependency_licensing' to 'true' to correct this
+        # error.
+        transitive_dependency_licensing_warning(<<-EOH)
+Software '#{software.name}' is not supported project type for transitive \
+dependency license collection. See https://github.com/chef/license_scout for \
+the list of supported languages and dependency managers. If this project does \
+not have any transitive dependencies, consider setting \
+'skip_transitive_dependency_licensing' to 'true' in order to correct this error.
+EOH
+      rescue LicenseScout::Exceptions::Error => e
+        transitive_dependency_licensing_warning(<<-EOH)
+Can not automatically detect licensing information for '#{software.name}' using \
+license_scout. Error is: '#{e}'
+EOH
+      rescue Exception => e
+        transitive_dependency_licensing_warning(<<-EOH)
+Unexpected error while running license_scout for '#{software.name}': '#{e}'
+EOH
+      end
+    end
 
     # Collect the license files for the software.
     def collect_licenses_for(software)

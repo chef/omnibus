@@ -58,5 +58,11 @@ RSpec.shared_examples "a software" do |name = "chefdk"|
     allow(software).to receive(:with_embedded_path).and_return(
       "PATH" => "#{bin_dir}:#{embedded_bin_dir}:#{ENV['PATH']}"
     )
+
+    allow(software).to receive(:embedded_bin) do |binary|
+      p = File.join(embedded_bin_dir, binary)
+      p.gsub!(/\//, '\\') if windows?
+      p
+    end
   end
 end

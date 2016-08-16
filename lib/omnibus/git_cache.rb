@@ -22,6 +22,18 @@ module Omnibus
     include Util
     include Logging
 
+    # The serial number represents compatibility of a cache entry with the
+    # current version of the omnibus code base. Any time a change is made to
+    # omnibus that makes the code incompatible with any cache entries created
+    # before the code change, the serial number should be incremented.
+    #
+    # For example, if a code change generates content in the `install_dir`
+    # before cache snapshots are taken, any snapshots created before upgrade
+    # will not have the generated content, so these snapshots would be
+    # incompatible with the current omnibus codebase. Incrementing the serial
+    # number ensures these old shapshots will not be used in subsequent builds.
+    SERIAL_NUMBER = 1
+
     REQUIRED_GIT_FILES = %w{
 HEAD
 description
@@ -98,7 +110,7 @@ refs}.freeze
       # dependencies, including the on currently being acted upon.
       shasums = [dep_list.map(&:shasum), software.shasum].flatten
       suffix  = Digest::SHA256.hexdigest(shasums.join("|"))
-      @tag    = "#{software.name}-#{suffix}"
+      @tag    = "#{software.name}-#{suffix}-#{SERIAL_NUMBER}"
 
       log.internal(log_key) { "tag: #{@tag}" }
 
