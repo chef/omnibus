@@ -32,7 +32,6 @@ module Omnibus
     SHELLOUT_OPTIONS = {
       log_level: :internal,
       timeout: 7200, # 2 hours
-      environment: {},
     }.freeze
 
     #
@@ -78,6 +77,7 @@ module Omnibus
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
       options = SHELLOUT_OPTIONS.merge(options)
+      options[:environment] = {} unless options.has_key? :environment
 
       command_string = args.join(" ")
       in_msys = options.delete(:in_msys_bash) && windows?
