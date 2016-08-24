@@ -513,7 +513,7 @@ module Omnibus
       license_output_dir = File.join(cache_dir, software.name)
 
       collector = LicenseScout::Collector.new(
-        software.project.name,
+        software.name,
         software.project_dir,
         license_output_dir,
         LicenseScout::Options.new(
