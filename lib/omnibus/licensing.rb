@@ -594,6 +594,7 @@ EOH
       "APL-1.0",       # Adaptive Public License
       "Apache-2.0",    # Apache License 2.0
       "APSL-2.0",      # Apple Public Source License
+      "Artistic-1.0",  # Artistic license 1.0
       "Artistic-2.0",  # Artistic license 2.0
       "AAL",           # Attribution Assurance Licenses
       "BSD-3-Clause",  # BSD 3-Clause "New" or "Revised" License
@@ -677,6 +678,7 @@ EOH
       "Oracle-Binary", # http://www.oracle.com/technetwork/java/javase/terms/license/index.html
       "OpenSSL",       # https://www.openssl.org/source/license.html
       "Chef-MLSA",     # https://www.chef.io/online-master-agreement/
+      "Perl-5",        # http://dev.perl.org/licenses/
     ].freeze
   end
 
