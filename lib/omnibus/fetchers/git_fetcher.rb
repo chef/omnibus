@@ -214,7 +214,6 @@ module Omnibus
     end
 
     # Class methods
-    public
 
     # Return the SHA1 corresponding to a ref as determined by the remote source.
     #

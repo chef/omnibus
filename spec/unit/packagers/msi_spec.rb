@@ -38,27 +38,27 @@ module Omnibus
       end
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :pkg" do
         expect(subject.id).to eq(:msi)
       end
     end
 
-    describe '#upgrade_code' do
+    describe "#upgrade_code" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:upgrade_code)
       end
 
       it "is required" do
-        expect {
+        expect do
           subject.upgrade_code
-        }.to raise_error(MissingRequiredAttribute)
+        end.to raise_error(MissingRequiredAttribute)
       end
 
       it "requires the value to be a String" do
-        expect {
+        expect do
           subject.parameters(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "returns the given value" do
@@ -68,7 +68,7 @@ module Omnibus
       end
     end
 
-    describe '#parameters' do
+    describe "#parameters" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:parameters)
       end
@@ -78,9 +78,9 @@ module Omnibus
       end
 
       it "requires the value to be a Hash" do
-        expect {
+        expect do
           subject.parameters(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "returns the given value" do
@@ -90,7 +90,7 @@ module Omnibus
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       before do
         allow(Config).to receive(:windows_arch).and_return(:foo_arch)
       end
@@ -105,13 +105,13 @@ module Omnibus
       end
     end
 
-    describe '#resources_dir' do
+    describe "#resources_dir" do
       it "is nested inside the staging_dir" do
         expect(subject.resources_dir).to eq("#{staging_dir}/Resources")
       end
     end
 
-    describe '#write_localization_file' do
+    describe "#write_localization_file" do
       it "generates the file" do
         subject.write_localization_file
         expect("#{staging_dir}/localization-en-us.wxl").to be_a_file
@@ -127,7 +127,7 @@ module Omnibus
       end
     end
 
-    describe '#write_parameters_file' do
+    describe "#write_parameters_file" do
       before do
         subject.upgrade_code("ABCD-1234")
       end
@@ -147,7 +147,7 @@ module Omnibus
       end
     end
 
-    describe '#write_source_file' do
+    describe "#write_source_file" do
       it "generates the file" do
         subject.write_source_file
         expect("#{staging_dir}/source.wxs").to be_a_file
@@ -202,7 +202,7 @@ module Omnibus
       end
     end
 
-    describe '#write_bundle_file' do
+    describe "#write_bundle_file" do
       before do
         subject.bundle_msi(true)
         subject.upgrade_code("ABCD-1234")
@@ -223,7 +223,7 @@ module Omnibus
       end
     end
 
-    describe '#windows_package_version' do
+    describe "#windows_package_version" do
       context "when the project build_version semver" do
         it "returns the right value" do
           expect(subject.windows_package_version).to eq("1.2.3.2")
@@ -239,7 +239,7 @@ module Omnibus
       end
     end
 
-    describe '#msi_display_version' do
+    describe "#msi_display_version" do
       context 'when the project build_version is "safe"' do
         it "returns the right value" do
           expect(subject.msi_display_version).to eq("1.2.3")
@@ -255,29 +255,29 @@ module Omnibus
       end
     end
 
-    describe '#wix_candle_extensions' do
+    describe "#wix_candle_extensions" do
       it "defaults to an empty Array" do
         expect(subject.wix_candle_extensions).to be_an(Array)
         expect(subject.wix_candle_extensions).to be_empty
       end
     end
 
-    describe '#wix_light_extensions' do
+    describe "#wix_light_extensions" do
       it "defaults to an empty Array" do
         expect(subject.wix_light_extensions).to be_an(Array)
         expect(subject.wix_light_extensions).to be_empty
       end
     end
 
-    describe '#wix_candle_extension' do
+    describe "#wix_candle_extension" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:wix_candle_extension)
       end
 
       it "requires the value to be an String" do
-        expect {
+        expect do
           subject.wix_candle_extension(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "returns the given value" do
@@ -287,15 +287,15 @@ module Omnibus
       end
     end
 
-    describe '#wix_light_extension' do
+    describe "#wix_light_extension" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:wix_light_extension)
       end
 
       it "requires the value to be an String" do
-        expect {
+        expect do
           subject.wix_light_extension(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "returns the given value" do
@@ -305,7 +305,7 @@ module Omnibus
       end
     end
 
-    describe '#wix_extension_switches' do
+    describe "#wix_extension_switches" do
       it "returns an empty string for an empty array" do
         expect(subject.wix_extension_switches([])).to eq("")
       end
@@ -319,15 +319,15 @@ module Omnibus
       end
     end
 
-    describe '#bundle_msi' do
+    describe "#bundle_msi" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:bundle_msi)
       end
 
       it "requires the value to be a TrueClass or a FalseClass" do
-        expect {
+        expect do
           subject.bundle_msi(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "returns the given value" do
@@ -336,15 +336,15 @@ module Omnibus
       end
     end
 
-    describe '#fast_msi' do
+    describe "#fast_msi" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:fast_msi)
       end
 
       it "requires the value to be a TrueClass or a FalseClass" do
-        expect {
+        expect do
           subject.fast_msi(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "returns the given value" do
@@ -353,7 +353,7 @@ module Omnibus
       end
     end
 
-    describe '#zip_command' do
+    describe "#zip_command" do
       it "returns a String" do
         expect(subject.zip_command).to be_a(String)
       end
@@ -363,7 +363,7 @@ module Omnibus
       end
     end
 
-    describe '#candle_command' do
+    describe "#candle_command" do
       it "returns a String" do
         expect(subject.candle_command).to be_a(String)
       end
@@ -393,7 +393,7 @@ module Omnibus
       end
     end
 
-    describe '#heat_command' do
+    describe "#heat_command" do
       it "returns a String" do
         expect(subject.heat_command).to be_a(String)
       end
@@ -423,7 +423,7 @@ module Omnibus
       end
     end
 
-    describe '#light_command' do
+    describe "#light_command" do
       it "returns a String" do
         expect(subject.light_command("foo")).to be_a(String)
       end
@@ -453,7 +453,7 @@ module Omnibus
       end
     end
 
-    describe '#gem_path' do
+    describe "#gem_path" do
       let(:install_dir) { File.join(tmp_path, "install_dir") }
 
       before do
@@ -469,9 +469,9 @@ module Omnibus
       end
 
       it "requires the value to be a String" do
-        expect {
+        expect do
           subject.gem_path(Object.new)
-        }.to raise_error(InvalidValue)
+        end.to raise_error(InvalidValue)
       end
 
       it "globs for gems under the install directory" do
@@ -509,7 +509,7 @@ module Omnibus
           allow(subject).to receive(:shellout!)
         end
 
-        describe '#timestamp_servers' do
+        describe "#timestamp_servers" do
           it "defaults to using ['http://timestamp.digicert.com','http://timestamp.verisign.com/scripts/timestamp.dll']" do
             subject.signing_identity("foo")
             expect(subject).to receive(:try_sign).with(msi, "http://timestamp.digicert.com").and_return(false)
@@ -517,20 +517,20 @@ module Omnibus
             subject.sign_package(msi)
           end
 
-          it 'uses the timestamp server if provided through the #timestamp_server dsl' do
+          it "uses the timestamp server if provided through the #timestamp_server dsl" do
             subject.signing_identity("foo", timestamp_servers: "http://fooserver")
             expect(subject).to receive(:try_sign).with(msi, "http://fooserver").and_return(true)
             subject.sign_package(msi)
           end
 
-          it 'tries all timestamp server if provided through the #timestamp_server dsl' do
+          it "tries all timestamp server if provided through the #timestamp_server dsl" do
             subject.signing_identity("foo", timestamp_servers: ["http://fooserver", "http://barserver"])
             expect(subject).to receive(:try_sign).with(msi, "http://fooserver").and_return(false)
             expect(subject).to receive(:try_sign).with(msi, "http://barserver").and_return(true)
             subject.sign_package(msi)
           end
 
-          it 'tries all timestamp server if provided through the #timestamp_servers dsl and stops at the first available' do
+          it "tries all timestamp server if provided through the #timestamp_servers dsl and stops at the first available" do
             subject.signing_identity("foo", timestamp_servers: ["http://fooserver", "http://barserver"])
             expect(subject).to receive(:try_sign).with(msi, "http://fooserver").and_return(true)
             expect(subject).not_to receive(:try_sign).with(msi, "http://barserver")

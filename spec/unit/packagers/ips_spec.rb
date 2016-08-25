@@ -39,7 +39,7 @@ module Omnibus
       end
     end
 
-    describe '#publisher_prefix' do
+    describe "#publisher_prefix" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:publisher_prefix)
       end
@@ -49,47 +49,47 @@ module Omnibus
       end
     end
 
-    it '#id is :IPS' do
+    it "#id is :IPS" do
       expect(subject.id).to eq(:ips)
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it "should create correct package name" do
         expect(subject.package_name).to eq("project-1.2.3-2.i386.p5p")
       end
     end
 
-    describe '#fmri_package_name' do
+    describe "#fmri_package_name" do
       it "should create correct fmri package name" do
         expect(subject.fmri_package_name).to eq ("project@1.2.3,5.11-2")
       end
     end
 
-    describe '#pkg_metadata_file' do
+    describe "#pkg_metadata_file" do
       it "is created inside the staging_dir" do
         expect(subject.pkg_metadata_file).to eq("#{subject.staging_dir}/gen.manifestfile")
       end
     end
 
-    describe '#pkg_manifest_file' do
+    describe "#pkg_manifest_file" do
       it "is created inside the staging_dir" do
         expect(subject.pkg_manifest_file).to eq("#{subject.staging_dir}/#{subject.safe_base_package_name}.p5m")
       end
     end
 
-    describe '#repo_dir' do
+    describe "#repo_dir" do
       it "is created inside the staging_dir" do
         expect(subject.repo_dir).to eq("#{subject.staging_dir}/publish/repo")
       end
     end
 
-    describe '#source_dir' do
+    describe "#source_dir" do
       it "is created inside the staging_dir" do
         expect(subject.source_dir).to eq("#{subject.staging_dir}/proto_install")
       end
     end
 
-    describe '#safe_base_package_name' do
+    describe "#safe_base_package_name" do
       context 'when the project name is "safe"' do
         it "returns the value without logging a message" do
           expect(subject.safe_base_package_name).to eq("project")
@@ -110,7 +110,7 @@ module Omnibus
       end
     end
 
-    describe '#safe_architecture' do
+    describe "#safe_architecture" do
       context "the architecture is Intel-based" do
         let(:architecture) { "i86pc" }
 

@@ -27,13 +27,13 @@ module Omnibus
       create_directory(staging_dir)
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :makeself" do
         expect(subject.id).to eq(:makeself)
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       before do
         allow(subject).to receive(:safe_architecture).and_return("x86_64")
       end
@@ -43,7 +43,7 @@ module Omnibus
       end
     end
 
-    describe '#write_makeselfinst' do
+    describe "#write_makeselfinst" do
       it "generates the executable file", :not_supported_on_windows do
         subject.write_makeselfinst
         expect("#{staging_dir}/makeselfinst").to be_an_executable
@@ -57,7 +57,7 @@ module Omnibus
       end
     end
 
-    describe '#write_scripts' do
+    describe "#write_scripts" do
       let(:default_scripts) { %w{ postinst } }
       before do
         default_scripts.each do |script_name|
@@ -79,7 +79,7 @@ module Omnibus
       end
     end
 
-    describe '#create_makeself_package' do
+    describe "#create_makeself_package" do
       before do
         allow(subject).to receive(:shellout!)
         allow(Dir).to receive(:chdir) { |_, &b| b.call }

@@ -12,13 +12,13 @@ module Omnibus
       end
     end
 
-    describe '#name' do
+    describe "#name" do
       it "returns the basename of the file" do
         expect(subject.name).to eq("thing.deb")
       end
     end
 
-    describe '#md5' do
+    describe "#md5" do
       let(:md5) { "abcdef123456" }
 
       before { allow(subject).to receive(:digest).with(path, :md5).and_return(md5) }
@@ -28,7 +28,7 @@ module Omnibus
       end
     end
 
-    describe '#sha256' do
+    describe "#sha256" do
       let(:sha256) { "abcdef123456" }
 
       before { allow(subject).to receive(:digest).with(path, :sha256).and_return(sha256) }
@@ -38,7 +38,7 @@ module Omnibus
       end
     end
 
-    describe '#sha512' do
+    describe "#sha512" do
       let(:sha512) { "abcdef123456" }
 
       before { allow(subject).to receive(:digest).with(path, :sha512).and_return(sha512) }
@@ -48,7 +48,7 @@ module Omnibus
       end
     end
 
-    describe '#content' do
+    describe "#content" do
       context "when the file exists" do
         let(:content) { "BINARY" }
 
@@ -68,7 +68,7 @@ module Omnibus
       end
     end
 
-    describe '#metadata' do
+    describe "#metadata" do
       let(:content) { '{ "platform": "ubuntu" }' }
 
       before { allow(IO).to receive(:read).and_return(content) }

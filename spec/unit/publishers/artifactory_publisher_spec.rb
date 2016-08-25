@@ -137,7 +137,7 @@ module Omnibus
 
     subject { described_class.new(path, options) }
 
-    describe '#publish' do
+    describe "#publish" do
       before do
         allow(subject).to receive(:packages).and_return(packages)
         Config.artifactory_base_path("com/getchef")
@@ -246,7 +246,7 @@ module Omnibus
       end
     end
 
-    describe '#metadata_properties_for' do
+    describe "#metadata_properties_for" do
       it "returns the transformed package metadata values" do
         expect(subject.send(:metadata_properties_for, package)).to include(package_properties.merge(build_values))
       end

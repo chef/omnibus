@@ -426,15 +426,15 @@ module Omnibus
           allow_any_instance_of(LicenseScout::Collector).to receive(:issue_report).and_return([])
         end
 
-        let(:expected_license_files) {
+        let(:expected_license_files) do
           %w{
             ruby_bundler-inifile-3.0.0-README.md
             ruby_bundler-mime-types-3.1-Licence.rdoc
             ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
           }
-        }
+        end
 
-        let(:expected_license_texts) {
+        let(:expected_license_texts) do
           [
             <<-EOH,
 This product includes inifile 3.0.0
@@ -458,7 +458,7 @@ For details, see:
 #{install_dir}/LICENSES/ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
 EOH
           ]
-        }
+        end
 
         it "includes transitive dependency license information in the project license information" do
           create_licenses
@@ -485,15 +485,15 @@ EOH
           allow_any_instance_of(LicenseScout::Collector).to receive(:issue_report).and_return([])
         end
 
-        let(:expected_license_files) {
+        let(:expected_license_files) do
           %w{
             ruby_bundler-inifile-3.0.0-README.md
             ruby_bundler-mime-types-3.1-Licence.rdoc
             ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
           }
-        }
+        end
 
-        let(:expected_license_texts) {
+        let(:expected_license_texts) do
           [
             <<-EOH,
 This product includes inifile 3.0.0
@@ -525,7 +525,7 @@ For details, see:
 EOH
 
           ]
-        }
+        end
 
         it "includes merged licensing information from multiple software definitions" do
           create_licenses

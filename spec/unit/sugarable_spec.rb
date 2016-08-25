@@ -47,12 +47,12 @@ module Omnibus
       end
 
       it "makes the DSL methods available in the cleanroom" do
-        expect {
+        expect do
           instance.evaluate <<-EOH.gsub(/^ {12}/, "")
             windows?
             vagrant?
           EOH
-        }.to_not raise_error
+        end.to_not raise_error
       end
     end
   end
