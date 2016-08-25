@@ -422,8 +422,10 @@ module Omnibus
 
       describe "when there are warnings in the licensing info" do
         before do
-          allow_any_instance_of(LicenseScout::Collector).to receive(:run)
-          allow_any_instance_of(LicenseScout::Collector).to receive(:issue_report).and_return(["This is a licensing warning!!!"])
+          allow_any_instance_of(LicenseScout::Collector).to receive(:run) do
+            FileUtils.cp_r(File.join(license_fixtures_path, "zlib"), File.join(install_dir, "license-cache/"))
+          end
+          allow_any_instance_of(LicenseScout::Reporter).to receive(:report).and_return(["This is a licensing warning!!!"])
         end
 
         it "logs the warnings" do
