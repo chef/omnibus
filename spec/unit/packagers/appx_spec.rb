@@ -34,19 +34,19 @@ module Omnibus
       end
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :pkg" do
         expect(subject.id).to eq(:appx)
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it "includes the name, version, and build iteration" do
         expect(subject.package_name).to eq("project-1.2.3-2.appx")
       end
     end
 
-    describe '#write_manifest_file' do
+    describe "#write_manifest_file" do
       before do
         allow(subject).to receive(:shellout!).and_return(double("output", stdout: "CN=Chef "))
         allow(subject).to receive(:signing_identity).and_return({})
@@ -71,7 +71,7 @@ module Omnibus
       end
     end
 
-    describe '#windows_package_version' do
+    describe "#windows_package_version" do
       context "when the project build_version semver" do
         it "returns the right value" do
           expect(subject.windows_package_version).to eq("1.2.3.2")
@@ -87,7 +87,7 @@ module Omnibus
       end
     end
 
-    describe '#pack_command' do
+    describe "#pack_command" do
       it "returns a String" do
         expect(subject.pack_command("foo")).to be_a(String)
       end
@@ -125,7 +125,7 @@ module Omnibus
           allow(subject).to receive(:shellout!)
         end
 
-        describe '#timestamp_servers' do
+        describe "#timestamp_servers" do
           it "defaults to using ['http://timestamp.digicert.com','http://timestamp.verisign.com/scripts/timestamp.dll']" do
             subject.signing_identity("foo")
             expect(subject).to receive(:try_sign).with(appx, "http://timestamp.digicert.com").and_return(false)
@@ -133,20 +133,20 @@ module Omnibus
             subject.sign_package(appx)
           end
 
-          it 'uses the timestamp server if provided through the #timestamp_server dsl' do
+          it "uses the timestamp server if provided through the #timestamp_server dsl" do
             subject.signing_identity("foo", timestamp_servers: "http://fooserver")
             expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(true)
             subject.sign_package(appx)
           end
 
-          it 'tries all timestamp server if provided through the #timestamp_server dsl' do
+          it "tries all timestamp server if provided through the #timestamp_server dsl" do
             subject.signing_identity("foo", timestamp_servers: ["http://fooserver", "http://barserver"])
             expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(false)
             expect(subject).to receive(:try_sign).with(appx, "http://barserver").and_return(true)
             subject.sign_package(appx)
           end
 
-          it 'tries all timestamp server if provided through the #timestamp_servers dsl and stops at the first available' do
+          it "tries all timestamp server if provided through the #timestamp_servers dsl and stops at the first available" do
             subject.signing_identity("foo", timestamp_servers: ["http://fooserver", "http://barserver"])
             expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(true)
             expect(subject).not_to receive(:try_sign).with(appx, "http://barserver")

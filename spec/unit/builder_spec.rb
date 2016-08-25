@@ -28,121 +28,121 @@ module Omnibus
       end
     end
 
-    describe '#command' do
+    describe "#command" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:command)
       end
     end
 
-    describe '#workers' do
+    describe "#workers" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:workers)
       end
     end
 
-    describe '#ruby' do
+    describe "#ruby" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:ruby)
       end
     end
 
-    describe '#gem' do
+    describe "#gem" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:gem)
       end
     end
 
-    describe '#bundle' do
+    describe "#bundle" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:bundle)
       end
     end
 
-    describe '#appbundle' do
+    describe "#appbundle" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:appbundle)
       end
     end
 
-    describe '#block' do
+    describe "#block" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:block)
       end
     end
 
-    describe '#erb' do
+    describe "#erb" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:erb)
       end
     end
 
-    describe '#mkdir' do
+    describe "#mkdir" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:mkdir)
       end
     end
 
-    describe '#touch' do
+    describe "#touch" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:touch)
       end
     end
 
-    describe '#delete' do
+    describe "#delete" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:delete)
       end
     end
 
-    describe '#copy' do
+    describe "#copy" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:copy)
       end
     end
 
-    describe '#move' do
+    describe "#move" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:move)
       end
     end
 
-    describe '#link' do
+    describe "#link" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:link)
       end
     end
 
-    describe '#sync' do
+    describe "#sync" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:sync)
       end
     end
 
-    describe '#update_config_guess' do
+    describe "#update_config_guess" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:update_config_guess)
       end
     end
 
-    describe '#windows_safe_path' do
+    describe "#windows_safe_path" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:windows_safe_path)
       end
     end
 
-    describe '#project_dir' do
+    describe "#project_dir" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:project_dir)
       end
     end
 
-    describe '#install_dir' do
+    describe "#install_dir" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:install_dir)
       end
     end
 
-    describe '#make' do
+    describe "#make" do
       before do
         allow(subject).to receive(:command)
       end
@@ -205,7 +205,7 @@ module Omnibus
       end
     end
 
-    describe '#configure' do
+    describe "#configure" do
       before do
         allow(subject).to receive(:command)
       end
@@ -287,7 +287,7 @@ module Omnibus
       end
     end
 
-    describe '#patch' do
+    describe "#patch" do
       before do
         allow(subject).to receive(:find_file)
           .with("config/patches", "good_patch")
@@ -331,11 +331,11 @@ module Omnibus
 
     describe "#shasum" do
       let(:build_step) do
-        Proc.new {
+        Proc.new do
           block do
             command("true")
           end
-        }
+        end
       end
 
       let(:tmp_dir) { Dir.mktmpdir }

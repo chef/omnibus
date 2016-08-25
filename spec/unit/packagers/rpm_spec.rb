@@ -40,7 +40,7 @@ module Omnibus
       end
     end
 
-    describe '#signing_passphrase' do
+    describe "#signing_passphrase" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:signing_passphrase)
       end
@@ -50,7 +50,7 @@ module Omnibus
       end
     end
 
-    describe '#vendor' do
+    describe "#vendor" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:vendor)
       end
@@ -64,7 +64,7 @@ module Omnibus
       end
     end
 
-    describe '#license' do
+    describe "#license" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:license)
       end
@@ -86,7 +86,7 @@ module Omnibus
       end
     end
 
-    describe '#priority' do
+    describe "#priority" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:priority)
       end
@@ -100,7 +100,7 @@ module Omnibus
       end
     end
 
-    describe '#category' do
+    describe "#category" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:category)
       end
@@ -114,7 +114,7 @@ module Omnibus
       end
     end
 
-    describe '#dist_tag' do
+    describe "#dist_tag" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:dist_tag)
       end
@@ -124,13 +124,13 @@ module Omnibus
       end
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :rpm" do
         expect(subject.id).to eq(:rpm)
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       context "when dist_tag is enabled" do
         before do
           allow(subject).to receive(:safe_architecture).and_return("x86_64")
@@ -152,13 +152,13 @@ module Omnibus
       end
     end
 
-    describe '#build_dir' do
+    describe "#build_dir" do
       it "is nested inside the staging_dir" do
         expect(subject.build_dir).to eq("#{staging_dir}/BUILD")
       end
     end
 
-    describe '#write_rpm_spec' do
+    describe "#write_rpm_spec" do
       before do
         allow(subject).to receive(:safe_architecture).and_return("x86_64")
       end
@@ -301,7 +301,7 @@ module Omnibus
       end
     end
 
-    describe '#create_rpm_file' do
+    describe "#create_rpm_file" do
       before do
         allow(subject).to receive(:shellout!)
         allow(Dir).to receive(:chdir) { |_, &b| b.call }
@@ -332,7 +332,7 @@ module Omnibus
       end
     end
 
-    describe '#spec_file' do
+    describe "#spec_file" do
       before do
         allow(subject).to receive(:package_name).and_return("package_name")
       end
@@ -342,7 +342,7 @@ module Omnibus
       end
     end
 
-    describe '#rpm_safe' do
+    describe "#rpm_safe" do
       it "adds quotes when required" do
         expect(subject.rpm_safe("file path")).to eq('"file path"')
       end
@@ -364,7 +364,7 @@ module Omnibus
       end
     end
 
-    describe '#safe_base_package_name' do
+    describe "#safe_base_package_name" do
       context 'when the project name is "safe"' do
         it "returns the value without logging a message" do
           expect(subject.safe_base_package_name).to eq("project")
@@ -385,13 +385,13 @@ module Omnibus
       end
     end
 
-    describe '#safe_build_iteration' do
+    describe "#safe_build_iteration" do
       it "returns the build iternation" do
         expect(subject.safe_build_iteration).to eq(project.build_iteration)
       end
     end
 
-    describe '#safe_version' do
+    describe "#safe_version" do
       context 'when the project build_version is "safe"' do
         it "returns the value without logging a message" do
           expect(subject.safe_version).to eq("1.2.3")
@@ -454,7 +454,7 @@ module Omnibus
       end
     end
 
-    describe '#safe_architecture' do
+    describe "#safe_architecture" do
       before do
         stub_ohai(platform: "redhat", version: "6.5") do |data|
           data["kernel"]["machine"] = "i386"

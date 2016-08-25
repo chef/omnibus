@@ -446,7 +446,7 @@ module Omnibus
       end
     end
 
-    describe '#ohai' do
+    describe "#ohai" do
       before { stub_ohai(platform: "ubuntu", version: "12.04") }
 
       it "is a DSL method" do
@@ -516,7 +516,7 @@ module Omnibus
       end
     end
 
-    describe '#<=>' do
+    describe "#<=>" do
       let(:zlib)   { described_class.new(project).tap { |s| s.name("zlib") } }
       let(:erchef) { described_class.new(project).tap { |s| s.name("erchef") } }
       let(:bacon)  { described_class.new(project).tap { |s| s.name("bacon") } }
@@ -527,7 +527,7 @@ module Omnibus
       end
     end
 
-    describe '#whitelist_file' do
+    describe "#whitelist_file" do
       it "appends to the whitelist_files array" do
         expect(subject.whitelist_files.size).to eq(0)
         subject.whitelist_file(/foo\/bar/)
@@ -636,7 +636,7 @@ module Omnibus
       end
     end
 
-    describe '#fetcher' do
+    describe "#fetcher" do
       before do
         expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", source).and_return("1.2.8")
       end
@@ -760,7 +760,7 @@ module Omnibus
       end
     end
 
-    describe '#shasum' do
+    describe "#shasum" do
       context "when a filepath is given" do
         let(:path) { "/software.rb" }
         let(:file) { double(File) }

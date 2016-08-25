@@ -329,20 +329,20 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       end
     end
 
-    describe '#name' do
+    describe "#name" do
       it "returns the basename of the package" do
         expect(subject.name).to eq("package.deb.metadata.json")
       end
     end
 
-    describe '#path' do
+    describe "#path" do
       it "delegates to .path_for" do
         expect(described_class).to receive(:path_for).once
         subject.path
       end
     end
 
-    describe '#save' do
+    describe "#save" do
       let(:file) { double(File) }
 
       before { allow(File).to receive(:open).and_yield(file) }
@@ -353,7 +353,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       end
     end
 
-    describe '#to_json' do
+    describe "#to_json" do
       it "generates pretty JSON" do
         expect(subject.to_json.strip).to eq <<-EOH.gsub(/^ {10}/, "").strip
           {

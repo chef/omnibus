@@ -87,7 +87,7 @@ module Omnibus
       end
     end
 
-    describe '#install_dir' do
+    describe "#install_dir" do
       it "removes duplicate slashes" do
         subject.install_dir("///opt//chef")
         expect(subject.install_dir).to eq("/opt/chef")
@@ -108,7 +108,7 @@ module Omnibus
       end
     end
 
-    describe '#default_root' do
+    describe "#default_root" do
       context "on Windows" do
         before { stub_ohai(platform: "windows", version: "2012") }
 
@@ -145,19 +145,19 @@ module Omnibus
       end
     end
 
-    describe '#license' do
+    describe "#license" do
       it "sets the default to Unspecified" do
         expect(subject.license).to eq ("Unspecified")
       end
     end
 
-    describe '#license_file_path' do
+    describe "#license_file_path" do
       it "sets the default to LICENSE" do
         expect(subject.license_file_path).to eq ("/sample/LICENSE")
       end
     end
 
-    describe '#dirty!' do
+    describe "#dirty!" do
       let(:software) { double(Omnibus::Software) }
 
       it "dirties the cache" do
@@ -173,7 +173,7 @@ module Omnibus
       end
     end
 
-    describe '#dirty?' do
+    describe "#dirty?" do
       it "returns true by default" do
         subject.instance_variable_set(:@culprit, nil)
         expect(subject).to_not be_dirty
@@ -190,7 +190,7 @@ module Omnibus
       end
     end
 
-    describe '#<=>' do
+    describe "#<=>" do
       let(:chefdk) { described_class.new.tap { |p| p.name("chefdk") } }
       let(:chef)   { described_class.new.tap { |p| p.name("chef") } }
       let(:ruby)   { described_class.new.tap { |p| p.name("ruby") } }
@@ -201,7 +201,7 @@ module Omnibus
       end
     end
 
-    describe '#build_iteration' do
+    describe "#build_iteration" do
       let(:fauxhai_options) { Hash.new }
 
       before { stub_ohai(fauxhai_options) }
@@ -243,20 +243,20 @@ module Omnibus
       end
     end
 
-    describe '#overrides' do
+    describe "#overrides" do
       before { subject.overrides.clear }
 
-      it 'sets all the things through #overrides' do
+      it "sets all the things through #overrides" do
         subject.override(:thing, version: "6.6.6")
         expect(subject.override(:zlib)).to be_nil
       end
 
-      it 'retrieves the things set through #overrides' do
+      it "retrieves the things set through #overrides" do
         subject.override(:thing, version: "6.6.6")
         expect(subject.override(:thing)[:version]).to eq("6.6.6")
       end
 
-      it 'symbolizes #overrides' do
+      it "symbolizes #overrides" do
         subject.override("thing", version: "6.6.6")
         [:thing, "thing"].each do |thing|
           expect(subject.override(thing)).not_to be_nil
@@ -265,7 +265,7 @@ module Omnibus
       end
     end
 
-    describe '#ohai' do
+    describe "#ohai" do
       before { stub_ohai(platform: "ubuntu", version: "12.04") }
 
       it "is a DSL method" do
@@ -277,21 +277,21 @@ module Omnibus
       end
     end
 
-    describe '#packagers_for_system' do
+    describe "#packagers_for_system" do
       it "returns array of packager objects" do
         subject.packagers_for_system.each do |packager|
           expect(packager).to be_a(Packager::Base)
         end
       end
 
-      it 'calls Packager#for_current_system' do
+      it "calls Packager#for_current_system" do
         expect(Packager).to receive(:for_current_system)
           .and_call_original
         subject.packagers_for_system
       end
     end
 
-    describe '#package' do
+    describe "#package" do
       it "raises an exception when a block is not given" do
         expect { subject.package(:foo) }.to raise_error(InvalidValue)
       end
@@ -312,7 +312,7 @@ module Omnibus
       end
     end
 
-    describe '#packagers' do
+    describe "#packagers" do
       it "returns a Hash" do
         expect(subject.packagers).to be_a(Hash)
       end
@@ -323,12 +323,12 @@ module Omnibus
       end
     end
 
-    describe '#compressor' do
+    describe "#compressor" do
       it "returns a compressor object" do
         expect(subject.compressor).to be_a(Compressor::Base)
       end
 
-      it 'calls Compressor#for_current_system' do
+      it "calls Compressor#for_current_system" do
         expect(Compressor).to receive(:for_current_system)
           .and_call_original
 
@@ -347,7 +347,7 @@ module Omnibus
       end
     end
 
-    describe '#compress' do
+    describe "#compress" do
       it "does not raises an exception when a block is not given" do
         expect { subject.compress(:foo) }.to_not raise_error
       end
@@ -373,7 +373,7 @@ module Omnibus
       end
     end
 
-    describe '#compressors' do
+    describe "#compressors" do
       it "returns a Hash" do
         expect(subject.compressors).to be_a(Hash)
       end
@@ -384,7 +384,7 @@ module Omnibus
       end
     end
 
-    describe '#shasum' do
+    describe "#shasum" do
       context "when a filepath is given" do
         let(:path) { "/project.rb" }
         let(:file) { double(File) }

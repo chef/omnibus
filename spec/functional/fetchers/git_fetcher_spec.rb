@@ -24,7 +24,7 @@ module Omnibus
 
     let(:revision) { shellout!("git rev-parse HEAD", cwd: project_dir).stdout.strip }
 
-    describe '#fetch_required?' do
+    describe "#fetch_required?" do
       context "when the repo is not cloned" do
         it "return true" do
           expect(subject.fetch_required?).to be_truthy
@@ -56,13 +56,13 @@ module Omnibus
       end
     end
 
-    describe '#version_guid' do
+    describe "#version_guid" do
       it "includes the current revision" do
         expect(subject.version_guid).to match(/^git:[0-9a-f]{40}/)
       end
     end
 
-    describe '#clean' do
+    describe "#clean" do
       before do
         subject.fetch
       end
@@ -105,7 +105,7 @@ module Omnibus
       end
     end
 
-    describe '#fetch'  do
+    describe "#fetch"  do
       let(:version)  { "v1.2.4" }
       let(:remote)   { remote_git_repo("zlib", annotated_tags: [version]) }
       let(:manifest_entry) do
@@ -124,7 +124,7 @@ module Omnibus
       end
     end
 
-    describe '#resolve_version' do
+    describe "#resolve_version" do
       context "when the version is a tag" do
         let(:version)  { "v1.2.3" }
         let(:remote)   { remote_git_repo("zlib", tags: [version]) }
@@ -180,7 +180,7 @@ module Omnibus
       end
     end
 
-    describe '#version_for_cache' do
+    describe "#version_for_cache" do
       it "includes the resolved revision" do
         expect(subject.version_for_cache).to eq("revision:45ded6d3b1a35d66ed866b2c3eb418426e6382b0")
       end

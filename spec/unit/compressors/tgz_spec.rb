@@ -36,13 +36,13 @@ module Omnibus
       allow(subject).to receive(:shellout!)
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it "returns the name of the packager" do
         expect(subject.package_name).to eq("project-1.2.3-2.pkg.tar.gz")
       end
     end
 
-    describe '#write_tgz' do
+    describe "#write_tgz" do
       before do
         File.open("#{staging_dir}/project-1.2.3-2.pkg", "wb") do |f|
           f.write " " * 1_000_000
