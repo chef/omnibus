@@ -7,13 +7,13 @@ module Omnibus
 
     subject { described_class.new(project) }
 
-    describe '#id' do
+    describe "#id" do
       it "is :dmg" do
         expect(subject.id).to eq(:null)
       end
     end
 
-    describe '#run!' do
+    describe "#run!" do
       it "does nothing" do
         expect(subject).to_not receive(:instance_eval)
         subject.run!

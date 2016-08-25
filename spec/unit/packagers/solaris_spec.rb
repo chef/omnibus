@@ -36,37 +36,37 @@ module Omnibus
       end
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :solaris" do
         expect(subject.id).to eq(:solaris)
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it "includes the name, version, iteration and architecture" do
         expect(subject.package_name).to eq("project-1.2.3-1.i386.solaris")
       end
     end
 
-    describe '#pkgmk_version' do
+    describe "#pkgmk_version" do
       it "includes the version and iteration" do
         expect(subject.pkgmk_version).to eq("1.2.3-1")
       end
     end
 
-    describe '#install_dirname' do
+    describe "#install_dirname" do
       it "returns the parent directory" do
         expect(subject.install_dirname).to eq("/opt")
       end
     end
 
-    describe '#install_basename' do
+    describe "#install_basename" do
       it "name of the install directory" do
         expect(subject.install_basename).to eq("project")
       end
     end
 
-    describe '#write_scripts' do
+    describe "#write_scripts" do
       context "when scripts are given" do
         let(:scripts) { %w{ postinstall postremove } }
         before do
@@ -111,7 +111,7 @@ module Omnibus
       end
     end
 
-    describe '#write_prototype_file' do
+    describe "#write_prototype_file" do
       let(:prototype_file) { File.join(staging_dir, "Prototype") }
 
       before do
@@ -155,7 +155,7 @@ module Omnibus
       end
     end
 
-    describe '#create_solaris_file' do
+    describe "#create_solaris_file" do
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
           .with("pkgmk -o -r /opt -d #{staging_dir} -f #{File.join(staging_dir, 'Prototype')}")
@@ -168,7 +168,7 @@ module Omnibus
       end
     end
 
-    describe '#write_pkginfo_file' do
+    describe "#write_pkginfo_file" do
       let(:pkginfo_file) { File.join(staging_dir, "pkginfo") }
       let(:hostname) { Socket.gethostname }
       let(:now) { Time.now }
@@ -199,7 +199,7 @@ module Omnibus
       end
     end
 
-    describe '#create_solaris_file' do
+    describe "#create_solaris_file" do
       before do
         allow(subject).to receive(:shellout!)
         allow(Dir).to receive(:chdir) { |_, &b| b.call }
@@ -217,7 +217,7 @@ module Omnibus
       end
     end
 
-    describe '#safe_architecture' do
+    describe "#safe_architecture" do
       context "the architecture is Intel-based" do
         let(:architecture) { "i86pc" }
 

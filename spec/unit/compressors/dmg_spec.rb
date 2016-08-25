@@ -33,7 +33,7 @@ module Omnibus
       allow(subject).to receive(:shellout!)
     end
 
-    describe '#window_bounds' do
+    describe "#window_bounds" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:window_bounds)
       end
@@ -43,7 +43,7 @@ module Omnibus
       end
     end
 
-    describe '#pkg_position' do
+    describe "#pkg_position" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:pkg_position)
       end
@@ -53,19 +53,19 @@ module Omnibus
       end
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :dmg" do
         expect(subject.id).to eq(:dmg)
       end
     end
 
-    describe '#resources_dir' do
+    describe "#resources_dir" do
       it "is nested inside the staging_dir" do
         expect(subject.resources_dir).to eq("#{staging_dir}/Resources")
       end
     end
 
-    describe '#clean_disks' do
+    describe "#clean_disks" do
       it "logs a message" do
         allow(subject).to receive(:shellout!)
           .and_return(double(Mixlib::ShellOut, stdout: ""))
@@ -75,7 +75,7 @@ module Omnibus
       end
     end
 
-    describe '#create_writable_dmg' do
+    describe "#create_writable_dmg" do
       it "logs a message" do
         output = capture_logging { subject.create_writable_dmg }
         expect(output).to include("Creating writable dmg")
@@ -98,7 +98,7 @@ module Omnibus
       end
     end
 
-    describe '#attach_dmg' do
+    describe "#attach_dmg" do
       before do
         allow(subject).to receive(:shellout!)
           .and_return(shellout)
@@ -129,7 +129,7 @@ module Omnibus
       end
     end
 
-    describe '#set_volume_icon' do
+    describe "#set_volume_icon" do
       it "logs a message" do
         output = capture_logging { subject.set_volume_icon }
         expect(output).to include("Setting volume icon")
@@ -165,7 +165,7 @@ module Omnibus
       end
     end
 
-    describe '#prettify_dmg' do
+    describe "#prettify_dmg" do
       it "logs a message" do
         output = capture_logging { subject.prettify_dmg }
         expect(output).to include("Making the dmg all pretty and stuff")
@@ -209,7 +209,7 @@ module Omnibus
       end
     end
 
-    describe '#compress_dmg' do
+    describe "#compress_dmg" do
       it "logs a message" do
         output = capture_logging { subject.compress_dmg }
         expect(output).to include("Compressing dmg")
@@ -237,7 +237,7 @@ module Omnibus
       end
     end
 
-    describe '#set_dmg_icon' do
+    describe "#set_dmg_icon" do
       it "logs a message" do
         output = capture_logging { subject.set_dmg_icon }
         expect(output).to include("Setting dmg icon")
@@ -265,7 +265,7 @@ module Omnibus
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it 'reflects the packager\'s unmodified package_name' do
         expect(subject.package_name).to eq("project-1.2.3-2.dmg")
       end
@@ -279,7 +279,7 @@ module Omnibus
       end
     end
 
-    describe '#writable_dmg' do
+    describe "#writable_dmg" do
       it "is in the staging_dir" do
         expect(subject.writable_dmg).to include(staging_dir)
       end
@@ -289,7 +289,7 @@ module Omnibus
       end
     end
 
-    describe '#volume_name' do
+    describe "#volume_name" do
       it "is the project friendly_name" do
         project.friendly_name("Friendly Bacon Bits")
         expect(subject.volume_name).to eq("Friendly Bacon Bits")

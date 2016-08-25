@@ -2,7 +2,7 @@ require "spec_helper"
 
 module Omnibus
   describe FileSyncer do
-    describe '#glob' do
+    describe "#glob" do
       before do
         FileUtils.mkdir_p(File.join(tmp_path, "folder"))
         FileUtils.mkdir_p(File.join(tmp_path, ".hidden_folder"))
@@ -39,7 +39,7 @@ module Omnibus
       end
     end
 
-    describe '#sync' do
+    describe "#sync" do
       let(:source) do
         source = File.join(tmp_path, "source")
         FileUtils.mkdir_p(source)
@@ -77,21 +77,21 @@ module Omnibus
 
       context "when destination file exists" do
 
-        let(:source) {
+        let(:source) do
           s = File.join(tmp_path, "source")
           FileUtils.mkdir_p(s)
           p = create_file(s, "read-only-file") { "new" }
           FileUtils.chmod(0400, p)
           s
-        }
+        end
 
-        let(:destination) {
+        let(:destination) do
           dest = File.join(tmp_path, "destination")
           FileUtils.mkdir_p(dest)
           create_file(dest, "read-only-file") { "old" }
           FileUtils.chmod(0400, File.join(dest, "read-only-file"))
           dest
-        }
+        end
 
         it "copies over a read-only file" do
           described_class.sync(source, destination)

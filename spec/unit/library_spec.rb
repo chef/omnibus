@@ -55,7 +55,7 @@ module Omnibus
     let(:yajl)        { generate_software("yajl", "1.1.0", %w{rubygems}) }
     let(:zlib)        { generate_software("zlib", "1.2.6", %w{libgcc}) }
 
-    describe '#component_added' do
+    describe "#component_added" do
       it "adds the software to the component list" do
         library.component_added(erchef)
         expect(library.components).to eql([erchef])
@@ -68,7 +68,7 @@ module Omnibus
       end
     end
 
-    describe '#build_order' do
+    describe "#build_order" do
       let(:library) do
         library = Library.new(project)
         library.component_added(preparation)

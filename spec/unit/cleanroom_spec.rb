@@ -17,11 +17,11 @@ module Omnibus
 
     let(:instance) { klass.new }
 
-    describe '#evaluate' do
+    describe "#evaluate" do
       it "exposes public methods" do
-        expect {
+        expect do
           instance.evaluate("exposed_method")
-        }.to_not raise_error
+        end.to_not raise_error
       end
 
       it "calls exposed methods on the instance" do
@@ -30,13 +30,13 @@ module Omnibus
       end
 
       it "does not expose unexposed methods" do
-        expect {
+        expect do
           instance.evaluate("unexposed_method")
-        }.to raise_error(NameError)
+        end.to raise_error(NameError)
       end
     end
 
-    describe '#evaluate_file' do
+    describe "#evaluate_file" do
       let(:contents) do
         <<-EOH.gsub(/^ {10}/, "")
           exposed_method

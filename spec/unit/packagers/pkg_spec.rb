@@ -40,31 +40,31 @@ module Omnibus
       end
     end
 
-    describe '#id' do
+    describe "#id" do
       it "is :pkg" do
         expect(subject.id).to eq(:pkg)
       end
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it "includes the name, version, and build iteration" do
         expect(subject.package_name).to eq("project-full-name-1.2.3-2.pkg")
       end
     end
 
-    describe '#resources_dir' do
+    describe "#resources_dir" do
       it "is nested inside the staging_dir" do
         expect(subject.resources_dir).to eq("#{staging_dir}/Resources")
       end
     end
 
-    describe '#scripts_dir' do
+    describe "#scripts_dir" do
       it "is nested inside the staging_dir" do
         expect(subject.scripts_dir).to eq("#{staging_dir}/Scripts")
       end
     end
 
-    describe '#write_scripts' do
+    describe "#write_scripts" do
       context "when scripts are given" do
         let(:scripts) { %w{ preinstall postinstall } }
         before do
@@ -109,7 +109,7 @@ module Omnibus
       end
     end
 
-    describe '#build_component_pkg' do
+    describe "#build_component_pkg" do
       it "executes the pkgbuild command" do
         expect(subject).to receive(:shellout!).with <<-EOH.gsub(/^ {10}/, "")
           pkgbuild \\
@@ -125,7 +125,7 @@ module Omnibus
       end
     end
 
-    describe '#write_distribution_file' do
+    describe "#write_distribution_file" do
       it "generates the file" do
         subject.write_distribution_file
         expect("#{staging_dir}/Distribution").to be_a_file
@@ -141,7 +141,7 @@ module Omnibus
       end
     end
 
-    describe '#build_product_pkg' do
+    describe "#build_product_pkg" do
       context "when pkg signing is disabled" do
         it "generates the distribution and runs productbuild" do
           expect(subject).to receive(:shellout!).with <<-EOH.gsub(/^ {12}/, "")
@@ -175,7 +175,7 @@ module Omnibus
       context "when the identifier isn't specified by the project" do
         before do
           subject.identifier(nil)
-          project.name('$Project#')
+          project.name("$Project#")
         end
 
         it "uses com.example.PROJECT_NAME as the identifier" do
@@ -184,13 +184,13 @@ module Omnibus
       end
     end
 
-    describe '#component_pkg' do
+    describe "#component_pkg" do
       it "returns the project name with -core.pkg" do
         expect(subject.component_pkg).to eq("project-full-name-core.pkg")
       end
     end
 
-    describe '#safe_base_package_name' do
+    describe "#safe_base_package_name" do
       context 'when the project name is "safe"' do
         it "returns the value without logging a message" do
           expect(subject.safe_base_package_name).to eq("project-full-name")
@@ -211,8 +211,8 @@ module Omnibus
       end
     end
 
-    describe '#safe_identifier' do
-      context 'when Project#identifier is given' do
+    describe "#safe_identifier" do
+      context "when Project#identifier is given" do
         before { subject.identifier("com.apple.project") }
 
         it "is used" do
@@ -241,13 +241,13 @@ module Omnibus
       end
     end
 
-    describe '#safe_build_iteration' do
+    describe "#safe_build_iteration" do
       it "returns the build iternation" do
         expect(subject.safe_build_iteration).to eq(project.build_iteration)
       end
     end
 
-    describe '#safe_version' do
+    describe "#safe_version" do
       context 'when the project build_version is "safe"' do
         it "returns the value without logging a message" do
           expect(subject.safe_version).to eq("1.2.3")

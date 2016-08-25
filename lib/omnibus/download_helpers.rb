@@ -67,14 +67,14 @@ module Omnibus
             rate_scale: ->(rate) { rate / 1024 }
           )
 
-          options[:content_length_proc] = ->(total) {
+          options[:content_length_proc] = ->(total) do
             reported_total = total
             progress_bar.total = total
-          }
-          options[:progress_proc] = ->(step) {
+          end
+          options[:progress_proc] = ->(step) do
             downloaded_amount = reported_total ? [step, reported_total].min : step
             progress_bar.progress = downloaded_amount
-          }
+          end
         end
 
         file = open(from_url, options)

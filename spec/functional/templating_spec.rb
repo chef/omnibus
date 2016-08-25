@@ -8,7 +8,7 @@ module Omnibus
   describe Templating do
     subject { RandomClass.new }
 
-    describe '#render_template' do
+    describe "#render_template" do
       let(:source)      { File.join(tmp_path, "source.erb") }
       let(:destination) { File.join(tmp_path, "final") }
       let(:mode)        { 0644 }

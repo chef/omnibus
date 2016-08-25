@@ -71,7 +71,7 @@ module Omnibus
       end
     end
 
-    describe '#install_dir' do
+    describe "#install_dir" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:install_dir)
       end
@@ -81,13 +81,13 @@ module Omnibus
       end
     end
 
-    describe '#windows_safe_path' do
+    describe "#windows_safe_path" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:windows_safe_path)
       end
     end
 
-    describe '#run!' do
+    describe "#run!" do
       before do
         allow(subject).to receive(:remove_directory)
         allow(Metadata).to receive(:generate)
@@ -105,14 +105,14 @@ module Omnibus
       end
     end
 
-    describe '#staging_dir' do
+    describe "#staging_dir" do
       it "creates a temporary directory" do
         expect(Dir).to receive(:mktmpdir)
         subject.send(:staging_dir)
       end
     end
 
-    describe '#resource_path' do
+    describe "#resource_path" do
       let(:id) { :base }
       before { allow(subject).to receive(:id).and_return(id) }
 
