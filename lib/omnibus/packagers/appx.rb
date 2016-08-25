@@ -80,7 +80,7 @@ module Omnibus
     # @return [String]
     #
     def pack_command(appx_file)
-      "makeappx.exe pack /d \"#{windows_safe_path(project.install_dir)}\" /p #{appx_file}"
+      "makeappx.exe pack /d \"#{windows_safe_path(project.install_dir)}\" /o /p #{appx_file}"
     end
   end
 end
