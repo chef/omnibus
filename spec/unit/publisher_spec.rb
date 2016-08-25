@@ -24,7 +24,7 @@ module Omnibus
 
     subject { described_class.new(pattern, options) }
 
-    describe '#packages' do
+    describe "#packages" do
       let(:a) { "/path/to/files/a.deb" }
       let(:b) { "/path/to/files/b.deb" }
       let(:glob) { [a, b] }
@@ -185,7 +185,7 @@ module Omnibus
 
     end
 
-    describe '#publish' do
+    describe "#publish" do
       it "is an abstract method" do
         expect { subject.publish }.to raise_error(NotImplementedError)
       end

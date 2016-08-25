@@ -16,7 +16,7 @@ module Omnibus
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
-    describe '#fetch_required?' do
+    describe "#fetch_required?" do
 
       context "when the repository is not cloned" do
         before { allow(subject).to receive(:cloned?).and_return(false) }
@@ -47,7 +47,7 @@ module Omnibus
       end
     end
 
-    describe '#version_guid' do
+    describe "#version_guid" do
       let(:revision) { "abcd1234" }
 
       before do
@@ -59,7 +59,7 @@ module Omnibus
       end
     end
 
-    describe '#clean' do
+    describe "#clean" do
       before do
         allow(subject).to receive(:git)
         allow(subject).to receive(:resolved_version).and_return("12341235")
@@ -80,7 +80,7 @@ module Omnibus
       end
     end
 
-    describe '#fetch' do
+    describe "#fetch" do
       before do
         allow(subject).to receive(:create_required_directories)
       end
@@ -118,7 +118,7 @@ module Omnibus
       end
     end
 
-    describe '#version_for_cache' do
+    describe "#version_for_cache" do
       it "returns the shasum of the commit that we expect to be at" do
         expect(subject.version_for_cache).to eq("revision:123abcd1234")
       end

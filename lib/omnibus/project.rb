@@ -368,7 +368,7 @@ module Omnibus
     def build_version(val = NULL, &block)
       if block && !null?(val)
         raise Error, "You cannot specify additional parameters to " \
-          '#build_version when a block is given!'
+          "#build_version when a block is given!"
       end
 
       if block

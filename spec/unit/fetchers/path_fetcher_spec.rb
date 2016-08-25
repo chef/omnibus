@@ -16,7 +16,7 @@ module Omnibus
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
-    describe '#fetch_required?' do
+    describe "#fetch_required?" do
       context "when the SHAs match" do
         before do
           allow(subject).to receive(:target_shasum).and_return("abcd1234")
@@ -40,19 +40,19 @@ module Omnibus
       end
     end
 
-    describe '#version_guid' do
+    describe "#version_guid" do
       it "returns the path" do
         expect(subject.version_guid).to eq("path:#{source_path}")
       end
     end
 
-    describe '#clean' do
+    describe "#clean" do
       it "returns true" do
         expect(subject.clean).to be_truthy
       end
     end
 
-    describe '#fetch' do
+    describe "#fetch" do
       before do
         allow(subject).to receive(:create_required_directories)
         allow(FileSyncer).to receive(:sync)
@@ -64,7 +64,7 @@ module Omnibus
       end
     end
 
-    describe '#version_for_cache' do
+    describe "#version_for_cache" do
       let(:shasum) { "abcd1234" }
 
       before do

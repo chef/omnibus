@@ -128,8 +128,6 @@ module Omnibus
       from_hash(hash)
     end
 
-    private
-
     #
     # Utility function to convert a Hash with String keys to a Hash
     # with Symbol keys, recursively.

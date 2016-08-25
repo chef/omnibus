@@ -25,7 +25,7 @@ module Omnibus
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
-    describe '#fetch_required?' do
+    describe "#fetch_required?" do
       context "when file is not downloaded" do
         before { allow(File).to receive(:exist?).and_return(false) }
 
@@ -61,7 +61,7 @@ module Omnibus
       end
     end
 
-    describe '#version_guid' do
+    describe "#version_guid" do
       context "source with md5" do
         it "returns the shasum" do
           expect(subject.version_guid).to eq("md5:abcd1234")
@@ -99,7 +99,7 @@ module Omnibus
       end
     end
 
-    describe '#clean' do
+    describe "#clean" do
       before do
         allow(FileUtils).to receive(:rm_rf)
         allow(subject).to receive(:deploy)
@@ -138,7 +138,7 @@ module Omnibus
       end
     end
 
-    describe '#version_for_cache' do
+    describe "#version_for_cache" do
       context "source with md5" do
         it "returns the download URL and md5" do
           expect(subject.version_for_cache).to eq("download_url:https://get.example.com/file.tar.gz|md5:abcd1234")
@@ -274,7 +274,7 @@ module Omnibus
       end
     end
 
-    describe '#deploy' do
+    describe "#deploy" do
       before do
         described_class.send(:public, :deploy)
       end
@@ -322,7 +322,7 @@ module Omnibus
       end
     end
 
-    describe '#extract' do
+    describe "#extract" do
 
       context "on Windows" do
         let(:root_prefix) { "C:" }
