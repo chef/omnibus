@@ -454,7 +454,7 @@ module Omnibus
       rescue ArgumentError
         log.warn(log_key) do
           "Version #{final_version} for software #{name} was not parseable. " \
-          'Comparison methods such as #satisfies? will not be available for this version.'
+          "Comparison methods such as #satisfies? will not be available for this version."
         end
         final_version
       end

@@ -100,7 +100,7 @@ module Omnibus
     let(:project_name) { "example" }
     let(:project_dir) { File.join(source_dir, project_name) }
 
-    describe '#command' do
+    describe "#command" do
       it "executes the command" do
         subject.command("echo 'Hello World!'")
 
@@ -109,13 +109,13 @@ module Omnibus
       end
     end
 
-    describe '#make' do
+    describe "#make" do
       it "is waiting for a good samaritan to write tests" do
         skip
       end
     end
 
-    describe '#patch' do
+    describe "#patch" do
       it "applies the patch" do
         configure = File.join(project_dir, "configure")
         File.open(configure, "w") do |f|
@@ -149,7 +149,7 @@ module Omnibus
       end
     end
 
-    describe '#ruby' do
+    describe "#ruby" do
       it "executes the command as the embdedded ruby" do
         ruby = File.join(scripts_dir, "setup.rb")
         File.open(ruby, "w") do |f|
@@ -169,7 +169,7 @@ module Omnibus
       end
     end
 
-    describe '#gem' do
+    describe "#gem" do
       it "executes the command as the embedded gem" do
         make_gemspec
         fake_embedded_bin("gem")
@@ -186,7 +186,7 @@ module Omnibus
       end
     end
 
-    describe '#bundler' do
+    describe "#bundler" do
       it "executes the command as the embedded bundler" do
         make_gemspec
         make_gemfile
@@ -200,7 +200,7 @@ module Omnibus
       end
     end
 
-    describe '#appbundle' do
+    describe "#appbundle" do
       let(:project) { double("Project") }
       let(:project_softwares) { [ double("Software", name: project_name, project_dir: project_dir) ] }
       it "executes the command as the embedded appbundler" do
@@ -226,7 +226,7 @@ module Omnibus
       end
     end
 
-    describe '#rake' do
+    describe "#rake" do
       it "executes the command as the embedded rake" do
         rakefile = File.join(project_dir, "Rakefile")
         File.open(rakefile, "w") do |f|
@@ -246,7 +246,7 @@ module Omnibus
       end
     end
 
-    describe '#block' do
+    describe "#block" do
       it "executes the command as a block" do
         subject.block("A complex operation") do
           FileUtils.touch("#{project_dir}/bacon")
@@ -258,7 +258,7 @@ module Omnibus
       end
     end
 
-    describe '#erb' do
+    describe "#erb" do
       it "renders the erb" do
         erb = File.join(templates_dir, "example.erb")
         File.open(erb, "w") do |f|
@@ -282,7 +282,7 @@ module Omnibus
       end
     end
 
-    describe '#mkdir' do
+    describe "#mkdir" do
       it "creates the directory" do
         path = File.join(tmp_path, "scratch")
         remove_directory(path)
@@ -294,7 +294,7 @@ module Omnibus
       end
     end
 
-    describe '#touch' do
+    describe "#touch" do
       it "creates the file" do
         path = File.join(tmp_path, "file")
         remove_file(path)
@@ -316,7 +316,7 @@ module Omnibus
       end
     end
 
-    describe '#delete' do
+    describe "#delete" do
       it "deletes the directory" do
         path = File.join(tmp_path, "scratch")
         create_directory(path)
@@ -351,7 +351,7 @@ module Omnibus
       end
     end
 
-    describe '#copy' do
+    describe "#copy" do
       it "copies the file" do
         path_a = File.join(tmp_path, "file1")
         path_b = File.join(tmp_path, "file2")
@@ -404,7 +404,7 @@ module Omnibus
       end
     end
 
-    describe '#move' do
+    describe "#move" do
       it "moves the file" do
         path_a = File.join(tmp_path, "file1")
         path_b = File.join(tmp_path, "file2")
@@ -461,7 +461,7 @@ module Omnibus
       end
     end
 
-    describe '#link', :not_supported_on_windows do
+    describe "#link", :not_supported_on_windows do
       it "links the file" do
         path_a = File.join(tmp_path, "file1")
         path_b = File.join(tmp_path, "file2")
@@ -504,7 +504,7 @@ module Omnibus
       end
     end
 
-    describe '#sync' do
+    describe "#sync" do
       let(:source) do
         source = File.join(tmp_path, "source")
         FileUtils.mkdir_p(source)
@@ -607,7 +607,7 @@ module Omnibus
       end
     end
 
-    describe '#update_config_guess', :not_supported_on_windows do
+    describe "#update_config_guess", :not_supported_on_windows do
       let(:config_guess_dir) { "#{install_dir}/embedded/lib/config_guess" }
 
       before do

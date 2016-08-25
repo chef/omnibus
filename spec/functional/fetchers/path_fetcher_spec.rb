@@ -24,7 +24,7 @@ module Omnibus
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
-    describe '#fetch_required?' do
+    describe "#fetch_required?" do
       context "when the directories have different files" do
         before do
           create_file("#{source_path}/directory/file") { "different" }
@@ -48,7 +48,7 @@ module Omnibus
       end
     end
 
-    describe '#version_guid' do
+    describe "#version_guid" do
       it "includes the source path" do
         expect(subject.version_guid).to eq("path:#{source_path}")
       end
@@ -82,13 +82,13 @@ module Omnibus
       end
     end
 
-    describe '#clean' do
+    describe "#clean" do
       it "returns true" do
         expect(subject.clean).to be_truthy
       end
     end
 
-    describe '#version_for_cache' do
+    describe "#version_for_cache" do
       before do
         create_file("#{source_path}/file_a")
         create_file("#{source_path}/file_b")
@@ -102,7 +102,7 @@ module Omnibus
       end
     end
 
-    describe '#resolve_version' do
+    describe "#resolve_version" do
       it "just returns the version" do
         expect(NetFetcher.resolve_version("1.2.3", source)).to eq("1.2.3")
       end

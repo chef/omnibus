@@ -37,7 +37,7 @@ module Omnibus
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
-    describe '#fetch_required?' do
+    describe "#fetch_required?" do
       context "when the file is not downloaded" do
         it "return true" do
           expect(subject.fetch_required?).to be_truthy
@@ -62,7 +62,7 @@ module Omnibus
       end
     end
 
-    describe '#version_guid' do
+    describe "#version_guid" do
       context "source with md5" do
         it "includes the md5 digest" do
           expect(subject.version_guid).to eq("md5:#{source_md5}")
@@ -100,7 +100,7 @@ module Omnibus
       end
     end
 
-    describe '#clean' do
+    describe "#clean" do
       before { fetch! }
 
       context "when the project directory exists" do
@@ -157,7 +157,7 @@ module Omnibus
       end
     end
 
-    describe '#fetch' do
+    describe "#fetch" do
       context "source with md5" do
         it "downloads the file" do
           fetch!
@@ -265,7 +265,7 @@ module Omnibus
       end
     end
 
-    describe '#version_for_cache' do
+    describe "#version_for_cache" do
       before do
         create_file("#{project_dir}/file_a")
         create_file("#{project_dir}/file_b")

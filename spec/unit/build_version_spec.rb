@@ -185,7 +185,7 @@ module Omnibus
       end
     end
 
-    describe '#initialize `path` parameter' do
+    describe "#initialize `path` parameter" do
       let(:path) { "/some/fake/path" }
       subject(:build_version) { BuildVersion.new(path) }
 

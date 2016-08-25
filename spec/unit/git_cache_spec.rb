@@ -52,13 +52,13 @@ module Omnibus
       described_class.new(zlib)
     end
 
-    describe '#cache_path' do
+    describe "#cache_path" do
       it "returns the install path appended to the install_cache path" do
         expect(ipc.cache_path).to eq(cache_path)
       end
     end
 
-    describe '#tag' do
+    describe "#tag" do
       it "returns the correct tag" do
         expect(ipc.tag).to eql("zlib-24a8ec71da04059dcf7ed3c6e8e0fd9d155476abe4b5156d1f13c42e85478c2b-#{cache_serial_number}")
       end
@@ -74,7 +74,7 @@ module Omnibus
       end
     end
 
-    describe '#create_cache_path' do
+    describe "#create_cache_path" do
       it "runs git init if the cache path does not exist" do
         allow(File).to receive(:directory?)
           .with(ipc.cache_path)
@@ -101,7 +101,7 @@ module Omnibus
       end
     end
 
-    describe '#incremental' do
+    describe "#incremental" do
       before(:each) do
         allow(ipc).to receive(:shellout!)
         allow(ipc).to receive(:create_cache_path)
@@ -132,7 +132,7 @@ module Omnibus
       end
     end
 
-    describe '#remove_git_dirs' do
+    describe "#remove_git_dirs" do
       let(:git_files) { ["git/HEAD", "git/description", "git/hooks", "git/info", "git/objects", "git/refs" ] }
       it "removes bare git directories" do
         allow(Dir).to receive(:glob).and_return(["git/config"])
@@ -155,7 +155,7 @@ module Omnibus
       end
     end
 
-    describe '#restore' do
+    describe "#restore" do
       let(:git_tag_output) { "#{ipc.tag}\n" }
 
       let(:tag_cmd) do

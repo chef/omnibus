@@ -78,7 +78,7 @@ module Omnibus
     end
 
     describe "#from_hash" do
-      let(:manifest) {
+      let(:manifest) do
         { manifest_format: 1,
           build_version: "12.4.0+20150629082811",
           build_git_revision: "2e763ac957b308ba95cef256c2491a5a55a163cc",
@@ -93,7 +93,7 @@ module Omnibus
             },
           },
         }
-      }
+      end
 
       it "has a build_version" do
         expect(Manifest.from_hash(manifest).build_version).to eq("12.4.0+20150629082811")
@@ -112,7 +112,7 @@ module Omnibus
       end
 
       context "v2 manifest" do
-        let(:manifest) {
+        let(:manifest) do
           { manifest_format: 2,
             build_version: "12.4.0+20150629082811",
             build_git_revision: "2e763ac957b308ba95cef256c2491a5a55a163cc",
@@ -129,7 +129,7 @@ module Omnibus
               },
             },
           }
-        }
+        end
 
         it "has a license" do
           expect(Manifest.from_hash(manifest).license).to eq("Unspecified")
@@ -137,11 +137,11 @@ module Omnibus
       end
 
       context "unsupported manifest" do
-        let(:manifest) {
+        let(:manifest) do
           {
             manifest_format: 99,
           }
-        }
+        end
 
         it "raises an error if it doesn't recognize the manifest version" do
           expect { Manifest.from_hash(manifest) }.to raise_error Manifest::InvalidManifestFormat

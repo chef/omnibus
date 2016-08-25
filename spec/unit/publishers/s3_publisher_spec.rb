@@ -40,7 +40,7 @@ module Omnibus
 
     subject { described_class.new(path) }
 
-    describe '#publish' do
+    describe "#publish" do
       before { allow(subject).to receive(:packages).and_return(packages) }
 
       it "validates the package" do
