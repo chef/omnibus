@@ -18,6 +18,7 @@ require "uri"
 require "fileutils"
 require "omnibus/download_helpers"
 require "license_scout/collector"
+require "license_scout/reporter"
 require "license_scout/options"
 
 module Omnibus
@@ -439,17 +440,31 @@ module Omnibus
 
       if Config.fatal_transitive_dependency_licensing_warnings && !transitive_dependency_licensing_warnings.empty?
         warnings_to_raise << transitive_dependency_licensing_warnings
+        warnings_to_raise << "If you are encountering missing license or missing license file errors for **transitive** dependencies, you can provide overrides for the missing information at https://github.com/chef/license_scout/blob/master/lib/license_scout/overrides.rb#L93"
       end
 
       warnings_to_raise.flatten!
       raise LicensingError.new(warnings_to_raise) unless warnings_to_raise.empty?
     end
 
+    # 0. Translate all transitive dependency licensing issues into omnibus warnings
     # 1. Parse all the licensing information for all software from 'cache_dir'
     # 2. Merge and drop the duplicates
     # 3. Add these licenses to the main manifest, to be merged with the main
     # licensing information from software definitions.
     def process_transitive_dependency_licensing_info
+      Dir.glob("#{cache_dir}/*").each do |license_output_dir|
+        reporter = LicenseScout::Reporter.new(license_output_dir)
+        begin
+          reporter.report.each { |i| transitive_dependency_licensing_warning(i) }
+        rescue LicenseScout::Exceptions::InvalidOutputReport => e
+          transitive_dependency_licensing_warning(<<-EOH)
+Licensing output report at '#{license_output_dir}' has errors:
+#{e}
+EOH
+        end
+      end
+
       Dir.glob("#{cache_dir}/*/*-dependency-licenses.json").each do |license_manifest_path|
         license_manifest_data = FFI_Yajl::Parser.parse(File.read(license_manifest_path))
         project_name = license_manifest_data["project_name"]
@@ -501,7 +516,7 @@ module Omnibus
       license_output_dir = File.join(cache_dir, software.name)
 
       collector = LicenseScout::Collector.new(
-        software.project.name,
+        software.name,
         software.project_dir,
         license_output_dir,
         LicenseScout::Options.new(
@@ -512,7 +527,6 @@ module Omnibus
 
       begin
         collector.run
-        collector.issue_report.each { |i| transitive_dependency_licensing_warning(i) }
       rescue LicenseScout::Exceptions::UnsupportedProjectType => e
         # Looks like this project is not supported by LicenseScout. Either the
         # language and the dependency manager used by the project is not
@@ -527,15 +541,31 @@ the list of supported languages and dependency managers. If this project does \
 not have any transitive dependencies, consider setting \
 'skip_transitive_dependency_licensing' to 'true' in order to correct this error.
 EOH
+        # If we got here, we need to fail now so we don't take a git
+        # cache snapshot, or else the software build could be restored
+        # from cache without fixing the license issue.
+        raise_if_warnings_fatal!
       rescue LicenseScout::Exceptions::Error => e
         transitive_dependency_licensing_warning(<<-EOH)
 Can not automatically detect licensing information for '#{software.name}' using \
 license_scout. Error is: '#{e}'
 EOH
+        # If we got here, we need to fail now so we don't take a git
+        # cache snapshot, or else the software build could be restored
+        # from cache without fixing the license issue.
+        raise_if_warnings_fatal!
       rescue Exception => e
+        # This catch all exception handling is here in order not to fail builds
+        # until license_scout gets more stable. As we are adding support for more
+        # and more dependency managers we discover unhandled edge cases which
+        # requires us to have this. Remove this once license_scout is stable.
         transitive_dependency_licensing_warning(<<-EOH)
 Unexpected error while running license_scout for '#{software.name}': '#{e}'
 EOH
+        # If we got here, we need to fail now so we don't take a git
+        # cache snapshot, or else the software build could be restored
+        # from cache without fixing the license issue.
+        raise_if_warnings_fatal!
       end
     end
 
@@ -594,6 +624,7 @@ EOH
       "APL-1.0",       # Adaptive Public License
       "Apache-2.0",    # Apache License 2.0
       "APSL-2.0",      # Apple Public Source License
+      "Artistic-1.0",  # Artistic license 1.0
       "Artistic-2.0",  # Artistic license 2.0
       "AAL",           # Attribution Assurance Licenses
       "BSD-3-Clause",  # BSD 3-Clause "New" or "Revised" License
@@ -677,6 +708,7 @@ EOH
       "Oracle-Binary", # http://www.oracle.com/technetwork/java/javase/terms/license/index.html
       "OpenSSL",       # https://www.openssl.org/source/license.html
       "Chef-MLSA",     # https://www.chef.io/online-master-agreement/
+      "Perl-5",        # http://dev.perl.org/licenses/
     ].freeze
   end
 
