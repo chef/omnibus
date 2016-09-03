@@ -193,9 +193,9 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             "CC"              => "gcc -static-libgcc",
             "LDFLAGS"         => "-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
-            "CFLAGS"          => "-I/opt/project/embedded/include",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
@@ -219,9 +219,9 @@ module Omnibus
             expect(subject.with_standard_compiler_flags).to eq(
               "CC"              => "gcc -static-libgcc",
               "LDFLAGS"         => "-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
-              "CFLAGS"          => "-I/opt/project/embedded/include",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include",
+              "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "LD_OPTIONS"      => "-R/opt/project/embedded/lib -M #{project_root}/files/mapfile/solaris",
               "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
