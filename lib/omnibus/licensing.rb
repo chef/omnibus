@@ -145,7 +145,6 @@ module Omnibus
     #
     def execute_post_build(software)
       collect_licenses_for(software)
-
       unless software.skip_transitive_dependency_licensing
         collect_transitive_dependency_licenses_for(software)
       end
@@ -521,11 +520,14 @@ EOH
         license_output_dir,
         LicenseScout::Options.new(
           environment: software.with_embedded_path,
-          ruby_bin: software.embedded_bin("ruby")
+          ruby_bin: software.embedded_bin("ruby"),
+          manual_licenses: software.dependency_licenses
         )
       )
 
       begin
+        # We do not automatically collect dependency licensing information when
+        # skip_transitive_dependency_licensing is set on the software.
         collector.run
       rescue LicenseScout::Exceptions::UnsupportedProjectType => e
         # Looks like this project is not supported by LicenseScout. Either the
