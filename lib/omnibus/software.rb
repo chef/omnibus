@@ -400,6 +400,39 @@ module Omnibus
     expose :skip_transitive_dependency_licensing
 
     #
+    # Set or retrieve licensing information of the dependencies.
+    # The information set is not validated or inspected. It is directly
+    #   passed to LicenseScout.
+    #
+    # @example
+    # dependency_licenses [
+    #   {
+    #     dependency_name: "logstash-output-websocket",
+    #     dependency_manager: "logstash_plugin",
+    #     license: "Apache-2.0",
+    #     license_file: [
+    #       "relative/path/to/license/file",
+    #       "https://download.elastic.co/logstash/LICENSE"
+    #     ]
+    #   },
+    #   ...
+    # ]
+    #
+    # @param [Hash] val
+    # @param [Array<Hash>] val
+    #   dependency license information.
+    # @return [Array<Hash>]
+    #
+    def dependency_licenses(val = NULL)
+      if null?(val)
+        @dependency_licenses || nil
+      else
+        @dependency_licenses = Array(val)
+      end
+    end
+    expose :dependency_licenses
+
+    #
     # Evaluate a block only if the version matches.
     #
     # @example

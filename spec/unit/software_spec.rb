@@ -42,6 +42,7 @@ module Omnibus
     it_behaves_like "a cleanroom setter", :license, %{license 'Apache 2.0'}
     it_behaves_like "a cleanroom setter", :license_file, %{license_file 'LICENSES/artistic.txt'}
     it_behaves_like "a cleanroom setter", :skip_transitive_dependency_licensing, %{skip_transitive_dependency_licensing true}
+    it_behaves_like "a cleanroom setter", :dependency_licenses, %{dependency_licenses [{license: "MIT"}]}
     it_behaves_like "a cleanroom setter", :whitelist_file, %{whitelist_file '/opt/whatever'}
     it_behaves_like "a cleanroom setter", :relative_path, %{relative_path '/path/to/extracted'}
     it_behaves_like "a cleanroom setter", :build, %|build {}|
