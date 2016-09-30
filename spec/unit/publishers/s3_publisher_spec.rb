@@ -17,7 +17,7 @@ module Omnibus
       Metadata.new(package,
         name: "chef",
         friendly_name: "Chef",
-        homepage: "https://getchef.com",
+        homepage: "https://chef.io",
         version: "11.0.6",
         basename: "chef.deb",
         platform: "ubuntu",

@@ -106,7 +106,7 @@ module Omnibus
         time = Time.at(680227200).utc.strftime("%c %z")
         env  = {
           "GIT_AUTHOR_NAME"     => "omnibus",
-          "GIT_AUTHOR_EMAIL"    => "omnibus@getchef.com",
+          "GIT_AUTHOR_EMAIL"    => "omnibus@chef.io",
           "GIT_AUTHOR_DATE"     => time,
           "GIT_COMMITTER_NAME"  => "omnibus",
           "GIT_COMMITTER_EMAIL" => "omnibus@gechef.com",

@@ -21,7 +21,7 @@ module Omnibus
       Project.new.evaluate do
         name          "chef-dk"
         maintainer    "Chef Software, Inc"
-        homepage      "http://getchef.com"
+        homepage      "https://chef.io"
         build_version "1.0.0"
 
         install_dir "/opt/chefdk"

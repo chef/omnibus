@@ -18,7 +18,7 @@ module Omnibus
       Metadata.new(package,
         name: "chef",
         friendly_name: "Chef",
-        homepage: "https://www.getchef.com",
+        homepage: "https://www.chef.io",
         version: "11.0.6",
         iteration: 1,
         license:  "Apache-2.0",
@@ -68,7 +68,7 @@ module Omnibus
             },
             ohai: {
               locked_source: {
-                git: "https://github.com/opscode/ohai.git",
+                git: "https://github.com/chef/ohai.git",
               },
               locked_version: "fec0959aa5da5ce7ba0e07740dbc08546a8f53f0",
               source_type: "git",

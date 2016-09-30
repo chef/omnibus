@@ -246,7 +246,7 @@ module Omnibus
     # **[Required]** Set or retrive the package homepage.
     #
     # @example
-    #   homepage 'https://www.getchef.com'
+    #   homepage 'https://www.chef.io'
     #
     # @raise [MissingRequiredAttribute] if a value was not set before being
     #   subsequently retrieved
@@ -258,7 +258,7 @@ module Omnibus
     #
     def homepage(val = NULL)
       if null?(val)
-        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, "https://www.getchef.com"))
+        @homepage || raise(MissingRequiredAttribute.new(self, :homepage, "https://www.chef.io"))
       else
         @homepage = val
       end

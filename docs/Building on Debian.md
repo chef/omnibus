@@ -6,7 +6,7 @@ This document details the steps and configurables for building DEB packages with
 Building a .deb
 ---------------
 ### Requirements
-Omnibus assumes the existence of the `fakeroot` and `dpkg-deb` command on the build system. The [omnibus cookbook](https://supermarket.getchef.com/cookbooks/omnibus) automatically handles this installation. If you are not using the Omnibus cookbook, you must install these packages manually or using another tool.
+Omnibus assumes the existence of the `fakeroot` and `dpkg-deb` command on the build system. The [omnibus cookbook](https://supermarket.chef.io/cookbooks/omnibus) automatically handles this installation. If you are not using the Omnibus cookbook, you must install these packages manually or using another tool.
 
 ### Configurables
 A number of project configuration values are taken into consideration for building Debian packages. These options are further described in the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
