@@ -21,7 +21,7 @@ Prerequisites
 -------------
 Omnibus is designed to run with a minimal set of prerequisites. You will need the following:
 
-- Ruby 2.0.0+
+- Ruby 2.1+
 - Bundler
 
 
