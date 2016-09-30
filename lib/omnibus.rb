@@ -21,9 +21,9 @@ require "pathname"
 
 require "omnibus/digestable"
 require "omnibus/exceptions"
+require "omnibus/sugarable"
 require "omnibus/util"
 require "omnibus/fetcher"
-require "omnibus/sugarable"
 require "omnibus/version"
 
 module Omnibus
