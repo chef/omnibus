@@ -339,9 +339,12 @@ by default, Omnibus caches compiled software definitions, so n+1 Omnibus project
 use_git_caching false
 ```
 
+## Contributing
 
-License
--------
+For information on contributing to this project see <https://github.com/chef/chef/blob/master/CONTRIBUTING.md>
+
+## License
+
 ```text
 Copyright 2012-2016 Chef Software, Inc.
 
