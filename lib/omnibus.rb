@@ -23,6 +23,7 @@ require "omnibus/digestable"
 require "omnibus/exceptions"
 require "omnibus/util"
 require "omnibus/fetcher"
+require "omnibus/sugarable"
 require "omnibus/version"
 
 module Omnibus
@@ -58,7 +59,6 @@ module Omnibus
   autoload :Reports,          "omnibus/reports"
   autoload :S3Cache,          "omnibus/s3_cache"
   autoload :Software,         "omnibus/software"
-  autoload :Sugarable,        "omnibus/sugarable"
   autoload :Templating,       "omnibus/templating"
   autoload :ThreadPool,       "omnibus/thread_pool"
   autoload :Licensing,        "omnibus/licensing"
