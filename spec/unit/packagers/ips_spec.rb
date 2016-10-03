@@ -8,7 +8,7 @@ module Omnibus
         project.name("project")
         project.homepage("https://example.com")
         project.install_dir("/opt/project")
-        project.build_version("1.2.3")
+        project.build_version("1.2.3+20161003185500.git.37.089ab3f")
         project.build_iteration("2")
         project.maintainer("Chef Software")
       end
@@ -55,7 +55,7 @@ module Omnibus
 
     describe "#package_name" do
       it "should create correct package name" do
-        expect(subject.package_name).to eq("project-1.2.3-2.i386.p5p")
+        expect(subject.package_name).to eq("project-1.2.3+20161003185500.git.37.089ab3f-2.i386.p5p")
       end
     end
 
@@ -211,7 +211,7 @@ module Omnibus
     describe "#export_pkg_archive_file" do
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
-          .with("pkgrecv -s #{staging_dir}/publish/repo -a -d #{package_dir}/project-1.2.3-2.i386.p5p project")
+          .with("pkgrecv -s #{staging_dir}/publish/repo -a -d #{package_dir}/project-1.2.3+20161003185500.git.37.089ab3f-2.i386.p5p project")
 
         expect(shellout).to receive(:stdout)
         subject.export_pkg_archive_file
