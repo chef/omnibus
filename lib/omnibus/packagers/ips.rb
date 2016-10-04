@@ -81,8 +81,7 @@ module Omnibus
     # @see Base#package_name
     #
     def package_name
-      version = project.build_version.split(/[^\d]/)[0..2].join(".")
-      "#{safe_base_package_name}-#{version}-#{project.build_iteration}.#{safe_architecture}.p5p"
+      "#{safe_base_package_name}-#{project.build_version}-#{project.build_iteration}.#{safe_architecture}.p5p"
     end
 
     #
