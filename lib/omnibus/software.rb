@@ -703,6 +703,17 @@ module Omnibus
             freebsd_flags["CXX"] = "clang++"
           end
           freebsd_flags
+        when "suse"
+          suse_flags = {
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+          }
+          # Enable gcc version 4.8 if it is available
+          if which("gcc-4.8")
+            suse_flags["CC"] = "gcc-4.8"
+            suse_flags["CXX"] = "g++-4.8"
+          end
+          suse_flags
         when "windows"
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
           opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
