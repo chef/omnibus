@@ -325,6 +325,61 @@ module Omnibus
         end
       end
 
+      context "on sles 11" do
+        before do
+          # sles identifies as suse
+          stub_ohai(platform: "suse", version: "11.4")
+        end
+        it "sets the defaults" do
+          expect(subject.with_standard_compiler_flags).to eq(
+          "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
+          "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+          "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+          "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+          "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+          )
+        end
+
+        context "with gcc 4.8 installed" do
+
+          before do
+            allow(subject).to receive(:which).and_return("/usr/bin/gcc-4.8")
+          end
+
+          it "sets the compiler args" do
+            expect(subject.with_standard_compiler_flags).to eq(
+              "CC"              => "gcc-4.8",
+              "CXX"             => "g++-4.8",
+              "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
+              "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+              "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              )
+          end
+        end
+      end
+
+      context "on sles 12" do
+        before do
+          # sles identifies as suse
+          stub_ohai(platform: "suse", version: "12.1")
+        end
+
+        it "sets the defaults" do
+          expect(subject.with_standard_compiler_flags).to eq(
+            "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+          )
+        end
+      end
+
       context "on Windows" do
         let(:win_arch_i386) { true }
 
