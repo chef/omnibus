@@ -286,6 +286,23 @@ module Omnibus
     expose :description
 
     #
+    # Add to the list of packages this one provides.
+    #
+    # @example
+    #   provide 'the-virtual-package'
+    #
+    # @param [String] val
+    #   the name of the package to provide
+    #
+    # @return [String]
+    #
+    def provide(val = NULL)
+      provides << val
+      provides.dup
+    end
+    expose :provide
+
+    #
     # Add to the list of packages this one replaces.
     #
     # This should only be used when renaming a package and obsoleting the old
@@ -895,6 +912,15 @@ module Omnibus
     #
     def replaces
       @replaces ||= []
+    end
+
+    #
+    # The list of things this project provides.
+    #
+    # @return [Array<String>]
+    #
+    def provides
+      @provides ||= []
     end
 
     #

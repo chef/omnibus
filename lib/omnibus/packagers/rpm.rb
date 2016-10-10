@@ -324,6 +324,7 @@ module Omnibus
           category:        category,
           conflicts:       project.conflicts,
           replaces:        project.replaces,
+          provides:        project.provides,
           dependencies:    project.runtime_dependencies,
           user:            project.package_user,
           group:           project.package_group,
