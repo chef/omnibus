@@ -10,6 +10,7 @@ module Omnibus
         project.build_version("1.2.3")
         project.build_iteration("2")
         project.maintainer("Chef Software")
+        project.provide("chefy-package")
         project.license(project_license) if project_license
       end
     end
@@ -136,6 +137,7 @@ module Omnibus
         expect(contents).to include("Vendor: Omnibus <omnibus@getchef.com>")
         expect(contents).to include("Architecture: amd64")
         expect(contents).to include("Maintainer: Chef Software")
+        expect(contents).to include("Provides: chefy-package")
         expect(contents).to include("Installed-Size: 0")
         expect(contents).to include("Section: misc")
         expect(contents).to include("Priority: extra")

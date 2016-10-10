@@ -11,6 +11,7 @@ module Omnibus
         project.build_iteration("2")
         project.maintainer("Chef Software")
         project.replace("old-project")
+        project.provide("chefy-package")
         project.license(project_license) if project_license
       end
     end
