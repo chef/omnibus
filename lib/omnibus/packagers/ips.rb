@@ -16,6 +16,16 @@
 
 module Omnibus
   class Packager::IPS < Packager::Base
+    # @return [Hash]
+    SCRIPT_MAP = {
+      # Default Omnibus naming
+      postinst:  "postinstall",
+      postrm: "postremove",
+      # Default Solaris naming
+      postinstall:  "postinstall",
+      postremove: "postremove",
+    }.freeze
+
     id :ips
 
     setup do
@@ -178,6 +188,24 @@ module Omnibus
     end
 
     #
+    # Copy all scripts in {Project#package_scripts_path} to the control
+    # directory of this repo.
+    #
+    # @return [void]
+    #
+    def write_scripts
+      SCRIPT_MAP.each do |source, destination|
+        source_path = File.join(project.package_scripts_path, source.to_s)
+
+        next unless File.file?(source_path)
+
+        destination_path = staging_dir_path(destination)
+        log.debug(log_key) { "Adding script `#{source}' to `#{destination_path}'" }
+        copy_file(source_path, destination_path)
+      end
+    end
+
+    #
     # A set of transform rules that `pkgmogrify' will apply to the package
     # manifest.
     #
@@ -188,6 +216,7 @@ module Omnibus
         destination: transform_file,
         variables: {
           pathdir: project.install_dir.split("/")[1],
+          linkfile: safe_base_package_name,
         }
       )
     end
