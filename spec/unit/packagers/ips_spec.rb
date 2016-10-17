@@ -144,6 +144,8 @@ module Omnibus
         transform_file_contents = File.read(transform_file)
         expect(transform_file_contents).to include("<transform dir path=opt$ -> edit group bin sys>")
         expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file ruby env>")
+        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file make env>")
+        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file perl env>")
       end
     end
 
