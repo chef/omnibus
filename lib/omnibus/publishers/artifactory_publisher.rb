@@ -222,6 +222,10 @@ module Omnibus
         "omnibus.sha1"             => package.metadata[:sha1],
         "omnibus.sha256"           => package.metadata[:sha256],
         "omnibus.sha512"           => package.metadata[:sha512],
+        "md5"                      => package.metadata[:md5],
+        "sha1"                     => package.metadata[:sha1],
+        "sha256"                   => package.metadata[:sha256],
+        "sha512"                   => package.metadata[:sha512],
       }.tap do |h|
         if build_record?
           h["build.name"] = package.metadata[:name]
