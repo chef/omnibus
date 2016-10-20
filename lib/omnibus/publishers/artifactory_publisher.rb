@@ -138,12 +138,6 @@ module Omnibus
           name: "omnibus",
           version: Omnibus::VERSION,
         },
-        properties: default_properties.merge(
-          "omnibus.project"            => name,
-          "omnibus.version"            => manifest.build_version,
-          "omnibus.build_git_revision" => manifest.build_git_revision,
-          "omnibus.license"            => manifest.license
-        ),
         modules: [
           {
             # com.getchef:chef-server:12.0.0
