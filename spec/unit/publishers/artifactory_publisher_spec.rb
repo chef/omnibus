@@ -112,6 +112,10 @@ module Omnibus
         "omnibus.sha512" => "SHA512",
         "omnibus.version" => "11.0.6",
         "omnibus.license" => "Apache-2.0",
+        "md5" => "ABCDEF123456",
+        "sha1" => "SHA1",
+        "sha256" => "SHA256",
+        "sha512" => "SHA512",
       }
     end
     let(:metadata_json_properites) do
