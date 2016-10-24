@@ -39,7 +39,7 @@ module Omnibus
       end
     end
 
-    describe '#publisher_prefix' do
+    describe "#publisher_prefix" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:publisher_prefix)
       end
@@ -49,47 +49,47 @@ module Omnibus
       end
     end
 
-    it '#id is :IPS' do
+    it "#id is :IPS" do
       expect(subject.id).to eq(:ips)
     end
 
-    describe '#package_name' do
+    describe "#package_name" do
       it "should create correct package name" do
         expect(subject.package_name).to eq("project-1.2.3+20161003185500.git.37.089ab3f-2.i386.p5p")
       end
     end
 
-    describe '#fmri_package_name' do
+    describe "#fmri_package_name" do
       it "should create correct fmri package name" do
         expect(subject.fmri_package_name).to eq ("project@1.2.3,5.11-2")
       end
     end
 
-    describe '#pkg_metadata_file' do
+    describe "#pkg_metadata_file" do
       it "is created inside the staging_dir" do
         expect(subject.pkg_metadata_file).to eq("#{subject.staging_dir}/gen.manifestfile")
       end
     end
 
-    describe '#pkg_manifest_file' do
+    describe "#pkg_manifest_file" do
       it "is created inside the staging_dir" do
         expect(subject.pkg_manifest_file).to eq("#{subject.staging_dir}/#{subject.safe_base_package_name}.p5m")
       end
     end
 
-    describe '#repo_dir' do
+    describe "#repo_dir" do
       it "is created inside the staging_dir" do
         expect(subject.repo_dir).to eq("#{subject.staging_dir}/publish/repo")
       end
     end
 
-    describe '#source_dir' do
+    describe "#source_dir" do
       it "is created inside the staging_dir" do
         expect(subject.source_dir).to eq("#{subject.staging_dir}/proto_install")
       end
     end
 
-    describe '#safe_base_package_name' do
+    describe "#safe_base_package_name" do
       context 'when the project name is "safe"' do
         it "returns the value without logging a message" do
           expect(subject.safe_base_package_name).to eq("project")
@@ -110,7 +110,7 @@ module Omnibus
       end
     end
 
-    describe '#safe_architecture' do
+    describe "#safe_architecture" do
       context "the architecture is Intel-based" do
         let(:architecture) { "i86pc" }
 
@@ -144,19 +144,71 @@ module Omnibus
         transform_file_contents = File.read(transform_file)
         expect(transform_file_contents).to include("<transform dir path=opt$ -> edit group bin sys>")
         expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file ruby env>")
-        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file make env>")
-        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file perl env>")
+      end
+    end
+
+    describe "#write_symlinks_file" do
+      let(:resources_path) { File.join(tmp_path, "resources/path") }
+      let(:symlinks_file) { File.join(staging_dir, "symlinks_file") }
+
+      before do
+        FileUtils.mkdir_p(resources_path)
+        allow(subject).to receive(:resources_path).and_return(resources_path)
+        File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+          f.puts("link path=usr/bin/ohai target=<%= projectdir %>/bin/ohai")
+          f.puts("link path=<%= projectdir %>/bin/gmake target=<%= projectdir %>/embedded/bin/make")
+        end
+      end
+
+      it "creates the symlinks file" do
+        subject.write_symlinks_file
+        symlinks_file_contents = File.read(symlinks_file)
+        expect(symlinks_file_contents).to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+        expect(symlinks_file_contents).to include("link path=/opt/project/bin/gmake target=/opt/project/embedded/bin/make")
       end
     end
 
     describe "#write_pkg_metadata" do
+      let(:resources_path) { File.join(tmp_path, "resources/path") }
+      let(:symlinks_file) { File.join(staging_dir, "symlinks_file") }
+      let(:manifest_file) { File.join(staging_dir, "gen.manifestfile") }
+
       it "should create metadata correctly" do
         subject.write_pkg_metadata
-        manifest_file = File.join(staging_dir, "gen.manifestfile")
-        manifest_file_contents = File.read(manifest_file)
         expect(File.exist?(manifest_file)).to be(true)
+        manifest_file_contents = File.read(manifest_file)
         expect(manifest_file_contents).to include("set name=pkg.fmri value=developer/versioning/project@1.2.3,5.11-2")
         expect(manifest_file_contents).to include("set name=variant.arch value=i386")
+      end
+
+      context "when symlinks_file exists" do
+        before do
+          FileUtils.mkdir_p(resources_path)
+          allow(subject).to receive(:resources_path).and_return(resources_path)
+          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/ohai target=<%= projectdir %>/bin/ohai")
+            f.puts("link path=<%= projectdir %>/bin/gmake target=<%= projectdir %>/embedded/bin/make")
+          end
+        end
+
+        it "should append symlinks_file to metadata contents" do
+          subject.write_pkg_metadata
+          expect(File.exist?(symlinks_file)).to be(true)
+          expect(File.exist?(manifest_file)).to be(true)
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+          expect(manifest_file_contents).to include("link path=/opt/project/bin/gmake target=/opt/project/embedded/bin/make")
+        end
+      end
+
+      context "when symlinks.erb does not exist" do
+        it "#write_pkg_metadata does not include symlinks" do
+          subject.write_pkg_metadata
+          expect(File.exist?(symlinks_file)).to be(false)
+          manifest_file = File.join(staging_dir, "gen.manifestfile")
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).not_to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+        end
       end
     end
 

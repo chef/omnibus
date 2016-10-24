@@ -105,6 +105,15 @@ module Omnibus
     end
 
     #
+    # The full path to the symlinks file on disk.
+    #
+    # @return [String]
+    #
+    def symlinks_file
+      @symlinks_file ||= File.join(staging_dir, "symlinks_file")
+    end
+
+    #
     # The full path to the pkg metadata file on disk.
     #
     # @return [String]
@@ -193,6 +202,25 @@ module Omnibus
     end
 
     #
+    # A set of symbolic links to installed commands that
+    #`pkgmogrify' will apply to the package manifest. Is called only when
+    # symlinks.erb template exists
+    # The resource exists locally. For example for project omnibus-toolchain
+    # resource_path("symlinks.erb") #=>
+    # {"/path/to/omnibus-toolchain/resources/omnibus-toolchain/ips/symlinks.erb"}
+    #
+    # @return [void]
+    #
+    def write_symlinks_file
+      render_template(resource_path("symlinks.erb"),
+        destination: symlinks_file,
+        variables: {
+          projectdir: project.install_dir,
+        }
+      )
+    end
+
+    #
     # Generate package metadata
     #
     # Create the gen template for `pkgmogrify`
@@ -210,6 +238,15 @@ module Omnibus
           arch:              safe_architecture,
         }
       )
+
+      # Append the contents of symlinks.erb if it exists
+      if File.exists?(resource_path("symlinks.erb"))
+        write_symlinks_file
+        add_symlinks = File.read(symlinks_file)
+        File.open(pkg_metadata_file, "a") do |symlink|
+          symlink.puts add_symlinks
+        end
+      end
 
       # Print the full contents of the rendered template file to generate package contents
       log.debug(log_key) { "Rendered Template:\n" + File.read(pkg_metadata_file) }
