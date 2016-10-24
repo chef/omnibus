@@ -8,33 +8,33 @@ module Omnibus
   describe Templating do
     subject { RandomClass.new }
 
-    describe '#render_template' do
-      let(:source)      { File.join(tmp_path, "source.erb") }
-      let(:destination) { File.join(tmp_path, "final") }
-      let(:mode)        { 0644 }
-      let(:variables)   { { name: "Name" } }
-      let(:contents) do
-        <<-EOH.gsub(/^ {10}/, "")
+    let(:source)      { File.join(tmp_path, "source.erb") }
+    let(:destination) { File.join(tmp_path, "final") }
+    let(:mode)        { 0644 }
+    let(:variables)   { { name: "Name" } }
+    let(:contents) do
+      <<-EOH.gsub(/^ {10}/, "")
           <%= name %>
 
           <% if false -%>
             This is magic!
           <% end -%>
         EOH
-      end
+    end
 
-      let(:options) do
-        {
-          destination: destination,
-          variables:   variables,
-          mode:        mode,
-        }
-      end
+    let(:options) do
+      {
+        destination: destination,
+        variables:   variables,
+        mode:        mode,
+      }
+    end
 
-      before do
-        File.open(source, "w") { |f| f.write(contents) }
-      end
+    before do
+      File.open(source, "w") { |f| f.write(contents) }
+    end
 
+    describe "#render_template" do
       context "when no destination is given" do
         let(:destination) { nil }
 
@@ -59,24 +59,25 @@ module Omnibus
           expect(destination).to be_an_executable
         end
       end
+    end
 
+    describe "#render_template_content" do
       context "when an undefined variable is used" do
         let(:contents) { "<%= not_a_real_variable %>" }
 
         it "raise an exception" do
           expect do
-            subject.render_template(source, options)
+            subject.render_template_content(source, variables)
           end.to raise_error(NameError)
         end
       end
 
       context "when no variables are present" do
-        let(:content)   { "static content" }
+        let(:contents) { "static content" }
         let(:variables) { {} }
 
         it "renders the template" do
-          subject.render_template(source, options)
-          expect(destination).to be_a_file
+          expect(subject.render_template_content(source, variables)).to eq("static content")
         end
       end
     end

@@ -150,13 +150,43 @@ module Omnibus
     end
 
     describe "#write_pkg_metadata" do
+      let(:resources_path) { File.join(tmp_path, "resources/path") }
+      let(:manifest_file) { File.join(staging_dir, "gen.manifestfile") }
+
       it "should create metadata correctly" do
         subject.write_pkg_metadata
-        manifest_file = File.join(staging_dir, "gen.manifestfile")
-        manifest_file_contents = File.read(manifest_file)
         expect(File.exist?(manifest_file)).to be(true)
+        manifest_file_contents = File.read(manifest_file)
         expect(manifest_file_contents).to include("set name=pkg.fmri value=developer/versioning/project@1.2.3,5.11-2")
         expect(manifest_file_contents).to include("set name=variant.arch value=i386")
+      end
+
+      context "when symlinks.erb exists" do
+        before do
+          FileUtils.mkdir_p(resources_path)
+          allow(subject).to receive(:resources_path).and_return(resources_path)
+          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/ohai target=<%= projectdir %>/bin/ohai")
+            f.puts("link path=<%= projectdir %>/bin/gmake target=<%= projectdir %>/embedded/bin/make")
+          end
+        end
+
+        it "should append symlinks to metadata contents" do
+          subject.write_pkg_metadata
+          expect(File.exist?(manifest_file)).to be(true)
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+          expect(manifest_file_contents).to include("link path=/opt/project/bin/gmake target=/opt/project/embedded/bin/make")
+        end
+      end
+
+      context "when symlinks.erb does not exist" do
+        it "#write_pkg_metadata does not include symlinks" do
+          subject.write_pkg_metadata
+          manifest_file = File.join(staging_dir, "gen.manifestfile")
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).not_to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+        end
       end
     end
 
