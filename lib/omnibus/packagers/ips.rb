@@ -193,6 +193,25 @@ module Omnibus
     end
 
     #
+    # A set of symbolic links to installed commands that
+    #`pkgmogrify' will apply to the package manifest. Is called only when
+    # symlinks.erb template exists
+    # The resource exists locally. For example for project omnibus-toolchain
+    # resource_path("symlinks.erb") #=>
+    # {"/path/to/omnibus-toolchain/resources/omnibus-toolchain/ips/symlinks.erb"}
+    #
+    # @return [void]
+    #
+    def write_symlinks
+      render_template_var(resource_path("symlinks.erb"),
+        variables: {
+          projectdir: project.install_dir,
+        }
+      )
+      @result
+    end
+
+    #
     # Generate package metadata
     #
     # Create the gen template for `pkgmogrify`
@@ -210,6 +229,14 @@ module Omnibus
           arch:              safe_architecture,
         }
       )
+
+      # Append the contents of symlinks.erb if it exists
+      if File.exists?(resource_path("symlinks.erb"))
+        write_symlinks
+        File.open(pkg_metadata_file, "a") do |symlink|
+          symlink.write(@result)
+        end
+      end
 
       # Print the full contents of the rendered template file to generate package contents
       log.debug(log_key) { "Rendered Template:\n" + File.read(pkg_metadata_file) }

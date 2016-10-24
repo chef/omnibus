@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 require "erb"
 
 module Omnibus
@@ -39,14 +38,9 @@ module Omnibus
     # @option options [Hash] :variables (default: +{}+)
     #   the list of variables to pass to the template
     #
-    def render_template(source, options = {})
-      destination = options.delete(:destination) || source.chomp(".erb")
-
-      mode      = options.delete(:mode) || 0644
+    def render_template_var(source, options)
       variables = options.delete(:variables) || {}
-
-      log.info(log_key) { "Rendering `#{source}' to `#{destination}'" }
-
+      
       unless options.empty?
         raise ArgumentError,
           "Unknown option(s): #{options.keys.map(&:inspect).join(', ')}"
@@ -61,10 +55,22 @@ module Omnibus
           Struct.new(*variables.keys).new(*variables.values)
         end
 
-      result = template.result(struct.instance_eval { binding })
+      @result = template.result(struct.instance_eval { binding })
+      @result
+    end
+
+    def render_template(source, options = {})
+      @source = source
+      @options = options
+
+      destination = options.delete(:destination) || source.chomp(".erb")
+      mode = options.delete(:mode) || 0644
+      log.info(log_key) { "Rendering `#{source}' to `#{destination}'" }
+
+      render_template_var(source, options)
 
       File.open(destination, "w", mode) do |file|
-        file.write(result)
+        file.write(@result)
       end
 
       true
