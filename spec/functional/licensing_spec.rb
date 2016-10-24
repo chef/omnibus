@@ -158,6 +158,8 @@ module Omnibus
       softwares.each { |s| project.library.component_added(s) }
 
       Licensing.create_incrementally(project) do |licensing|
+        yield licensing if block_given?
+
         project.softwares.each do |software|
           licensing.execute_post_build(software)
         end
@@ -328,13 +330,8 @@ module Omnibus
 
       it "does not collect transitive licensing info for any software" do
         softwares.each { |s| project.library.component_added(s) }
-
-        Licensing.create_incrementally(project) do |licensing|
+        create_licenses do |licensing|
           expect(licensing).not_to receive(:collect_transitive_dependency_licenses_for)
-
-          project.softwares.each do |software|
-            licensing.execute_post_build(software)
-          end
         end
       end
     end
@@ -431,6 +428,20 @@ module Omnibus
         it "logs the warnings" do
           output = capture_logging { create_licenses }
           expect(output).to include("This is a licensing warning!!!")
+        end
+
+        describe "when :fatal_transitive_dependency_licensing_warnings is set" do
+          before do
+            Omnibus::Config.fatal_transitive_dependency_licensing_warnings(true)
+          end
+
+          it "raises an error after post_build step" do
+            expect do
+              create_licenses do |licensing|
+                expect(licensing).not_to receive(:process_transitive_dependency_licensing_info)
+              end
+            end.to raise_error(Omnibus::LicensingError)
+          end
         end
       end
 
