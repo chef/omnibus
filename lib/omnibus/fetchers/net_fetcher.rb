@@ -262,7 +262,7 @@ module Omnibus
       elsif downloaded_file.end_with?(".zip")
         shellout!("unzip #{safe_downloaded_file} -d #{safe_project_dir}")
       else
-        shellout!("#{tar} #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}")
+        shellout!("#{tar} #{compression_switch}xfo #{safe_downloaded_file} -C#{safe_project_dir}")
       end
     end
 
