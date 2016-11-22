@@ -159,29 +159,38 @@ module Omnibus
     ].freeze
 
     IGNORED_ENDINGS = %w{
+      .TXT
       .[ch]
+      .bat
+      .beam
+      .cmake
       .e*rb
       .gemspec
       .gitignore
       .h*h
       .java
       .js
+      .jsm
       .json
       .lock
       .log
       .lua
       .md
       .mkd
+      .npmignore
       .out
       .pl
       .pm
       .png
+      .pod
       .py[oc]*
       .r*html
       .rdoc
       .ri
+      .rst
       .sh
       .sql
+      .svg
       .toml
       .ttf
       .txt
@@ -189,12 +198,16 @@ module Omnibus
       .yml
       Gemfile
       LICENSE
+      Makefile
       README
       Rakefile
       VERSION
+      license
     }.freeze
 
     IGNORED_PATTERNS = %w{
+      /LICENSES/
+      /man/
       /share/doc/
       /share/postgresql/
       /share/terminfo/
