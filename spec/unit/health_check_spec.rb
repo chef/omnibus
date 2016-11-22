@@ -139,7 +139,7 @@ module Omnibus
         )
       end
 
-      let(:regexp) { ".*(\\.[ch]|\\.e*rb|\\.gemspec|\\.gitignore|\\.h*h|\\.java|\\.js|\\.json|\\.lock|\\.log|\\.lua|\\.md|\\.mkd|\\.out|\\.pl|\\.pm|\\.png|\\.py[oc]*|\\.r*html|\\.rdoc|\\.ri|\\.sh|\\.sql|\\.toml|\\.ttf|\\.txt|\\.xml|\\.yml|Gemfile|LICENSE|README|Rakefile|VERSION)$|.*\\/share\\/doc\\/.*|.*\\/share\\/postgresql\\/.*|.*\\/share\\/terminfo\\/.*|.*\\/terminfo\\/.*" }
+      let(:regexp) { ".*(\\.TXT|\\.[ch]|\\.bat|\\.beam|\\.cmake|\\.e*rb|\\.gemspec|\\.gitignore|\\.h*h|\\.java|\\.js|\\.jsm|\\.json|\\.lock|\\.log|\\.lua|\\.md|\\.mkd|\\.npmignore|\\.out|\\.pl|\\.pm|\\.png|\\.pod|\\.py[oc]*|\\.r*html|\\.rdoc|\\.ri|\\.rst|\\.sh|\\.sql|\\.svg|\\.toml|\\.ttf|\\.txt|\\.xml|\\.yml|Gemfile|LICENSE|Makefile|README|Rakefile|VERSION|license)$|.*\\/LICENSES\\/.*|.*\\/man\\/.*|.*\\/share\\/doc\\/.*|.*\\/share\\/postgresql\\/.*|.*\\/share\\/terminfo\\/.*|.*\\/terminfo\\/.*" }
 
       it "raises an exception when there are external dependencies" do
         allow(subject).to receive(:shellout)
