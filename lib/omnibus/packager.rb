@@ -26,6 +26,7 @@ module Omnibus
     autoload :MSI,      "omnibus/packagers/msi"
     autoload :APPX,     "omnibus/packagers/appx"
     autoload :PKG,      "omnibus/packagers/pkg"
+    autoload :PKGSRC,   "omnibus/packagers/pkgsrc"
     autoload :Solaris,  "omnibus/packagers/solaris"
     autoload :IPS,      "omnibus/packagers/ips"
     autoload :RPM,      "omnibus/packagers/rpm"
@@ -47,6 +48,7 @@ module Omnibus
       "ips"      => IPS,
       "windows"  => [MSI, APPX],
       "mac_os_x" => PKG,
+      "smartos"  => PKGSRC,
     }.freeze
 
     #
