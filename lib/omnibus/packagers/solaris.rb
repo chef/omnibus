@@ -54,10 +54,6 @@ module Omnibus
       File.basename(project.install_dir)
     end
 
-    def staging_dir_path(file_name)
-      File.join(staging_dir, file_name)
-    end
-
     #
     # Copy all scripts in {Project#package_scripts_path} to the control
     # directory of this repo.

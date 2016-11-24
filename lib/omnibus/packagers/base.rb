@@ -181,6 +181,15 @@ module Omnibus
     end
 
     #
+    # Helper method to produce staging paths
+    #
+    # @return [String]
+    #
+    def staging_dir_path(file_name)
+      File.join(staging_dir, file_name)
+    end
+
+    #
     # @!group Resource methods
     # --------------------------------------------------
 

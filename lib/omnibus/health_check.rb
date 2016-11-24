@@ -124,6 +124,12 @@ module Omnibus
       /libgcc_s.so/,
       /libstdc\+\+\.so/,
       /libcrypt.so/,
+      /libcrypto.so/,
+      /libssl.so/,
+      /libssp\.so/,
+      /libumem\.so/,
+      /libffi\.so/,
+      /libz\.so/, # while we package our own libz, this get dragged along from Solaris 11's libelf library for some reason...
     ].freeze
 
     MAC_WHITELIST_LIBS = [
