@@ -38,7 +38,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"
   gem.add_development_dependency "aruba",       "~> 0.5"
-  gem.add_development_dependency "chefstyle",   "~> 0.3"
+  gem.add_development_dependency "chefstyle"
   gem.add_development_dependency "fauxhai",     "~> 3.2"
   gem.add_development_dependency "rspec",       "~> 3.0"
   gem.add_development_dependency "rspec-json_expectations"
