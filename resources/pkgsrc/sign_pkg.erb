@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+unless (cmd = ARGV[0])
+  STDERR.puts 'Usage: sign_pkg COMMAND'
+  exit 1
+end
+
+password = '<%= passphrase %>'
+
+require 'pty'
+
+puts cmd
+PTY.spawn(cmd) do |r, w, pid|
+  prompt = r.read(166)
+
+  unless prompt =~ /Enter passphrase: /
+    STDERR.puts "unexpected output from `#{cmd}`: '#{prompt}'"
+    Process.kill(:KILL, pid)
+    exit 1
+  end
+
+  STDOUT.puts prompt
+  w.write("#{password}\n")
+
+  line = r.gets
+  puts line
+  if line =~ /gpg: Invalid/
+    STDERR.puts 'pkg_src signing failure'
+    exit 1
+  end
+  Process.wait(pid)
+end

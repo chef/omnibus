@@ -26,6 +26,7 @@ module Omnibus
       write_comment
       write_packlist
       create_pkg
+      sign_pkg if signing_passphrase
     end
 
     def build_info
@@ -51,9 +52,103 @@ module Omnibus
       shellout! "cd #{Config.package_dir} && pkg_create -i #{postinst} -k #{postrm} -p  #{project.install_dir} -b #{build_ver} -B #{build_info} -c #{comment_file} -d #{comment_file} -f #{pack_list} -I #{project.install_dir} -l -U #{package_name}"
     end
 
+    def sign_pkg
+      staging_package_name = File.join(Config.staging_dir, package_name)
+      target_package_name = File.join(Config.package_dir, package_name)
+      FileUtils.mv(target_package_name, staging_package_name)
+      config_file = Tempfile.new
+      config_file.close
+      render_template(resource_path("pkg_config.conf.erb"),
+                      destination: config_file.path,
+                      variables: {
+                        gpg_path: "/usr/bin/gpg",
+                        gpg_id: signing_identity,
+                      }
+                     )
+      with_gpg_signing do |wrapper|
+        log.info(log_key) { "Signing package" }
+        shellout!("#{wrapper} \"pkg_admin -C #{config_file.path} gpg-sign-package #{staging_package_name} #{target_package_name}\"")
+      end
+    ensure
+      config_file.unlink
+    end
+
+    #
+    # Render the pkg signing script with secure permissions, call the given
+    # block with the path to the script, and ensure deletion of the script from
+    # disk since it contains sensitive information.
+    #
+    # @param [Proc] block
+    #   the block to call
+    #
+    # @return [String]
+    #
+    def with_gpg_signing(&block)
+      directory   = Dir.mktmpdir
+      destination = "#{directory}/sign-pkg"
+
+      render_template(resource_path("sign_pkg.erb"),
+        destination: destination,
+        mode: 0700,
+        variables: {
+          passphrase: signing_passphrase,
+        }
+      )
+
+      # Yield the destination to the block
+      yield(destination)
+    ensure
+      remove_file(destination)
+      remove_directory(directory)
+    end
+
+
     def package_name
       "#{project.package_name}-#{project.build_version}.tgz"
     end
+
+    #
+    # Set or return the signing passphrase. If this value is provided,
+    # Omnibus will attempt to sign the RPM.
+    #
+    # @example
+    #   signing_passphrase "foo"
+    #
+    # @param [String] val
+    #   the passphrase to use when signing the RPM
+    #
+    # @return [String]
+    #   the RPM-signing passphrase
+    #
+    def signing_passphrase(val = NULL)
+      if null?(val)
+        @signing_passphrase
+      else
+        @signing_passphrase = val
+      end
+    end
+    expose :signing_passphrase
+
+    #
+    # Set or return the signing identity.
+    #
+    # @example
+    #   signing_identity "foo"
+    #
+    # @param [String] val
+    #   the identity to use when signing the PKG
+    #
+    # @return [String]
+    #   the PKG-signing identity
+    #
+    def signing_identity(val = NULL)
+      if null?(val)
+        @signing_identity
+      else
+        @signing_identity = val
+      end
+    end
+    expose :signing_identity
 
     def write_buildver
       File.open build_ver, "w+" do |f|
