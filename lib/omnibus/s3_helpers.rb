@@ -32,10 +32,12 @@ module Omnibus
       #
       # @example
       #   {
-      #     region:               'us-east-1',
-      #     access_key_id:        Config.s3_access_key,
-      #     secret_access_key:    Config.s3_secret_key,
-      #     bucket_name:          Config.s3_bucket
+      #     region:                   'us-east-1',
+      #     access_key_id:            Config.s3_access_key,
+      #     secret_access_key:        Config.s3_secret_key,
+      #     bucket_name:              Config.s3_bucket,
+      #     endpoint:                 Config.s3_endpoint,
+      #     use_accelerate_endpoint:  Config.s3_accelerate
       #   }
       #
       # @return [Hash<String, String>]
@@ -50,11 +52,19 @@ module Omnibus
       # @return [Aws::S3::Resource]
       #
       def client
-        @s3_client ||= Aws::S3::Resource.new(
-          region:            s3_configuration[:region],
-          access_key_id:     s3_configuration[:access_key_id],
-          secret_access_key: s3_configuration[:secret_access_key]
-        )
+        @s3_client ||= Aws::S3::Resource.new(client_params)
+      end
+
+      def client_params
+        params = {
+          region:                   s3_configuration[:region],
+          access_key_id:            s3_configuration[:access_key_id],
+          secret_access_key:        s3_configuration[:secret_access_key],
+          use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint]
+        }
+
+        params.merge(endpoint:      s3_configuration[:endpoint]) if s3_configuration[:endpoint]
+        params
       end
 
       #
