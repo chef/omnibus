@@ -60,10 +60,17 @@ module Omnibus
           region:                   s3_configuration[:region],
           access_key_id:            s3_configuration[:access_key_id],
           secret_access_key:        s3_configuration[:secret_access_key],
-          use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint]
+          use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint],
         }
 
-        params.merge(endpoint:      s3_configuration[:endpoint]) if s3_configuration[:endpoint]
+        if s3_configuration[:use_accelerate_endpoint]
+          params[:endpoint] = "https://s3-accelerate.amazonaws.com"
+        end
+
+        if s3_configuration[:endpoint]
+          params[:endpoint] = s3_configuration[:endpoint]
+        end
+
         params
       end
 

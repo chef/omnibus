@@ -145,7 +145,7 @@ module Omnibus
           secret_access_key:       Config.s3_secret_key,
           bucket_name:             Config.s3_bucket,
           endpoint:                Config.s3_endpoint,
-          use_accelerate_endpoint: Config.s3_accelerate
+          use_accelerate_endpoint: Config.s3_accelerate,
         }
       end
 
