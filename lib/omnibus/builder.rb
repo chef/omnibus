@@ -81,10 +81,6 @@ module Omnibus
       warn_for_shell_commands(command)
 
       build_commands << BuildCommand.new("Execute: `#{command}'") do
-        # If we expect the command to run cleanly in windows within a limited
-        # msys shell, we also expect it to run cleanly on other platforms
-        # without the assistance of our chef or ruby binaries.
-        options[:clean_ruby_path] = true if options[:in_msys_bash]
         shellout!(command, options)
       end
     end
@@ -249,7 +245,6 @@ module Omnibus
 
       patches << patch_path
       options[:in_msys_bash] = true
-      options[:clean_ruby_path] = true
       build_commands << BuildCommand.new("Apply patch `#{source}'") do
         shellout!(patch_cmd, options)
       end
@@ -311,7 +306,6 @@ module Omnibus
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
         bin = embedded_bin("ruby")
-        options[:clean_ruby_path] = true
         shellout!("#{bin} #{command}", options)
       end
     end
@@ -329,7 +323,6 @@ module Omnibus
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
         bin = embedded_bin("gem")
-        options[:clean_ruby_path] = true
         shellout!("#{bin} #{command}", options)
       end
     end
@@ -350,7 +343,6 @@ module Omnibus
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
         bin = embedded_bin("bundle")
-        options[:clean_ruby_path] = true
         shellout!("#{bin} #{command}", options)
       end
     end
@@ -384,7 +376,6 @@ module Omnibus
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
 
-        options[:clean_ruby_path] = true
         shellout!("#{appbundler_bin} '#{app_software.project_dir}' '#{bin_dir}'", options)
       end
     end
@@ -403,7 +394,6 @@ module Omnibus
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
         bin = embedded_bin("rake")
-        options[:clean_ruby_path] = true
         shellout!("#{bin} #{command}", options)
       end
     end

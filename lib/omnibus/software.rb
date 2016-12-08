@@ -737,7 +737,7 @@ module Omnibus
       # On windows, make this an msys style path because autotools don't grok
       # windows paths and use : as a path separator. See the mingw cookbook for
       # how the flag gets passed into the msys2 shell.
-      if windows?
+      if windows? && ENV["MSYS_TOOLCHAIN"]
         pkg_config_flags["PREMSYS2_PKG_CONFIG_PATH"] = to_msys2_path(pkg_config_flags["PKG_CONFIG_PATH"])
       end
 
@@ -765,7 +765,7 @@ module Omnibus
       new_env = env.merge(path_key => path_value)
 
       # Extra path elements for msys2.
-      if windows?
+      if windows? && ENV["MSYS_TOOLCHAIN"]
         msys2_paths = paths.map { |x| to_msys2_path(x) }
         new_env["PREMSYS2_PATH"] = msys2_paths.join(":")
       end

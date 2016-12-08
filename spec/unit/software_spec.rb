@@ -340,9 +340,25 @@ module Omnibus
               "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m32 -Wl,-rpath,/opt/project/embedded/lib",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-              "PREMSYS2_PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
             )
+          end
+
+          context "with MSYS_TOOLCHAIN enabled" do
+            before { ENV["MSYS_TOOLCHAIN"] = "true" }
+            after { ENV.delete("MSYS_TOOLCHAIN") }
+
+            it "sets a modified default" do
+              expect(subject.with_standard_compiler_flags).to eq(
+                "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+                "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+                "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+                "LDFLAGS"         => "-L/opt/project/embedded/lib -m32 -Wl,-rpath,/opt/project/embedded/lib",
+                "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+                "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+                "PREMSYS2_PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              )
+            end
           end
         end
 
@@ -356,9 +372,25 @@ module Omnibus
               "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m64 -Wl,-rpath,/opt/project/embedded/lib",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-              "PREMSYS2_PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
             )
+          end
+
+          context "with MSYS_TOOLCHAIN enabeld" do
+            before { ENV["MSYS_TOOLCHAIN"] = "true" }
+            after { ENV.delete("MSYS_TOOLCHAIN") }
+
+            it "sets a modified default" do
+              expect(subject.with_standard_compiler_flags).to eq(
+                "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+                "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+                "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+                "LDFLAGS"         => "-L/opt/project/embedded/lib -m64 -Wl,-rpath,/opt/project/embedded/lib",
+                "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+                "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+                "PREMSYS2_PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              )
+            end
           end
         end
       end

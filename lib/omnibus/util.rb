@@ -109,7 +109,7 @@ module Omnibus
 
       # Try our best to get rid of the "outer" omnibus ruby and any current
       # chef-client/chef-dk installations from the path.
-      if options.delete(:clean_ruby_path)
+      if ENV["MSYS_TOOLCHAIN"]
         path_dirs = options[:environment].fetch(path_key, "").split(File::PATH_SEPARATOR || ":")
         path_dirs = path_dirs.map { |p| windows_safe_path(p) }
         safe_install_dir = windows_safe_path(install_dir)
