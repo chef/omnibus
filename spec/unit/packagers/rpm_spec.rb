@@ -124,6 +124,34 @@ module Omnibus
       end
     end
 
+    describe "#compression_type" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:compression_type)
+      end
+
+      it "has a default value" do
+        expect(subject.compression_type).to eq(:gzip)
+      end
+
+      it "must be a symbol" do
+        expect { subject.compression_type(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe "#compression_level" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:compression_level)
+      end
+
+      it "has a default value" do
+        expect(subject.compression_level).to eq(9)
+      end
+
+      it "must be an integer" do
+        expect { subject.compression_level(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
     describe "#id" do
       it "is :rpm" do
         expect(subject.id).to eq(:rpm)
@@ -187,6 +215,55 @@ module Omnibus
         expect(contents).to include("URL: https://example.com")
         expect(contents).to include("Packager: Chef Software")
         expect(contents).to include("Obsoletes: old-project")
+        expect(contents).to include("_binary_payload w9.gzdio")
+      end
+
+      context "when RPM compression type xz is configured" do
+        before do
+          subject.compression_type(:xz)
+        end
+
+        it "has the correct binary_payload line" do
+          subject.write_rpm_spec
+          contents = File.read(spec_file)
+          expect(contents).to include("_binary_payload w9.xzdio")
+        end
+
+        context "when RPM compression level is also configured" do
+          before do
+            subject.compression_level(6)
+          end
+
+          it "has the correct binary_payload line" do
+            subject.write_rpm_spec
+            contents = File.read(spec_file)
+            expect(contents).to include("_binary_payload w6.xzdio")
+          end
+        end
+      end
+
+      context "when RPM compression type bzip2 is configured" do
+        before do
+          subject.compression_type(:bzip2)
+        end
+
+        it "has the correct binary_payload line" do
+          subject.write_rpm_spec
+          contents = File.read(spec_file)
+          expect(contents).to include("_binary_payload w9.bzdio")
+        end
+
+        context "when RPM compression level is also configured" do
+          before do
+            subject.compression_level(6)
+          end
+
+          it "has the correct binary_payload line" do
+            subject.write_rpm_spec
+            contents = File.read(spec_file)
+            expect(contents).to include("_binary_payload w6.bzdio")
+          end
+        end
       end
 
       context "when scripts are given" do
