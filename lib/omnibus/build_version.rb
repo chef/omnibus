@@ -148,14 +148,15 @@ module Omnibus
     # It works as a patch on top of Omnibus::BuildVersion#semver.
     # Returns:
     #  - For stable builds: `semver` output
-    #  - For nightly builds: AGENT_VERSION+git.COMMITS_SINCE.GIT_SHA
+    #  - For nightly builds: AGENT_VERSION.git.COMMITS_SINCE.GIT_SHA
     #    (where `AGENT_VERSION` is an environment variable)
     def dd_agent_format
       agent_version = semver
       if ENV['AGENT_VERSION'] and ENV['AGENT_VERSION'].length > 1 and agent_version.include? "git"
         agent_version = ENV['AGENT_VERSION'] + "." + agent_version.split("+")[1]
       end
-      agent_version
+      # Replace any remaining `+` with `.` to comply with S3 object names
+      agent_version.gsub('+', '.')
     end
 
     # Generates a version string by running
