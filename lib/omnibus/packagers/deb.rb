@@ -167,6 +167,86 @@ module Omnibus
     expose :section
 
     #
+    # Compression algorithm (gzip, xz, none) to use (-Z).
+    #
+    # @example
+    #   compression_type :xz
+    #
+    # @param [Symbol] val
+    #   type of compression (:gzip, :xz, :none)
+    #
+    # @return [Symbol]
+    #   type of compression for this package
+    #
+    def compression_type(val = NULL)
+      if null?(val)
+        @compression_type || :gzip
+      else
+        unless val.is_a?(Symbol) && [:gzip, :xz, :none].member?(val)
+          raise InvalidValue.new(:compression_type, "be a Symbol (:gzip, :xz, or :none)")
+        end
+
+        @compression_type = val
+      end
+    end
+    expose :compression_type
+
+    #
+    # Compression level (1-9) to use (-Z).
+    #
+    # @example
+    #   compression_level 1
+    #
+    # @param [Integer] val
+    #   level of compression (1, .., 9)
+    #
+    # @return [Integer]
+    #   level of compression for this package
+    #
+    def compression_level(val = NULL)
+      if null?(val)
+        @compression_level || 9
+      else
+        unless val.is_a?(Integer) && 1 <= val && 9 >= val
+          raise InvalidValue.new(:compression_level, "be an Integer between 1 and 9")
+        end
+
+        @compression_level = val
+      end
+    end
+    expose :compression_level
+
+    #
+    # Compression strategy to use (-Z).
+    # For gzip: :filtered, :huffman, :rle, or :fixed;
+    # for xz: :extreme
+    # (nil means parameter will not be passsed to dpkg-deb)
+    #
+    # @example
+    #   compression_strategy :extreme
+    #
+    # @param [Symbol] val
+    #   compression strategy
+    #
+    # @return [Symbol]
+    #   compression strategy for this package
+    #
+    def compression_strategy(val = NULL)
+      if null?(val)
+        @compression_strategy
+      else
+        unless val.is_a?(Symbol) &&
+            [:filtered, :huffman, :rle, :fixed, :extreme].member?(val)
+          raise InvalidValue.new(:compression_strategy, "be a Symbol (:filtered, "\
+                                                        ":huffman, :rle, :fixed, or :extreme)")
+        end
+
+        @compression_strategy = val
+      end
+    end
+    expose :compression_strategy
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -291,7 +371,21 @@ module Omnibus
 
       # Execute the build command
       Dir.chdir(Config.package_dir) do
-        shellout!("fakeroot dpkg-deb -z9 -Zgzip -D --build #{staging_dir} #{package_name}")
+        shellout!("fakeroot dpkg-deb #{compression_params} -D --build #{staging_dir} #{package_name}")
+      end
+    end
+
+    #
+    # Return the parameters passed to dpkg-deb for setting the compression
+    # according to configuration.
+    #
+    # @return [String]
+    #
+    def compression_params
+      if compression_strategy
+        "-z#{compression_level} -Z#{compression_type} -S#{compression_strategy}"
+      else
+        "-z#{compression_level} -Z#{compression_type}"
       end
     end
 
