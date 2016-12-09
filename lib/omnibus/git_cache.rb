@@ -32,7 +32,7 @@ module Omnibus
     # will not have the generated content, so these snapshots would be
     # incompatible with the current omnibus codebase. Incrementing the serial
     # number ensures these old shapshots will not be used in subsequent builds.
-    SERIAL_NUMBER = 2
+    SERIAL_NUMBER = 3
 
     REQUIRED_GIT_FILES = %w{
 HEAD

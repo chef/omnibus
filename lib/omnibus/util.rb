@@ -35,6 +35,36 @@ module Omnibus
     }.freeze
 
     #
+    # The proper platform-specific "$PATH" key.
+    #
+    # @return [String]
+    #
+    def path_key
+      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
+      # $WINDOWSRAGE, and if you don't set that your native gem compiles
+      # will fail because the magic fixup it does to add the mingw compiler
+      # stuff won't work.
+      #
+      # Turns out there is other build environments that only set ENV['PATH'] and if we
+      # modify ENV['Path'] then it ignores that.  So, we scan ENV and returns the first
+      # one that we find.
+      #
+      if windows?
+        result = ENV.keys.grep(/\Apath\Z/i)
+        case result.length
+        when 0
+          raise "The current omnibus environment has no PATH"
+        when 1
+          result.first
+        else
+          raise "The current omnibus environment has multiple PATH/Path variables."
+        end
+      else
+        "PATH"
+      end
+    end
+
+    #
     # Shells out and runs +command+.
     #
     # @overload shellout(command, options = {})
@@ -52,6 +82,14 @@ module Omnibus
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
       options = SHELLOUT_OPTIONS.merge(options)
+
+      command_string = args.join(" ")
+      in_msys = options.delete(:in_msys_bash) && ENV["MSYSTEM"]
+      # Mixlib will handle escaping characters for cmd but our command might
+      # contain '. For now, assume that won't happen because I don't know
+      # whether this command is going to be played via cmd or through
+      # ProcessCreate.
+      command_string = "bash -c \'#{command_string}\'" if in_msys
 
       # Grab the log_level
       log_level = options.delete(:log_level)
@@ -74,9 +112,9 @@ module Omnibus
       end
 
       # Log the actual command
-      log.public_send(log_level, log_key) { "$ #{args.join(' ')}" }
+      log.public_send(log_level, log_key) { "$ #{command_string}" }
 
-      cmd = Mixlib::ShellOut.new(*args, options)
+      cmd = Mixlib::ShellOut.new(command_string, options)
       cmd.environment["HOME"] = "/tmp" unless ENV["HOME"]
       cmd.run_command
       cmd
@@ -148,6 +186,20 @@ module Omnibus
       else
         path
       end
+    end
+
+    #
+    # Convert the given path to be appropriate for usage with the given compiler
+    #
+    # @param [String, Array<String>] pieces
+    #   the pieces of the path to join and fix
+    # @return [String]
+    #   the path with applied changes
+    #
+    def compiler_safe_path(*pieces)
+      path = File.join(*pieces)
+      path = path.sub(/^([A-Za-z]):\//, "/\\1/") if ENV["MSYSTEM"]
+      path
     end
 
     #
