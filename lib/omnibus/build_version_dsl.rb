@@ -118,7 +118,7 @@ module Omnibus
     # @return [String]
     def maybe_append_timestamp(version)
       if Config.append_timestamp && !has_timestamp?(version)
-        [version, Omnibus::BuildVersion.build_start_time].join("+")
+        [version, Omnibus::BuildVersion.build_start_time].join(".")
       else
         version
       end
@@ -132,9 +132,7 @@ module Omnibus
     # @param [String] version
     # @return [Boolean]
     def has_timestamp?(version)
-      _ver, build_info = version.split("+")
-      return false if build_info.nil?
-      build_info.split(".").any? do |part|
+      version.split(".").any? do |part|
         begin
           Time.strptime(part, Omnibus::BuildVersion::TIMESTAMP_FORMAT)
           true
