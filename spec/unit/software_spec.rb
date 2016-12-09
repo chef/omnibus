@@ -77,7 +77,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides LDFLAGS" do
@@ -87,7 +88,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides CFLAGS" do
@@ -97,7 +99,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides CXXFLAGS" do
@@ -107,7 +110,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides CPPFLAGS" do
@@ -117,7 +121,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "preserves anything else" do
@@ -128,7 +133,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -150,7 +156,8 @@ module Omnibus
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
             "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -176,7 +183,8 @@ module Omnibus
               "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
               "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -199,7 +207,8 @@ module Omnibus
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -225,7 +234,8 @@ module Omnibus
               "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "LD_OPTIONS"      => "-R/opt/project/embedded/lib -M #{project_root}/files/mapfile/solaris",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -241,7 +251,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -266,7 +277,8 @@ module Omnibus
             "OBJECT_MODE"     => "64",
             "ARFLAGS"         => "-X64 cru",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -283,7 +295,8 @@ module Omnibus
             "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
             "LDFLAGS" => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH" => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -301,7 +314,9 @@ module Omnibus
               "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
               "LDFLAGS" => "-L/opt/project/embedded/lib",
               "LD_RUN_PATH" => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig" )
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
+            )
           end
         end
       end
@@ -320,7 +335,8 @@ module Omnibus
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LDFLAGS"         => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -337,7 +353,8 @@ module Omnibus
           "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
           "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
           "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+          "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -356,7 +373,8 @@ module Omnibus
               "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
               "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
               )
           end
         end
@@ -375,7 +393,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -391,12 +410,13 @@ module Omnibus
         context "in 32-bit mode" do
           it "sets the default" do
             expect(subject.with_standard_compiler_flags).to eq(
-              "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
+              "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m32 -fno-lto",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -406,12 +426,13 @@ module Omnibus
 
           it "sets the default" do
             expect(subject.with_standard_compiler_flags).to eq(
-              "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
+              "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m64 -fno-lto",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -481,9 +502,10 @@ module Omnibus
             allow(ENV).to receive(:keys).and_return(%w{ Path PATH })
           end
 
-          it "returns a path key of `Path`" do
-            expect(subject.with_embedded_path).to eq(
-              "Path" => prepended_path
+          it "and raises an error when PATH is also set" do
+            expect { subject.with_embedded_path }.to raise_error(
+              RuntimeError,
+              "The current omnibus environment has multiple PATH/Path variables."
             )
           end
         end
