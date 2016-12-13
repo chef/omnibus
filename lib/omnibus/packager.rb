@@ -16,38 +16,146 @@
 
 module Omnibus
   module Packager
-    include Logging
     include Sugarable
 
-    autoload :Base,     "omnibus/packagers/base"
-    autoload :BFF,      "omnibus/packagers/bff"
-    autoload :DEB,      "omnibus/packagers/deb"
-    autoload :Makeself, "omnibus/packagers/makeself"
-    autoload :MSI,      "omnibus/packagers/msi"
-    autoload :APPX,     "omnibus/packagers/appx"
-    autoload :PKG,      "omnibus/packagers/pkg"
-    autoload :Solaris,  "omnibus/packagers/solaris"
-    autoload :IPS,      "omnibus/packagers/ips"
-    autoload :RPM,      "omnibus/packagers/rpm"
+    autoload :BFF,      'omnibus/packagers/bff'
+    autoload :DEB,      'omnibus/packagers/deb'
+    autoload :Makeself, 'omnibus/packagers/makeself'
+    autoload :MSI,      'omnibus/packagers/msi'
+    autoload :APPX,     'omnibus/packagers/appx'
+    autoload :PKG,      'omnibus/packagers/pkg'
+    autoload :Solaris,  'omnibus/packagers/solaris'
+    autoload :IPS,      'omnibus/packagers/ips'
+    autoload :RPM,      'omnibus/packagers/rpm'
 
-    #
-    # The list of Ohai platform families mapped to the respective packager
-    # class.
-    #
-    # @return [Hash<String, Class>]
-    #
-    PLATFORM_PACKAGER_MAP = {
-      "debian"   => DEB,
-      "fedora"   => RPM,
-      "suse"     => RPM,
-      "rhel"     => RPM,
-      "wrlinux"  => RPM,
-      "aix"      => BFF,
-      "solaris"  => Solaris,
-      "ips"      => IPS,
-      "windows"  => [MSI, APPX],
-      "mac_os_x" => PKG,
-    }.freeze
+    class Platform
+      require 'omnibus/packagers/base'
+
+      def initialize(platform_information)
+        @platform_info = platform_information
+      end
+
+      def self.create(platform_information)
+        platform_name = platform_information['platform_family']
+        class_name = "#{platform_name.capitalize}Platform"
+
+        begin
+          name = Packager.const_get(class_name)
+        rescue NameError
+          name = DefaultPlatform
+        end
+        name.new(platform_information)
+      end
+
+      # Returns an array of supported packager types for this platform
+      # @abstract
+      def supported_packagers
+        raise AbstractMethodException.new
+      end
+
+      protected
+      def satisfies_version_constraint?(version_constraint)
+        version = @platform_info['platform_version']
+        Chef::Sugar::Constraints::Version.new(version).satisfies?(version_constraint)
+      end
+    end
+
+    class DefaultPlatform < Platform
+      include Logging
+      require 'omnibus/packagers/makeself'
+
+      def supported_packagers
+        platform = @platform_info['platform_family']
+        log.warn(log_key) do
+          "Could not determine packager for `#{platform}', defaulting to `makeself'!"
+        end
+
+        [Makeself]
+      end
+    end
+
+    class Solaris2Platform < Platform
+      require 'omnibus/packagers/solaris'
+      require 'omnibus/packagers/ips'
+      require 'omnibus/packagers/makeself'
+
+      def supported_packagers
+        case
+        when satisfies_version_constraint?('>= 5.11')
+          [IPS]
+        when satisfies_version_constraint?('>= 5.10')
+          [Solaris]
+        else
+          [Makeself]
+        end
+      end
+    end
+
+    class WindowsPlatform < Platform
+      require 'omnibus/packagers/msi'
+      require 'omnibus/packagers/appx'
+
+      def supported_packagers
+        return [MSI, APPX] if satisfies_version_constraint?('>= 6.2')
+        [MSI]
+      end
+    end
+
+    class DebianPlatform < Platform
+      require 'omnibus/packagers/DEB'
+
+      def supported_packagers
+        [DEB]
+      end
+    end
+
+    class FedoraPlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class SusePlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class RhelPlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class WrlinuxPlatform < Platform
+      require 'omnibus/packagers/RPM'
+
+      def supported_packagers
+        [RPM]
+      end
+    end
+
+    class AixPlatform < Platform
+      require 'omnibus/packagers/BFF'
+
+      def supported_packagers
+        [BFF]
+      end
+    end
+
+    class Mac_os_xPlatform < Platform
+      require 'omnibus/packagers/PKG'
+
+      def supported_packagers
+        [PKG]
+      end
+    end
 
     #
     # Determine the packager(s) for the current system. This method returns the
@@ -59,31 +167,7 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      family = Ohai["platform_family"]
-      version = Ohai["platform_version"]
-
-      if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
-        family = "ips"
-      elsif family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.10")
-        family = "solaris"
-      end
-      if klass = PLATFORM_PACKAGER_MAP[family]
-        package_types = klass.is_a?(Array) ? klass : [ klass ]
-
-        if package_types.include?(APPX) &&
-            !Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 6.2")
-          log.warn(log_key) { "APPX generation is only supported on Windows versions 2012 and above" }
-          package_types = package_types - [APPX]
-        end
-
-        package_types
-      else
-        log.warn(log_key) do
-          "Could not determine packager for `#{family}', defaulting " \
-          "to `makeself'!"
-        end
-        [Makeself]
-      end
+      Platform.create(Ohai).supported_packagers
     end
     module_function :for_current_system
   end
