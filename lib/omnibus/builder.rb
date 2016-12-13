@@ -1056,6 +1056,8 @@ module Omnibus
         log.warn(log_key) { "Detected command `remove'. Consider using the `delete' DSL method." }
       when /^rsync /i
         log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
+      when /^pip /i
+        log.warn(log_key) { "Detected command `pip'. Consider using the `pip' DSL method." }
       end
     end
 
