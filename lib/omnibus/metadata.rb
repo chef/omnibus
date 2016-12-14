@@ -201,6 +201,7 @@ module Omnibus
           when "5.1.2600", "xp"     then "xp"
           when "5.2.3790", "2003r2" then "2003r2"
           when "6.0.6001", "2008"   then "2008"
+          when "6.0.6002", '2008'   then '2008'
           when "6.1.7600", "7"      then "7"
           when "6.1.7601", "2008r2" then "2008r2"
           when "6.2.9200", "2012"   then "2012"
