@@ -471,6 +471,12 @@ module Omnibus
       :x86
     end
 
+    # Flag specifying whether the project should be built with FIPS
+    # compatability or not.
+    #
+    # @return [true, false]
+    default(:fips_mode, false)
+
     # --------------------------------------------------
     # @!endgroup
     #
