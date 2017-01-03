@@ -12,7 +12,7 @@ module Omnibus
       expect(described_class.singleton_class.included_modules).to include(Sugarable)
     end
 
-    it "includes Sugarable" do
+    it "is a sugarable" do
       expect(described_class.ancestors).to include(Sugarable)
     end
   end
@@ -54,6 +54,26 @@ module Omnibus
           EOH
         }.to_not raise_error
       end
+    end
+  end
+
+  describe Sugar do
+    let(:klass) do
+      Class.new do
+        include Sugar
+      end
+    end
+
+    let(:instance) { klass.new }
+
+    it "returns the windows architecture being built" do
+      expect(Omnibus::Config).to receive(:windows_arch).and_return(:x86_64)
+      expect(instance.windows_arch_i386?).to eq(false)
+    end
+
+    it "returns whether fips_mode is enabled" do
+      expect(Omnibus::Config).to receive(:fips_mode).and_return(false)
+      expect(instance.fips_mode?).to eq(false)
     end
   end
 end
