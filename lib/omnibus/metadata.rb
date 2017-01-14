@@ -172,7 +172,7 @@ module Omnibus
         when "centos", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos", "nexus", "ios_xr"
           # Only want MAJOR (e.g. Debian 7, OmniOS r151006, SmartOS 20120809T221258Z)
           platform_version.split(".").first
-        when "aix", "gentoo", "mac_os_x", "openbsd", "slackware", "solaris2", "opensuse", "ubuntu"
+        when "aix", "gentoo", "mac_os_x", "openbsd", "slackware", "solaris2", "opensuse", "ubuntu", "alpine"
           # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
           platform_version.split(".")[0..1].join(".")
         when "arch"
