@@ -28,6 +28,7 @@ module Omnibus
       destination = File.join(source_dir, project.install_dir)
       FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
       write_transform_file
+      write_versionlock_file
     end
 
     build do
@@ -105,6 +106,15 @@ module Omnibus
     end
 
     #
+    # The full path to the version-lock file on disk.
+    #
+    # @return [String]
+    #
+    def versionlock_file
+      @versionlock_file ||= File.join(staging_dir, "version-lock")
+    end
+
+    #
     # The full path to the pkg metadata file on disk.
     #
     # @return [String]
@@ -175,6 +185,17 @@ module Omnibus
       else
         Ohai["kernel"]["machine"]
       end
+    end
+
+    #
+    # A version-lock rule that `pkgmogrify' will apply to at the end of package
+    # manifest.
+    #
+    # @return [void]
+    #
+    def write_versionlock_file
+      transform_str = "<transform pkg depend -> default facet.version-lock.*> false>"
+      File.write("#{staging_dir}/version-lock", transform_str)
     end
 
     #
@@ -259,6 +280,7 @@ module Omnibus
       shellout!("pkgdepend generate -md #{source_dir} #{pkg_manifest_file}.2 | pkgfmt > #{pkg_manifest_file}.3")
       shellout!("pkgmogrify -DARCH=`uname -p` #{pkg_manifest_file}.3 #{transform_file} | pkgfmt > #{pkg_manifest_file}.4")
       shellout!("pkgdepend resolve -m #{pkg_manifest_file}.4")
+      shellout!("pkgmogrify #{pkg_manifest_file}.4.res #{versionlock_file} > #{pkg_manifest_file}.5.res")
     end
 
     #
@@ -268,7 +290,7 @@ module Omnibus
     #
     def validate_pkg_manifest
       log.info(log_key) { "Validating package manifest" }
-      shellout!("pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{pkg_manifest_file}.4.res")
+      shellout!("pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{pkg_manifest_file}.5.res")
     end
 
     #
@@ -288,7 +310,7 @@ module Omnibus
     #
     def publish_ips_pkg
       shellout!("pkgrepo -s #{repo_dir} set publisher/prefix=#{publisher_prefix}")
-      shellout!("pkgsend publish -s #{repo_dir} -d #{source_dir} #{pkg_manifest_file}.4.res")
+      shellout!("pkgsend publish -s #{repo_dir} -d #{source_dir} #{pkg_manifest_file}.5.res")
       log.info(log_key) { "Published IPS package to repo: #{repo_dir}" }
 
       repo_info = shellout("pkg list -afv -g #{repo_dir}").stdout
