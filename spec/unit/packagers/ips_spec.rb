@@ -136,6 +136,16 @@ module Omnibus
       end
     end
 
+    describe "#write_versionlock_file" do
+      let(:versionlock_file) { File.join(staging_dir, "version-lock") }
+
+      it "creates the version-lock file" do
+        subject.write_versionlock_file
+        versionlock_file_contents = File.read(versionlock_file)
+        expect(versionlock_file_contents).to include("<transform pkg depend -> default facet.version-lock.*> false>")
+      end
+    end
+
     describe "#write_transform_file" do
       let(:transform_file) { File.join(staging_dir, "doc-transform") }
 
@@ -208,6 +218,8 @@ module Omnibus
           .with("pkgmogrify -DARCH=`uname -p` #{staging_dir}/project.p5m.3 #{staging_dir}/doc-transform | pkgfmt > #{staging_dir}/project.p5m.4")
         expect(subject).to receive(:shellout!)
           .with("pkgdepend resolve -m #{staging_dir}/project.p5m.4")
+        expect(subject).to receive(:shellout!)
+          .with("pkgmogrify #{staging_dir}/project.p5m.4.res #{staging_dir}/version-lock > #{staging_dir}/project.p5m.5.res")
         subject.generate_pkg_deps
       end
     end
@@ -215,7 +227,7 @@ module Omnibus
     describe "#validate_pkg_manifest" do
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
-          .with("pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_dir}/project.p5m.4.res")
+          .with("pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_dir}/project.p5m.5.res")
         subject.validate_pkg_manifest
       end
     end
@@ -233,7 +245,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with("pkgrepo -s #{staging_dir}/publish/repo set publisher/prefix=Omnibus")
         expect(subject).to receive(:shellout!)
-          .with("pkgsend publish -s #{staging_dir}/publish/repo -d #{staging_dir}/proto_install #{staging_dir}/project.p5m.4.res")
+          .with("pkgsend publish -s #{staging_dir}/publish/repo -d #{staging_dir}/proto_install #{staging_dir}/project.p5m.5.res")
 
         expect(shellout).to receive(:stdout)
         subject.publish_ips_pkg
