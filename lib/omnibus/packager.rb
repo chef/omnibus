@@ -45,7 +45,7 @@ module Omnibus
       "aix"      => BFF,
       "solaris"  => Solaris,
       "ips"      => IPS,
-      "windows"  => [MSI, APPX],
+      "windows"  => MSI,
       "mac_os_x" => PKG,
     }.freeze
 
