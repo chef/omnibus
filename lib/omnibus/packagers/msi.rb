@@ -16,12 +16,18 @@
 
 require "pathname"
 require "omnibus/packagers/windows_base"
+require "FileUtils"
 
 module Omnibus
   class Packager::MSI < Packager::WindowsBase
     id :msi
 
     setup do
+      if bundle_msi
+        helper_tmp_dir = Dir.mktmpdir
+        parameters.store('HelperDir', helper_tmp_dir)
+        FileUtils.mv "#{install_dir}/bin/upgrade-helper.exe", "#{helper_tmp_dir}"
+      end
       # Render the localization
       write_localization_file
 
@@ -108,7 +114,8 @@ module Omnibus
         # This assumes, rightly or wrongly, that any installers we want to bundle
         # into our installer will be downloaded by omnibus and put in the cache dir
         if bundle_msi
-          shellout!(candle_command(is_bundle: true))
+          bundle_candle_vars ="-dPackageMsi=#{msi_file}"
+          shellout!(candle_command(is_bundle: true, candle_vars: bundle_candle_vars))
 
           bundle_file = windows_safe_path(Config.package_dir, bundle_name)
           shellout!(light_command(bundle_file, is_bundle: true), returns: [0, 204])
@@ -472,6 +479,7 @@ module Omnibus
           -ext WixBalExtension
           #{wix_extension_switches(wix_candle_extensions)}
           -dOmnibusCacheDir="#{windows_safe_path(File.expand_path(Config.cache_dir))}"
+          #{candle_vars}
           "#{windows_safe_path(staging_dir, 'bundle.wxs')}"
         EOH
       else
