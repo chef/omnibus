@@ -681,7 +681,7 @@ module Omnibus
     #       Default: [:config_guess, :config_sub]
     def update_config_guess(target: ".", install: [:config_guess, :config_sub])
       build_commands << BuildCommand.new("update_config_guess `target: #{target} install: #{install.inspect}'") do
-        config_guess_dir = "#{install_dir}/embedded/lib/config_guess"
+        config_guess_dir = "/tmp/build/embedded/lib/config_guess"
         %w{config.guess config.sub}.each do |c|
           unless File.exist?(File.join(config_guess_dir, c))
             raise "Can not find #{c}. Make sure you add a dependency on 'config_guess' in your software definition"
