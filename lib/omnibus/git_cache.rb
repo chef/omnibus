@@ -140,21 +140,17 @@ refs}.freeze
 
       create_cache_path
 
-      restore_me = false
-      cmd = git_cmd(%Q{tag -l "#{tag}"})
-
-      cmd.stdout.each_line do |line|
-        restore_me = true if tag == line.chomp
-      end
-
-      if restore_me
+      if has_tag(tag)
         log.internal(log_key) { "Detected tag `#{tag}' can be restored, marking it for restoration" }
         git_cmd(%Q{tag -f restore_here "#{tag}"})
         true
-      else
+      elsif has_tag("restore_here")
         log.internal(log_key) { "Could not find tag `#{tag}', restoring previous tag" }
         git_cmd(%Q{checkout -f restore_here})
         git_cmd(%Q{tag -d restore_here})
+        false
+      else
+        log.internal(log_key) { "Could not find marker tag `restore_here', nothing to restore" }
         false
       end
     end
@@ -211,6 +207,11 @@ refs}.freeze
     # @return [String]
     def log_key
       @log_key ||= "#{super}: #{software.name}"
+    end
+
+    def has_tag(tag)
+      cmd = git_cmd(%Q{tag -l "#{tag}"})
+      cmd.stdout.lines.any? { |line| tag == line.chomp }
     end
   end
 end
