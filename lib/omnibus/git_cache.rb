@@ -146,13 +146,18 @@ refs}.freeze
         true
       elsif has_tag("restore_here")
         log.internal(log_key) { "Could not find tag `#{tag}', restoring previous tag" }
-        git_cmd(%Q{checkout -f restore_here})
-        git_cmd(%Q{tag -d restore_here})
+        restore_from_cache
         false
       else
         log.internal(log_key) { "Could not find marker tag `restore_here', nothing to restore" }
         false
       end
+    end
+
+    def restore_from_cache
+      git_cmd("checkout -f restore_here")
+    ensure
+      git_cmd("tag -d restore_here")
     end
 
     #

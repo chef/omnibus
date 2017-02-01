@@ -1076,6 +1076,12 @@ module Omnibus
         softwares.each do |software|
           software.build_me([license_collector])
         end
+
+        # If nothing has dirtied the cache, checkout the last cache dir
+        unless dirty?
+          log.info(log_key) { "Cache not dirtied, restoring last marker" }
+          GitCache.new(softwares.last).restore_from_cache
+        end
       end
 
       write_json_manifest
