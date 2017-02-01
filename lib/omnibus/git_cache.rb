@@ -148,11 +148,13 @@ refs}.freeze
       end
 
       if restore_me
-        log.internal(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
-        git_cmd(%Q{checkout -f "#{tag}"})
+        log.internal(log_key) { "Detected tag `#{tag}' can be restored, marking it for restoration" }
+        git_cmd(%Q{tag -f restore_here "#{tag}"})
         true
       else
-        log.internal(log_key) { "Could not find tag `#{tag}', skipping restore" }
+        log.internal(log_key) { "Could not find tag `#{tag}', restoring previous tag" }
+        git_cmd(%Q{checkout -f restore_here})
+        git_cmd(%Q{tag -d restore_here})
         false
       end
     end
