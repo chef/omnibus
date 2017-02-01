@@ -1107,6 +1107,8 @@ module Omnibus
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
 
+      packager = packagers_for_system[0]
+
       # Install any package this project extends
       extended_packages.each do |packages, enablerepo|
         log.info(log_key) { "installing #{packages}" }
