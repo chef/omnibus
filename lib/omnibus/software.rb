@@ -164,6 +164,24 @@ module Omnibus
     end
     expose :name
 
+    # Sets wether the software should always be built or not.
+    # Since it doesn't influence the build order, you should put these
+    # dependencies at the end to maximize the git caching
+    #
+    # @example
+    #   always_build true
+    #
+    # @return [Boolean]
+    #
+    def always_build(val = NULL)
+      if null?(val)
+        @always_build
+      else
+        @always_build = val
+      end
+    end
+    expose :always_build
+
     #
     # Sets the description of the software.
     #
@@ -1080,6 +1098,12 @@ module Omnibus
             "Building because `#{project.culprit.name}' dirtied the cache"
           end
           execute_build(build_wrappers)
+        elsif always_build
+          log.info(log_key) do
+            "Building because always_build is true"
+          end
+          execute_build(build_wrappers)
+          project.dirty!(self)
         elsif git_cache.restore
           log.info(log_key) { "Restored from cache" }
         else
