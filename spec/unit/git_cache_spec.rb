@@ -170,7 +170,7 @@ module Omnibus
           .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
           .and_return(tag_cmd)
         allow(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"})
+          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f restore_here "#{ipc.tag}"})
         allow(ipc).to receive(:create_cache_path)
       end
 
@@ -179,25 +179,54 @@ module Omnibus
         ipc.restore
       end
 
-      it "checks for a tag with the software and version, and if it finds it, checks it out" do
+      it "checks for a tag with the software and version, and if it finds it, marks it as restoration point" do
         expect(ipc).to receive(:shellout!)
           .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
           .and_return(tag_cmd)
         expect(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"})
+          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f restore_here "#{ipc.tag}"})
         ipc.restore
       end
 
       describe "if the tag does not exist" do
         let(:git_tag_output) { "\n" }
+        let(:restore_tag_cmd) do
+          cmd_double = double(Mixlib::ShellOut)
+          allow(cmd_double).to receive(:stdout).and_return(git_restore_tag_output)
+          allow(cmd_double).to receive(:error!).and_return(cmd_double)
+          cmd_double
+        end
 
-        it "does nothing" do
-          expect(ipc).to receive(:shellout!)
-            .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
-            .and_return(tag_cmd)
-          expect(ipc).to_not receive(:shellout!)
-            .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"})
-          ipc.restore
+        describe "if the restore marker tag exists" do
+          let(:git_restore_tag_output) { "restore_here\n" }
+
+          it "checks out the last save restoration point and deletes the marker tag" do
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "restore_here"})
+              .and_return(restore_tag_cmd)
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
+              .and_return(tag_cmd)
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f restore_here})
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -d restore_here})
+            ipc.restore
+          end
+        end
+
+        describe "if the restore marker tag does not exist" do
+          let(:git_restore_tag_output) { "\n" }
+
+          it "does nothing" do
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "restore_here"})
+              .and_return(restore_tag_cmd)
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
+              .and_return(tag_cmd)
+            ipc.restore
+          end
         end
       end
     end
