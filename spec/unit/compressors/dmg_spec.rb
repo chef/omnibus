@@ -5,6 +5,7 @@ module Omnibus
     let(:project) do
       Project.new.tap do |project|
         project.name("project")
+        project.friendly_name("Project One")
         project.homepage("https://example.com")
         project.install_dir("/opt/project")
         project.build_version("1.2.3")
@@ -86,7 +87,7 @@ module Omnibus
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil create \\
               -srcfolder "#{staging_dir}/Resources" \\
-              -volname "Project" \\
+              -volname "Project One" \\
               -fs HFS+ \\
               -fsargs "-c c=64,a=16,e=16" \\
               -format UDRW \\
@@ -155,10 +156,10 @@ module Omnibus
             iconutil -c icns tmp.iconset
 
             # Copy it over
-            cp tmp.icns "/Volumes/Project/.VolumeIcon.icns"
+            cp tmp.icns "/Volumes/Project One/.VolumeIcon.icns"
 
             # Source the icon
-            SetFile -a C "/Volumes/Project"
+            SetFile -a C "/Volumes/Project One"
           EOH
 
         subject.set_volume_icon
@@ -181,7 +182,7 @@ module Omnibus
         contents = File.read("#{staging_dir}/create_dmg.osascript")
 
         expect(contents).to include('tell application "Finder"')
-        expect(contents).to include('  tell disk "Project"')
+        expect(contents).to include('  tell disk "Project One"')
         expect(contents).to include("    open")
         expect(contents).to include("    set current view of container window to icon view")
         expect(contents).to include("    set toolbar visible of container window to false")
@@ -221,7 +222,7 @@ module Omnibus
 
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
-            chmod -Rf go-w /Volumes/Project
+            chmod -Rf go-w "/Volumes/Project One"
             sync
             hdiutil detach "#{device}"
             hdiutil convert \\
@@ -291,8 +292,7 @@ module Omnibus
 
     describe "#volume_name" do
       it "is the project friendly_name" do
-        project.friendly_name("Friendly Bacon Bits")
-        expect(subject.volume_name).to eq("Friendly Bacon Bits")
+        expect(subject.volume_name).to eq("Project One")
       end
     end
   end
