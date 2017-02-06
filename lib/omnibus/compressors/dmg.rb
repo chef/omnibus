@@ -118,7 +118,7 @@ module Omnibus
     def clean_disks
       log.info(log_key) { "Cleaning previously mounted disks" }
 
-      existing_disks = shellout!("mount | grep /Volumes/#{volume_name} | awk '{print $1}'")
+      existing_disks = shellout!("mount | grep \"/Volumes/#{volume_name}\" | awk '{print $1}'")
       existing_disks.stdout.lines.each do |existing_disk|
         existing_disk.chomp!
 
@@ -240,7 +240,7 @@ module Omnibus
 
       Dir.chdir(staging_dir) do
         shellout! <<-EOH.gsub(/^ {10}/, "")
-          chmod -Rf go-w /Volumes/#{volume_name}
+          chmod -Rf go-w "/Volumes/#{volume_name}"
           sync
           hdiutil detach "#{@device}"
           hdiutil convert \\
