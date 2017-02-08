@@ -413,5 +413,36 @@ module Omnibus
         end
       end
     end
+
+    describe "#restore_complete_build" do
+      let(:cached_build) { double(GitCache) }
+      let(:first_software) { double(Omnibus::Software) }
+      let(:last_software) { double(Omnibus::Software) }
+
+      before do
+        allow(Config).to receive(:use_git_caching).and_return(git_caching)
+      end
+
+      context "when git caching is enabled" do
+        let(:git_caching) { true }
+
+        it "restores the last software built" do
+          expect(subject).to receive(:softwares).and_return([first_software, last_software])
+          expect(GitCache).to receive(:new).with(last_software).and_return(cached_build)
+          expect(cached_build).to receive(:restore_from_cache)
+          subject.restore_complete_build
+        end
+      end
+
+      context "when git caching is disabled" do
+        let(:git_caching) { false }
+
+        it "does nothing" do
+          expect(subject).not_to receive(:softwares)
+          expect(GitCache).not_to receive(:new)
+          subject.restore_complete_build
+        end
+      end
+    end
   end
 end
