@@ -66,6 +66,8 @@ module Omnibus
       else
         force_recreate_project_dir! unless dir_empty?(project_dir)
         git_clone
+        git_checkout
+        git_clone_submodules if clone_submodules?
       end
     end
 
@@ -141,7 +143,16 @@ module Omnibus
     # @return [void]
     #
     def git_clone
-      git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
+      git("clone #{source_url} .")
+    end
+
+    #
+    # Clone the +source_url+ into the +project_dir+.
+    #
+    # @return [void]
+    #
+    def git_clone_submodules
+      git("submodule update --init --recursive")
     end
 
     #
