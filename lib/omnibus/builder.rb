@@ -856,7 +856,7 @@ module Omnibus
         if tries <= 0
           raise e
         else
-          delay = delay * 2
+          delay *= 2
 
           log.warn(log_key) do
             label = "#{(Config.build_retries - tries) + 1}/#{Config.build_retries}"

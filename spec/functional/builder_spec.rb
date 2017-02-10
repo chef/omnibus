@@ -47,7 +47,7 @@ module Omnibus
       options
     end
 
-    def make_gemspec()
+    def make_gemspec
       gemspec = File.join(project_dir, "#{project_name}.gemspec")
       File.open(gemspec, "w") do |f|
         f.write <<-EOH.gsub(/^ {12}/, "")
@@ -64,7 +64,7 @@ module Omnibus
       gemspec
     end
 
-    def make_gemfile()
+    def make_gemfile
       gemfile = File.join(project_dir, "Gemfile")
       File.open(gemfile, "w") do |f|
         f.write <<-EOH.gsub(/^ {12}/, "")
@@ -74,7 +74,7 @@ module Omnibus
       gemfile
     end
 
-    def make_gemfile_lock()
+    def make_gemfile_lock
       gemfile_lock = File.join(project_dir, "Gemfile.lock")
       File.open(gemfile_lock, "w") do |f|
         f.write <<-EOH.gsub(/^ {12}/, "")
