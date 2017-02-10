@@ -16,7 +16,7 @@
 
 require "pathname"
 require "omnibus/packagers/windows_base"
-require "FileUtils"
+require "fileutils"
 
 module Omnibus
   class Packager::MSI < Packager::WindowsBase
