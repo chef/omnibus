@@ -141,7 +141,9 @@ module Omnibus
     # @return [void]
     #
     def git_clone
-      git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
+      retry_block("git clone", [CommandTimeout, CommandFailed]) do
+        git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
+      end
     end
 
     #
@@ -154,7 +156,11 @@ module Omnibus
       # default when a sha1 is provided).  git older than 1.7.5 doesn't
       # support the --detach flag.
       git("checkout #{resolved_version} -f -q")
-      git("submodule update --recursive") if clone_submodules?
+      if clone_submodules?
+        retry_block("git submodule update", [CommandTimeout, CommandFailed]) do
+          git("submodule update --recursive")
+        end
+      end
     end
 
     #
@@ -165,7 +171,9 @@ module Omnibus
     def git_fetch
       fetch_cmd = "fetch #{source_url} #{described_version}"
       fetch_cmd << " --recurse-submodules=on-demand" if clone_submodules?
-      git(fetch_cmd)
+      retry_block("git fetch", [CommandTimeout, CommandFailed]) do
+        git(fetch_cmd)
+      end
     end
 
     #
@@ -259,7 +267,10 @@ module Omnibus
       # allows us to return the SHA of the tagged commit for annotated
       # tags. We take care to only return exact matches in
       # process_remote_list.
-      remote_list = shellout!("git ls-remote \"#{source[:git]}\" \"#{ref}*\"").stdout
+      remote_list = retry_block("git ls-remote", [CommandTimeout, CommandFailed]) do
+        shellout!("git ls-remote \"#{source[:git]}\" \"#{ref}*\"").stdout
+      end
+
       commit_ref = dereference_annotated_tag(remote_list, ref)
 
       unless commit_ref
