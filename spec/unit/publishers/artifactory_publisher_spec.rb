@@ -195,7 +195,7 @@ module Omnibus
           # raise an exception a set number of times.
           @times = 0
           allow(artifact).to receive(:upload) do
-            @times += 1;
+            @times += 1
             raise Artifactory::Error::HTTPError.new("status" => "409", "message" => "CONFLICT") unless @times > 1
           end
         end

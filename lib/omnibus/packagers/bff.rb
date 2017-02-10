@@ -226,9 +226,7 @@ module Omnibus
       # from within the staging_dir's .info folder (where control files for the
       # packaging process are kept.)
       log.debug(log_key) do
-        "With .inventory file of:\n" + File.read("#{
-          File.join( staging_dir, '.info', "#{safe_base_package_name}.inventory" )
-        }")
+        "With .inventory file of:\n" + File.read("#{File.join( staging_dir, '.info', "#{safe_base_package_name}.inventory" )}")
       end
 
       # Copy the resulting package up to the package_dir

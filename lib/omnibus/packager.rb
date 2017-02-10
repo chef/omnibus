@@ -75,7 +75,7 @@ module Omnibus
         if package_types.include?(APPX) &&
             !Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 6.2")
           log.warn(log_key) { "APPX generation is only supported on Windows versions 2012 and above" }
-          package_types = package_types - [APPX]
+          package_types -= [APPX]
         end
 
         package_types
