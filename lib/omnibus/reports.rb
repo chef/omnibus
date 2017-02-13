@@ -25,7 +25,7 @@ module Omnibus
     # will be stored in the column, the width is 0 (i.e., nothing
     # should be printed, not even the column header)
     def column_width(items, column_name)
-      widest_item = items.max { |a, b| a.size <=> b.size }
+      widest_item = items.max_by(&:size)
       if widest_item
         widest = (widest_item.size >= column_name.size) ? widest_item : column_name
         widest.size + PADDING

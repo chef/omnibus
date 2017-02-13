@@ -18,9 +18,9 @@ require "ffi_yajl"
 
 module Omnibus
   class Manifest
-    class InvalidManifestFormat < Exception; end
-    class NotAManifestEntry < Exception; end
-    class MissingManifestEntry < Exception; end
+    class InvalidManifestFormat < RuntimeError; end
+    class NotAManifestEntry < RuntimeError; end
+    class MissingManifestEntry < RuntimeError; end
 
     include Logging
 

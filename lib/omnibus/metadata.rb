@@ -167,6 +167,7 @@ module Omnibus
       #   the platform shortname. this might be an Ohai-returned platform or
       #   platform family but it also might be a shortname like `el`
       #
+      # rubocop:disable Lint/DuplicateCaseCondition
       def truncate_platform_version(platform_version, platform)
         case platform
         when "centos", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos", "nexus", "ios_xr"

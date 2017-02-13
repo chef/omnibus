@@ -21,30 +21,36 @@ module Omnibus
           git %{remote add origin "#{options[:remote]}"} if options[:remote]
           git %{push origin master}
 
-          options[:annotated_tags].each do |tag|
-            File.open("tag", "w") { |f| f.write(tag) }
-            git %{add tag}
-            git %{commit -am "Create tag #{tag}"}
-            git %{tag "#{tag}" -m "#{tag}"}
-            git %{push origin "#{tag}"} if options[:remote]
-          end if options[:annotated_tags]
+          if options[:annotated_tags]
+            options[:annotated_tags].each do |tag|
+              File.open("tag", "w") { |f| f.write(tag) }
+              git %{add tag}
+              git %{commit -am "Create tag #{tag}"}
+              git %{tag "#{tag}" -m "#{tag}"}
+              git %{push origin "#{tag}"} if options[:remote]
+            end
+          end
 
-          options[:tags].each do |tag|
-            File.open("tag", "w") { |f| f.write(tag) }
-            git %{add tag}
-            git %{commit -am "Create tag #{tag}"}
-            git %{tag "#{tag}"}
-            git %{push origin "#{tag}"} if options[:remote]
-          end if options[:tags]
+          if options[:tags]
+            options[:tags].each do |tag|
+              File.open("tag", "w") { |f| f.write(tag) }
+              git %{add tag}
+              git %{commit -am "Create tag #{tag}"}
+              git %{tag "#{tag}"}
+              git %{push origin "#{tag}"} if options[:remote]
+            end
+          end
 
-          options[:branches].each do |branch|
-            git %{checkout -b #{branch} master}
-            File.open("branch", "w") { |f| f.write(branch) }
-            git %{add branch}
-            git %{commit -am "Create branch #{branch}"}
-            git %{push origin "#{branch}"} if options[:remote]
-            git %{checkout master}
-          end if options[:branches]
+          if options[:branches]
+            options[:branches].each do |branch|
+              git %{checkout -b #{branch} master}
+              File.open("branch", "w") { |f| f.write(branch) }
+              git %{add branch}
+              git %{commit -am "Create branch #{branch}"}
+              git %{push origin "#{branch}"} if options[:remote]
+              git %{checkout master}
+            end
+          end
         end
         path
       end
