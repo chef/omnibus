@@ -42,6 +42,11 @@ module Omnibus
     end
 
     #
+    # Expose selected methods from included mixins
+    #
+    expose :which
+
+    #
     # @return [Software]
     #   the software definition that created this builder
     #

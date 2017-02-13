@@ -151,6 +151,30 @@ module Omnibus
     end
 
     #
+    # Locate an executable in the current $PATH.
+    #
+    # @param [String] executable
+    #   path or name of the executable you are looking for
+    #
+    # @param [Hash] env
+    #   an environment with a PATH that you would like to search
+    #
+    # @return [String, nil]
+    #   the path to the executable, or +nil+ if not present
+    #
+    def which(executable, env = ENV)
+      if File.file?(executable) && File.executable?(executable)
+        executable
+      elsif env["PATH"]
+        path = env["PATH"].split(File::PATH_SEPARATOR).find do |path|
+          File.executable?(File.join(path, executable))
+        end
+
+        path && File.expand_path(executable, path)
+      end
+    end
+
+    #
     # Create a directory at the given +path+.
     #
     # @param [String, Array<String>] paths

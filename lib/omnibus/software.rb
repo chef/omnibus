@@ -16,6 +16,7 @@
 
 require "fileutils"
 require "uri"
+require "omnibus/util"
 require "omnibus/manifest_entry"
 
 module Omnibus

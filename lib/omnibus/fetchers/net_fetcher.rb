@@ -15,11 +15,13 @@
 #
 
 require "fileutils"
+require "omnibus/util"
 require "omnibus/download_helpers"
 
 module Omnibus
   class NetFetcher < Fetcher
     include DownloadHelpers
+    include Util
 
     # Use 7-zip to extract 7z/zip for Windows
     WIN_7Z_EXTENSIONS = %w{.7z .zip}
@@ -321,7 +323,7 @@ module Omnibus
     # @return [String]
     #
     def tar
-      Omnibus.which("gtar") ? "gtar" : "tar"
+      which("gtar") ? "gtar" : "tar"
     end
   end
 end
