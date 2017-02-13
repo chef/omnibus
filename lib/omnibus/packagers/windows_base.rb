@@ -76,7 +76,7 @@ module Omnibus
         end
 
         @signing_identity[:store] = params[:store] || "My"
-        @signing_identity[:algorithm] = params[:algorithm] || "SHA1"
+        @signing_identity[:algorithm] = params[:algorithm] || "SHA256"
         servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
         @signing_identity[:timestamp_servers] = [servers].flatten
         @signing_identity[:machine_store] = params[:machine_store] || false
