@@ -181,7 +181,7 @@ module Omnibus
         subject.prettify_dmg
         contents = File.read("#{staging_dir}/create_dmg.osascript")
 
-        expect(contents).to include('set found_disk to do shell script "ls /Volumes/ | grep Project One*"')
+        expect(contents).to include('set found_disk to do shell script "ls /Volumes/ | grep \'Project One*\'"')
         expect(contents).to include("	set the bounds of Finder window 1 to {100, 100, 750, 600}")
         expect(contents).to include('  	set position of item "project-1.2.3-2.pkg" of container window to {535, 50}')
       end
