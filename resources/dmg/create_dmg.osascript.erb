@@ -1,5 +1,5 @@
 # find disks that start with <%= volume_name %>
-set found_disk to do shell script "ls /Volumes/ | grep <%= volume_name %>*"
+set found_disk to do shell script "ls /Volumes/ | grep '<%= volume_name %>*'"
 
 if found_disk is {} then
 	set errormsg to "Disk " & found_disk & " not found"
