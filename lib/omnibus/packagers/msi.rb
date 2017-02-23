@@ -27,6 +27,11 @@ module Omnibus
         helper_tmp_dir = Dir.mktmpdir
         parameters.store('HelperDir', helper_tmp_dir)
         FileUtils.mv "#{install_dir}/bin/upgrade-helper.exe", "#{helper_tmp_dir}"
+        if signing_identity
+          Dir["#{helper_tmp_dir}" + "/**/*.{exe,dll}"].each do |signfile|
+            sign_package(signfile)
+          end
+        end
       end
       # Render the localization
       write_localization_file
@@ -60,6 +65,18 @@ module Omnibus
     end
 
     build do
+      puts "starting signing"
+      if signing_identity
+        Dir["#{install_dir}" + "/bin/**/*.exe"].each do |signfile|
+          puts "signing #{signfile}"
+          sign_package(signfile)
+        end
+
+        Dir["#{install_dir}" + "/dist/**/*.exe"].each do |signfile|
+          sign_package(signfile)
+        end
+
+      end
       # If fastmsi, zip up the contents of the install directory
       shellout!(zip_command) if fast_msi
 
