@@ -76,6 +76,8 @@ refs}.freeze
       else
         create_directory(File.dirname(cache_path))
         git_cmd("init -q")
+        git_cmd("config --local user.name 'Omnibus Git Cache'")
+        git_cmd("config --local user.email 'omnibus@localhost'")
         true
       end
     end
