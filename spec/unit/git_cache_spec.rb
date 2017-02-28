@@ -86,6 +86,10 @@ module Omnibus
           .with(File.dirname(ipc.cache_path))
         expect(ipc).to receive(:shellout!)
           .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} init -q")
+        expect(ipc).to receive(:shellout!)
+          .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} config --local user.name 'Omnibus Git Cache'")
+        expect(ipc).to receive(:shellout!)
+          .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} config --local user.email 'omnibus@localhost'")
         ipc.create_cache_path
       end
 
