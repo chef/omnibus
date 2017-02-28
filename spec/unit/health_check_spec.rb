@@ -139,7 +139,7 @@ module Omnibus
         )
       end
 
-      let(:regexp) { ".*(\\.TXT|\\.[ch]|\\.bat|\\.beam|\\.cmake|\\.e*rb|\\.gemspec|\\.gitignore|\\.h*h|\\.java|\\.js|\\.jsm|\\.json|\\.lock|\\.log|\\.lua|\\.md|\\.mkd|\\.npmignore|\\.out|\\.pl|\\.pm|\\.png|\\.pod|\\.py[oc]*|\\.r*html|\\.rdoc|\\.ri|\\.rst|\\.sh|\\.sql|\\.svg|\\.toml|\\.ttf|\\.txt|\\.xml|\\.yml|Gemfile|LICENSE|Makefile|README|Rakefile|VERSION|license)$|.*\\/LICENSES\\/.*|.*\\/man\\/.*|.*\\/share\\/doc\\/.*|.*\\/share\\/postgresql\\/.*|.*\\/share\\/terminfo\\/.*|.*\\/terminfo\\/.*" }
+      let(:regexp) { ".*(\\.TXT|\\.[ch]|\\.[ch]pp|\\.[eh]rl|\\.app|\\.appup|\\.bat|\\.beam|\\.cc|\\.cmake|\\.conf|\\.css|\\.e*rb|\\.feature|\\.gemspec|\\.gif|\\.gitignore|\\.gitkeep|\\.h*h|\\.jar|\\.java|\\.jpg|\\.js|\\.jsm|\\.json|\\.lock|\\.log|\\.lua|\\.md|\\.mkd|\\.npmignore|\\.out|\\.packlist|\\.perl|\\.pl|\\.pm|\\.png|\\.pod|\\.properties|\\.py[oc]*|\\.r*html|\\.rake|\\.rdoc|\\.ri|\\.rst|\\.scss|\\.sh|\\.sql|\\.svg|\\.toml|\\.ttf|\\.txt|\\.xml|\\.yml|Gemfile|LICENSE|Makefile|README|Rakefile|VERSION|license)$|.*\\/build_info\\/.*|.*\\/licenses\\/.*|.*\\/LICENSES\\/.*|.*\\/man\\/.*|.*\\/share\\/doc\\/.*|.*\\/share\\/info\\/.*|.*\\/share\\/postgresql\\/.*|.*\\/share\\/terminfo\\/.*|.*\\/share\\/timezone\\/.*|.*\\/terminfo\\/.*" }
 
       it "raises an exception when there are external dependencies" do
         allow(subject).to receive(:shellout)
