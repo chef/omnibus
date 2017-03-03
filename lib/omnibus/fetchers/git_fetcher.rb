@@ -163,7 +163,7 @@ module Omnibus
     # @return [void]
     #
     def git_fetch
-      fetch_cmd = "fetch #{source_url} #{described_version}"
+      fetch_cmd = "fetch #{source_url} #{described_version} --tags"
       fetch_cmd << " --recurse-submodules=on-demand" if clone_submodules?
       git(fetch_cmd)
     end
