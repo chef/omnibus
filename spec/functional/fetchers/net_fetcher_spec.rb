@@ -12,7 +12,7 @@ module Omnibus
   describe NetFetcher do
     include_examples "a software", "zlib"
 
-    let(:source_url) { "http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz" }
+    let(:source_url) { "http://chef-releng.s3.amazonaws.com/omnibus/integration_test/zlib-1.2.8.tar.gz" }
     let(:source_md5) { "44d667c142d7cda120332623eab69f40" }
     let(:source_sha1) { "a4d316c404ff54ca545ea71a27af7dbc29817088" }
     let(:source_sha256) { "36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d" }
@@ -243,7 +243,7 @@ module Omnibus
       it "when the download times out" do
         # Mock the Timeout::Error for this particular test only
         WebMock.disable_net_connect!
-        stub_request(:get, "http://downloads.sourceforge.net/project/libpng/zlib/1.2.8/zlib-1.2.8.tar.gz").to_timeout
+        stub_request(:get, "http://chef-releng.s3.amazonaws.com/omnibus/integration_test/zlib-1.2.8.tar.gz").to_timeout
         output = capture_logging do
           expect { subject.send(:download) }.to raise_error(Timeout::Error)
         end
