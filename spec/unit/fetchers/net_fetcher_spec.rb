@@ -176,6 +176,46 @@ module Omnibus
       end
     end
 
+    describe "#download_url" do
+      context "s3 cache enabled" do
+        before do
+          Config.use_s3_caching(true)
+          Config.s3_access_key("ABCD1234")
+          Config.s3_secret_key("EFGH5678")
+          Config.s3_bucket("mybucket")
+
+          # clear cache
+          S3Cache.remove_instance_variable(:@s3_client) if S3Cache.instance_variable_defined?(:@s3_client)
+        end
+
+        it "returns the source s3 generated url" do
+          expect(subject.send(:download_url)).to eq("https://mybucket.s3.amazonaws.com/file-1.2.3-abcd1234")
+        end
+
+        context "custom endpoint" do
+          before { Config.s3_endpoint("http://example.com") }
+
+          it "returns the url using custom s3 endpoint" do
+            expect(subject.send(:download_url)).to eq("http://mybucket.example.com/file-1.2.3-abcd1234")
+          end
+        end
+
+        context "s3 transfer acceleration" do
+          before { Config.s3_accelerate(true) }
+
+          it "returns the url using s3 accelerate endpoint" do
+            expect(subject.send(:download_url)).to eq("https://mybucket.s3-accelerate.amazonaws.com/file-1.2.3-abcd1234")
+          end
+        end
+      end
+
+      context "s3 cache disabled" do
+        it "returns the source url" do
+          expect(subject.send(:download_url)).to eq("https://get.example.com/file.tar.gz")
+        end
+      end
+    end
+
     describe "downloading the file" do
 
       let(:expected_open_opts) do

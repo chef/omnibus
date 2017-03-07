@@ -144,7 +144,7 @@ module Omnibus
     #
     def download_url
       if Config.use_s3_caching
-        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(self)}"
+        S3Cache.url_for(self)
       else
         source[:url]
       end

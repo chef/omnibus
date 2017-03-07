@@ -132,14 +132,20 @@ module Omnibus
         "#{software.name}-#{software.version}-#{software.fetcher.checksum}"
       end
 
+      def url_for(software)
+        client.bucket(Config.s3_bucket).object(S3Cache.key_for(software)).public_url
+      end
+
       private
 
       def s3_configuration
         {
-          region:               Config.s3_region,
-          access_key_id:        Config.s3_access_key,
-          secret_access_key:    Config.s3_secret_key,
-          bucket_name:          Config.s3_bucket,
+          region:                  Config.s3_region,
+          access_key_id:           Config.s3_access_key,
+          secret_access_key:       Config.s3_secret_key,
+          bucket_name:             Config.s3_bucket,
+          endpoint:                Config.s3_endpoint,
+          use_accelerate_endpoint: Config.s3_accelerate,
         }
       end
 
