@@ -21,6 +21,7 @@ module Omnibus
     def self.included(base)
       # This module requires logging is also available
       base.send(:include, Logging)
+      base.send(:include, Sugarable)
     end
 
     #
@@ -31,8 +32,32 @@ module Omnibus
     SHELLOUT_OPTIONS = {
       log_level: :internal,
       timeout: 7200, # 2 hours
-      environment: {},
     }.freeze
+
+    #
+    # The proper platform-specific "$PATH" key.
+    #
+    # @return [String]
+    #
+    def path_key
+      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
+      # $WINDOWSRAGE, and if you don't set that your native gem compiles
+      # will fail because the magic fixup it does to add the mingw compiler
+      # stuff won't work.
+      #
+      # Turns out there is other build environments that only set ENV['PATH'] and if we
+      # modify ENV['Path'] then it ignores that.  So, we scan ENV and returns the first
+      # one that we find.
+      #
+      if windows?
+        result = ENV.keys.grep(/\Apath\Z/i)
+        raise "The current omnibus environment has no PATH" if result.length == 0
+        raise "The current omnibus environment has duplicate PATHs" if result.length > 1
+        result.first
+      else
+        "PATH"
+      end
+    end
 
     #
     # Shells out and runs +command+.
@@ -52,6 +77,15 @@ module Omnibus
     def shellout(*args)
       options = args.last.kind_of?(Hash) ? args.pop : {}
       options = SHELLOUT_OPTIONS.merge(options)
+      options[:environment] = {} unless options.has_key? :environment
+
+      command_string = args.join(" ")
+      in_msys = options.delete(:in_msys_bash) && windows?
+      # Mixlib will handle escaping characters for cmd but our command might
+      # contain '. For now, assume that won't happen because I don't know
+      # whether this command is going to be played via cmd or through
+      # ProcessCreate.
+      command_string = "bash -c \'#{command_string}\'" if in_msys
 
       # Grab the log_level
       log_level = options.delete(:log_level)
@@ -65,18 +99,56 @@ module Omnibus
         options[:environment] = options.fetch(:environment, {}).merge(options[:env])
       end
 
+      # Double check that we don't have conflicting PATH definitions.
+      path_keys = options[:environment].keys.grep(/\Apath\Z/i)
+      if path_keys.length > 1
+        raise InvalidValue.new("shellout", "receive environment without duplicate PATH values")
+      elsif path_keys.length == 1 && path_keys.first != path_key
+        options[:environment][path_key] = options[:environment].delete(path_keys.first)
+      end
+
+      # Try our best to get rid of the "outer" omnibus ruby and any current
+      # chef-client/chef-dk installations from the path.
+      if options.delete(:clean_ruby_path)
+        path_dirs = options[:environment].fetch(path_key, "").split(File::PATH_SEPARATOR || ":")
+        path_dirs = path_dirs.map { |p| windows_safe_path(p) }
+        safe_install_dir = windows_safe_path(install_dir)
+        path_dirs = path_dirs.reject do |p|
+          !p.start_with?(safe_install_dir) && filter_paths.any? { |f| p.start_with?(f) }
+        end
+        options[:environment][path_key] = path_dirs.join(File::PATH_SEPARATOR || ":")
+      end
+
       # Log any environment options given
       unless options[:environment].empty?
         log.public_send(log_level, log_key) { "Environment:" }
-        options[:environment].sort.each do |key, value|
-          log.public_send(log_level, log_key) { "  #{key}=#{value.inspect}" }
+        if in_msys
+          # Run a command to log the actual environment variables inside the
+          # msys shell. Live stream at the same level we would have otherwise
+          # logged the environment at.
+          env_options = options.dup
+          env_options[:live_stream] = log.live_stream(log_level || :info)
+          env_cmds = options[:environment].keys.sort.map do |key|
+            # Special case "PATH" because it's capitalized and handled differently.
+            key = "PATH" if key == path_key
+            "echo #{key}=$#{key}"
+          end
+          env_cmds << "echo PWD=$PWD"
+
+          cmd = Mixlib::ShellOut.new("bash -c \'#{env_cmds.join(';')}\'", env_options)
+          cmd.environment["HOME"] = "/tmp" unless ENV["HOME"]
+          cmd.run_command
+        else
+          options[:environment].sort.each do |key, value|
+            log.public_send(log_level, log_key) { "  #{key}=#{value.inspect}" }
+          end
         end
       end
 
       # Log the actual command
-      log.public_send(log_level, log_key) { "$ #{args.join(' ')}" }
+      log.public_send(log_level, log_key) { "$ #{command_string}" }
 
-      cmd = Mixlib::ShellOut.new(*args, options)
+      cmd = Mixlib::ShellOut.new(command_string, options)
       cmd.environment["HOME"] = "/tmp" unless ENV["HOME"]
       cmd.run_command
       cmd
@@ -148,6 +220,18 @@ module Omnibus
       else
         path
       end
+    end
+
+    #
+    # Takes a ruby style path (e.g. C:/foo/bar) and coverts it to an msys path (/C/foo/bar).
+    #
+    # @param [String, Array<String>] pieces
+    #   the pieces of the path to join and fix
+    # @return [String]
+    #
+    def to_msys2_path(*pieces)
+      path = File.join(*pieces)
+      path.sub(/^([A-Za-z]):\//, "/\\1/")
     end
 
     #
@@ -248,6 +332,22 @@ module Omnibus
     def create_link(a, b)
       log.debug(log_key) { "Linking `#{a}' to `#{b}'" }
       FileUtils.ln_s(a, b)
+    end
+
+    private
+
+    def filter_paths
+      @filter_paths ||=
+        begin
+          # Any alternate binaries or gems from the users environment.
+          filters = Gem.paths.path.dup
+          # Be more paranoid and remove other any possible alternate
+          # embedded ruby in chef products.
+          filters << "C:/opscode" if windows?
+          # Current ruby - this is the ruby that omnibus itself uses.
+          filters << File.expand_path(File.join(RbConfig.ruby, "../.."))
+          filters.map { |p| windows_safe_path(p) }
+        end
     end
   end
 end

@@ -718,7 +718,7 @@ module Omnibus
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
           opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
           {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag} -fno-lto",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{arch_flag} -Wl,-rpath,#{install_dir}/embedded/lib",
             # We do not wish to enable SSE even though we target i686 because
             # of a stack alignment issue with some libraries. We have not
             # exactly ascertained the cause but some compiled library/binary
@@ -732,9 +732,7 @@ module Omnibus
             # TODO: This was true of our old TDM gcc 4.7 compilers. Is it still
             # true with mingw-w64?
             #
-            # XXX: Temporarily turning -O3 into -O2 -fno-lto to work around some
-            # weird linker issues.
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O2 -fno-lto #{opt_flag}",
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 #{opt_flag}",
           }
         else
           {
@@ -773,12 +771,23 @@ module Omnibus
         extra_linker_flags["LD_OPTIONS"] = ld_options
       end
 
+      # Always want to favor pkg-config from embedded location to not hose
+      # configure scripts which try to be too clever and ignore our explicit
+      # CFLAGS and LDFLAGS in favor of pkg-config info.
+      pkg_config_flags = {
+        "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig",
+      }
+
+      # On windows, make this an msys style path because autotools don't grok
+      # windows paths and use : as a path separator. See the mingw cookbook for
+      # how the flag gets passed into the msys2 shell.
+      if windows?
+        pkg_config_flags["PREMSYS2_PKG_CONFIG_PATH"] = to_msys2_path(pkg_config_flags["PKG_CONFIG_PATH"])
+      end
+
       env.merge(compiler_flags).
         merge(extra_linker_flags).
-        # always want to favor pkg-config from embedded location to not hose
-        # configure scripts which try to be too clever and ignore our explicit
-        # CFLAGS and LDFLAGS in favor of pkg-config info
-        merge({ "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig" }).
+        merge(pkg_config_flags).
         # Set default values for CXXFLAGS and CPPFLAGS.
         merge("CXXFLAGS" => compiler_flags["CFLAGS"]).
         merge("CPPFLAGS" => compiler_flags["CFLAGS"])
@@ -797,7 +806,14 @@ module Omnibus
     def with_embedded_path(env = {})
       paths = ["#{install_dir}/bin", "#{install_dir}/embedded/bin"]
       path_value = prepend_path(paths)
-      env.merge(path_key => path_value)
+      new_env = env.merge(path_key => path_value)
+
+      # Extra path elements for msys2.
+      if windows?
+        msys2_paths = paths.map { |x| to_msys2_path(x) }
+        new_env["PREMSYS2_PATH"] = msys2_paths.join(":")
+      end
+      new_env
     end
     expose :with_embedded_path
 
@@ -1166,28 +1182,6 @@ module Omnibus
     #
     def git_cache
       @git_cache ||= GitCache.new(self)
-    end
-
-    #
-    # The proper platform-specific "$PATH" key.
-    #
-    # @return [String]
-    #
-    def path_key
-      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
-      # $WINDOWSRAGE, and if you don't set that your native gem compiles
-      # will fail because the magic fixup it does to add the mingw compiler
-      # stuff won't work.
-      #
-      # Turns out there is other build environments that only set ENV['PATH'] and if we
-      # modify ENV['Path'] then it ignores that.  So, we scan ENV and returns the first
-      # one that we find.
-      #
-      if Ohai["platform"] == "windows"
-        ENV.keys.grep(/\Apath\Z/i).first
-      else
-        "PATH"
-      end
     end
 
     #
