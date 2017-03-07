@@ -276,6 +276,14 @@ module Omnibus
     expose :windows_safe_path
 
     #
+    # (see Util#to_msys2_path)
+    #
+    def to_msys2_path(*pieces)
+      super
+    end
+    expose :to_msys2_path
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -795,14 +803,6 @@ module Omnibus
       # Make sure the PWD is set to the correct directory
       # Also make a clone of options so that we can mangle it safely below.
       options = { cwd: software.project_dir }.merge(options)
-
-      if options.delete(:in_msys_bash) && windows?
-        # Mixlib will handle escaping characters for cmd but our command might
-        # contain '. For now, assume that won't happen because I don't know
-        # whether this command is going to be played via cmd or through
-        # ProcessCreate.
-        command_string = "bash -c \'#{command_string}\'"
-      end
 
       # Set the log level to :info so users will see build commands
       options[:log_level] ||= :info
