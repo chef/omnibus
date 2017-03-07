@@ -728,13 +728,7 @@ module Omnibus
             # soon as gcc emits aligned SSE xmm register spills which generate
             # GPEs and terminate the application very rudely with very little
             # to debug with.
-            #
-            # TODO: This was true of our old TDM gcc 4.7 compilers. Is it still
-            # true with mingw-w64?
-            #
-            # XXX: Temporarily turning -O3 into -O2 -fno-lto to work around some
-            # weird linker issues.
-            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O2 -fno-lto #{opt_flag}",
+            "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O3 #{opt_flag}",
           }
         else
           {
@@ -781,7 +775,8 @@ module Omnibus
         merge({ "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig" }).
         # Set default values for CXXFLAGS and CPPFLAGS.
         merge("CXXFLAGS" => compiler_flags["CFLAGS"]).
-        merge("CPPFLAGS" => compiler_flags["CFLAGS"])
+        merge("CPPFLAGS" => compiler_flags["CFLAGS"]).
+        merge("OMNIBUS_INSTALL_DIR" => install_dir)
     end
     expose :with_standard_compiler_flags
 
@@ -1166,28 +1161,6 @@ module Omnibus
     #
     def git_cache
       @git_cache ||= GitCache.new(self)
-    end
-
-    #
-    # The proper platform-specific "$PATH" key.
-    #
-    # @return [String]
-    #
-    def path_key
-      # The ruby devkit needs ENV['Path'] set instead of ENV['PATH'] because
-      # $WINDOWSRAGE, and if you don't set that your native gem compiles
-      # will fail because the magic fixup it does to add the mingw compiler
-      # stuff won't work.
-      #
-      # Turns out there is other build environments that only set ENV['PATH'] and if we
-      # modify ENV['Path'] then it ignores that.  So, we scan ENV and returns the first
-      # one that we find.
-      #
-      if Ohai["platform"] == "windows"
-        ENV.keys.grep(/\Apath\Z/i).first
-      else
-        "PATH"
-      end
     end
 
     #
