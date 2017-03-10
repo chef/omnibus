@@ -138,7 +138,7 @@ module Omnibus
           shellout!(light_command(bundle_file, is_bundle: true), returns: [0, 204])
 
           if signing_identity
-            sign_package(bundle_file)
+            sign_package(bundle_file, is_bundle: true)
           end
         end
       end

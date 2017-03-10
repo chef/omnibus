@@ -111,8 +111,25 @@ module Omnibus
     # the file with with each server, stopping after the first to succeed.
     # If none succeed, an exception is raised.
     #
-    def sign_package(package_file)
+    def sign_package(package_file, is_bundle: false )
       success = false
+
+      if is_bundle
+        cmd = Array.new.tap do |arr|
+          arr << "insignia.exe"
+          arr << "-ib \"#{package_file}\""
+          arr << "-o engine.exe"
+        end.join(" ")
+        shellout(cmd)
+        sign_package("engine.exe", is_bundle: false)
+        cmd = Array.new.tap do |arr|
+          arr << "insignia.exe"
+          arr << "-ab engine.exe \"#{package_file}\""
+          arr << "-o \"#{package_file}\""
+        end.join(" ")
+        shellout(cmd)
+      end
+
       timestamp_servers.each do |ts|
         success = try_sign(package_file, ts)
         break if success
