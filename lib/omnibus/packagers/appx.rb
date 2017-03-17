@@ -52,7 +52,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}.appx"
+      "#{project.package_name}-#{project.build_version}-#{project.build_iteration}-#{Config.windows_arch}.appx"
     end
 
     #
