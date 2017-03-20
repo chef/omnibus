@@ -21,18 +21,19 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(/^(test|spec|features)\//)
   gem.require_paths = ["lib"]
 
-  # https://github.com/ksubrama/pedump, branch 'patch-1'
-  # is declared in the Gemfile because of its outdated
-  # dependency on multipart-post (~> 1.1.4)
+  gem.add_dependency "aws-sdk",          "~> 2"
   gem.add_dependency "chef-sugar",       "~> 3.3"
   gem.add_dependency "cleanroom",        "~> 1.0"
+  gem.add_dependency "ffi-yajl",         "~> 2.2"
   gem.add_dependency "mixlib-shellout",  "~> 2.0"
-  gem.add_dependency "mixlib-versioning"
   gem.add_dependency "ohai",             "~> 8.0"
   gem.add_dependency "ruby-progressbar", "~> 1.7"
-  gem.add_dependency "aws-sdk",          "~> 2"
   gem.add_dependency "thor",             "~> 0.18"
-  gem.add_dependency "ffi-yajl",         "~> 2.2"
+
+  gem.add_dependency "mixlib-versioning"
+  gem.add_dependency "pedump"
+
+  # from Gemfile
   gem.add_dependency "license_scout"
 
   gem.add_development_dependency "bundler"
