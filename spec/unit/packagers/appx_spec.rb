@@ -41,8 +41,12 @@ module Omnibus
     end
 
     describe "#package_name" do
+      before do
+        allow(Config).to receive(:windows_arch).and_return(:foo_arch)
+      end
+
       it "includes the name, version, and build iteration" do
-        expect(subject.package_name).to eq("project-1.2.3-2.appx")
+        expect(subject.package_name).to eq("project-1.2.3-2-foo_arch.appx")
       end
     end
 
