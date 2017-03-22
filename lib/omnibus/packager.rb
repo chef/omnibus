@@ -30,6 +30,7 @@ module Omnibus
     autoload :Solaris,  "omnibus/packagers/solaris"
     autoload :IPS,      "omnibus/packagers/ips"
     autoload :RPM,      "omnibus/packagers/rpm"
+    autoload :PKGNG,    "omnibus/packagers/pkgng"
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -48,6 +49,7 @@ module Omnibus
       "ips"      => IPS,
       "windows"  => [MSI, APPX],
       "mac_os_x" => PKG,
+      "freebsd"  => [Makeself, PKGNG],
       "smartos"  => PKGSRC,
     }.freeze
 
