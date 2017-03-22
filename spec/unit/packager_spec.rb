@@ -65,6 +65,13 @@ module Omnibus
           expect(described_class.for_current_system).to eq([Packager::RPM])
         end
       end
+
+      context "on freebsd" do
+        before { stub_ohai(platform: "freebsd", version: "10.3") }
+        it "prefers Makeself and PKGNG" do
+          expect(described_class.for_current_system).to eq([Packager::Makeself, Packager::PKGNG])
+        end
+      end
     end
   end
 end
