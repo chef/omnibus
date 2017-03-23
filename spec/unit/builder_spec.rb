@@ -321,6 +321,13 @@ module Omnibus
         run_build_command
       end
 
+      it "appends -l tp patch command if ignore_whitspace is provided" do
+        expect { subject.patch(source: "good_patch", ignore_whitespace: true) }.to_not raise_error
+        expect(subject).to receive(:shellout!)
+          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch -l", in_msys_bash: true)
+        run_build_command
+      end
+
       it "persists other options" do
         expect { subject.patch(source: "good_patch", timeout: 3600) }.to_not raise_error
         expect(subject).to receive(:shellout!)

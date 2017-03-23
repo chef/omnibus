@@ -220,6 +220,7 @@ module Omnibus
       source = options.delete(:source)
       plevel = options.delete(:plevel) || 1
       target = options.delete(:target)
+      ignore_whitespace = options.delete(:ignore_whitespace)
 
       locations, patch_path = find_file("config/patches", source)
 
@@ -241,6 +242,10 @@ module Omnibus
         patch_cmd = "cat #{clean_patch_path} | patch -p#{plevel} #{target}"
       else
         patch_cmd = "patch -p#{plevel} -i #{clean_patch_path}"
+      end
+
+      if ignore_whitespace
+        patch_cmd = "#{patch_cmd} -l"
       end
 
       patches << patch_path
