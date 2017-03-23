@@ -198,7 +198,14 @@ module Omnibus
     #
     def compiler_safe_path(*pieces)
       path = File.join(*pieces)
-      path = path.sub(/^([A-Za-z]):\//, "/\\1/") if ENV["MSYSTEM"]
+
+      # If we are running in msys2-land, turn the path into a posix-style path
+      if ENV["MSYSTEM"]
+        path = path.gsub(File::ALT_SEPARATOR, File::SEPARATOR)   # undo the windows safe path
+        path = path.gsub(/([A-Za-z]):\//) { "/#{$1.downcase}/" } # turn C:/ into /c/
+        path = path.gsub(File::PATH_SEPARATOR, ":")              # use unix-style path separator
+      end
+
       path
     end
 
