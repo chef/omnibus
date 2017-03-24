@@ -52,7 +52,7 @@ module Omnibus
       described_class.new(zlib)
     end
 
-    let(:git_flags) { "-c core.autocrlf=false -c core.ignorecase=false --git-dir=#{cache_path} --work-tree=#{install_dir}" }
+    let(:git_flags) { %Q{-c core.autocrlf=false -c core.ignorecase=false --git-dir="#{cache_path}" --work-tree="#{install_dir}"} }
 
     describe "#cache_path" do
       it "returns the install path appended to the install_cache path" do
@@ -234,6 +234,25 @@ module Omnibus
             ipc.restore
           end
         end
+      end
+    end
+
+    describe "#git_cmd" do
+      let(:terrible_install_dir) { %q{/opt/why  please don't do this} }
+
+      before(:each) do
+        allow(project).to receive(:install_dir)
+          .and_return(terrible_install_dir)
+        allow(ipc).to receive(:shellout!)
+          .with(%Q{git #{git_flags} version})
+          .and_return("git version 2.11.0")
+      end
+
+      it "doesn't mangle an #install_dir with spaces" do
+        expect(ipc.send(:install_dir)).to eq(terrible_install_dir)
+        expect(ipc).to receive(:shellout!)
+          .with(%Q{git #{git_flags} version})
+        ipc.send(:git_cmd, "version")
       end
     end
   end
