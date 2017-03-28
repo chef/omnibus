@@ -89,7 +89,8 @@ module Omnibus
       # contain '. For now, assume that won't happen because I don't know
       # whether this command is going to be played via cmd or through
       # ProcessCreate.
-      command_string = "bash -c \'#{command_string}\'" if in_msys
+      bashexplicit = ENV["OMNIBUS_TOOLCHAIN_INSTALL_DIR"] ? "#{ENV["OMNIBUS_TOOLCHAIN_INSTALL_DIR"]}/embedded/bin/bash" : "bash"
+      command_string = "#{bashexplicit} -c \'#{command_string}\'" if in_msys
 
       # Grab the log_level
       log_level = options.delete(:log_level)
