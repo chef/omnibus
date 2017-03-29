@@ -113,15 +113,15 @@ dependency "chef"
 
 Some DSL methods available include:
 
-   DSL Method     | Description
-:---------------: | ----------------------------------------------------------------
-     `name`       | The name of the project
-  `install_dir`   | The desired install location of the package
- `build_version`  | The package version
+DSL Method        | Description
+:---------------- | ----------------------------------------------------------------
+`name`            | The name of the project
+`install_dir`     | The desired install location of the package
+`build_version`   | The package version
 `build_iteration` | The package iteration number
-  `dependency`    | An Omnibus software-defined component to include in this package
-    `package`     | Invoke a packager-specific DSL
-   `compress`     | Invoke a compressor-specific DSL
+`dependency`      | An Omnibus software-defined component to include in this package
+`package`         | Invoke a packager-specific DSL
+`compress`        | Invoke a compressor-specific DSL
 
 By default a timestamp is appended to the build_version. You can turn this behavior off by setting `append_timestamp` to `false` in your configuration file or using `--override append_timestamp:false` at the command line.
 
