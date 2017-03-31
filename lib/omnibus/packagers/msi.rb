@@ -45,6 +45,9 @@ module Omnibus
       # Optionally, render the bundle file
       write_bundle_file if bundle_msi
 
+      # Optionally, render the bundle theme file
+      write_bundle_theme_file if bundle_msi and bundle_theme
+
       # Copy all the staging assets from vendored Omnibus into the resources
       # directory.
       create_directory("#{resources_dir}/assets")
@@ -262,6 +265,25 @@ module Omnibus
     expose :bundle_msi
 
     #
+    # Signal that the bundle has a custom theme
+    #
+    # @example
+    #   bundle_theme true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether we're a bundle or not
+    #
+    # @return [TrueClass, FalseClass]
+    #   whether we're a bundle or not
+    def bundle_theme(val = false)
+      unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
+        raise InvalidValue.new(:bundle_theme, "be TrueClass or FalseClass")
+      end
+      @bundle_theme ||= val
+    end
+    expose :bundle_theme
+
+    #
     # Signal that we're building a zip-based MSI
     #
     # @example
@@ -429,6 +451,27 @@ module Omnibus
     def write_bundle_file
       render_template(resource_path("bundle.wxs.erb"),
         destination: "#{staging_dir}/bundle.wxs",
+        variables: {
+          name:            project.package_name,
+          friendly_name:   project.friendly_name,
+          maintainer:      project.maintainer,
+          upgrade_code:    upgrade_code,
+          parameters:      parameters,
+          version:         windows_package_version,
+          display_version: msi_display_version,
+          msi:             windows_safe_path(Config.package_dir, msi_name),
+        }
+      )
+    end
+
+    #
+    # Write the bundle theme file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_bundle_theme_file
+      render_template(resource_path("bundle_theme.xml.erb"),
+        destination: "#{staging_dir}/bundle_theme.xml",
         variables: {
           name:            project.package_name,
           friendly_name:   project.friendly_name,
