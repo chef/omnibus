@@ -131,9 +131,9 @@ module Omnibus
     def write_gen_template
       # Get a list of all files
       files = FileSyncer.glob("#{staging_dir}/**/*").reject do |path|
-        # remove any files with spaces.
-        if path =~ /[[:space:]]/
-          log.warn(log_key) { "Skipping packaging '#{path}' file due to whitespace in filename" }
+        # remove any files with spaces or braces.
+        if path =~ /[[:space:]{}]/
+          log.warn(log_key) { "Skipping packaging '#{path}' file due to whitespace or braces in filename" }
           true
         end
       end

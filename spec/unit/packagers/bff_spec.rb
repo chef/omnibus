@@ -191,6 +191,36 @@ module Omnibus
         end
       end
 
+      context "when paths with invalid characters are present", if: !windows? do
+        let(:contents) do
+          subject.write_gen_template
+          File.read(gen_file)
+        end
+
+        before do
+          create_file("#{staging_dir}/file with_a_space")
+          create_file("#{staging_dir}/file_with_{left_brace")
+          create_file("#{staging_dir}/file_with_}right_brace")
+          create_file("#{staging_dir}/file_that_meets_expectations")
+        end
+
+        it "includes a file that does not include invalid characters" do
+          expect(contents).to include("/file_that_meets_expectations")
+        end
+
+        it "does not include a file with spaces in the path" do
+          expect(contents).to_not include("/file with_a_space")
+        end
+
+        it "does not include a file with left braces in the path" do
+          expect(contents).to_not include("/file_with_{left_brace")
+        end
+
+        it "does not include a file with right braces in the path" do
+          expect(contents).to_not include("/file_with_}right_brace")
+        end
+      end
+
       context "when script files are present" do
         before do
           create_file("#{subject.scripts_staging_dir}/preinst")
