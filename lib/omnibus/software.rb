@@ -295,6 +295,8 @@ module Omnibus
     #
     # @option val [Boolean] :submodules (false)
     #   clone git submodules
+    # @option val [Boolean] :always_fetch_tags (false)
+    #   always fetch tags from the remote, useful if the version of the project is determined from this software
     #
     # If multiple checksum types are provided, only the strongest will be used.
     #
@@ -314,7 +316,7 @@ module Omnibus
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
           :cookie, :warning, :unsafe, :extract, # used by net_fetcher
           :options, # used by path_fetcher
-          :submodules # used by git_fetcher
+          :submodules, :always_fetch_tags # used by git_fetcher
         ]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
