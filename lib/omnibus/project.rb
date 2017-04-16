@@ -697,6 +697,11 @@ module Omnibus
     end
     expose :ohai
 
+    def watch(dir)
+      dirs_to_watch << dir
+    end
+    expose :watch
+
     #
     # Set or retrieve the {#license} of the project.
     #
@@ -837,6 +842,10 @@ module Omnibus
     #
     def dependencies
       @dependencies ||= []
+    end
+
+    def dirs_to_watch
+      @dirs_to_watch ||= []
     end
 
     #
