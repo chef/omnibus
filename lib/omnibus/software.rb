@@ -660,7 +660,7 @@ module Omnibus
             "CC" => "xlc_r -q64",
             "CXX" => "xlC_r -q64",
             "CFLAGS" => "-q64 -I#{install_dir}/embedded/include -D_LARGE_FILES -O",
-            "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib",
+            "LDFLAGS" => "-q64 -L#{install_dir}/embedded/lib -Wl,-blibpath:#{install_dir}/embedded/lib:/usr/lib:/lib:/usr/ccs/lib",
             "LD" => "ld -b64",
             "OBJECT_MODE" => "64",
             "ARFLAGS" => "-X64 cru",
