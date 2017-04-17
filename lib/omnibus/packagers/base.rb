@@ -139,7 +139,7 @@ module Omnibus
     #
     def run!
       # Ensure the package directory exists
-      create_directory(Config.package_dir)
+      create_directory(Config.package_dir) unless Dir.exists?(Config.package_dir)
 
       measure("Packaging time") do
         # Run the setup and build sequences
