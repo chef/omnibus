@@ -253,6 +253,7 @@ module Omnibus
 
           fetched_file
         end
+        expect(fetched_file).to receive(:fsync)
         expect(fetched_file).to receive(:close)
         expect(FileUtils).to receive(:cp).with(tempfile_path, destination_path)
         expect(fetched_file).to receive(:unlink)
