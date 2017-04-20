@@ -25,7 +25,7 @@ module Omnibus
     it_behaves_like "a cleanroom setter", :friendly_name, %{friendly_name 'Chef'}
     it_behaves_like "a cleanroom setter", :package_name, %{package_name 'chef.package'}
     it_behaves_like "a cleanroom setter", :maintainer, %{maintainer 'Chef Software, Inc'}
-    it_behaves_like "a cleanroom setter", :homepage, %{homepage 'https://getchef.com'}
+    it_behaves_like "a cleanroom setter", :homepage, %{homepage 'https://chef.io'}
     it_behaves_like "a cleanroom setter", :description, %{description 'Installs the thing'}
     it_behaves_like "a cleanroom setter", :replace, %{replace 'old-chef'}
     it_behaves_like "a cleanroom setter", :conflict, %{conflict 'puppet'}

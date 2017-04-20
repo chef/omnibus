@@ -6,7 +6,7 @@ This document details the steps and configurables for building RPM packages with
 Building a .rpm
 ---------------
 ### Requirements
-Omnibus assumes the existence of the `rpmbuild` command on the build system. The [omnibus cookbook](https://supermarket.getchef.com/cookbooks/omnibus) automatically handles this installation. If you are not using the Omnibus cookbook, you must install the package manually or using another tool.
+Omnibus assumes the existence of the `rpmbuild` command on the build system. The [omnibus cookbook](https://supermarket.chef.io/cookbooks/omnibus) automatically handles this installation. If you are not using the Omnibus cookbook, you must install the package manually or using another tool.
 
 ### Configurables
 The following Project values are taken into consideration when building RPMs:

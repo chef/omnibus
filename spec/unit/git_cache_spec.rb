@@ -10,7 +10,7 @@ module Omnibus
         build_version "1.0.0"
 
         maintainer "Chef Software, Inc"
-        homepage "http://getchef.com"
+        homepage "https://chef.io"
 
         dependency "preparation"
         dependency "snoopy"

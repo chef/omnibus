@@ -80,7 +80,7 @@ module Omnibus
     #
     def vendor(val = NULL)
       if null?(val)
-        @vendor || "Omnibus <omnibus@getchef.com>"
+        @vendor || "Omnibus <omnibus@chef.io>"
       else
         unless val.is_a?(String)
           raise InvalidValue.new(:vendor, "be a String")

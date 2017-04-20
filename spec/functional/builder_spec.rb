@@ -55,7 +55,7 @@ module Omnibus
               gem.name           = '#{project_name}'
               gem.version        = '1.0.0'
               gem.author         = 'Chef Software, Inc.'
-              gem.email          = 'info@getchef.com'
+              gem.email          = 'info@chef.io'
               gem.description    = 'Installs a thing'
               gem.summary        = gem.description
             end

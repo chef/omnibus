@@ -36,7 +36,7 @@ module Omnibus
       end
 
       it "has a default value" do
-        expect(subject.vendor).to eq("Omnibus <omnibus@getchef.com>")
+        expect(subject.vendor).to eq("Omnibus <omnibus@chef.io>")
       end
 
       it "must be a string" do
@@ -175,7 +175,7 @@ module Omnibus
         expect(contents).to include("Package: project")
         expect(contents).to include("Version: 1.2.3")
         expect(contents).to include("License: Unspecified")
-        expect(contents).to include("Vendor: Omnibus <omnibus@getchef.com>")
+        expect(contents).to include("Vendor: Omnibus <omnibus@chef.io>")
         expect(contents).to include("Architecture: amd64")
         expect(contents).to include("Maintainer: Chef Software")
         expect(contents).to include("Installed-Size: 0")

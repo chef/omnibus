@@ -187,7 +187,7 @@ module Omnibus
           # than the platform version. Take a look at the following file for the
           # details:
           #
-          #   https://github.com/opscode/chef/blob/master/lib/chef/win32/version.rb
+          #   https://github.com/chef/chef/blob/master/lib/chef/win32/version.rb
           #
           # As we don't need to be exact here the simple mapping below is based on:
           #
