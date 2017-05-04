@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2014 Chef Software, Inc.
+# Copyright 2012-2017, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,15 +64,23 @@ module Omnibus
     def build_order
       head = []
       tail = []
+      puts "BUILD_ORDER COMPONENTS: "
+      require 'pp'
+      pp @components
       @components.each do |component|
         if head.length == 0
+          puts "should be preparation: #{component}"
           head << component
         elsif @project.dependencies.include?(component.name) && @components.none? { |c| c.dependencies.include?(component.name) }
+          puts "pushing to tail: #{component}"
           tail << component
         else
+          puts "pushing to head: #{component}"
           head << component
         end
       end
+      puts "result: "
+      pp [head, tail].flatten
       [head, tail].flatten
     end
 
