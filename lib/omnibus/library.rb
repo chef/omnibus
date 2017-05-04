@@ -65,22 +65,25 @@ module Omnibus
       head = []
       tail = []
       puts "BUILD_ORDER COMPONENTS: "
-      require 'pp'
-      pp @components
+      @components.each do |component|
+        puts "  #{component.name}"
+      end
       @components.each do |component|
         if head.length == 0
-          puts "should be preparation: #{component}"
+          puts "should be preparation: #{component.name}"
           head << component
         elsif @project.dependencies.include?(component.name) && @components.none? { |c| c.dependencies.include?(component.name) }
-          puts "pushing to tail: #{component}"
+          puts "pushing to tail: #{component.name}"
           tail << component
         else
-          puts "pushing to head: #{component}"
+          puts "pushing to head: #{component.name}"
           head << component
         end
       end
-      puts "result: "
-      pp [head, tail].flatten
+      puts "RESULT: "
+      [head, tail].flatten.each do |compoment|
+        puts "  #{component.name}"
+      end
       [head, tail].flatten
     end
 
