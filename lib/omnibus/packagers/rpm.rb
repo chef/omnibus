@@ -626,13 +626,19 @@ module Omnibus
     # @return [void]
     #
     def install(packages, enablerepo = NULL)
-      if null?(enablerepo)
-        enablerepo_string = ''
+      if Ohai["platform_family"] == 'suse'
+        log.info('enablerepo only works on yum based systems, not on zypper based ones')
+        shellout!('zypper clean')
+        shellout!("zypper install -y #{packages}")
       else
-        enablerepo_string = "--disablerepo='*' --enablerepo='#{enablerepo}'"
+        if null?(enablerepo)
+          enablerepo_string = ''
+        else
+          enablerepo_string = "--disablerepo='*' --enablerepo='#{enablerepo}'"
+        end
+        shellout!('yum clean expire-cache')
+        shellout!("yum -y #{enablerepo_string} install #{packages}")
       end
-      shellout!('yum clean expire-cache')
-      shellout!("yum -y #{enablerepo_string} install #{packages}")
     end
 
     #
@@ -641,7 +647,11 @@ module Omnibus
     # @return [void]
     #
     def remove(packages)
-      `yum -y remove #{packages}`
+      if ohai["platform_family"] == 'suse'
+        shellout!("zypper remove -y #{packages}")
+      else
+        shellout!("yum -y remove #{packages}")
+      end
     end
   end
 end
