@@ -81,7 +81,7 @@ module Omnibus
         end
       end
       puts "RESULT: "
-      [head, tail].flatten.each do |compoment|
+      [head, tail].flatten.each do |component|
         puts "  #{component.name}"
       end
       [head, tail].flatten
