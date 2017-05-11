@@ -48,11 +48,11 @@ Omnibus determines the platform for which to build an installer based on **the p
 
 ## More documentation
 
-- [Building on Debian](docs/Building on Debian.md)
-- [Building on OSX](docs/Building on OSX.md)
-- [Building on RHEL](docs/Building on RHEL.md)
-- [Building on Windows](docs/Building on Windows.md)
-- [Build Cache](docs/Build Cache.md)
+- [Building on Debian](docs/Building%20on%20Debian.md)
+- [Building on OSX](docs/Building%20on%20OSX.md)
+- [Building on RHEL](docs/Building%20on%20RHEL.md)
+- [Building on Windows](docs/Building%20on%20Windows.md)
+- [Build Cache](docs/Build%20Cache.md)
 
 ## Configuration DSL
 
