@@ -1,6 +1,8 @@
 # ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 
-[![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem] [![Travis Build Status](http://img.shields.io/travis/chef/omnibus.svg?label=Travis CI)][travis] [![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
+[![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
+[![Travis Build Status](http://img.shields.io/travis/chef/omnibus.svg?label=Travis%20CI)][travis]
+[![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
 
 Easily create full-stack installers for your project across a variety of platforms.
 
