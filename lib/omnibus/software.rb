@@ -1,5 +1,5 @@
 #
-# Copyright 2012 Chef Software, Inc.
+# Copyright 2012-2017, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -959,6 +959,7 @@ module Omnibus
 
       @overrides
     end
+    expose :overrides
 
     #
     # Determine if this software version overridden externally, relative to the
