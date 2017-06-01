@@ -142,6 +142,12 @@ module Omnibus
       end
     end
 
+    describe "#overrides" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:overrides)
+      end
+    end
+
     describe "#make" do
       before do
         allow(subject).to receive(:command)
