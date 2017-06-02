@@ -250,6 +250,7 @@ module Omnibus
             fname = File.basename(downloaded_file, File.extname(downloaded_file))
             fname << ".tar" if downloaded_file.end_with?("tgz", "txz")
             next_file = windows_safe_path(File.join(temp_dir, fname))
+            next_file = Dir.glob(File.join(temp_dir, '**', '*.tar'))[0] unless File.file?(next_file)
 
             log.debug(log_key) { "Temporarily extracting `#{next_file}' to `#{safe_project_dir}'" }
             shellout!("7z.exe x #{next_file} -o#{safe_project_dir} -r -y")
@@ -262,7 +263,7 @@ module Omnibus
       elsif downloaded_file.end_with?(".zip")
         shellout!("unzip #{safe_downloaded_file} -d #{safe_project_dir}")
       else
-        shellout!("#{tar} #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}")
+        shellout!("#{tar} #{compression_switch}xfo #{safe_downloaded_file} -C#{safe_project_dir}")
       end
     end
 

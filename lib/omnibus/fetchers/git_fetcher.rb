@@ -18,12 +18,12 @@ module Omnibus
   class GitFetcher < Fetcher
     #
     # A fetch is required if the git repository is not cloned or if the local
-    # revision does not match the desired revision.
+    # revision does not match the desired revision or if we always fetch tags
     #
     # @return [true, false]
     #
     def fetch_required?
-      !(cloned? && contains_revision?(resolved_version))
+      !(cloned? && contains_revision?(resolved_version)) || always_fetch_tags?
     end
 
     #
@@ -63,6 +63,7 @@ module Omnibus
 
       if cloned?
         git_fetch
+        git_fetch_tags if always_fetch_tags?
       else
         force_recreate_project_dir! unless dir_empty?(project_dir)
         git_clone
@@ -106,6 +107,15 @@ module Omnibus
     #
     def clone_submodules?
       source[:submodules] || false
+    end
+
+    #
+    # Determine if we should always fetch tags
+    #
+    # @return [true, false]
+    #
+    def always_fetch_tags?
+      source[:always_fetch_tags] || false
     end
 
     #
@@ -174,6 +184,20 @@ module Omnibus
       retry_block("git fetch", [CommandTimeout, CommandFailed]) do
         git(fetch_cmd)
       end
+    end
+
+    #
+    # Force-fetch the tags from the remote
+    # We do this in a separate step on top of `git_fetch` because until v1.9 of git, `git fetch`
+    # was not a strict subset of `git fetch --tags`: doing only `git fetch --tags` doesn't
+    # guarantee that the latest commits are actually fetched.
+    # Merge with `git_fetch` once git >= v1.9 is used on all our build images.
+    #
+    # @return [void]
+    #
+    def git_fetch_tags
+      fetch_cmd = "fetch #{source_url} #{described_version} --tags"
+      git(fetch_cmd)
     end
 
     #

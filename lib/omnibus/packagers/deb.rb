@@ -35,10 +35,16 @@ module Omnibus
       # extra_package_file '/path/to/foo.txt' #=> /tmp/scratch/path/to/foo.txt
       project.extra_package_files.each do |file|
         parent      = File.dirname(file)
-        destination = File.join(staging_dir, parent)
 
-        create_directory(destination)
-        copy_file(file, destination)
+        if File.directory?(file)
+          destination = File.join(staging_dir, file)
+          create_directory(destination)
+          FileSyncer.sync(file, destination)
+        else
+          destination = File.join(staging_dir, parent)
+          create_directory(destination)
+          copy_file(file, destination)
+        end
       end
 
       # Create the Debain file directory
@@ -115,6 +121,29 @@ module Omnibus
       end
     end
     expose :license
+
+    #
+    # Sets or return the epoch for this package
+    #
+    # @example
+    #   epoch 1
+    # @param [Integer] val
+    #   the epoch number
+    #
+    # @return [Integer]
+    #   the epoch of the current package
+    def epoch(val = NULL)
+      if null?(val)
+        @epoch || NULL
+      else
+        unless val.is_a?(Integer)
+          raise InvalidValue.new(:epoch, 'be an Integer')
+        end
+
+        @epoch = val
+      end
+    end
+    expose :epoch
 
     #
     # Set or return the priority for this package.
@@ -281,7 +310,7 @@ module Omnibus
         destination: File.join(debian_dir, "control"),
         variables: {
           name:           safe_base_package_name,
-          version:        safe_version,
+          version:        safe_epoch + safe_version,
           iteration:      safe_build_iteration,
           vendor:         vendor,
           license:        license,
@@ -446,6 +475,15 @@ module Omnibus
     end
 
     #
+    # Returns the string to prepend to the version if needed.
+    #
+    # @return [String]
+    #
+    def safe_epoch
+      null?(epoch) ? '' : "#{epoch}:"
+    end
+
+    #
     # Return the Debian-ready version, replacing all dashes (+-+) with tildes
     # (+~+) and converting any invalid characters to underscores (+_+).
     #
@@ -492,6 +530,29 @@ module Omnibus
     #
     def safe_architecture
       @safe_architecture ||= shellout!("dpkg --print-architecture").stdout.split("\n").first || "noarch"
+    end
+
+    #
+    # Install the specified packages
+    #
+    # @return [void]
+    #
+    def install(packages, enablerepo = NULL)
+      if null?(enablerepo)
+        shellout!('apt-get update')
+      else
+        shellout!("apt-get update -o Dir::Etc::sourcelist='sources.list.d/#{enablerepo}.list' -o Dir::Etc::sourceparts='-' -o APT::Get::List-Cleanup='0'")
+      end
+      shellout!("apt-get install -y --force-yes #{packages}")
+    end
+
+    #
+    # Remove the specified packages
+    #
+    # @return [void]
+    #
+    def remove(packages)
+      shellout!("apt-get remove -y --force-yes #{packages}")
     end
   end
 end

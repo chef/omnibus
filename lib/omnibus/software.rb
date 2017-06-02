@@ -164,6 +164,24 @@ module Omnibus
     end
     expose :name
 
+    # Sets wether the software should always be built or not.
+    # Since it doesn't influence the build order, you should put these
+    # dependencies at the end to maximize the git caching
+    #
+    # @example
+    #   always_build true
+    #
+    # @return [Boolean]
+    #
+    def always_build(val = NULL)
+      if null?(val)
+        @always_build
+      else
+        @always_build = val
+      end
+    end
+    expose :always_build
+
     #
     # Sets the description of the software.
     #
@@ -277,6 +295,8 @@ module Omnibus
     #
     # @option val [Boolean] :submodules (false)
     #   clone git submodules
+    # @option val [Boolean] :always_fetch_tags (false)
+    #   always fetch tags from the remote, useful if the version of the project is determined from this software
     #
     # If multiple checksum types are provided, only the strongest will be used.
     #
@@ -296,7 +316,7 @@ module Omnibus
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
           :cookie, :warning, :unsafe, :extract, # used by net_fetcher
           :options, # used by path_fetcher
-          :submodules # used by git_fetcher
+          :submodules, :always_fetch_tags # used by git_fetcher
         ]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
@@ -842,6 +862,41 @@ module Omnibus
     expose :ohai
 
     #
+    # Downloads a software license to ship with the final build.
+    # 
+    # Licenses will be copied into {install_dir}/sources/{software_name}
+    #
+    # @param [String] name_or_url 
+    #   the name of the license to ship or a URL pointing to the license file.
+    #
+    #   Available License Names : LGPLv2, LGPLv3, PSFL, Apache, Apachev2,
+    #   GPLv2, GPLv3, ZPL
+    #
+    # @example
+    #   ship_license 'GPLv3'
+    #
+    # @example 
+    #    ship_license 'http://www.r-project.org/Licenses/GPL-3' 
+    #
+    def ship_license(name_or_url)
+      @ship_license
+    end
+    expose :ship_license
+
+    #
+    # Downloads a software source code to ship with the final build
+    #
+    # Sources will be copied into {install_dir}/sources/{software_name}
+    #
+    # @param [String] url
+    #   An URL pointing to a source code archive
+    #   
+    def ship_source(url)
+        @ship_source
+    end
+    expose :ship_source
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -1085,6 +1140,12 @@ module Omnibus
             "Building because `#{project.culprit.name}' dirtied the cache"
           end
           execute_build(build_wrappers)
+        elsif always_build
+          log.info(log_key) do
+            "Building because always_build is true"
+          end
+          execute_build(build_wrappers)
+          project.dirty!(self)
         elsif git_cache.restore
           log.info(log_key) { "Restored from cache" }
         else

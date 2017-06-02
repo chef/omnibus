@@ -16,12 +16,23 @@
 
 require "pathname"
 require "omnibus/packagers/windows_base"
+require "fileutils"
 
 module Omnibus
   class Packager::MSI < Packager::WindowsBase
     id :msi
 
     setup do
+      if bundle_msi
+        helper_tmp_dir = Dir.mktmpdir
+        parameters.store('HelperDir', helper_tmp_dir)
+        FileUtils.mv "#{install_dir}/bin/upgrade-helper.exe", "#{helper_tmp_dir}"
+        if signing_identity
+          Dir["#{helper_tmp_dir}" + "/**/*.{exe,dll}"].each do |signfile|
+            sign_package(signfile)
+          end
+        end
+      end
       # Render the localization
       write_localization_file
 
@@ -33,6 +44,9 @@ module Omnibus
 
       # Optionally, render the bundle file
       write_bundle_file if bundle_msi
+
+      # Optionally, render the bundle theme file
+      write_bundle_theme_file if bundle_msi and bundle_theme
 
       # Copy all the staging assets from vendored Omnibus into the resources
       # directory.
@@ -54,21 +68,64 @@ module Omnibus
     end
 
     build do
+      puts "starting signing"
+      if signing_identity
+        Dir["#{install_dir}" + "/bin/**/*.exe"].each do |signfile|
+          puts "signing #{signfile}"
+          sign_package(signfile)
+        end
+
+        Dir["#{install_dir}" + "/dist/**/*.exe"].each do |signfile|
+          sign_package(signfile)
+        end
+
+      end
       # If fastmsi, zip up the contents of the install directory
       shellout!(zip_command) if fast_msi
+
+      # If there are extra package files let's Harvest them hard
+      dir_refs = []
+      candle_vars = ''
+      wxs_list = ''
+      wixobj_list = ''
+      if File.directory?("#{Config.source_dir}\\extra_package_files")
+        # Let's collect the DirectoryRefs
+        Dir.foreach("#{Config.source_dir}\\extra_package_files") do |item|
+          next if item == '.' or item == '..'
+          dir_refs.push(item)
+        end
+      end
 
       # Harvest the files with heat.exe, recursively generate fragment for
       # project directory
       Dir.chdir(staging_dir) do
         shellout!(heat_command)
 
+        # Let's also harvest our extras
+        dir_refs.each do |dirref|
+          shellout! <<-EOH.split.join(' ').squeeze(' ').strip
+            heat.exe dir
+              "#{windows_safe_path("#{Config.source_dir}\\extra_package_files\\#{dirref}")}"
+              -nologo -srd -gg -cg Extra#{dirref}
+              -dr #{dirref}
+              -var "var.Extra#{dirref}"
+              -out "extra-#{dirref}.wxs"
+          EOH
+
+          candle_vars += "-dExtra#{dirref}=\""\
+            "#{windows_safe_path("#{Config.source_dir}\\extra_package_files\\#{dirref}")}"\
+            "\" "
+          wxs_list += "extra-#{dirref}.wxs "
+          wixobj_list += "extra-#{dirref}.wixobj "
+        end
+
         # Compile with candle.exe
-        shellout!(candle_command)
+        shellout!(candle_command(candle_vars: candle_vars, wxs_list: wxs_list))
 
         # Create the msi, ignoring the 204 return code from light.exe since it is
         # about some expected warnings
         msi_file = windows_safe_path(Config.package_dir, msi_name)
-        shellout!(light_command(msi_file), returns: [0, 204])
+        shellout!(light_command(msi_file, wixobj_list: wixobj_list), returns: [0, 204])
 
         if signing_identity
           sign_package(msi_file)
@@ -77,13 +134,14 @@ module Omnibus
         # This assumes, rightly or wrongly, that any installers we want to bundle
         # into our installer will be downloaded by omnibus and put in the cache dir
         if bundle_msi
-          shellout!(candle_command(is_bundle: true))
+          bundle_candle_vars ="-dPackageMsi=#{msi_file}"
+          shellout!(candle_command(is_bundle: true, candle_vars: bundle_candle_vars))
 
           bundle_file = windows_safe_path(Config.package_dir, bundle_name)
           shellout!(light_command(bundle_file, is_bundle: true), returns: [0, 204])
 
           if signing_identity
-            sign_package(bundle_file)
+            sign_package(bundle_file, is_bundle: true)
           end
         end
       end
@@ -205,6 +263,25 @@ module Omnibus
       @bundle_msi ||= val
     end
     expose :bundle_msi
+
+    #
+    # Signal that the bundle has a custom theme
+    #
+    # @example
+    #   bundle_theme true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether we're a bundle or not
+    #
+    # @return [TrueClass, FalseClass]
+    #   whether we're a bundle or not
+    def bundle_theme(val = false)
+      unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
+        raise InvalidValue.new(:bundle_theme, "be TrueClass or FalseClass")
+      end
+      @bundle_theme ||= val
+    end
+    expose :bundle_theme
 
     #
     # Signal that we're building a zip-based MSI
@@ -388,6 +465,27 @@ module Omnibus
     end
 
     #
+    # Write the bundle theme file into the staging directory.
+    #
+    # @return [void]
+    #
+    def write_bundle_theme_file
+      render_template(resource_path("bundle_theme.xml.erb"),
+        destination: "#{staging_dir}/bundle_theme.xml",
+        variables: {
+          name:            project.package_name,
+          friendly_name:   project.friendly_name,
+          maintainer:      project.maintainer,
+          upgrade_code:    upgrade_code,
+          parameters:      parameters,
+          version:         windows_package_version,
+          display_version: msi_display_version,
+          msi:             windows_safe_path(Config.package_dir, msi_name),
+        }
+      )
+    end
+
+    #
     # Get the shell command to create a zip file that contains
     # the contents of the project install directory
     #
@@ -432,7 +530,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def candle_command(is_bundle: false)
+    def candle_command(is_bundle: false, candle_vars: '', wxs_list: '')
       if is_bundle
         <<-EOH.split.join(" ").squeeze(" ").strip
         candle.exe
@@ -441,6 +539,7 @@ module Omnibus
           -ext WixBalExtension
           #{wix_extension_switches(wix_candle_extensions)}
           -dOmnibusCacheDir="#{windows_safe_path(File.expand_path(Config.cache_dir))}"
+          #{candle_vars}
           "#{windows_safe_path(staging_dir, 'bundle.wxs')}"
         EOH
       else
@@ -449,7 +548,10 @@ module Omnibus
             -nologo
             #{wix_candle_flags}
             #{wix_extension_switches(wix_candle_extensions)}
-            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
+            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}"
+            #{candle_vars}
+            "project-files.wxs"
+            #{wxs_list}
             "#{windows_safe_path(staging_dir, 'source.wxs')}"
         EOH
       end
@@ -460,7 +562,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def light_command(out_file, is_bundle: false)
+    def light_command(out_file, is_bundle: false, wixobj_list: '')
       if is_bundle
         <<-EOH.split.join(" ").squeeze(" ").strip
         light.exe
@@ -481,7 +583,7 @@ module Omnibus
             #{wix_extension_switches(wix_light_extensions)}
             -cultures:en-us
             -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
-            project-files.wixobj source.wixobj
+            project-files.wixobj #{wixobj_list} source.wixobj
             -out "#{out_file}"
         EOH
       end

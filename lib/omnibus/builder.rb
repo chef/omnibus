@@ -18,6 +18,7 @@ require "fileutils"
 require "mixlib/shellout"
 require "ostruct"
 require "pathname"
+require "httparty"
 
 module Omnibus
   class Builder
@@ -85,6 +86,21 @@ module Omnibus
       end
     end
     expose :command
+
+    # Calls the embedded pip (Datadog specific function)
+    #
+    # @param [String] subcommand
+    #   the pip subcommand to execute
+    #
+    # @return [void]
+    def pip(subcommand, options = {})
+     pip_path = "\"#{install_dir}/embedded/bin/pip\""
+     if Ohai['platform'] == "windows"
+       pip_path = "\"#{windows_safe_path(install_dir)}\\embedded\\Scripts\\pip.exe\""
+     end
+     command("#{pip_path} #{subcommand}", options)
+    end
+    expose :pip
 
     #
     # Execute the given make command. When present, this method will prefer the
@@ -680,7 +696,7 @@ module Omnibus
     #       Default: [:config_guess, :config_sub]
     def update_config_guess(target: ".", install: [:config_guess, :config_sub])
       build_commands << BuildCommand.new("update_config_guess `target: #{target} install: #{install.inspect}'") do
-        config_guess_dir = "#{install_dir}/embedded/lib/config_guess"
+        config_guess_dir = "/tmp/build/embedded/lib/config_guess"
         %w{config.guess config.sub}.each do |c|
           unless File.exist?(File.join(config_guess_dir, c))
             raise "Can not find #{c}. Make sure you add a dependency on 'config_guess' in your software definition"
@@ -763,6 +779,70 @@ module Omnibus
     end
 
     #
+    # Downloads a software license to ship with the final build.
+    #
+    # Licenses will be copied into {install_dir}/sources/{software_name}
+    #
+    # @param [String] name_or_url
+    #   the name of the license to ship or a URL pointing to the license file.
+    #
+    #   Available License Names : LGPLv2, LGPLv3, PSFL, Apache, Apachev2,
+    #   GPLv2, GPLv3, ZPL
+    #
+    # @example
+    #   ship_license 'GPLv3'
+    #
+    # @example
+    #    ship_license 'http://www.r-project.org/Licenses/GPL-3'
+    #
+    def ship_license(name_or_url)
+      build_commands << BuildCommand.new("Adding License: '#{name_or_url}'") do
+        dir_name = "#{install_dir}/licenses/#{self.name}"
+        FileUtils.mkdir_p(dir_name)
+        urls = {
+          "LGPLv2" => "http://www.r-project.org/Licenses/LGPL-2",
+          "LGPLv3" => "http://www.r-project.org/Licenses/LGPL-3",
+          "PSFL" => "https://gist.githubusercontent.com/remh/1e6c62177a1a972fbc47/raw/01e9994ccf3a239a9045f31963006d2bba1cea42/PSF.license",
+          "Apache" => "http://www.apache.org/licenses/LICENSE-1.0",
+          "Apachev2" => "http://www.apache.org/licenses/LICENSE-2.0.txt",
+          "GPLv2" => "http://www.r-project.org/Licenses/GPL-2",
+          "GPLv3" => "http://www.r-project.org/Licenses/GPL-3",
+          "ZPL" => "https://gist.githubusercontent.com/remh/d60434c9fee49af69850/raw/5582f08b89995ee25bb0a556e32ca8a9de197f23/ZPL.license",
+          "MIT" => "https://www.r-project.org/Licenses/MIT",
+        }
+        url = (urls.key? name_or_url) ? urls[name_or_url] : name_or_url
+        raise "License #{url} is not starting with http" unless url.start_with? "http"
+        file_name = "#{dir_name}/" + url.split("/")[-1]
+        File.open(file_name, "wb") do |f|
+            log.info(log_key) { "Writing license file from #{url} to #{file_name}" }
+            f.write HTTParty.get(url).parsed_response
+        end
+      end
+    end
+    expose :ship_license
+
+    #
+    # Downloads a software source code to ship with the final build
+    #
+    # Sources will be copied into {install_dir}/sources/{software_name}
+    #
+    # @param [String] url
+    #   An URL pointing to a source code archive
+    #
+    def ship_source(url)
+      build_commands << BuildCommand.new("Adding Source code: `#{url}'") do
+        dir_name = "#{install_dir}/sources/#{self.name}"
+        FileUtils.mkdir_p(dir_name)
+        raise "Source #{url} is not starting with http" unless url.start_with? "http"
+        file_name = "#{dir_name}/" + url.split("/")[-1]
+        File.open(file_name, "wb") do |f|
+          log.info(log_key) { "Writing source archive from #{url} to #{file_name}" }
+          f.write HTTParty.get(url).parsed_response
+        end
+      end
+    end
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -807,6 +887,9 @@ module Omnibus
     # @see (Util#shellout!)
     #
     def shellout!(command_string, options = {})
+      # check command for acceptable output before raising - even if command fails
+      acceptable_output = options.delete(:acceptable_output) || false
+
       # Make sure the PWD is set to the correct directory
       # Also make a clone of options so that we can mangle it safely below.
       options = { cwd: software.project_dir }.merge(options)
@@ -818,7 +901,17 @@ module Omnibus
       options[:live_stream] ||= log.live_stream(:debug)
 
       # Use Util's shellout
-      super(command_string, options)
+      if not acceptable_output
+        super(command_string, options)
+      else
+        cmd = shellout(command_string, options)
+        if cmd.stdout.include? acceptable_output or cmd.stderr.include? acceptable_output
+          cmd
+        else
+          cmd.error!
+          cmd
+        end
+      end
     end
 
     #
@@ -970,6 +1063,8 @@ module Omnibus
         log.warn(log_key) { "Detected command `remove'. Consider using the `delete' DSL method." }
       when /^rsync /i
         log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
+      when /^pip /i
+        log.warn(log_key) { "Detected command `pip'. Consider using the `pip' DSL method." }
       end
     end
 

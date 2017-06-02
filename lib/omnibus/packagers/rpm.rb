@@ -61,10 +61,16 @@ module Omnibus
       # extra_package_file '/path/to/foo.txt' #=> /tmp/BUILD/path/to/foo.txt
       project.extra_package_files.each do |file|
         parent      = File.dirname(file)
-        destination = File.join("#{staging_dir}/BUILD", parent)
 
-        create_directory(destination)
-        copy_file(file, destination)
+        if File.directory?(file)
+          destination = File.join("#{staging_dir}/BUILD", file)
+          create_directory(destination)
+          FileSyncer.sync(file, destination)
+        else
+          destination = File.join("#{staging_dir}/BUILD", parent)
+          create_directory(destination)
+          copy_file(file, destination)
+        end
       end
     end
 
@@ -151,6 +157,29 @@ module Omnibus
       end
     end
     expose :license
+
+    #
+    # Sets or return the epoch for this package
+    #
+    # @example
+    #   epoch 1
+    # @param [Integer] val
+    #   the epoch number
+    #
+    # @return [Integer]
+    #   the epoch of the current package
+    def epoch(val = NULL)
+      if null?(val)
+        @epoch || NULL
+      else
+        unless val.is_a?(Integer)
+          raise InvalidValue.new(:epoch, 'be an Integer')
+        end
+
+        @epoch = val
+      end
+    end
+    expose :epoch
 
     #
     # Set or return the priority for this package.
@@ -327,10 +356,16 @@ module Omnibus
     # @return [String]
     #
     def mark_filesystem_directories(fsdir)
-      if fsdir.eql?("/") || fsdir.eql?("/usr/lib") || fsdir.eql?("/usr/share/empty")
-        return "%dir %attr(0555,root,root) #{fsdir}"
+      # Workaround for datadog-agent: do not list `filesystem` directories in the package because some packages
+      # installed by default on some distros have a complete disregard for the permissions defined by their
+      # own `filesystem` pkg, and then conflict with the datadog-agent pkg
+      # Example: the `service-nanny` pkg on Amazon Linux EMR, which defines `755` perms on `/usr/bin`
+      if fsdir.eql?("/") || fsdir.eql?("/usr/bin") || fsdir.eql?("/usr/lib") || fsdir.eql?("/usr/share/empty")
+        # return "%dir %attr(0555,root,root) #{fsdir}"
+        return ""
       elsif filesystem_directories.include?(fsdir)
-        return "%dir %attr(0755,root,root) #{fsdir}"
+        # return "%dir %attr(0755,root,root) #{fsdir}"
+        return ""
       else
         return "%dir #{fsdir}"
       end
@@ -356,13 +391,15 @@ module Omnibus
 
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
-                .map { |path| build_filepath(path) }
+                .map    { |path| build_filepath(path) }
+                .reject { |path| path.empty? }
 
       render_template(resource_path("spec.erb"),
         destination: spec_file,
         variables: {
           name:            safe_base_package_name,
           version:         safe_version,
+          epoch:           safe_epoch,
           iteration:       safe_build_iteration,
           vendor:          vendor,
           license:         license,
@@ -454,7 +491,9 @@ module Omnibus
       end
 
       FileSyncer.glob("#{staging_dir}/RPMS/**/*.rpm").each do |rpm|
-        copy_file(rpm, Config.package_dir)
+        # RPMbuild doesn't let use choose the final RPM name, it contains the epoch if the
+        # corresponding DSL was set so... let's get rid from the RPM name here :/
+        copy_file(rpm, "#{Config.package_dir}/#{rpm.split('/')[-1].sub(/\d+:/, '')}" )
       end
     end
 
@@ -567,6 +606,15 @@ module Omnibus
     end
 
     #
+    # Returns the epoch if precised.
+    #
+    # @return [String]
+    #
+    def safe_epoch
+      null?(epoch) ? '' : epoch.to_s
+    end
+
+    #
     # RPM package versions cannot contain dashes, so we will convert them to
     # underscores.
     #
@@ -605,16 +653,16 @@ module Omnibus
         version = converted
       end
 
-      if version =~ /\A[a-zA-Z0-9\.\+\~]+\z/
+      if version =~ /\A[a-zA-Z0-9\.\+\:\~]+\z/
         version
       else
-        converted = version.gsub(/[^a-zA-Z0-9\.\+\~]+/, "_")
+        converted = version.gsub(/[^a-zA-Z0-9\.\+\:\~]+/, "_")
 
         log.warn(log_key) do
           "The `version' component of RPM package names can only include " \
           "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), tildes (~) and underscores (_). Converting " \
-          "`#{project.build_version}' to `#{converted}'."
+          "plus signs (+), tildes (~), colons (:) and underscores (_). " \
+          "Converting `#{project.build_version}' to `#{converted}'."
         end
 
         converted
@@ -638,6 +686,40 @@ module Omnibus
         end
       else
         Ohai["kernel"]["machine"]
+      end
+    end
+
+    #
+    # Install the specified packages
+    #
+    # @return [void]
+    #
+    def install(packages, enablerepo = NULL)
+      if ohai["platform_family"] == 'suse'
+        log.info('enablerepo only works on yum based systems, not on zypper based ones')
+        shellout!('zypper clean')
+        shellout!("zypper install -y #{packages}")
+      else
+        if null?(enablerepo)
+          enablerepo_string = ''
+        else
+          enablerepo_string = "--disablerepo='*' --enablerepo='#{enablerepo}'"
+        end
+        shellout!('yum clean expire-cache')
+        shellout!("yum -y #{enablerepo_string} install #{packages}")
+      end
+    end
+
+    #
+    # Remove the specified package
+    #
+    # @return [void]
+    #
+    def remove(packages)
+      if ohai["platform_family"] == 'suse'
+        `zypper remove -y #{packages}`
+      else
+        `yum -y remove #{packages}`
       end
     end
   end

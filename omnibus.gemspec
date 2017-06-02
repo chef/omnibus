@@ -35,6 +35,7 @@ Gem::Specification.new do |gem|
 
   # from Gemfile
   gem.add_dependency "license_scout"
+  gem.add_dependency 'httparty'
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"
