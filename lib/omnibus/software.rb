@@ -748,6 +748,13 @@ module Omnibus
         "LD_RUN_PATH" => "#{install_dir}/embedded/lib",
       }
 
+      if s390x? && platform_version.satisfies?("< 7.0")
+        extra_linker_flags = {
+          "LD_RUN_PATH" => "/opt/omnibus-gcc/embedded/lib64,#{install_dir}/embedded/lib",
+        }
+      end
+
+
       if solaris2?
         ld_options = "-R#{install_dir}/embedded/lib"
 
