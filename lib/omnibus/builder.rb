@@ -18,6 +18,7 @@ require "fileutils"
 require "mixlib/shellout"
 require "ostruct"
 require "pathname"
+require "omnibus/whitelist"
 
 module Omnibus
   class Builder
@@ -563,6 +564,29 @@ module Omnibus
     expose :delete
 
     #
+    # Strip symbols from the given file or directory on the system. This method uses
+    # find and passes the matched files to strip through xargs, ignoring errors.
+    # So one may pass in a specific file/directory or a glob of files.
+    #
+    # @param [String] path
+    #   the path of the file(s) to strip
+    #
+    # @return (see #command)
+    #
+    def strip(path)
+      regexp_ends = ".*(" + IGNORED_ENDINGS.map { |e| e.gsub(/\./, '\.') }.join("|") + ")$"
+      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(/\//, '\/') + ".*" }.join("|")
+      regexp = regexp_ends + "|" + regexp_patterns
+
+      # Do not actually care if strip runs on non-strippable file, as its a no-op.  Hence the `|| true` appended.
+      # Do want to avoid stripping files unneccessarily so as not to slow down build process.
+      find_command = "find #{path}/ -type f -regextype posix-extended ! -regex \"#{regexp}\" | xargs strip || true"
+      options = { in_msys_bash: true }
+      command(find_command, options)
+    end
+    expose :strip
+
+    #
     # Copy the given source to the destination. This method accepts a single
     # file or a file pattern to match.
     #
@@ -970,6 +994,8 @@ module Omnibus
         log.warn(log_key) { "Detected command `remove'. Consider using the `delete' DSL method." }
       when /^rsync /i
         log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
+      when /^strip /i
+        log.warn(log_key) { "Detected command `strip'. Consider using the `strip' DSL method." }
       end
     end
 

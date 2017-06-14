@@ -187,6 +187,7 @@ DSL Method          | Description
 `mkdir`             | Create the given directory
 `touch`             | Create the given empty file
 `delete`            | Remove the given file or directory
+`strip`             | Strip symbols from binaries on a given file or directory
 `copy`              | Copy a to b
 `move`              | Move a to b
 `link`              | Link a to b
