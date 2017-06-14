@@ -78,6 +78,8 @@ use_git_caching false
 use_s3_caching true
 s3_access_key  ENV['S3_ACCESS_KEY']
 s3_secret_key  ENV['S3_SECRET_KEY']
+# You can use the Shared Credentials files in place of the s3_access_key and s3_secret_key.
+#s3_profile    ENV['S3_PROFILE']
 s3_bucket      ENV['S3_BUCKET']
 ```
 

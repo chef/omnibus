@@ -46,12 +46,17 @@ module Omnibus
     private
 
     def s3_configuration
-      {
+      config = {
         region:            @options[:region],
-        access_key_id:     Config.publish_s3_access_key,
-        secret_access_key: Config.publish_s3_secret_key,
         bucket_name:       @options[:bucket],
       }
+
+      if Config.publish_s3_profile
+        config[:profile]            = Config.publish_s3_profile
+      else
+        config[:access_key_id]      = Config.publish_s3_access_key
+        config[:secret_access_key]  = Config.publish_s3_secret_key
+      end
     end
 
     #

@@ -139,14 +139,21 @@ module Omnibus
       private
 
       def s3_configuration
-        {
-          region:                  Config.s3_region,
-          access_key_id:           Config.s3_access_key,
-          secret_access_key:       Config.s3_secret_key,
-          bucket_name:             Config.s3_bucket,
-          endpoint:                Config.s3_endpoint,
-          use_accelerate_endpoint: Config.s3_accelerate,
+        config = {
+          region:                   Config.s3_region,
+          bucket_name:              Config.s3_bucket,
+          endpoint:                 Config.s3_endpoint,
+          use_accelerate_endpoint:  Config.s3_accelerate,
         }
+
+        if Config.s3_profile
+          config[:profile] = Config.s3_profile
+        else
+          config[:access_key_id] = Config.s3_access_key,
+          config[:secret_access_key] = Config.s3_secret_key
+        end
+
+        config
       end
 
       #

@@ -15,6 +15,8 @@
 #
 
 require "aws-sdk"
+require "aws-sdk-core/credentials"
+require "aws-sdk-core/shared_credentials"
 require "base64"
 
 module Omnibus
@@ -33,8 +35,6 @@ module Omnibus
       # @example
       #   {
       #     region:                   'us-east-1',
-      #     access_key_id:            Config.s3_access_key,
-      #     secret_access_key:        Config.s3_secret_key,
       #     bucket_name:              Config.s3_bucket,
       #     endpoint:                 Config.s3_endpoint,
       #     use_accelerate_endpoint:  Config.s3_accelerate
@@ -52,14 +52,21 @@ module Omnibus
       # @return [Aws::S3::Resource]
       #
       def client
-        @s3_client ||= Aws::S3::Resource.new(client_params)
+        Aws.config.update(
+          region: s3_configuration[:region],
+          credentials: get_credentials
+        )
+
+        @s3_client ||= Aws::S3::Resource.new(resource_params)
       end
 
-      def client_params
+      #
+      # S3 Resource Parameters
+      #
+      # @return [Hash]
+      #
+      def resource_params
         params = {
-          region:                   s3_configuration[:region],
-          access_key_id:            s3_configuration[:access_key_id],
-          secret_access_key:        s3_configuration[:secret_access_key],
           use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint],
         }
 
@@ -72,6 +79,19 @@ module Omnibus
         end
 
         params
+      end
+
+      #
+      # Create credentials object based on credential profile or access key
+      # parameters for use by the client object.
+      #
+      # @return [Aws::SharedCredentials, Aws::Credentials]
+      def get_credentials
+        if s3_configuration[:profile]
+          Aws::SharedCredentials.new(profile_name: s3_configuration[:profile])
+        elsif s3_configuration[:access_key_id] && s3_configuration[:secret_access_key]
+          Aws::Credentials.new(s3_configuration[:access_key_id], s3_configuration[:secret_access_key])
+        end
       end
 
       #
