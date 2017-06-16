@@ -94,6 +94,12 @@ module Omnibus
       end
     end
 
+    describe "#strip" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:strip)
+      end
+    end
+
     describe "#copy" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:copy)
