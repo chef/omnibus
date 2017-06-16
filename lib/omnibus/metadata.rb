@@ -145,7 +145,13 @@ module Omnibus
       #
       def platform_shortname
         if rhel?
-          "el"
+          # ohai identifies amazon as a sub-distro of rhel (which is fine
+          # because otherwise a lot of backwards compat would break)
+          if amazon?
+            "amzn"
+          else
+            "el"
+          end
         elsif suse?
           "sles"
         else
@@ -179,6 +185,10 @@ module Omnibus
         when "arch"
           # Arch Linux does not have a platform_version ohai attribute, it is rolling release (lsb_release -r)
           "rolling"
+        when "amzn"
+          # Amazon has a rolling release but they specify 1 as the version in
+          # their packages, for some reason.
+          "1"
         when "windows"
           # Windows has this really awesome "feature", where their version numbers
           # internally do not match the "marketing" name.

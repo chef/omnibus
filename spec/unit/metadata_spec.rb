@@ -179,6 +179,11 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
     end
 
     describe ".platform_shortname" do
+      it "returns amzn on amazon" do
+        stub_ohai(platform: "amazon", version: "2017.03")
+        expect(described_class.platform_shortname).to eq("amzn")
+      end
+
       it "returns el on rhel" do
         stub_ohai(platform: "redhat", version: "6.4")
         expect(described_class.platform_shortname).to eq("el")
@@ -210,6 +215,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       end
 
       it_behaves_like "a version manipulator", "aix", "7.1", "7.1"
+      it_behaves_like "a version manipulator", "amzn", "2017", "1"
       it_behaves_like "a version manipulator", "arch", "rolling", "rolling"
       it_behaves_like "a version manipulator", "centos", "5.9.6", "5"
       it_behaves_like "a version manipulator", "debian", "7.1", "7"
