@@ -29,4 +29,42 @@ module Omnibus
       end
     end
   end
+
+  context "when #s3_configuration is defined" do
+    describe "#get_credentials" do
+      let(:klass) do
+        Class.new do
+          include Omnibus::S3Helpers
+        end
+      end
+      let(:instance) { klass.new }
+      let(:key_pair) { { access_key_id: "key_id", secret_access_key: "access_key" } }
+      let(:profile) { "my-profile" }
+      let(:config) { { bucket_name: "foo", region: "us-east-1" } }
+
+      it "uses configured key pairs" do
+        allow_any_instance_of(klass).to receive(:s3_configuration).and_return(config.merge!(key_pair))
+        expect(Aws::Credentials).to receive(:new).with(
+          config[:access_key_id],
+          config[:secret_access_key]
+        )
+        expect(Aws::SharedCredentials).to_not receive(:new)
+        instance.send(:get_credentials)
+      end
+
+      it "preferrs shared credentials profiles over key pairs" do
+        allow_any_instance_of(klass).to receive(:s3_configuration).and_return(
+          {
+            **config,
+            **key_pair,
+            profile: profile,
+          }
+        )
+        expect(Aws::Credentials).to_not receive(:new)
+        allow(Aws::SharedCredentials).to receive(:new).with(profile_name: profile)
+        instance.send(:get_credentials)
+      end
+
+    end
+  end
 end

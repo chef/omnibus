@@ -279,15 +279,28 @@ module Omnibus
     #
     # @return [String]
     default(:s3_access_key) do
-      raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
+      if self.s3_profile
+        nil
+      else
+        raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
+      end
     end
 
     # The S3 secret key to use with S3 caching.
     #
-    # @return [String]
+    # @return [String, nil]
     default(:s3_secret_key) do
-      raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
+      if self.s3_profile
+        nil
+      else
+        raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
+      end
     end
+
+    # The AWS credentials profile to use with S3 caching.
+    #
+    # @return [String]
+    default(:s3_profile, nil)
 
     # The region of the S3 bucket you want to cache software artifacts in.
     # Defaults to 'us-east-1'
@@ -400,14 +413,22 @@ module Omnibus
     #
     # @return [String]
     default(:publish_s3_access_key) do
-      raise MissingRequiredAttribute.new(self, :publish_s3_access_key, "'ABCD1234'")
+      if self.s3_profile
+        nil
+      else
+        raise MissingRequiredAttribute.new(self, :publish_s3_access_key, "'ABCD1234'")
+      end
     end
 
     # The S3 secret key to use for S3 artifact release
     #
     # @return [String]
     default(:publish_s3_secret_key) do
-      raise MissingRequiredAttribute.new(self, :publish_s3_secret_key, "'EFGH5678'")
+      if self.s3_profile
+        nil
+      else
+        raise MissingRequiredAttribute.new(self, :publish_s3_secret_key, "'EFGH5678'")
+      end
     end
 
     # --------------------------------------------------
