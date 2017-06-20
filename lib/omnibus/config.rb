@@ -279,7 +279,7 @@ module Omnibus
     #
     # @return [String]
     default(:s3_access_key) do
-      if self.s3_profile
+      if s3_profile
         nil
       else
         raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
@@ -290,7 +290,7 @@ module Omnibus
     #
     # @return [String, nil]
     default(:s3_secret_key) do
-      if self.s3_profile
+      if s3_profile
         nil
       else
         raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
@@ -413,7 +413,7 @@ module Omnibus
     #
     # @return [String]
     default(:publish_s3_access_key) do
-      if self.s3_profile
+      if s3_profile
         nil
       else
         raise MissingRequiredAttribute.new(self, :publish_s3_access_key, "'ABCD1234'")
@@ -424,7 +424,7 @@ module Omnibus
     #
     # @return [String]
     default(:publish_s3_secret_key) do
-      if self.s3_profile
+      if s3_profile
         nil
       else
         raise MissingRequiredAttribute.new(self, :publish_s3_secret_key, "'EFGH5678'")
