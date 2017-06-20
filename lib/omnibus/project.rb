@@ -1034,7 +1034,7 @@ module Omnibus
     # @return [1, 0, -1]
     #
     def <=>(other)
-      self.name <=> other.name
+      name <=> other.name
     end
 
     #
@@ -1199,7 +1199,7 @@ module Omnibus
     # @return [true, false]
     #
     def ==(other)
-      self.hash == other.hash
+      hash == other.hash
     end
     alias_method :eql?, :==
 

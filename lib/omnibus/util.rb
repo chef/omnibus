@@ -155,18 +155,16 @@ module Omnibus
     #   Number of times to retry the given block.
     #
     def retry_block(logstr, retried_exceptions = [], retries = Omnibus::Config.fetcher_retries, &block)
-      begin
-        yield
-      rescue Exception => e
-        raise e unless retried_exceptions.any? { |eclass| e.is_a?(eclass) }
-        if retries != 0
-          log.info(log_key) { "Retrying failed #{logstr} due to #{e} (#{retries} retries left)..." }
-          retries -= 1
-          retry
-        else
-          log.error(log_key) { "#{logstr} failed - #{e.class}!" }
-          raise
-        end
+      yield
+    rescue Exception => e
+      raise e unless retried_exceptions.any? { |eclass| e.is_a?(eclass) }
+      if retries != 0
+        log.info(log_key) { "Retrying failed #{logstr} due to #{e} (#{retries} retries left)..." }
+        retries -= 1
+        retry
+      else
+        log.error(log_key) { "#{logstr} failed - #{e.class}!" }
+        raise
       end
     end
 
