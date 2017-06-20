@@ -394,7 +394,7 @@ module Omnibus
     #
     def local?(license)
       u = URI(license)
-      return u.scheme.nil?
+      u.scheme.nil?
     end
 
     #

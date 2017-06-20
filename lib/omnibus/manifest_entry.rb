@@ -38,7 +38,7 @@ module Omnibus
 
     def ==(other)
       if other.is_a?(ManifestEntry)
-        (self.to_hash == other.to_hash) && (self.name == other.name)
+        (to_hash == other.to_hash) && (name == other.name)
       end
     end
   end
