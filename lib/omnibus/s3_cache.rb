@@ -149,7 +149,7 @@ module Omnibus
         if Config.s3_profile
           config[:profile] = Config.s3_profile
         else
-          config[:access_key_id] = Config.s3_access_key,
+          config[:access_key_id] = Config.s3_access_key
           config[:secret_access_key] = Config.s3_secret_key
         end
 

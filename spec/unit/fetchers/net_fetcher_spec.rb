@@ -448,6 +448,10 @@ module Omnibus
           Config.cache_dir("/")
           stub_ohai(platform: "ubuntu", version: "12.04")
           stub_const("File::ALT_SEPARATOR", nil)
+
+          allow(Omnibus).to receive(:which)
+            .with("gtar")
+            .and_return(false)
         end
 
         context "when gtar is not present" do
@@ -479,8 +483,8 @@ module Omnibus
             stub_const("File::ALT_SEPARATOR", nil)
 
             allow(Omnibus).to receive(:which)
-            .with("gtar")
-            .and_return("/path/to/gtar")
+              .with("gtar")
+              .and_return("/path/to/gtar")
           end
 
           it_behaves_like "an extractor", "7z", {},
