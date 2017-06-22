@@ -1,6 +1,11 @@
 Omnibus CHANGELOG
 =================
 
+v5.6.1 (June 22, 2017)
+----------------------
+### Bug Fixes
+- S3 cache: fix bug using access_key_id/secret_access_key (#786)
+
 v5.6.0 (June 20, 2017)
 ----------------------
 ### New Features
