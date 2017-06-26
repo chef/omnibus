@@ -68,7 +68,7 @@ module Omnibus
 
     describe "with_standard_compiler_flags helper" do
       context "on ubuntu" do
-        before { stub_ohai(platform: "ubuntu", version: "12.04") }
+        before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -242,7 +242,7 @@ module Omnibus
       end
 
       context "on mac_os_x" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.9.2") }
+        before { stub_ohai(platform: "mac_os_x", version: "10.12") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -285,7 +285,7 @@ module Omnibus
 
       context "on freebsd 9" do
         before do
-          stub_ohai(platform: "freebsd", version: "9.2")
+          stub_ohai(platform: "freebsd", version: "9.3")
         end
 
         it "sets the defaults" do
@@ -323,7 +323,7 @@ module Omnibus
 
       context "on freebsd 10" do
         before do
-          stub_ohai(platform: "freebsd", version: "10.0")
+          stub_ohai(platform: "freebsd", version: "10.3")
         end
 
         it "Clang as the default compiler" do
@@ -383,7 +383,7 @@ module Omnibus
       context "on sles 12" do
         before do
           # sles identifies as suse
-          stub_ohai(platform: "suse", version: "12.1")
+          stub_ohai(platform: "suse", version: "12.2")
         end
 
         it "sets the defaults" do
@@ -403,7 +403,7 @@ module Omnibus
         let(:win_arch_i386) { true }
 
         before do
-          stub_ohai(platform: "windows", version: "2012")
+          stub_ohai(platform: "windows", version: "2012R2")
           allow(subject).to receive(:windows_arch_i386?).and_return(win_arch_i386)
         end
 
@@ -485,7 +485,7 @@ module Omnibus
 
       context "on Windows" do
         before do
-          stub_ohai(platform: "windows", version: "2012")
+          stub_ohai(platform: "windows", version: "2012R2")
         end
 
         let(:separator) { ";" }
@@ -525,7 +525,7 @@ module Omnibus
     end
 
     describe "#ohai" do
-      before { stub_ohai(platform: "ubuntu", version: "12.04") }
+      before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:ohai)

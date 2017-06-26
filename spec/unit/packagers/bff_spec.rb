@@ -373,7 +373,7 @@ module Omnibus
 
     describe "#safe_architecture" do
       before do
-        stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+        stub_ohai(platform: "ubuntu", version: "16.04") do |data|
           data["kernel"]["machine"] = "i386"
         end
       end
