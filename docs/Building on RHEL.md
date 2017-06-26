@@ -27,7 +27,7 @@ The following Project values are taken into consideration when building RPMs:
 - `runtime_dependency`
 - `url`
 
-These options are further described in the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
+These options are further described in the [`Project` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Project).
 
 These values are interpolated and evaluated using Omnibus' internal RPM templates. For 99% of users, these templates should be satisfactory. If you encounter an instance where Omnibus' RPM templates do not satisfy a use case, please open an issue.
 
@@ -67,9 +67,9 @@ Some DSL methods available include:
 | `priority`           | The priority for the package                |
 | `category`           | The category for this package               |
 
-If you are unfamilar with any of these terms, you should just accept the defaults. For more information on the purpose of any of these configuration options, please see the RPM spec.
+If you are unfamiliar with any of these terms, you should just accept the defaults. For more information on the purpose of any of these configuration options, please see the RPM spec.
 
-For more information, please see the [`Packager::RPM` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Packager/RPM).
+For more information, please see the [`Packager::RPM` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Packager/RPM).
 
 ### Notes on RPM-signing
 To sign an RPM, you will need a GPG keypair. You can [create your own signing key](http://www.madboa.com/geek/gpg-quickstart/) or [import an existing one](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/gpg-cs.html). Omnibus automatically generates an `.rpmmacros` config file for `rpmbuild` that assumes that the real name associated to the GPG key is the same as the name of the project maintainer as specified in your Omnibus config. You can override this by creating your own `.rpmmacros` using the steps above.

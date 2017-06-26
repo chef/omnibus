@@ -54,4 +54,4 @@ Some DSL methods available include:
 | **`upgrade_code`** | The unique GUID for this package                |
 | `parameters`       | And arbirtary list of key-value pairs to render |
 
-For more information, please see the [`Packager::MSI` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Packager/MSI).
+For more information, please see the [`Packager::MSI` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Packager/MSI).
