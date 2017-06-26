@@ -5,7 +5,7 @@ This document details the steps and configurables for building omnibus packages 
 
 Building a .pkg
 ---------------
-In Mac OS X, a `.pkg` is a special file that is read by Installer.app that contains the set of instructions for installating a piece of software on a target system.
+In Mac OS X, a `.pkg` is a special file that is read by Installer.app that contains the set of instructions for installing a piece of software on a target system.
 
 ### Requirements
 By default, Omnibus does not generate pkg-related assets. To generate the pkg assets, run the Omnibus new command with the `--pkg-assets` flag:
@@ -89,4 +89,4 @@ Some DSL methods available include:
 | `window_bounds`    | The size and location of the DMG window     |
 | `pkg_position`     | The position of the pkg inside the DMG      |
 
-For more information, please see the [`Compressor::DMG` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Compressor/DMG).
+For more information, please see the [`Compressor::DMG` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Compressor/DMG).

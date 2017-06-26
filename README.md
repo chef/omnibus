@@ -83,7 +83,7 @@ s3_secret_key  ENV['S3_SECRET_KEY']
 s3_bucket      ENV['S3_BUCKET']
 ```
 
-For more information, please see the [`Config` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Config).
+For more information, please see the [`Config` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Config).
 
 You can tell Omnibus to load a different configuration file by passing the `--config` option to any command:
 
@@ -129,7 +129,7 @@ DSL Method        | Description
 
 By default a timestamp is appended to the build_version. You can turn this behavior off by setting `append_timestamp` to `false` in your configuration file or using `--override append_timestamp:false` at the command line.
 
-For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
+For more information, please see the [`Project` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Project).
 
 ### Software
 
