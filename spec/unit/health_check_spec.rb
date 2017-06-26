@@ -30,11 +30,11 @@ module Omnibus
 
     context "on windows" do
       before do
-        stub_ohai(platform: "windows", version: "2012")
+        stub_ohai(platform: "windows", version: "2012R2")
       end
 
       it "will perform dll base relocation checks" do
-        stub_ohai(platform: "windows", version: "2012")
+        stub_ohai(platform: "windows", version: "2012R2")
         expect(subject.relocation_checkable?).to be true
       end
 
@@ -101,7 +101,7 @@ module Omnibus
     end
 
     context "on linux" do
-      before { stub_ohai(platform: "ubuntu", version: "12.04") }
+      before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
       let(:bad_healthcheck) do
         double("Mixlib::Shellout",

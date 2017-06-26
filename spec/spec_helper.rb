@@ -72,7 +72,7 @@ RSpec.configure do |config|
     FileUtils.mkdir_p(tmp_path)
 
     # Don't run Ohai - tests can still override this
-    stub_ohai(platform: "ubuntu", version: "12.04")
+    stub_ohai(platform: "ubuntu", version: "16.04")
 
     # Default to real HTTP requests
     WebMock.allow_net_connect!

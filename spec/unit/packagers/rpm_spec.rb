@@ -35,7 +35,7 @@ module Omnibus
       create_directory("#{staging_dir}/SOURCES")
       create_directory("#{staging_dir}/SPECS")
 
-      stub_ohai(platform: "redhat", version: "6.5") do |data|
+      stub_ohai(platform: "redhat", version: "6.9") do |data|
         data["kernel"]["machine"] = architecture
       end
     end
@@ -533,7 +533,7 @@ module Omnibus
 
     describe "#safe_architecture" do
       before do
-        stub_ohai(platform: "redhat", version: "6.5") do |data|
+        stub_ohai(platform: "redhat", version: "6.9") do |data|
           data["kernel"]["machine"] = "i386"
         end
       end
@@ -544,7 +544,7 @@ module Omnibus
 
       context "when i686" do
         before do
-          stub_ohai(platform: "redhat", version: "6.5") do |data|
+          stub_ohai(platform: "redhat", version: "6.9") do |data|
             data["kernel"]["machine"] = "i686"
           end
         end
@@ -557,9 +557,9 @@ module Omnibus
       context "on Pidora" do
         before do
           # There's no Pidora in Fauxhai :(
-          stub_ohai(platform: "fedora", version: "20") do |data|
+          stub_ohai(platform: "fedora", version: "25") do |data|
             data["platform"] = "pidora"
-            data["platform_version"] = "20"
+            data["platform_version"] = "25"
             data["kernel"]["machine"] = "armv6l"
           end
         end

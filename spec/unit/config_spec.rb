@@ -50,7 +50,7 @@ module Omnibus
     describe "#workers" do
       context "when the Ohai data is not present" do
         before do
-          stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
             data["cpu"] = nil
           end
         end
@@ -62,7 +62,7 @@ module Omnibus
 
       context "when the Ohai data is present" do
         before do
-          stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
             data["cpu"] = { "total" => "5" }
           end
         end
@@ -74,7 +74,7 @@ module Omnibus
     end
 
     context "on Windows" do
-      before { stub_ohai(platform: "windows", version: "2012") }
+      before { stub_ohai(platform: "windows", version: "2012R2") }
 
       include_examples "a configurable", :base_dir, "C:/omnibus-ruby"
       include_examples "a configurable", :cache_dir, "C:/omnibus-ruby/cache"
