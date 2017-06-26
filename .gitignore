@@ -52,6 +52,7 @@ $RECYCLE.BIN/
 /test/version_tmp/
 /tmp/
 /spec/tmp
+gem_graph.png
 
 ## Specific to RubyMotion:
 .dat*

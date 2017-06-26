@@ -1,11 +1,12 @@
 version: "{build}"
 
-os: Windows Server 2012
+os: Windows Server 2012 R2
 platform:
   - x64
 
 environment:
   matrix:
+    - RUBY_VERSION: 24
     - RUBY_VERSION: 23
     - RUBY_VERSION: 22
 
