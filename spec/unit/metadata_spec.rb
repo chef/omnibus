@@ -85,7 +85,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
           sha256:   "abcd1234",
           sha512:   "abcdef123456",
           platform: "ubuntu",
-          platform_version: "12.04",
+          platform_version: "16.04",
           arch: "x86_64",
           name: "some-project",
           friendly_name: "Some Project",
@@ -130,7 +130,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       let(:architecture) { "x86_64" }
 
       before do
-        stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+        stub_ohai(platform: "ubuntu", version: "16.04") do |data|
           data["kernel"]["machine"] = architecture
         end
       end
@@ -180,17 +180,17 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
     describe ".platform_shortname" do
       it "returns el on rhel" do
-        stub_ohai(platform: "redhat", version: "6.4")
+        stub_ohai(platform: "redhat", version: "6.9")
         expect(described_class.platform_shortname).to eq("el")
       end
 
       it "returns sles on suse" do
-        stub_ohai(platform: "suse", version: "12.0")
+        stub_ohai(platform: "suse", version: "12.2")
         expect(described_class.platform_shortname).to eq("sles")
       end
 
       it "returns .platform on all other systems" do
-        stub_ohai(platform: "ubuntu", version: "12.04")
+        stub_ohai(platform: "ubuntu", version: "16.04")
         expect(described_class.platform_shortname).to eq("ubuntu")
       end
     end
@@ -199,7 +199,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       shared_examples "a version manipulator" do |platform_shortname, version, expected|
         context "on #{platform_shortname}-#{version}" do
           it "returns the correct value" do
-            stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+            stub_ohai(platform: "ubuntu", version: "16.04") do |data|
               data["platform"] = platform_shortname
               data["platform_version"] = version
             end
@@ -247,7 +247,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
       context "given an unknown platform" do
         before do
-          stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
             data["platform"] = "bacon"
             data["platform_version"] = "1.crispy"
           end
@@ -261,7 +261,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
       context "given an unknown windows platform version" do
         before do
-          stub_ohai(platform: "ubuntu", version: "12.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
             data["platform"] = "windows"
             data["platform_version"] = "1.2.3"
           end

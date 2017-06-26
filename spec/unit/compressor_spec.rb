@@ -4,7 +4,7 @@ module Omnibus
   describe Compressor do
     describe ".for_current_system" do
       context "on Mac OS X" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.9.2") }
+        before { stub_ohai(platform: "mac_os_x", version: "10.12") }
 
         context "when :dmg is activated" do
           it "prefers dmg" do
@@ -26,7 +26,7 @@ module Omnibus
       end
 
       context "on Ubuntu" do
-        before { stub_ohai(platform: "ubuntu", version: "14.04") }
+        before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
         context "when :tgz activated" do
           it "prefers tgz" do

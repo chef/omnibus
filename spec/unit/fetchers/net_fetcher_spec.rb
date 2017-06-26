@@ -369,7 +369,7 @@ module Omnibus
 
         before do
           Config.cache_dir("C:/")
-          stub_ohai(platform: "windows", version: "2012")
+          stub_ohai(platform: "windows", version: "2012R2")
           allow(Dir).to receive(:mktmpdir).and_yield("C:/tmp_dir")
         end
 
@@ -446,7 +446,7 @@ module Omnibus
       context "on Linux" do
         before do
           Config.cache_dir("/")
-          stub_ohai(platform: "ubuntu", version: "12.04")
+          stub_ohai(platform: "ubuntu", version: "16.04")
           stub_const("File::ALT_SEPARATOR", nil)
 
           allow(Omnibus).to receive(:which)
@@ -479,7 +479,7 @@ module Omnibus
           before do
             Config.cache_dir("/")
 
-            stub_ohai(platform: "ubuntu", version: "12.04")
+            stub_ohai(platform: "ubuntu", version: "16.04")
             stub_const("File::ALT_SEPARATOR", nil)
 
             allow(Omnibus).to receive(:which)
