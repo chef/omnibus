@@ -333,6 +333,13 @@ module Omnibus
     # @return [Integer]
     default(:publish_retries, 2)
 
+    # Directory pattern for publisher. Interpolation of matadata keys are supported.
+    #
+    # @example 'custom_prefix/%{platform}/%{platform_version}/%{arch}/%{basename}'
+    #
+    # @return [String]
+    default(:publish_dir_pattern, nil)
+
     # --------------------------------------------------
     # @!endgroup
     #

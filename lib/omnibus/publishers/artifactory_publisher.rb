@@ -260,7 +260,7 @@ module Omnibus
     # and the package metadata.
     #
     # @example
-    #   chef/11.6.0/chef-11.6.0-1.el6.x86_64.rpm
+    #   com/getchef/chef/11.6.0/ubuntu/14.04/chef-11.6.0-1.el6.x86_64.rpm
     #
     # @param [Package] package
     #   the package to generate the remote path for
@@ -268,13 +268,10 @@ module Omnibus
     # @return [String]
     #
     def remote_path_for(package)
+      pattern = Config.publish_dir_pattern || "%{name}/%{version}/%{platform}/%{platform_version}/%{basename}"
       File.join(
         Config.artifactory_base_path,
-        package.metadata[:name],
-        package.metadata[:version],
-        package.metadata[:platform],
-        package.metadata[:platform_version],
-        package.metadata[:basename]
+        pattern % package.metadata
       )
     end
   end
