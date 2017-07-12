@@ -57,6 +57,8 @@ module Omnibus
         config[:access_key_id]      = Config.publish_s3_access_key
         config[:secret_access_key]  = Config.publish_s3_secret_key
       end
+
+      config
     end
 
     #
