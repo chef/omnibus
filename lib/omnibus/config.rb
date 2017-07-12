@@ -277,7 +277,7 @@ module Omnibus
 
     # The S3 access key to use with S3 caching.
     #
-    # @return [String]
+    # @return [String, nil]
     default(:s3_access_key) do
       if s3_profile
         nil
@@ -299,7 +299,7 @@ module Omnibus
 
     # The AWS credentials profile to use with S3 caching.
     #
-    # @return [String]
+    # @return [String, nil]
     default(:s3_profile, nil)
 
     # The region of the S3 bucket you want to cache software artifacts in.
@@ -411,9 +411,9 @@ module Omnibus
 
     # The S3 access key to use for S3 artifact release.
     #
-    # @return [String]
+    # @return [String, nil]
     default(:publish_s3_access_key) do
-      if s3_profile
+      if publish_s3_profile
         nil
       else
         raise MissingRequiredAttribute.new(self, :publish_s3_access_key, "'ABCD1234'")
@@ -422,14 +422,19 @@ module Omnibus
 
     # The S3 secret key to use for S3 artifact release
     #
-    # @return [String]
+    # @return [String, nil]
     default(:publish_s3_secret_key) do
-      if s3_profile
+      if publish_s3_profile
         nil
       else
         raise MissingRequiredAttribute.new(self, :publish_s3_secret_key, "'EFGH5678'")
       end
     end
+
+    # The AWS credentials profile to use with S3 publisher.
+    #
+    # @return [String, nil]
+    default(:publish_s3_profile, nil)
 
     # --------------------------------------------------
     # @!endgroup
