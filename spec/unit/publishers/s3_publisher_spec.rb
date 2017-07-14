@@ -100,9 +100,9 @@ module Omnibus
         end
       end
 
-      context "when the custom publish_dir_pattern is set" do
+      context "when the custom s3_publish_pattern is set" do
         before do
-          Config.publish_dir_pattern("custom_prefix/%{name}/%{version}/%{platform}/%{platform_version}")
+          Config.s3_publish_pattern("custom_prefix/%{name}/%{version}/%{platform}/%{platform_version}")
         end
 
         it "uploads the package to the provided path" do
