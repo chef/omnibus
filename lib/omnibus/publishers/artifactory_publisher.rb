@@ -268,10 +268,9 @@ module Omnibus
     # @return [String]
     #
     def remote_path_for(package)
-      pattern = Config.publish_dir_pattern || "%{name}/%{version}/%{platform}/%{platform_version}/%{basename}"
       File.join(
         Config.artifactory_base_path,
-        pattern % package.metadata
+        Config.artifactory_publish_pattern % package.metadata
       )
     end
   end

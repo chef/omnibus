@@ -76,9 +76,8 @@ module Omnibus
     # @return [String]
     #
     def key_for(package, *stuff)
-      pattern = Config.publish_dir_pattern || "%{platform}/%{platform_version}/%{arch}/%{basename}"
       File.join(
-        pattern % package.metadata,
+        Config.s3_publish_pattern % package.metadata,
         *stuff
       )
     end

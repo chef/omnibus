@@ -249,9 +249,9 @@ module Omnibus
         end
       end
 
-      context "custom publish_dir_pattern is set" do
+      context "custom artifactory_publish_pattern is set" do
         before do
-          Config.publish_dir_pattern("%{platform}/%{platform_version}/%{arch}/%{basename}")
+          Config.artifactory_publish_pattern("%{platform}/%{platform_version}/%{arch}/%{basename}")
         end
 
         it "uploads the package to the provided path" do
