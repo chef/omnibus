@@ -100,6 +100,23 @@ module Omnibus
         end
       end
 
+      context "when the custom publish_dir_pattern is set" do
+        before do
+          Config.publish_dir_pattern("custom_prefix/%{name}/%{version}/%{platform}/%{platform_version}")
+        end
+
+        it "uploads the package to the provided path" do
+          expect(subject).to receive(:store_object).with(
+            "custom_prefix/chef/11.0.6/ubuntu/14.04/chef.deb.metadata.json",
+            FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
+            nil,
+            "private"
+          ).once
+
+          subject.publish
+        end
+      end
+
       context "when a block is given" do
         it "yields the package to the block" do
           block = ->(package) { package.do_something! }
