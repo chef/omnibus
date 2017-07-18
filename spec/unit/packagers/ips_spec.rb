@@ -1,5 +1,4 @@
 require "spec_helper"
-require "pry"
 
 module Omnibus
   describe Packager::IPS do
@@ -171,18 +170,23 @@ module Omnibus
         expect(manifest_file_contents).to include("set name=variant.arch value=i386")
       end
 
-      context "when symlinks.erb exists" do
+      context "when both symlinks.erb and project-symlinks.erb exists" do
         before do
           FileUtils.mkdir_p(resources_path)
           allow(subject).to receive(:resources_path).and_return(resources_path)
-          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+          File.open(File.join(resources_path, "project-symlinks.erb"), "w+") do |f|
             f.puts("link path=usr/bin/ohai target=<%= projectdir %>/bin/ohai")
             f.puts("link path=<%= projectdir %>/bin/gmake target=<%= projectdir %>/embedded/bin/make")
           end
+          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/knife target=<%= projectdir %>/bin/knife")
+            f.puts("link path=<%= projectdir %>/bin/berks target=<%= projectdir %>/embedded/bin/berks")
+          end
         end
 
-        it "should append symlinks to metadata contents" do
+        it "should render project-symlinks.erb and append to metadata contents" do
           subject.write_pkg_metadata
+          expect(subject.symlinks_file).to eq("project-symlinks.erb")
           expect(File.exist?(manifest_file)).to be(true)
           manifest_file_contents = File.read(manifest_file)
           expect(manifest_file_contents).to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
@@ -190,12 +194,34 @@ module Omnibus
         end
       end
 
-      context "when symlinks.erb does not exist" do
+      context "when only symlinks.erb exists" do
+        before do
+          FileUtils.mkdir_p(resources_path)
+          allow(subject).to receive(:resources_path).and_return(resources_path)
+          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/knife target=<%= projectdir %>/bin/knife")
+            f.puts("link path=<%= projectdir %>/bin/berks target=<%= projectdir %>/embedded/bin/berks")
+          end
+        end
+
+        it "should render symlinks.erb and append to metadata contents" do
+          subject.write_pkg_metadata
+          expect(subject.symlinks_file).to eq("symlinks.erb")
+          expect(File.exist?(manifest_file)).to be(true)
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).to include("link path=usr/bin/knife target=/opt/project/bin/knife")
+          expect(manifest_file_contents).to include("link path=/opt/project/bin/berks target=/opt/project/embedded/bin/berks")
+        end
+      end
+
+      context "when symlinks_file does not exist" do
         it "#write_pkg_metadata does not include symlinks" do
           subject.write_pkg_metadata
           manifest_file = File.join(staging_dir, "gen.manifestfile")
           manifest_file_contents = File.read(manifest_file)
+          expect(subject.symlinks_file).to be_nil
           expect(manifest_file_contents).not_to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+          expect(manifest_file_contents).not_to include("link path=usr/bin/knife target=/opt/project/bin/knife")
         end
       end
     end
