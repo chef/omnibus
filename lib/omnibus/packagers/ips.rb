@@ -214,17 +214,32 @@ module Omnibus
     end
 
     #
+    # The name of the project specific template if it exists
+    # The resource exists locally. For example for project omnibus-toolchain
+    # resource_path("#{safe_base_package_name}-symlinks.erb") #=>
+    # {"/path/to/omnibus-toolchain/resources/omnibus-toolchain/ips/omnibus-toolchain-symlinks.erb"}
+    # OR {"/path/to/omnibus-toolchain/resources/omnibus-toolchain/ips/symlinks.erb"}
+    #
+    # @return [String]
+    #
+    def symlinks_file
+      if File.exists?(resource_path("#{safe_base_package_name}-symlinks.erb"))
+        "#{safe_base_package_name}-symlinks.erb"
+      elsif File.exists?(resource_path("symlinks.erb"))
+        "symlinks.erb"
+      end
+    end
+
+    #
     # A set of symbolic links to installed commands that
     #`pkgmogrify' will apply to the package manifest. Is called only when
-    # symlinks.erb template exists
-    # The resource exists locally. For example for project omnibus-toolchain
-    # resource_path("symlinks.erb") #=>
-    # {"/path/to/omnibus-toolchain/resources/omnibus-toolchain/ips/symlinks.erb"}
+    # "#{safe_base_package_name}-symlinks.erb" or "symlinks.erb" template resource
+    # exists locally
     #
     # @return [String]
     #
     def render_symlinks
-      render_template_content(resource_path("symlinks.erb"),
+      render_template_content(resource_path(symlinks_file),
         {
           projectdir: project.install_dir,
         }
@@ -250,8 +265,8 @@ module Omnibus
         }
       )
 
-      # Append the contents of symlinks.erb if it exists
-      if File.exists?(resource_path("symlinks.erb"))
+      # Append the contents of symlinks_file if it exists
+      if symlinks_file
         File.open(pkg_metadata_file, "a") do |symlink|
           symlink.write(render_symlinks)
         end
