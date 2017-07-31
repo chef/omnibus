@@ -65,19 +65,19 @@ module Omnibus
     # The unique upload key for this package. The additional "stuff" is
     # postfixed to the end of the path.
     #
+    # @example
+    #   'el/6/x86_64/chef-11.6.0-1.el6.x86_64.rpm/chef-11.6.0-1.el6.x86_64.rpm'
+    #
     # @param [Package] package
     #   the package this key is for
     # @param [Array<String>] stuff
-    #   the additional things to prepend
+    #   the additional things to append
     #
     # @return [String]
     #
     def key_for(package, *stuff)
       File.join(
-        package.metadata[:platform],
-        package.metadata[:platform_version],
-        package.metadata[:arch],
-        package.name,
+        Config.s3_publish_pattern % package.metadata,
         *stuff
       )
     end

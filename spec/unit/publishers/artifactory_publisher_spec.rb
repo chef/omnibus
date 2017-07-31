@@ -248,6 +248,22 @@ module Omnibus
           subject.publish
         end
       end
+
+      context "custom artifactory_publish_pattern is set" do
+        before do
+          Config.artifactory_publish_pattern("%{platform}/%{platform_version}/%{arch}/%{basename}")
+        end
+
+        it "uploads the package to the provided path" do
+          expect(artifact).to receive(:upload).with(
+            repository,
+            "com/getchef/ubuntu/14.04/x86_64/chef.deb",
+            hash_including(metadata_json_properites)
+          ).once
+
+          subject.publish
+        end
+      end
     end
 
     describe "#metadata_properties_for" do

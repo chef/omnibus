@@ -371,6 +371,14 @@ module Omnibus
       raise MissingRequiredAttribute.new(self, :artifactory_base_path, "'com/mycompany'")
     end
 
+    # Directory pattern for the Artifactory publisher.
+    # Interpolation of metadata keys is supported.
+    #
+    # @example '%{platform}/%{platform_version}/%{arch}/%{basename}'
+    #
+    # @return [String]
+    default(:artifactory_publish_pattern, "%{name}/%{version}/%{platform}/%{platform_version}/%{basename}")
+
     # The path on disk to an SSL pem file to sign requests with.
     #
     # @return [String, nil]
@@ -435,6 +443,14 @@ module Omnibus
     #
     # @return [String, nil]
     default(:publish_s3_profile, nil)
+
+    # Directory pattern for the S3 publisher.
+    # Interpolation of metadata keys is supported.
+    #
+    # @example '%{platform}/%{platform_version}/%{arch}/%{basename}'
+    #
+    # @return [String]
+    default(:s3_publish_pattern, "%{platform}/%{platform_version}/%{arch}/%{basename}")
 
     # --------------------------------------------------
     # @!endgroup
