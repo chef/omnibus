@@ -40,6 +40,18 @@ module Omnibus
       end
     end
 
+    describe "#python" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:python)
+      end
+    end
+
+    describe "#setup_py" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:setup_py)
+      end
+    end
+
     describe "#ruby" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:ruby)

@@ -149,6 +149,32 @@ module Omnibus
       end
     end
 
+    describe "#python" do
+      it "executes the command as the embdedded python", python: true do
+        python = File.join(scripts_dir, "setup.py")
+        File.open(python, "w") do |f|
+          f.write <<-EOH.gsub(/^ {12}/, "")
+            with open("#{software.install_dir}/test.txt", "w") as f:
+              f.write("This is content!")
+          EOH
+        end
+
+        # python is a lot less likely to be on a box running these tests..
+        begin
+          fake_embedded_bin("python")
+        rescue
+          skip
+        end
+
+        subject.python(python, env: subject.with_embedded_path)
+        subject.build
+
+        path = "#{software.install_dir}/test.txt"
+        expect(path).to be_a_file
+        expect(File.read(path)).to eq("This is content!")
+      end
+    end
+
     describe "#ruby" do
       it "executes the command as the embdedded ruby" do
         ruby = File.join(scripts_dir, "setup.rb")
