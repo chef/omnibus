@@ -11,6 +11,15 @@ require "rspec/core/rake_task"
   end
 end
 
+RSpec::Core::RakeTask.new(:func_py) do |t|
+  t.pattern = "spec/functional/**/*_spec.rb"
+  t.rspec_opts = [].tap do |a|
+    a.push("--color")
+    a.push("--format progress")
+    a.push("--tag python")
+  end.join(" ")
+end
+
 require "cucumber/rake/task"
 Cucumber::Rake::Task.new(:acceptance) do |t|
   t.cucumber_opts = [].tap do |a|

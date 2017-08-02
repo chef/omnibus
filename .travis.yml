@@ -16,6 +16,18 @@ before_script:
   - git config --global user.email "clouseau@chef.io"
   - git config --global user.name "Pink Panther"
 script: bundle exec rake travis:ci
+matrix:
+  include:
+    - python: '2.7'
+      language: python
+      install: true
+      before_install:
+        - rvm default
+        - gem update --system
+        - gem install bundler
+        - bundle install
+      script:
+        - bundle exec rake func_py
 notifications:
   slack:
     on_change: true

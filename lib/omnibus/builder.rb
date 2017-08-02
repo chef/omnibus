@@ -296,6 +296,51 @@ module Omnibus
     # --------------------------------------------------
 
     #
+    # @!group Python DSL methods
+    #
+    # The following DSL methods are available from within build blocks and
+    # expose Python DSL methods.
+    # --------------------------------------------------
+
+    #
+    # Execute the given Python command or script against the embedded Python.
+    #
+    # @example
+    #   python "import socket; socket.gethostbyname('google.com')"
+    #
+    # @param (see #command)
+    # @return (see #command)
+    #
+    def python(command, options = {})
+      build_commands << BuildCommand.new("python `#{command}'") do
+        bin = embedded_bin("python")
+        shellout!("#{bin} #{command}", options)
+      end
+    end
+    expose :python
+
+    #
+    # Execute the given setup.py command against the embedded Python.
+    #
+    # @example
+    #   setup_py 'configure --zmq="#{install_dir}/embedded"'
+    #
+    # @param (see #command)
+    # @return (see #command)
+    #
+    def setup_py(command, options = {})
+      build_commands << BuildCommand.new("python setup.py `#{command}'") do
+        bin = embedded_bin("python setup.py")
+        shellout!("#{bin} #{command}", options)
+      end
+    end
+    expose :setup_py
+
+    #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
     # @!group Ruby DSL methods
     #
     # The following DSL methods are available from within build blocks and
