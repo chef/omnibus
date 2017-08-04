@@ -49,7 +49,7 @@ module Omnibus
     #   have already removed anything extraneous.
     #
     def clean
-      return true
+      true
     end
 
     #
@@ -114,11 +114,9 @@ module Omnibus
     # @return [String]
     #
     def target_shasum
-      begin
-        @target_shasum ||= digest(target_file, :sha256)
-      rescue Errno::ENOENT
-        @target_shasum = 0
-      end
+      @target_shasum ||= digest(target_file, :sha256)
+    rescue Errno::ENOENT
+      @target_shasum = 0
     end
 
     #
