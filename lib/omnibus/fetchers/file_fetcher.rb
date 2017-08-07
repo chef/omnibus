@@ -19,7 +19,7 @@ require "fileutils"
 module Omnibus
   class FileFetcher < Fetcher
     #
-    # Fetch if the local directory checksum is different than the path directory
+    # Fetch if the local file checksum is different than the path file
     # checksum.
     #
     # @return [true, false]
@@ -29,8 +29,8 @@ module Omnibus
     end
 
     #
-    # The version identifier for this path. This is computed using the path
-    # on disk to the source and the recursive shasum of that path on disk.
+    # The version identifier for this file. This is computed using the file
+    # on disk to the source and the shasum of that file on disk.
     #
     # @return [String]
     #
@@ -68,7 +68,7 @@ module Omnibus
     end
 
     #
-    # The version for this item in the cache. The is the shasum of the directory
+    # The version for this item in the cache. The is the shasum of the file
     # on disk.
     #
     # This method is called *before* clean but *after* fetch. Since fetch
@@ -109,18 +109,18 @@ module Omnibus
     end
 
     #
-    # The shasum of the directory **inside** the project.
+    # The shasum of the file **inside** the project.
     #
-    # @return [String]
+    # @return [String, nil]
     #
     def target_shasum
       @target_shasum ||= digest(target_file, :sha256)
     rescue Errno::ENOENT
-      @target_shasum = 0
+      @target_shasum = nil
     end
 
     #
-    # The shasum of the directory **outside** of the project.
+    # The shasum of the file **outside** of the project.
     #
     # @return [String]
     #
