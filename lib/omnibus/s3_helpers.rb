@@ -38,6 +38,7 @@ module Omnibus
       #     bucket_name:              Config.s3_bucket,
       #     endpoint:                 Config.s3_endpoint,
       #     use_accelerate_endpoint:  Config.s3_accelerate
+      #     force_path_style:         Config.s3_force_path_style
       #   }
       #
       # @return [Hash<String, String>]
@@ -68,6 +69,7 @@ module Omnibus
       def resource_params
         params = {
           use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint],
+          force_path_style: s3_configuration[:force_path_style],
         }
 
         if s3_configuration[:use_accelerate_endpoint]

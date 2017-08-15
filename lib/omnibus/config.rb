@@ -315,6 +315,11 @@ module Omnibus
     # @return [String, nil]
     default(:s3_endpoint, nil)
 
+    # Use path style URLs instead of subdomains for S3 URLs
+    #
+    # @return [true, false]
+    default(:s3_force_path_style, false)
+
     # Enable or disable S3 Accelerate support
     #
     # @return [true, false]
