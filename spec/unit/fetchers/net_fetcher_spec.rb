@@ -200,6 +200,17 @@ module Omnibus
           end
         end
 
+        context "custom endpoint with path style urls" do
+          before do
+            Config.s3_force_path_style(true)
+            Config.s3_endpoint("http://example.com")
+          end
+
+          it "returns the url using path style" do
+            expect(subject.send(:download_url)).to eq("http://example.com/mybucket/file-1.2.3-abcd1234")
+          end
+        end
+
         context "s3 transfer acceleration" do
           before { Config.s3_accelerate(true) }
 
