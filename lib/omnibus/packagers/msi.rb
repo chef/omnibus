@@ -88,11 +88,14 @@ module Omnibus
       candle_vars = ''
       wxs_list = ''
       wixobj_list = ''
-      if File.directory?("#{Config.source_dir}\\extra_package_files")
-        # Let's collect the DirectoryRefs
-        Dir.foreach("#{Config.source_dir}\\extra_package_files") do |item|
-          next if item == '.' or item == '..'
-          dir_refs.push(item)
+      
+      if not extra_package_files.nil?
+        if File.directory?(extra_package_files)
+          # Let's collect the DirectoryRefs
+          Dir.foreach(extra_package_files) do |item|
+            next if item == '.' or item == '..'
+            dir_refs.push(item)
+          end
         end
       end
 
@@ -105,7 +108,7 @@ module Omnibus
         dir_refs.each do |dirref|
           shellout! <<-EOH.split.join(' ').squeeze(' ').strip
             heat.exe dir
-              "#{windows_safe_path("#{Config.source_dir}\\extra_package_files\\#{dirref}")}"
+              "#{windows_safe_path("#{extra_package_files}\\#{dirref}")}"
               -nologo -srd -gg -cg Extra#{dirref}
               -dr #{dirref}
               -var "var.Extra#{dirref}"
@@ -113,7 +116,7 @@ module Omnibus
           EOH
 
           candle_vars += "-dExtra#{dirref}=\""\
-            "#{windows_safe_path("#{Config.source_dir}\\extra_package_files\\#{dirref}")}"\
+            "#{windows_safe_path("#{extra_package_files}\\#{dirref}")}"\
             "\" "
           wxs_list += "extra-#{dirref}.wxs "
           wixobj_list += "extra-#{dirref}.wixobj "
@@ -176,6 +179,17 @@ module Omnibus
     end
     expose :upgrade_code
 
+    def extra_package_files(val = NULL)
+      if null?(val)
+        @extra_package_files || nil
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:extra_package_files, "be a String")
+        end
+        @extra_package_files = val
+      end
+    end
+    expose :extra_package_files
     #
     # Set or retrieve the custom msi building parameters.
     #
