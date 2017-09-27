@@ -39,6 +39,7 @@ package :deb do
   license 'Apache 2.0'
   priority 'extra'
   section 'databases'
+  signing_passphrase 'acbd1234'
 end
 ```
 
@@ -46,6 +47,7 @@ Some DSL methods available include:
 
 | DSL Method           | Description                                 |
 | :------------------: | --------------------------------------------|
+| `signing_passphrase` | The passphrase to sign the RPM with         |
 | `vendor`             | The name of the package producer            |
 | `license`            | The default license for the package         |
 | `priority`           | The priority for the package                |
@@ -56,4 +58,4 @@ If you are unfamiliar with any of these terms, you should just accept the defaul
 For more information, please see the [`Packager::DEB` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Packager/DEB).
 
 ### Notes on DEB-signing
-At this time, signing Debian packages is not supported.
+To sign an DEB, you will need a GPG keypair. You can [create your own signing key](http://www.madboa.com/geek/gpg-quickstart/) or [import an existing one](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/gpg-cs.html). Omnibus will automatically call `gpg` with arguments that assume the real name associated to the GPG key is the same as the name of the project maintainer as specified in your Omnibus config.
