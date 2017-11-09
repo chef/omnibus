@@ -345,6 +345,7 @@ module Omnibus
         before do
           # sles identifies as suse
           stub_ohai(platform: "suse", version: "11.4")
+          allow(subject).to receive(:which).with("gcc-4.8").and_return(false)
         end
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -384,6 +385,7 @@ module Omnibus
         before do
           # sles identifies as suse
           stub_ohai(platform: "suse", version: "12.2")
+          allow(subject).to receive(:which).with("gcc-4.8").and_return(false)
         end
 
         it "sets the defaults" do
