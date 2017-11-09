@@ -928,6 +928,7 @@ module Omnibus
       original = ENV.to_hash
 
       ENV.delete("_ORIGINAL_GEM_PATH")
+      ENV.delete_if { |k, _| k.start_with?("BUNDLER_") }
       ENV.delete_if { |k, _| k.start_with?("BUNDLE_") }
       ENV.delete_if { |k, _| k.start_with?("GEM_") }
       ENV.delete_if { |k, _| k.start_with?("RUBY") }
