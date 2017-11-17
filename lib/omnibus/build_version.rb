@@ -125,8 +125,8 @@ module Omnibus
     end
 
     # We'll attempt to retrieve the timestamp from the Jenkin's set BUILD_TIMESTAMP
-    # environment variable. This will ensure platform specfic packages for the
-    # same build will share the same timestamp.
+    # or fall back to BUILD_ID environment variable. This will ensure platform specfic
+    # packages for the same build will share the same timestamp.
     def build_start_time
       @build_start_time ||= begin
                               if ENV["BUILD_TIMESTAMP"]
@@ -134,6 +134,15 @@ module Omnibus
                                   Time.strptime(ENV["BUILD_TIMESTAMP"], "%Y-%m-%d_%H-%M-%S")
                                 rescue ArgumentError
                                   error_message =  "BUILD_TIMESTAMP environment variable "
+                                  error_message << "should be in YYYY-MM-DD_hh-mm-ss "
+                                  error_message << "format."
+                                  raise ArgumentError, error_message
+                                end
+                              elsif ENV["BUILD_ID"]
+                                begin
+                                  Time.strptime(ENV["BUILD_ID"], "%Y-%m-%d_%H-%M-%S")
+                                rescue ArgumentError
+                                  error_message =  "BUILD_ID environment variable "
                                   error_message << "should be in YYYY-MM-DD_hh-mm-ss "
                                   error_message << "format."
                                   raise ArgumentError, error_message
