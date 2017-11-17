@@ -112,13 +112,13 @@ module Omnibus
         expect(build_version.semver).to match(/11.0.0-alpha1\+#{today_string}[0-9]+.git.207.694b062/)
       end
 
-      it "uses ENV['BUILD_ID'] to generate timestamp if set" do
-        stub_env("BUILD_ID", "2012-12-25_16-41-40")
+      it "uses ENV['BUILD_TIMESTAMP'] to generate timestamp if set" do
+        stub_env("BUILD_TIMESTAMP", "2012-12-25_16-41-40")
         expect(build_version.semver).to eq("11.0.0-alpha1+20121225164140.git.207.694b062")
       end
 
-      it "fails on invalid ENV['BUILD_ID'] values" do
-        stub_env("BUILD_ID", "AAAA")
+      it "fails on invalid ENV['BUILD_TIMESTAMP'] values" do
+        stub_env("BUILD_TIMESTAMP", "AAAA")
         expect { build_version.semver }.to raise_error(ArgumentError)
       end
 
