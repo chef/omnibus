@@ -124,7 +124,7 @@ module Omnibus
       build_tag
     end
 
-    # We'll attempt to retrive the timestamp from the Jenkin's set BUILD_TIMESTAMP
+    # We'll attempt to retrieve the timestamp from the Jenkin's set BUILD_TIMESTAMP
     # environment variable. This will ensure platform specfic packages for the
     # same build will share the same timestamp.
     def build_start_time
