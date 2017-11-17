@@ -122,6 +122,17 @@ module Omnibus
         expect { build_version.semver }.to raise_error(ArgumentError)
       end
 
+      it "uses ENV['BUILD_ID'] to generate timestamp if set and BUILD_TIMESTAMP is not set" do
+        stub_env("BUILD_ID", "2012-12-25_16-41-40")
+        expect(build_version.semver).to eq("11.0.0-alpha1+20121225164140.git.207.694b062")
+      end
+
+      it "fails on invalid ENV['BUILD_ID'] values" do
+        stub_env("BUILD_ID", "AAAA")
+        expect { build_version.semver }.to raise_error(ArgumentError)
+      end
+
+
       context "prerelease version with dashes" do
         let(:git_describe) { "11.0.0-alpha-3-207-g694b062" }
 
