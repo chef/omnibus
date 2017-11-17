@@ -132,7 +132,6 @@ module Omnibus
         expect { build_version.semver }.to raise_error(ArgumentError)
       end
 
-
       context "prerelease version with dashes" do
         let(:git_describe) { "11.0.0-alpha-3-207-g694b062" }
 
