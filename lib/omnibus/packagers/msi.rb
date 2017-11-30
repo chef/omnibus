@@ -78,6 +78,11 @@ module Omnibus
         Dir["#{install_dir}" + "/dist/**/*.exe"].each do |signfile|
           sign_package(signfile)
         end
+        puts "additional signing files"
+        additional_sign_files.each do |signfile|
+          puts "signing #{signfile}"
+          sign_package(signfile)
+        end
 
       end
       # If fastmsi, zip up the contents of the install directory
@@ -153,6 +158,21 @@ module Omnibus
     #
     # @!group DSL methods
     # --------------------------------------------------
+
+    #
+    # set or retrieve additional files to sign
+    #
+    def additional_sign_files(val = NULL)
+      if null?(val)
+        @additional_sign_files
+      else 
+        unless val.is_a?(Array)
+          raise InvalidValue.new(:additional_sign_files, "be an Array")
+        end
+        @additional_sign_files = val
+      end
+    end
+    expose :additional_sign_files
 
     #
     # Set or retrieve the upgrade code.
