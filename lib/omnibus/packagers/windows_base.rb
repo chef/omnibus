@@ -113,25 +113,28 @@ module Omnibus
     #
     def sign_package(package_file, is_bundle: false )
       success = false
-
+      safe_package_file = "#{windows_safe_path(package_file)}"
       if is_bundle
         cmd = Array.new.tap do |arr|
           arr << "insignia.exe"
-          arr << "-ib \"#{package_file}\""
+          arr << "-ib \"#{safe_package_file}\""
           arr << "-o engine.exe"
         end.join(" ")
         shellout(cmd)
         sign_package("engine.exe", is_bundle: false)
         cmd = Array.new.tap do |arr|
           arr << "insignia.exe"
-          arr << "-ab engine.exe \"#{package_file}\""
-          arr << "-o \"#{package_file}\""
+          arr << "-ab engine.exe \"#{safe_package_file}\""
+          arr << "-o \"#{safe_package_file}\""
         end.join(" ")
         shellout(cmd)
       end
 
       timestamp_servers.each do |ts|
-        success = try_sign(package_file, ts)
+        success = try_sign(safe_package_file, ts)
+
+        puts "signed" if success
+
         break if success
       end
       raise FailedToSignWindowsPackage.new if !success
@@ -149,6 +152,7 @@ module Omnibus
         arr << "/d #{project.package_name}"
         arr << "\"#{package_file}\""
       end.join(" ")
+      puts cmd
       status = shellout(cmd)
       if status.exitstatus != 0
         log.warn(log_key) do
