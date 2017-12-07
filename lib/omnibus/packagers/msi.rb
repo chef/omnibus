@@ -79,9 +79,12 @@ module Omnibus
           sign_package(signfile)
         end
         puts "additional signing files"
-        additional_sign_files.each do |signfile|
-          puts "signing #{signfile}"
-          sign_package(signfile)
+
+        if additional_sign_files
+            additional_sign_files.each do |signfile|
+            puts "signing #{signfile}"
+            sign_package(signfile)
+            end
         end
 
       end
