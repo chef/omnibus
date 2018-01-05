@@ -68,18 +68,8 @@ module Omnibus
     end
 
     build do
-      puts "starting signing"
       if signing_identity
-        Dir["#{install_dir}" + "/bin/**/*.exe"].each do |signfile|
-          puts "signing #{signfile}"
-          sign_package(signfile)
-        end
-
-        Dir["#{install_dir}" + "/dist/**/*.exe"].each do |signfile|
-          sign_package(signfile)
-        end
-        puts "additional signing files"
-
+        puts "starting signing"
         if additional_sign_files
             additional_sign_files.each do |signfile|
             puts "signing #{signfile}"
