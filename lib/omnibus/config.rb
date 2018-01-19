@@ -101,9 +101,9 @@ module Omnibus
     # @return [String]
     default(:base_dir) do
       if Ohai["platform"] == "windows"
-        "C:/omnibus-ruby"
+        File.join(*["C:/omnibus-ruby", cache_suffix].compact)
       else
-        "/var/cache/omnibus"
+        File.join(*["/var/cache/omnibus", cache_suffix].compact)
       end
     end
 
@@ -112,6 +112,12 @@ module Omnibus
     #
     # @return [String]
     default(:cache_dir) { File.join(base_dir, "cache") }
+
+    # The suffix added (typically the software name) to create a wholly
+    # separate base cache directory for the software.
+    #
+    # @return [String]
+    default(:cache_suffix, nil)
 
     # The absolute path to the directory on the virtual machine where
     # git caching will occur and software's will be progressively cached.

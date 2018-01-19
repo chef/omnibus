@@ -93,5 +93,15 @@ module Omnibus
       include_examples "a configurable", :build_dir, "/foo/bar/build"
       include_examples "a configurable", :package_dir, "/foo/bar/pkg"
     end
+
+    context "when cache_suffix is specified" do
+      before { described_class.cache_suffix("projecto") }
+
+      include_examples "a configurable", :cache_dir, "/var/cache/omnibus/projecto/cache"
+      include_examples "a configurable", :git_cache_dir, "/var/cache/omnibus/projecto/cache/git_cache"
+      include_examples "a configurable", :source_dir, "/var/cache/omnibus/projecto/src"
+      include_examples "a configurable", :build_dir, "/var/cache/omnibus/projecto/build"
+      include_examples "a configurable", :package_dir, "/var/cache/omnibus/projecto/pkg"
+    end
   end
 end
