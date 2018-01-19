@@ -9,7 +9,7 @@ gem "license_scout", git: "https://github.com/chef/license_scout"
 gem "net-ssh", "3.2.0"
 
 group :docs do
-  gem "yard",          "~> 0.8"
+  gem "yard",          "~> 0.9"
   gem "redcarpet",     "~> 2.2.2"
   gem "github-markup", "~> 0.7"
 end
