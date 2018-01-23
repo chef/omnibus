@@ -1,0 +1,16 @@
+slack:
+  notify_channel: omnibus-rfr
+
+github:
+  maintainer_group: chef/omnibus-maintainers
+  version_tag_format: "v{{version}}"
+
+merge_actions:
+  - built_in:bump_version:
+      ignore_labels:
+        - "Version: Skip Bump"
+  - bash:.expeditor/update_version.sh:
+      only_if:
+        - built_in:bump_version
+  - built_in:build_gem
+
