@@ -4,13 +4,21 @@ slack:
 github:
   maintainer_group: chef/omnibus-maintainers
   version_tag_format: "v{{version}}"
+  minor_bump_labels:
+    - "Version: Bump Minor"
 
 merge_actions:
   - built_in:bump_version:
       ignore_labels:
         - "Version: Skip Bump"
+        - "Expeditor: Skip All"
   - bash:.expeditor/update_version.sh:
       only_if:
         - built_in:bump_version
-  - built_in:build_gem
-
+  - built_in:update_changelog:
+      ignore_labels:
+        - "Changelog: Skip Update"
+        - "Expeditor: Skip All"
+  - built_in:build_gem:
+      only_if:
+        - built_in:bump_version
