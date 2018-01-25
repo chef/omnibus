@@ -126,6 +126,7 @@ MAC_WHITELIST_LIBS = [
   /Tcl$/,
   /Cocoa$/,
   /Carbon$/,
+  /Foundation/,
   /IOKit$/,
   /Tk$/,
   /libutil\.dylib/,
