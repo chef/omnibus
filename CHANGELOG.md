@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.1 -->
+<!-- latest_release 5.6.2 -->
+## [v5.6.2](https://github.com/chef/omnibus/tree/v5.6.2) (2018-01-25)
+
+#### Merged Pull Requests
+- Whitelist Foundation framework [#813](https://github.com/chef/omnibus/pull/813) ([thommay](https://github.com/thommay))
+<!-- latest_release -->
+
 v5.6.1 (June 22, 2017)
 ----------------------
 ### Bug Fixes
 - S3 cache: fix bug using access_key_id/secret_access_key (#786)
-<!-- latest_release -->
 
 v5.6.0 (June 20, 2017)
 ----------------------
