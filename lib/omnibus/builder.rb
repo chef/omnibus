@@ -662,13 +662,14 @@ module Omnibus
         Dir.chdir(software.project_dir) do
           if options.delete(:unchecked)
             FileUtils.ln_s(source, destination, options)
-          end
-          files = FileSyncer.glob(source)
-          if files.empty?
-            log.warn(log_key) { "no matched files for glob #{command}" }
           else
-            files.each do |file|
-              FileUtils.ln_s(file, destination, options)
+            files = FileSyncer.glob(source)
+            if files.empty?
+              log.warn(log_key) { "no matched files for glob #{command}" }
+            else
+              files.each do |file|
+                FileUtils.ln_s(file, destination, options)
+              end
             end
           end
         end
