@@ -7,6 +7,9 @@ github:
   minor_bump_labels:
     - "Version: Bump Minor"
 
+rubygems:
+  - omnibus
+
 merge_actions:
   - built_in:bump_version:
       ignore_labels:
@@ -22,3 +25,7 @@ merge_actions:
   - built_in:build_gem:
       only_if:
         - built_in:bump_version
+
+promote:
+  action:
+    - built_in:publish_rubygems
