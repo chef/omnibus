@@ -660,12 +660,16 @@ module Omnibus
       command = "link `#{source}' to `#{destination}'"
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
-          files = FileSyncer.glob(source)
-          if files.empty?
-            log.warn(log_key) { "no matched files for glob #{command}" }
+          if options.delete(:unchecked)
+            FileUtils.ln_s(source, destination, options)
           else
-            files.each do |file|
-              FileUtils.ln_s(file, destination, options)
+            files = FileSyncer.glob(source)
+            if files.empty?
+              log.warn(log_key) { "no matched files for glob #{command}" }
+            else
+              files.each do |file|
+                FileUtils.ln_s(file, destination, options)
+              end
             end
           end
         end
