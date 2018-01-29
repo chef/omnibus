@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.3 -->
+<!-- latest_release 5.6.4 -->
+## [v5.6.4](https://github.com/chef/omnibus/tree/v5.6.4) (2018-01-29)
+
+#### Merged Pull Requests
+- Update custom action and support MSIFASTINSTALL property [#815](https://github.com/chef/omnibus/pull/815) ([stuartpreston](https://github.com/stuartpreston))
+<!-- latest_release -->
+
 ## [v5.6.3](https://github.com/chef/omnibus/tree/v5.6.3) (2018-01-26)
 
 #### Merged Pull Requests
 - sometimes we just need to gorram make a link [#814](https://github.com/chef/omnibus/pull/814) ([thommay](https://github.com/thommay))
-<!-- latest_release -->
 
 ## [v5.6.2](https://github.com/chef/omnibus/tree/v5.6.2) (2018-01-25)
 
