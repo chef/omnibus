@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.5 -->
+<!-- latest_release 5.6.6 -->
+## [v5.6.6](https://github.com/chef/omnibus/tree/v5.6.6) (2018-01-30)
+
+#### Merged Pull Requests
+- Empty commit to force release trigger [#817](https://github.com/chef/omnibus/pull/817) ([scotthain](https://github.com/scotthain))
+<!-- latest_release -->
+
 ## [v5.6.5](https://github.com/chef/omnibus/tree/v5.6.5) (2018-01-30)
 
 #### Merged Pull Requests
 - Add config to allow rubygems publish and promote [#816](https://github.com/chef/omnibus/pull/816) ([scotthain](https://github.com/scotthain))
-<!-- latest_release -->
 
 ## [v5.6.4](https://github.com/chef/omnibus/tree/v5.6.4) (2018-01-29)
 
