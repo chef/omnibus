@@ -138,12 +138,6 @@ module Omnibus
           name: "omnibus",
           version: Omnibus::VERSION,
         },
-        properties: default_properties.merge(
-          "omnibus.project"            => name,
-          "omnibus.version"            => manifest.build_version,
-          "omnibus.build_git_revision" => manifest.build_git_revision,
-          "omnibus.license"            => manifest.license
-        ),
         modules: [
           {
             # com.getchef:chef-server:12.0.0
@@ -228,6 +222,10 @@ module Omnibus
         "omnibus.sha1"             => package.metadata[:sha1],
         "omnibus.sha256"           => package.metadata[:sha256],
         "omnibus.sha512"           => package.metadata[:sha512],
+        "md5"                      => package.metadata[:md5],
+        "sha1"                     => package.metadata[:sha1],
+        "sha256"                   => package.metadata[:sha256],
+        "sha512"                   => package.metadata[:sha512],
       }.tap do |h|
         if build_record?
           h["build.name"] = package.metadata[:name]
@@ -262,7 +260,7 @@ module Omnibus
     # and the package metadata.
     #
     # @example
-    #   chef/11.6.0/chef-11.6.0-1.el6.x86_64.rpm
+    #   com/getchef/chef/11.6.0/ubuntu/14.04/chef-11.6.0-1.el6.x86_64.rpm
     #
     # @param [Package] package
     #   the package to generate the remote path for
@@ -272,11 +270,7 @@ module Omnibus
     def remote_path_for(package)
       File.join(
         Config.artifactory_base_path,
-        package.metadata[:name],
-        package.metadata[:version],
-        package.metadata[:platform],
-        package.metadata[:platform_version],
-        package.metadata[:basename]
+        Config.artifactory_publish_pattern % package.metadata
       )
     end
   end

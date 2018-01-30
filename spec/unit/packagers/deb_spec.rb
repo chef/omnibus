@@ -95,6 +95,48 @@ module Omnibus
       end
     end
 
+    describe "#compression_type" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:compression_type)
+      end
+
+      it "has a default value" do
+        expect(subject.compression_type).to eq(:gzip)
+      end
+
+      it "must be a symbol" do
+        expect { subject.compression_type(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe "#compression_level" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:compression_level)
+      end
+
+      it "has a default value" do
+        expect(subject.compression_level).to eq(9)
+      end
+
+      it "must be a symbol" do
+        expect { subject.compression_level(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
+    describe "#compression_strategy" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:compression_strategy)
+      end
+
+      it "has a default value" do
+        expect(subject.compression_strategy).to eq(nil)
+      end
+
+      it "must be a symbol" do
+        expect { subject.compression_strategy(Object.new) }.to raise_error(InvalidValue)
+      end
+    end
+
     describe "#id" do
       it "is :deb" do
         expect(subject.id).to eq(:deb)
@@ -258,6 +300,82 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with(/dpkg-deb -z9 -Zgzip -D --build/)
         subject.create_deb_file
+      end
+
+      describe "when deb compression type xz is configured" do
+        before do
+          subject.compression_type(:xz)
+        end
+
+        it "uses the correct command for xz" do
+          expect(subject).to receive(:shellout!)
+            .with(/dpkg-deb -z9 -Zxz -D --build/)
+          subject.create_deb_file
+        end
+
+        context "when deb compression level is configured" do
+          before do
+            subject.compression_level(6)
+          end
+
+          it "uses the correct command for xz" do
+            expect(subject).to receive(:shellout!)
+              .with(/dpkg-deb -z6 -Zxz -D --build/)
+            subject.create_deb_file
+          end
+        end
+
+        context "when deb compression strategy is configured" do
+          before do
+            subject.compression_strategy(:extreme)
+          end
+
+          it "uses the correct command for xz" do
+            expect(subject).to receive(:shellout!)
+              .with(/dpkg-deb -z9 -Zxz -Sextreme -D --build/)
+            subject.create_deb_file
+          end
+        end
+      end
+    end
+
+    describe "#sign_deb_file", :not_supported_on_windows do
+      context "when DEB signing is not enabled" do
+        before do
+          subject.signing_passphrase(nil)
+        end
+
+        it "logs a message" do
+          output = capture_logging { subject.sign_deb_file }
+          expect(output).to include("Signing not enabled for .deb file")
+        end
+      end
+
+      context "when DEB signing is enabled" do
+        before do
+          allow(subject).to receive(:shellout!)
+          allow(subject).to receive(:package_name).and_return("safe")
+          subject.signing_passphrase("foobar")
+        end
+
+        it "logs a message" do
+          output = capture_logging { subject.sign_deb_file }
+          expect(output).to include("Signing enabled for .deb file")
+        end
+
+        it "finds gpg and ar commands" do
+          output = capture_logging { subject.sign_deb_file }
+          expect(output).not_to include("Signing not possible.")
+        end
+
+        it "runs correct commands" do
+          expect(subject).to receive(:shellout!)
+            .at_least(:once).with(/ar x/)
+            .at_least(:once).with(/cat debian-binary control\.tar/)
+            .at_least(:once).with(/fakeroot gpg/)
+            .at_least(:once).with(/fakeroot ar rc/)
+          subject.sign_deb_file
+        end
       end
     end
 

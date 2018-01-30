@@ -4,14 +4,14 @@ module Omnibus
   describe Packager do
     describe ".for_current_system" do
       context "on Mac OS X" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.9.2") }
+        before { stub_ohai(platform: "mac_os_x", version: "10.12") }
         it "prefers PKG" do
           expect(described_class.for_current_system).to eq([Packager::PKG])
         end
       end
 
-      context "on Windows 2012" do
-        before { stub_ohai(platform: "windows", version: "2012") }
+      context "on Windows 2012 R2" do
+        before { stub_ohai(platform: "windows", version: "2012R2") }
         it "prefers MSI and APPX" do
           expect(described_class.for_current_system).to eq([Packager::MSI, Packager::APPX])
         end
@@ -38,29 +38,29 @@ module Omnibus
         end
       end
 
-      context "on aix" do
+      context "on AIX" do
         before { stub_ohai(platform: "aix", version: "7.1") }
         it "prefers BFF" do
           expect(described_class.for_current_system).to eq([Packager::BFF])
         end
       end
 
-      context "on fedora" do
-        before { stub_ohai(platform: "fedora", version: "20") }
+      context "on Fedora" do
+        before { stub_ohai(platform: "fedora", version: "25") }
         it "prefers RPM" do
           expect(described_class.for_current_system).to eq([Packager::RPM])
         end
       end
 
-      context "on debian" do
-        before { stub_ohai(platform: "debian", version: "7.2") }
+      context "on Debian" do
+        before { stub_ohai(platform: "debian", version: "8.8") }
         it "prefers RPM" do
           expect(described_class.for_current_system).to eq([Packager::DEB])
         end
       end
 
-      context "on suse" do
-        before { stub_ohai(platform: "suse", version: "12.0") }
+      context "on SLES" do
+        before { stub_ohai(platform: "suse", version: "12.2") }
         it "prefers RPM" do
           expect(described_class.for_current_system).to eq([Packager::RPM])
         end

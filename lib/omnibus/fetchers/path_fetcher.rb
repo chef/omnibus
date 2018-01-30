@@ -49,7 +49,7 @@ module Omnibus
     #   have already removed anything extraneous.
     #
     def clean
-      return true
+      true
     end
 
     #

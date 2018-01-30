@@ -1060,7 +1060,7 @@ module Omnibus
     # @return [1, 0, -1]
     #
     def <=>(other)
-      self.name <=> other.name
+      name <=> other.name
     end
 
     #
@@ -1102,6 +1102,9 @@ module Omnibus
         softwares.each do |software|
           software.build_me([license_collector])
         end
+
+        # If nothing has dirtied the cache, checkout the last cache dir
+        restore_complete_build unless dirty?
       end
 
       write_json_manifest
@@ -1109,6 +1112,13 @@ module Omnibus
       HealthCheck.run!(self)
       package_me
       compress_me
+    end
+
+    def restore_complete_build
+      if Config.use_git_caching
+        log.info(log_key) { "Cache not dirtied, restoring last marker" }
+        GitCache.new(softwares.last).restore_from_cache
+      end
     end
 
     def write_json_manifest
@@ -1215,7 +1225,7 @@ module Omnibus
     # @return [true, false]
     #
     def ==(other)
-      self.hash == other.hash
+      hash == other.hash
     end
     alias_method :eql?, :==
 

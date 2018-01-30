@@ -1,13 +1,14 @@
 version: "{build}"
 
-os: Windows Server 2012
+os: Windows Server 2012 R2
 platform:
   - x64
 
 environment:
   matrix:
+    - RUBY_VERSION: 24
+    - RUBY_VERSION: 23
     - RUBY_VERSION: 22
-    - RUBY_VERSION: 21
 
 clone_folder: c:\projects\omnibus
 clone_depth: 1
@@ -21,7 +22,7 @@ install:
   - echo %PATH%
   - ruby --version
   - gem --version
-  - gem install bundler -v 1.10.6 --quiet --no-ri --no-rdoc
+  - gem install bundler -v 1.10.6 --quiet --no-ri --no-rdoc --force
   - bundler --version
   - cp C:\Ruby23-x64\DevKit\mingw\bin\bsdtar.exe C:\Ruby23-x64\DevKit\mingw\bin\tar.exe
   - appveyor DownloadFile http://curl.haxx.se/ca/cacert.pem -FileName C:\cacert.pem

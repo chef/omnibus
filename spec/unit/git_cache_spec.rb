@@ -52,6 +52,8 @@ module Omnibus
       described_class.new(zlib)
     end
 
+    let(:git_flags) { %Q{-c core.autocrlf=false -c core.ignorecase=false --git-dir="#{cache_path}" --work-tree="#{install_dir}"} }
+
     describe "#cache_path" do
       it "returns the install path appended to the install_cache path" do
         expect(ipc.cache_path).to eq(cache_path)
@@ -85,7 +87,11 @@ module Omnibus
         expect(FileUtils).to receive(:mkdir_p)
           .with(File.dirname(ipc.cache_path))
         expect(ipc).to receive(:shellout!)
-          .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} init -q")
+          .with("git #{git_flags} init -q")
+        expect(ipc).to receive(:shellout!)
+          .with("git #{git_flags} config --local user.name \"Omnibus Git Cache\"")
+        expect(ipc).to receive(:shellout!)
+          .with("git #{git_flags} config --local user.email \"omnibus@localhost\"")
         ipc.create_cache_path
       end
 
@@ -115,19 +121,19 @@ module Omnibus
       it "adds all the changes to git removing git directories" do
         expect(ipc).to receive(:remove_git_dirs)
         expect(ipc).to receive(:shellout!)
-          .with("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} add -A -f")
+          .with("git #{git_flags} add -A -f")
         ipc.incremental
       end
 
       it "commits the backup for the software" do
         expect(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} commit -q -m "Backup of #{ipc.tag}"})
+          .with(%Q{git #{git_flags} commit -q -m "Backup of #{ipc.tag}"})
         ipc.incremental
       end
 
       it "tags the software backup" do
         expect(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -f "#{ipc.tag}"})
+          .with(%Q{git #{git_flags} tag -f "#{ipc.tag}"})
         ipc.incremental
       end
     end
@@ -167,10 +173,10 @@ module Omnibus
 
       before(:each) do
         allow(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
+          .with(%Q{git #{git_flags} tag -l "#{ipc.tag}"})
           .and_return(tag_cmd)
         allow(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"})
+          .with(%Q{git #{git_flags} tag -f restore_here "#{ipc.tag}"})
         allow(ipc).to receive(:create_cache_path)
       end
 
@@ -179,26 +185,74 @@ module Omnibus
         ipc.restore
       end
 
-      it "checks for a tag with the software and version, and if it finds it, checks it out" do
+      it "checks for a tag with the software and version, and if it finds it, marks it as restoration point" do
         expect(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
+          .with(%Q{git #{git_flags} tag -l "#{ipc.tag}"})
           .and_return(tag_cmd)
         expect(ipc).to receive(:shellout!)
-          .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"})
+          .with(%Q{git #{git_flags} tag -f restore_here "#{ipc.tag}"})
         ipc.restore
       end
 
       describe "if the tag does not exist" do
         let(:git_tag_output) { "\n" }
-
-        it "does nothing" do
-          expect(ipc).to receive(:shellout!)
-            .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} tag -l "#{ipc.tag}"})
-            .and_return(tag_cmd)
-          expect(ipc).to_not receive(:shellout!)
-            .with(%Q{git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} checkout -f "#{ipc.tag}"})
-          ipc.restore
+        let(:restore_tag_cmd) do
+          cmd_double = double(Mixlib::ShellOut)
+          allow(cmd_double).to receive(:stdout).and_return(git_restore_tag_output)
+          allow(cmd_double).to receive(:error!).and_return(cmd_double)
+          cmd_double
         end
+
+        describe "if the restore marker tag exists" do
+          let(:git_restore_tag_output) { "restore_here\n" }
+
+          it "checks out the last save restoration point and deletes the marker tag" do
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git #{git_flags} tag -l "restore_here"})
+              .and_return(restore_tag_cmd)
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git #{git_flags} tag -l "#{ipc.tag}"})
+              .and_return(tag_cmd)
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git #{git_flags} checkout -f restore_here})
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git #{git_flags} tag -d restore_here})
+            ipc.restore
+          end
+        end
+
+        describe "if the restore marker tag does not exist" do
+          let(:git_restore_tag_output) { "\n" }
+
+          it "does nothing" do
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git #{git_flags} tag -l "restore_here"})
+              .and_return(restore_tag_cmd)
+            expect(ipc).to receive(:shellout!)
+              .with(%Q{git #{git_flags} tag -l "#{ipc.tag}"})
+              .and_return(tag_cmd)
+            ipc.restore
+          end
+        end
+      end
+    end
+
+    describe "#git_cmd" do
+      let(:terrible_install_dir) { %q{/opt/why  please don't do this} }
+
+      before(:each) do
+        allow(project).to receive(:install_dir)
+          .and_return(terrible_install_dir)
+        allow(ipc).to receive(:shellout!)
+          .with(%Q{git #{git_flags} version})
+          .and_return("git version 2.11.0")
+      end
+
+      it "doesn't mangle an #install_dir with spaces" do
+        expect(ipc.send(:install_dir)).to eq(terrible_install_dir)
+        expect(ipc).to receive(:shellout!)
+          .with(%Q{git #{git_flags} version})
+        ipc.send(:git_cmd, "version")
       end
     end
   end

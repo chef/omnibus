@@ -111,7 +111,7 @@ module Omnibus
 
     describe "#default_root" do
       context "on Windows" do
-        before { stub_ohai(platform: "windows", version: "2012") }
+        before { stub_ohai(platform: "windows", version: "2012R2") }
 
         it "returns C:/" do
           expect(subject.default_root).to eq("C:")
@@ -119,7 +119,7 @@ module Omnibus
       end
 
       context "on non-Windows" do
-        before { stub_ohai(platform: "ubuntu", version: "12.04") }
+        before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
         it "returns /opt" do
           expect(subject.default_root).to eq("/opt")
@@ -208,21 +208,21 @@ module Omnibus
       before { stub_ohai(fauxhai_options) }
 
       context "when on RHEL" do
-        let(:fauxhai_options) { { platform: "redhat", version: "6.4" } }
+        let(:fauxhai_options) { { platform: "redhat", version: "6.9" } }
         it "returns a RHEL iteration" do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context "when on Debian" do
-        let(:fauxhai_options) { { platform: "debian", version: "7.2" } }
+        let(:fauxhai_options) { { platform: "debian", version: "8.8" } }
         it "returns a Debian iteration" do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context "when on FreeBSD" do
-        let(:fauxhai_options) { { platform: "freebsd", version: "9.1" } }
+        let(:fauxhai_options) { { platform: "freebsd", version: "9.3" } }
         it "returns a FreeBSD iteration" do
           expect(subject.build_iteration).to eq(1)
         end
@@ -237,7 +237,7 @@ module Omnibus
       end
 
       context "when on OS X" do
-        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.8.2" } }
+        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.12" } }
         it "returns a generic iteration" do
           expect(subject.build_iteration).to eq(1)
         end
@@ -267,7 +267,7 @@ module Omnibus
     end
 
     describe "#ohai" do
-      before { stub_ohai(platform: "ubuntu", version: "12.04") }
+      before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:ohai)
@@ -411,6 +411,37 @@ module Omnibus
 
         it "returns the correct shasum" do
           expect(subject.shasum).to eq("3cc6bd98da4d643b79c71be2c93761a458b442e2931f7d421636f526d0c1e8bf")
+        end
+      end
+    end
+
+    describe "#restore_complete_build" do
+      let(:cached_build) { double(GitCache) }
+      let(:first_software) { double(Omnibus::Software) }
+      let(:last_software) { double(Omnibus::Software) }
+
+      before do
+        allow(Config).to receive(:use_git_caching).and_return(git_caching)
+      end
+
+      context "when git caching is enabled" do
+        let(:git_caching) { true }
+
+        it "restores the last software built" do
+          expect(subject).to receive(:softwares).and_return([first_software, last_software])
+          expect(GitCache).to receive(:new).with(last_software).and_return(cached_build)
+          expect(cached_build).to receive(:restore_from_cache)
+          subject.restore_complete_build
+        end
+      end
+
+      context "when git caching is disabled" do
+        let(:git_caching) { false }
+
+        it "does nothing" do
+          expect(subject).not_to receive(:softwares)
+          expect(GitCache).not_to receive(:new)
+          subject.restore_complete_build
         end
       end
     end

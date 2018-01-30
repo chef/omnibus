@@ -26,6 +26,7 @@ module Omnibus
     autoload :MSI,      "omnibus/packagers/msi"
     autoload :APPX,     "omnibus/packagers/appx"
     autoload :PKG,      "omnibus/packagers/pkg"
+    autoload :PKGSRC,   "omnibus/packagers/pkgsrc"
     autoload :Solaris,  "omnibus/packagers/solaris"
     autoload :IPS,      "omnibus/packagers/ips"
     autoload :RPM,      "omnibus/packagers/rpm"
@@ -47,6 +48,7 @@ module Omnibus
       "ips"      => IPS,
       "windows"  => [MSI, APPX],
       "mac_os_x" => PKG,
+      "smartos"  => PKGSRC,
     }.freeze
 
     #
@@ -73,7 +75,7 @@ module Omnibus
         if package_types.include?(APPX) &&
             !Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 6.2")
           log.warn(log_key) { "APPX generation is only supported on Windows versions 2012 and above" }
-          package_types = package_types - [APPX]
+          package_types -= [APPX]
         end
 
         package_types

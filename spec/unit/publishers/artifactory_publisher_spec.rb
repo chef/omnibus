@@ -112,6 +112,10 @@ module Omnibus
         "omnibus.sha512" => "SHA512",
         "omnibus.version" => "11.0.6",
         "omnibus.license" => "Apache-2.0",
+        "md5" => "ABCDEF123456",
+        "sha1" => "SHA1",
+        "sha256" => "SHA256",
+        "sha512" => "SHA512",
       }
     end
     let(:metadata_json_properites) do
@@ -191,7 +195,7 @@ module Omnibus
           # raise an exception a set number of times.
           @times = 0
           allow(artifact).to receive(:upload) do
-            @times += 1;
+            @times += 1
             raise Artifactory::Error::HTTPError.new("status" => "409", "message" => "CONFLICT") unless @times > 1
           end
         end
@@ -239,6 +243,22 @@ module Omnibus
             repository,
             "com/getchef/chef/11.0.6/ubuntu/14.04/chef.deb",
             hash_including(package_properties.merge(delivery_props))
+          ).once
+
+          subject.publish
+        end
+      end
+
+      context "custom artifactory_publish_pattern is set" do
+        before do
+          Config.artifactory_publish_pattern("%{platform}/%{platform_version}/%{arch}/%{basename}")
+        end
+
+        it "uploads the package to the provided path" do
+          expect(artifact).to receive(:upload).with(
+            repository,
+            "com/getchef/ubuntu/14.04/x86_64/chef.deb",
+            hash_including(metadata_json_properites)
           ).once
 
           subject.publish

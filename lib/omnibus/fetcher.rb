@@ -193,6 +193,8 @@ module Omnibus
           GitFetcher
         elsif source[:path]
           PathFetcher
+        elsif source[:file]
+          FileFetcher
         end
       else
         NullFetcher

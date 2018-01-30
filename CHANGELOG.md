@@ -1,5 +1,63 @@
-Omnibus CHANGELOG
-=================
+<!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
+
+<!-- latest_release 5.6.4 -->
+## [v5.6.4](https://github.com/chef/omnibus/tree/v5.6.4) (2018-01-29)
+
+#### Merged Pull Requests
+- Update custom action and support MSIFASTINSTALL property [#815](https://github.com/chef/omnibus/pull/815) ([stuartpreston](https://github.com/stuartpreston))
+<!-- latest_release -->
+
+## [v5.6.3](https://github.com/chef/omnibus/tree/v5.6.3) (2018-01-26)
+
+#### Merged Pull Requests
+- sometimes we just need to gorram make a link [#814](https://github.com/chef/omnibus/pull/814) ([thommay](https://github.com/thommay))
+
+## [v5.6.2](https://github.com/chef/omnibus/tree/v5.6.2) (2018-01-25)
+
+#### Merged Pull Requests
+- Whitelist Foundation framework [#813](https://github.com/chef/omnibus/pull/813) ([thommay](https://github.com/thommay))
+
+v5.6.1 (June 22, 2017)
+----------------------
+### Bug Fixes
+- S3 cache: fix bug using access_key_id/secret_access_key (#786)
+
+v5.6.0 (June 20, 2017)
+----------------------
+### New Features
+- Add AWS Shared Credentials support.(#781)
+- Add option to build command to populate S3 cache. (#781)
+- Add strip BuildCommand. (#775)
+- Add support for building against omnibus-toolchain on Windows. (#759)
+- Don't require build user to have a configured Git identity (#758)
+- Added endpoint and S3 transfer acceleration as config options (#736)
+- Only checkout from git_cache once (#747)
+- IPS: Add version-lock facet at end of manifest (#745)
+- Alpine Linux Support (#744)
+- Add fips_mode flags (#742)
+- SmartOS pkgsrc support (#733)
+- Make DEB and RPM compression configurable (#738)
+- Check for the transitive dependency licensing errors during post_build. (#729)
+- Enable gcc 4.8 on suse/sles if available (#720)
+- Allow manually specify transitive dependency license information (#712)
+
+### Bug Fixes
+- Various bugfixes for APPX support. (#752, #759)
+- Expose overrides. (#780)
+- Fixed documentation links and table in README (#769, #778)
+- Fixed Travis CI Label (#777)
+- git_cache fixes: Use `.join` on git commands lines to avoid mangle and set
+  `core.ingorecase=false` (#768)
+- Ignore paths with braces in the BFF packager. (#771)
+- Switch from single to double quotes in git config. (#767)
+- Fixed Windows globbing. (#766)
+- Update pedump to latest released. (#714)
+- Retry git network operations by default (#753)
+- Fix guard for non-caching projects (#751)
+- DMG bug fixes (#748)
+- IPS Package fixes (#718, #728, #740)
+- Artifactory publisher fixes/improvements (#725)
+- Do not autoload fetcher to avoid eace condition (#715)
 
 v5.5.0 (August 16, 2016)
 -----------------------

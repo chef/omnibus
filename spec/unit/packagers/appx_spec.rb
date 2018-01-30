@@ -41,14 +41,18 @@ module Omnibus
     end
 
     describe "#package_name" do
+      before do
+        allow(Config).to receive(:windows_arch).and_return(:foo_arch)
+      end
+
       it "includes the name, version, and build iteration" do
-        expect(subject.package_name).to eq("project-1.2.3-2.appx")
+        expect(subject.package_name).to eq("project-1.2.3-2-foo_arch.appx")
       end
     end
 
     describe "#write_manifest_file" do
       before do
-        allow(subject).to receive(:shellout!).and_return(double("output", stdout: "CN=Chef "))
+        allow(subject).to receive(:shellout!).and_return(double("output", stdout: 'CN="Chef", O="Chef"'))
         allow(subject).to receive(:signing_identity).and_return({})
       end
 
@@ -63,7 +67,7 @@ module Omnibus
 
         expect(contents).to include('Name="project"')
         expect(contents).to include('Version="1.2.3.2"')
-        expect(contents).to include('Publisher="CN=Chef"')
+        expect(contents).to include('Publisher="CN=&quot;Chef&quot;, O=&quot;Chef&quot;"')
         expect(contents).to include("<DisplayName>Project</DisplayName>")
         expect(contents).to include(
           '<PublisherDisplayName>"Chef Software &lt;maintainers@chef.io&gt;"</PublisherDisplayName>'

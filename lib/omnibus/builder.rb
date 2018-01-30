@@ -18,6 +18,7 @@ require "fileutils"
 require "mixlib/shellout"
 require "ostruct"
 require "pathname"
+require "omnibus/whitelist"
 
 module Omnibus
   class Builder
@@ -274,6 +275,21 @@ module Omnibus
       super
     end
     expose :windows_safe_path
+
+    #
+    # (see Util#compiler_safe_path)
+    #
+    # Some compilers require paths to be formatted in certain ways. This helper
+    # takes in the standard Omnibus-style path and ensures that it is passed
+    # correctly.
+    #
+    # @example
+    #   configure ["--prefix=#{compiler_safe_path(install_dir, "embedded")}"]
+    #
+    def compiler_safe_path(*pieces)
+      super
+    end
+    expose :compiler_safe_path
 
     #
     # @!endgroup
@@ -548,6 +564,29 @@ module Omnibus
     expose :delete
 
     #
+    # Strip symbols from the given file or directory on the system. This method uses
+    # find and passes the matched files to strip through xargs, ignoring errors.
+    # So one may pass in a specific file/directory or a glob of files.
+    #
+    # @param [String] path
+    #   the path of the file(s) to strip
+    #
+    # @return (see #command)
+    #
+    def strip(path)
+      regexp_ends = ".*(" + IGNORED_ENDINGS.map { |e| e.gsub(/\./, '\.') }.join("|") + ")$"
+      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(/\//, '\/') + ".*" }.join("|")
+      regexp = regexp_ends + "|" + regexp_patterns
+
+      # Do not actually care if strip runs on non-strippable file, as its a no-op.  Hence the `|| true` appended.
+      # Do want to avoid stripping files unneccessarily so as not to slow down build process.
+      find_command = "find #{path}/ -type f -regextype posix-extended ! -regex \"#{regexp}\" | xargs strip || true"
+      options = { in_msys_bash: true }
+      command(find_command, options)
+    end
+    expose :strip
+
+    #
     # Copy the given source to the destination. This method accepts a single
     # file or a file pattern to match.
     #
@@ -621,12 +660,16 @@ module Omnibus
       command = "link `#{source}' to `#{destination}'"
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
-          files = FileSyncer.glob(source)
-          if files.empty?
-            log.warn(log_key) { "no matched files for glob #{command}" }
+          if options.delete(:unchecked)
+            FileUtils.ln_s(source, destination, options)
           else
-            files.each do |file|
-              FileUtils.ln_s(file, destination, options)
+            files = FileSyncer.glob(source)
+            if files.empty?
+              log.warn(log_key) { "no matched files for glob #{command}" }
+            else
+              files.each do |file|
+                FileUtils.ln_s(file, destination, options)
+              end
             end
           end
         end
@@ -796,14 +839,6 @@ module Omnibus
       # Also make a clone of options so that we can mangle it safely below.
       options = { cwd: software.project_dir }.merge(options)
 
-      if options.delete(:in_msys_bash) && windows?
-        # Mixlib will handle escaping characters for cmd but our command might
-        # contain '. For now, assume that won't happen because I don't know
-        # whether this command is going to be played via cmd or through
-        # ProcessCreate.
-        command_string = "bash -c \'#{command_string}\'"
-      end
-
       # Set the log level to :info so users will see build commands
       options[:log_level] ||= :info
 
@@ -856,7 +891,7 @@ module Omnibus
         if tries <= 0
           raise e
         else
-          delay = delay * 2
+          delay *= 2
 
           log.warn(log_key) do
             label = "#{(Config.build_retries - tries) + 1}/#{Config.build_retries}"
@@ -897,6 +932,7 @@ module Omnibus
       original = ENV.to_hash
 
       ENV.delete("_ORIGINAL_GEM_PATH")
+      ENV.delete_if { |k, _| k.start_with?("BUNDLER_") }
       ENV.delete_if { |k, _| k.start_with?("BUNDLE_") }
       ENV.delete_if { |k, _| k.start_with?("GEM_") }
       ENV.delete_if { |k, _| k.start_with?("RUBY") }
@@ -963,6 +999,8 @@ module Omnibus
         log.warn(log_key) { "Detected command `remove'. Consider using the `delete' DSL method." }
       when /^rsync /i
         log.warn(log_key) { "Detected command `rsync'. Consider using the `sync' DSL method." }
+      when /^strip /i
+        log.warn(log_key) { "Detected command `strip'. Consider using the `strip' DSL method." }
       end
     end
 

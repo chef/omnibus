@@ -5,6 +5,7 @@ module Omnibus
     let(:project) do
       Project.new.tap do |project|
         project.name("project")
+        project.friendly_name("Project One")
         project.homepage("https://example.com")
         project.install_dir("/opt/project")
         project.build_version("1.2.3")
@@ -86,7 +87,7 @@ module Omnibus
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil create \\
               -srcfolder "#{staging_dir}/Resources" \\
-              -volname "Project" \\
+              -volname "Project One" \\
               -fs HFS+ \\
               -fsargs "-c c=64,a=16,e=16" \\
               -format UDRW \\
@@ -155,10 +156,10 @@ module Omnibus
             iconutil -c icns tmp.iconset
 
             # Copy it over
-            cp tmp.icns "/Volumes/Project/.VolumeIcon.icns"
+            cp tmp.icns "/Volumes/Project One/.VolumeIcon.icns"
 
             # Source the icon
-            SetFile -a C "/Volumes/Project"
+            SetFile -a C "/Volumes/Project One"
           EOH
 
         subject.set_volume_icon
@@ -180,23 +181,9 @@ module Omnibus
         subject.prettify_dmg
         contents = File.read("#{staging_dir}/create_dmg.osascript")
 
-        expect(contents).to include('tell application "Finder"')
-        expect(contents).to include('  tell disk "Project"')
-        expect(contents).to include("    open")
-        expect(contents).to include("    set current view of container window to icon view")
-        expect(contents).to include("    set toolbar visible of container window to false")
-        expect(contents).to include("    set statusbar visible of container window to false")
-        expect(contents).to include("    set the bounds of container window to {100, 100, 750, 600}")
-        expect(contents).to include("    set theViewOptions to the icon view options of container window")
-        expect(contents).to include("    set arrangement of theViewOptions to not arranged")
-        expect(contents).to include("    set icon size of theViewOptions to 72")
-        expect(contents).to include('    set background picture of theViewOptions to file ".support:background.png"')
-        expect(contents).to include("    delay 5")
-        expect(contents).to include('    set position of item "project-1.2.3-2.pkg" of container window to {535, 50}')
-        expect(contents).to include("    update without registering applications")
-        expect(contents).to include("    delay 5")
-        expect(contents).to include("  end tell")
-        expect(contents).to include("end tell")
+        expect(contents).to include('set found_disk to do shell script "ls /Volumes/ | grep \'Project One*\'"')
+        expect(contents).to include("	set the bounds of Finder window 1 to {100, 100, 750, 600}")
+        expect(contents).to include('  	set position of item "project-1.2.3-2.pkg" of container window to {535, 50}')
       end
 
       it "runs the apple script" do
@@ -221,7 +208,7 @@ module Omnibus
 
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
-            chmod -Rf go-w /Volumes/Project
+            chmod -Rf go-w "/Volumes/Project One"
             sync
             hdiutil detach "#{device}"
             hdiutil convert \\
@@ -291,8 +278,7 @@ module Omnibus
 
     describe "#volume_name" do
       it "is the project friendly_name" do
-        project.friendly_name("Friendly Bacon Bits")
-        expect(subject.volume_name).to eq("Friendly Bacon Bits")
+        expect(subject.volume_name).to eq("Project One")
       end
     end
   end

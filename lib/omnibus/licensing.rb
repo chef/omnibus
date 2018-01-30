@@ -147,6 +147,7 @@ module Omnibus
       collect_licenses_for(software)
       unless software.skip_transitive_dependency_licensing
         collect_transitive_dependency_licenses_for(software)
+        check_transitive_dependency_licensing_errors_for(software)
       end
     end
 
@@ -393,7 +394,7 @@ module Omnibus
     #
     def local?(license)
       u = URI(license)
-      return u.scheme.nil?
+      u.scheme.nil?
     end
 
     #
@@ -452,18 +453,6 @@ module Omnibus
     # 3. Add these licenses to the main manifest, to be merged with the main
     # licensing information from software definitions.
     def process_transitive_dependency_licensing_info
-      Dir.glob("#{cache_dir}/*").each do |license_output_dir|
-        reporter = LicenseScout::Reporter.new(license_output_dir)
-        begin
-          reporter.report.each { |i| transitive_dependency_licensing_warning(i) }
-        rescue LicenseScout::Exceptions::InvalidOutputReport => e
-          transitive_dependency_licensing_warning(<<-EOH)
-Licensing output report at '#{license_output_dir}' has errors:
-#{e}
-EOH
-        end
-      end
-
       Dir.glob("#{cache_dir}/*/*-dependency-licenses.json").each do |license_manifest_path|
         license_manifest_data = FFI_Yajl::Parser.parse(File.read(license_manifest_path))
         project_name = license_manifest_data["project_name"]
@@ -512,12 +501,11 @@ EOH
       # the build completes we will process these license files but we need to
       # perform this step after build, before git_cache to be able to operate
       # correctly with the git_cache.
-      license_output_dir = File.join(cache_dir, software.name)
 
       collector = LicenseScout::Collector.new(
         software.name,
         software.project_dir,
-        license_output_dir,
+        license_output_dir(software),
         LicenseScout::Options.new(
           environment: software.with_embedded_path,
           ruby_bin: software.embedded_bin("ruby"),
@@ -569,6 +557,25 @@ EOH
         # from cache without fixing the license issue.
         raise_if_warnings_fatal!
       end
+    end
+
+    # Checks transitive dependency licensing errors for the given software
+    def check_transitive_dependency_licensing_errors_for(software)
+      reporter = LicenseScout::Reporter.new(license_output_dir(software))
+      begin
+        reporter.report.each { |i| transitive_dependency_licensing_warning(i) }
+      rescue LicenseScout::Exceptions::InvalidOutputReport => e
+        transitive_dependency_licensing_warning(<<-EOH)
+Licensing output report at '#{license_output_dir(software)}' has errors:
+#{e}
+EOH
+      end
+      raise_if_warnings_fatal!
+    end
+
+    # The directory to store the licensing information for the given software
+    def license_output_dir(software)
+      File.join(cache_dir, software.name)
     end
 
     # Collect the license files for the software.

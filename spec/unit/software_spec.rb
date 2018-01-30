@@ -68,7 +68,7 @@ module Omnibus
 
     describe "with_standard_compiler_flags helper" do
       context "on ubuntu" do
-        before { stub_ohai(platform: "ubuntu", version: "12.04") }
+        before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -77,7 +77,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides LDFLAGS" do
@@ -87,7 +88,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides CFLAGS" do
@@ -97,7 +99,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides CXXFLAGS" do
@@ -107,7 +110,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "overrides CPPFLAGS" do
@@ -117,7 +121,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
         it "preserves anything else" do
@@ -128,7 +133,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -150,7 +156,8 @@ module Omnibus
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
             "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -176,7 +183,8 @@ module Omnibus
               "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
               "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -199,7 +207,8 @@ module Omnibus
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -225,14 +234,15 @@ module Omnibus
               "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "LD_OPTIONS"      => "-R/opt/project/embedded/lib -M #{project_root}/files/mapfile/solaris",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
       end
 
       context "on mac_os_x" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.9.2") }
+        before { stub_ohai(platform: "mac_os_x", version: "10.12") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -241,7 +251,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -266,14 +277,15 @@ module Omnibus
             "OBJECT_MODE"     => "64",
             "ARFLAGS"         => "-X64 cru",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
 
       context "on freebsd 9" do
         before do
-          stub_ohai(platform: "freebsd", version: "9.2")
+          stub_ohai(platform: "freebsd", version: "9.3")
         end
 
         it "sets the defaults" do
@@ -283,7 +295,8 @@ module Omnibus
             "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
             "LDFLAGS" => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH" => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -301,14 +314,16 @@ module Omnibus
               "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
               "LDFLAGS" => "-L/opt/project/embedded/lib",
               "LD_RUN_PATH" => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig" )
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
+            )
           end
         end
       end
 
       context "on freebsd 10" do
         before do
-          stub_ohai(platform: "freebsd", version: "10.0")
+          stub_ohai(platform: "freebsd", version: "10.3")
         end
 
         it "Clang as the default compiler" do
@@ -320,7 +335,8 @@ module Omnibus
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LDFLAGS"         => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -329,6 +345,7 @@ module Omnibus
         before do
           # sles identifies as suse
           stub_ohai(platform: "suse", version: "11.4")
+          allow(subject).to receive(:which).with("gcc-4.8").and_return(false)
         end
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -337,7 +354,8 @@ module Omnibus
           "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
           "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
           "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+          "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -356,7 +374,8 @@ module Omnibus
               "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
               "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
               )
           end
         end
@@ -365,7 +384,8 @@ module Omnibus
       context "on sles 12" do
         before do
           # sles identifies as suse
-          stub_ohai(platform: "suse", version: "12.1")
+          stub_ohai(platform: "suse", version: "12.2")
+          allow(subject).to receive(:which).with("gcc-4.8").and_return(false)
         end
 
         it "sets the defaults" do
@@ -375,7 +395,8 @@ module Omnibus
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
       end
@@ -384,19 +405,20 @@ module Omnibus
         let(:win_arch_i386) { true }
 
         before do
-          stub_ohai(platform: "windows", version: "2012")
+          stub_ohai(platform: "windows", version: "2012R2")
           allow(subject).to receive(:windows_arch_i386?).and_return(win_arch_i386)
         end
 
         context "in 32-bit mode" do
           it "sets the default" do
             expect(subject.with_standard_compiler_flags).to eq(
-              "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O2 -fno-lto -march=i686",
+              "CFLAGS"          => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -m32 -O3 -march=i686",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m32 -fno-lto",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -406,12 +428,13 @@ module Omnibus
 
           it "sets the default" do
             expect(subject.with_standard_compiler_flags).to eq(
-              "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O2 -fno-lto -march=x86-64",
+              "CFLAGS"          => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -m64 -O3 -march=x86-64",
               "LDFLAGS"         => "-L/opt/project/embedded/lib -m64 -fno-lto",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig"
+              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+              "OMNIBUS_INSTALL_DIR" => "/opt/project"
             )
           end
         end
@@ -464,7 +487,7 @@ module Omnibus
 
       context "on Windows" do
         before do
-          stub_ohai(platform: "windows", version: "2012")
+          stub_ohai(platform: "windows", version: "2012R2")
         end
 
         let(:separator) { ";" }
@@ -481,9 +504,10 @@ module Omnibus
             allow(ENV).to receive(:keys).and_return(%w{ Path PATH })
           end
 
-          it "returns a path key of `Path`" do
-            expect(subject.with_embedded_path).to eq(
-              "Path" => prepended_path
+          it "and raises an error when PATH is also set" do
+            expect { subject.with_embedded_path }.to raise_error(
+              RuntimeError,
+              "The current omnibus environment has multiple PATH/Path variables."
             )
           end
         end
@@ -503,7 +527,7 @@ module Omnibus
     end
 
     describe "#ohai" do
-      before { stub_ohai(platform: "ubuntu", version: "12.04") }
+      before { stub_ohai(platform: "ubuntu", version: "16.04") }
 
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:ohai)

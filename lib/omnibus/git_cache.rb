@@ -32,7 +32,7 @@ module Omnibus
     # will not have the generated content, so these snapshots would be
     # incompatible with the current omnibus codebase. Incrementing the serial
     # number ensures these old shapshots will not be used in subsequent builds.
-    SERIAL_NUMBER = 2
+    SERIAL_NUMBER = 3
 
     REQUIRED_GIT_FILES = %w{
 HEAD
@@ -76,6 +76,9 @@ refs}.freeze
       else
         create_directory(File.dirname(cache_path))
         git_cmd("init -q")
+        # On windows, git is very picky about single vs double quotes
+        git_cmd("config --local user.name \"Omnibus Git Cache\"")
+        git_cmd("config --local user.email \"omnibus@localhost\"")
         true
       end
     end
@@ -140,21 +143,24 @@ refs}.freeze
 
       create_cache_path
 
-      restore_me = false
-      cmd = git_cmd(%Q{tag -l "#{tag}"})
-
-      cmd.stdout.each_line do |line|
-        restore_me = true if tag == line.chomp
-      end
-
-      if restore_me
-        log.internal(log_key) { "Detected tag `#{tag}' can be restored, restoring" }
-        git_cmd(%Q{checkout -f "#{tag}"})
+      if has_tag(tag)
+        log.internal(log_key) { "Detected tag `#{tag}' can be restored, marking it for restoration" }
+        git_cmd(%Q{tag -f restore_here "#{tag}"})
         true
+      elsif has_tag("restore_here")
+        log.internal(log_key) { "Could not find tag `#{tag}', restoring previous tag" }
+        restore_from_cache
+        false
       else
-        log.internal(log_key) { "Could not find tag `#{tag}', skipping restore" }
+        log.internal(log_key) { "Could not find marker tag `restore_here', nothing to restore" }
         false
       end
+    end
+
+    def restore_from_cache
+      git_cmd("checkout -f restore_here")
+    ensure
+      git_cmd("tag -d restore_here")
     end
 
     #
@@ -190,7 +196,14 @@ refs}.freeze
     # @return [Mixlib::Shellout] the underlying command object.
     #
     def git_cmd(command)
-      shellout!("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} #{command}")
+      shellout!([
+        "git",
+        "-c core.autocrlf=false",
+        "-c core.ignorecase=false",
+        "--git-dir=\"#{cache_path}\"",
+        "--work-tree=\"#{install_dir}\"",
+        command,
+      ].join(" "))
     end
 
     #
@@ -209,6 +222,11 @@ refs}.freeze
     # @return [String]
     def log_key
       @log_key ||= "#{super}: #{software.name}"
+    end
+
+    def has_tag(tag)
+      cmd = git_cmd(%Q{tag -l "#{tag}"})
+      cmd.stdout.lines.any? { |line| tag == line.chomp }
     end
   end
 end

@@ -1,17 +1,37 @@
+# find disks that start with <%= volume_name %>
+set found_disk to do shell script "ls /Volumes/ | grep '<%= volume_name %>*'"
+
+if found_disk is {} then
+	set errormsg to "Disk " & found_disk & " not found"
+	error errormsg
+end if
+
 tell application "Finder"
-  tell disk "<%= volume_name %>"
-    open
-    set current view of container window to icon view
-    set toolbar visible of container window to false
-    set statusbar visible of container window to false
-    set the bounds of container window to {<%= window_bounds %>}
-    set theViewOptions to the icon view options of container window
-    set arrangement of theViewOptions to not arranged
-    set icon size of theViewOptions to 72
+	# In case finder has been closed somehow
+	reopen
+	# Reactivate it in case it is "out of focus"
+	activate
+	# Deactivate any current selections
+	set selection to {}
+	# Set it to the location of the proper volume
+	set target of Finder window 1 to found_disk
+	# We like icons
+	set current view of Finder window 1 to icon view
+	# No toolbar or statusbar
+	set toolbar visible of Finder window 1 to false
+	set statusbar visible of Finder window 1 to false
+	# How big and where does it live on the desktop
+	set the bounds of Finder window 1 to {<%= window_bounds %>}
+  # We now talk to the disk object that is a subset of the "Finder"
+  tell disk found_disk
+  	# Pull the view options from the Icon View object
+    # The container window is how we grab hold of the "Finder" window in the
+    # context of the disk object (the disk object is a sub-thing of the app)
+  	set theViewOptions to the icon view options of container window
     set background picture of theViewOptions to file ".support:background.png"
-    delay 5
-    set position of item "<%= pkg_name %>" of container window to {<%= pkg_position %>}
-    update without registering applications
-    delay 5
+  	set arrangement of theViewOptions to not arranged
+  	set icon size of theViewOptions to 72
+  	set position of item "<%= pkg_name %>" of container window to {<%= pkg_position %>}
+  	update without registering applications
   end tell
 end tell

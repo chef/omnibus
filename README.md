@@ -1,6 +1,8 @@
 # ![Omnibus Icon](lib/omnibus/assets/README-logo.png) Omnibus
 
-[![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem] [![Travis Build Status](http://img.shields.io/travis/chef/omnibus.svg?label=Travis CI)][travis] [![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
+[![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
+[![Travis Build Status](http://img.shields.io/travis/chef/omnibus.svg?label=Travis%20CI)][travis]
+[![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
 
 Easily create full-stack installers for your project across a variety of platforms.
 
@@ -15,7 +17,7 @@ This project is managed by the CHEF Release Engineering team. For more informati
 
 Omnibus is designed to run with a minimal set of prerequisites. You will need the following:
 
-- Ruby 2.1+
+- Ruby 2.2+
 - Bundler
 
 ## Get Started
@@ -48,11 +50,11 @@ Omnibus determines the platform for which to build an installer based on **the p
 
 ## More documentation
 
-- [Building on Debian](docs/Building on Debian.md)
-- [Building on OSX](docs/Building on OSX.md)
-- [Building on RHEL](docs/Building on RHEL.md)
-- [Building on Windows](docs/Building on Windows.md)
-- [Build Cache](docs/Build Cache.md)
+- [Building on Debian](docs/Building%20on%20Debian.md)
+- [Building on OSX](docs/Building%20on%20OSX.md)
+- [Building on RHEL](docs/Building%20on%20RHEL.md)
+- [Building on Windows](docs/Building%20on%20Windows.md)
+- [Build Cache](docs/Build%20Cache.md)
 
 ## Configuration DSL
 
@@ -76,10 +78,12 @@ use_git_caching false
 use_s3_caching true
 s3_access_key  ENV['S3_ACCESS_KEY']
 s3_secret_key  ENV['S3_SECRET_KEY']
+# You can use the Shared Credentials files in place of the s3_access_key and s3_secret_key.
+#s3_profile    ENV['S3_PROFILE']
 s3_bucket      ENV['S3_BUCKET']
 ```
 
-For more information, please see the [`Config` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Config).
+For more information, please see the [`Config` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Config).
 
 You can tell Omnibus to load a different configuration file by passing the `--config` option to any command:
 
@@ -113,19 +117,19 @@ dependency "chef"
 
 Some DSL methods available include:
 
-   DSL Method     | Description
-:---------------: | ----------------------------------------------------------------
-     `name`       | The name of the project
-  `install_dir`   | The desired install location of the package
- `build_version`  | The package version
+DSL Method        | Description
+:---------------- | ----------------------------------------------------------------
+`name`            | The name of the project
+`install_dir`     | The desired install location of the package
+`build_version`   | The package version
 `build_iteration` | The package iteration number
-  `dependency`    | An Omnibus software-defined component to include in this package
-    `package`     | Invoke a packager-specific DSL
-   `compress`     | Invoke a compressor-specific DSL
+`dependency`      | An Omnibus software-defined component to include in this package
+`package`         | Invoke a packager-specific DSL
+`compress`        | Invoke a compressor-specific DSL
 
 By default a timestamp is appended to the build_version. You can turn this behavior off by setting `append_timestamp` to `false` in your configuration file or using `--override append_timestamp:false` at the command line.
 
-For more information, please see the [`Project` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Project).
+For more information, please see the [`Project` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Project).
 
 ### Software
 
@@ -185,6 +189,7 @@ DSL Method          | Description
 `mkdir`             | Create the given directory
 `touch`             | Create the given empty file
 `delete`            | Remove the given file or directory
+`strip`             | Strip symbols from binaries on a given file or directory
 `copy`              | Copy a to b
 `move`              | Move a to b
 `link`              | Link a to b

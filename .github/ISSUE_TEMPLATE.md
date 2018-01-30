@@ -22,5 +22,3 @@ The relevant output of the Omnibus build or a link to a gist of the entire build
 The verbose build output (`omnibus build <PROJECT> -l internal`) may be useful, but please link to a gist, or truncate it.
 
 --------------------------------------------------
-/cc @chef/omnibus-maintainers <- This ensures the Omnibus Maintainers team are notified to review this PR.
-

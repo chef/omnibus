@@ -1,5 +1,4 @@
 require "spec_helper"
-require "pry"
 
 module Omnibus
   describe Packager::IPS do
@@ -136,6 +135,16 @@ module Omnibus
       end
     end
 
+    describe "#write_versionlock_file" do
+      let(:versionlock_file) { File.join(staging_dir, "version-lock") }
+
+      it "creates the version-lock file" do
+        subject.write_versionlock_file
+        versionlock_file_contents = File.read(versionlock_file)
+        expect(versionlock_file_contents).to include("<transform pkg depend -> default facet.version-lock.*> false>")
+      end
+    end
+
     describe "#write_transform_file" do
       let(:transform_file) { File.join(staging_dir, "doc-transform") }
 
@@ -144,17 +153,76 @@ module Omnibus
         transform_file_contents = File.read(transform_file)
         expect(transform_file_contents).to include("<transform dir path=opt$ -> edit group bin sys>")
         expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file ruby env>")
+        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file make env>")
+        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file perl env>")
       end
     end
 
     describe "#write_pkg_metadata" do
+      let(:resources_path) { File.join(tmp_path, "resources/path") }
+      let(:manifest_file) { File.join(staging_dir, "gen.manifestfile") }
+
       it "should create metadata correctly" do
         subject.write_pkg_metadata
-        manifest_file = File.join(staging_dir, "gen.manifestfile")
-        manifest_file_contents = File.read(manifest_file)
         expect(File.exist?(manifest_file)).to be(true)
+        manifest_file_contents = File.read(manifest_file)
         expect(manifest_file_contents).to include("set name=pkg.fmri value=developer/versioning/project@1.2.3,5.11-2")
         expect(manifest_file_contents).to include("set name=variant.arch value=i386")
+      end
+
+      context "when both symlinks.erb and project-symlinks.erb exists" do
+        before do
+          FileUtils.mkdir_p(resources_path)
+          allow(subject).to receive(:resources_path).and_return(resources_path)
+          File.open(File.join(resources_path, "project-symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/ohai target=<%= projectdir %>/bin/ohai")
+            f.puts("link path=<%= projectdir %>/bin/gmake target=<%= projectdir %>/embedded/bin/make")
+          end
+          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/knife target=<%= projectdir %>/bin/knife")
+            f.puts("link path=<%= projectdir %>/bin/berks target=<%= projectdir %>/embedded/bin/berks")
+          end
+        end
+
+        it "should render project-symlinks.erb and append to metadata contents" do
+          subject.write_pkg_metadata
+          expect(subject.symlinks_file).to eq("project-symlinks.erb")
+          expect(File.exist?(manifest_file)).to be(true)
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+          expect(manifest_file_contents).to include("link path=/opt/project/bin/gmake target=/opt/project/embedded/bin/make")
+        end
+      end
+
+      context "when only symlinks.erb exists" do
+        before do
+          FileUtils.mkdir_p(resources_path)
+          allow(subject).to receive(:resources_path).and_return(resources_path)
+          File.open(File.join(resources_path, "symlinks.erb"), "w+") do |f|
+            f.puts("link path=usr/bin/knife target=<%= projectdir %>/bin/knife")
+            f.puts("link path=<%= projectdir %>/bin/berks target=<%= projectdir %>/embedded/bin/berks")
+          end
+        end
+
+        it "should render symlinks.erb and append to metadata contents" do
+          subject.write_pkg_metadata
+          expect(subject.symlinks_file).to eq("symlinks.erb")
+          expect(File.exist?(manifest_file)).to be(true)
+          manifest_file_contents = File.read(manifest_file)
+          expect(manifest_file_contents).to include("link path=usr/bin/knife target=/opt/project/bin/knife")
+          expect(manifest_file_contents).to include("link path=/opt/project/bin/berks target=/opt/project/embedded/bin/berks")
+        end
+      end
+
+      context "when symlinks_file does not exist" do
+        it "#write_pkg_metadata does not include symlinks" do
+          subject.write_pkg_metadata
+          manifest_file = File.join(staging_dir, "gen.manifestfile")
+          manifest_file_contents = File.read(manifest_file)
+          expect(subject.symlinks_file).to be_nil
+          expect(manifest_file_contents).not_to include("link path=usr/bin/ohai target=/opt/project/bin/ohai")
+          expect(manifest_file_contents).not_to include("link path=usr/bin/knife target=/opt/project/bin/knife")
+        end
       end
     end
 
@@ -176,6 +244,8 @@ module Omnibus
           .with("pkgmogrify -DARCH=`uname -p` #{staging_dir}/project.p5m.3 #{staging_dir}/doc-transform | pkgfmt > #{staging_dir}/project.p5m.4")
         expect(subject).to receive(:shellout!)
           .with("pkgdepend resolve -m #{staging_dir}/project.p5m.4")
+        expect(subject).to receive(:shellout!)
+          .with("pkgmogrify #{staging_dir}/project.p5m.4.res #{staging_dir}/version-lock > #{staging_dir}/project.p5m.5.res")
         subject.generate_pkg_deps
       end
     end
@@ -183,7 +253,7 @@ module Omnibus
     describe "#validate_pkg_manifest" do
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
-          .with("pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_dir}/project.p5m.4.res")
+          .with("pkglint -c /tmp/lint-cache -r http://pkg.oracle.com/solaris/release #{staging_dir}/project.p5m.5.res")
         subject.validate_pkg_manifest
       end
     end
@@ -201,7 +271,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with("pkgrepo -s #{staging_dir}/publish/repo set publisher/prefix=Omnibus")
         expect(subject).to receive(:shellout!)
-          .with("pkgsend publish -s #{staging_dir}/publish/repo -d #{staging_dir}/proto_install #{staging_dir}/project.p5m.4.res")
+          .with("pkgsend publish -s #{staging_dir}/publish/repo -d #{staging_dir}/proto_install #{staging_dir}/project.p5m.5.res")
 
         expect(shellout).to receive(:stdout)
         subject.publish_ips_pkg
