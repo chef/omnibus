@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.4 -->
+<!-- latest_release 5.6.5 -->
+## [v5.6.5](https://github.com/chef/omnibus/tree/v5.6.5) (2018-01-30)
+
+#### Merged Pull Requests
+- Add config to allow rubygems publish and promote [#816](https://github.com/chef/omnibus/pull/816) ([scotthain](https://github.com/scotthain))
+<!-- latest_release -->
+
 ## [v5.6.4](https://github.com/chef/omnibus/tree/v5.6.4) (2018-01-29)
 
 #### Merged Pull Requests
 - Update custom action and support MSIFASTINSTALL property [#815](https://github.com/chef/omnibus/pull/815) ([stuartpreston](https://github.com/stuartpreston))
-<!-- latest_release -->
 
 ## [v5.6.3](https://github.com/chef/omnibus/tree/v5.6.3) (2018-01-26)
 
