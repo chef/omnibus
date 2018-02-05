@@ -12,6 +12,7 @@ Check out [How Chef is Maintained](https://github.com/chef/chef-rfc/blob/master/
 
 ## Maintainers
 
+- [Robb Kidd](https://github.com/robbkidd)
 - [Seth Chisamore](https://github.com/schisamo)
 - [Jeremiah Snapp](https://github.com/jeremiahsnapp)
 - [Jaymala Sinha](https://github.com/jaymalasinha)
