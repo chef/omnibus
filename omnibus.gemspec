@@ -35,6 +35,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency "ffi-yajl",         "~> 2.2"
   gem.add_dependency "license_scout"
   gem.add_dependency 'httparty'
+  # Pin ffi (dep of ohai) to a version that can be compiled with older autoconfs
+  gem.add_dependency "ffi",              "1.9.18"
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"
