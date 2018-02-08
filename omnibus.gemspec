@@ -34,7 +34,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "pedump"
 
   # from Gemfile
-  gem.add_dependency "license_scout"
+  gem.add_dependency "license_scout", "~> 1.0"
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"
