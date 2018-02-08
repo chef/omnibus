@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.7 -->
+<!-- latest_release 5.6.8 -->
+## [v5.6.8](https://github.com/chef/omnibus/tree/v5.6.8) (2018-02-08)
+
+#### Merged Pull Requests
+- Avoid using git to determine gem contents [#820](https://github.com/chef/omnibus/pull/820) ([tduffield](https://github.com/tduffield))
+<!-- latest_release -->
+
 ## [v5.6.7](https://github.com/chef/omnibus/tree/v5.6.7) (2018-02-08)
 
 #### Merged Pull Requests
 - Pin omnibus to license_scout ~&gt; 1.0 [#819](https://github.com/chef/omnibus/pull/819) ([tduffield](https://github.com/tduffield))
-<!-- latest_release -->
 
 ## [v5.6.6](https://github.com/chef/omnibus/tree/v5.6.6) (2018-01-30)
 
