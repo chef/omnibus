@@ -292,7 +292,7 @@ module Omnibus
         val = canonicalize_source(val)
 
         extra_keys = val.keys - [
-          :git, :path, :url, # fetcher types
+          :git, :file, :path, :url, # fetcher types
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
           :cookie, :warning, :unsafe, :extract, # used by net_fetcher
           :options, # used by path_fetcher
@@ -303,7 +303,7 @@ module Omnibus
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
         end
 
-        duplicate_keys = val.keys & [:git, :path, :url]
+        duplicate_keys = val.keys & [:git, :file, :path, :url]
         unless duplicate_keys.size < 2
           raise InvalidValue.new(:source,
             "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
@@ -1053,6 +1053,8 @@ module Omnibus
           :url
         elsif source[:git]
           :git
+        elsif source[:file]
+          :file
         elsif source[:path]
           :path
         end
