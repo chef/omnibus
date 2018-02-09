@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.8 -->
+<!-- latest_release 5.6.9 -->
+## [v5.6.9](https://github.com/chef/omnibus/tree/v5.6.9) (2018-02-09)
+
+#### Merged Pull Requests
+- Add &quot;:file&quot; to the list of supported sources [#808](https://github.com/chef/omnibus/pull/808) ([legal90](https://github.com/legal90))
+<!-- latest_release -->
+
 ## [v5.6.8](https://github.com/chef/omnibus/tree/v5.6.8) (2018-02-08)
 
 #### Merged Pull Requests
 - Avoid using git to determine gem contents [#820](https://github.com/chef/omnibus/pull/820) ([tduffield](https://github.com/tduffield))
-<!-- latest_release -->
 
 ## [v5.6.7](https://github.com/chef/omnibus/tree/v5.6.7) (2018-02-08)
 
