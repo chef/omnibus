@@ -8,7 +8,6 @@ environment:
   matrix:
     - RUBY_VERSION: 24
     - RUBY_VERSION: 23
-    - RUBY_VERSION: 22
 
 clone_folder: c:\projects\omnibus
 clone_depth: 1

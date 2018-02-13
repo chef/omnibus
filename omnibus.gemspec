@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.description    = gem.summary
   gem.homepage       = "https://github.com/chef/omnibus"
 
-  gem.required_ruby_version = ">= 2.2"
+  gem.required_ruby_version = ">= 2.3"
 
   gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/*")
   gem.bindir = "bin"
@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "cleanroom",        "~> 1.0"
   gem.add_dependency "ffi-yajl",         "~> 2.2"
   gem.add_dependency "mixlib-shellout",  "~> 2.0"
-  gem.add_dependency "ohai",             "~> 8.0"
+  gem.add_dependency "ohai",             ">= 8.6.0.alpha.1", "< 15"
   gem.add_dependency "ruby-progressbar", "~> 1.7"
   gem.add_dependency "thor",             "~> 0.18"
   gem.add_dependency "license_scout",    "~> 1.0"
