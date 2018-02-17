@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.9 -->
+<!-- latest_release 5.6.10 -->
+## [v5.6.10](https://github.com/chef/omnibus/tree/v5.6.10) (2018-02-17)
+
+#### Merged Pull Requests
+- Loosen the pinning on &quot;ohai&quot; [#823](https://github.com/chef/omnibus/pull/823) ([richardc](https://github.com/richardc))
+<!-- latest_release -->
+
 ## [v5.6.9](https://github.com/chef/omnibus/tree/v5.6.9) (2018-02-09)
 
 #### Merged Pull Requests
 - Add &quot;:file&quot; to the list of supported sources [#808](https://github.com/chef/omnibus/pull/808) ([legal90](https://github.com/legal90))
-<!-- latest_release -->
 
 ## [v5.6.8](https://github.com/chef/omnibus/tree/v5.6.8) (2018-02-08)
 
