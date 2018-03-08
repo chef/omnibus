@@ -668,6 +668,7 @@ EOH
       "AGPL-3.0",      # GNU Affero General Public License v3
       "GPL-2.0",       # GNU General Public License version 2.0
       "GPL-3.0",       # GNU General Public License version 3.0
+      "LGPL-2.0",      # GNU Library or "Lesser" General Public License version 2.0
       "LGPL-2.1",      # GNU Library or "Lesser" General Public License version 2.1
       "LGPL-3.0",      # GNU Library or "Lesser" General Public License version 3.0
       "HPND",          # Historical Permission Notice and Disclaimer
