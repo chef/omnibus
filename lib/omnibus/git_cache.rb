@@ -32,7 +32,7 @@ module Omnibus
     # will not have the generated content, so these snapshots would be
     # incompatible with the current omnibus codebase. Incrementing the serial
     # number ensures these old shapshots will not be used in subsequent builds.
-    SERIAL_NUMBER = 3
+    SERIAL_NUMBER = 4
 
     REQUIRED_GIT_FILES = %w{
 HEAD
@@ -126,11 +126,12 @@ refs}.freeze
 
       create_cache_path
       remove_git_dirs
+      hardlinks = find_hardlinks
 
       git_cmd("add -A -f")
 
       begin
-        git_cmd(%Q{commit -q -m "Backup of #{tag}"})
+        git_cmd("commit -q -F -", input: "Backup of #{tag}\n\n#{FFI_Yajl::Encoder.encode(hardlinks, pretty: true)}")
       rescue CommandFailed => e
         raise unless e.message.include?("nothing to commit")
       end
@@ -159,6 +160,7 @@ refs}.freeze
 
     def restore_from_cache
       git_cmd("checkout -f restore_here")
+      restore_hardlinks
     ensure
       git_cmd("tag -d restore_here")
     end
@@ -181,6 +183,43 @@ refs}.freeze
         FileUtils.rm_rf(File.dirname(path))
       end
 
+      true
+    end
+
+    # Discover any hardlinked files in the install_dir
+    #
+    # @return [Hash{String => Array<String>}]
+    def find_hardlinks
+      hardlink_sources = {}
+      hardlinks = {}
+      Omnibus::FileSyncer.all_files_under(install_dir).each do |path|
+        stat = File.stat(path)
+        if stat.ftype.to_sym == :file && stat.nlink > 1
+          key = [stat.dev, stat.ino]
+          if source = hardlink_sources[key]
+            hardlinks[source] ||= []
+            hardlinks[source] << path
+          else
+            hardlink_sources[key] = path
+          end
+        end
+      end
+      hardlinks
+    end
+
+    # Restores any hardlinking from the commit message body.  Body is assumed to
+    # be the JSON encoded return value from #find_hardlinks.
+    #
+    # @return true
+    def restore_hardlinks
+      body = git_cmd("log --format=%b -n 1").stdout
+      hardlinks = FFI_Yajl::Parser.parse(body)
+
+      hardlinks.each do |source, dest|
+        dest.each do |path|
+          FileUtils.ln(source, path, force: true)
+        end
+      end
       true
     end
 

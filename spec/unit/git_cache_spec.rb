@@ -105,10 +105,83 @@ module Omnibus
       end
     end
 
+    describe "#find_hardlinks" do
+      let(:regular_file_stat) do
+        stat = double(File::Stat)
+        allow(stat).to receive(:ftype).and_return(:file)
+        allow(stat).to receive(:nlink).and_return(1)
+        stat
+      end
+
+      let(:hardlinked_file_stat) do
+        stat = double(File::Stat)
+        allow(stat).to receive(:ftype).and_return(:file)
+        allow(stat).to receive(:nlink).and_return(2)
+        allow(stat).to receive(:dev).and_return(5)
+        allow(stat).to receive(:ino).and_return(25)
+        stat
+      end
+
+      before do
+        allow(File).to receive(:stat).and_return(regular_file_stat)
+        allow(File).to receive(:stat).with("foo").and_return(hardlinked_file_stat)
+        allow(File).to receive(:stat).with("bar").and_return(hardlinked_file_stat)
+
+        allow(Omnibus::FileSyncer).to receive(:all_files_under).and_return(
+          %w{ foo bar baz quux }
+        )
+      end
+
+      it "returns some hardlinks" do
+        expect(ipc.find_hardlinks).to eq({ "foo" => ["bar"] })
+      end
+    end
+
+    describe "#restore_hardlinks" do
+      let(:hardlinks) do
+        {
+          "/opt/demo/bin/file1" => [
+            "/opt/demo/bin/file2",
+            "/opt/demo/bin/file3",
+          ],
+        }
+      end
+
+      let(:git_log_output) { FFI_Yajl::Encoder.encode(hardlinks) }
+
+      let(:log_cmd) do
+        cmd_double = double(Mixlib::ShellOut)
+        allow(cmd_double).to receive(:stdout).and_return(git_log_output)
+        cmd_double
+      end
+
+      before(:each) do
+        allow(ipc).to receive(:git_cmd)
+          .with("log --format=%b -n 1").and_return(log_cmd)
+        allow(FileUtils).to receive(:ln)
+      end
+
+      it "checks the commit message" do
+        expect(ipc).to receive(:git_cmd)
+          .with("log --format=%b -n 1")
+
+        ipc.restore_hardlinks
+      end
+
+      it "recreates hardlinks" do
+        expect(FileUtils).to receive(:ln)
+          .with("/opt/demo/bin/file1", "/opt/demo/bin/file2", force: true)
+        expect(FileUtils).to receive(:ln)
+          .with("/opt/demo/bin/file1", "/opt/demo/bin/file3", force: true)
+        ipc.restore_hardlinks
+      end
+    end
+
     describe "#incremental" do
       before(:each) do
         allow(ipc).to receive(:git_cmd)
         allow(ipc).to receive(:create_cache_path)
+        allow(ipc).to receive(:find_hardlinks).and_return({})
       end
 
       it "creates the cache path" do
@@ -125,7 +198,7 @@ module Omnibus
 
       it "commits the backup for the software" do
         expect(ipc).to receive(:git_cmd)
-          .with(%Q{commit -q -m "Backup of #{ipc.tag}"})
+          .with("commit -q -F -", input: "Backup of #{ipc.tag}\n\n{\n\n}\n")
         ipc.incremental
       end
 
@@ -176,6 +249,7 @@ module Omnibus
         allow(ipc).to receive(:git_cmd)
           .with(%Q{tag -f restore_here "#{ipc.tag}"})
         allow(ipc).to receive(:create_cache_path)
+        allow(ipc).to receive(:restore_hardlinks)
       end
 
       it "creates the cache path" do
