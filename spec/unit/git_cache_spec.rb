@@ -244,15 +244,21 @@ module Omnibus
         allow(project).to receive(:install_dir)
           .and_return(terrible_install_dir)
         allow(ipc).to receive(:shellout!)
-          .with(%Q{git #{git_flags} version})
+          .with(%Q{git #{git_flags} version}, {})
           .and_return("git version 2.11.0")
       end
 
       it "doesn't mangle an #install_dir with spaces" do
         expect(ipc.send(:install_dir)).to eq(terrible_install_dir)
         expect(ipc).to receive(:shellout!)
-          .with(%Q{git #{git_flags} version})
+          .with(%Q{git #{git_flags} version}, {})
         ipc.send(:git_cmd, "version")
+      end
+
+      it "passes options" do
+        expect(ipc).to receive(:shellout!)
+          .with(%Q{git #{git_flags} commit -F -}, input: "Commit message")
+        ipc.send(:git_cmd, "commit -F -", input: "Commit message")
       end
     end
   end
