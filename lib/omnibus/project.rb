@@ -164,6 +164,10 @@ module Omnibus
     # remove duplicate slashes which might be caused as a result of string
     # interpolation.
     #
+    # NOTE: This now allows for EXISTING directories (like C:\Program Files) 
+    # with spaces in the path, but does not allow for the application's target
+    # directory to have spaces.
+    #
     # @example
     #   install_dir '/opt/chef'
     #
@@ -180,6 +184,21 @@ module Omnibus
         @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, "/opt/chef"))
       else
         @install_dir = val.tr('\\', "/").squeeze("/").chomp("/")
+        if windows? && @install_dir.include?(" ")          
+          dir_no_spacer = ""
+          @install_dir.split("/").each do |dirpart|
+            if dir_no_spacer.empty?
+              dir_no_spacer = dirpart # Assuming <drive>:
+            else
+              dir_no_spacer << "/" << dirpart
+              if dir_no_spacer.include?(" ")
+                # This will take care of existing directories like "\Program Files\"
+                dir_no_spacer = shellout!("for %1 in (\"#{dir_no_spacer}\") do @echo %~s1").stdout.strip
+              end
+            end
+            @install_dir = dir_no_spacer
+          end
+        end
       end
     end
     expose :install_dir
