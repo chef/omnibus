@@ -1,7 +1,7 @@
 sudo: false
 rvm:
-  - 2.3.4
-  - 2.4.1
+  - 2.5
+  - 2.4
 bundler_args: "--jobs 7 --without docs local"
 branches:
   only:

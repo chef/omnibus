@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.description    = gem.summary
   gem.homepage       = "https://github.com/chef/omnibus"
 
-  gem.required_ruby_version = ">= 2.3"
+  gem.required_ruby_version = ">= 2.4"
 
   gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/*")
   gem.bindir = "bin"
