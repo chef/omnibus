@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.description    = gem.summary
   gem.homepage       = "https://github.com/chef/omnibus"
 
-  gem.required_ruby_version = ">= 2.3"
+  gem.required_ruby_version = ">= 2.4"
 
   gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/*")
   gem.bindir = "bin"
@@ -37,7 +37,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"
   gem.add_development_dependency "aruba",       "~> 0.5"
-  gem.add_development_dependency "chefstyle"
+  gem.add_development_dependency "chefstyle",   "= 0.6"
   gem.add_development_dependency "fauxhai",     "~> 5.2"
   gem.add_development_dependency "rspec",       "~> 3.0"
   gem.add_development_dependency "rspec-json_expectations"
