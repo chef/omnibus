@@ -802,7 +802,7 @@ module Omnibus
     #
     def text_manifest_path(path = NULL)
       if null?(path)
-        @test_manifest_path || File.join(install_dir, "version-manifest.txt")
+        @text_manifest_path || File.join(install_dir, "version-manifest.txt")
       else
         @text_manifest_path = path
       end
