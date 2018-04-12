@@ -93,7 +93,10 @@ module Omnibus
         expect(subject.install_dir).to eq("/opt/chef")
       end
 
-      it "converts Windows slashes to Ruby ones" do
+      # Project#install_dir calls File.expand_path which will
+      # cause this test to fail on unix-like systems where Ruby
+      # doesn't handle the drive-letter in expand_path
+      it "converts Windows slashes to Ruby ones", :windows_only => true do
         subject.install_dir('C:\\chef\\chefdk')
         expect(subject.install_dir).to eq("C:/chef/chefdk")
       end
@@ -101,6 +104,11 @@ module Omnibus
       it "removes trailing slashes" do
         subject.install_dir("/opt/chef//")
         expect(subject.install_dir).to eq("/opt/chef")
+      end
+
+      it "expands relative paths" do
+        subject.install_dir("./local")
+        expect(subject.install_dir).to eq("#{Dir.pwd}/local")
       end
 
       it "is a DSL method" do

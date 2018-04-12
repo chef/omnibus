@@ -18,7 +18,7 @@ module Omnibus
     let(:project_root) { File.join(tmp_path, "project/root") }
     let(:package_dir)  { File.join(tmp_path, "package/dir") }
     let(:staging_dir)  { File.join(tmp_path, "staging/dir") }
-    let(:install_dir)  { "C:/project" }
+    let(:install_dir) { "/project" }
 
     before do
       Config.project_root(project_root)
@@ -154,7 +154,7 @@ module Omnibus
       end
 
       it "has the correct content" do
-        project.install_dir("C:/foo/bar/blip")
+        project.install_dir("/foo/bar/blip")
         subject.write_source_file
         contents = File.read("#{staging_dir}/source.wxs")
 
