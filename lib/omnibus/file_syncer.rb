@@ -56,13 +56,13 @@ module Omnibus
     #
     def all_files_under(source, options = {})
       excludes = Array(options[:exclude]).map do |exclude|
-        [exclude, "#{exclude}/*"]
+        [exclude, "#{exclude}/**"]
       end.flatten
 
       source_files = glob(File.join(source, "**/*"))
       source_files = source_files.reject do |source_file|
         basename = relative_path_for(source_file, source)
-        excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH) }
+        excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH | File::FNM_PATHNAME) }
       end
     end
 
