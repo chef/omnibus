@@ -395,8 +395,8 @@ module Omnibus
         # ChefDK.  You should also explicitly specify the lockdir when going down this road.
         command << [ "'#{gem}'" ] if gem
 
-        # FIXME: appbundler lacks support for this argument when not also specifying the gem (3-arg appbundling lacks support)
-        # (if you really need this bug fixed, though, fix it in appbundler, don't try using the 4-arg version to try to
+        # FIXME: appbundler lacks support for this argument when not also specifying the gem (2-arg appbundling lacks support)
+        # (if you really need this bug fixed, though, fix it in appbundler, don't try using the 3-arg version to try to
         # get `--without` support, you will likely wind up going down a sad path).
         command << [ "--without", without.join(",") ] unless without.nil?
 
