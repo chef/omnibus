@@ -376,7 +376,6 @@ module Omnibus
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
-        gem              ||= software_name
 
         lockdir ||=
           begin
@@ -389,7 +388,8 @@ module Omnibus
             app_software.project_dir
           end
 
-        command = [ appbundler_bin, "'#{lockdir}'", "'#{bin_dir}'", "'#{gem}'" ]
+        command = [ appbundler_bin, "'#{lockdir}'", "'#{bin_dir}'" ]
+        command << [ "'#{gem}'" ] if gem
 
         command << [ "--without", without.join(",") ] unless without.nil?
 
