@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2014 Chef Software, Inc.
+# Copyright 2012-2018, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -372,19 +372,38 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(software_name, options = {})
+    def appbundle(software_name, lockdir: nil, gem: nil, without: nil, **options)
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
-        app_software = project.softwares.find do |p|
-          p.name == software_name
-        end
-
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
+
+        lockdir ||=
+          begin
+            app_software = project.softwares.find do |p|
+              p.name == software_name
+            end
+            if app_software.nil?
+              raise "could not find software definition for #{software_name}, add a dependency to it, or pass a lockdir argument to appbundle command."
+            end
+            app_software.project_dir
+          end
+
+        command = [ appbundler_bin, "'#{lockdir}'", "'#{bin_dir}'" ]
+
+        # This option is almost entirely for support of ChefDK and enables transitive gemfile lock construction in order
+        # to be able to decouple the dev gems for all the different components of ChefDK.  AKA:  don't use it outside of
+        # ChefDK.  You should also explicitly specify the lockdir when going down this road.
+        command << [ "'#{gem}'" ] if gem
+
+        # FIXME: appbundler lacks support for this argument when not also specifying the gem (2-arg appbundling lacks support)
+        # (if you really need this bug fixed, though, fix it in appbundler, don't try using the 3-arg version to try to
+        # get `--without` support, you will likely wind up going down a sad path).
+        command << [ "--without", without.join(",") ] unless without.nil?
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
 
-        shellout!("#{appbundler_bin} '#{app_software.project_dir}' '#{bin_dir}'", options)
+        shellout!(command.join(" "), options)
       end
     end
     expose :appbundle
