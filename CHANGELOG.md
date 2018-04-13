@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.11 -->
+<!-- latest_release 5.6.12 -->
+## [v5.6.12](https://github.com/chef/omnibus/tree/v5.6.12) (2018-04-13)
+
+#### Merged Pull Requests
+- Support appbundler 0.11.0 [#776](https://github.com/chef/omnibus/pull/776) ([lamont-granquist](https://github.com/lamont-granquist))
+<!-- latest_release -->
+
 ## [v5.6.11](https://github.com/chef/omnibus/tree/v5.6.11) (2018-04-05)
 
 #### Merged Pull Requests
 - Fix typo (fixes Project.text_manifest_path) [#832](https://github.com/chef/omnibus/pull/832) ([benwtr](https://github.com/benwtr))
-<!-- latest_release -->
 
 ## [v5.6.10](https://github.com/chef/omnibus/tree/v5.6.10) (2018-02-17)
 
