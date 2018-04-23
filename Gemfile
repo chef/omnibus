@@ -5,7 +5,7 @@ gemspec
 gem "pedump", git: "https://github.com/ksubrama/pedump", branch: "patch-1"
 
 # Always use license_scout from master
-gem "license_scout", github: "chef/license_scout"
+gem "license_scout", "~> 1.0.2"
 
 group :docs do
   gem "yard",          "~> 0.8"
