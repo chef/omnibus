@@ -279,15 +279,33 @@ module Omnibus
     #
     # @return [String]
     default(:s3_access_key) do
-      raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
+      if s3_profile || s3_role || s3_instance_profile
+        nil
+      else
+        raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
+      end
     end
 
     # The S3 secret key to use with S3 caching.
     #
     # @return [String]
     default(:s3_secret_key) do
-      raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
+      if s3_profile || s3_role || s3_instance_profile
+        nil
+      else
+        raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
+      end
     end
+
+    # The AWS credentials profile to use with S3 caching.
+    #
+    # @return [String, nil]
+    default(:s3_profile, nil)
+
+    # The path where the AWS credentials file can be found for the S3 caching profile
+    #
+    # @return [String, nil]
+    default(:s3_credentials_file_path, nil)
 
     # The region of the S3 bucket you want to cache software artifacts in.
     # Defaults to 'us-east-1'
@@ -296,6 +314,67 @@ module Omnibus
     default(:s3_region) do
       "us-east-1"
     end
+
+    # The HTTP or HTTPS endpoint to send requests to, when using non-standard endpoint
+    #
+    # @return [String, nil]
+    default(:s3_endpoint, nil)
+
+    # Use path style URLs instead of subdomains for S3 URLs
+    #
+    # @return [true, false]
+    default(:s3_force_path_style, false)
+
+    # Enable or disable S3 Accelerate support
+    #
+    # @return [true, false]
+    default(:s3_accelerate, false)
+
+    # Use a role with S3 caching
+    #
+    # @return [true, false]
+    default(:s3_role, false)
+
+    # The arn to use with the role
+    #
+    # @return [String, nil]
+    default(:s3_role_arn, nil)
+
+    # The session name to use with the role
+    #
+    # @return [String, nil]
+    default(:s3_role_session_name, nil)
+
+    # Use a profile to authenticate the role change
+    #
+    # @return [true, false]
+    default(:s3_sts_creds_profile, false)
+
+    # Use the ECS credentials to authenticate the role change
+    #
+    # @return [true, false]
+    default(:s3_sts_creds_ecs_credentials, false)
+
+    # Use an instance profile to authenticate the role change
+    #
+    # @return [true, false]
+    default(:s3_sts_creds_instance_profile, false)
+
+    # Use the instance profile to connect to s3
+    #
+    # @return [true, false]
+    default(:s3_instance_profile, false)
+
+    # S3 Authenticated Download
+    #
+    # @return [true, false]
+    default(:s3_authenticated_download, false)
+
+    # S3 use ECS instance credentials provider
+    #
+    # @return [true, false]
+    default(:s3_ecs_credentials, false)
+
 
     # --------------------------------------------------
     # @!endgroup

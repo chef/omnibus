@@ -15,6 +15,8 @@
 #
 
 require "aws-sdk"
+require "aws-sdk-core/credentials"
+require "aws-sdk-core/shared_credentials"
 require "base64"
 
 module Omnibus
@@ -32,10 +34,11 @@ module Omnibus
       #
       # @example
       #   {
-      #     region:               'us-east-1',
-      #     access_key_id:        Config.s3_access_key,
-      #     secret_access_key:    Config.s3_secret_key,
-      #     bucket_name:          Config.s3_bucket
+      #     region:                   'us-east-1',
+      #     bucket_name:              Config.s3_bucket,
+      #     endpoint:                 Config.s3_endpoint,
+      #     use_accelerate_endpoint:  Config.s3_accelerate
+      #     force_path_style:         Config.s3_force_path_style
       #   }
       #
       # @return [Hash<String, String>]
@@ -50,11 +53,70 @@ module Omnibus
       # @return [Aws::S3::Resource]
       #
       def client
-        @s3_client ||= Aws::S3::Resource.new(
-          region:            s3_configuration[:region],
-          access_key_id:     s3_configuration[:access_key_id],
-          secret_access_key: s3_configuration[:secret_access_key]
-        )
+        # Update the region before grabbing credentials,
+        # in case the credential type needs the region
+        Aws.config.update(region: s3_configuration[:region])
+        Aws.config.update(credentials: get_credentials)
+
+        @s3_client ||= Aws::S3::Resource.new(resource_params)
+      end
+
+      #
+      # S3 Resource Parameters
+      #
+      # @return [Hash]
+      #
+      def resource_params
+        params = {
+          use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint],
+          force_path_style: s3_configuration[:force_path_style],
+          region: s3_configuration[:region],
+        }
+
+        if s3_configuration[:use_accelerate_endpoint]
+          params[:endpoint] = "https://s3-accelerate.amazonaws.com"
+        end
+
+        if s3_configuration[:endpoint]
+          params[:endpoint] = s3_configuration[:endpoint]
+        end
+
+        if s3_configuration[:retry_limit]
+          params[:retry_limit] = s3_configuration[:retry_limit]
+        end
+
+        params
+      end
+
+      #
+      # Create credentials object based on credential profile or access key
+      # parameters for use by the client object.
+      #
+      # @return [Aws::SharedCredentials, Aws::Credentials]
+      def get_credentials(sts_client_credentials=false)
+        if s3_configuration[:role] && !sts_client_credentials
+          # The region must be set in order for Aws::STS::Client to be created
+          Aws::AssumeRoleCredentials.new(
+            client: Aws::STS::Client.new(
+              region: s3_configuration[:region],
+              credentials: get_credentials(sts_client_credentials=true),
+            ),
+            region: s3_configuration[:region],
+            role_arn: s3_configuration[:role_arn],
+            role_session_name: s3_configuration[:role_session_name]
+          )
+        elsif s3_configuration[:profile] || (sts_client_credentials && s3_configuration[:sts_creds_profile])
+          Aws::SharedCredentials.new(
+            profile_name: s3_configuration[:profile],
+            path: s3_configuration[:credentials_file_path]
+          )
+        elsif s3_configuration[:ecs_credentials] || (sts_client_credentials && s3_configuration[:sts_creds_ecs_credentials])
+          Aws::ECSCredentials.new()
+        elsif s3_configuration[:instance_profile] || (sts_client_credentials && s3_configuration[:sts_creds_instance_profile])
+          Aws::InstanceProfileCredentials.new()
+        elsif s3_configuration[:access_key_id] && s3_configuration[:secret_access_key]
+          Aws::Credentials.new(s3_configuration[:access_key_id], s3_configuration[:secret_access_key])
+        end
       end
 
       #

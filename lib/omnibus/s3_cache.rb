@@ -43,7 +43,7 @@ module Omnibus
       # @return [Array<String>]
       #
       def keys
-        bucket.objects.map(&:key)
+        client.bucket(Config.s3_bucket).objects.map(&:key)
       end
 
       #
@@ -103,6 +103,15 @@ module Omnibus
         end
       end
 
+      def get_object(filename, software)
+        object = client.bucket(Config.s3_bucket).object(S3Cache.key_for(software))
+        object.get(
+          response_target: filename,
+          bucket: Config.s3_bucket,
+          key: key_for(software)
+        )
+      end
+
       #
       # @private
       #
@@ -132,15 +141,45 @@ module Omnibus
         "#{software.name}-#{software.version}-#{software.fetcher.checksum}"
       end
 
+      def url_for(software)
+        client.bucket(Config.s3_bucket).object(S3Cache.key_for(software)).public_url
+      end
+
       private
 
       def s3_configuration
-        {
-          region:               Config.s3_region,
-          access_key_id:        Config.s3_access_key,
-          secret_access_key:    Config.s3_secret_key,
-          bucket_name:          Config.s3_bucket,
+        config = {
+          region:                    Config.s3_region,
+          bucket_name:               Config.s3_bucket,
+          endpoint:                  Config.s3_endpoint,
+          use_accelerate_endpoint:   Config.s3_accelerate,
+          force_path_style:          Config.s3_force_path_style,
+          s3_authenticated_download: Config.s3_authenticated_download,
+          retry_limit:               Config.fetcher_retries,
         }
+
+        if Config.s3_profile
+          config[:profile] = Config.s3_profile
+          config[:credentials_file_path] = Config.s3_credentials_file_path
+        elsif Config.s3_instance_profile
+          if Config.s3_ecs_credentials || ENV['AWS_CONTAINER_CREDENTIALS_RELATIVE_URI']
+            config[:ecs_credentials] = true
+          else
+            config[:instance_profile] = Config.s3_instance_profile
+          end
+        elsif Config.s3_role
+          config[:role] = Config.s3_role
+          config[:role_arn] = Config.s3_role_arn
+          config[:role_session_name] = Config.s3_role_session_name
+          config[:sts_creds_profile] = Config.s3_sts_creds_profile
+          config[:sts_creds_ecs_credentials] = Config.s3_sts_creds_ecs_credentials
+          config[:sts_creds_instance_profile] = Config.s3_sts_creds_instance_profile
+        else
+          config[:access_key_id] = Config.s3_access_key
+          config[:secret_access_key] = Config.s3_secret_key
+        end
+
+        config
       end
 
       #

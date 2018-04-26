@@ -80,8 +80,6 @@ module Omnibus
     # @return [void]
     #
     def fetch
-      log.info(log_key) { "Downloading from `#{download_url}'" }
-
       create_required_directories
       download
       verify_checksum!
@@ -144,7 +142,7 @@ module Omnibus
     #
     def download_url
       if Config.use_s3_caching
-        "http://#{Config.s3_bucket}.s3.amazonaws.com/#{S3Cache.key_for(self)}"
+        S3Cache.url_for(self)
       else
         source[:url]
       end
@@ -170,7 +168,25 @@ module Omnibus
       # Set the cookie if one was given
       options["Cookie"] = source[:cookie] if source[:cookie]
 
-      download_file!(download_url, downloaded_file, options)
+      # The s3 bucket isn't public, force downloading using the sdk
+      if Config.use_s3_caching && Config.s3_authenticated_download
+        get_from_s3
+      else
+        download_file!(download_url, downloaded_file, options)
+      end
+    end
+
+    #
+    # Download the file directly from s3 using get_object
+    #
+    def get_from_s3
+      begin
+        S3Cache.get_object(downloaded_file, self)
+      rescue Aws::S3::Errors::NoSuchKey => e
+        log.error(log_key) {
+          "Download failed - #{e.class}!"
+        }
+      end
     end
 
     #
