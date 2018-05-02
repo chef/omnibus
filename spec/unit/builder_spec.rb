@@ -186,7 +186,7 @@ module Omnibus
       end
 
       context "when gmake is not present" do
-        before do
+        before(:each) do
           allow(Omnibus).to receive(:which)
             .and_return(nil)
         end
@@ -196,24 +196,24 @@ module Omnibus
             .with("make", in_msys_bash: true)
           subject.make
         end
-      end
 
-      it "accepts 0 options" do
-        expect(subject).to receive(:command)
-          .with("make", in_msys_bash: true)
-        expect { subject.make }.to_not raise_error
-      end
+        it "accepts 0 options" do
+          expect(subject).to receive(:command)
+            .with("make", in_msys_bash: true)
+          expect { subject.make }.to_not raise_error
+        end
 
-      it "accepts an additional command string" do
-        expect(subject).to receive(:command)
-          .with("make install", in_msys_bash: true)
-        expect { subject.make("install") }.to_not raise_error
-      end
+        it "accepts an additional command string" do
+          expect(subject).to receive(:command)
+            .with("make install", in_msys_bash: true)
+          expect { subject.make("install") }.to_not raise_error
+        end
 
-      it "persists given options" do
-        expect(subject).to receive(:command)
-          .with("make", timeout: 3600, in_msys_bash: true)
-        subject.make(timeout: 3600)
+        it "persists given options" do
+          expect(subject).to receive(:command)
+            .with("make", timeout: 3600, in_msys_bash: true)
+          subject.make(timeout: 3600)
+        end
       end
     end
 
