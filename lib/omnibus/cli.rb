@@ -91,7 +91,7 @@ module Omnibus
       if @options[:output_manifest]
         FileUtils.mkdir_p("pkg")
         File.open(::File.join("pkg", "version-manifest.json"), "w") do |f|
-          f.write(FFI_Yajl::Encoder.encode(project.built_manifest.to_hash))
+          f.write(FFI_Yajl::Encoder.encode(project.built_manifest.to_hash, pretty: true))
         end
       end
     end
