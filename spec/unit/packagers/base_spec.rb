@@ -87,6 +87,23 @@ module Omnibus
       end
     end
 
+    describe "#skip_packager" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:skip_packager)
+      end
+
+      it "requires the value to be a TrueClass or a FalseClass" do
+        expect do
+          subject.skip_packager(Object.new)
+        end.to raise_error(InvalidValue)
+      end
+
+      it "returns the given value" do
+        subject.skip_packager(true)
+        expect(subject.skip_packager).to be_truthy
+      end
+    end
+
     describe "#run!" do
       before do
         allow(subject).to receive(:remove_directory)
