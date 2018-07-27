@@ -29,7 +29,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "ohai",             ">= 8.6.0.alpha.1", "< 15"
   gem.add_dependency "ruby-progressbar", "~> 1.7"
   gem.add_dependency "thor",             "~> 0.18"
-  gem.add_dependency "license_scout",    "~> 1.0"
+  gem.add_dependency "license_scout",    "~> 1.0.11"
 
   gem.add_dependency "mixlib-versioning"
   gem.add_dependency "pedump"
