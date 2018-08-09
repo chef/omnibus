@@ -242,7 +242,7 @@ module Omnibus
       end
 
       context "on mac_os_x" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.12") }
+        before { stub_ohai(platform: "mac_os_x", version: "10.13") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
@@ -323,7 +323,7 @@ module Omnibus
 
       context "on freebsd 10" do
         before do
-          stub_ohai(platform: "freebsd", version: "10.3")
+          stub_ohai(platform: "freebsd", version: "10.4")
         end
 
         it "Clang as the default compiler" do
