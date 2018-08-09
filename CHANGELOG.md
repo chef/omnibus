@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.12 -->
+<!-- latest_release 5.6.13 -->
+## [v5.6.13](https://github.com/chef/omnibus/tree/v5.6.13) (2018-08-09)
+
+#### Merged Pull Requests
+- Bump versions of ohai, chef-sugar, and fauxhai [#844](https://github.com/chef/omnibus/pull/844) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v5.6.12](https://github.com/chef/omnibus/tree/v5.6.12) (2018-04-13)
 
 #### Merged Pull Requests
 - Support appbundler 0.11.0 [#776](https://github.com/chef/omnibus/pull/776) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_release -->
 
 ## [v5.6.11](https://github.com/chef/omnibus/tree/v5.6.11) (2018-04-05)
 
