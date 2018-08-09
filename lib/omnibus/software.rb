@@ -688,21 +688,12 @@ module Omnibus
           end
           solaris_flags
         when "freebsd"
-          freebsd_flags = {
+          {
+            "CC" => "clang",
+            "CXX" => "clang++",
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
-          # Enable gcc version 4.9 if it is available
-          if (Ohai["os_version"].to_i <= 903000) && which("gcc49")
-            freebsd_flags["CC"] = "gcc49"
-            freebsd_flags["CXX"] = "g++49"
-          end
-          # Clang became the default compiler in FreeBSD 10+
-          if Ohai["os_version"].to_i >= 1000024
-            freebsd_flags["CC"] = "clang"
-            freebsd_flags["CXX"] = "clang++"
-          end
-          freebsd_flags
         when "suse"
           suse_flags = {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
