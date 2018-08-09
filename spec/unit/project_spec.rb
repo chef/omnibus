@@ -214,14 +214,14 @@ module Omnibus
       end
 
       context "when on Debian" do
-        let(:fauxhai_options) { { platform: "debian", version: "8.8" } }
+        let(:fauxhai_options) { { platform: "debian", version: "8.11" } }
         it "returns a Debian iteration" do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context "when on FreeBSD" do
-        let(:fauxhai_options) { { platform: "freebsd", version: "9.3" } }
+        let(:fauxhai_options) { { platform: "freebsd", version: "10.4" } }
         it "returns a FreeBSD iteration" do
           expect(subject.build_iteration).to eq(1)
         end
@@ -236,7 +236,7 @@ module Omnibus
       end
 
       context "when on OS X" do
-        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.12" } }
+        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.13" } }
         it "returns a generic iteration" do
           expect(subject.build_iteration).to eq(1)
         end

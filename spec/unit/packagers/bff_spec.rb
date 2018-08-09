@@ -167,13 +167,13 @@ module Omnibus
         end
 
         context "creates a config script" do
-          it 'when there wasn\'t one provided' do
+          it "when there wasn't one provided" do
             FileUtils.rm_f("#{subject.scripts_staging_dir}/config")
             subject.write_gen_template
             expect(File).to exist("#{subject.scripts_staging_dir}/config")
           end
 
-          it 'when one is provided in the project\'s def' do
+          it "when one is provided in the project's def" do
             create_file("#{project_root}/package-scripts/project/config")
             subject.write_gen_template
             contents = File.read("#{subject.scripts_staging_dir}/config")
