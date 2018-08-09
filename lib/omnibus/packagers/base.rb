@@ -140,7 +140,7 @@ module Omnibus
     #   whether to skip this packager type or not
     def skip_packager(val = false)
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
-        raise InvalidValue.new(:iwix_light_delay_validation, "be TrueClass or FalseClass")
+        raise InvalidValue.new(:skip_packager, "be TrueClass or FalseClass")
       end
       @skip_package ||= val
     end
