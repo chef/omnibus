@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.14 -->
+<!-- latest_release 5.6.15 -->
+## [v5.6.15](https://github.com/chef/omnibus/tree/v5.6.15) (2018-08-09)
+
+#### Merged Pull Requests
+- Update truncate_platform_version with new platforms / update gentoo [#846](https://github.com/chef/omnibus/pull/846) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v5.6.14](https://github.com/chef/omnibus/tree/v5.6.14) (2018-08-09)
 
 #### Merged Pull Requests
 - Remove support for FreeBSD 9 [#845](https://github.com/chef/omnibus/pull/845) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v5.6.13](https://github.com/chef/omnibus/tree/v5.6.13) (2018-08-09)
 
