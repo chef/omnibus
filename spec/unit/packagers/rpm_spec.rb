@@ -557,9 +557,9 @@ module Omnibus
       context "on Pidora" do
         before do
           # There's no Pidora in Fauxhai :(
-          stub_ohai(platform: "fedora", version: "25") do |data|
+          stub_ohai(platform: "fedora", version: "27") do |data|
             data["platform"] = "pidora"
-            data["platform_version"] = "25"
+            data["platform_version"] = "27"
             data["kernel"]["machine"] = "armv6l"
           end
         end
