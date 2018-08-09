@@ -290,7 +290,7 @@ module Omnibus
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
-            "CC"=>"clang",
+            "CC" => "clang",
             "CFLAGS" => "-I/opt/project/embedded/include -O2",
             "CXXFLAGS"  => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
