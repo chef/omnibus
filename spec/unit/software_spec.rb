@@ -283,16 +283,18 @@ module Omnibus
         end
       end
 
-      context "on freebsd 9" do
+      context "on freebsd 10" do
         before do
           stub_ohai(platform: "freebsd", version: "10.4")
         end
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
+            "CC"=>"clang",
             "CFLAGS" => "-I/opt/project/embedded/include -O2",
             "CXXFLAGS"  => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
+            "CXX" => "clang++",
             "LDFLAGS" => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH" => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
@@ -303,20 +305,6 @@ module Omnibus
         context "with gcc 4.9 installed" do
           before do
             allow(subject).to receive(:which).and_return("/usr/local/bin/gcc49")
-          end
-
-          it "sets the compiler args" do
-            expect(subject.with_standard_compiler_flags).to eq(
-              "CC"              => "gcc49",
-              "CXX"             => "g++49",
-              "CFLAGS" => "-I/opt/project/embedded/include -O2",
-              "CXXFLAGS"  => "-I/opt/project/embedded/include -O2",
-              "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
-              "LDFLAGS" => "-L/opt/project/embedded/lib",
-              "LD_RUN_PATH" => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-              "OMNIBUS_INSTALL_DIR" => "/opt/project"
-            )
           end
         end
       end
