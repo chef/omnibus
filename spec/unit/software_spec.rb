@@ -285,7 +285,7 @@ module Omnibus
 
       context "on freebsd 9" do
         before do
-          stub_ohai(platform: "freebsd", version: "9.3")
+          stub_ohai(platform: "freebsd", version: "10.4")
         end
 
         it "sets the defaults" do
