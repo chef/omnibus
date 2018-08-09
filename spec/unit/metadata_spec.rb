@@ -210,6 +210,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       end
 
       it_behaves_like "a version manipulator", "aix", "7.1", "7.1"
+      it_behaves_like "a version manipulator", "amazon", "2018.03", "2018.03"
       it_behaves_like "a version manipulator", "arch", "rolling", "rolling"
       it_behaves_like "a version manipulator", "centos", "5.9.6", "5"
       it_behaves_like "a version manipulator", "debian", "7.1", "7"
@@ -217,12 +218,13 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       it_behaves_like "a version manipulator", "el", "6.5", "6"
       it_behaves_like "a version manipulator", "fedora", "11.5", "11"
       it_behaves_like "a version manipulator", "freebsd", "10.0", "10"
-      it_behaves_like "a version manipulator", "gentoo", "2004.3", "2004.3"
+      it_behaves_like "a version manipulator", "gentoo", "4.9.95-gentoo", "rolling"
       it_behaves_like "a version manipulator", "ios_xr", "6.0.0.14I", "6"
       it_behaves_like "a version manipulator", "mac_os_x", "10.9.1", "10.9"
       it_behaves_like "a version manipulator", "nexus", "5.0", "5"
       it_behaves_like "a version manipulator", "omnios", "r151010", "r151010"
       it_behaves_like "a version manipulator", "openbsd", "5.4.4", "5.4"
+      it_behaves_like "a version manipulator", "opensuseleap", "42.3", "42.3"
       it_behaves_like "a version manipulator", "opensuse", "5.9", "5.9"
       it_behaves_like "a version manipulator", "pidora", "11.5", "11"
       it_behaves_like "a version manipulator", "raspbian", "7.1", "7"
