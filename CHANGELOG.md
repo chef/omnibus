@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.13 -->
+<!-- latest_release 5.6.14 -->
+## [v5.6.14](https://github.com/chef/omnibus/tree/v5.6.14) (2018-08-09)
+
+#### Merged Pull Requests
+- Remove support for FreeBSD 9 [#845](https://github.com/chef/omnibus/pull/845) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v5.6.13](https://github.com/chef/omnibus/tree/v5.6.13) (2018-08-09)
 
 #### Merged Pull Requests
 - Bump versions of ohai, chef-sugar, and fauxhai [#844](https://github.com/chef/omnibus/pull/844) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v5.6.12](https://github.com/chef/omnibus/tree/v5.6.12) (2018-04-13)
 
