@@ -1,31 +1,36 @@
+# Documentation available at https://expeditor-docs.es.chef.io/
+
+# Slack channel in Chef Software slack to send notifications about build failures, etc
 slack:
   notify_channel: omnibus-rfr
-
-github:
-  maintainer_group: chef/omnibus-maintainers
-  version_tag_format: "v{{version}}"
-  minor_bump_labels:
-    - "Version: Bump Minor"
 
 rubygems:
   - omnibus
 
+github:
+  # This deletes the GitHub PR branch after successfully merged into the release branch
+  delete_branch_on_merge: true
+  # The tag format to use (e.g. v1.0.0)
+  version_tag_format: "v{{version}}"
+  # allow bumping the minor release via label
+  minor_bump_labels:
+    - "Expeditor: Bump Minor Version"
+
+promote:
+  actions:
+    - built_in:publish_rubygems
+
+# These actions are taken, in order they are specified, anytime a Pull Request is merged.
 merge_actions:
   - built_in:bump_version:
       ignore_labels:
-        - "Version: Skip Bump"
+        - "Expeditor: Skip Version Bump"
         - "Expeditor: Skip All"
   - bash:.expeditor/update_version.sh:
-      only_if:
-        - built_in:bump_version
+      only_if: built_in:bump_version
   - built_in:update_changelog:
       ignore_labels:
-        - "Changelog: Skip Update"
+        - "Expeditor: Exclude From Changelog"
         - "Expeditor: Skip All"
   - built_in:build_gem:
-      only_if:
-        - built_in:bump_version
-
-promote:
-  action:
-    - built_in:publish_rubygems
+      only_if: built_in:bump_version
