@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 5.6.15 -->
+<!-- latest_release 5.6.16 -->
+## [v5.6.16](https://github.com/chef/omnibus/tree/v5.6.16) (2018-08-10)
+
+#### Merged Pull Requests
+- Remove gem version constraints and avoid installing pry in Travis [#847](https://github.com/chef/omnibus/pull/847) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v5.6.15](https://github.com/chef/omnibus/tree/v5.6.15) (2018-08-09)
 
 #### Merged Pull Requests
 - Update truncate_platform_version with new platforms / update gentoo [#846](https://github.com/chef/omnibus/pull/846) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v5.6.14](https://github.com/chef/omnibus/tree/v5.6.14) (2018-08-09)
 
