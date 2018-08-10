@@ -1,16 +1,25 @@
 sudo: false
-rvm:
-  - 2.5.1
-  - 2.4.4
-bundler_args: "--jobs 7 --without docs local"
+language: ruby
+
+matrix:
+  include:
+    - rvm: 2.4.4
+    - rvm: 2.5.1
+    - rvm: ruby-head
+  allow_failures:
+    - rvm: ruby-head
+bundler_args: "--jobs 7 --without docs debug"
 branches:
   only:
     - 2.0-stable
     - 3.0-stable
     - master
 before_install:
-  - gem update --system
+  - gem --version
+  - rvm @global do gem uninstall bundler -a -x -I || true
   - gem install bundler
+  - bundle --version
+  - rm -f .bundle/config
 before_script:
   - git config --global user.email "clouseau@chef.io"
   - git config --global user.name "Pink Panther"
