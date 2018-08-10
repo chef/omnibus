@@ -8,7 +8,7 @@ group :docs do
   gem "github-markup"
 end
 
-group :development do
+group :debug do
   gem "pry"
   gem "pry-byebug"
   gem "pry-stack_explorer"
