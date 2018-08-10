@@ -3,6 +3,8 @@ rvm:
   - 2.5.1
   - 2.4.4
 bundler_args: "--jobs 7 --without docs local"
+language: ruby
+cache: bundler
 branches:
   only:
     - 2.0-stable
