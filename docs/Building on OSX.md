@@ -45,7 +45,7 @@ Some DSL methods available include:
 | `identifier`       | The `com.whatever` id for the package       |
 | `signing_identity` | The key to sign the PKG with                |
 
-For more information, please see the [`Packager::PKG` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Packager/PKG).
+For more information, please see the [`Packager::PKG` documentation](http://rubydoc.info/github/chef/omnibus/Omnibus/Packager/PKG).
 
 
 Building a .dmg
