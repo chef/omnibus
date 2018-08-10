@@ -1,6 +1,5 @@
 sudo: false
 language: ruby
-cache: bundler
 
 matrix:
   include:
@@ -16,7 +15,6 @@ branches:
     - 3.0-stable
     - master
 before_install:
-  - gem update --system
   - gem --version
   - rvm @global do gem uninstall bundler -a -x -I || true
   - gem install bundler
