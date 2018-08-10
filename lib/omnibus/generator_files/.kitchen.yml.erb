@@ -9,24 +9,25 @@ driver:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.4.1
 
 platforms:
-  - name: centos-7.1
+  - name: centos-6
     run_list: yum-epel::default
-  - name: centos-6.6
+  - name: centos-7
     run_list: yum-epel::default
-  - name: centos-5.11
-    run_list: yum-epel::default
-  - name: debian-7.8
+  - name: debian-8
     run_list: apt::default
-  - name: debian-6.0.10
+  - name: debian-9
     run_list: apt::default
-  - name: freebsd-10.1
+  - name: freebsd-10
+    run_list: freebsd::portsnap
+  - name: freebsd-11
     run_list: freebsd::portsnap
   - name: ubuntu-14.04
     run_list: apt::default
-  - name: ubuntu-12.04
+  - name: ubuntu-16.04
+    run_list: apt::default
+  - name: ubuntu-18.04
     run_list: apt::default
 
 suites:
