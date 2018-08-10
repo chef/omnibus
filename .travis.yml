@@ -9,7 +9,7 @@ matrix:
     - rvm: ruby-head
   allow_failures:
     - rvm: ruby-head
-bundler_args: "--jobs 7 --without docs development"
+bundler_args: "--jobs 7 --without docs debug"
 branches:
   only:
     - 2.0-stable
