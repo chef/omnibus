@@ -1,9 +1,10 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release unreleased -->
-## Unreleased
+<!-- latest_release 6.0.1 -->
+## [v6.0.1](https://github.com/chef/omnibus/tree/v6.0.1) (2018-08-10)
 
 #### Merged Pull Requests
+- Update Opscode references to Chef and bump copyrights [#850](https://github.com/chef/omnibus/pull/850) ([tas50](https://github.com/tas50))
 - Bump to 6.0 and add release notes [#849](https://github.com/chef/omnibus/pull/849) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 
