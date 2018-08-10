@@ -1,10 +1,15 @@
 sudo: false
-rvm:
-  - 2.5.1
-  - 2.4.4
-bundler_args: "--jobs 7 --without docs local"
 language: ruby
 cache: bundler
+
+matrix:
+  include:
+    - rvm: 2.4.4
+    - rvm: 2.5.1
+    - rvm: ruby-head
+  allow_failures:
+    - rvm: ruby-head
+bundler_args: "--jobs 7 --without docs development"
 branches:
   only:
     - 2.0-stable
