@@ -28,6 +28,7 @@ module Omnibus
     it_behaves_like "a cleanroom setter", :homepage, %{homepage 'https://getchef.com'}
     it_behaves_like "a cleanroom setter", :description, %{description 'Installs the thing'}
     it_behaves_like "a cleanroom setter", :replace, %{replace 'old-chef'}
+    it_behaves_like "a cleanroom setter", :provide, %{provide 'chefy-package'}
     it_behaves_like "a cleanroom setter", :conflict, %{conflict 'puppet'}
     it_behaves_like "a cleanroom setter", :build_version, %{build_version '1.2.3'}
     it_behaves_like "a cleanroom setter", :build_iteration, %{build_iteration 1}
