@@ -38,6 +38,7 @@ package :msi do
   parameters {
     'KeyThing' => 'ValueThing'
   }
+  localization 'da-dk'
 end
 ```
 
@@ -53,5 +54,6 @@ Some DSL methods available include:
 | :----------------: | ------------------------------------------------|
 | **`upgrade_code`** | The unique GUID for this package                |
 | `parameters`       | And arbirtary list of key-value pairs to render |
+| `localization`     | The language to display in the UI               |
 
 For more information, please see the [`Packager::MSI` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Packager/MSI).
