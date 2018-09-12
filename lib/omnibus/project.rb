@@ -1141,13 +1141,17 @@ module Omnibus
           packager.evaluate(&block)
         end
 
-        # Run the actual packager
-        packager.run!
+        if packager.disabled?
+          log.internal(log_key) { "#{packager.id} disabled - skipping" }
+        else
+          # Run the actual packager
+          packager.run!
 
-        # Copy the generated package and metadata back into the workspace
-        package_path = File.join(Config.package_dir, packager.package_name)
-        FileUtils.cp(package_path, destination, preserve: true)
-        FileUtils.cp("#{package_path}.metadata.json", destination, preserve: true)
+          # Copy the generated package and metadata back into the workspace
+          package_path = File.join(Config.package_dir, packager.package_name)
+          FileUtils.cp(package_path, destination, preserve: true)
+          FileUtils.cp("#{package_path}.metadata.json", destination, preserve: true)
+        end
       end
     end
 

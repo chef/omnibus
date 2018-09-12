@@ -64,6 +64,7 @@ module Omnibus
     # @param [Project] project
     #
     def initialize(project)
+      @disabled = false
       @project = project
     end
 
@@ -128,6 +129,14 @@ module Omnibus
     expose :windows_safe_path
 
     #
+    # Disable this packager.
+    #
+    def disable
+      @disabled = true
+    end
+
+    expose :disable
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -158,6 +167,13 @@ module Omnibus
         # build failed.
         remove_directory(staging_dir)
       end
+    end
+
+    #
+    # True if the current package type should not be generated even if it is supported
+    # for the target platform.
+    def disabled?
+      @disabled
     end
 
     #
