@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "aws-sdk"
+require "aws-sdk-s3"
 require "aws-sdk-core/credentials"
 require "aws-sdk-core/shared_credentials"
 require "base64"
