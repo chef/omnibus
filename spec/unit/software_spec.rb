@@ -329,6 +329,27 @@ module Omnibus
         end
       end
 
+      context "on sles 15" do
+        before do
+          # sles identifies as suse
+          stub_ohai(platform: "sles", version: "15")
+        end
+
+        it "sets the defaults" do
+          expect(subject.with_standard_compiler_flags).to eq(
+          "CC"              => "gcc",
+          "CXX"             => "g++",
+          "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
+          "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+          "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+          "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+          "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+          "OMNIBUS_INSTALL_DIR" => "/opt/project"
+          )
+        end
+      end
+
       context "on sles 11" do
         before do
           # sles identifies as suse

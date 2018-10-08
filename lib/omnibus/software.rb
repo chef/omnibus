@@ -694,6 +694,11 @@ module Omnibus
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
+        when "sles"
+          {
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+          }
         when "suse"
           suse_flags = {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
