@@ -373,7 +373,7 @@ module Omnibus
         before do
           # sles identifies as suse
           stub_ohai(platform: "suse", version: "12.2")
-          allow(subject).to receive(:which).with("gcc-4.8").and_return(false)
+          allow(subject).to receive(:which).with("gcc-4.8").and_return(true)
         end
 
         it "sets the defaults" do
