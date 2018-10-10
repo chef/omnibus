@@ -700,7 +700,7 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
           # Enable gcc version 4.8 if it is available
-          if which("gcc-4.8")
+          if which("gcc-4.8") && platform_version.satisfies?("< 12")
             suse_flags["CC"] = "gcc-4.8"
             suse_flags["CXX"] = "g++-4.8"
           end
