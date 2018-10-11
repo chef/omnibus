@@ -990,14 +990,14 @@ module Omnibus
       fetcher.version_guid
     end
 
-    def resolved_version
-      @resolved_version ||= fetcher.version_for_cache || version
+    def version_for_cache
+      @version_for_cache ||= fetcher.version_for_cache || version
     end
 
     # Returns the version to be used in cache.
     def version_for_cache
-      @version_for_cache ||= if resolved_version
-                               resolved_version
+      @version_for_cache ||= if version_for_cache
+                               version_for_cache
                              else
                                log.warn(log_key) do
                                  "No version given! Git caching disabled." \
@@ -1073,11 +1073,12 @@ module Omnibus
     #
     def build_me(build_wrappers = [])
       if Config.use_git_caching
-        if !resolved_version
+        if !version_for_cache
           log.info(log_key) do
             "Forcing a build because resolved version is nil"
           end
           execute_build
+          project.dirty!(self)
         elsif project.dirty?
           log.info(log_key) do
             "Building because `#{project.culprit.name}' dirtied the cache"
