@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "aws-sdk"
+require "aws-sdk-s3"
 require "aws-sdk-core/credentials"
 require "aws-sdk-core/shared_credentials"
 require "base64"
@@ -93,6 +93,9 @@ module Omnibus
           Aws::SharedCredentials.new(profile_name: s3_configuration[:profile])
         elsif s3_configuration[:access_key_id] && s3_configuration[:secret_access_key]
           Aws::Credentials.new(s3_configuration[:access_key_id], s3_configuration[:secret_access_key])
+        else
+          # No credentials specified, only public data will be retrievable
+          Aws::Credentials.new(nil, nil)
         end
       end
 
