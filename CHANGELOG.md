@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.2 -->
+<!-- latest_release 6.0.3 -->
+## [v6.0.3](https://github.com/chef/omnibus/tree/v6.0.3) (2018-10-11)
+
+#### Merged Pull Requests
+- Using aws-sdk-s3 [#855](https://github.com/chef/omnibus/pull/855) ([JackDanger](https://github.com/JackDanger))
+<!-- latest_release -->
+
 ## [v6.0.2](https://github.com/chef/omnibus/tree/v6.0.2) (2018-10-10)
 
 #### Merged Pull Requests
 - Unpin gcc-4.8 for later versions of Suse [#858](https://github.com/chef/omnibus/pull/858) ([jaymalasinha](https://github.com/jaymalasinha))
-<!-- latest_release -->
 
 ## [v6.0.1](https://github.com/chef/omnibus/tree/v6.0.1) (2018-08-10)
 
