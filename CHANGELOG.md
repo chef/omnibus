@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.3 -->
+<!-- latest_release 6.0.4 -->
+## [v6.0.4](https://github.com/chef/omnibus/tree/v6.0.4) (2018-10-11)
+
+#### Merged Pull Requests
+- Remove generator file pins [#859](https://github.com/chef/omnibus/pull/859) ([lamont-granquist](https://github.com/lamont-granquist))
+<!-- latest_release -->
+
 ## [v6.0.3](https://github.com/chef/omnibus/tree/v6.0.3) (2018-10-11)
 
 #### Merged Pull Requests
 - Using aws-sdk-s3 [#855](https://github.com/chef/omnibus/pull/855) ([JackDanger](https://github.com/JackDanger))
-<!-- latest_release -->
 
 ## [v6.0.2](https://github.com/chef/omnibus/tree/v6.0.2) (2018-10-10)
 
