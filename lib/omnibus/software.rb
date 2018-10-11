@@ -987,20 +987,21 @@ module Omnibus
       fetcher.version_guid
     end
 
-    def version_for_cache
-      @version_for_cache ||= fetcher.version_for_cache || version
+    # This is the real version if one exists (nil if there's no real version)
+    def real_version
+      @real_version ||= fetcher.version_for_cache || version
     end
 
     # Returns the version to be used in cache.
     def version_for_cache
-      @version_for_cache ||= if version_for_cache
-                               version_for_cache
+      @version_for_cache ||= if real_version
+                               real_version
                              else
                                log.warn(log_key) do
                                  "No version given! Git caching disabled." \
                                end
 
-                               '0.0.0'
+                               "0.0.0"
                              end
     end
 
@@ -1070,7 +1071,7 @@ module Omnibus
     #
     def build_me(build_wrappers = [])
       if Config.use_git_caching
-        if !version_for_cache
+        if !real_version
           log.info(log_key) do
             "Forcing a build because resolved version is nil"
           end
