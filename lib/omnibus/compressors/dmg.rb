@@ -231,7 +231,9 @@ module Omnibus
     end
 
     #
-    # Compress the dmg using hdiutil and zlib.
+    # Compress the dmg using hdiutil and zlib. zlib offers better compression
+    # levels than bzip2 (10.4+) or LZFSE (10.11+), but takes longer to compress.
+    # We're willing to trade slightly longer build times for smaller package sizes.
     #
     # @return [void]
     #
