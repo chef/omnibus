@@ -112,13 +112,15 @@ module Omnibus
     end
 
     #
-    # The path on disk to the downloaded asset. This method requires the
-    # presence of a +source_uri+.
+    # The path on disk to the downloaded asset. The filename is defined by
+    # +source :cached_name+. If ommited, then it comes from the software's
+    # +source :url+ value
     #
     # @return [String]
     #
     def downloaded_file
-      filename = File.basename(source[:url], "?*")
+      filename = source[:cached_name] if source[:cached_name]
+      filename ||= File.basename(source[:url], "?*")
       File.join(Config.cache_dir, filename)
     end
 
