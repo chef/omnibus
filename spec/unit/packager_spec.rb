@@ -52,6 +52,13 @@ module Omnibus
         end
       end
 
+      context "on Amazon Linux 2" do
+        before { stub_ohai(platform: "amazon", version: "2") }
+        it "prefers RPM" do
+          expect(described_class.for_current_system).to eq([Packager::RPM])
+        end
+      end
+
       context "on Debian" do
         before { stub_ohai(platform: "debian", version: "8.11") }
         it "prefers RPM" do
