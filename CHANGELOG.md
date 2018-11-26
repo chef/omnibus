@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.6 -->
+<!-- latest_release 6.0.7 -->
+## [v6.0.7](https://github.com/chef/omnibus/tree/v6.0.7) (2018-11-26)
+
+#### Merged Pull Requests
+- Use RPM on Amazon Linux 2 [#863](https://github.com/chef/omnibus/pull/863) ([repeatedly](https://github.com/repeatedly))
+<!-- latest_release -->
+
 ## [v6.0.6](https://github.com/chef/omnibus/tree/v6.0.6) (2018-11-19)
 
 #### Merged Pull Requests
 - Add &quot;cached_name&quot; option for net fetcher [#837](https://github.com/chef/omnibus/pull/837) ([legal90](https://github.com/legal90))
-<!-- latest_release -->
 
 ## [v6.0.5](https://github.com/chef/omnibus/tree/v6.0.5) (2018-11-19)
 
