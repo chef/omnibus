@@ -173,7 +173,7 @@ module Omnibus
     def git_describe
       @git_describe ||= begin
         # We only match tags starting with a number to discards non-agent ones (like: dca-1.1.0)
-        cmd = shellout("git describe --tags --match '[0-9]*'", cwd: @path)
+        cmd = shellout("git describe --tags --match \"[0-9]*\"", cwd: @path)
 
         if cmd.exitstatus == 0
           cmd.stdout.chomp
