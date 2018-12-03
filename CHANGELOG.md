@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.7 -->
+<!-- latest_release 6.0.8 -->
+## [v6.0.8](https://github.com/chef/omnibus/tree/v6.0.8) (2018-12-03)
+
+#### Merged Pull Requests
+- S3 Publisher: Print the download URL for published artifacts [#829](https://github.com/chef/omnibus/pull/829) ([legal90](https://github.com/legal90))
+<!-- latest_release -->
+
 ## [v6.0.7](https://github.com/chef/omnibus/tree/v6.0.7) (2018-11-26)
 
 #### Merged Pull Requests
 - Use RPM on Amazon Linux 2 [#863](https://github.com/chef/omnibus/pull/863) ([repeatedly](https://github.com/repeatedly))
-<!-- latest_release -->
 
 ## [v6.0.6](https://github.com/chef/omnibus/tree/v6.0.6) (2018-11-19)
 
