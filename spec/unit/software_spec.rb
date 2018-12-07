@@ -891,5 +891,13 @@ module Omnibus
         end
       end
     end
+
+    describe "#version" do
+      it "handles semver style git tags correctly" do
+        project.override :software, version: "v2.3.4"
+        expect( subject.version ).to eql("2.3.4")
+        expect( subject.version ).to be_a(Chef::Sugar::Constraints::Version)
+      end
+    end
   end
 end

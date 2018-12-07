@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2017, Chef Software Inc.
+# Copyright 2012-2018, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -481,6 +481,11 @@ module Omnibus
       end
 
       return if final_version.nil?
+
+      # make git caching work with semver-style versions (assuming a leading v followed by a digit is semver)
+      if final_version =~ /^v(\d+.*)/
+        final_version = $1
+      end
 
       begin
         Chef::Sugar::Constraints::Version.new(final_version)
