@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.8 -->
+<!-- latest_release 6.0.9 -->
+## [v6.0.9](https://github.com/chef/omnibus/tree/v6.0.9) (2018-12-07)
+
+#### Merged Pull Requests
+- Fix comparisons for semver style git tags [#864](https://github.com/chef/omnibus/pull/864) ([lamont-granquist](https://github.com/lamont-granquist))
+<!-- latest_release -->
+
 ## [v6.0.8](https://github.com/chef/omnibus/tree/v6.0.8) (2018-12-03)
 
 #### Merged Pull Requests
 - S3 Publisher: Print the download URL for published artifacts [#829](https://github.com/chef/omnibus/pull/829) ([legal90](https://github.com/legal90))
-<!-- latest_release -->
 
 ## [v6.0.7](https://github.com/chef/omnibus/tree/v6.0.7) (2018-11-26)
 
