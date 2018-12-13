@@ -43,6 +43,7 @@ module Omnibus
       "suse"     => RPM,
       "rhel"     => RPM,
       "wrlinux"  => RPM,
+      "amazon"   => RPM,
       "aix"      => BFF,
       "solaris"  => Solaris,
       "ips"      => IPS,

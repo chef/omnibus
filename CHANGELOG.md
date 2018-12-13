@@ -1,12 +1,57 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.1 -->
+<!-- latest_release 6.0.10 -->
+## [v6.0.10](https://github.com/chef/omnibus/tree/v6.0.10) (2018-12-10)
+
+#### Merged Pull Requests
+- Revert &quot;Fix comparisons for semver style git tags&quot; [#865](https://github.com/chef/omnibus/pull/865) ([lamont-granquist](https://github.com/lamont-granquist))
+<!-- latest_release -->
+
+## [v6.0.9](https://github.com/chef/omnibus/tree/v6.0.9) (2018-12-07)
+
+#### Merged Pull Requests
+- Fix comparisons for semver style git tags [#864](https://github.com/chef/omnibus/pull/864) ([lamont-granquist](https://github.com/lamont-granquist))
+
+## [v6.0.8](https://github.com/chef/omnibus/tree/v6.0.8) (2018-12-03)
+
+#### Merged Pull Requests
+- S3 Publisher: Print the download URL for published artifacts [#829](https://github.com/chef/omnibus/pull/829) ([legal90](https://github.com/legal90))
+
+## [v6.0.7](https://github.com/chef/omnibus/tree/v6.0.7) (2018-11-26)
+
+#### Merged Pull Requests
+- Use RPM on Amazon Linux 2 [#863](https://github.com/chef/omnibus/pull/863) ([repeatedly](https://github.com/repeatedly))
+
+## [v6.0.6](https://github.com/chef/omnibus/tree/v6.0.6) (2018-11-19)
+
+#### Merged Pull Requests
+- Add &quot;cached_name&quot; option for net fetcher [#837](https://github.com/chef/omnibus/pull/837) ([legal90](https://github.com/legal90))
+
+## [v6.0.5](https://github.com/chef/omnibus/tree/v6.0.5) (2018-11-19)
+
+#### Merged Pull Requests
+- Add support of LGPL-2.0 license [#825](https://github.com/chef/omnibus/pull/825) ([legal90](https://github.com/legal90))
+
+## [v6.0.4](https://github.com/chef/omnibus/tree/v6.0.4) (2018-10-11)
+
+#### Merged Pull Requests
+- Remove generator file pins [#859](https://github.com/chef/omnibus/pull/859) ([lamont-granquist](https://github.com/lamont-granquist))
+
+## [v6.0.3](https://github.com/chef/omnibus/tree/v6.0.3) (2018-10-11)
+
+#### Merged Pull Requests
+- Using aws-sdk-s3 [#855](https://github.com/chef/omnibus/pull/855) ([JackDanger](https://github.com/JackDanger))
+
+## [v6.0.2](https://github.com/chef/omnibus/tree/v6.0.2) (2018-10-10)
+
+#### Merged Pull Requests
+- Unpin gcc-4.8 for later versions of Suse [#858](https://github.com/chef/omnibus/pull/858) ([jaymalasinha](https://github.com/jaymalasinha))
+
 ## [v6.0.1](https://github.com/chef/omnibus/tree/v6.0.1) (2018-08-10)
 
 #### Merged Pull Requests
 - Update Opscode references to Chef and bump copyrights [#850](https://github.com/chef/omnibus/pull/850) ([tas50](https://github.com/tas50))
 - Bump to 6.0 and add release notes [#849](https://github.com/chef/omnibus/pull/849) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v5.6.17](https://github.com/chef/omnibus/tree/v5.6.17) (2018-08-10)
 

@@ -30,13 +30,27 @@ module Omnibus
 
         # Upload the metadata first
         log.debug(log_key) { "Uploading '#{package.metadata.name}'" }
-        store_object(key_for(package, package.metadata.name), FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
-                     nil, access_policy)
+
+        s3_metadata_object = store_object(
+          key_for(package, package.metadata.name),
+          FFI_Yajl::Encoder.encode(package.metadata.to_hash, pretty: true),
+          nil,
+          access_policy
+        )
+
+        log.debug(log_key) { "Uploading is completed. Download URL (#{access_policy}): #{s3_metadata_object.public_url}" }
 
         # Upload the actual package
         log.info(log_key) { "Uploading '#{package.name}'" }
-        store_object(key_for(package, package.name), package.content,
-                     package.metadata[:md5], access_policy)
+
+        s3_object = store_object(
+          key_for(package, package.name),
+          package.content,
+          package.metadata[:md5],
+          access_policy
+        )
+
+        log.info(log_key) { "Uploading is completed. Download URL (#{access_policy}): #{s3_object.public_url}" }
 
         # If a block was given, "yield" the package to the caller
         yield(package) if block

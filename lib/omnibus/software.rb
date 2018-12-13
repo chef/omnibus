@@ -294,7 +294,7 @@ module Omnibus
         extra_keys = val.keys - [
           :git, :file, :path, :url, # fetcher types
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
-          :cookie, :warning, :unsafe, :extract, # used by net_fetcher
+          :cookie, :warning, :unsafe, :extract, :cached_name, # used by net_fetcher
           :options, # used by path_fetcher
           :submodules # used by git_fetcher
         ]
@@ -700,7 +700,7 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
           # Enable gcc version 4.8 if it is available
-          if which("gcc-4.8")
+          if which("gcc-4.8") && platform_version.satisfies?("< 12")
             suse_flags["CC"] = "gcc-4.8"
             suse_flags["CXX"] = "g++-4.8"
           end
