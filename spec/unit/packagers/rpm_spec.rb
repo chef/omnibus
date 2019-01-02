@@ -267,7 +267,7 @@ module Omnibus
       end
 
       context "when scripts are given" do
-        let(:scripts) { %w{ pre post preun postun verifyscript pretans posttrans } }
+        let(:scripts) { %w{ pre post preun postun verifyscript pretrans posttrans } }
 
         before do
           scripts.each do |script_name|
