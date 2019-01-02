@@ -31,7 +31,7 @@ module Omnibus
       preun:        "preun",
       postun:       "postun",
       verifyscript: "verifyscript",
-      pretans:      "pretans",
+      pretrans:      "pretrans",
       posttrans:    "posttrans",
     }.freeze
 
