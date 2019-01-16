@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.10 -->
+<!-- latest_release 6.0.11 -->
+## [v6.0.11](https://github.com/chef/omnibus/tree/v6.0.11) (2019-01-02)
+
+#### Merged Pull Requests
+- Change &#39;pretans&#39; to &#39;pretrans&#39; [#866](https://github.com/chef/omnibus/pull/866) ([ccheek21](https://github.com/ccheek21))
+<!-- latest_release -->
+
 ## [v6.0.10](https://github.com/chef/omnibus/tree/v6.0.10) (2018-12-10)
 
 #### Merged Pull Requests
 - Revert &quot;Fix comparisons for semver style git tags&quot; [#865](https://github.com/chef/omnibus/pull/865) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_release -->
 
 ## [v6.0.9](https://github.com/chef/omnibus/tree/v6.0.9) (2018-12-07)
 
