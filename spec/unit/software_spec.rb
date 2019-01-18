@@ -190,57 +190,6 @@ module Omnibus
         end
       end
 
-      context "on solaris_10" do
-        before do
-          stub_ohai(platform: "solaris2", version: "5.10") do |data|
-            # For some reason, this isn't set in Fauxhai
-            data["platform"] = "solaris2"
-          end
-        end
-
-        it "sets the defaults" do
-          expect(subject.with_standard_compiler_flags).to eq(
-            "CC"              => "gcc -static-libgcc",
-            "LDFLAGS"         => "-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "LD_OPTIONS"      => "-R/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-            "OMNIBUS_INSTALL_DIR" => "/opt/project"
-          )
-        end
-
-        context "when loader mapping file is specified" do
-          # Let the unit tests run on windows where auto-path translation occurs.
-          let(:project_root) { File.join(tmp_path, "/root/project") }
-          before do
-            stub_ohai(platform: "solaris2", version: "5.10") do |data|
-              # For some reason, this isn't set in Fauxhai
-              data["platform"] = "solaris2"
-            end
-            Config.project_root(project_root)
-            Config.solaris_linker_mapfile("files/mapfile/solaris")
-            allow(File).to receive(:exist?).and_return(true)
-          end
-
-          it "sets LD_OPTIONS correctly" do
-            expect(subject.with_standard_compiler_flags).to eq(
-              "CC"              => "gcc -static-libgcc",
-              "LDFLAGS"         => "-R/opt/project/embedded/lib -L/opt/project/embedded/lib -static-libgcc",
-              "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
-              "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "LD_OPTIONS"      => "-R/opt/project/embedded/lib -M #{project_root}/files/mapfile/solaris",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-              "OMNIBUS_INSTALL_DIR" => "/opt/project"
-            )
-          end
-        end
-      end
-
       context "on mac_os_x" do
         before { stub_ohai(platform: "mac_os_x", version: "10.13") }
 
