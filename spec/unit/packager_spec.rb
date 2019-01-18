@@ -31,13 +31,6 @@ module Omnibus
         end
       end
 
-      context "on Solaris 10" do
-        before { stub_ohai(platform: "solaris2", version: "5.10") }
-        it "prefers Solaris" do
-          expect(described_class.for_current_system).to eq([Packager::Solaris])
-        end
-      end
-
       context "on AIX" do
         before { stub_ohai(platform: "aix", version: "7.1") }
         it "prefers BFF" do
