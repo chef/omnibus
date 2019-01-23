@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.13 -->
+<!-- latest_release 6.0.14 -->
+## [v6.0.14](https://github.com/chef/omnibus/tree/v6.0.14) (2019-01-23)
+
+#### Merged Pull Requests
+- Whitelist the Security framework library on macOS [#873](https://github.com/chef/omnibus/pull/873) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v6.0.13](https://github.com/chef/omnibus/tree/v6.0.13) (2019-01-23)
 
 #### Merged Pull Requests
 - Use a SPDX compliant license string in the gemspec [#869](https://github.com/chef/omnibus/pull/869) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v6.0.12](https://github.com/chef/omnibus/tree/v6.0.12) (2019-01-18)
 
