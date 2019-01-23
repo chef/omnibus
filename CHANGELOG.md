@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.12 -->
+<!-- latest_release 6.0.13 -->
+## [v6.0.13](https://github.com/chef/omnibus/tree/v6.0.13) (2019-01-23)
+
+#### Merged Pull Requests
+- Use a SPDX compliant license string in the gemspec [#869](https://github.com/chef/omnibus/pull/869) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v6.0.12](https://github.com/chef/omnibus/tree/v6.0.12) (2019-01-18)
 
 #### Merged Pull Requests
 - Resolve test failures in Travis [#872](https://github.com/chef/omnibus/pull/872) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v6.0.11](https://github.com/chef/omnibus/tree/v6.0.11) (2019-01-02)
 
