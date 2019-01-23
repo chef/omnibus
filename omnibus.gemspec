@@ -6,7 +6,7 @@ require "omnibus/version"
 Gem::Specification.new do |gem|
   gem.name           = "omnibus"
   gem.version        = Omnibus::VERSION
-  gem.license        = "Apache 2.0"
+  gem.license        = "Apache-2.0"
   gem.author         = "Chef Software, Inc."
   gem.email          = "releng@chef.io"
   gem.summary        = "Omnibus is a framework for building self-installing, full-stack software builds."
