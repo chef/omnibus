@@ -135,6 +135,7 @@ MAC_WHITELIST_LIBS = [
   /libiconv/,
   /libstdc\+\+\.6\.dylib/,
   /libc\+\+\.1\.dylib/,
+  /Security/,
 ].freeze
 
 FREEBSD_WHITELIST_LIBS = [
