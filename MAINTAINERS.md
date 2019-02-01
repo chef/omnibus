@@ -24,3 +24,4 @@ Check out [How Chef is Maintained](https://github.com/chef/chef-rfc/blob/master/
 - [Steven Danna](https://github.com/stevendanna)
 - [Thom May](https://github.com/thommay)
 - [Yvonne Lam](http://github.com/yzl)
+- [Marc Paradise](http://github.com/marcparadise)
