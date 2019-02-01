@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.16 -->
+<!-- latest_release 6.0.17 -->
+## [v6.0.17](https://github.com/chef/omnibus/tree/v6.0.17) (2019-02-01)
+
+#### Merged Pull Requests
+- add support for light to delay validation [#842](https://github.com/chef/omnibus/pull/842) ([jmartin-r7](https://github.com/jmartin-r7))
+<!-- latest_release -->
+
 ## [v6.0.16](https://github.com/chef/omnibus/tree/v6.0.16) (2019-02-01)
 
 #### Merged Pull Requests
 - allow project configuration to skip packagers [#843](https://github.com/chef/omnibus/pull/843) ([jmartin-r7](https://github.com/jmartin-r7))
-<!-- latest_release -->
 
 ## [v6.0.15](https://github.com/chef/omnibus/tree/v6.0.15) (2019-02-01)
 
