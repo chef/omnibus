@@ -15,5 +15,5 @@
 #
 
 module Omnibus
-  VERSION = "6.0.15"
+  VERSION = "6.0.16"
 end
