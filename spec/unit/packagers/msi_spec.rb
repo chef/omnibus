@@ -269,6 +269,28 @@ module Omnibus
       end
     end
 
+    describe "#wix_light_delay_validation" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:wix_light_delay_validation)
+      end
+
+      it "requires the value to be a TrueClass or a FalseClass" do
+        expect do
+          subject.wix_light_delay_validation(Object.new)
+        end.to raise_error(InvalidValue)
+      end
+
+      it "defaults to an empty String" do
+        expect(subject.wix_light_delay_validation).to be_a(String)
+        expect(subject.wix_light_delay_validation).to be_empty
+      end
+
+      it "returns the string `-sval` when true" do
+        subject.wix_light_delay_validation(true)
+        expect(subject.wix_light_delay_validation).to eq("-sval")
+      end
+    end
+
     describe "#wix_candle_extension" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:wix_candle_extension)

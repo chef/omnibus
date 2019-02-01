@@ -167,6 +167,29 @@ module Omnibus
     expose :wix_light_extension
 
     #
+    # Signal delay validation for wix light
+    #
+    # @example
+    #   wix_light_deplay_validation true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether to delay validation or not
+    #
+    # @return [String]
+    #   whether we're a bundle or not
+    def wix_light_delay_validation(val = false)
+      unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
+        raise InvalidValue.new(:iwix_light_delay_validation, "be TrueClass or FalseClass")
+      end
+      @delay_validation ||= val
+      unless @delay_validation
+        return ""
+      end
+      "-sval"
+    end
+    expose :wix_light_delay_validation
+
+    #
     # Set the wix candle extensions to load
     #
     # @example
@@ -465,6 +488,7 @@ module Omnibus
         <<-EOH.split.join(" ").squeeze(" ").strip
         light.exe
           -nologo
+          #{wix_light_delay_validation}
           -ext WixUIExtension
           -ext WixBalExtension
           #{wix_extension_switches(wix_light_extensions)}
@@ -477,6 +501,7 @@ module Omnibus
         <<-EOH.split.join(" ").squeeze(" ").strip
           light.exe
             -nologo
+            #{wix_light_delay_validation}
             -ext WixUIExtension
             #{wix_extension_switches(wix_light_extensions)}
             -cultures:en-us
