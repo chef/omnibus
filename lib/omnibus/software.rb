@@ -665,11 +665,6 @@ module Omnibus
             "OBJECT_MODE" => "64",
             "ARFLAGS" => "-X64 cru",
           }
-        when "mac_os_x"
-          {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-          }
         when "solaris2"
           if platform_version.satisfies?("<= 5.10")
             solaris_flags = {

@@ -195,7 +195,7 @@ module Omnibus
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
-            "LDFLAGS"         => "-L/opt/project/embedded/lib",
+            "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
             "CFLAGS"          => "-I/opt/project/embedded/include -O2",
             "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
             "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
