@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.18 -->
+<!-- latest_release 6.0.19 -->
+## [v6.0.19](https://github.com/chef/omnibus/tree/v6.0.19) (2019-02-26)
+
+#### Merged Pull Requests
+- Remove custom LDFLAGS and CFLAGS for osx. [#878](https://github.com/chef/omnibus/pull/878) ([jonsmorrow](https://github.com/jonsmorrow))
+<!-- latest_release -->
+
 ## [v6.0.18](https://github.com/chef/omnibus/tree/v6.0.18) (2019-02-01)
 
 #### Merged Pull Requests
 - Add marcparadise to maintainers [#874](https://github.com/chef/omnibus/pull/874) ([marcparadise](https://github.com/marcparadise))
-<!-- latest_release -->
 
 ## [v6.0.17](https://github.com/chef/omnibus/tree/v6.0.17) (2019-02-01)
 
