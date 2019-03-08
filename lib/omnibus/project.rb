@@ -186,7 +186,7 @@ module Omnibus
 
     def python_2_embedded(val = NULL)
       if null?(val)
-        @python_2_embedded || raise(MissingRequiredAttribute.new(self, :install_dir, "/opt/chef"))
+        @python_2_embedded || "#{install_dir}/embedded2"
       else
         @python_2_embedded = val.tr('\\', "/").squeeze("/").chomp("/")
       end
@@ -195,7 +195,7 @@ module Omnibus
 
     def python_3_embedded(val = NULL)
       if null?(val)
-        @python_3_embedded || raise(MissingRequiredAttribute.new(self, :install_dir, "/opt/chef"))
+        @python_3_embedded || "#{install_dir}/embedded3"
       else
         @python_3_embedded = val.tr('\\', "/").squeeze("/").chomp("/")
       end
