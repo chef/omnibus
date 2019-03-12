@@ -764,12 +764,13 @@ module Omnibus
     end
 
     #
-    # Downloads a software license to ship with the final build.
+    # Adds a software license to ship with the final build.
     #
     # Licenses will be copied into {install_dir}/sources/{software_name}
     #
-    # @param [String] name_or_url
-    #   the name of the license to ship or a URL pointing to the license file.
+    # @param [String] source
+    #   the name of the license to ship, a URL pointing to the license file, or
+    #   the path on disk to the license
     #
     #   Available License Names : LGPLv2, LGPLv3, PSFL, Apache, Apachev2,
     #   GPLv2, GPLv3, ZPL
@@ -780,11 +781,14 @@ module Omnibus
     # @example
     #    ship_license 'http://www.r-project.org/Licenses/GPL-3'
     #
-    def ship_license(name_or_url)
-      build_commands << BuildCommand.new("Adding License: '#{name_or_url}'") do
+    # @example
+    #    ship_license 'LICENSE'
+    #
+    def ship_license(source)
+      build_commands << BuildCommand.new("Adding License: '#{source}'") do
         dir_name = "#{install_dir}/licenses/#{self.name}"
         FileUtils.mkdir_p(dir_name)
-        urls = {
+        known_licenses = {
           "LGPLv2" => "http://www.r-project.org/Licenses/LGPL-2",
           "LGPLv3" => "http://www.r-project.org/Licenses/LGPL-3",
           "PSFL" => "https://gist.githubusercontent.com/remh/1e6c62177a1a972fbc47/raw/01e9994ccf3a239a9045f31963006d2bba1cea42/PSF.license",
@@ -795,12 +799,18 @@ module Omnibus
           "ZPL" => "https://gist.githubusercontent.com/remh/d60434c9fee49af69850/raw/5582f08b89995ee25bb0a556e32ca8a9de197f23/ZPL.license",
           "MIT" => "https://www.r-project.org/Licenses/MIT",
         }
-        url = (urls.key? name_or_url) ? urls[name_or_url] : name_or_url
-        raise "License #{url} is not starting with http" unless url.start_with? "http"
-        file_name = "#{dir_name}/" + url.split("/")[-1]
-        File.open(file_name, "wb") do |f|
-            log.info(log_key) { "Writing license file from #{url} to #{file_name}" }
-            f.write HTTParty.get(url).parsed_response
+        path = (known_licenses.key? source) ? known_licenses[source] : source
+        destination = "#{dir_name}/" + path.split("/")[-1]
+        if path.start_with? "http"
+          File.open(destination, "wb") do |f|
+            log.info(log_key) { "Downloading license file from #{path} to #{destination}" }
+            f.write HTTParty.get(path).parsed_response
+          end
+        else
+          Dir.chdir(software.project_dir) do
+            log.info(log_key) { "Moving license file from #{path} to #{destination}" }
+            FileUtils.mv(path, destination)
+          end
         end
       end
     end
