@@ -102,6 +102,26 @@ module Omnibus
     end
     expose :pip
 
+    def py2pip(subcommand, options = {})
+     pip_path = "\"#{python_2_embedded}/bin/pip\""
+     if Ohai['platform'] == "windows"
+       pip_path = "\"#{windows_safe_path(python_2_embedded)}\\Scripts\\pip.exe\""
+     end
+     command("#{pip_path} #{subcommand}", options)
+    end
+    expose :py2pip
+
+    def py3pip(subcommand, options = {})
+     pip_path = "\"#{python_3_embedded}/bin/pip\""
+     if Ohai['platform'] == "windows"
+       pip_path = "\"#{windows_safe_path(python_3_embedded)}\\Scripts\\pip.exe\""
+     end
+     command("#{pip_path} #{subcommand}", options)
+    end
+    expose :py3pip
+
+
+
     #
     # Execute the given make command. When present, this method will prefer the
     # use of +gmake+ over +make+. If applicable, this method will also set

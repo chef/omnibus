@@ -184,6 +184,23 @@ module Omnibus
     end
     expose :install_dir
 
+    def python_2_embedded(val = NULL)
+      if null?(val)
+        @python_2_embedded || "#{install_dir}/embedded2"
+      else
+        @python_2_embedded = val.tr('\\', "/").squeeze("/").chomp("/")
+      end
+    end
+    expose :python_2_embedded
+
+    def python_3_embedded(val = NULL)
+      if null?(val)
+        @python_3_embedded || "#{install_dir}/embedded3"
+      else
+        @python_3_embedded = val.tr('\\', "/").squeeze("/").chomp("/")
+      end
+    end
+    expose :python_3_embedded
     #
     # The default root where a project should be installed. On Windows-based
     # systems, this value defaults to +C:+. On non-Windows systems, this value

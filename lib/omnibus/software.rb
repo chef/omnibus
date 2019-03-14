@@ -574,6 +574,16 @@ module Omnibus
     end
     expose :install_dir
 
+    def python_2_embedded
+      @project.python_2_embedded
+    end
+    expose :python_2_embedded
+
+    def python_3_embedded
+      @project.python_3_embedded
+    end
+    expose :python_3_embedded
+
     #
     # Define a series of {Builder} DSL commands that are executed to build the
     # software.
