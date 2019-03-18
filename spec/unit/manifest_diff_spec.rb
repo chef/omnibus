@@ -3,11 +3,11 @@ require "spec_helper"
 module Omnibus
   describe ManifestDiff do
     def manifest_entry_for(name, dv, lv)
-      Omnibus::ManifestEntry.new(name, { :described_version => dv,
-                                         :locked_version => lv,
-                                         :locked_source => {
-                                     :git => "git://#{name}@example.com" },
-                                         :source_type => :git,
+      Omnibus::ManifestEntry.new(name, { described_version: dv,
+                                         locked_version: lv,
+                                         locked_source: {
+                                     git: "git://#{name}@example.com" },
+                                         source_type: :git,
                                  })
     end
 
@@ -31,30 +31,30 @@ module Omnibus
 
     describe "#updated" do
       it "returns items that existed in the first manifest but have been changed" do
-        expect(subject.updated).to eq([{ :name => "foo",
-                                         :old_version => "deadbeef",
-                                         :new_version => "deadbea0",
-                                         :source_type => :git,
-                                         :source => { :git => "git://foo@example.com" },
+        expect(subject.updated).to eq([{ name: "foo",
+                                         old_version: "deadbeef",
+                                         new_version: "deadbea0",
+                                         source_type: :git,
+                                         source: { git: "git://foo@example.com" },
                                        }])
       end
 
       describe "#removed" do
         it "returns items that existed in the first manfiest but don't exist in the second" do
-          expect(subject.removed).to eq([{ :name => "bar",
-                                           :old_version => "deadbeef",
-                                           :source_type => :git,
-                                           :source => { :git => "git://bar@example.com" },
+          expect(subject.removed).to eq([{ name: "bar",
+                                           old_version: "deadbeef",
+                                           source_type: :git,
+                                           source: { git: "git://bar@example.com" },
                                          }])
         end
       end
 
       describe "#added" do
         it "returns items that did not exist in the first manifest but do exist in the second" do
-          expect(subject.added).to eq([{ :name => "quux",
-                                         :new_version => "deadbeef",
-                                         :source_type => :git,
-                                         :source => { :git => "git://quux@example.com" },
+          expect(subject.added).to eq([{ name: "quux",
+                                         new_version: "deadbeef",
+                                         source_type: :git,
+                                         source: { git: "git://quux@example.com" },
                                        }])
         end
       end

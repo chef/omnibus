@@ -21,18 +21,18 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  "pre",
+      preinst: "pre",
       postinst: "post",
-      prerm:    "preun",
-      postrm:   "postun",
+      prerm: "preun",
+      postrm: "postun",
       # Default RPM naming
-      pre:          "pre",
-      post:         "post",
-      preun:        "preun",
-      postun:       "postun",
+      pre: "pre",
+      post: "post",
+      preun: "preun",
+      postun: "postun",
       verifyscript: "verifyscript",
-      pretrans:      "pretrans",
-      posttrans:    "posttrans",
+      pretrans: "pretrans",
+      posttrans: "posttrans",
     }.freeze
 
     id :rpm
@@ -361,28 +361,28 @@ module Omnibus
       render_template(resource_path("spec.erb"),
         destination: spec_file,
         variables: {
-          name:            safe_base_package_name,
-          version:         safe_version,
-          iteration:       safe_build_iteration,
-          vendor:          vendor,
-          license:         license,
-          dist_tag:        dist_tag,
-          maintainer:      project.maintainer,
-          homepage:        project.homepage,
-          description:     project.description,
-          priority:        priority,
-          category:        category,
-          conflicts:       project.conflicts,
-          replaces:        project.replaces,
-          dependencies:    project.runtime_dependencies,
-          user:            project.package_user,
-          group:           project.package_group,
-          scripts:         scripts,
-          config_files:    config_files,
-          files:           files,
-          build_dir:       build_dir,
+          name: safe_base_package_name,
+          version: safe_version,
+          iteration: safe_build_iteration,
+          vendor: vendor,
+          license: license,
+          dist_tag: dist_tag,
+          maintainer: project.maintainer,
+          homepage: project.homepage,
+          description: project.description,
+          priority: priority,
+          category: category,
+          conflicts: project.conflicts,
+          replaces: project.replaces,
+          dependencies: project.runtime_dependencies,
+          user: project.package_user,
+          group: project.package_group,
+          scripts: scripts,
+          config_files: config_files,
+          files: files,
+          build_dir: build_dir,
           platform_family: Ohai["platform_family"],
-          compression:     compression,
+          compression: compression,
         }
       )
     end
@@ -583,7 +583,7 @@ module Omnibus
       #
       if version =~ /\-/
         if Ohai["platform_family"] == "wrlinux"
-          converted = version.tr("-", "_") #WRL has an elderly RPM version
+          converted = version.tr("-", "_") # WRL has an elderly RPM version
           log.warn(log_key) do
             "Omnibus replaces dashes (-) with tildes (~) so pre-release " \
             "versions get sorted earlier than final versions.  However, the " \

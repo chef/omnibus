@@ -68,7 +68,7 @@ module Omnibus
       #
       def resource_params
         params = {
-          use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint],
+          use_accelerate_endpoint: s3_configuration[:use_accelerate_endpoint],
           force_path_style: s3_configuration[:force_path_style],
         }
 

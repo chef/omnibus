@@ -19,14 +19,14 @@ module Omnibus
           <% if false -%>
             This is magic!
           <% end -%>
-        EOH
+      EOH
     end
 
     let(:options) do
       {
         destination: destination,
-        variables:   variables,
-        mode:        mode,
+        variables: variables,
+        mode: mode,
       }
     end
 

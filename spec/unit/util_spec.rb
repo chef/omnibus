@@ -44,7 +44,7 @@ module Omnibus
           timeout:     7_200,
           exitstatus:  32,
           environment: {
-            "TICKLE_ME"  => "elmo",
+            "TICKLE_ME" => "elmo",
             "I_LOVE_YOU" => "barney",
           }
         )

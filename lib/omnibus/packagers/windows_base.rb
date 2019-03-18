@@ -17,7 +17,7 @@
 module Omnibus
   class Packager::WindowsBase < Packager::Base
     DEFAULT_TIMESTAMP_SERVERS = ["http://timestamp.digicert.com",
-                                 "http://timestamp.verisign.com/scripts/timestamp.dll"]
+                                 "http://timestamp.verisign.com/scripts/timestamp.dll"].freeze
 
     #
     # Set the signing certificate name
@@ -145,7 +145,7 @@ module Omnibus
                 STDERR
                 ------
                 #{status.stderr}
-                EOH
+          EOH
         end
       end
       status.exitstatus == 0
