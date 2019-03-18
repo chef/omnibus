@@ -19,10 +19,10 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  "preinstall",
+      preinst: "preinstall",
       postinst: "postinstall",
       # Default PKG naming
-      preinstall:  "preinstall",
+      preinstall: "preinstall",
       postinstall: "postinstall",
     }.freeze
 
@@ -39,11 +39,11 @@ module Omnibus
       render_template(resource_path("license.html.erb"),
         destination: "#{resources_dir}/license.html",
         variables: {
-          name:          project.name,
+          name: project.name,
           friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
+          maintainer: project.maintainer,
           build_version: project.build_version,
-          package_name:  project.package_name,
+          package_name: project.package_name,
         }
       )
 
@@ -51,11 +51,11 @@ module Omnibus
       render_template(resource_path("welcome.html.erb"),
         destination: "#{resources_dir}/welcome.html",
         variables: {
-          name:          project.name,
+          name: project.name,
           friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
+          maintainer: project.maintainer,
           build_version: project.build_version,
-          package_name:  project.package_name,
+          package_name: project.package_name,
         }
       )
 
@@ -218,8 +218,8 @@ module Omnibus
         mode: 0600,
         variables: {
           friendly_name: project.friendly_name,
-          identifier:    safe_identifier,
-          version:       safe_version,
+          identifier: safe_identifier,
+          version: safe_version,
           component_pkg: component_pkg,
         }
       )

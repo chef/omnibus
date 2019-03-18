@@ -21,7 +21,7 @@ module Omnibus
     let(:source_dir)   { File.join(staging_dir, "proto_install") }
     let(:repo_dir)     { File.join(staging_dir, "publish/repo") }
     let(:architecture) { "i86pc" }
-    let(:shellout) { double("Mixlib::ShellOut", :run_command => true, :error! => nil) }
+    let(:shellout) { double("Mixlib::ShellOut", run_command: true, error!: nil) }
 
     before do
       Config.project_root(project_root)

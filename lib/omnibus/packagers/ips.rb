@@ -223,16 +223,16 @@ module Omnibus
     # @return [String]
     #
     def symlinks_file
-      if File.exists?(resource_path("#{safe_base_package_name}-symlinks.erb"))
+      if File.exist?(resource_path("#{safe_base_package_name}-symlinks.erb"))
         "#{safe_base_package_name}-symlinks.erb"
-      elsif File.exists?(resource_path("symlinks.erb"))
+      elsif File.exist?(resource_path("symlinks.erb"))
         "symlinks.erb"
       end
     end
 
     #
     # A set of symbolic links to installed commands that
-    #`pkgmogrify' will apply to the package manifest. Is called only when
+    # `pkgmogrify' will apply to the package manifest. Is called only when
     # "#{safe_base_package_name}-symlinks.erb" or "symlinks.erb" template resource
     # exists locally
     #
@@ -257,11 +257,11 @@ module Omnibus
       render_template(resource_path("gen.manifestfile.erb"),
         destination: pkg_metadata_file,
         variables: {
-          name:              safe_base_package_name,
+          name: safe_base_package_name,
           fmri_package_name: fmri_package_name,
-          description:       project.description,
-          summary:           project.friendly_name,
-          arch:              safe_architecture,
+          description: project.description,
+          summary: project.friendly_name,
+          arch: safe_architecture,
         }
       )
 

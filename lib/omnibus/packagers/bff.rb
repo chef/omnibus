@@ -19,12 +19,12 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  "Pre-installation Script",
+      preinst: "Pre-installation Script",
       postinst: "Post-installation Script",
-      config:   "Configuration Script",
+      config: "Configuration Script",
       unconfig: "Unconfiguration Script",
-      prerm:    "Pre_rm Script",
-      postrm:   "Unconfiguration Script",
+      prerm: "Pre_rm Script",
+      postrm: "Unconfiguration Script",
     }.freeze
 
     id :bff
@@ -144,11 +144,11 @@ module Omnibus
           alt = path.gsub(/(:|,)/, "__")
           log.debug(log_key) { "Renaming #{path} to #{alt}" }
 
-          File.rename(path, alt) if File.exists?(path)
+          File.rename(path, alt) if File.exist?(path)
 
           # Create a config script if needed based on resources/bff/config.erb
           config_script_path = File.join(scripts_staging_dir, "config")
-          unless File.exists? config_script_path
+          unless File.exist? config_script_path
             render_template(resource_path("config.erb"),
               destination: "#{scripts_staging_dir}/config",
               variables: {
@@ -182,13 +182,13 @@ module Omnibus
       render_template(resource_path("gen.template.erb"),
         destination: File.join(staging_dir, "gen.template"),
         variables: {
-          name:           safe_base_package_name,
-          install_dir:    project.install_dir,
-          friendly_name:  project.friendly_name,
-          version:        bff_version,
-          description:    project.description,
-          files:          files,
-          scripts:        scripts,
+          name: safe_base_package_name,
+          install_dir: project.install_dir,
+          friendly_name: project.friendly_name,
+          version: bff_version,
+          description: project.description,
+          files: files,
+          scripts: scripts,
         }
       )
 

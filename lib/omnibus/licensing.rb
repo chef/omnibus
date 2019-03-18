@@ -535,22 +535,22 @@ module Omnibus
         # dependencies.  In the latter case software definition should set
         # 'skip_transitive_dependency_licensing' to 'true' to correct this
         # error.
-        transitive_dependency_licensing_warning(<<-EOH)
-Software '#{software.name}' is not supported project type for transitive \
-dependency license collection. See https://github.com/chef/license_scout for \
-the list of supported languages and dependency managers. If this project does \
-not have any transitive dependencies, consider setting \
-'skip_transitive_dependency_licensing' to 'true' in order to correct this error.
-EOH
+        transitive_dependency_licensing_warning(<<~EOH)
+          Software '#{software.name}' is not supported project type for transitive \
+          dependency license collection. See https://github.com/chef/license_scout for \
+          the list of supported languages and dependency managers. If this project does \
+          not have any transitive dependencies, consider setting \
+          'skip_transitive_dependency_licensing' to 'true' in order to correct this error.
+        EOH
         # If we got here, we need to fail now so we don't take a git
         # cache snapshot, or else the software build could be restored
         # from cache without fixing the license issue.
         raise_if_warnings_fatal!
       rescue LicenseScout::Exceptions::Error => e
-        transitive_dependency_licensing_warning(<<-EOH)
-Can not automatically detect licensing information for '#{software.name}' using \
-license_scout. Error is: '#{e}'
-EOH
+        transitive_dependency_licensing_warning(<<~EOH)
+          Can not automatically detect licensing information for '#{software.name}' using \
+          license_scout. Error is: '#{e}'
+        EOH
         # If we got here, we need to fail now so we don't take a git
         # cache snapshot, or else the software build could be restored
         # from cache without fixing the license issue.
@@ -560,9 +560,9 @@ EOH
         # until license_scout gets more stable. As we are adding support for more
         # and more dependency managers we discover unhandled edge cases which
         # requires us to have this. Remove this once license_scout is stable.
-        transitive_dependency_licensing_warning(<<-EOH)
-Unexpected error while running license_scout for '#{software.name}': '#{e}'
-EOH
+        transitive_dependency_licensing_warning(<<~EOH)
+          Unexpected error while running license_scout for '#{software.name}': '#{e}'
+        EOH
         # If we got here, we need to fail now so we don't take a git
         # cache snapshot, or else the software build could be restored
         # from cache without fixing the license issue.
@@ -576,10 +576,10 @@ EOH
       begin
         reporter.report.each { |i| transitive_dependency_licensing_warning(i) }
       rescue LicenseScout::Exceptions::InvalidOutputReport => e
-        transitive_dependency_licensing_warning(<<-EOH)
-Licensing output report at '#{license_output_dir(software)}' has errors:
-#{e}
-EOH
+        transitive_dependency_licensing_warning(<<~EOH)
+          Licensing output report at '#{license_output_dir(software)}' has errors:
+          #{e}
+        EOH
       end
       raise_if_warnings_fatal!
     end

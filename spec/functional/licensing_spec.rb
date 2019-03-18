@@ -464,27 +464,27 @@ module Omnibus
 
         let(:expected_license_texts) do
           [
-            <<-EOH,
-This product includes inifile 3.0.0
-which is a 'ruby_bundler' dependency of 'zlib',
-and which is available under a 'MIT' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-inifile-3.0.0-README.md
-EOH
-            <<-EOH,
-This product includes mime-types 3.1
-which is a 'ruby_bundler' dependency of 'zlib',
-and which is available under a 'MIT' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-mime-types-3.1-Licence.rdoc
-EOH
-            <<-EOH,
-This product includes mini_portile2 2.1.0
-which is a 'ruby_bundler' dependency of 'zlib',
-and which is available under a 'MIT' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
-EOH
+            <<~EOH,
+              This product includes inifile 3.0.0
+              which is a 'ruby_bundler' dependency of 'zlib',
+              and which is available under a 'MIT' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-inifile-3.0.0-README.md
+            EOH
+            <<~EOH,
+              This product includes mime-types 3.1
+              which is a 'ruby_bundler' dependency of 'zlib',
+              and which is available under a 'MIT' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-mime-types-3.1-Licence.rdoc
+            EOH
+            <<~EOH,
+              This product includes mini_portile2 2.1.0
+              which is a 'ruby_bundler' dependency of 'zlib',
+              and which is available under a 'MIT' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
+            EOH
           ]
         end
 
@@ -523,34 +523,34 @@ EOH
 
         let(:expected_license_texts) do
           [
-            <<-EOH,
-This product includes inifile 3.0.0
-which is a 'ruby_bundler' dependency of 'snoopy', 'zlib',
-and which is available under a 'MIT' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-inifile-3.0.0-README.md
-EOH
-            <<-EOH,
-This product includes mime-types 3.1
-which is a 'ruby_bundler' dependency of 'zlib',
-and which is available under a 'MIT' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-mime-types-3.1-Licence.rdoc
-EOH
-            <<-EOH,
-This product includes mini_portile2 2.1.0
-which is a 'ruby_bundler' dependency of 'zlib',
-and which is available under a 'MIT' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
-EOH
-            <<-EOH,
-This product includes bundler-audit 0.5.0
-which is a 'ruby_bundler' dependency of 'snoopy',
-and which is available under a 'GPLv3' License.
-For details, see:
-#{install_dir}/LICENSES/ruby_bundler-bundler-audit-0.5.0-COPYING.txt
-EOH
+            <<~EOH,
+              This product includes inifile 3.0.0
+              which is a 'ruby_bundler' dependency of 'snoopy', 'zlib',
+              and which is available under a 'MIT' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-inifile-3.0.0-README.md
+            EOH
+            <<~EOH,
+              This product includes mime-types 3.1
+              which is a 'ruby_bundler' dependency of 'zlib',
+              and which is available under a 'MIT' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-mime-types-3.1-Licence.rdoc
+            EOH
+            <<~EOH,
+              This product includes mini_portile2 2.1.0
+              which is a 'ruby_bundler' dependency of 'zlib',
+              and which is available under a 'MIT' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-mini_portile2-2.1.0-LICENSE.txt
+            EOH
+            <<~EOH,
+              This product includes bundler-audit 0.5.0
+              which is a 'ruby_bundler' dependency of 'snoopy',
+              and which is available under a 'GPLv3' License.
+              For details, see:
+              #{install_dir}/LICENSES/ruby_bundler-bundler-audit-0.5.0-COPYING.txt
+            EOH
 
           ]
         end

@@ -61,8 +61,8 @@ module Omnibus
 
     def s3_configuration
       config = {
-        region:            @options[:region],
-        bucket_name:       @options[:bucket],
+        region: @options[:region],
+        bucket_name: @options[:bucket],
       }
 
       if Config.publish_s3_profile

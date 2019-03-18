@@ -42,20 +42,20 @@ module Omnibus
 
     let(:data) { { foo: "bar" } }
     let(:license_file_content) do
-      <<-EOH
-some_project 1.2.3 license: "Apache-2.0"
+      <<~EOH
+        some_project 1.2.3 license: "Apache-2.0"
 
-                              Apache License
-                        Version 2.0, January 2004
-                     http://www.apache.org/licenses/
-TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+                                      Apache License
+                                Version 2.0, January 2004
+                             http://www.apache.org/licenses/
+        TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
-1. Definitions.
+        1. Definitions.
 
-   "License" shall mean the terms and conditions for use, reproduction,
-   and distribution as defined by Sections 1 through 9 of this document.
+           "License" shall mean the terms and conditions for use, reproduction,
+           and distribution as defined by Sections 1 through 9 of this document.
 
-...
+        ...
       EOH
     end
 

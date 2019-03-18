@@ -1,0 +1,852 @@
+# all of these could/should be corrected. Have at it if you want.
+
+# Cop supports --auto-correct.
+# Configuration parameters: TreatCommentsAsGroupSeparators, Include.
+# Include: **/*.gemfile, **/Gemfile, **/gems.rb
+Bundler/OrderedGems:
+  Exclude:
+    - 'Gemfile'
+
+# Cop supports --auto-correct.
+# Configuration parameters: TreatCommentsAsGroupSeparators, Include.
+# Include: **/*.gemspec
+Gemspec/OrderedDependencies:
+  Exclude:
+    - 'omnibus.gemspec'
+
+# Configuration parameters: Include.
+# Include: **/*.gemspec
+Gemspec/RequiredRubyVersion:
+  Exclude:
+    - 'omnibus.gemspec'
+
+# Cop supports --auto-correct.
+Layout/AlignArray:
+  Exclude:
+    - 'spec/unit/changelog_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle.
+# SupportedHashRocketStyles: key, separator, table
+# SupportedColonStyles: key, separator, table
+# SupportedLastArgumentHashStyles: always_inspect, always_ignore, ignore_implicit, ignore_explicit
+Layout/AlignHash:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/publishers/artifactory_publisher.rb'
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/support/examples.rb'
+    - 'spec/unit/publishers/artifactory_publisher_spec.rb'
+    - 'spec/unit/software_spec.rb'
+    - 'spec/unit/util_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, IndentationWidth.
+# SupportedStyles: with_first_parameter, with_fixed_indentation
+Layout/AlignParameters:
+  Enabled: false
+
+# Cop supports --auto-correct.
+Layout/BlockEndNewline:
+  Exclude:
+    - 'spec/unit/changelogprinter_spec.rb'
+
+# Cop supports --auto-correct.
+Layout/ClosingParenthesisIndentation:
+  Exclude:
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+Layout/CommentIndentation:
+  Exclude:
+    - 'lib/omnibus/metadata.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: AllowBorderComment, AllowMarginComment.
+Layout/EmptyComment:
+  Exclude:
+    - 'lib/omnibus/config.rb'
+    - 'lib/omnibus/project.rb'
+
+# Cop supports --auto-correct.
+Layout/EmptyLineAfterGuardClause:
+  Exclude:
+    - 'lib/omnibus/build_version_dsl.rb'
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/cleaner.rb'
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/packagers/base.rb'
+    - 'lib/omnibus/packagers/msi.rb'
+    - 'lib/omnibus/packagers/rpm.rb'
+    - 'lib/omnibus/packagers/windows_base.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/util.rb'
+    - 'spec/functional/builder_spec.rb'
+
+# Cop supports --auto-correct.
+Layout/EmptyLineAfterMagicComment:
+  Exclude:
+    - 'omnibus.gemspec'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: empty_lines, no_empty_lines
+Layout/EmptyLinesAroundBlockBody:
+  Exclude:
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/functional/file_syncer_spec.rb'
+    - 'spec/unit/build_version_spec.rb'
+    - 'spec/unit/fetchers/git_fetcher_spec.rb'
+    - 'spec/unit/fetchers/net_fetcher_spec.rb'
+    - 'spec/unit/file_syncer_spec.rb'
+    - 'spec/unit/omnibus_spec.rb'
+    - 'spec/unit/packagers/bff_spec.rb'
+    - 'spec/unit/packagers/ips_spec.rb'
+    - 'spec/unit/publisher_spec.rb'
+    - 'spec/unit/publishers/artifactory_publisher_spec.rb'
+    - 'spec/unit/s3_helpers_spec.rb'
+    - 'spec/unit/semantic_version_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: empty_lines, empty_lines_except_namespace, empty_lines_special, no_empty_lines, beginning_only, ending_only
+Layout/EmptyLinesAroundClassBody:
+  Exclude:
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/semantic_version.rb'
+    - 'lib/omnibus/thread_pool.rb'
+
+# Cop supports --auto-correct.
+Layout/EmptyLinesAroundExceptionHandlingKeywords:
+  Exclude:
+    - 'lib/omnibus/packagers/bff.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: empty_lines, empty_lines_except_namespace, empty_lines_special, no_empty_lines
+Layout/EmptyLinesAroundModuleBody:
+  Exclude:
+    - 'lib/omnibus/digestable.rb'
+    - 'lib/omnibus/sugarable.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, IndentationWidth.
+# SupportedStyles: consistent, consistent_relative_to_receiver, special_for_inner_method_call, special_for_inner_method_call_in_parentheses
+Layout/FirstParameterIndentation:
+  Exclude:
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, IndentationWidth.
+# SupportedStyles: special_inside_parentheses, consistent, align_brackets
+Layout/IndentArray:
+  Exclude:
+    - 'lib/omnibus/git_cache.rb'
+    - 'lib/omnibus/ohai.rb'
+    - 'lib/omnibus/whitelist.rb'
+    - 'spec/unit/generator_spec.rb'
+    - 'spec/unit/library_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, IndentationWidth.
+# SupportedStyles: special_inside_parentheses, consistent, align_braces
+Layout/IndentHash:
+  Exclude:
+    - 'lib/omnibus/s3_helpers.rb'
+    - 'lib/omnibus/software.rb'
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/unit/health_check_spec.rb'
+    - 'spec/unit/manifest_diff_spec.rb'
+
+# Cop supports --auto-correct.
+Layout/LeadingBlankLines:
+  Exclude:
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/whitelist.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: symmetrical, new_line, same_line
+Layout/MultilineArrayBraceLayout:
+  Exclude:
+    - 'lib/omnibus/git_cache.rb'
+    - 'lib/omnibus/ohai.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: symmetrical, new_line, same_line
+Layout/MultilineHashBraceLayout:
+  Exclude:
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/manifest_diff_spec.rb'
+    - 'spec/unit/manifest_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: symmetrical, new_line, same_line
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: false
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, IndentationWidth.
+# SupportedStyles: aligned, indented, indented_relative_to_receiver
+Layout/MultilineMethodCallIndentation:
+  Exclude:
+    - 'lib/omnibus/packagers/rpm.rb'
+    - 'lib/omnibus/software.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/generator_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, IndentationWidth.
+# SupportedStyles: aligned, indented
+Layout/MultilineOperationIndentation:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/packager.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+
+# Cop supports --auto-correct.
+Layout/SpaceAfterNot:
+  Exclude:
+    - 'lib/omnibus/manifest.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBrackets.
+# SupportedStyles: space, no_space, compact
+# SupportedStylesForEmptyBrackets: space, no_space
+Layout/SpaceInsideArrayLiteralBrackets:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/packager.rb'
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/unit/builder_spec.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/file_syncer_spec.rb'
+    - 'spec/unit/git_cache_spec.rb'
+    - 'spec/unit/health_check_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: space, no_space
+Layout/SpaceInsideParens:
+  Exclude:
+    - 'lib/omnibus/packagers/bff.rb'
+
+# Cop supports --auto-correct.
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Exclude:
+    - 'lib/omnibus/publisher.rb'
+    - 'omnibus.gemspec'
+    - 'spec/unit/packagers/bff_spec.rb'
+    - 'spec/unit/packagers/makeself_spec.rb'
+    - 'spec/unit/packagers/pkg_spec.rb'
+    - 'spec/unit/packagers/rpm_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+Lint/AmbiguousRegexpLiteral:
+  Exclude:
+    - 'spec/functional/builder_spec.rb'
+
+# Configuration parameters: AllowSafeAssignment.
+Lint/AssignmentInCondition:
+  Exclude:
+    - 'lib/omnibus/build_version.rb'
+    - 'lib/omnibus/compressors/tgz.rb'
+    - 'lib/omnibus/file_syncer.rb'
+    - 'lib/omnibus/packager.rb'
+    - 'lib/omnibus/publishers/artifactory_publisher.rb'
+
+Lint/EmptyWhen:
+  Exclude:
+    - 'lib/omnibus/health_check.rb'
+
+Lint/IneffectiveAccessModifier:
+  Exclude:
+    - 'lib/omnibus/fetcher.rb'
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+
+# Configuration parameters: MaximumRangeSize.
+Lint/MissingCopEnableDirective:
+  Exclude:
+    - 'lib/omnibus/core_extensions/open_uri.rb'
+    - 'lib/omnibus/metadata.rb'
+
+Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+    - 'lib/omnibus/cli/base.rb'
+    - 'spec/unit/packagers/ips_spec.rb'
+    - 'spec/unit/packagers/msi_spec.rb'
+    - 'spec/unit/project_spec.rb'
+    - 'spec/unit/s3_cacher_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+Lint/RescueException:
+  Exclude:
+    - 'lib/omnibus/util.rb'
+
+Lint/ShadowingOuterLocalVariable:
+  Exclude:
+    - 'lib/omnibus.rb'
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+
+# Cop supports --auto-correct.
+Lint/UnneededRequireStatement:
+  Exclude:
+    - 'lib/omnibus/thread_pool.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
+Lint/UnusedBlockArgument:
+  Exclude:
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/manifest.rb'
+    - 'lib/omnibus/publishers/artifactory_publisher.rb'
+    - 'spec/support/matchers.rb'
+    - 'spec/unit/publishers/artifactory_publisher_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
+Lint/UnusedMethodArgument:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/fetchers/file_fetcher.rb'
+    - 'lib/omnibus/fetchers/net_fetcher.rb'
+    - 'lib/omnibus/fetchers/null_fetcher.rb'
+    - 'lib/omnibus/fetchers/path_fetcher.rb'
+    - 'lib/omnibus/instrumentation.rb'
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/packagers/rpm.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/s3_cache.rb'
+    - 'lib/omnibus/software.rb'
+    - 'lib/omnibus/util.rb'
+    - 'spec/support/output_helpers.rb'
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'lib/omnibus/digestable.rb'
+    - 'lib/omnibus/file_syncer.rb'
+    - 'lib/omnibus/software.rb'
+
+Metrics/AbcSize:
+  Max: 110
+
+# Configuration parameters: CountComments, ExcludedMethods.
+# ExcludedMethods: refine
+Metrics/BlockLength:
+  Max: 713
+
+# Configuration parameters: CountBlocks.
+Metrics/BlockNesting:
+  Max: 4
+
+# Configuration parameters: CountComments.
+Metrics/ClassLength:
+  Max: 519
+
+Metrics/CyclomaticComplexity:
+  Max: 16
+
+# Configuration parameters: CountComments, ExcludedMethods.
+Metrics/MethodLength:
+  Max: 105
+
+# Configuration parameters: CountComments.
+Metrics/ModuleLength:
+  Max: 715
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+Naming/AccessorMethodName:
+  Exclude:
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/s3_helpers.rb'
+
+# Configuration parameters: Blacklist.
+# Blacklist: (?-mix:(^|\s)(EO[A-Z]{1}|END)(\s|$))
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
+# Configuration parameters: EnforcedStyleForLeadingUnderscores.
+# SupportedStylesForLeadingUnderscores: disallowed, required, optional
+Naming/MemoizedInstanceVariableName:
+  Exclude:
+    - 'lib/omnibus/cli/changelog.rb'
+    - 'lib/omnibus/compressors/dmg.rb'
+    - 'lib/omnibus/packagers/base.rb'
+    - 'lib/omnibus/publishers/artifactory_publisher.rb'
+    - 'lib/omnibus/s3_helpers.rb'
+
+# Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist, MethodDefinitionMacros.
+# NamePrefix: is_, has_, have_
+# NamePrefixBlacklist: is_, has_, have_
+# NameWhitelist: is_a?
+# MethodDefinitionMacros: define_method, define_singleton_method
+Naming/PredicateName:
+  Exclude:
+    - 'spec/**/*'
+    - 'lib/omnibus/build_version_dsl.rb'
+    - 'lib/omnibus/git_cache.rb'
+
+# Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
+# AllowedNames: io, id, to, by, on, in, at, ip, db
+Naming/UncommunicativeMethodParamName:
+  Exclude:
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/cli/base.rb'
+    - 'lib/omnibus/manifest.rb'
+    - 'lib/omnibus/manifest_diff.rb'
+    - 'lib/omnibus/ohai.rb'
+    - 'lib/omnibus/util.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/manifest_diff_spec.rb'
+
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: snake_case, normalcase, non_integer
+Naming/VariableNumber:
+  Exclude:
+    - 'spec/unit/project_spec.rb'
+
+Security/Open:
+  Exclude:
+    - 'lib/omnibus/download_helpers.rb'
+
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: inline, group
+Style/AccessModifierDeclarations:
+  Exclude:
+    - 'lib/omnibus/compressor.rb'
+    - 'lib/omnibus/packager.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: prefer_alias, prefer_alias_method
+Style/Alias:
+  Exclude:
+    - 'lib/omnibus/config.rb'
+    - 'lib/omnibus/core_extensions/open_uri.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/software.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: percent_q, bare_percent
+Style/BarePercentLiterals:
+  Exclude:
+    - 'lib/omnibus/git_cache.rb'
+    - 'lib/omnibus/packagers/pkg.rb'
+    - 'spec/unit/git_cache_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: braces, no_braces, context_dependent
+Style/BracesAroundHashParameters:
+  Exclude:
+    - 'lib/omnibus/packagers/ips.rb'
+    - 'lib/omnibus/s3_helpers.rb'
+    - 'lib/omnibus/software.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/fetcher_spec.rb'
+    - 'spec/unit/health_check_spec.rb'
+    - 'spec/unit/manifest_diff_spec.rb'
+    - 'spec/unit/manifest_spec.rb'
+    - 'spec/unit/s3_helpers_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: AutoCorrect, EnforcedStyle.
+# SupportedStyles: nested, compact
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: is_a?, kind_of?
+Style/ClassCheck:
+  Exclude:
+    - 'lib/omnibus/software.rb'
+    - 'lib/omnibus/util.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.
+# SupportedStyles: assign_to_condition, assign_inside_condition
+Style/ConditionalAssignment:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/project.rb'
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  Exclude:
+    - 'lib/omnibus/cleaner.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/sugarable.rb'
+    - 'spec/spec_helper.rb'
+
+# Cop supports --auto-correct.
+Style/EachWithObject:
+  Exclude:
+    - 'lib/omnibus.rb'
+    - 'lib/omnibus/library.rb'
+    - 'lib/omnibus/manifest.rb'
+    - 'lib/omnibus/packagers/bff.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+    - 'lib/omnibus/packagers/msi.rb'
+    - 'lib/omnibus/packagers/rpm.rb'
+    - 'lib/omnibus/s3_cache.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: empty, nil, both
+Style/EmptyElse:
+  Exclude:
+    - 'lib/omnibus/cli.rb'
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+
+# Cop supports --auto-correct.
+Style/EmptyLiteral:
+  Exclude:
+    - 'lib/omnibus/packagers/windows_base.rb'
+    - 'lib/omnibus/publisher.rb'
+    - 'spec/unit/project_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: compact, expanded
+Style/EmptyMethod:
+  Exclude:
+    - 'lib/omnibus/fetchers/net_fetcher.rb'
+    - 'spec/functional/fetchers/net_fetcher_spec.rb'
+
+# Cop supports --auto-correct.
+Style/Encoding:
+  Exclude:
+    - 'omnibus.gemspec'
+
+Style/EvalWithLocation:
+  Exclude:
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/packagers/base.rb'
+
+# Cop supports --auto-correct.
+Style/ExpandPathArguments:
+  Exclude:
+    - 'bin/omnibus'
+    - 'lib/omnibus.rb'
+    - 'lib/omnibus/generator.rb'
+    - 'omnibus.gemspec'
+    - 'spec/support/path_helpers.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: format, sprintf, percent
+Style/FormatString:
+  Exclude:
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/health_check.rb'
+    - 'spec/support/matchers.rb'
+
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: annotated, template, unannotated
+Style/FormatStringToken:
+  Exclude:
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/config.rb'
+    - 'spec/support/matchers.rb'
+    - 'spec/unit/publishers/artifactory_publisher_spec.rb'
+    - 'spec/unit/publishers/s3_publisher_spec.rb'
+
+# Configuration parameters: MinBodyLength.
+Style/GuardClause:
+  Enabled: false
+
+Style/IdenticalConditionalBranches:
+  Exclude:
+    - 'lib/omnibus/digestable.rb'
+
+Style/IfInsideElse:
+  Exclude:
+    - 'lib/omnibus/build_version_dsl.rb'
+    - 'lib/omnibus/cli/base.rb'
+    - 'lib/omnibus/config.rb'
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/software.rb'
+
+# Cop supports --auto-correct.
+Style/IfUnlessModifier:
+  Enabled: false
+
+# Cop supports --auto-correct.
+# Configuration parameters: InverseMethods, InverseBlocks.
+Style/InverseMethods:
+  Exclude:
+    - 'lib/omnibus/packagers/deb.rb'
+    - 'lib/omnibus/s3_cache.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: line_count_dependent, lambda, literal
+Style/Lambda:
+  Exclude:
+    - 'lib/omnibus/download_helpers.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: IgnoredMethods.
+Style/MethodCallWithoutArgsParentheses:
+  Exclude:
+    - 'lib/omnibus/logger.rb'
+    - 'spec/unit/builder_spec.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/manifest_diff_spec.rb'
+
+Style/MethodMissingSuper:
+  Exclude:
+    - 'lib/omnibus/ohai.rb'
+
+Style/MissingRespondToMissing:
+  Exclude:
+    - 'lib/omnibus/ohai.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: module_function, extend_self
+Style/ModuleFunction:
+  Exclude:
+    - 'lib/omnibus/reports.rb'
+
+Style/MultilineBlockChain:
+  Exclude:
+    - 'lib/omnibus/git_cache.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: both, prefix, postfix
+Style/NegatedIf:
+  Exclude:
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/manifest.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+    - 'lib/omnibus/packagers/windows_base.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, MinBodyLength.
+# SupportedStyles: skip_modifier_ifs, always
+Style/Next:
+  Exclude:
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+    - 'lib/omnibus/packagers/makeself.rb'
+    - 'lib/omnibus/packagers/pkg.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedOctalStyle.
+# SupportedOctalStyles: zero_with_o, zero_only
+Style/NumericLiteralPrefix:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/generator.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+    - 'lib/omnibus/packagers/makeself.rb'
+    - 'lib/omnibus/packagers/pkg.rb'
+    - 'lib/omnibus/packagers/rpm.rb'
+    - 'lib/omnibus/templating.rb'
+    - 'spec/functional/file_syncer_spec.rb'
+    - 'spec/functional/templating_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: Strict.
+Style/NumericLiterals:
+  MinDigits: 10
+
+# Cop supports --auto-correct.
+# Configuration parameters: AutoCorrect, EnforcedStyle, IgnoredMethods.
+# SupportedStyles: predicate, comparison
+Style/NumericPredicate:
+  Exclude:
+    - 'spec/**/*'
+    - 'lib/omnibus/build_version.rb'
+    - 'lib/omnibus/library.rb'
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/packagers/windows_base.rb'
+
+# Cop supports --auto-correct.
+Style/ParallelAssignment:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/cli.rb'
+    - 'lib/omnibus/core_extensions/open_uri.rb'
+    - 'spec/unit/fetchers/net_fetcher_spec.rb'
+    - 'spec/unit/project_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: PreferredDelimiters.
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+# Cop supports --auto-correct.
+Style/Proc:
+  Exclude:
+    - 'lib/omnibus/logger.rb'
+    - 'lib/omnibus/project.rb'
+    - 'spec/unit/builder_spec.rb'
+    - 'spec/unit/project_spec.rb'
+    - 'spec/unit/util_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: compact, exploded
+Style/RaiseArgs:
+  Exclude:
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+    - 'lib/omnibus/fetchers/net_fetcher.rb'
+    - 'lib/omnibus/metadata.rb'
+    - 'lib/omnibus/package.rb'
+    - 'lib/omnibus/packagers/windows_base.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/publisher.rb'
+    - 'lib/omnibus/software.rb'
+    - 'lib/omnibus/util.rb'
+
+# Cop supports --auto-correct.
+Style/RedundantParentheses:
+  Exclude:
+    - 'spec/unit/packagers/ips_spec.rb'
+    - 'spec/unit/project_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, AllowInnerSlashes.
+# SupportedStyles: slashes, percent_r, mixed
+Style/RegexpLiteral:
+  Exclude:
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/packagers/bff.rb'
+    - 'lib/omnibus/util.rb'
+    - 'omnibus.gemspec'
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/support/examples.rb'
+    - 'spec/unit/packagers/bff_spec.rb'
+    - 'spec/unit/packagers/pkgsrc_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: use_perl_names, use_english_names
+Style/SpecialGlobalVars:
+  Exclude:
+    - 'bin/omnibus'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiterals:
+  Enabled: false
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: single_quotes, double_quotes
+Style/StringLiteralsInInterpolation:
+  Exclude:
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: MinSize.
+# SupportedStyles: percent, brackets
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+# Cop supports --auto-correct.
+# Configuration parameters: IgnoredMethods.
+# IgnoredMethods: respond_to, define_method
+Style/SymbolProc:
+  Exclude:
+    - 'lib/omnibus/packagers/rpm.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle, AllowSafeAssignment.
+# SupportedStyles: require_parentheses, require_no_parentheses, require_parentheses_when_complex
+Style/TernaryParentheses:
+  Exclude:
+    - 'lib/omnibus/reports.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyleForMultiline.
+# SupportedStylesForMultiline: comma, consistent_comma, no_comma
+Style/TrailingCommaInArrayLiteral:
+  Exclude:
+    - 'lib/omnibus.rb'
+    - 'lib/omnibus/fetcher.rb'
+    - 'lib/omnibus/git_cache.rb'
+    - 'lib/omnibus/publishers/artifactory_publisher.rb'
+    - 'lib/omnibus/whitelist.rb'
+    - 'spec/unit/changelogprinter_spec.rb'
+    - 'spec/unit/library_spec.rb'
+    - 'spec/unit/publisher_spec.rb'
+    - 'spec/unit/publishers/artifactory_publisher_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyleForMultiline.
+# SupportedStylesForMultiline: comma, consistent_comma, no_comma
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+# Cop supports --auto-correct.
+# Configuration parameters: ExactNameMatch, AllowPredicates, AllowDSLWriters, IgnoreClassMethods, Whitelist.
+# Whitelist: to_ary, to_a, to_c, to_enum, to_h, to_hash, to_i, to_int, to_io, to_open, to_path, to_proc, to_r, to_regexp, to_str, to_s, to_sym
+Style/TrivialAccessors:
+  Exclude:
+    - 'lib/omnibus.rb'
+    - 'lib/omnibus/package.rb'
+    - 'lib/omnibus/project.rb'
+    - 'lib/omnibus/software.rb'
+
+# Cop supports --auto-correct.
+Style/UnneededInterpolation:
+  Exclude:
+    - 'lib/omnibus/changelog_printer.rb'
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+    - 'lib/omnibus/packagers/bff.rb'
+    - 'lib/omnibus/packagers/msi.rb'
+    - 'lib/omnibus/packagers/rpm.rb'
+    - 'lib/omnibus/reports.rb'
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/spec_helper.rb'
+    - 'spec/unit/fetchers/net_fetcher_spec.rb'
+    - 'spec/unit/packagers/base_spec.rb'
+    - 'spec/unit/packagers/msi_spec.rb'
+
+# Cop supports --auto-correct.
+Style/UnneededPercentQ:
+  Exclude:
+    - 'lib/omnibus/packagers/pkg.rb'
+    - 'spec/unit/git_cache_spec.rb'
+
+# Cop supports --auto-correct.
+# Configuration parameters: EnforcedStyle.
+# SupportedStyles: all_comparison_operators, equality_operators_only
+Style/YodaCondition:
+  Exclude:
+    - 'lib/omnibus/packagers/deb.rb'
+    - 'lib/omnibus/packagers/rpm.rb'
+
+# Cop supports --auto-correct.
+Style/ZeroLengthPredicate:
+  Exclude:
+    - 'lib/omnibus/health_check.rb'
+    - 'lib/omnibus/library.rb'

@@ -337,9 +337,9 @@ module Omnibus
       render_template(resource_path("localization-#{localization}.wxl.erb"),
         destination: "#{staging_dir}/localization-#{localization}.wxl",
         variables: {
-          name:          project.package_name,
+          name: project.package_name,
           friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
+          maintainer: project.maintainer,
         }
       )
     end
@@ -353,12 +353,12 @@ module Omnibus
       render_template(resource_path("parameters.wxi.erb"),
         destination: "#{staging_dir}/parameters.wxi",
         variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
+          name: project.package_name,
+          friendly_name: project.friendly_name,
+          maintainer: project.maintainer,
+          upgrade_code: upgrade_code,
+          parameters: parameters,
+          version: windows_package_version,
           display_version: msi_display_version,
         }
       )
@@ -402,11 +402,11 @@ module Omnibus
       render_template(resource_path("source.wxs.erb"),
         destination: "#{staging_dir}/source.wxs",
         variables: {
-          name:          project.package_name,
+          name: project.package_name,
           friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
-          hierarchy:     hierarchy,
-          fastmsi:       fast_msi,
+          maintainer: project.maintainer,
+          hierarchy: hierarchy,
+          fastmsi: fast_msi,
           wix_install_dir: wix_install_dir,
         }
       )
@@ -421,14 +421,14 @@ module Omnibus
       render_template(resource_path("bundle.wxs.erb"),
         destination: "#{staging_dir}/bundle.wxs",
         variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
+          name: project.package_name,
+          friendly_name: project.friendly_name,
+          maintainer: project.maintainer,
+          upgrade_code: upgrade_code,
+          parameters: parameters,
+          version: windows_package_version,
           display_version: msi_display_version,
-          msi:             windows_safe_path(Config.package_dir, msi_name),
+          msi: windows_safe_path(Config.package_dir, msi_name),
         }
       )
     end

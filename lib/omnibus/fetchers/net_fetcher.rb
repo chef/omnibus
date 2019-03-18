@@ -22,16 +22,16 @@ module Omnibus
     include DownloadHelpers
 
     # Use 7-zip to extract 7z/zip for Windows
-    WIN_7Z_EXTENSIONS = %w{.7z .zip}
+    WIN_7Z_EXTENSIONS = %w{.7z .zip}.freeze
 
     # tar probably has compression scheme linked in, otherwise for tarballs
-    COMPRESSED_TAR_EXTENSIONS = %w{.tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma}
+    COMPRESSED_TAR_EXTENSIONS = %w{.tar.gz .tgz tar.bz2 .tar.xz .txz .tar.lzma}.freeze
     TAR_EXTENSIONS = COMPRESSED_TAR_EXTENSIONS + [".tar"]
 
     ALL_EXTENSIONS = WIN_7Z_EXTENSIONS + TAR_EXTENSIONS
 
     # Digest types used for verifying file checksums
-    DIGESTS = [:sha512, :sha256, :sha1, :md5]
+    DIGESTS = [:sha512, :sha256, :sha1, :md5].freeze
 
     #
     # A fetch is required if the downloaded_file (such as a tarball) does not
