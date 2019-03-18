@@ -64,7 +64,7 @@ module OpenURI
   #
   # @see http://winstonyw.com/2013/10/02/openuris_open_tempfile_and_stringio/
   #
-  # rubocop:disable Style/ConstantName
+  # rubocop:disable Naming/ConstantName
   class Buffer
     remove_const :StringMax
     StringMax = 0
