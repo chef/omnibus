@@ -1,5 +1,12 @@
 # all of these could/should be corrected. Have at it if you want.
 
+Layout/ClosingHeredocIndentation:
+  Exclude:
+    - 'lib/omnibus/licensing.rb'
+
+Layout/IndentHeredoc:
+  Exclude:
+    - 'lib/omnibus/licensing.rb'
 
 Lint/AmbiguousRegexpLiteral:
   Exclude:
