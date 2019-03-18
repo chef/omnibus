@@ -1,0 +1,56 @@
+# all of these could/should be corrected. Have at it if you want.
+
+Layout/ClosingHeredocIndentation:
+  Exclude:
+    - 'lib/omnibus/licensing.rb'
+
+Layout/IndentHeredoc:
+  Exclude:
+    - 'lib/omnibus/licensing.rb'
+
+Lint/AmbiguousRegexpLiteral:
+  Exclude:
+    - 'spec/functional/builder_spec.rb'
+    - 'spec/functional/licensing_spec.rb'
+
+# Configuration parameters: AllowSafeAssignment.
+Lint/AssignmentInCondition:
+  Exclude:
+    - 'lib/omnibus/build_version.rb'
+    - 'lib/omnibus/compressors/tgz.rb'
+    - 'lib/omnibus/file_syncer.rb'
+    - 'lib/omnibus/packager.rb'
+    - 'lib/omnibus/publishers/artifactory_publisher.rb'
+
+Lint/EmptyWhen:
+  Exclude:
+    - 'lib/omnibus/health_check.rb'
+
+Lint/IneffectiveAccessModifier:
+  Exclude:
+    - 'lib/omnibus/fetcher.rb'
+    - 'lib/omnibus/fetchers/git_fetcher.rb'
+
+Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+    - 'lib/omnibus/cli/base.rb'
+    - 'spec/unit/packagers/ips_spec.rb'
+    - 'spec/unit/packagers/msi_spec.rb'
+    - 'spec/unit/project_spec.rb'
+    - 'spec/unit/s3_cacher_spec.rb'
+    - 'spec/unit/software_spec.rb'
+
+Lint/ShadowingOuterLocalVariable:
+  Exclude:
+    - 'lib/omnibus.rb'
+    - 'lib/omnibus/builder.rb'
+    - 'lib/omnibus/licensing.rb'
+    - 'lib/omnibus/packagers/deb.rb'
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'lib/omnibus/digestable.rb'
+    - 'lib/omnibus/exceptions.rb'
+    - 'lib/omnibus/file_syncer.rb'
+    - 'lib/omnibus/licensing.rb'
+    - 'lib/omnibus/software.rb'

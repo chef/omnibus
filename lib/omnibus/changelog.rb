@@ -2,7 +2,7 @@ require "omnibus/git_repository"
 
 module Omnibus
   class ChangeLog
-    CHANGELOG_TAG = "ChangeLog-Entry"
+    CHANGELOG_TAG = "ChangeLog-Entry".freeze
 
     attr_reader :end_ref
     def initialize(start_ref = nil, end_ref = "HEAD", git_repo = GitRepository.new("./"))

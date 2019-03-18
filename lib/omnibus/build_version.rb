@@ -34,7 +34,7 @@ module Omnibus
     #
     # @see Omnibus::BuildVersion#semver
     # @see Time#strftime
-    TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
+    TIMESTAMP_FORMAT = "%Y%m%d%H%M%S".freeze
 
     class << self
       # @see (BuildVersion#git_describe)

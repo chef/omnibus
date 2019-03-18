@@ -451,7 +451,7 @@ module Omnibus
     end
 
     describe "#safe_architecture" do
-      let(:shellout) { double("Mixlib::ShellOut", :run_command => true, :error! => nil) }
+      let(:shellout) { double("Mixlib::ShellOut", run_command: true, error!: nil) }
 
       before do
         allow(Mixlib::ShellOut).to receive(:new).and_return(shellout)

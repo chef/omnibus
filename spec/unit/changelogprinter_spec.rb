@@ -6,11 +6,11 @@ module Omnibus
   describe ChangeLogPrinter do
     describe "#print" do
       def manifest_entry_for(name, dv, lv, source_type = :local)
-        Omnibus::ManifestEntry.new(name, { :described_version => dv,
-                                           :locked_version => lv,
-                                           :locked_source => {
-                                             :git => "git://#{name}@example.com" },
-                                           :source_type => source_type,
+        Omnibus::ManifestEntry.new(name, { described_version: dv,
+                                           locked_version: lv,
+                                           locked_source: {
+                                             git: "git://#{name}@example.com" },
+                                           source_type: source_type,
         })
       end
 

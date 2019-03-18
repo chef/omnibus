@@ -117,9 +117,9 @@ module Omnibus
       before do
         allow(subject).to receive(:shellout!)
         File.open("#{staging_dir}/files", "w+") do |f|
-          f.write <<-EOF
-/foo/bar/baz
-/a file with spaces
+          f.write <<~EOF
+            /foo/bar/baz
+            /a file with spaces
           EOF
         end
       end

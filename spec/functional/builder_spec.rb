@@ -32,7 +32,7 @@ module Omnibus
         raise "Could not find #{name} in bundler environment" unless source
 
         target = File.join(embedded_bin_dir, name)
-        create_link(source, target) unless File.exists?(target)
+        create_link(source, target) unless File.exist?(target)
       end
     end
 

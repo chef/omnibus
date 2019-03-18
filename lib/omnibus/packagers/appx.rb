@@ -64,10 +64,10 @@ module Omnibus
       render_template(resource_path("AppxManifest.xml.erb"),
         destination: "#{windows_safe_path(project.install_dir)}/AppxManifest.xml",
         variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          version:         windows_package_version,
-          maintainer:      project.maintainer,
+          name: project.package_name,
+          friendly_name: project.friendly_name,
+          version: windows_package_version,
+          maintainer: project.maintainer,
           certificate_subject: certificate_subject.gsub('"', "&quot;"),
         }
       )

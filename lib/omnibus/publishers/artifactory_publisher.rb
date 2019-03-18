@@ -95,7 +95,7 @@ module Omnibus
         local_path: artifact.path,
         client:     client,
         checksums: {
-          "md5"  => md5,
+          "md5" => md5,
           "sha1" => sha1,
         }
       )
@@ -151,13 +151,13 @@ module Omnibus
                 {
                   type: File.extname(package.path).split(".").last,
                   sha1: package.metadata[:sha1],
-                  md5:  package.metadata[:md5],
+                  md5: package.metadata[:md5],
                   name: package.metadata[:basename],
                 },
                 {
                   type: File.extname(package.metadata.path).split(".").last,
                   sha1: digest(package.metadata.path, :sha1),
-                  md5:  digest(package.metadata.path, :md5),
+                  md5: digest(package.metadata.path, :md5),
                   name: File.basename(package.metadata.path),
                 },
               ]
@@ -211,21 +211,21 @@ module Omnibus
     #
     def metadata_properties_for(package)
       metadata = {
-        "omnibus.project"          => package.metadata[:name],
-        "omnibus.platform"         => package.metadata[:platform],
+        "omnibus.project" => package.metadata[:name],
+        "omnibus.platform" => package.metadata[:platform],
         "omnibus.platform_version" => package.metadata[:platform_version],
-        "omnibus.architecture"     => package.metadata[:arch],
-        "omnibus.version"          => package.metadata[:version],
-        "omnibus.iteration"        => package.metadata[:iteration],
-        "omnibus.license"          => package.metadata[:license],
-        "omnibus.md5"              => package.metadata[:md5],
-        "omnibus.sha1"             => package.metadata[:sha1],
-        "omnibus.sha256"           => package.metadata[:sha256],
-        "omnibus.sha512"           => package.metadata[:sha512],
-        "md5"                      => package.metadata[:md5],
-        "sha1"                     => package.metadata[:sha1],
-        "sha256"                   => package.metadata[:sha256],
-        "sha512"                   => package.metadata[:sha512],
+        "omnibus.architecture" => package.metadata[:arch],
+        "omnibus.version" => package.metadata[:version],
+        "omnibus.iteration" => package.metadata[:iteration],
+        "omnibus.license" => package.metadata[:license],
+        "omnibus.md5" => package.metadata[:md5],
+        "omnibus.sha1" => package.metadata[:sha1],
+        "omnibus.sha256" => package.metadata[:sha256],
+        "omnibus.sha512" => package.metadata[:sha512],
+        "md5" => package.metadata[:md5],
+        "sha1" => package.metadata[:sha1],
+        "sha256" => package.metadata[:sha256],
+        "sha512" => package.metadata[:sha512],
       }.tap do |h|
         if build_record?
           h["build.name"] = package.metadata[:name]
