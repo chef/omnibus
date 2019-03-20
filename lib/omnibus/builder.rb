@@ -765,7 +765,7 @@ module Omnibus
       log.internal(log_key) { "Cached builder checksum before build: #{shasum}" }
       if software.overridden?
         log.info(log_key) do
-          "Version overridden from #{software.default_version} to "\
+          "Version overridden from #{software.default_version || "n/a"} to "\
           "#{software.version}"
         end
       end
