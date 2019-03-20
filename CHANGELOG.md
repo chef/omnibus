@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.20 -->
+<!-- latest_release 6.0.21 -->
+## [v6.0.21](https://github.com/chef/omnibus/tree/v6.0.21) (2019-03-20)
+
+#### Merged Pull Requests
+- Improve logging when overriding a version when there is no default [#880](https://github.com/chef/omnibus/pull/880) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
 ## [v6.0.20](https://github.com/chef/omnibus/tree/v6.0.20) (2019-03-18)
 
 #### Merged Pull Requests
 - Loosen mixlib-shellout/ohai deps and upgrade chefstyle [#879](https://github.com/chef/omnibus/pull/879) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v6.0.19](https://github.com/chef/omnibus/tree/v6.0.19) (2019-02-26)
 
