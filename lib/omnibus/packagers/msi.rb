@@ -249,6 +249,29 @@ module Omnibus
     expose :fast_msi
 
     #
+    # Set or retrieve the localization. Take a look at
+    # this list[https://www.firegiant.com/wix/tutorial/user-interface/do-you-speak-english/]
+    # of valid localizations.
+    #
+    # @example
+    #   localization 'de-de'
+    #
+    # @param [String] val
+    #   the localization to set
+    #
+    # @return [String]
+    #   the set localization
+    #
+    def localization(val = "en-us")
+      unless val.is_a?(String)
+        raise InvalidValue.new(:localization, "be a String")
+      end
+
+      @localization ||= val
+    end
+    expose :localization
+
+    #
     # Discovers a path to a gem/file included in a gem under the install directory.
     #
     # @example
@@ -311,8 +334,8 @@ module Omnibus
     # @return [void]
     #
     def write_localization_file
-      render_template(resource_path("localization-en-us.wxl.erb"),
-        destination: "#{staging_dir}/localization-en-us.wxl",
+      render_template(resource_path("localization-#{localization}.wxl.erb"),
+        destination: "#{staging_dir}/localization-#{localization}.wxl",
         variables: {
           name: project.package_name,
           friendly_name: project.friendly_name,
@@ -492,8 +515,8 @@ module Omnibus
           -ext WixUIExtension
           -ext WixBalExtension
           #{wix_extension_switches(wix_light_extensions)}
-          -cultures:en-us
-          -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
+          -cultures:#{localization}
+          -loc "#{windows_safe_path(staging_dir, "localization-#{localization}.wxl")}"
           bundle.wixobj
           -out "#{out_file}"
         EOH
@@ -504,8 +527,8 @@ module Omnibus
             #{wix_light_delay_validation}
             -ext WixUIExtension
             #{wix_extension_switches(wix_light_extensions)}
-            -cultures:en-us
-            -loc "#{windows_safe_path(staging_dir, 'localization-en-us.wxl')}"
+            -cultures:#{localization}
+            -loc "#{windows_safe_path(staging_dir, "localization-#{localization}.wxl")}"
             project-files.wixobj source.wixobj
             -out "#{out_file}"
         EOH

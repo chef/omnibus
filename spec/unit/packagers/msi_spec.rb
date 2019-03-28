@@ -90,6 +90,29 @@ module Omnibus
       end
     end
 
+    describe "#localization" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:localization)
+      end
+
+      it "defaults to String en-us" do
+        expect(subject.localization).to be_a(String)
+        expect(subject.localization).to eq("en-us")
+      end
+
+      it "requires the value to be a String" do
+        expect do
+          subject.localization(Object.new)
+        end.to raise_error(InvalidValue)
+      end
+
+      it "returns the given value" do
+        loc = "te-st"
+        subject.localization(loc)
+        expect(subject.localization).to eq(loc)
+      end
+    end
+
     describe "#package_name" do
       before do
         allow(Config).to receive(:windows_arch).and_return(:foo_arch)
