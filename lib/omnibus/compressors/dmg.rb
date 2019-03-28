@@ -216,10 +216,10 @@ module Omnibus
       render_template(resource_path("create_dmg.osascript.erb"),
         destination: "#{staging_dir}/create_dmg.osascript",
         variables: {
-          volume_name:   volume_name,
-          pkg_name:      packager.package_name,
+          volume_name: volume_name,
+          pkg_name: packager.package_name,
           window_bounds: window_bounds,
-          pkg_position:  pkg_position,
+          pkg_position: pkg_position,
         }
       )
 

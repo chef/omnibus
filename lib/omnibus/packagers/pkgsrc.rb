@@ -62,11 +62,11 @@ module Omnibus
     end
 
     def write_buildinfo
-      buildinfo_content = <<-EOF
-MACHINE_ARCH=#{safe_architecture}
-OPSYS=#{opsys}
-OS_VERSION=#{os_version}
-PKGTOOLS_VERSION=#{PKGTOOLS_VERSION}
+      buildinfo_content = <<~EOF
+        MACHINE_ARCH=#{safe_architecture}
+        OPSYS=#{opsys}
+        OS_VERSION=#{os_version}
+        PKGTOOLS_VERSION=#{PKGTOOLS_VERSION}
       EOF
 
       File.open(build_info, "w+") do |f|

@@ -167,6 +167,29 @@ module Omnibus
     expose :wix_light_extension
 
     #
+    # Signal delay validation for wix light
+    #
+    # @example
+    #   wix_light_deplay_validation true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether to delay validation or not
+    #
+    # @return [String]
+    #   whether we're a bundle or not
+    def wix_light_delay_validation(val = false)
+      unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
+        raise InvalidValue.new(:iwix_light_delay_validation, "be TrueClass or FalseClass")
+      end
+      @delay_validation ||= val
+      unless @delay_validation
+        return ""
+      end
+      "-sval"
+    end
+    expose :wix_light_delay_validation
+
+    #
     # Set the wix candle extensions to load
     #
     # @example
@@ -314,9 +337,9 @@ module Omnibus
       render_template(resource_path("localization-#{localization}.wxl.erb"),
         destination: "#{staging_dir}/localization-#{localization}.wxl",
         variables: {
-          name:          project.package_name,
+          name: project.package_name,
           friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
+          maintainer: project.maintainer,
         }
       )
     end
@@ -330,12 +353,12 @@ module Omnibus
       render_template(resource_path("parameters.wxi.erb"),
         destination: "#{staging_dir}/parameters.wxi",
         variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
+          name: project.package_name,
+          friendly_name: project.friendly_name,
+          maintainer: project.maintainer,
+          upgrade_code: upgrade_code,
+          parameters: parameters,
+          version: windows_package_version,
           display_version: msi_display_version,
         }
       )
@@ -379,11 +402,11 @@ module Omnibus
       render_template(resource_path("source.wxs.erb"),
         destination: "#{staging_dir}/source.wxs",
         variables: {
-          name:          project.package_name,
+          name: project.package_name,
           friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
-          hierarchy:     hierarchy,
-          fastmsi:       fast_msi,
+          maintainer: project.maintainer,
+          hierarchy: hierarchy,
+          fastmsi: fast_msi,
           wix_install_dir: wix_install_dir,
         }
       )
@@ -398,14 +421,14 @@ module Omnibus
       render_template(resource_path("bundle.wxs.erb"),
         destination: "#{staging_dir}/bundle.wxs",
         variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
+          name: project.package_name,
+          friendly_name: project.friendly_name,
+          maintainer: project.maintainer,
+          upgrade_code: upgrade_code,
+          parameters: parameters,
+          version: windows_package_version,
           display_version: msi_display_version,
-          msi:             windows_safe_path(Config.package_dir, msi_name),
+          msi: windows_safe_path(Config.package_dir, msi_name),
         }
       )
     end
@@ -488,6 +511,7 @@ module Omnibus
         <<-EOH.split.join(" ").squeeze(" ").strip
         light.exe
           -nologo
+          #{wix_light_delay_validation}
           -ext WixUIExtension
           -ext WixBalExtension
           #{wix_extension_switches(wix_light_extensions)}
@@ -500,6 +524,7 @@ module Omnibus
         <<-EOH.split.join(" ").squeeze(" ").strip
           light.exe
             -nologo
+            #{wix_light_delay_validation}
             -ext WixUIExtension
             #{wix_extension_switches(wix_light_extensions)}
             -cultures:#{localization}

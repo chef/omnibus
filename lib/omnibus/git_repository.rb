@@ -37,7 +37,7 @@ module Omnibus
     end
 
     def git(cmd)
-      shellout!("git #{cmd}", :cwd => repo_path).stdout
+      shellout!("git #{cmd}", cwd: repo_path).stdout
     end
   end
 end

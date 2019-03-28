@@ -1,11 +1,46 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.14 -->
+<!-- latest_release 6.0.21 -->
+## [v6.0.21](https://github.com/chef/omnibus/tree/v6.0.21) (2019-03-20)
+
+#### Merged Pull Requests
+- Improve logging when overriding a version when there is no default [#880](https://github.com/chef/omnibus/pull/880) ([tas50](https://github.com/tas50))
+<!-- latest_release -->
+
+## [v6.0.20](https://github.com/chef/omnibus/tree/v6.0.20) (2019-03-18)
+
+#### Merged Pull Requests
+- Loosen mixlib-shellout/ohai deps and upgrade chefstyle [#879](https://github.com/chef/omnibus/pull/879) ([tas50](https://github.com/tas50))
+
+## [v6.0.19](https://github.com/chef/omnibus/tree/v6.0.19) (2019-02-26)
+
+#### Merged Pull Requests
+- Remove custom LDFLAGS and CFLAGS for osx. [#878](https://github.com/chef/omnibus/pull/878) ([jonsmorrow](https://github.com/jonsmorrow))
+
+## [v6.0.18](https://github.com/chef/omnibus/tree/v6.0.18) (2019-02-01)
+
+#### Merged Pull Requests
+- Add marcparadise to maintainers [#874](https://github.com/chef/omnibus/pull/874) ([marcparadise](https://github.com/marcparadise))
+
+## [v6.0.17](https://github.com/chef/omnibus/tree/v6.0.17) (2019-02-01)
+
+#### Merged Pull Requests
+- add support for light to delay validation [#842](https://github.com/chef/omnibus/pull/842) ([jmartin-r7](https://github.com/jmartin-r7))
+
+## [v6.0.16](https://github.com/chef/omnibus/tree/v6.0.16) (2019-02-01)
+
+#### Merged Pull Requests
+- allow project configuration to skip packagers [#843](https://github.com/chef/omnibus/pull/843) ([jmartin-r7](https://github.com/jmartin-r7))
+
+## [v6.0.15](https://github.com/chef/omnibus/tree/v6.0.15) (2019-02-01)
+
+#### Merged Pull Requests
+- Drop testing of unsupported platforms [#875](https://github.com/chef/omnibus/pull/875) ([marcparadise](https://github.com/marcparadise))
+
 ## [v6.0.14](https://github.com/chef/omnibus/tree/v6.0.14) (2019-01-23)
 
 #### Merged Pull Requests
 - Whitelist the Security framework library on macOS [#873](https://github.com/chef/omnibus/pull/873) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v6.0.13](https://github.com/chef/omnibus/tree/v6.0.13) (2019-01-23)
 

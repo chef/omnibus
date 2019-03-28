@@ -167,7 +167,7 @@ module Omnibus
               --resources "#{staging_dir}/Resources" \\
               --sign "My Special Identity" \\
               "#{package_dir}/project-full-name-1.2.3-2.pkg"
-            EOH
+          EOH
           subject.build_product_pkg
         end
       end

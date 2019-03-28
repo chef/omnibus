@@ -665,11 +665,6 @@ module Omnibus
             "OBJECT_MODE" => "64",
             "ARFLAGS" => "-X64 cru",
           }
-        when "mac_os_x"
-          {
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-          }
         when "solaris2"
           if platform_version.satisfies?("<= 5.10")
             solaris_flags = {
@@ -758,16 +753,16 @@ module Omnibus
         extra_linker_flags["LD_OPTIONS"] = ld_options
       end
 
-      env.merge(compiler_flags).
-        merge(extra_linker_flags).
+      env.merge(compiler_flags)
+        .merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
         merge({ "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig" }).
         # Set default values for CXXFLAGS and CPPFLAGS.
-        merge("CXXFLAGS" => compiler_flags["CFLAGS"]).
-        merge("CPPFLAGS" => compiler_flags["CFLAGS"]).
-        merge("OMNIBUS_INSTALL_DIR" => install_dir)
+        merge("CXXFLAGS" => compiler_flags["CFLAGS"])
+        .merge("CPPFLAGS" => compiler_flags["CFLAGS"])
+        .merge("OMNIBUS_INSTALL_DIR" => install_dir)
     end
     expose :with_standard_compiler_flags
 

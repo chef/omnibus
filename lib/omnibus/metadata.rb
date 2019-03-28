@@ -46,24 +46,24 @@ module Omnibus
 
         data = {
           # Package
-          basename:         package.name,
-          md5:              package.md5,
-          sha1:             package.sha1,
-          sha256:           package.sha256,
-          sha512:           package.sha512,
-          platform:         platform_shortname,
+          basename: package.name,
+          md5: package.md5,
+          sha1: package.sha1,
+          sha256: package.sha256,
+          sha512: package.sha512,
+          platform: platform_shortname,
           platform_version: platform_version,
-          arch:             arch,
+          arch: arch,
 
           # Project
-          name:             project.name,
-          friendly_name:    project.friendly_name,
-          homepage:         project.homepage,
-          version:          project.build_version,
-          iteration:        project.build_iteration,
-          license:          project.license,
+          name: project.name,
+          friendly_name: project.friendly_name,
+          homepage: project.homepage,
+          version: project.build_version,
+          iteration: project.build_iteration,
+          license: project.license,
           version_manifest: project.built_manifest.to_hash,
-          license_content:  File.exist?(project.license_file_path) ? File.read(project.license_file_path) : "",
+          license_content: File.exist?(project.license_file_path) ? File.read(project.license_file_path) : "",
         }
 
         instance = new(package, data)
@@ -170,7 +170,7 @@ module Omnibus
       # rubocop:disable Lint/DuplicateCaseCondition
       def truncate_platform_version(platform_version, platform)
         case platform
-        when "centos", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos", "nexus", "ios_xr"
+        when "centos", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos"
           # Only want MAJOR (e.g. Debian 7, OmniOS r151006, SmartOS 20120809T221258Z)
           platform_version.split(".").first
         when "aix", "alpine", "mac_os_x", "openbsd", "slackware", "solaris2", "opensuse", "opensuseleap", "ubuntu", "amazon"

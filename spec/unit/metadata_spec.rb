@@ -42,20 +42,20 @@ module Omnibus
 
     let(:data) { { foo: "bar" } }
     let(:license_file_content) do
-      <<-EOH
-some_project 1.2.3 license: "Apache-2.0"
+      <<~EOH
+        some_project 1.2.3 license: "Apache-2.0"
 
-                              Apache License
-                        Version 2.0, January 2004
-                     http://www.apache.org/licenses/
-TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+                                      Apache License
+                                Version 2.0, January 2004
+                             http://www.apache.org/licenses/
+        TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
-1. Definitions.
+        1. Definitions.
 
-   "License" shall mean the terms and conditions for use, reproduction,
-   and distribution as defined by Sections 1 through 9 of this document.
+           "License" shall mean the terms and conditions for use, reproduction,
+           and distribution as defined by Sections 1 through 9 of this document.
 
-...
+        ...
       EOH
     end
 
@@ -219,9 +219,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       it_behaves_like "a version manipulator", "fedora", "11.5", "11"
       it_behaves_like "a version manipulator", "freebsd", "10.0", "10"
       it_behaves_like "a version manipulator", "gentoo", "4.9.95-gentoo", "rolling"
-      it_behaves_like "a version manipulator", "ios_xr", "6.0.0.14I", "6"
       it_behaves_like "a version manipulator", "mac_os_x", "10.9.1", "10.9"
-      it_behaves_like "a version manipulator", "nexus", "5.0", "5"
       it_behaves_like "a version manipulator", "omnios", "r151010", "r151010"
       it_behaves_like "a version manipulator", "openbsd", "5.4.4", "5.4"
       it_behaves_like "a version manipulator", "opensuseleap", "42.3", "42.3"
