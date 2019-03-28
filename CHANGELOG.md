@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.21 -->
+<!-- latest_release 6.0.22 -->
+## [v6.0.22](https://github.com/chef/omnibus/tree/v6.0.22) (2019-03-28)
+
+#### Merged Pull Requests
+- Added localization option for msi packager [#854](https://github.com/chef/omnibus/pull/854) ([MrWong99](https://github.com/MrWong99))
+<!-- latest_release -->
+
 ## [v6.0.21](https://github.com/chef/omnibus/tree/v6.0.21) (2019-03-20)
 
 #### Merged Pull Requests
 - Improve logging when overriding a version when there is no default [#880](https://github.com/chef/omnibus/pull/880) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
 
 ## [v6.0.20](https://github.com/chef/omnibus/tree/v6.0.20) (2019-03-18)
 
