@@ -36,6 +36,7 @@ module Omnibus
     build do
       create_writable_dmg
       attach_dmg
+      copy_assets_to_dmg
       # Give some time to the system so attached dmg shows up in Finder
       sleep 5
       set_volume_icon
@@ -138,11 +139,9 @@ module Omnibus
 
       shellout! <<-EOH.gsub(/^ {8}/, "")
         hdiutil create \\
-          -srcfolder "#{resources_dir}" \\
           -volname "#{volume_name}" \\
           -fs HFS+ \\
           -fsargs "-c c=64,a=16,e=16" \\
-          -format UDRW \\
           -size 512000k \\
           "#{writable_dmg}"
       EOH
@@ -167,6 +166,17 @@ module Omnibus
         EOH
 
         cmd.stdout.strip
+      end
+    end
+
+    #
+    # Copy assets to dmg
+    #
+    def copy_assets_to_dmg
+      log.info(log_key) { "Copying assets into dmg" }
+
+      FileSyncer.glob("#{resources_dir}/*").each do |file|
+        FileUtils.cp_r(file, "/Volumes/#{volume_name}")
       end
     end
 

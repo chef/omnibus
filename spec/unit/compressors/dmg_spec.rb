@@ -86,11 +86,9 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil create \\
-              -srcfolder "#{staging_dir}/Resources" \\
               -volname "Project One" \\
               -fs HFS+ \\
               -fsargs "-c c=64,a=16,e=16" \\
-              -format UDRW \\
               -size 512000k \\
               "#{staging_dir}/project-writable.dmg"
           EOH
@@ -127,6 +125,13 @@ module Omnibus
 
       it "returns the stripped stdout" do
         expect(subject.attach_dmg).to eq("hello")
+      end
+    end
+
+    describe "#copy_assets_to_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.copy_assets_to_dmg }
+        expect(output).to include("Copying assets into dmg")
       end
     end
 
