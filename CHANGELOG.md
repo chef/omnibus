@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.22 -->
+<!-- latest_release 6.0.23 -->
+## [v6.0.23](https://github.com/chef/omnibus/tree/v6.0.23) (2019-04-01)
+
+#### Merged Pull Requests
+- Break dmg creation and assets copying into separate steps [#881](https://github.com/chef/omnibus/pull/881) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+<!-- latest_release -->
+
 ## [v6.0.22](https://github.com/chef/omnibus/tree/v6.0.22) (2019-03-28)
 
 #### Merged Pull Requests
 - Added localization option for msi packager [#854](https://github.com/chef/omnibus/pull/854) ([MrWong99](https://github.com/MrWong99))
-<!-- latest_release -->
 
 ## [v6.0.21](https://github.com/chef/omnibus/tree/v6.0.21) (2019-03-20)
 
