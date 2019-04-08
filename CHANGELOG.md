@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.23 -->
+<!-- latest_release 6.0.24 -->
+## [v6.0.24](https://github.com/chef/omnibus/tree/v6.0.24) (2019-04-08)
+
+#### Merged Pull Requests
+- New projects lacked critical files, such as kitchen and package scripts [#867](https://github.com/chef/omnibus/pull/867) ([iamjohnnym](https://github.com/iamjohnnym))
+<!-- latest_release -->
+
 ## [v6.0.23](https://github.com/chef/omnibus/tree/v6.0.23) (2019-04-01)
 
 #### Merged Pull Requests
 - Break dmg creation and assets copying into separate steps [#881](https://github.com/chef/omnibus/pull/881) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
-<!-- latest_release -->
 
 ## [v6.0.22](https://github.com/chef/omnibus/tree/v6.0.22) (2019-03-28)
 
