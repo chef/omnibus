@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2018, Chef Software Inc.
+# Copyright 2012-2019, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -372,7 +372,7 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(software_name, lockdir: nil, gem: nil, without: nil, **options)
+    def appbundle(software_name, lockdir: nil, gem: nil, without: nil, extra_bin_files: nil , **options)
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
@@ -399,6 +399,8 @@ module Omnibus
         # (if you really need this bug fixed, though, fix it in appbundler, don't try using the 3-arg version to try to
         # get `--without` support, you will likely wind up going down a sad path).
         command << [ "--without", without.join(",") ] unless without.nil?
+
+        command << [ "--extra-bin-files", extra_bin_files.join(",") ] unless extra_bin_files.nil? || extra_bin_files.empty?
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
