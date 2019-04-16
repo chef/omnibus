@@ -25,6 +25,34 @@ module Omnibus
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }
 
+    describe "authorization" do
+      context "when none passed" do
+        it "does not get passed" do
+          expect(subject).to receive(:download_file!) do |url_arg, path_arg, options_arg|
+            expect(options_arg).to_not have_key("Authorization")
+          end
+
+          subject.send(:download)
+        end
+      end
+
+      context "when passed" do
+        let(:auth_header) { "a fake auth header" }
+        let(:source) do
+          { url: "https://get.example.com/file.tar.gz", md5: "abcd1234", authorization: auth_header }
+        end
+
+        it "does get passed" do
+          expect(subject).to receive(:download_file!) do |url_arg, path_arg, options_arg|
+            expect(options_arg).to have_key("Authorization")
+            expect(options_arg["Authorization"]).to eq(auth_header)
+          end
+
+          subject.send(:download)
+        end
+      end
+    end
+
     describe "#fetch_required?" do
       context "when file is not downloaded" do
         before { allow(File).to receive(:exist?).and_return(false) }

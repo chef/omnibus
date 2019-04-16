@@ -263,6 +263,8 @@ module Omnibus
     #
     # @option val [String] :cookie (nil)
     #   a cookie to set
+    # @option val [String] :authorization (nil)
+    #   an authorization header to set
     # @option val [String] :warning (nil)
     #   a warning message to print when downloading
     # @option val [Symbol] :extract (nil)
@@ -294,7 +296,7 @@ module Omnibus
         extra_keys = val.keys - [
           :git, :file, :path, :url, # fetcher types
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
-          :cookie, :warning, :unsafe, :extract, :cached_name, # used by net_fetcher
+          :cookie, :warning, :unsafe, :extract, :cached_name, :authorization, # used by net_fetcher
           :options, # used by path_fetcher
           :submodules # used by git_fetcher
         ]

@@ -171,6 +171,7 @@ module Omnibus
 
       # Set the cookie if one was given
       options["Cookie"] = source[:cookie] if source[:cookie]
+      options["Authorization"] = source[:authorization] if source[:authorization]
 
       download_file!(download_url, downloaded_file, options)
     end
