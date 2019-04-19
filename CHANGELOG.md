@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.25 -->
+<!-- latest_release 6.0.26 -->
+## [v6.0.26](https://github.com/chef/omnibus/tree/v6.0.26) (2019-04-19)
+
+#### Merged Pull Requests
+- add extra-bin-flags option to appbundler [#884](https://github.com/chef/omnibus/pull/884) ([lamont-granquist](https://github.com/lamont-granquist))
+<!-- latest_release -->
+
 ## [v6.0.25](https://github.com/chef/omnibus/tree/v6.0.25) (2019-04-16)
 
 #### Merged Pull Requests
 - Support authenticated HTTP URLs (fixes #851) [#852](https://github.com/chef/omnibus/pull/852) ([LeeXGreen](https://github.com/LeeXGreen))
-<!-- latest_release -->
 
 ## [v6.0.24](https://github.com/chef/omnibus/tree/v6.0.24) (2019-04-08)
 
