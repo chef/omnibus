@@ -140,6 +140,7 @@ module Omnibus
       /Cocoa$/,
       /Carbon$/,
       /IOKit$/,
+      /Kerberos/,
       /Tk$/,
       /libutil\.dylib/,
       /libffi\.dylib/,
