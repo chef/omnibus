@@ -1,11 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.26 -->
+<!-- latest_release 6.0.27 -->
+## [v6.0.27](https://github.com/chef/omnibus/tree/v6.0.27) (2019-05-01)
+
+#### Merged Pull Requests
+- Generate a valid project by default [#888](https://github.com/chef/omnibus/pull/888) ([stevendanna](https://github.com/stevendanna))
+<!-- latest_release -->
+
 ## [v6.0.26](https://github.com/chef/omnibus/tree/v6.0.26) (2019-04-19)
 
 #### Merged Pull Requests
 - add extra-bin-flags option to appbundler [#884](https://github.com/chef/omnibus/pull/884) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_release -->
 
 ## [v6.0.25](https://github.com/chef/omnibus/tree/v6.0.25) (2019-04-16)
 
