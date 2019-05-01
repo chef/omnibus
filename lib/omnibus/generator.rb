@@ -90,6 +90,7 @@ module Omnibus
 
     def create_example_software_definitions
       template("config/software/zlib.rb.erb", "#{target}/config/software/#{name}-zlib.rb", template_options)
+      template("config/software/preparation.rb.erb", "#{target}/config/software/preparation.rb", template_options)
     end
 
     def create_kitchen_files
