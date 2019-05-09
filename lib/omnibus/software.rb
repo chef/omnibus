@@ -285,6 +285,9 @@ module Omnibus
     #   a warning message to print when downloading
     # @option val [Symbol] :extract (nil)
     #   either :tar, :lax_tar :seven_zip
+    # @option val [String] :target_filename (nil)
+    #   when the source is a single (non-extractable) file, the filename it will be accessible as in the project_dir
+    #   defaults to "#{software.name}-#{URLBasename}"
     #
     # Only used in path_fetcher:
     #
@@ -314,7 +317,7 @@ module Omnibus
         extra_keys = val.keys - [
           :git, :path, :url, # fetcher types
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
-          :cookie, :warning, :unsafe, :extract, # used by net_fetcher
+          :cookie, :warning, :unsafe, :extract, :target_filename, # used by net_fetcher
           :options, # used by path_fetcher
           :submodules, :always_fetch_tags # used by git_fetcher
         ]
