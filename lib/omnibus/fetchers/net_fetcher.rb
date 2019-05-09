@@ -117,7 +117,7 @@ module Omnibus
     #
     def downloaded_file
       filename = File.basename(source[:url], "?*")
-      File.join(Config.cache_dir, filename)
+      File.join(Config.cache_dir, "#{self.name}-#{filename}")
     end
 
     #
