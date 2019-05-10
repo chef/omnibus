@@ -286,8 +286,9 @@ module Omnibus
     # @option val [Symbol] :extract (nil)
     #   either :tar, :lax_tar :seven_zip
     # @option val [String] :target_filename (nil)
-    #   when the source is a single (non-extractable) file, the filename it will be accessible as in the project_dir
-    #   defaults to "#{software.name}-#{URLBasename}"
+    #   when the source is a single (non-extractable) file, the file will be present under this name
+    #   in the project_dir.
+    #   Defaults to "#{software.name}-#{URLBasename}"
     #
     # Only used in path_fetcher:
     #
