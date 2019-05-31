@@ -459,15 +459,83 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      yield_shellout_results("find #{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
         when /^\s+(.+) \(.+\)$/
           linked = Regexp.last_match[1]
           name = File.basename(linked)
-          bad_libs = check_for_bad_library(bad_libs, current_library, name, linked)
+          bad_libs = check_for_bad_macos_library(bad_libs, current_library, name, linked)
         end
+      end
+
+      bad_libs
+    end
+
+    #
+    # Check the given path and library for "bad" libraries.
+    #
+    def check_for_bad_macos_library(bad_libs, current_library, name, linked)
+      safe = nil
+
+      whitelist_libs = MAC_WHITELIST_LIBS
+
+      whitelist_libs.each do |reg|
+        safe ||= true if reg.match(name)
+      end
+
+      whitelist_files.each do |reg|
+        safe ||= true if reg.match(current_library)
+      end
+
+      log.debug(log_key) { "  --> Dependency: #{name}" }
+      log.debug(log_key) { "  --> Provided by: #{linked}" }
+
+      linked_present = false
+
+      if !safe
+        rpath_regexp = Regexp.new("@rpath")
+        install_dir_regexp = Regexp.new(project.install_dir)
+
+        # Do the linker's work of replacing @rpath with the rpaths defined by the library
+        if linked =~ rpath_regexp
+          possible_paths = []
+          # Find what are the library's rpaths by looking at the load commands.
+          # Example otool -l partial output:
+          # Load command 13
+          #          cmd LC_LOAD_DYLIB
+          #      cmdsize 56
+          #         name /usr/lib/libSystem.B.dylib (offset 24)
+          #   time stamp 2 Thu Jan  1 01:00:02 1970
+          #      current version 1238.60.2
+          # compatibility version 1.0.0
+          # Load command 14
+          #          cmd LC_RPATH
+          #      cmdsize 48
+          #         name /opt/datadog-agent/embedded/lib (offset 12)
+          yield_shellout_results("otool -l #{current_library} | grep LC_RPATH -A2 | grep path | awk '{ print $2 }'") do |rpath|
+            # The rpath variable contains a \n (\r\n on Windows), so we remove it when including it in the complete path
+            possible_paths << linked.sub("@rpath", rpath.chop)
+          end
+        else
+          possible_paths = [linked]
+        end
+
+        linked_present = possible_paths.any? { |path| path =~ install_dir_regexp }
+      end
+
+      if !safe && !linked_present
+        log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
+        bad_libs[current_library] ||= {}
+        bad_libs[current_library][name] ||= {}
+        if bad_libs[current_library][name].key?(linked)
+          bad_libs[current_library][name][linked] += 1
+        else
+          bad_libs[current_library][name][linked] = 1
+        end
+      else
+        log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
       end
 
       bad_libs
@@ -483,7 +551,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
+      yield_shellout_results("find #{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}' | xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -515,7 +583,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}' | xargs ldd") do |line|
+      yield_shellout_results("find #{project.install_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}' | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -577,7 +645,7 @@ module Omnibus
     # @yield [String]
     #   each line
     #
-    def read_shared_libs(command)
+    def yield_shellout_results(command)
       cmd = shellout(command)
       cmd.stdout.each_line do |line|
         yield line
