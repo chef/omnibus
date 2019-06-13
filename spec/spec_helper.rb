@@ -1,3 +1,5 @@
+Encoding.default_external = Encoding::UTF_8
+
 require "rspec"
 require "rspec/its"
 require "rspec/json_expectations"
@@ -16,6 +18,10 @@ def mac?
 end
 
 RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.max_formatted_output_length = 1000
+  end
+
   # Custom matchers and shared examples
   require_relative "support/examples"
   require_relative "support/matchers"
