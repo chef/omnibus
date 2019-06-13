@@ -36,6 +36,7 @@ module Omnibus
           omnibus-name/config/projects/name.rb
           omnibus-name/config/software
           omnibus-name/config/software/name-zlib.rb
+          omnibus-name/config/software/preparation.rb
           omnibus-name/omnibus.rb
           omnibus-name/package-scripts
           omnibus-name/package-scripts/name
