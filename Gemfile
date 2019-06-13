@@ -16,3 +16,7 @@ end
 
 # this brings in several fixes to rspec-json_expectations that are causing test failures
 gem "rspec-json_expectations", git: "https://github.com/tas50/rspec-json_expectations.git"
+
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.5")
+  gem "ohai", "<15"
+end
