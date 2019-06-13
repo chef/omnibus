@@ -1,3 +1,5 @@
+Encoding.default_external = Encoding::UTF_8
+
 require "rspec"
 require "rspec/its"
 require "rspec/json_expectations"
