@@ -1,27 +1,21 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.0.30 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [6.0.30](https://github.com/chef/omnibus/tree/6.0.30) (2019-06-13)
 
 #### Merged Pull Requests
+- Add buildkite PR verification to expeditor [#891](https://github.com/chef/omnibus/pull/891) ([tas50](https://github.com/tas50))
 - Switch off my fork of rspec-json_expectations &amp; fix spec failures [#885](https://github.com/chef/omnibus/pull/885) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
-<!-- release_rollup since=6.0.25 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Switch off my fork of rspec-json_expectations &amp; fix spec failures [#885](https://github.com/chef/omnibus/pull/885) ([tas50](https://github.com/tas50)) <!-- 6.0.30 -->
-- Add buildkite PR verification to expeditor [#891](https://github.com/chef/omnibus/pull/891) ([tas50](https://github.com/tas50)) <!-- 6.0.29 -->
-- CentOS packages for Raspberry Pi 3s are &#39;armv7hl&#39; not &#39;armv7l&#39; [#889](https://github.com/chef/omnibus/pull/889) ([mattray](https://github.com/mattray))
-- Generate a valid project by default [#888](https://github.com/chef/omnibus/pull/888) ([stevendanna](https://github.com/stevendanna))
-- add extra-bin-flags option to appbundler [#884](https://github.com/chef/omnibus/pull/884) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [v6.0.25](https://github.com/chef/omnibus/tree/v6.0.25) (2019-04-16)
 
 #### Merged Pull Requests
 - Support authenticated HTTP URLs (fixes #851) [#852](https://github.com/chef/omnibus/pull/852) ([LeeXGreen](https://github.com/LeeXGreen))
-<!-- latest_stable_release -->
 
 ## [v6.0.24](https://github.com/chef/omnibus/tree/v6.0.24) (2019-04-08)
 
