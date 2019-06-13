@@ -6,21 +6,20 @@
 #### Merged Pull Requests
 - CentOS packages for Raspberry Pi 3s are &#39;armv7hl&#39; not &#39;armv7l&#39; [#889](https://github.com/chef/omnibus/pull/889) ([mattray](https://github.com/mattray))
 <!-- latest_release -->
-
-## [v6.0.27](https://github.com/chef/omnibus/tree/v6.0.27) (2019-05-01)
+<!-- release_rollup since=6.0.25 -->
+### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- CentOS packages for Raspberry Pi 3s are &#39;armv7hl&#39; not &#39;armv7l&#39; [#889](https://github.com/chef/omnibus/pull/889) ([mattray](https://github.com/mattray))
 - Generate a valid project by default [#888](https://github.com/chef/omnibus/pull/888) ([stevendanna](https://github.com/stevendanna))
-
-## [v6.0.26](https://github.com/chef/omnibus/tree/v6.0.26) (2019-04-19)
-
-#### Merged Pull Requests
 - add extra-bin-flags option to appbundler [#884](https://github.com/chef/omnibus/pull/884) ([lamont-granquist](https://github.com/lamont-granquist))
-
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [v6.0.25](https://github.com/chef/omnibus/tree/v6.0.25) (2019-04-16)
 
 #### Merged Pull Requests
 - Support authenticated HTTP URLs (fixes #851) [#852](https://github.com/chef/omnibus/pull/852) ([LeeXGreen](https://github.com/LeeXGreen))
+<!-- latest_stable_release -->
 
 ## [v6.0.24](https://github.com/chef/omnibus/tree/v6.0.24) (2019-04-08)
 
