@@ -11,12 +11,20 @@ require 'pty'
 
 puts rpm_cmd
 PTY.spawn(rpm_cmd) do |r, w, pid|
+  # Older versions of rpmsign will prompt right away for the passphrase
+  prompt = r.read(19)
+
+  if prompt == 'Enter pass phrase: '
+    STDOUT.puts prompt
+    w.write("#{password}\n")
+  end
+
   # Keep printing output unti the command exits
   loop do
     begin
       line = r.gets
       puts line
-      if line =~ /Enter pass phrase:/ || line =~ /Please enter the passphrase to unlock the OpenPGP secret key:/
+      if line =~ /Please enter the passphrase to unlock the OpenPGP secret key:/
         w.write("#{password}\n")
       elsif (line =~ /failed/) && !(line =~ /warning:/)
         STDERR.puts 'RPM signing failure'
