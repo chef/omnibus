@@ -809,15 +809,15 @@ module Omnibus
         dir_name = "#{install_dir}/licenses/#{self.name}"
         FileUtils.mkdir_p(dir_name)
         known_licenses = {
-          "LGPLv2" => "http://www.r-project.org/Licenses/LGPL-2",
-          "LGPLv3" => "http://www.r-project.org/Licenses/LGPL-3",
+          "LGPLv2" => "https://www.gnu.org/licenses/old-licenses/lgpl-2.0.txt",
+          "LGPLv3" => "https://www.gnu.org/licenses/lgpl-3.0.txt",
           "PSFL" => "https://gist.githubusercontent.com/remh/1e6c62177a1a972fbc47/raw/01e9994ccf3a239a9045f31963006d2bba1cea42/PSF.license",
           "Apache" => "http://www.apache.org/licenses/LICENSE-1.0",
           "Apachev2" => "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "GPLv2" => "http://www.r-project.org/Licenses/GPL-2",
-          "GPLv3" => "http://www.r-project.org/Licenses/GPL-3",
+          "GPLv2" => "https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt",
+          "GPLv3" => "https://www.gnu.org/licenses/gpl-3.0.txt",
           "ZPL" => "https://gist.githubusercontent.com/remh/d60434c9fee49af69850/raw/5582f08b89995ee25bb0a556e32ca8a9de197f23/ZPL.license",
-          "MIT" => "https://www.r-project.org/Licenses/MIT",
+          "MIT" => "https://gist.githubusercontent.com/arbll/80dca8c2d54cceeed554b6327f89d795/raw/70889b3833476970c5140263ddce46908e88d777/MIT",
         }
         path = (known_licenses.key? source) ? known_licenses[source] : source
         destination = "#{dir_name}/" + path.split("/")[-1]
