@@ -71,6 +71,7 @@ module Omnibus
     #
     attr_reader :project_dir
     attr_reader :build_dir
+    attr_reader :sources_dir
 
     #
     # Create a new Fetcher object from the given software.
@@ -82,14 +83,16 @@ module Omnibus
     # @param [ManifestEntry] manifest_entry
     # @param [String] project_dir
     # @param [String] build_dir
+    # @param [String] sources_dir
     #
-    def initialize(manifest_entry, project_dir, build_dir)
+    def initialize(manifest_entry, project_dir, build_dir, sources_dir)
       @name    = manifest_entry.name
       @source  = manifest_entry.locked_source
       @resolved_version = manifest_entry.locked_version
       @described_version = manifest_entry.described_version
       @project_dir = project_dir
       @build_dir = build_dir
+      @sources_dir = sources_dir
     end
 
     #

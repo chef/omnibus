@@ -837,27 +837,6 @@ module Omnibus
     expose :ship_license
 
     #
-    # Downloads a software source code to ship with the final build
-    #
-    # Sources will be copied into {install_dir}/sources/{software_name}
-    #
-    # @param [String] url
-    #   An URL pointing to a source code archive
-    #
-    def ship_source(url)
-      build_commands << BuildCommand.new("Adding Source code: `#{url}'") do
-        dir_name = "#{install_dir}/sources/#{self.name}"
-        FileUtils.mkdir_p(dir_name)
-        raise "Source #{url} is not starting with http" unless url.start_with? "http"
-        file_name = "#{dir_name}/" + url.split("/")[-1]
-        File.open(file_name, "wb") do |f|
-          log.info(log_key) { "Writing source archive from #{url} to #{file_name}" }
-          f.write HTTParty.get(url).parsed_response
-        end
-      end
-    end
-
-    #
     # @!endgroup
     # --------------------------------------------------
 

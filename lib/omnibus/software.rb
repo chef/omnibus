@@ -333,6 +333,10 @@ module Omnibus
             "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
         end
 
+        if ship_source
+          val[:ship_source] = true
+        end
+
         @source ||= {}
         @source.merge!(val)
       end
@@ -577,6 +581,11 @@ module Omnibus
       @project.install_dir
     end
     expose :install_dir
+
+    def sources_dir
+      @project.sources_dir
+    end
+    expose :sources_dir
 
     def python_2_embedded
       @project.python_2_embedded
@@ -859,15 +868,27 @@ module Omnibus
     expose :ship_license
 
     #
-    # Downloads a software source code to ship with the final build
+    # Tells if the sources should be shipped alongside the built
+    # software.
     #
-    # Sources will be copied into {install_dir}/sources/{software_name}
+    # If set to true, the sources will be put in {sources_dir}/{software_name}
+    # by the fetcher, and will be copied to {install_dir}/sources/{software_name}
+    # by the Project which created this Software.
     #
-    # @param [String] url
-    #   An URL pointing to a source code archive
-    #   
-    def ship_source(url)
-        @ship_source
+    # @example
+    #   ship_source true
+    #
+    # @param [Boolean] val
+    #   the new value of ship_source.
+    #
+    # @return [Boolean]
+    #
+    def ship_source(val = NULL)
+      if null?(val)
+        @ship_source || false
+      else
+        @ship_source = val
+      end
     end
     expose :ship_source
 
@@ -1065,9 +1086,9 @@ module Omnibus
     def fetcher
       @fetcher ||=
         if source_type == :url && File.basename(source[:url], "?*").end_with?(*NetFetcher::ALL_EXTENSIONS)
-          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir)
+          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, fetch_dir, build_dir, sources_dir)
         else
-          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir)
+          Fetcher.fetcher_class_for_source(self.source).new(manifest_entry, project_dir, build_dir, sources_dir)
         end
     end
 

@@ -184,6 +184,15 @@ module Omnibus
     end
     expose :install_dir
 
+    def sources_dir(val = NULL)
+      if null?(val)
+        @sources_dir || File.expand_path("#{files_path}/sources")
+      else
+        @sources_dir = val.tr('\\', "/").squeeze("/").chomp("/")
+      end
+    end
+    expose :sources_dir
+
     def python_2_embedded(val = NULL)
       if null?(val)
         @python_2_embedded || "#{install_dir}/embedded2"
@@ -870,6 +879,25 @@ module Omnibus
     end
 
     #
+    # Add all sources that have to be shipped to the project's
+    # {install_dir}/sources.
+    #
+    # @return [true]
+    #
+    def install_sources
+      log.info(log_key) { "Searching for sources to ship with the package." }
+      if Dir.exist?(sources_dir)
+        log.info(log_key) { "Sources found in #{sources_dir}. Moving them to #{install_dir}/sources." }
+        FileUtils.mkdir_p("#{install_dir}/sources")
+        FileUtils.cp_r("#{sources_dir}/.", "#{install_dir}/sources")
+      else
+        log.info(log_key) { "No sources found." }
+      end
+
+      true
+    end
+
+    #
     # The list of software dependencies for this project. These is the software
     # that comprises your project, and is distinct from runtime dependencies.
     #
@@ -1137,6 +1165,9 @@ module Omnibus
           software.build_me([license_collector])
         end
       end
+
+      # Install shipped sources in the sources/ folder
+      install_sources
 
       write_json_manifest
       write_text_manifest

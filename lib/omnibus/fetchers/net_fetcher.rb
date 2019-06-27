@@ -131,6 +131,15 @@ module Omnibus
     end
 
     #
+    # Tells if the sources should be shipped
+    #
+    # @return [Boolean]
+    #
+    def ship_source?
+      source[:ship_source]
+    end
+
+    #
     # The checksum as defined by the user in the software definition.
     #
     # @return [String]
@@ -224,6 +233,15 @@ module Omnibus
           # exist due to create_required_directories
           log.info(log_key) { "`#{safe_downloaded_file}' is a regular file - naming copy `#{target_filename}'" }
           FileUtils.cp(downloaded_file, File.join(project_dir, target_filename))
+        end
+      end
+      if ship_source?
+        FileUtils.mkdir_p("#{sources_dir}/#{name}")
+        log.info(log_key) { "Moving the sources #{sources_dir}/#{name}/#{downloaded_file.split("/")[-1]}" }
+        if File.directory?(downloaded_file)
+          FileUtils.cp_r("#{downloaded_file}/.", "#{sources_dir}/#{name}")
+        else
+          FileUtils.cp(downloaded_file, "#{sources_dir}/#{name}")
         end
       end
     end
