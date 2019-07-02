@@ -496,6 +496,7 @@ module Omnibus
 
       if !safe
         rpath_regexp = Regexp.new("@rpath")
+        loader_path_regexp = Regexp.new("@loader_path")
         install_dir_regexp = Regexp.new(project.install_dir)
 
         # Do the linker's work of replacing @rpath with the rpaths defined by the library
@@ -518,6 +519,10 @@ module Omnibus
             # The rpath variable contains a \n (\r\n on Windows), so we remove it when including it in the complete path
             possible_paths << linked.sub("@rpath", rpath.chop)
           end
+        # Do the linker's work of replacing @loader_path by the directory the library that's using the dependency is in
+        elsif linked =~ loader_path_regexp
+          loader_path = File.dirname(current_library)
+          possible_paths = [linked.sub("@loader_path", loader_path)]
         else
           possible_paths = [linked]
         end
