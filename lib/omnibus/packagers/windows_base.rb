@@ -86,24 +86,60 @@ module Omnibus
     end
     expose :signing_identity
 
-    def thumbprint
-      signing_identity[:thumbprint]
+    def signing_identity_file(pfxfile = NULL, params = NULL)
+      unless null?(pfxfile)
+        @signing_identity_file = {}
+        unless pfxfile.is_a?(String)
+          raise InvalidValue.new(:pfxfile, "be a String")
+        end
+
+        @signing_identity_file[:pfxfile] = pfxfile
+
+        if !null?(params)
+          unless params.is_a?(Hash)
+            raise InvalidValue.new(:params, "be a Hash")
+          end
+
+          valid_keys = [:password, :timestamp_servers, :algorithm]
+          invalid_keys = params.keys - valid_keys
+          unless invalid_keys.empty?
+            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(', ')}]. "\
+                                   "Found invalid keys [#{invalid_keys.join(', ')}]")
+          end
+
+          if !params[:password].nil? && !(
+             params[:password].is_a?(TrueClass) ||
+             params[:password].is_a?(FalseClass))
+            raise InvalidValue.new(:params, "contain key :password of type TrueClass or FalseClass")
+          end
+        else
+          params = {}
+        end
+
+        @signing_identity_file[:algorithm] = params[:algorithm] || "SHA1"
+        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
+        @signing_identity_file[:timestamp_servers] = [servers].flatten
+        @signing_identity_file[:password] = params[:password] || false
+        end
+
+        @signing_identity_file
+    end
+    expose :signing_identity_file
+
+    def pfx_algorithm
+      signing_identity_file[:algorithm]
     end
 
-    def algorithm
-      signing_identity[:algorithm]
+    def pfx_password
+      signing_identity_file[:password]
     end
 
-    def cert_store_name
-      signing_identity[:store]
+    def pfx_timestamp_servers
+      signing_identity_file[:timestamp_servers]
     end
 
-    def timestamp_servers
-      signing_identity[:timestamp_servers]
-    end
-
-    def machine_store?
-      signing_identity[:machine_store]
+    def pfx_file
+      signing_identity_file[:pfxfile]
     end
 
     #
@@ -141,17 +177,30 @@ module Omnibus
     end
 
     def try_sign(package_file, url)
-      cmd = Array.new.tap do |arr|
-        arr << "signtool.exe"
-        arr << "sign /v"
-        arr << "/t #{url}"
-        arr << "/fd #{algorithm}"
-        arr << "/sm" if machine_store?
-        arr << "/s #{cert_store_name}"
-        arr << "/sha1 #{thumbprint}"
-        arr << "/d #{project.package_name}"
-        arr << "\"#{package_file}\""
-      end.join(" ")
+      if signing_identity
+        cmd = Array.new.tap do |arr|
+          arr << "signtool.exe"
+          arr << "sign /v"
+          arr << "/t #{url}"
+          arr << "/fd #{algorithm}"
+          arr << "/sm" if machine_store?
+          arr << "/s #{cert_store_name}"
+          arr << "/sha1 #{thumbprint}"
+          arr << "/d #{project.package_name}"
+          arr << "\"#{package_file}\""
+        end.join(" ")
+      elsif signing_identity_file
+        cmd = Array.new.tap do |arr|
+          arr << "signtool.exe"
+          arr << "sign /v"
+          arr << "/t #{url}"
+          arr << "/f #{pfx_file}"
+          arr << "/fd #{algorithm}"
+          arr << "/p #{pfx_password}"
+          arr << "/d #{project.package_name}"
+          arr << "\"#{package_file}\""
+        end.join(" ")
+      end
       puts cmd
       status = shellout(cmd)
       if status.exitstatus != 0
