@@ -86,6 +86,18 @@ module Omnibus
     end
     expose :signing_identity
 
+    def thumbprint
+      signing_identity[:thumbprint]
+    end
+
+    def cert_store_name
+      signing_identity[:store]
+    end
+
+    def machine_store?
+      signing_identity[:machine_store]
+    end
+
     def signing_identity_file(pfxfile = NULL, params = NULL)
       unless null?(pfxfile)
         @signing_identity_file = {}
@@ -107,10 +119,8 @@ module Omnibus
                                    "Found invalid keys [#{invalid_keys.join(', ')}]")
           end
 
-          if !params[:password].nil? && !(
-             params[:password].is_a?(TrueClass) ||
-             params[:password].is_a?(FalseClass))
-            raise InvalidValue.new(:params, "contain key :password of type TrueClass or FalseClass")
+          if params[:password].nil? 
+            raise InvalidValue.new(:params, "Must supply password for PFX file")
           end
         else
           params = {}
@@ -134,13 +144,29 @@ module Omnibus
       signing_identity_file[:password]
     end
 
-    def pfx_timestamp_servers
-      signing_identity_file[:timestamp_servers]
-    end
-
     def pfx_file
       signing_identity_file[:pfxfile]
     end
+
+    def timestamp_servers
+      if signing_identity
+        signing_identity[:timestamp_servers]
+      elsif signing_identity_file
+        signing_identity_file[:timestamp_servers]
+      else
+        nil
+      end
+    end
+    def algorithm
+      if signing_identity
+        signing_identity[:algorithm]
+      elsif signing_identity_file
+        signing_identity_file[:algorithm]
+      else
+        nil
+      end
+    end
+  
 
     #
     # Iterates through available timestamp servers and tries to sign
