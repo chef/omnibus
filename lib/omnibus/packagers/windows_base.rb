@@ -47,6 +47,9 @@ module Omnibus
     #
     def signing_identity(thumbprint = NULL, params = NULL)
       unless null?(thumbprint)
+        if signing_identity_file
+          raise Error, "You cannot specify signing_identity and signing_identity_file"
+        end
         @signing_identity = {}
         unless thumbprint.is_a?(String)
           raise InvalidValue.new(:signing_identity, "be a String")
@@ -100,6 +103,9 @@ module Omnibus
 
     def signing_identity_file(pfxfile = NULL, params = NULL)
       unless null?(pfxfile)
+        if signing_identity
+          raise Error, "You cannot specify signing_identity and signing_identity_file"
+        end
         @signing_identity_file = {}
         unless pfxfile.is_a?(String)
           raise InvalidValue.new(:pfxfile, "be a String")
