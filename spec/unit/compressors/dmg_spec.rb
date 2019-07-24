@@ -222,10 +222,25 @@ module Omnibus
               -imagekey \\
               zlib-level=9 \\
               -o "#{package_dir}/project-1.2.3-2.dmg"
-            rm -rf "#{staging_dir}/project-writable.dmg"
           EOH
 
         subject.compress_dmg
+      end
+    end
+
+    describe "#remove_writable_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.remove_writable_dmg }
+        expect(output).to include("Removing writable dmg")
+      end
+
+      it "runs the command" do
+        expect(subject).to receive(:shellout!)
+          .with <<-EOH.gsub(/^ {12}/, "")
+            rm -rf "#{staging_dir}/project-writable.dmg"
+          EOH
+
+        subject.remove_writable_dmg
       end
     end
 

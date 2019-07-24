@@ -43,6 +43,7 @@ module Omnibus
       prettify_dmg
       compress_dmg
       set_dmg_icon
+      remove_writable_dmg
     end
 
     #
@@ -261,6 +262,20 @@ module Omnibus
             -imagekey \\
             zlib-level=9 \\
             -o "#{package_path}"
+        EOH
+      end
+    end
+
+    #
+    # Remove writable dmg.
+    #
+    # @return [void]
+    #
+    def remove_writable_dmg
+      log.info(log_key) { "Removing writable dmg" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           rm -rf "#{writable_dmg}"
         EOH
       end
