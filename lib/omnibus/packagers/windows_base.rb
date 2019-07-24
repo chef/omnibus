@@ -47,6 +47,9 @@ module Omnibus
     #
     def signing_identity(thumbprint = NULL, params = NULL)
       unless null?(thumbprint)
+        if signing_identity_file
+          raise Error, "You cannot specify signing_identity and signing_identity_file"
+        end
         @signing_identity = {}
         unless thumbprint.is_a?(String)
           raise InvalidValue.new(:signing_identity, "be a String")
@@ -90,21 +93,86 @@ module Omnibus
       signing_identity[:thumbprint]
     end
 
-    def algorithm
-      signing_identity[:algorithm]
-    end
-
     def cert_store_name
       signing_identity[:store]
-    end
-
-    def timestamp_servers
-      signing_identity[:timestamp_servers]
     end
 
     def machine_store?
       signing_identity[:machine_store]
     end
+
+    def signing_identity_file(pfxfile = NULL, params = NULL)
+      unless null?(pfxfile)
+        if signing_identity
+          raise Error, "You cannot specify signing_identity and signing_identity_file"
+        end
+        @signing_identity_file = {}
+        unless pfxfile.is_a?(String)
+          raise InvalidValue.new(:pfxfile, "be a String")
+        end
+
+        @signing_identity_file[:pfxfile] = pfxfile
+
+        if !null?(params)
+          unless params.is_a?(Hash)
+            raise InvalidValue.new(:params, "be a Hash")
+          end
+
+          valid_keys = [:password, :timestamp_servers, :algorithm]
+          invalid_keys = params.keys - valid_keys
+          unless invalid_keys.empty?
+            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(', ')}]. "\
+                                   "Found invalid keys [#{invalid_keys.join(', ')}]")
+          end
+
+          if params[:password].nil? 
+            raise InvalidValue.new(:params, "Must supply password for PFX file")
+          end
+        else
+          params = {}
+        end
+
+        @signing_identity_file[:algorithm] = params[:algorithm] || "SHA1"
+        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
+        @signing_identity_file[:timestamp_servers] = [servers].flatten
+        @signing_identity_file[:password] = params[:password] || false
+        end
+
+        @signing_identity_file
+    end
+    expose :signing_identity_file
+
+    def pfx_algorithm
+      signing_identity_file[:algorithm]
+    end
+
+    def pfx_password
+      signing_identity_file[:password]
+    end
+
+    def pfx_file
+      signing_identity_file[:pfxfile]
+    end
+
+    def timestamp_servers
+      if signing_identity
+        signing_identity[:timestamp_servers]
+      elsif signing_identity_file
+        signing_identity_file[:timestamp_servers]
+      else
+        nil
+      end
+    end
+    def algorithm
+      if signing_identity
+        signing_identity[:algorithm]
+      elsif signing_identity_file
+        signing_identity_file[:algorithm]
+      else
+        nil
+      end
+    end
+  
 
     #
     # Iterates through available timestamp servers and tries to sign
@@ -141,17 +209,30 @@ module Omnibus
     end
 
     def try_sign(package_file, url)
-      cmd = Array.new.tap do |arr|
-        arr << "signtool.exe"
-        arr << "sign /v"
-        arr << "/t #{url}"
-        arr << "/fd #{algorithm}"
-        arr << "/sm" if machine_store?
-        arr << "/s #{cert_store_name}"
-        arr << "/sha1 #{thumbprint}"
-        arr << "/d #{project.package_name}"
-        arr << "\"#{package_file}\""
-      end.join(" ")
+      if signing_identity
+        cmd = Array.new.tap do |arr|
+          arr << "signtool.exe"
+          arr << "sign /v"
+          arr << "/t #{url}"
+          arr << "/fd #{algorithm}"
+          arr << "/sm" if machine_store?
+          arr << "/s #{cert_store_name}"
+          arr << "/sha1 #{thumbprint}"
+          arr << "/d #{project.package_name}"
+          arr << "\"#{package_file}\""
+        end.join(" ")
+      elsif signing_identity_file
+        cmd = Array.new.tap do |arr|
+          arr << "signtool.exe"
+          arr << "sign /v"
+          arr << "/t #{url}"
+          arr << "/f #{pfx_file}"
+          arr << "/fd #{algorithm}"
+          arr << "/p #{pfx_password}"
+          arr << "/d #{project.package_name}"
+          arr << "\"#{package_file}\""
+        end.join(" ")
+      end
       puts cmd
       status = shellout(cmd)
       if status.exitstatus != 0
