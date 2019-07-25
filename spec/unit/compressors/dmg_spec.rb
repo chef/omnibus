@@ -217,7 +217,7 @@ module Omnibus
           .with <<-EOH.gsub(/^ {12}/, "")
             chmod -Rf go-w "/Volumes/Project One"
             sync
-            hdiutil detach "#{device}"
+            hdiutil detach "#{device}" &&\
             hdiutil convert \\
               "#{staging_dir}/project-writable.dmg" \\
               -format UDZO \\
