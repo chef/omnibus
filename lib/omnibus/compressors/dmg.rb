@@ -144,7 +144,8 @@ module Omnibus
           -fs HFS+ \\
           -fsargs "-c c=64,a=16,e=16" \\
           -size 512000k \\
-          "#{writable_dmg}"
+          "#{writable_dmg}" \\
+          -puppetstrings
       EOH
     end
 
@@ -160,6 +161,7 @@ module Omnibus
 
         cmd = shellout! <<-EOH.gsub(/^ {10}/, "")
           hdiutil attach \\
+            -puppetstrings \\
             -readwrite \\
             -noverify \\
             -noautoopen \\
@@ -261,7 +263,8 @@ module Omnibus
             -format UDZO \\
             -imagekey \\
             zlib-level=9 \\
-            -o "#{package_path}"
+            -o "#{package_path}" \\
+            -puppetstrings
         EOH
       end
     end
