@@ -43,6 +43,7 @@ module Omnibus
       prettify_dmg
       compress_dmg
       set_dmg_icon
+      verify_dmg
       remove_writable_dmg
     end
 
@@ -264,6 +265,23 @@ module Omnibus
             -imagekey \\
             zlib-level=9 \\
             -o "#{package_path}" \\
+            -puppetstrings
+        EOH
+      end
+    end
+
+    #
+    # Verify checksum on created dmg.
+    #
+    # @return [void]
+    #
+    def verify_dmg
+      log.info(log_key) { "Verifying dmg" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, "")
+          hdiutil verify \\
+            "#{package_path}" \\
             -puppetstrings
         EOH
       end
