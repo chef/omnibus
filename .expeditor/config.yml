@@ -4,7 +4,6 @@
 slack:
   notify_channel:
     - chef-found-notify
-    - omnibus-rfr
 
 # This publish is triggered by the `built_in:publish_rubygems` artifact_action.
 rubygems:

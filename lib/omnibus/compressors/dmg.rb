@@ -43,6 +43,8 @@ module Omnibus
       prettify_dmg
       compress_dmg
       set_dmg_icon
+      verify_dmg
+      remove_writable_dmg
     end
 
     #
@@ -143,7 +145,8 @@ module Omnibus
           -fs HFS+ \\
           -fsargs "-c c=64,a=16,e=16" \\
           -size 512000k \\
-          "#{writable_dmg}"
+          "#{writable_dmg}" \\
+          -puppetstrings
       EOH
     end
 
@@ -159,6 +162,7 @@ module Omnibus
 
         cmd = shellout! <<-EOH.gsub(/^ {10}/, "")
           hdiutil attach \\
+            -puppetstrings \\
             -readwrite \\
             -noverify \\
             -noautoopen \\
@@ -254,13 +258,45 @@ module Omnibus
         shellout! <<-EOH.gsub(/^ {10}/, "")
           chmod -Rf go-w "/Volumes/#{volume_name}"
           sync
-          hdiutil detach "#{@device}"
+          hdiutil detach "#{@device}" &&  \
           hdiutil convert \\
             "#{writable_dmg}" \\
             -format UDZO \\
             -imagekey \\
             zlib-level=9 \\
-            -o "#{package_path}"
+            -o "#{package_path}" \\
+            -puppetstrings
+        EOH
+      end
+    end
+
+    #
+    # Verify checksum on created dmg.
+    #
+    # @return [void]
+    #
+    def verify_dmg
+      log.info(log_key) { "Verifying dmg" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, "")
+          hdiutil verify \\
+            "#{package_path}" \\
+            -puppetstrings
+        EOH
+      end
+    end
+
+    #
+    # Remove writable dmg.
+    #
+    # @return [void]
+    #
+    def remove_writable_dmg
+      log.info(log_key) { "Removing writable dmg" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           rm -rf "#{writable_dmg}"
         EOH
       end

@@ -90,7 +90,8 @@ module Omnibus
               -fs HFS+ \\
               -fsargs "-c c=64,a=16,e=16" \\
               -size 512000k \\
-              "#{staging_dir}/project-writable.dmg"
+              "#{staging_dir}/project-writable.dmg" \\
+              -puppetstrings
           EOH
 
         subject.create_writable_dmg
@@ -114,6 +115,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil attach \\
+              -puppetstrings \\
               -readwrite \\
               -noverify \\
               -noautoopen \\
@@ -215,17 +217,51 @@ module Omnibus
           .with <<-EOH.gsub(/^ {12}/, "")
             chmod -Rf go-w "/Volumes/Project One"
             sync
-            hdiutil detach "#{device}"
+            hdiutil detach "#{device}" &&\
             hdiutil convert \\
               "#{staging_dir}/project-writable.dmg" \\
               -format UDZO \\
               -imagekey \\
               zlib-level=9 \\
-              -o "#{package_dir}/project-1.2.3-2.dmg"
-            rm -rf "#{staging_dir}/project-writable.dmg"
+              -o "#{package_dir}/project-1.2.3-2.dmg" \\
+              -puppetstrings
           EOH
 
         subject.compress_dmg
+      end
+    end
+
+    describe "#verify_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.verify_dmg }
+        expect(output).to include("Verifying dmg")
+      end
+
+      it "runs the command" do
+        expect(subject).to receive(:shellout!)
+          .with <<-EOH.gsub(/^ {12}/, "")
+            hdiutil verify \\
+              "#{package_dir}/project-1.2.3-2.dmg" \\
+              -puppetstrings
+          EOH
+
+        subject.verify_dmg
+      end
+    end
+
+    describe "#remove_writable_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.remove_writable_dmg }
+        expect(output).to include("Removing writable dmg")
+      end
+
+      it "runs the command" do
+        expect(subject).to receive(:shellout!)
+          .with <<-EOH.gsub(/^ {12}/, "")
+            rm -rf "#{staging_dir}/project-writable.dmg"
+          EOH
+
+        subject.remove_writable_dmg
       end
     end
 
