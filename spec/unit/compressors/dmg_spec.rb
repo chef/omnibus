@@ -90,7 +90,8 @@ module Omnibus
               -fs HFS+ \\
               -fsargs "-c c=64,a=16,e=16" \\
               -size 512000k \\
-              "#{staging_dir}/project-writable.dmg"
+              "#{staging_dir}/project-writable.dmg" \\
+              -puppetstrings
           EOH
 
         subject.create_writable_dmg
@@ -114,6 +115,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil attach \\
+              -puppetstrings \\
               -readwrite \\
               -noverify \\
               -noautoopen \\
@@ -221,7 +223,8 @@ module Omnibus
               -format UDZO \\
               -imagekey \\
               zlib-level=9 \\
-              -o "#{package_dir}/project-1.2.3-2.dmg"
+              -o "#{package_dir}/project-1.2.3-2.dmg" \\
+              -puppetstrings
           EOH
 
         subject.compress_dmg
