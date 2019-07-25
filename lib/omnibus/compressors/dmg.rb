@@ -258,7 +258,7 @@ module Omnibus
         shellout! <<-EOH.gsub(/^ {10}/, "")
           chmod -Rf go-w "/Volumes/#{volume_name}"
           sync
-          hdiutil detach "#{@device}"
+          hdiutil detach "#{@device}" &&  \
           hdiutil convert \\
             "#{writable_dmg}" \\
             -format UDZO \\
