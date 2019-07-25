@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 6.0.31 -->
+## [6.0.31](https://github.com/chef/omnibus/tree/6.0.31) (2019-07-25)
+
+#### Merged Pull Requests
+- Separate removing writable dmg [#895](https://github.com/chef/omnibus/pull/895) ([jaymalasinha](https://github.com/jaymalasinha))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=6.0.30 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Separate removing writable dmg [#895](https://github.com/chef/omnibus/pull/895) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 6.0.31 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [6.0.30](https://github.com/chef/omnibus/tree/6.0.30) (2019-06-13)
