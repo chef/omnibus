@@ -26,10 +26,10 @@ module Omnibus
     #
     # @example JSON
     #   {
-    #     "ubuntu-10.04": [
-    #       "ubuntu-10.04",
-    #       "ubuntu-12.04",
-    #       "ubuntu-14.04"
+    #     "ubuntu-10.04-x86_64": [
+    #       "ubuntu-10.04-x86_64",
+    #       "ubuntu-12.04-x86_64",
+    #       "ubuntu-14.04-x86_64"
     #     ]
     #   }
     #
@@ -99,7 +99,7 @@ module Omnibus
       end
 
       klass.publish(pattern, options) do |package|
-        say("Published '#{package.name}' for #{package.metadata[:platform]}-#{package.metadata[:platform_version]}", :green)
+        say("Published '#{package.name}' for #{package.metadata[:platform]}-#{package.metadata[:platform_version]}-#{package.metadata[:arch]}", :green)
       end
     end
   end
