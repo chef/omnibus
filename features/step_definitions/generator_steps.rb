@@ -46,10 +46,10 @@ end
 Given(/^I have a platform mappings file named "(.+)"$/) do |name|
   write_file(name, <<-EOH.gsub(/^ {4}/, ""))
     {
-      "ubuntu-10.04": [
-        "ubuntu-10.04",
-        "ubuntu-12.04",
-        "ubuntu-14.04"
+      "ubuntu-10.04-x86_64": [
+        "ubuntu-10.04-x86_64",
+        "ubuntu-12.04-x86_64",
+        "ubuntu-14.04-x86_64"
       ]
     }
   EOH

@@ -44,10 +44,10 @@ module Omnibus
     #   mapping of build to publish platform(s)
     # @example
     #   {
-    #     'ubuntu-10.04' => [
-    #       'ubuntu-10.04',
-    #       'ubuntu-12.04',
-    #       'ubuntu-14.04',
+    #     'ubuntu-10.04-x86_64' => [
+    #       'ubuntu-10.04-x86_64',
+    #       'ubuntu-12.04-x86_64',
+    #       'ubuntu-14.04-x86_64',
     #     ],
     #   }
     #
@@ -75,33 +75,35 @@ module Omnibus
         if @options[:platform_mappings]
           # the platform map is a simple hash with publish to build platform mappings
           @options[:platform_mappings].each_pair do |build_platform, publish_platforms|
-            # Splits `ubuntu-12.04` into `ubuntu` and `12.04`
-            build_platform, build_platform_version = build_platform.rpartition("-") - %w{ - }
+            # Splits `ubuntu-12.04-x86_64` into `ubuntu`, `12.04` and `x86_64`
+            build_platform, build_platform_version, build_architecture = build_platform.split("-")
 
             # locate the package for the build platform
             packages = build_packages.select do |p|
               p.metadata[:platform] == build_platform &&
-                p.metadata[:platform_version] == build_platform_version
+                p.metadata[:platform_version] == build_platform_version &&
+                p.metadata[:arch] == build_architecture
             end
 
             if packages.empty?
               log.warn(log_key) do
-                "Could not locate a package for build platform #{build_platform}-#{build_platform_version}. " \
+                "Could not locate a package for build platform #{build_platform}-#{build_platform_version}-#{build_architecture}. " \
                 "Publishing will be skipped for: #{publish_platforms.join(', ')}"
               end
             end
 
             publish_platforms.each do |publish_platform|
-              publish_platform, publish_platform_version = publish_platform.rpartition("-") - %w{ - }
+              publish_platform, publish_platform_version, publish_architecture = publish_platform.split("-")
 
               packages.each do |p|
                 # create a copy of our package before mucking with its metadata
                 publish_package  = p.dup
                 publish_metadata = p.metadata.dup.to_hash
 
-                # override the platform and platform version in the metadata
+                # override the platform, platform version and architecture in the metadata
                 publish_metadata[:platform]         = publish_platform
                 publish_metadata[:platform_version] = publish_platform_version
+                publish_metadata[:arch]             = publish_architecture
 
                 # Set the updated metadata on the package object
                 publish_package.metadata = Metadata.new(publish_package, publish_metadata)
