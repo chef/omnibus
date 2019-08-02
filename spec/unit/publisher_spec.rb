@@ -47,9 +47,9 @@ module Omnibus
         let(:options) do
           {
             platform_mappings: {
-              "ubuntu-12.04" => [
-                "ubuntu-12.04",
-                "ubuntu-14.04",
+              "ubuntu-12.04-x86_64" => [
+                "ubuntu-12.04-x86_64",
+                "ubuntu-14.04-x86_64",
               ],
             },
           }
@@ -155,9 +155,9 @@ module Omnibus
           let(:options) do
             {
               platform_mappings: {
-                "ubuntu-10.04" => [
-                  "ubuntu-12.04",
-                  "ubuntu-14.04",
+                "ubuntu-10.04-x86_64" => [
+                  "ubuntu-12.04-x86_64",
+                  "ubuntu-14.04-x86_64",
                 ],
               },
             }
@@ -165,7 +165,7 @@ module Omnibus
 
           it "prints a warning" do
             output = capture_logging { subject.packages }
-            expect(output).to include("Could not locate a package for build platform ubuntu-10.04. Publishing will be skipped for: ubuntu-12.04, ubuntu-14.04")
+            expect(output).to include("Could not locate a package for build platform ubuntu-10.04-x86_64. Publishing will be skipped for: ubuntu-12.04-x86_64, ubuntu-14.04-x86_64")
           end
         end
       end
