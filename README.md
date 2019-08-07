@@ -4,6 +4,14 @@
 [![Build Status](https://badge.buildkite.com/446fd6049a9a5eeab50112aba117d3b7670ec085acb91f78dd.svg?branch=master)](https://buildkite.com/chef-oss/chef-omnibus-master-verify)
 [![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
 
+**Umbrella Project**: [Chef Foundation](https://github.com/chef/chef-oss-practices/blob/master/projects/chef-foundation.md)
+
+**Project State**: [Active](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md#active)
+
+**Issues [Response Time Maximum](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md)**: 14 days
+
+**Pull Request [Response Time Maximum](https://github.com/chef/chef-oss-practices/blob/master/repo-management/repo-states.md)**: 14 days
+
 Easily create full-stack installers for your project across a variety of platforms.
 
 Seth Chisamore and Christopher Maier of CHEF gave an introductory talk on Omnibus at ChefConf 2013, entitled **Eat the Whole Bowl: Building a Full-Stack Installer with Omnibus**:
