@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.0 -->
-## [6.1.0](https://github.com/chef/omnibus/tree/6.1.0) (2019-08-02)
+<!-- latest_release 6.1.1 -->
+## [6.1.1](https://github.com/chef/omnibus/tree/6.1.1) (2019-08-15)
 
 #### Merged Pull Requests
-- Use architecture from platform mappings file when publishing packages [#896](https://github.com/chef/omnibus/pull/896) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Change exclude to use `**` to skip levels [#834](https://github.com/chef/omnibus/pull/834) ([richardc](https://github.com/richardc))
 <!-- latest_release -->
 <!-- release_rollup since=6.0.30 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Change exclude to use `**` to skip levels [#834](https://github.com/chef/omnibus/pull/834) ([richardc](https://github.com/richardc)) <!-- 6.1.1 -->
 - Use architecture from platform mappings file when publishing packages [#896](https://github.com/chef/omnibus/pull/896) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 6.1.0 -->
 - Separate removing writable dmg [#895](https://github.com/chef/omnibus/pull/895) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 6.0.31 -->
 <!-- release_rollup -->
