@@ -104,6 +104,22 @@ module Omnibus
     end
 
     #
+    # Shells out and runs +command+ and yields the result
+    # one line at a time.
+    #
+    # @param [String] command
+    #   the command to execute
+    # @yield [String]
+    #   each line
+    #
+    def yield_shellout_results(command)
+      cmd = shellout(command)
+      cmd.stdout.each_line do |line|
+        yield line
+      end
+    end
+
+    #
     # Convert the given path to be appropiate for shelling out on Windows.
     #
     # @param [String, Array<String>] pieces

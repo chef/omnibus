@@ -86,5 +86,6 @@ module Omnibus
       end
     end
     module_function :for_current_system
+
   end
 end

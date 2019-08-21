@@ -45,12 +45,27 @@ module Omnibus
       create_directory("#{staging_dir}/SOURCES")
       create_directory("#{staging_dir}/SPECS")
 
+      # Create the RPM directory structure for debug builds
+      if debug_build?
+        create_directory("#{staging_dbg_dir}/BUILD")
+        create_directory("#{staging_dbg_dir}/RPMS")
+        create_directory("#{staging_dbg_dir}/SRPMS")
+        create_directory("#{staging_dbg_dir}/SOURCES")
+        create_directory("#{staging_dbg_dir}/SPECS")
+      end
+
       # Copy the full-stack installer into the SOURCE directory, accounting for
       # any excluded files.
       #
       # /opt/hamlet => /tmp/daj29013/BUILD/opt/hamlet
+      skip = exclusions + debug_package_paths
       destination = File.join(build_dir, project.install_dir)
-      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
+      FileSyncer.sync(project.install_dir, destination, exclude: skip)
+
+      if debug_build?
+        destination_dbg = File.join(build_dir(true), project.install_dir)
+        FileSyncer.sync(project.install_dir, destination_dbg, include: debug_package_paths)
+      end
 
       # Copy over any user-specified extra package files.
       #
@@ -63,11 +78,11 @@ module Omnibus
         parent      = File.dirname(file)
 
         if File.directory?(file)
-          destination = File.join("#{staging_dir}/BUILD", file)
+          destination = File.join(build_dir, file)
           create_directory(destination)
           FileSyncer.sync(file, destination)
         else
-          destination = File.join("#{staging_dir}/BUILD", parent)
+          destination = File.join(build_dir, parent)
           create_directory(destination)
           copy_file(file, destination)
         end
@@ -80,6 +95,14 @@ module Omnibus
 
       # Generate the rpm
       create_rpm_file
+
+      if debug_build?
+        # Generate the spec
+        write_rpm_spec(true)
+
+        # Generate the rpm
+        create_rpm_file(true)
+      end
     end
 
     #
@@ -263,11 +286,11 @@ module Omnibus
     #
     # @return [String]
     #
-    def package_name
+    def package_name(debug = false)
       if dist_tag
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+        "#{safe_base_package_name(debug)}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
       else
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+        "#{safe_base_package_name(debug)}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
       end
     end
 
@@ -276,8 +299,12 @@ module Omnibus
     #
     # @return [String]
     #
-    def build_dir
-      @build_dir ||= File.join(staging_dir, "BUILD")
+    def build_dir(debug = false)
+      src_dir = staging_dir
+      if debug
+        src_dir = staging_dbg_dir
+      end
+      File.join(src_dir, "BUILD")
     end
 
     #
@@ -327,10 +354,15 @@ module Omnibus
     #
     # @return [void]
     #
-    def write_rpm_spec
+    def write_rpm_spec(debug = false)
+
       # Create a map of scripts that exist and their contents
       scripts = SCRIPT_MAP.inject({}) do |hash, (source, destination)|
-        path =  File.join(project.package_scripts_path, source.to_s)
+        script_src = source.to_s
+        if debug
+          script_src = "#{source.to_s}-dbg"
+        end
+        path =  File.join(project.package_scripts_path, script_src)
 
         if File.file?(path)
           hash[destination] = File.read(path)
@@ -339,15 +371,22 @@ module Omnibus
         hash
       end
 
+      pkg_dependencies = project.runtime_dependencies
+      if debug
+        pkg_dependencies = ["#{safe_base_package_name} = #{safe_version}-#{safe_build_iteration}.#{safe_architecture}"]
+      end
+
       # Get a list of all files
-      files = FileSyncer.glob("#{build_dir}/**/*")
-                .map    { |path| build_filepath(path) }
+      files = FileSyncer.glob("#{build_dir(debug)}/**/*")
+                .map    { |path| build_filepath(path, debug) }
                 .reject { |path| path.empty? }
 
+      log.debug(log_key) { "These are the files going into the package(#{safe_base_package_name(debug)}): #{files}" }
+
       render_template(resource_path("spec.erb"),
-        destination: spec_file,
+        destination: spec_file(debug),
         variables: {
-          name:            safe_base_package_name,
+          name:            safe_base_package_name(debug),
           version:         safe_version,
           epoch:           safe_epoch,
           iteration:       safe_build_iteration,
@@ -361,13 +400,13 @@ module Omnibus
           category:        category,
           conflicts:       project.conflicts,
           replaces:        project.replaces,
-          dependencies:    project.runtime_dependencies,
+          dependencies:    pkg_dependencies,
           user:            project.package_user,
           group:           project.package_group,
           scripts:         scripts,
           config_files:    config_files,
           files:           files,
-          build_dir:       build_dir,
+          build_dir:       build_dir(debug),
           platform_family: Ohai["platform_family"],
         }
       )
@@ -380,12 +419,16 @@ module Omnibus
     #
     # @return [void]
     #
-    def create_rpm_file
+    def create_rpm_file(debug = false)
+      stage = staging_dir
+      if debug
+        stage = staging_dbg_dir
+      end
       command =  %{rpmbuild}
       command << %{ --target #{safe_architecture}}
       command << %{ -bb}
-      command << %{ --buildroot #{staging_dir}/BUILD}
-      command << %{ --define '_topdir #{staging_dir}'}
+      command << %{ --buildroot #{build_dir(debug)}}
+      command << %{ --define '_topdir #{stage}'}
 
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
@@ -409,7 +452,7 @@ module Omnibus
         end
 
         command << " --sign"
-        command << " #{spec_file}"
+        command << " #{spec_file(debug)}"
 
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Creating .rpm file" }
@@ -417,11 +460,11 @@ module Omnibus
         end
       else
         log.info(log_key) { "Creating .rpm file" }
-        command << " #{spec_file}"
+        command << " #{spec_file(debug)}"
         shellout!("#{command}")
       end
 
-      FileSyncer.glob("#{staging_dir}/RPMS/**/*.rpm").each do |rpm|
+      FileSyncer.glob("#{stage}/RPMS/**/*.rpm").each do |rpm|
         # RPMbuild doesn't let use choose the final RPM name, it contains the epoch if the
         # corresponding DSL was set so... let's get rid from the RPM name here :/
         copy_file(rpm, "#{Config.package_dir}/#{rpm.split('/')[-1].sub(/\d+:/, '')}" )
@@ -433,10 +476,10 @@ module Omnibus
     #
     # @return [String]
     #
-    def build_filepath(path)
-      filepath = rpm_safe("/" + path.gsub("#{build_dir}/", ""))
+    def build_filepath(path, debug = false)
+      filepath = rpm_safe("/" + path.gsub("#{build_dir(debug)}/", ""))
       return if config_files.include?(filepath)
-      full_path = build_dir + filepath.gsub("[%]", "%")
+      full_path = build_dir(debug) + filepath.gsub("[%]", "%")
       # FileSyncer.glob quotes pathnames that contain spaces, which is a problem on el7
       full_path.delete!('"')
       # Mark directories with the %dir directive to prevent rpmbuild from counting their contents twice.
@@ -449,8 +492,12 @@ module Omnibus
     #
     # @return [String]
     #
-    def spec_file
-      "#{staging_dir}/SPECS/#{package_name}.spec"
+    def spec_file(debug = false)
+      dst_dir = staging_dir
+      if debug
+        dst_dir = staging_dbg_dir
+      end
+      "#{dst_dir}/SPECS/#{package_name(debug)}.spec"
     end
 
     #
@@ -509,9 +556,9 @@ module Omnibus
     #
     # @return [String]
     #
-    def safe_base_package_name
+    def safe_base_package_name(debug = false)
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
-        project.package_name.dup
+        name = project.package_name.dup
       else
         converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, "-")
 
@@ -522,8 +569,10 @@ module Omnibus
           "`#{converted}'."
         end
 
-        converted
+        name = converted
       end
+
+      debug ? "#{name}-dbg" : name
     end
 
     #

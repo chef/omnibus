@@ -643,21 +643,6 @@ module Omnibus
     end
 
     #
-    # Execute the given command, yielding each line.
-    #
-    # @param [String] command
-    #   the command to execute
-    # @yield [String]
-    #   each line
-    #
-    def yield_shellout_results(command)
-      cmd = shellout(command)
-      cmd.stdout.each_line do |line|
-        yield line
-      end
-    end
-
-    #
     # Check the given path and library for "bad" libraries.
     #
     # @param [Hash<String, Hash<String, Hash<String, Int>>>]

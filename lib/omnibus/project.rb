@@ -631,6 +631,28 @@ module Omnibus
     expose :dependency
 
     #
+    # Add a debug package path.
+    #
+    # Paths added here will be excluded from the main package and added to
+    # the debug variant instead.
+    #
+    # @example
+    #   debug_path 'foo/bar'
+    #   dependency 'quz'
+    #
+    # @param [String] val
+    #   the path to include in the debug build
+    #
+    # @return [Array<String>]
+    #   the list of dependencies
+    #
+    def debug_path(pattern)
+      debug_package_paths << pattern
+      debug_package_paths.dup
+    end
+    expose :debug_path
+
+    #
     # Add a package that is a runtime dependency of this project.
     #
     # This is distinct from a build-time dependency, which should correspond to
@@ -815,6 +837,23 @@ module Omnibus
     expose :license_file_path
 
     #
+    # Method to enable whether or not a build should be stripped.
+    #
+    # @example
+    #   strip_build = true
+    #
+    # @return [String]
+    #
+    def strip_build(val = true)
+      if null?(val)
+        @strip_build || false
+      else
+        @strip_build = val
+      end
+    end
+    expose :strip_build
+
+    #
     # Location of json-formated version manifest, written at at the
     # end of the build. If no path is specified
     # +install_dir+/version-manifest.json is used.
@@ -909,6 +948,19 @@ module Omnibus
     #
     def dependencies
       @dependencies ||= []
+    end
+
+    # The list of paths to include in the debug package.
+    # Paths here specified will be excluded from the main build.
+    #
+    # @see #debug_path
+    #
+    # @param [Array<String>]
+    #
+    # @return [Array<String>]
+    #
+    def debug_package_paths
+      @debug_package_paths ||= []
     end
 
     #
@@ -1172,6 +1224,8 @@ module Omnibus
       write_json_manifest
       write_text_manifest
       HealthCheck.run!(self)
+
+      Stripper.run!(self) if strip_build
 
       # Remove any package this project extends, after the health check ran
       extended_packages.each do |packages, _|

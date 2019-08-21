@@ -243,6 +243,28 @@ module Omnibus
     expose :dependency
 
     #
+    # Add a debug package path.
+    #
+    # Paths added here will be excluded from the main package and added to
+    # the debug variant instead.
+    #
+    # @example
+    #   debug_path 'foo/bar'
+    #   dependency 'quz'
+    #
+    # @param [String] val
+    #   the path to include in the debug build
+    #
+    # @return [Array<String>]
+    #   the list of dependencies
+    #
+    def debug_path(pattern)
+      debug_package_paths << pattern
+      debug_package_paths.dup
+    end
+    expose :debug_path
+
+    #
     # Set or retrieve the source for the software.
     #
     # @raise [InvalidValue]
@@ -847,10 +869,10 @@ module Omnibus
 
     #
     # Downloads a software license to ship with the final build.
-    # 
+    #
     # Licenses will be copied into {install_dir}/sources/{software_name}
     #
-    # @param [String] name_or_url 
+    # @param [String] name_or_url
     #   the name of the license to ship or a URL pointing to the license file.
     #
     #   Available License Names : LGPLv2, LGPLv3, PSFL, Apache, Apachev2,
@@ -859,8 +881,8 @@ module Omnibus
     # @example
     #   ship_license 'GPLv3'
     #
-    # @example 
-    #    ship_license 'http://www.r-project.org/Licenses/GPL-3' 
+    # @example
+    #    ship_license 'http://www.r-project.org/Licenses/GPL-3'
     #
     def ship_license(name_or_url)
       @ship_license
@@ -964,6 +986,19 @@ module Omnibus
     #
     def dependencies
       @dependencies ||= []
+    end
+
+    # The list of paths to include in the debug package.
+    # Paths here specified will be excluded from the main build.
+    #
+    # @see #debug_path
+    #
+    # @param [Array<String>]
+    #
+    # @return [Array<String>]
+    #
+    def debug_package_paths
+      @debug_package_paths ||= []
     end
 
     #

@@ -49,6 +49,9 @@ module Omnibus
     #
     # @option options [String, Array<String>] :exclude
     #   a file, folder, or globbing pattern of files to ignore when syncing
+    # @option options [String, Array<String>] :include
+    #   a file, folder, or globbing pattern of files that has to be matched
+    #   when syncing
     #
     # @return [Array<String>]
     #   the list of all files
@@ -58,11 +61,25 @@ module Omnibus
         [exclude, "#{exclude}/*"]
       end.flatten
 
+      includes = Array(options[:include]).map do |include|
+        [include, "#{include}/*"]
+      end.flatten
+
+
       source_files = glob(File.join(source, "**/*"))
       source_files = source_files.reject do |source_file|
         basename = relative_path_for(source_file, source)
         excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH) }
       end
+
+      if not includes.empty?
+        source_files = source_files.reject do |source_file|
+          basename = relative_path_for(source_file, source)
+          includes.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH) }
+        end
+      end
+
+      source_files
     end
 
     #
@@ -171,8 +188,6 @@ module Omnibus
       true
     end
 
-    private
-
     #
     # The relative path of the given +path+ to the +parent+.
     #
@@ -186,6 +201,8 @@ module Omnibus
     def relative_path_for(path, parent)
       Pathname.new(path).relative_path_from(Pathname.new(parent)).to_s
     end
+
+    private
 
     #
     # A list of hard link file(s) sources which have already been copied,

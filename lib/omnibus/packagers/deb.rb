@@ -23,8 +23,14 @@ module Omnibus
       # any excluded files.
       #
       # /opt/hamlet => /tmp/daj29013/opt/hamlet
+      skip = exclusions + debug_package_paths
       destination = File.join(staging_dir, project.install_dir)
-      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
+      FileSyncer.sync(project.install_dir, destination, exclude: skip)
+
+      if debug_build?
+        destination_dbg = File.join(staging_dbg_dir, project.install_dir)
+        FileSyncer.sync(project.install_dir, destination_dbg, include: debug_package_paths)
+      end
 
       # Copy over any user-specified extra package files.
       #
@@ -47,8 +53,9 @@ module Omnibus
         end
       end
 
-      # Create the Debain file directory
+      # Create the Debian file directory
       create_directory(debian_dir)
+      create_directory(debian_dbg_dir) if debug_build?
     end
 
     build do
@@ -66,6 +73,24 @@ module Omnibus
 
       # Create the deb
       create_deb_file
+
+      # Now the debug build
+      if debug_build?
+        # Render the Debian +control+ file
+        write_control_file(true)
+
+        # Write the conffiles
+        write_conffiles_file(true)
+
+        # Write the scripts
+        write_scripts(true)
+
+        # Render the md5 sums
+        write_md5_sums(true)
+
+        # Create the deb
+        create_deb_file(true)
+      end
     end
 
     #
@@ -203,8 +228,8 @@ module Omnibus
     # The name of the package to create. Note, this does **not** include the
     # extension.
     #
-    def package_name
-      "#{safe_base_package_name}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
+    def package_name(debug = false)
+      "#{safe_base_package_name(debug)}_#{safe_version}-#{safe_build_iteration}_#{safe_architecture}.deb"
     end
 
     #
@@ -220,30 +245,49 @@ module Omnibus
     end
 
     #
+    # The path where Debian-specific debug files will live.
+    #
+    # @example
+    #   /var/.../chef-server_11.12.4/DEBIAN
+    #
+    # @return [String]
+    #
+    def debian_dbg_dir
+      @debian_dbg_dir ||= File.join(staging_dbg_dir, "DEBIAN")
+    end
+
+    #
     # Render a control file in +#{debian_dir}/control+ using the supplied ERB
     # template.
     #
     # @return [void]
     #
-    def write_control_file
+    def write_control_file(debug = false)
+      dst_dir = debug ? debian_dbg_dir : debian_dir
+
+      pkg_dependencies = project.runtime_dependencies
+      if debug
+        pkg_dependencies = ["#{safe_base_package_name} (= #{safe_epoch + safe_version}-#{safe_build_iteration})"]
+      end
+
       render_template(resource_path("control.erb"),
-        destination: File.join(debian_dir, "control"),
+        destination: File.join(dst_dir, "control"),
         variables: {
-          name:           safe_base_package_name,
+          name:           safe_base_package_name(debug),
           version:        safe_epoch + safe_version,
           iteration:      safe_build_iteration,
           vendor:         vendor,
           license:        license,
           architecture:   safe_architecture,
           maintainer:     project.maintainer,
-          installed_size: package_size,
+          installed_size: package_size(debug),
           homepage:       project.homepage,
           description:    project.description,
           priority:       priority,
           section:        section,
           conflicts:      project.conflicts,
           replaces:       project.replaces,
-          dependencies:   project.runtime_dependencies,
+          dependencies:   pkg_dependencies,
         }
       )
     end
@@ -253,11 +297,16 @@ module Omnibus
     #
     # @return [void]
     #
-    def write_conffiles_file
+    def write_conffiles_file(debug = false)
       return if project.config_files.empty?
 
+      dst_dir = debian_dir
+      if debug
+        dst_dir = debian_dbg_dir
+      end
+
       render_template(resource_path("conffiles.erb"),
-        destination: File.join(debian_dir, "conffiles"),
+        destination: File.join(dst_dir, "conffiles"),
         variables: {
           config_files: project.config_files,
         }
@@ -270,15 +319,23 @@ module Omnibus
     #
     # @return [void]
     #
-    def write_scripts
+    def write_scripts(debug = false)
+      dst_dir = debian_dir
+      scripts_path = project.package_scripts_path
+      if debug
+        dst_dir = debian_dbg_dir
+      end
+
       %w{preinst postinst prerm postrm}.each do |script|
-        path = File.join(project.package_scripts_path, script)
+        script_src = debug ? "#{script}-dbg" : script
+        path = File.join(scripts_path, script_src)
 
         if File.file?(path)
-          log.debug(log_key) { "Adding script `#{script}' to `#{debian_dir}' from #{path}" }
-          copy_file(path, debian_dir)
-          log.debug(log_key) { "SCRIPT FILE:  #{debian_dir}/#{script}" }
-          FileUtils.chmod(0755, File.join(debian_dir, script))
+          script_dst = File.join(dst_dir, script)
+          log.debug(log_key) { "Adding script `#{script}' to `#{dst_dir}' from #{path}" }
+          copy_file(path, script_dst)
+          log.debug(log_key) { "SCRIPT FILE:  #{dst_dir}/#{script}" }
+          FileUtils.chmod(0755, script_dst)
         end
       end
     end
@@ -289,11 +346,19 @@ module Omnibus
     #
     # @return [void]
     #
-    def write_md5_sums
+    def write_md5_sums(debug = false)
+      staging_path = staging_dir
       path = "#{staging_dir}/**/*"
+      dst_dir = debian_dir
+      if debug
+        staging_path = staging_dbg_dir
+        path = "#{staging_dbg_dir}/**/*"
+        dst_dir = debian_dbg_dir
+      end
+
       hash = FileSyncer.glob(path).inject({}) do |hash, path|
-        if File.file?(path) && !File.symlink?(path) && !(File.dirname(path) == debian_dir)
-          relative_path = path.gsub("#{staging_dir}/", "")
+        if File.file?(path) && !File.symlink?(path) && !(File.dirname(path) == dst_dir)
+          relative_path = path.gsub("#{staging_path}/", "")
           hash[relative_path] = digest(path, :md5)
         end
 
@@ -301,7 +366,7 @@ module Omnibus
       end
 
       render_template(resource_path("md5sums.erb"),
-        destination: File.join(debian_dir, "md5sums"),
+        destination: File.join(dst_dir, "md5sums"),
         variables: {
           md5sums: hash,
         }
@@ -315,36 +380,60 @@ module Omnibus
     #
     # @return [void]
     #
-    def create_deb_file
+    def create_deb_file(debug = false)
       log.info(log_key) { "Creating .deb file" }
+
+      staging_path = staging_dir
+      if debug
+        staging_path = staging_dbg_dir
+      end
 
       # Execute the build command
       Dir.chdir(Config.package_dir) do
-        shellout!("fakeroot dpkg-deb -z9 -Zgzip -D --build #{staging_dir} #{package_name}")
+        shellout!("fakeroot dpkg-deb -z9 -Zgzip -D --build #{staging_path} #{package_name(debug)}")
       end
     end
 
     #
     # The size of this Debian package. This is dynamically calculated.
     #
+    # No longer memoized.
+    #
     # @return [Fixnum]
     #
-    def package_size
-      @package_size ||= begin
-        path  = "#{project.install_dir}/**/*"
-        total = FileSyncer.glob(path).inject(0) do |size, path|
-          unless File.directory?(path) || File.symlink?(path)
-            size += File.size(path)
-          end
+    def package_size(debug = false)
+      path  = "#{project.install_dir}/**/*"
+      matches = FileSyncer.glob(path)
+      if debug
+        skip = exclusions
+      else
+        skip = exclusions + debug_package_paths
+      end
 
-          size
+      matches = matches.reject do |source_file|
+        basename = FileSyncer.relative_path_for(source_file, project.install_dir)
+        skip.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH) }
+      end
+
+      if debug and not debug_package_paths.empty?
+        matches = matches.reject do |source_file|
+          basename = FileSyncer.relative_path_for(source_file, project.install_dir)
+          debug_package_paths.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH) }
+        end
+      end
+
+      total = matches.inject(0) do |size, path|
+        unless File.directory?(path) || File.symlink?(path)
+          size += File.size(path)
         end
 
-        # Per http://www.debian.org/doc/debian-policy/ch-controlfields.html, the
-        # disk space is given as the integer value of the estimated installed
-        # size in bytes, divided by 1024 and rounded up.
-        total / 1024
+        size
       end
+
+      # Per http://www.debian.org/doc/debian-policy/ch-controlfields.html, the
+      # disk space is given as the integer value of the estimated installed
+      # size in bytes, divided by 1024 and rounded up.
+      total / 1024
     end
 
     #
@@ -353,9 +442,9 @@ module Omnibus
     #
     # @return [String]
     #
-    def safe_base_package_name
+    def safe_base_package_name(debug = false)
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
-        project.package_name.dup
+        name = project.package_name.dup
       else
         converted = project.package_name.downcase.gsub(/[^a-z0-9\.\+\-]+/, "-")
 
@@ -366,8 +455,10 @@ module Omnibus
           "`#{converted}'."
         end
 
-        converted
+        name = converted
       end
+
+      debug ? "#{name}-dbg" : name
     end
 
     #
