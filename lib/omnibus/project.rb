@@ -844,7 +844,7 @@ module Omnibus
     #
     # @return [String]
     #
-    def strip_build(val = true)
+    def strip_build(val = NULL)
       if null?(val)
         @strip_build || false
       else
