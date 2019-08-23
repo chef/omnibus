@@ -57,6 +57,18 @@ module Omnibus
       end
     end
 
+    #
+    # The list of patterns to skip (ignore) stripping files on from the
+    # project and softwares.
+    #
+    # @return [Array<String, Regexp>]
+    #
+    def strip_skip
+      project.library.components.inject(project.strip_exclude_paths) do |array, component|
+        array += component.strip_exclude_paths
+        array
+      end
+    end
 
     def strip_linux
       path = project.install_dir
@@ -66,6 +78,9 @@ module Omnibus
       yield_shellout_results("find #{path}/ -type f -exec file {} \\; | grep 'ELF' | cut -f1 -d:") do |elf|
         log.debug(log_key) { "processing: #{elf}" }
         source = elf.strip
+
+        next if strip_skip.any? { |exclude| File.fnmatch?(exclude, source, File::FNM_DOTMATCH) }
+
         debugfile = "#{source}.dbg"
         target = File.join(symboldir, debugfile)
 

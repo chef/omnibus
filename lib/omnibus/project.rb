@@ -653,6 +653,27 @@ module Omnibus
     expose :debug_path
 
     #
+    # Add a strip exclude path.
+    #
+    # Paths added here will be excluded from the stripping process.
+    #
+    # @example
+    #   strip_exclude 'foo/bar'
+    #   dependency 'quz'
+    #
+    # @param [String] val
+    #   the path to exclude from stripping
+    #
+    # @return [Array<String>]
+    #   the list of dependencies
+    #
+    def strip_exclude(pattern)
+      strip_exclude_paths << pattern
+      strip_exclude_paths.dup
+    end
+    expose :strip_exclude
+
+    #
     # Add a package that is a runtime dependency of this project.
     #
     # This is distinct from a build-time dependency, which should correspond to
@@ -961,6 +982,19 @@ module Omnibus
     #
     def debug_package_paths
       @debug_package_paths ||= []
+    end
+
+    # The list of paths to exclude in the stripping process.
+    # Paths here specified will be excluded when stripping.
+    #
+    # @see #strip_exclude
+    #
+    # @param [Array<String>]
+    #
+    # @return [Array<String>]
+    #
+    def strip_exclude_paths
+      @strip_exclude_paths ||= []
     end
 
     #
