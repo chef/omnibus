@@ -404,10 +404,14 @@ module Omnibus
     def package_size(debug = false)
       path  = "#{project.install_dir}/**/*"
       matches = FileSyncer.glob(path)
+      extended_debug_package_paths = debug_package_paths.map do |path|
+        [path, "#{path}/*"]
+      end.flatten
+
       if debug
         skip = exclusions
       else
-        skip = exclusions + debug_package_paths
+        skip = exclusions + extended_debug_package_paths
       end
 
       matches = matches.reject do |source_file|
@@ -418,7 +422,7 @@ module Omnibus
       if debug and not debug_package_paths.empty?
         matches = matches.reject do |source_file|
           basename = FileSyncer.relative_path_for(source_file, project.install_dir)
-          debug_package_paths.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH) }
+          extended_debug_package_paths.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH) }
         end
       end
 
