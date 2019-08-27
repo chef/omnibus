@@ -217,6 +217,9 @@ module Omnibus
           .with <<-EOH.gsub(/^ {12}/, "")
             chmod -Rf go-w "/Volumes/Project One"
             sync
+            hdiutil unmount "#{device}"
+            # Give some time to the system so unmount dmg
+            sleep 5
             hdiutil detach "#{device}" &&\
             hdiutil convert \\
               "#{staging_dir}/project-writable.dmg" \\
