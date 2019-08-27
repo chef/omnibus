@@ -258,6 +258,9 @@ module Omnibus
         shellout! <<-EOH.gsub(/^ {10}/, "")
           chmod -Rf go-w "/Volumes/#{volume_name}"
           sync
+          hdiutil unmount "#{@device}"
+          # Give some time to the system so unmount dmg
+          sleep 5
           hdiutil detach "#{@device}" &&  \
           hdiutil convert \\
             "#{writable_dmg}" \\
