@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "aws-sdk-s3",       "~> 1"
   gem.add_dependency "chef-sugar-ng",    ">= 3.3"
-  gem.add_dependency "cleanroom",        "~> 1.0"
+  gem.add_dependency "chef-cleanroom",   "~> 1.0"
   gem.add_dependency "ffi-yajl",         "~> 2.2"
   gem.add_dependency "mixlib-shellout",  ">= 2.0", "< 4.0"
   gem.add_dependency "ohai",             ">= 13", "< 16"
