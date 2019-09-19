@@ -1,29 +1,26 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.4 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [6.1.4](https://github.com/chef/omnibus/tree/6.1.4) (2019-09-19)
 
 #### Merged Pull Requests
+- Separate removing writable dmg [#895](https://github.com/chef/omnibus/pull/895) ([jaymalasinha](https://github.com/jaymalasinha))
+- Use architecture from platform mappings file when publishing packages [#896](https://github.com/chef/omnibus/pull/896) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Change exclude to use `**` to skip levels [#834](https://github.com/chef/omnibus/pull/834) ([richardc](https://github.com/richardc))
+- Pretty print version manifest to pkg folder [#839](https://github.com/chef/omnibus/pull/839) ([balasankarc](https://github.com/balasankarc))
+- Unmount dmg before detaching [#897](https://github.com/chef/omnibus/pull/897) ([jaymalasinha](https://github.com/jaymalasinha))
 - use chef-fauxhai, chef-sugar-ng and chef-cleanroom gems [#903](https://github.com/chef/omnibus/pull/903) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_release -->
-<!-- release_rollup since=6.0.30 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- use chef-fauxhai, chef-sugar-ng and chef-cleanroom gems [#903](https://github.com/chef/omnibus/pull/903) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.4 -->
-- Unmount dmg before detaching [#897](https://github.com/chef/omnibus/pull/897) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 6.1.3 -->
-- Pretty print version manifest to pkg folder [#839](https://github.com/chef/omnibus/pull/839) ([balasankarc](https://github.com/balasankarc)) <!-- 6.1.2 -->
-- Change exclude to use `**` to skip levels [#834](https://github.com/chef/omnibus/pull/834) ([richardc](https://github.com/richardc)) <!-- 6.1.1 -->
-- Use architecture from platform mappings file when publishing packages [#896](https://github.com/chef/omnibus/pull/896) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 6.1.0 -->
-- Separate removing writable dmg [#895](https://github.com/chef/omnibus/pull/895) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 6.0.31 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [6.0.30](https://github.com/chef/omnibus/tree/6.0.30) (2019-06-13)
 
 #### Merged Pull Requests
 - Add buildkite PR verification to expeditor [#891](https://github.com/chef/omnibus/pull/891) ([tas50](https://github.com/tas50))
 - Switch off my fork of rspec-json_expectations &amp; fix spec failures [#885](https://github.com/chef/omnibus/pull/885) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [v6.0.25](https://github.com/chef/omnibus/tree/v6.0.25) (2019-04-16)
 
