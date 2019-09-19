@@ -34,7 +34,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "mixlib-versioning"
   gem.add_dependency "pedump"
 
-  gem.add_development_dependency "artifactory", "~> 2.0"
+  gem.add_development_dependency "artifactory", "~> 3.0"
   gem.add_development_dependency "aruba",       "~> 0.5"
   gem.add_development_dependency "chefstyle",   "= 0.12"
   gem.add_development_dependency "fauxhai",     ">= 5.2"
