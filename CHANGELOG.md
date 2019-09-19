@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.3 -->
-## [6.1.3](https://github.com/chef/omnibus/tree/6.1.3) (2019-08-28)
+<!-- latest_release 6.1.4 -->
+## [6.1.4](https://github.com/chef/omnibus/tree/6.1.4) (2019-09-19)
 
 #### Merged Pull Requests
-- Unmount dmg before detaching [#897](https://github.com/chef/omnibus/pull/897) ([jaymalasinha](https://github.com/jaymalasinha))
+- use chef-fauxhai, chef-sugar-ng and chef-cleanroom gems [#903](https://github.com/chef/omnibus/pull/903) ([lamont-granquist](https://github.com/lamont-granquist))
 <!-- latest_release -->
 <!-- release_rollup since=6.0.30 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- use chef-fauxhai, chef-sugar-ng and chef-cleanroom gems [#903](https://github.com/chef/omnibus/pull/903) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.4 -->
 - Unmount dmg before detaching [#897](https://github.com/chef/omnibus/pull/897) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 6.1.3 -->
 - Pretty print version manifest to pkg folder [#839](https://github.com/chef/omnibus/pull/839) ([balasankarc](https://github.com/balasankarc)) <!-- 6.1.2 -->
 - Change exclude to use `**` to skip levels [#834](https://github.com/chef/omnibus/pull/834) ([richardc](https://github.com/richardc)) <!-- 6.1.1 -->
