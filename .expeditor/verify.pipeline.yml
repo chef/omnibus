@@ -26,3 +26,30 @@ steps:
     executor:
       docker:
         image: ruby:2.6-stretch
+
+- label: run-specs-windows-unit-2.6
+  command:
+    - /workdir/.expeditor/buildkite/verify-unit.ps1
+  expeditor:
+    executor:
+      docker:
+        host_os: windows
+        shell: ["powershell", "-Command"]
+
+- label: run-specs-windows-functional-2.6
+  command:
+    - /workdir/.expeditor/buildkite/verify-funct.ps1
+  expeditor:
+    executor:
+      docker:
+        host_os: windows
+        shell: ["powershell", "-Command"]
+
+- label: run-specs-windows-acceptance-2.6
+  command:
+    - /workdir/.expeditor/buildkite/verify-accept.ps1
+  expeditor:
+    executor:
+      docker:
+        host_os: windows
+        shell: ["powershell", "-Command"]
