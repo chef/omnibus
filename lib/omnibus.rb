@@ -63,11 +63,12 @@ module Omnibus
   autoload :ThreadPool,       "omnibus/thread_pool"
   autoload :Licensing,        "omnibus/licensing"
 
-  autoload :GitFetcher,  "omnibus/fetchers/git_fetcher"
-  autoload :NetFetcher,  "omnibus/fetchers/net_fetcher"
-  autoload :NullFetcher, "omnibus/fetchers/null_fetcher"
-  autoload :PathFetcher, "omnibus/fetchers/path_fetcher"
-  autoload :FileFetcher, "omnibus/fetchers/file_fetcher"
+  autoload :GitFetcher,         "omnibus/fetchers/git_fetcher"
+  autoload :NetFetcher,         "omnibus/fetchers/net_fetcher"
+  autoload :ArtifactoryFetcher, "omnibus/fetchers/artifactory_fetcher"
+  autoload :NullFetcher,        "omnibus/fetchers/null_fetcher"
+  autoload :PathFetcher,        "omnibus/fetchers/path_fetcher"
+  autoload :FileFetcher,        "omnibus/fetchers/file_fetcher"
 
   autoload :ArtifactoryPublisher, "omnibus/publishers/artifactory_publisher"
   autoload :NullPublisher,        "omnibus/publishers/null_publisher"

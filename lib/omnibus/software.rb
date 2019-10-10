@@ -298,7 +298,8 @@ module Omnibus
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
           :cookie, :warning, :unsafe, :extract, :cached_name, :authorization, # used by net_fetcher
           :options, # used by path_fetcher
-          :submodules # used by git_fetcher
+          :submodules, # used by git_fetcher
+          :repository, :filename_pattern, :endpoint # used by artifactory_fetcher
         ]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
