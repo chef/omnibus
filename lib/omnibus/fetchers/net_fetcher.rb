@@ -45,6 +45,17 @@ module Omnibus
     end
 
     #
+    # A extract is required if the downloaded_file is an archive and
+    # source[:extract] is set to true if provided. Default: true
+    #
+    # @return [true, false]
+    #
+    def extract_required?
+      return false unless downloaded_file.end_with?(*ALL_EXTENSIONS)
+      !source.key?(:extract) ? true : source[:extract]
+    end
+
+    #
     # The version identifier for this remote location. This is computed using
     # the name of the software, the version of the software, and the checksum.
     #
@@ -182,11 +193,15 @@ module Omnibus
     # is copied over as a raw file.
     #
     def deploy
-      if downloaded_file.end_with?(*ALL_EXTENSIONS)
+      if downloaded_file.end_with?(*ALL_EXTENSIONS) && extract_required?
         log.info(log_key) { "Extracting `#{safe_downloaded_file}' to `#{safe_project_dir}'" }
         extract
       else
-        log.info(log_key) { "`#{safe_downloaded_file}' is not an archive - copying to `#{safe_project_dir}'" }
+        if extract_required?
+          log.info(log_key) { "`#{safe_downloaded_file}' has extraction disabled - copying to `#{safe_project_dir}'" }
+        else
+          log.info(log_key) { "`#{safe_downloaded_file}' is not an archive - copying to `#{safe_project_dir}'" }
+        end
 
         if File.directory?(downloaded_file)
           # If the file itself was a directory, copy the whole thing over. This
