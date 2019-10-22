@@ -219,6 +219,7 @@ module Omnibus
       it_behaves_like "a version manipulator", "fedora", "11.5", "11"
       it_behaves_like "a version manipulator", "freebsd", "10.0", "10"
       it_behaves_like "a version manipulator", "gentoo", "4.9.95-gentoo", "rolling"
+      it_behaves_like "a version manipulator", "kali", "rolling", "rolling"
       it_behaves_like "a version manipulator", "mac_os_x", "10.9.1", "10.9"
       it_behaves_like "a version manipulator", "omnios", "r151010", "r151010"
       it_behaves_like "a version manipulator", "openbsd", "5.4.4", "5.4"
