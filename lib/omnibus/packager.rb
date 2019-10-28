@@ -19,17 +19,18 @@ module Omnibus
     include Logging
     include Sugarable
 
-    autoload :Base,     "omnibus/packagers/base"
-    autoload :BFF,      "omnibus/packagers/bff"
-    autoload :DEB,      "omnibus/packagers/deb"
-    autoload :Makeself, "omnibus/packagers/makeself"
-    autoload :MSI,      "omnibus/packagers/msi"
-    autoload :APPX,     "omnibus/packagers/appx"
-    autoload :PKG,      "omnibus/packagers/pkg"
-    autoload :PKGSRC,   "omnibus/packagers/pkgsrc"
-    autoload :Solaris,  "omnibus/packagers/solaris"
-    autoload :IPS,      "omnibus/packagers/ips"
-    autoload :RPM,      "omnibus/packagers/rpm"
+    autoload :Base,           "omnibus/packagers/base"
+    autoload :BFF,            "omnibus/packagers/bff"
+    autoload :DEB,            "omnibus/packagers/deb"
+    autoload :Makeself,       "omnibus/packagers/makeself"
+    autoload :MSI,            "omnibus/packagers/msi"
+    autoload :APPX,           "omnibus/packagers/appx"
+    autoload :PKG,            "omnibus/packagers/pkg"
+    autoload :PKGSRC,         "omnibus/packagers/pkgsrc"
+    autoload :Solaris,        "omnibus/packagers/solaris"
+    autoload :IPS,            "omnibus/packagers/ips"
+    autoload :RPM,            "omnibus/packagers/rpm"
+    autoload :InstallBuilder, "omnibus/packagers/installbuilder"
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -41,14 +42,14 @@ module Omnibus
       "debian" => DEB,
       "fedora" => RPM,
       "suse" => RPM,
-      "rhel" => RPM,
+      "rhel" => [RPM, InstallBuilder],
       "wrlinux" => RPM,
       "amazon" => RPM,
       "aix" => BFF,
       "solaris" => Solaris,
       "omnios" => IPS,
       "ips" => IPS,
-      "windows" => [MSI, APPX],
+      "windows" => [MSI, APPX, InstallBuilder],
       "mac_os_x" => PKG,
       "smartos" => PKGSRC,
     }.freeze
