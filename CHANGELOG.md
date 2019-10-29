@@ -1,20 +1,18 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.7 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [6.1.7](https://github.com/chef/omnibus/tree/6.1.7) (2019-10-29)
 
 #### Merged Pull Requests
+- Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow))
+- add `kali` as rolling OS [#907](https://github.com/chef/omnibus/pull/907) ([jmartin-r7](https://github.com/jmartin-r7))
 - Update artifactory requirement from ~&gt; 2.0 to ~&gt; 3.0 [#899](https://github.com/chef/omnibus/pull/899) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
-<!-- latest_release -->
-<!-- release_rollup since=6.1.4 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update artifactory requirement from ~&gt; 2.0 to ~&gt; 3.0 [#899](https://github.com/chef/omnibus/pull/899) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.7 -->
-- add `kali` as rolling OS [#907](https://github.com/chef/omnibus/pull/907) ([jmartin-r7](https://github.com/jmartin-r7)) <!-- 6.1.6 -->
-- Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 6.1.5 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [6.1.4](https://github.com/chef/omnibus/tree/6.1.4) (2019-09-19)
 
 #### Merged Pull Requests
@@ -24,7 +22,6 @@
 - Pretty print version manifest to pkg folder [#839](https://github.com/chef/omnibus/pull/839) ([balasankarc](https://github.com/balasankarc))
 - Unmount dmg before detaching [#897](https://github.com/chef/omnibus/pull/897) ([jaymalasinha](https://github.com/jaymalasinha))
 - use chef-fauxhai, chef-sugar-ng and chef-cleanroom gems [#903](https://github.com/chef/omnibus/pull/903) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_stable_release -->
 
 ## [6.0.30](https://github.com/chef/omnibus/tree/6.0.30) (2019-06-13)
 
