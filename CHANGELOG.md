@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 6.1.5 -->
+## [6.1.5](https://github.com/chef/omnibus/tree/6.1.5) (2019-10-29)
+
+#### Merged Pull Requests
+- Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=6.1.4 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 6.1.5 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [6.1.4](https://github.com/chef/omnibus/tree/6.1.4) (2019-09-19)
