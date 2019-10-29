@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.5 -->
-## [6.1.5](https://github.com/chef/omnibus/tree/6.1.5) (2019-10-29)
+<!-- latest_release 6.1.6 -->
+## [6.1.6](https://github.com/chef/omnibus/tree/6.1.6) (2019-10-29)
 
 #### Merged Pull Requests
-- Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow))
+- add `kali` as rolling OS [#907](https://github.com/chef/omnibus/pull/907) ([jmartin-r7](https://github.com/jmartin-r7))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.4 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- add `kali` as rolling OS [#907](https://github.com/chef/omnibus/pull/907) ([jmartin-r7](https://github.com/jmartin-r7)) <!-- 6.1.6 -->
 - Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 6.1.5 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
