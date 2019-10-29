@@ -133,8 +133,11 @@ MAC_WHITELIST_LIBS = [
   /libffi\.dylib/,
   /libncurses\.5\.4\.dylib/,
   /libiconv/,
+  /libidn2\.0\.dylib/,
   /libstdc\+\+\.6\.dylib/,
   /libc\+\+\.1\.dylib/,
+  /libc\+\+\.1\.dylib/,
+  /libzstd\.1\.dylib/,
   /Security/,
 ].freeze
 
