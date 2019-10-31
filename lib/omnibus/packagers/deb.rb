@@ -207,7 +207,7 @@ module Omnibus
       if null?(val)
         @compression_type || :gzip
       else
-        unless val.is_a?(Symbol) && [:gzip, :xz, :none].member?(val)
+        unless val.is_a?(Symbol) && %i{gzip xz none}.member?(val)
           raise InvalidValue.new(:compression_type, "be a Symbol (:gzip, :xz, or :none)")
         end
 
@@ -261,7 +261,7 @@ module Omnibus
         @compression_strategy
       else
         unless val.is_a?(Symbol) &&
-            [:filtered, :huffman, :rle, :fixed, :extreme].member?(val)
+            %i{filtered huffman rle fixed extreme}.member?(val)
           raise InvalidValue.new(:compression_strategy, "be a Symbol (:filtered, "\
                                                         ":huffman, :rle, :fixed, or :extreme)")
         end
@@ -320,8 +320,7 @@ module Omnibus
           conflicts: project.conflicts,
           replaces: project.replaces,
           dependencies: project.runtime_dependencies,
-        }
-      )
+        })
     end
 
     #
@@ -336,8 +335,7 @@ module Omnibus
         destination: File.join(debian_dir, "conffiles"),
         variables: {
           config_files: project.config_files,
-        }
-      )
+        })
     end
 
     #
@@ -380,8 +378,7 @@ module Omnibus
         destination: File.join(debian_dir, "md5sums"),
         variables: {
           md5sums: hash,
-        }
-      )
+        })
     end
 
     #
@@ -421,7 +418,7 @@ module Omnibus
     #
     # @return [void]
     def sign_deb_file
-      if !signing_passphrase
+      unless signing_passphrase
         log.info(log_key) { "Signing not enabled for .deb file" }
         return
       end
@@ -447,7 +444,7 @@ module Omnibus
             # Create signature (as +root+)
             gpg_command =  "#{gpg} --armor --sign --detach-sign"
             gpg_command << " --local-user '#{project.maintainer}'"
-            gpg_command << " --homedir #{ENV['HOME']}/.gnupg" # TODO: Make this configurable
+            gpg_command << " --homedir #{ENV["HOME"]}/.gnupg" # TODO: Make this configurable
             ## pass the +signing_passphrase+ via +STDIN+
             gpg_command << " --batch --no-tty"
             ## Check `gpg` for the compatibility/need of pinentry-mode

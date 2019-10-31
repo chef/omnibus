@@ -46,8 +46,7 @@ module Omnibus
           environment: {
             "TICKLE_ME" => "elmo",
             "I_LOVE_YOU" => "barney",
-          }
-        )
+          })
       end
 
       context "when the command fails" do

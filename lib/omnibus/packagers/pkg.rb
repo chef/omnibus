@@ -44,8 +44,7 @@ module Omnibus
           maintainer: project.maintainer,
           build_version: project.build_version,
           package_name: project.package_name,
-        }
-      )
+        })
 
       # Render the welcome template
       render_template(resource_path("welcome.html.erb"),
@@ -56,8 +55,7 @@ module Omnibus
           maintainer: project.maintainer,
           build_version: project.build_version,
           package_name: project.package_name,
-        }
-      )
+        })
 
       # "Render" the assets
       copy_file(resource_path("background.png"), "#{resources_dir}/background.png")
@@ -221,8 +219,7 @@ module Omnibus
           identifier: safe_identifier,
           version: safe_version,
           component_pkg: component_pkg,
-        }
-      )
+        })
     end
 
     #

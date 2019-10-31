@@ -181,10 +181,12 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:iwix_light_delay_validation, "be TrueClass or FalseClass")
       end
+
       @delay_validation ||= val
       unless @delay_validation
         return ""
       end
+
       "-sval"
     end
     expose :wix_light_delay_validation
@@ -225,6 +227,7 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:bundle_msi, "be TrueClass or FalseClass")
       end
+
       @bundle_msi ||= val
     end
     expose :bundle_msi
@@ -244,6 +247,7 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:fast_msi, "be TrueClass or FalseClass")
       end
+
       @fast_msi ||= val
     end
     expose :fast_msi
@@ -298,6 +302,7 @@ module Omnibus
 
       raise "Could not find `#{search_pattern}'!" if file_paths.none?
       raise "Multiple possible matches of `#{search_pattern}'! : #{file_paths}" if file_paths.count > 1
+
       file_paths.first.relative_path_from(install_path).to_s
     end
     expose :gem_path
@@ -340,8 +345,7 @@ module Omnibus
           name: project.package_name,
           friendly_name: project.friendly_name,
           maintainer: project.maintainer,
-        }
-      )
+        })
     end
 
     #
@@ -360,8 +364,7 @@ module Omnibus
           parameters: parameters,
           version: windows_package_version,
           display_version: msi_display_version,
-        }
-      )
+        })
     end
 
     #
@@ -408,8 +411,7 @@ module Omnibus
           hierarchy: hierarchy,
           fastmsi: fast_msi,
           wix_install_dir: wix_install_dir,
-        }
-      )
+        })
     end
 
     #
@@ -429,8 +431,7 @@ module Omnibus
           version: windows_package_version,
           display_version: msi_display_version,
           msi: windows_safe_path(Config.package_dir, msi_name),
-        }
-      )
+        })
     end
 
     #
@@ -487,7 +488,7 @@ module Omnibus
           -ext WixBalExtension
           #{wix_extension_switches(wix_candle_extensions)}
           -dOmnibusCacheDir="#{windows_safe_path(File.expand_path(Config.cache_dir))}"
-          "#{windows_safe_path(staging_dir, 'bundle.wxs')}"
+          "#{windows_safe_path(staging_dir, "bundle.wxs")}"
         EOH
       else
         <<-EOH.split.join(" ").squeeze(" ").strip
@@ -496,7 +497,7 @@ module Omnibus
             #{wix_candle_flags}
             #{wix_extension_switches(wix_candle_extensions)}
             -dProjectSourceDir="#{windows_safe_path(project.install_dir)}" "project-files.wxs"
-            "#{windows_safe_path(staging_dir, 'source.wxs')}"
+            "#{windows_safe_path(staging_dir, "source.wxs")}"
         EOH
       end
     end
@@ -588,7 +589,7 @@ module Omnibus
     # @return [String]
     #
     def wix_extension_switches(arr)
-      "#{arr.map { |e| "-ext '#{e}'" }.join(' ')}"
+      "#{arr.map { |e| "-ext '#{e}'" }.join(" ")}"
     end
   end
 end

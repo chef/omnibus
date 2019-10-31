@@ -235,7 +235,8 @@ module Omnibus
       clean_patch_path = patch_path
       if windows?
         clean_patch_path = Pathname.new(patch_path).relative_path_from(
-          Pathname.new(software.project_dir)).to_s
+          Pathname.new(software.project_dir)
+        ).to_s
       end
 
       if target
@@ -385,6 +386,7 @@ module Omnibus
             if app_software.nil?
               raise "could not find software definition for #{software_name}, add a dependency to it, or pass a lockdir argument to appbundle command."
             end
+
             app_software.project_dir
           end
 
@@ -500,8 +502,7 @@ module Omnibus
         render_template(source_path,
           destination: dest,
           mode:        mode,
-          variables:   vars
-        )
+          variables:   vars)
       end
     end
     expose :erb
@@ -596,7 +597,7 @@ module Omnibus
     #
     def strip(path)
       regexp_ends = ".*(" + IGNORED_ENDINGS.map { |e| e.gsub(/\./, '\.') }.join("|") + ")$"
-      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(/\//, '\/') + ".*" }.join("|")
+      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(%r{/}, '\/') + ".*" }.join("|")
       regexp = regexp_ends + "|" + regexp_patterns
 
       # Do not actually care if strip runs on non-strippable file, as its a no-op.  Hence the `|| true` appended.
@@ -727,7 +728,7 @@ module Omnibus
     #       config.guess.to. Default: "."
     #     install [Array<Symbol>] parts of config.guess to copy.
     #       Default: [:config_guess, :config_sub]
-    def update_config_guess(target: ".", install: [:config_guess, :config_sub])
+    def update_config_guess(target: ".", install: %i{config_guess config_sub})
       build_commands << BuildCommand.new("update_config_guess `target: #{target} install: #{install.inspect}'") do
         config_guess_dir = "#{install_dir}/embedded/lib/config_guess"
         %w{config.guess config.sub}.each do |c|

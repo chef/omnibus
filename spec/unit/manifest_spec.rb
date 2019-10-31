@@ -45,7 +45,7 @@ module Omnibus
         second = ManifestEntry.new("wombat", {})
         subject.add("foobar", first)
         subject.add("wombat", second)
-        expect(subject.entry_names).to eq([:foobar, :wombat])
+        expect(subject.entry_names).to eq(%i{foobar wombat})
       end
     end
 

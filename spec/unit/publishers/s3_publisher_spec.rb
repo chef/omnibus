@@ -9,8 +9,7 @@ module Omnibus
         path: "/path/to/files/chef.deb",
         name: "chef.deb",
         content: "BINARY",
-        validate!: true
-      )
+        validate!: true)
     end
 
     let(:metadata) do
@@ -24,8 +23,7 @@ module Omnibus
         platform_version: "14.04",
         arch: "x86_64",
         sha1: "SHA1",
-        md5: "ABCDEF123456"
-      )
+        md5: "ABCDEF123456")
     end
 
     let(:packages) { [package] }

@@ -80,7 +80,7 @@ module Omnibus
     #   populated with results of the command.
     #
     def shellout(*args)
-      options = args.last.kind_of?(Hash) ? args.pop : {}
+      options = args.last.is_a?(Hash) ? args.pop : {}
       options = SHELLOUT_OPTIONS.merge(options)
 
       command_string = args.join(" ")
@@ -158,6 +158,7 @@ module Omnibus
       yield
     rescue Exception => e
       raise e unless retried_exceptions.any? { |eclass| e.is_a?(eclass) }
+
       if retries != 0
         log.info(log_key) { "Retrying failed #{logstr} due to #{e} (#{retries} retries left)..." }
         retries -= 1
@@ -196,7 +197,7 @@ module Omnibus
     #
     def compiler_safe_path(*pieces)
       path = File.join(*pieces)
-      path = path.sub(/^([A-Za-z]):\//, "/\\1/") if ENV["MSYSTEM"]
+      path = path.sub(%r{^([A-Za-z]):/}, "/\\1/") if ENV["MSYSTEM"]
       path
     end
 

@@ -142,6 +142,7 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:skip_packager, "be TrueClass or FalseClass")
       end
+
       @skip_package ||= val
     end
     expose :skip_packager

@@ -134,6 +134,7 @@ module Omnibus
     def has_timestamp?(version)
       _ver, build_info = version.split("+")
       return false if build_info.nil?
+
       build_info.split(".").any? do |part|
         begin
           Time.strptime(part, Omnibus::BuildVersion::TIMESTAMP_FORMAT)

@@ -305,7 +305,7 @@ module Omnibus
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
         end
 
-        duplicate_keys = val.keys & [:git, :file, :path, :url]
+        duplicate_keys = val.keys & %i{git file path url}
         unless duplicate_keys.size < 2
           raise InvalidValue.new(:source,
             "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
@@ -509,7 +509,7 @@ module Omnibus
     #   the list of currently whitelisted files
     #
     def whitelist_file(file)
-      file = Regexp.new(file) unless file.kind_of?(Regexp)
+      file = Regexp.new(file) unless file.is_a?(Regexp)
       whitelist_files << file
       whitelist_files.dup
     end

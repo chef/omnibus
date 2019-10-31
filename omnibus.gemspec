@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/{*,.kitchen*}")
   gem.bindir = "bin"
   gem.executables = %w{omnibus}
-  gem.test_files = gem.files.grep(/^(test|spec|features)\//)
+  gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
   gem.add_dependency "aws-sdk-s3",       "~> 1"
