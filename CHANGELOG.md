@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.8 -->
-## [6.1.8](https://github.com/chef/omnibus/tree/6.1.8) (2019-10-31)
+<!-- latest_release 6.1.9 -->
+## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-10-31)
 
 #### Merged Pull Requests
-- force builds nil versions [#619](https://github.com/chef/omnibus/pull/619) ([lamont-granquist](https://github.com/lamont-granquist))
+- Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.7 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.9 -->
 - force builds nil versions [#619](https://github.com/chef/omnibus/pull/619) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.8 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
