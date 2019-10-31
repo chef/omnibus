@@ -243,7 +243,7 @@ module Omnibus
       if null?(val)
         @compression_type || :gzip
       else
-        unless val.is_a?(Symbol) && [:gzip, :bzip2, :xz].member?(val)
+        unless val.is_a?(Symbol) && %i{gzip bzip2 xz}.member?(val)
           raise InvalidValue.new(:compression_type, "be a Symbol (:gzip, :bzip2, or :xz)")
         end
 
@@ -317,7 +317,7 @@ module Omnibus
     # @return [Array]
     #
     def filesystem_directories
-      @filesystem_directories ||= IO.readlines(resource_path("filesystem_list")).map { |f| f.chomp }
+      @filesystem_directories ||= IO.readlines(resource_path("filesystem_list")).map(&:chomp)
     end
 
     #
@@ -356,7 +356,7 @@ module Omnibus
 
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir}/**/*")
-                .map { |path| build_filepath(path) }
+        .map { |path| build_filepath(path) }
 
       render_template(resource_path("spec.erb"),
         destination: spec_file,
@@ -383,8 +383,7 @@ module Omnibus
           build_dir: build_dir,
           platform_family: Ohai["platform_family"],
           compression: compression,
-        }
-      )
+        })
     end
 
     #
@@ -422,8 +421,8 @@ module Omnibus
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
 
-        if File.exist?("#{ENV['HOME']}/.rpmmacros")
-          log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
+        if File.exist?("#{ENV["HOME"]}/.rpmmacros")
+          log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}'" }
           home = ENV["HOME"]
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
@@ -435,9 +434,8 @@ module Omnibus
             destination: "#{home}/.rpmmacros",
             variables: {
               gpg_name: project.maintainer,
-              gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
-            }
-          )
+              gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
+            })
         end
 
         command << " --sign"
@@ -466,11 +464,13 @@ module Omnibus
     def build_filepath(path)
       filepath = rpm_safe("/" + path.gsub("#{build_dir}/", ""))
       return if config_files.include?(filepath)
+
       full_path = build_dir + filepath.gsub("[%]", "%")
       # FileSyncer.glob quotes pathnames that contain spaces, which is a problem on el7
       full_path.delete!('"')
       # Mark directories with the %dir directive to prevent rpmbuild from counting their contents twice.
       return mark_filesystem_directories(filepath) if !File.symlink?(full_path) && File.directory?(full_path)
+
       filepath
     end
 
@@ -502,8 +502,7 @@ module Omnibus
         mode: 0700,
         variables: {
           passphrase: signing_passphrase,
-        }
-      )
+        })
 
       # Yield the destination to the block
       yield(destination)

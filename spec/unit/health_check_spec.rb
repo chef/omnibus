@@ -8,9 +8,7 @@ module Omnibus
         name: "chefdk",
         install_dir: "/opt/chefdk",
         library: double(Library,
-          components: []
-        )
-      )
+          components: []))
     end
 
     def mkdump(base, size, x64 = false)
@@ -19,9 +17,7 @@ module Omnibus
         x64?: x64,
         ioh: double(x64 ? PEdump::IMAGE_OPTIONAL_HEADER64 : PEdump::IMAGE_OPTIONAL_HEADER32,
           ImageBase: base,
-          SizeOfImage: size
-        )
-      )
+          SizeOfImage: size))
       expect(dump).to receive(:pe).and_return(pe)
       dump
     end

@@ -69,7 +69,7 @@ module Omnibus
     #
     def packages
       @packages ||= begin
-        publish_packages = Array.new
+        publish_packages = []
         build_packages   = FileSyncer.glob(@pattern).map { |path| Package.new(path) }
 
         if @options[:platform_mappings]
@@ -88,7 +88,7 @@ module Omnibus
             if packages.empty?
               log.warn(log_key) do
                 "Could not locate a package for build platform #{build_platform}-#{build_platform_version}-#{build_architecture}. " \
-                "Publishing will be skipped for: #{publish_platforms.join(', ')}"
+                "Publishing will be skipped for: #{publish_platforms.join(", ")}"
               end
             end
 

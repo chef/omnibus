@@ -1015,6 +1015,7 @@ module Omnibus
     #
     def dirty!(software)
       raise ProjectAlreadyDirty.new(self) if culprit
+
       @culprit = software
     end
 

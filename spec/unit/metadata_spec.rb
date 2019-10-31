@@ -16,8 +16,7 @@ module Omnibus
         md5:    "abc123",
         sha1:   "abc123",
         sha256: "abcd1234",
-        sha512: "abcdef123456"
-      )
+        sha512: "abcdef123456")
     end
 
     let(:project) do
@@ -29,15 +28,13 @@ module Omnibus
         build_iteration:  "1",
         license:          "Apache-2.0",
         built_manifest:    double(Manifest,
-                                  to_hash: {
-                                    manifest_format: 2,
-                                    build_version: "1.2.3",
-                                    build_git_revision: "SHA",
-                                    license: "Apache-2.0",
-                                  }
-                                ),
-        license_file_path: license_path
-      )
+          to_hash: {
+            manifest_format: 2,
+            build_version: "1.2.3",
+            build_git_revision: "SHA",
+            license: "Apache-2.0",
+          }),
+        license_file_path: license_path)
     end
 
     let(:data) { { foo: "bar" } }

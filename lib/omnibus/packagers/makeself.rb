@@ -81,8 +81,7 @@ module Omnibus
         destination: makeselfinst_staging_path,
         variables: {
           install_dir: project.install_dir,
-        }
-      )
+        })
       FileUtils.chmod(0755, makeselfinst_staging_path)
     end
 
