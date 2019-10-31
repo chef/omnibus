@@ -70,7 +70,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with "cd #{project.install_dir} && find . -type l -or -type f | sort >> #{staging_dir}/packlist"
         subject.write_packlist
-        expect(File.read("#{staging_dir}/packlist")).to match(/@pkgdir \/opt\/project/)
+        expect(File.read("#{staging_dir}/packlist")).to match(%r{@pkgdir /opt/project})
       end
     end
   end

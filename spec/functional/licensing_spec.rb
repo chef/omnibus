@@ -37,14 +37,14 @@ module Omnibus
         expect(project_license).to match /This product bundles private_code 1.7.2,\nwhich is available under a "Unspecified"/
         expect(project_license).to match /This product bundles snoopy 1.0.0,\nwhich is available under a "GPL v2"/
         expect(project_license).not_to match /preparation/
-        expect(project_license).to match /LICENSES\/snoopy-artistic.html/
-        expect(project_license).to match /LICENSES\/snoopy-NOTICE/
+        expect(project_license).to match %r{LICENSES/snoopy-artistic.html}
+        expect(project_license).to match %r{LICENSES/snoopy-NOTICE}
         if zlib_version_override
           expect(project_license).to match /This product bundles zlib 1.8.0,\nwhich is available under a "Apache-2.0"/
-          expect(project_license).to match /LICENSES\/zlib-APACHE/
+          expect(project_license).to match %r{LICENSES/zlib-APACHE}
         else
           expect(project_license).to match /This product bundles zlib 1.7.2,\nwhich is available under a "Zlib"/
-          expect(project_license).to match /LICENSES\/zlib-LICENSE/
+          expect(project_license).to match %r{LICENSES/zlib-LICENSE}
         end
       end
 
@@ -263,7 +263,7 @@ module Omnibus
       it "should log a warning for the missing file" do
         output = capture_logging { create_licenses }
         expect(output).to match(/Retrying failed download/)
-        expect(output).to match(/Can not download license file 'https:\/\/downloads.chef.io\/LICENSE' for software 'problematic'./)
+        expect(output).to match(%r{Can not download license file 'https://downloads.chef.io/LICENSE' for software 'problematic'.})
       end
     end
 

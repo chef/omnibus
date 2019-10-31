@@ -209,8 +209,7 @@ module Omnibus
         destination: transform_file,
         variables: {
           pathdir: project.install_dir.split("/")[1],
-        }
-      )
+        })
     end
 
     #
@@ -242,8 +241,7 @@ module Omnibus
       render_template_content(resource_path(symlinks_file),
         {
           projectdir: project.install_dir,
-        }
-      )
+        })
     end
 
     #
@@ -262,8 +260,7 @@ module Omnibus
           description: project.description,
           summary: project.friendly_name,
           arch: safe_architecture,
-        }
-      )
+        })
 
       # Append the contents of symlinks_file if it exists
       if symlinks_file

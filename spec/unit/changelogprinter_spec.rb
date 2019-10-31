@@ -16,16 +16,18 @@ module Omnibus
 
       let(:changelog) do
         double(ChangeLog,
-                               changelog_entries: %w{entry1 entry2},
-                               authors: %w{alice bob}) end
+          changelog_entries: %w{entry1 entry2},
+          authors: %w{alice bob})
+      end
       let(:git_changelog) do
         double(ChangeLog,
-                                   changelog_entries:
-                                   %w{sub-entry1 sub-entry2}) end
+          changelog_entries:
+          %w{sub-entry1 sub-entry2})
+      end
       let(:now) { double(Time) }
       let(:emptydiff) { EmptyManifestDiff.new }
       let(:old_manifest) do
-        m = Manifest.new()
+        m = Manifest.new
         m.add("updated-comp", manifest_entry_for("updated-comp", "v9", "v9"))
         m.add("updated-comp-2", manifest_entry_for("updated-comp-2", "someref0", "someref0", :git))
         m.add("removed-comp", manifest_entry_for("removed-comp", "v9", "v9"))
@@ -33,7 +35,7 @@ module Omnibus
         m
       end
       let(:new_manifest) do
-        m = Manifest.new()
+        m = Manifest.new
         m.add("updated-comp", manifest_entry_for("updated-comp", "v10", "v10"))
         m.add("updated-comp-2", manifest_entry_for("updated-comp-2", "someotherref", "someotherref", :git))
         m.add("added-comp", manifest_entry_for("added-comp", "v100", "v100"))

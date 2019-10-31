@@ -9,12 +9,12 @@ module Omnibus
       describe "#client" do
         it "raises an error if it is not overridden" do
           expect { s3_configuration }.to raise_error(RuntimeError,
-                                                     "You must override s3_configuration")
+            "You must override s3_configuration")
         end
 
         it "raises an error stating that s3_configuration must be overriden" do
           expect { client }.to raise_error(RuntimeError,
-                                           "You must override s3_configuration")
+            "You must override s3_configuration")
         end
       end
     end

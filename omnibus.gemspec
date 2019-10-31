@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/{*,.kitchen*}")
   gem.bindir = "bin"
   gem.executables = %w{omnibus}
-  gem.test_files = gem.files.grep(/^(test|spec|features)\//)
+  gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
   gem.add_dependency "aws-sdk-s3",       "~> 1"
@@ -36,7 +36,7 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency "artifactory", "~> 3.0"
   gem.add_development_dependency "aruba",       "~> 0.5"
-  gem.add_development_dependency "chefstyle",   "= 0.12"
+  gem.add_development_dependency "chefstyle",   "= 0.13.3"
   gem.add_development_dependency "fauxhai",     ">= 5.2"
   gem.add_development_dependency "rspec",       "~> 3.0"
   gem.add_development_dependency "rspec-json_expectations"

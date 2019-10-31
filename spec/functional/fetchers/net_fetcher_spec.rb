@@ -4,8 +4,7 @@ module Omnibus
   module RSpec
     module OhaiHelpers
       # Turn off the mandatory Ohai helper.
-      def stub_ohai(options = {}, &block)
-      end
+      def stub_ohai(options = {}, &block); end
     end
   end
 
@@ -29,10 +28,10 @@ module Omnibus
 
     let(:manifest_entry) do
       double(ManifestEntry,
-             name: "software",
-             locked_version: "1.2.8",
-             described_version: "1.2.8",
-             locked_source: source)
+        name: "software",
+        locked_version: "1.2.8",
+        described_version: "1.2.8",
+        locked_source: source)
     end
 
     subject { described_class.new(manifest_entry, project_dir, build_dir) }

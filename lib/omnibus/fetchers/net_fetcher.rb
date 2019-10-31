@@ -31,7 +31,7 @@ module Omnibus
     ALL_EXTENSIONS = WIN_7Z_EXTENSIONS + TAR_EXTENSIONS
 
     # Digest types used for verifying file checksums
-    DIGESTS = [:sha512, :sha256, :sha1, :md5].freeze
+    DIGESTS = %i{sha512 sha256 sha1 md5}.freeze
 
     #
     # A fetch is required if the downloaded_file (such as a tarball) does not
@@ -314,8 +314,7 @@ module Omnibus
     #
     # @return [[String]]
     #
-    def extract_command
-    end
+    def extract_command; end
 
     #
     # Primitively determine whether we should use gtar or tar to untar a file.

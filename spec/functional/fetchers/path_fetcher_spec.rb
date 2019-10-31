@@ -12,10 +12,10 @@ module Omnibus
 
     let(:manifest_entry) do
       double(Omnibus::ManifestEntry,
-             name: "pathelogical",
-             locked_version: nil,
-             described_version: nil,
-             locked_source: source)
+        name: "pathelogical",
+        locked_version: nil,
+        described_version: nil,
+        locked_source: source)
     end
 
     before do

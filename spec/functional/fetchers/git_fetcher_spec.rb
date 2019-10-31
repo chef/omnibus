@@ -110,10 +110,10 @@ module Omnibus
       let(:remote)   { remote_git_repo("zlib", annotated_tags: [version]) }
       let(:manifest_entry) do
         double(ManifestEntry,
-               name: "software",
-               locked_version: "efde208366abd0f91419d8a54b45e3f6e0540105",
-               described_version: version,
-               locked_source: source)
+          name: "software",
+          locked_version: "efde208366abd0f91419d8a54b45e3f6e0540105",
+          described_version: version,
+          locked_source: source)
       end
 
       subject { described_class.new(manifest_entry, project_dir, build_dir) }

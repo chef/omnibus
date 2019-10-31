@@ -12,7 +12,7 @@ module Omnibus
     end
 
     let(:manifest_one) do
-      m = Omnibus::Manifest.new()
+      m = Omnibus::Manifest.new
       m.add("foo", manifest_entry_for("foo", "1.2.4", "deadbeef"))
       m.add("bar", manifest_entry_for("bar", "1.2.4", "deadbeef"))
       m.add("baz", manifest_entry_for("baz", "1.2.4", "deadbeef"))
@@ -20,7 +20,7 @@ module Omnibus
     end
 
     let(:manifest_two) do
-      m = Omnibus::Manifest.new()
+      m = Omnibus::Manifest.new
       m.add("foo", manifest_entry_for("foo", "1.2.5", "deadbea0"))
       m.add("baz", manifest_entry_for("baz", "1.2.4", "deadbeef"))
       m.add("quux", manifest_entry_for("quux", "1.2.4", "deadbeef"))

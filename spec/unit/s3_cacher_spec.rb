@@ -7,9 +7,7 @@ module Omnibus
         name: "ruby",
         version: "1.9.3",
         fetcher: double(Fetcher,
-          checksum: "abcd1234"
-        )
-      )
+          checksum: "abcd1234"))
     end
 
     let(:python_27) do
@@ -17,9 +15,7 @@ module Omnibus
         name: "python",
         version: "2.7",
         fetcher: double(Fetcher,
-          checksum: "defg5678"
-        )
-      )
+          checksum: "defg5678"))
     end
 
     describe ".list" do

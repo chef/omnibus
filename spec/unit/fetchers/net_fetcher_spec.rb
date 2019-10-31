@@ -11,10 +11,10 @@ module Omnibus
 
     let(:manifest_entry) do
       double(Omnibus::ManifestEntry,
-             name: "file",
-             locked_version: "1.2.3",
-             described_version: "1.2.3",
-             locked_source: source)
+        name: "file",
+        locked_version: "1.2.3",
+        described_version: "1.2.3",
+        locked_source: source)
     end
 
     let(:cache_dir) { "/cache" }
@@ -331,11 +331,10 @@ module Omnibus
       context "when the file is a .#{extension}" do
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
-                 name: "file",
-                 locked_version: "1.2.3",
-                 described_version: "1.2.3",
-                 locked_source: { url: "https://get.example.com/file.#{extension}", md5: "abcd1234" }.merge(source_options)
-                )
+            name: "file",
+            locked_version: "1.2.3",
+            described_version: "1.2.3",
+            locked_source: { url: "https://get.example.com/file.#{extension}", md5: "abcd1234" }.merge(source_options))
         end
 
         subject { described_class.new(manifest_entry, project_dir, build_dir) }
@@ -361,10 +360,10 @@ module Omnibus
       context "when the downloaded file is a folder" do
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
-                 name: "file",
-                 locked_version: "1.2.3",
-                 described_version: "1.2.3",
-                 locked_source: { url: "https://get.example.com/folder", md5: "abcd1234" })
+            name: "file",
+            locked_version: "1.2.3",
+            described_version: "1.2.3",
+            locked_source: { url: "https://get.example.com/folder", md5: "abcd1234" })
         end
 
         subject { described_class.new(manifest_entry, project_dir, build_dir) }
@@ -382,10 +381,10 @@ module Omnibus
       context "when the downloaded file is a regular file" do
         let(:manifest_entry) do
           double(Omnibus::ManifestEntry,
-                 name: "file",
-                 locked_version: "1.2.3",
-                 described_version: "1.2.3",
-                 locked_source: { url: "https://get.example.com/file", md5: "abcd1234" })
+            name: "file",
+            locked_version: "1.2.3",
+            described_version: "1.2.3",
+            locked_source: { url: "https://get.example.com/file", md5: "abcd1234" })
         end
 
         subject { described_class.new(manifest_entry, project_dir, build_dir) }

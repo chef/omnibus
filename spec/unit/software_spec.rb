@@ -286,13 +286,13 @@ module Omnibus
         end
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
-          "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-          "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-          "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-          "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
-          "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-          "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-          "OMNIBUS_INSTALL_DIR" => "/opt/project"
+            "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "LD_RUN_PATH"     => "/opt/project/embedded/lib",
+            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
+            "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
 
@@ -313,7 +313,7 @@ module Omnibus
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
               "OMNIBUS_INSTALL_DIR" => "/opt/project"
-              )
+            )
           end
         end
       end
@@ -547,7 +547,7 @@ module Omnibus
     describe "#whitelist_file" do
       it "appends to the whitelist_files array" do
         expect(subject.whitelist_files.size).to eq(0)
-        subject.whitelist_file(/foo\/bar/)
+        subject.whitelist_file(%r{foo/bar})
         expect(subject.whitelist_files.size).to eq(1)
       end
 

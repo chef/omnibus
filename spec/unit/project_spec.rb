@@ -202,7 +202,7 @@ module Omnibus
     end
 
     describe "#build_iteration" do
-      let(:fauxhai_options) { Hash.new }
+      let(:fauxhai_options) { {} }
 
       before { stub_ohai(fauxhai_options) }
 
@@ -340,7 +340,7 @@ module Omnibus
         subject.compress(:tgz)
 
         expect(Compressor).to receive(:for_current_system)
-          .with([:dmg, :tgz])
+          .with(%i{dmg tgz})
           .and_call_original
 
         subject.compressor

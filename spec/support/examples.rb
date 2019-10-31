@@ -27,8 +27,7 @@ RSpec.shared_examples "a software" do |name = "chefdk"|
       install_dir: install_dir,
       project_dir: project_dir,
       source:      source,
-      overridden?: false
-    )
+      overridden?: false)
   end
 
   before do
@@ -56,12 +55,12 @@ RSpec.shared_examples "a software" do |name = "chefdk"|
     FileUtils.mkdir_p(embedded_bin_dir)
 
     allow(software).to receive(:with_embedded_path).and_return(
-      "PATH" => "#{bin_dir}:#{embedded_bin_dir}:#{ENV['PATH']}"
+      "PATH" => "#{bin_dir}:#{embedded_bin_dir}:#{ENV["PATH"]}"
     )
 
     allow(software).to receive(:embedded_bin) do |binary|
       p = File.join(embedded_bin_dir, binary)
-      p.gsub!(/\//, '\\') if windows?
+      p.gsub!(%r{/}, '\\') if windows?
       p
     end
   end

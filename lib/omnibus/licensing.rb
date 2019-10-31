@@ -130,8 +130,7 @@ module Omnibus
     #
     # @return [void]
     #
-    def execute_pre_build(software)
-    end
+    def execute_pre_build(software); end
 
     # Callback that gets called by Software#build_me after the build is done.
     # Invokes license copying for the given software. This ensures that
@@ -246,7 +245,7 @@ module Omnibus
 
         out << "This product bundles #{name} #{version},\n"
         out << "which is available under a \"#{license}\" License.\n"
-        if !license_files.empty?
+        unless license_files.empty?
           out << "For details, see:\n"
           license_files.each do |license_file|
             out << "#{license_package_location(name, license_file)}\n"

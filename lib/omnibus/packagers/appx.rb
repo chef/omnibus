@@ -69,8 +69,7 @@ module Omnibus
           version: windows_package_version,
           maintainer: project.maintainer,
           certificate_subject: certificate_subject.gsub('"', "&quot;"),
-        }
-      )
+        })
     end
 
     #

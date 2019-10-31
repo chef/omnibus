@@ -139,11 +139,11 @@ module Omnibus
 
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
-          .with("cd /opt && find project -print > #{File.join(staging_dir, 'files')}")
+          .with("cd /opt && find project -print > #{File.join(staging_dir, "files")}")
         expect(subject).to receive(:shellout!)
-          .with("cd /opt && pkgproto < #{File.join(staging_dir, 'files.clean')} > #{File.join(staging_dir, 'Prototype.files')}")
+          .with("cd /opt && pkgproto < #{File.join(staging_dir, "files.clean")} > #{File.join(staging_dir, "Prototype.files")}")
         expect(subject).to receive(:shellout!)
-          .with("awk '{ $5 = \"root\"; $6 = \"root\"; print }' < #{File.join(staging_dir, 'Prototype.files')} >> #{File.join(staging_dir, 'Prototype')}")
+          .with("awk '{ $5 = \"root\"; $6 = \"root\"; print }' < #{File.join(staging_dir, "Prototype.files")} >> #{File.join(staging_dir, "Prototype")}")
         subject.write_prototype_file
       end
 
@@ -158,11 +158,11 @@ module Omnibus
     describe "#create_solaris_file" do
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
-          .with("pkgmk -o -r /opt -d #{staging_dir} -f #{File.join(staging_dir, 'Prototype')}")
+          .with("pkgmk -o -r /opt -d #{staging_dir} -f #{File.join(staging_dir, "Prototype")}")
         expect(subject).to receive(:shellout!)
           .with("pkgchk -vd #{staging_dir} project")
         expect(subject).to receive(:shellout!)
-          .with("pkgtrans #{staging_dir} #{File.join(package_dir, 'project-1.2.3-1.i386.solaris')} project")
+          .with("pkgtrans #{staging_dir} #{File.join(package_dir, "project-1.2.3-1.i386.solaris")} project")
 
         subject.create_solaris_file
       end
@@ -207,11 +207,11 @@ module Omnibus
 
       it "uses the correct commands" do
         expect(subject).to receive(:shellout!)
-          .with("pkgmk -o -r /opt -d #{staging_dir} -f #{File.join(staging_dir, 'Prototype')}")
+          .with("pkgmk -o -r /opt -d #{staging_dir} -f #{File.join(staging_dir, "Prototype")}")
         expect(subject).to receive(:shellout!)
           .with("pkgchk -vd #{staging_dir} project")
         expect(subject).to receive(:shellout!)
-          .with("pkgtrans #{staging_dir} #{File.join(package_dir, 'project-1.2.3-1.i386.solaris')} project")
+          .with("pkgtrans #{staging_dir} #{File.join(package_dir, "project-1.2.3-1.i386.solaris")} project")
 
         subject.create_solaris_file
       end

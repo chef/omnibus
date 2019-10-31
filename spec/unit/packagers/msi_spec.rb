@@ -419,7 +419,7 @@ module Omnibus
         end
 
         it "outputs a source.wxs file to the staging directory" do
-          expect(subject.candle_command).to include("#{subject.windows_safe_path(staging_dir, 'source.wxs')}")
+          expect(subject.candle_command).to include("#{subject.windows_safe_path(staging_dir, "source.wxs")}")
         end
       end
 
@@ -433,7 +433,7 @@ module Omnibus
         end
 
         it "outputs a bundle.wxs file to the staging directory" do
-          expect(subject.candle_command(is_bundle: true)).to include("#{subject.windows_safe_path(staging_dir, 'bundle.wxs')}")
+          expect(subject.candle_command(is_bundle: true)).to include("#{subject.windows_safe_path(staging_dir, "bundle.wxs")}")
         end
       end
     end
