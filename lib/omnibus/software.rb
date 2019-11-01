@@ -1075,7 +1075,7 @@ module Omnibus
           log.info(log_key) do
             "Forcing a build because resolved version is nil"
           end
-          execute_build
+          execute_build(build_wrappers)
           project.dirty!(self)
         elsif project.dirty?
           log.info(log_key) do
