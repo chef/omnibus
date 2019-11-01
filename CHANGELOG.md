@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 6.1.10 -->
+## [6.1.10](https://github.com/chef/omnibus/tree/6.1.10) (2019-11-01)
+
+#### Merged Pull Requests
+- old PR that was merged was very old [#910](https://github.com/chef/omnibus/pull/910) ([lamont-granquist](https://github.com/lamont-granquist))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=6.1.9 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- old PR that was merged was very old [#910](https://github.com/chef/omnibus/pull/910) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.10 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-11-01)
