@@ -1,26 +1,23 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.9 -->
-## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-10-31)
-
-#### Merged Pull Requests
-- Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
-<!-- release_rollup since=6.1.7 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.9 -->
-- force builds nil versions [#619](https://github.com/chef/omnibus/pull/619) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.8 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-11-01)
+
+#### Merged Pull Requests
+- force builds nil versions [#619](https://github.com/chef/omnibus/pull/619) ([lamont-granquist](https://github.com/lamont-granquist))
+- Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+<!-- latest_stable_release -->
+
 ## [6.1.7](https://github.com/chef/omnibus/tree/6.1.7) (2019-10-29)
 
 #### Merged Pull Requests
 - Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow))
 - add `kali` as rolling OS [#907](https://github.com/chef/omnibus/pull/907) ([jmartin-r7](https://github.com/jmartin-r7))
 - Update artifactory requirement from ~&gt; 2.0 to ~&gt; 3.0 [#899](https://github.com/chef/omnibus/pull/899) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
-<!-- latest_stable_release -->
 
 ## [6.1.4](https://github.com/chef/omnibus/tree/6.1.4) (2019-09-19)
 
