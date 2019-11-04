@@ -1076,7 +1076,7 @@ module Omnibus
             "Forcing a build because resolved version is nil"
           end
           execute_build(build_wrappers)
-          project.dirty!(self)
+          project.dirty!(self) unless project.dirty? # omnibus can only be mildly dirty
         elsif project.dirty?
           log.info(log_key) do
             "Building because `#{project.culprit.name}' dirtied the cache"
