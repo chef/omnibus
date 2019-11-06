@@ -206,6 +206,46 @@ module Omnibus
     expose :maintainer
 
     #
+    # Sets the bin_dirs where this software installs bins.
+    #
+    # @example
+    #   bin_dirs ['/opt/chef-workstation/bin']
+    #
+    # @param [Array<String>] val
+    #   the bin_dirs of the software
+    #
+    # @return [Array<String>]
+    #
+    def bin_dirs(val = NULL)
+      if null?(val)
+        @bin_dirs || [windows_safe_path("#{install_dir}/bin"), windows_safe_path("#{install_dir}/embedded/bin")]
+      else
+        @bin_dirs = val
+      end
+    end
+    expose :bin_dirs
+
+    #
+    # Sets the lib_dirs where this software installs libs.
+    #
+    # @example
+    #   lib_dirs ['/opt/chef-workstation/bin']
+    #
+    # @param [Array<String>] val
+    #   the lib_dirs of the software
+    #
+    # @return [Array<String>]
+    #
+    def lib_dirs(val = NULL)
+      if null?(val)
+        @lib_dirs || [windows_safe_path("#{install_dir}/embedded/lib")]
+      else
+        @lib_dirs = val
+      end
+    end
+    expose :lib_dirs
+
+    #
     # Add a software dependency to this software.
     #
     # @example

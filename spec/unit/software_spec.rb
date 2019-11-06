@@ -558,6 +558,36 @@ module Omnibus
       end
     end
 
+    describe "#bin_dirs" do
+      it "sets bin_dirs" do
+        subject.bin_dirs ["my_bin_dir"]
+        expect(subject.bin_dirs).to eq(["my_bin_dir"])
+        expect(subject.bin_dirs).to be_kind_of(Array)
+      end
+
+      context "bin_dirs is not set" do
+        it "returns default values" do
+          expect(subject.bin_dirs).to eq(["/opt/project/bin", "/opt/project/embedded/bin"])
+          expect(subject.bin_dirs).to be_kind_of(Array)
+        end
+      end
+    end
+
+    describe "#lib_dirs" do
+      it "sets lib_dirs" do
+        subject.lib_dirs ["my_lib_dir"]
+        expect(subject.lib_dirs).to eq(["my_lib_dir"])
+        expect(subject.lib_dirs).to be_kind_of(Array)
+      end
+
+      context "lib_dirs is not set" do
+        it "returns default values" do
+          expect(subject.lib_dirs).to eq(["/opt/project/embedded/lib"])
+          expect(subject.lib_dirs).to be_kind_of(Array)
+        end
+      end
+    end
+
     context "testing repo-level version overrides" do
       context "without overrides" do
         it "returns the original values" do
