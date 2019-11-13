@@ -33,6 +33,7 @@ module Omnibus
       /libc\.so/,
       /libcrypt\.so/,
       /libdb-4.7\.so/,
+      /libdb-5.3\.so/,
       /libdl/,
       /libfreebl\d\.so/,
       /libgcc_s\.so/,
