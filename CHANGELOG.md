@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.12 -->
-## [6.1.12](https://github.com/chef/omnibus/tree/6.1.12) (2019-11-08)
+<!-- latest_release 6.1.13 -->
+## [6.1.13](https://github.com/chef/omnibus/tree/6.1.13) (2019-11-13)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from = 0.13.3 to = 0.14.0 [#912](https://github.com/chef/omnibus/pull/912) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50)) <!-- 6.1.13 -->
 - Update chefstyle requirement from = 0.13.3 to = 0.14.0 [#912](https://github.com/chef/omnibus/pull/912) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.12 -->
 - Don&#39;t mark the cache dirty if it already is. [#911](https://github.com/chef/omnibus/pull/911) ([btm](https://github.com/btm)) <!-- 6.1.11 -->
 - old PR that was merged was very old [#910](https://github.com/chef/omnibus/pull/910) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.10 -->
