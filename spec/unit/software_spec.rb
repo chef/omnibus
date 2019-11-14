@@ -73,9 +73,9 @@ module Omnibus
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -84,9 +84,9 @@ module Omnibus
         it "overrides LDFLAGS" do
           expect(subject.with_standard_compiler_flags("LDFLAGS" => "foo")).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -95,9 +95,9 @@ module Omnibus
         it "overrides CFLAGS" do
           expect(subject.with_standard_compiler_flags("CFLAGS" => "foo")).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -106,9 +106,9 @@ module Omnibus
         it "overrides CXXFLAGS" do
           expect(subject.with_standard_compiler_flags("CXXFLAGS" => "foo")).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -117,9 +117,9 @@ module Omnibus
         it "overrides CPPFLAGS" do
           expect(subject.with_standard_compiler_flags("CPPFLAGS" => "foo")).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -129,9 +129,9 @@ module Omnibus
           expect(subject.with_standard_compiler_flags("numberwang" => 4)).to eq(
             "numberwang"      => 4,
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -196,9 +196,9 @@ module Omnibus
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -240,9 +240,9 @@ module Omnibus
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
             "CC" => "clang",
-            "CFLAGS" => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"  => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"  => "-I/opt/project/embedded/include -O2",
+            "CFLAGS" => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"  => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"  => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "CXX" => "clang++",
             "LDFLAGS" => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH" => "/opt/project/embedded/lib",
@@ -267,9 +267,9 @@ module Omnibus
           expect(subject.with_standard_compiler_flags).to eq(
             "CC"              => "clang",
             "CXX"             => "clang++",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LDFLAGS"         => "-L/opt/project/embedded/lib",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
@@ -287,9 +287,9 @@ module Omnibus
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -307,9 +307,9 @@ module Omnibus
               "CC"              => "gcc-4.8",
               "CXX"             => "g++-4.8",
               "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-              "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+              "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+              "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+              "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
               "LD_RUN_PATH"     => "/opt/project/embedded/lib",
               "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
               "OMNIBUS_INSTALL_DIR" => "/opt/project"
@@ -328,9 +328,9 @@ module Omnibus
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
             "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2",
+            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "LD_RUN_PATH"     => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
