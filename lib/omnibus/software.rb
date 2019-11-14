@@ -671,7 +671,7 @@ module Omnibus
           {
             "CC" => "gcc -m64 -static-libgcc",
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
         when "freebsd"
           {
