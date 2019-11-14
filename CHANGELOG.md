@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.13 -->
-## [6.1.13](https://github.com/chef/omnibus/tree/6.1.13) (2019-11-13)
+<!-- latest_release 6.1.14 -->
+## [6.1.14](https://github.com/chef/omnibus/tree/6.1.14) (2019-11-14)
 
 #### Merged Pull Requests
-- Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50))
+- Remove Solaris 10 platform and enable some hardening flags on Linux/Mac/FreeBSD [#915](https://github.com/chef/omnibus/pull/915) ([lamont-granquist](https://github.com/lamont-granquist))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Remove Solaris 10 platform and enable some hardening flags on Linux/Mac/FreeBSD [#915](https://github.com/chef/omnibus/pull/915) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.14 -->
 - Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50)) <!-- 6.1.13 -->
 - Update chefstyle requirement from = 0.13.3 to = 0.14.0 [#912](https://github.com/chef/omnibus/pull/912) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.12 -->
 - Don&#39;t mark the cache dirty if it already is. [#911](https://github.com/chef/omnibus/pull/911) ([btm](https://github.com/btm)) <!-- 6.1.11 -->
