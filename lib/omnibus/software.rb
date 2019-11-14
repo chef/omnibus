@@ -668,33 +668,22 @@ module Omnibus
             "ARFLAGS" => "-X64 cru",
           }
         when "solaris2"
-          if platform_version.satisfies?("<= 5.10")
-            solaris_flags = {
-              # this override is due to a bug in libtool documented here:
-              # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
-              "CC" => "gcc -static-libgcc",
-              "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-            }
-          elsif platform_version.satisfies?(">= 5.11")
-            solaris_flags = {
-              "CC" => "gcc -m64 -static-libgcc",
-              "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-            }
-          end
-          solaris_flags
+          {
+            "CC" => "gcc -m64 -static-libgcc",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+          }
         when "freebsd"
           {
             "CC" => "clang",
             "CXX" => "clang++",
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
         when "suse"
           suse_flags = {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
           # Enable gcc version 4.8 if it is available
           if which("gcc-4.8") && platform_version.satisfies?("< 12")
@@ -721,7 +710,7 @@ module Omnibus
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
         end
 
