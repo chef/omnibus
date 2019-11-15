@@ -647,7 +647,7 @@ module Omnibus
     def gcc_hardening_cflags
       "-D_FORTIFY_SOURCE=2 -fstack-protector -fPIE -fPIC"
     end
-    expose gcc_hardening_cflags
+    expose :gcc_hardening_cflags
 
     # Common GCC hardening LDFLAGS
     #
@@ -656,7 +656,7 @@ module Omnibus
     def gcc_hardening_ldflags
       "-pie"
     end
-    expose gcc_hardening_ldflags
+    expose :gcc_hardening_ldflags
 
     #
     # Add standard compiler flags to the environment hash to produce omnibus
