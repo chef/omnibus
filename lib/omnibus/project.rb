@@ -1315,6 +1315,10 @@ module Omnibus
           packager.evaluate(&block)
         end
 
+        if packager.skip_packager
+          log.info(log_key) { "Skipping #{packager.id} per project configuration." }
+          next
+        end
         # Run the actual packager
         packager.run!
 
