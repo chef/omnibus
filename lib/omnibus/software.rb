@@ -649,15 +649,6 @@ module Omnibus
     end
     expose :gcc_hardening_cflags
 
-    # Common GCC hardening LDFLAGS
-    #
-    # @return [String]
-    #
-    def gcc_hardening_ldflags
-      "-pie"
-    end
-    expose :gcc_hardening_ldflags
-
     #
     # Add standard compiler flags to the environment hash to produce omnibus
     # binaries (correct RPATH, etc).
@@ -695,12 +686,12 @@ module Omnibus
           {
             "CC" => "clang",
             "CXX" => "clang++",
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib #{gcc_hardening_ldflags}",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2 #{gcc_hardening_cflags}",
           }
         when "suse"
           suse_flags = {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib #{gcc_hardening_ldflags}",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2 #{gcc_hardening_cflags}",
           }
           # Enable gcc version 4.8 if it is available
@@ -727,7 +718,7 @@ module Omnibus
           }
         else
           {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib #{gcc_hardening_ldflags}",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2 #{gcc_hardening_cflags}",
           }
         end
