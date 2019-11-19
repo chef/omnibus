@@ -253,7 +253,7 @@ For all of these paths, **order matters**, so it is possible to depend on local 
 $PWD/config/software/foo.rb
 /path/to/software/config/software/foo.rb
 /other/path/to/software/config/software/foo.rb
-/Users/sethvargo/.gems/.../my-comany-omnibus-software/config/software/foo.rb
+/Users/sethvargo/.gems/.../my-company-omnibus-software/config/software/foo.rb
 /Users/sethvargo/.gems/.../omnibus-software/config/software/foo.rb
 ```
 
@@ -273,7 +273,7 @@ This will output a JSON-formatted manifest containing the resolved version of ev
 
 Sometimes a platform has libraries that need to be whitelisted so the healthcheck can pass. The whitelist found in the [healthcheck](https://github.com/chef/omnibus/blob/master/lib/omnibus/health_check.rb) code comprises the minimal required for successful builds on supported platforms.
 
-To add your own whitelisted library, simply add the a regex to your software definition in your omnibus project as follows:
+To add your own whitelisted library, simply add a regex to your software definition in your omnibus project as follows:
 
 ```
 whitelist_file /libpcrecpp\.so\..+/
@@ -289,11 +289,11 @@ STATUS: _EXPERIMENTAL_
 
 `omnibus changelog generate` will generate a changelog for an omnibus project. This command currently assumes:
 
-- version-manifest.json is checked into the project root
-- the project is a git repository
-- each version is tagged with a SemVer compliant annotated tag
+- A version-manifest.json file is checked into the project root
+- The project is a git repository
+- Each version is tagged with a SemVer compliant annotated tag
 - Any git-based sources are checked out at ../COMPONENT_NAME
-- Any commit message line prepended with ChangeLog-Entry: should be added to the changelog.
+- Any commit message line prepended with ChangeLog-Entry: should be added to the changelog
 
 These assumptions _will_ change as we determine what works best for a number of our projects.
 
