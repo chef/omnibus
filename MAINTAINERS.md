@@ -8,7 +8,7 @@ Check out [How Chef is Maintained](https://github.com/chef/chef-rfc/blob/master/
 
 ## Project Lead
 
-- [Scott Hain](https://github.com/scotthain)
+- [Seth Chisamore](https://github.com/schisamo)
 
 ## Maintainers
 
