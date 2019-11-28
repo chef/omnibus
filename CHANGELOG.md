@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.17 -->
-## [6.1.17](https://github.com/chef/omnibus/tree/6.1.17) (2019-11-28)
+<!-- latest_release 6.1.18 -->
+## [6.1.18](https://github.com/chef/omnibus/tree/6.1.18) (2019-11-28)
 
 #### Merged Pull Requests
-- Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain))
+- Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey)) <!-- 6.1.18 -->
 - Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain)) <!-- 6.1.17 -->
 - fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey)) <!-- 6.1.16 -->
 - Minor spelling, grammar, punctuation [#917](https://github.com/chef/omnibus/pull/917) ([ehershey](https://github.com/ehershey)) <!-- 6.1.15 -->
