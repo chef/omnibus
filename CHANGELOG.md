@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.16 -->
-## [6.1.16](https://github.com/chef/omnibus/tree/6.1.16) (2019-11-19)
+<!-- latest_release 6.1.17 -->
+## [6.1.17](https://github.com/chef/omnibus/tree/6.1.17) (2019-11-28)
 
 #### Merged Pull Requests
-- fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey))
+- Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain)) <!-- 6.1.17 -->
 - fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey)) <!-- 6.1.16 -->
 - Minor spelling, grammar, punctuation [#917](https://github.com/chef/omnibus/pull/917) ([ehershey](https://github.com/ehershey)) <!-- 6.1.15 -->
 - Remove Solaris 10 platform and enable some hardening flags on Linux/Mac/FreeBSD [#915](https://github.com/chef/omnibus/pull/915) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.14 -->
