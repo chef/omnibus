@@ -39,10 +39,12 @@ module Omnibus
       # If there are extra package files let's add them
       zip_source_path = ""
       
-      if not extra_package_dir.nil?
-        if File.directory?(extra_package_dir)
-          # Let's collect the DirectoryRefs
-          zip_source_path = "#{windows_safe_path(extra_package_dir)}\\* "
+      if not extra_package_dirs.nil?
+        extra_package_dirs.each do |extra_package_dir|
+          if File.directory?(extra_package_dir)
+            # Let's collect the DirectoryRefs
+            zip_source_path += "#{windows_safe_path(extra_package_dir)}\\* "
+          end
         end
       end
       zip_file = windows_safe_path(Config.package_dir, zip_name)
@@ -75,17 +77,17 @@ module Omnibus
     end
     expose :additional_sign_files
 
-    def extra_package_dir(val = NULL)
+    def extra_package_dirs(val = NULL)
       if null?(val)
-        @extra_package_dir || nil
+        @extra_package_dirs || nil
       else
-        unless val.is_a?(String)
-          raise InvalidValue.new(:extra_package_dir, "be a String")
+        unless val.is_a?(Array)
+          raise InvalidValue.new(:extra_package_dir, "be an Array")
         end
-        @extra_package_dir = val
+        @extra_package_dirs = val
       end
     end
-    expose :extra_package_dir
+    expose :extra_package_dirs
 
     #
     # Discovers a path to a gem/file included in a gem under the install directory.
