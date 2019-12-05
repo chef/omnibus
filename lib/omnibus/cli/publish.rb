@@ -34,12 +34,12 @@ module Omnibus
     #   }
     #
     class_option :platform_mappings,
-      desc: "The optional platform mappings JSON file to publish with",
-      type: :string
+                 desc: "The optional platform mappings JSON file to publish with",
+                 type: :string
 
     class_option :version_manifest,
-      desc: "Path to the version-manifest.json file to publish with",
-      type: :string
+                 desc: "Path to the version-manifest.json file to publish with",
+                 type: :string
 
     #
     # Publish to S3.
@@ -47,14 +47,14 @@ module Omnibus
     #   $ omnibus publish s3 buckethands pkg/chef*
     #
     method_option :acl,
-      type: :string,
-      desc: "The accessibility of the uploaded packages",
-      enum: %w{public private},
-      default: "private"
+                  type: :string,
+                  desc: "The accessibility of the uploaded packages",
+                  enum: %w{public private},
+                  default: "private"
     method_option :region,
-      type: :string,
-      desc: "The region in which the bucket is located",
-      default: "us-east-1"
+                  type: :string,
+                  desc: "The region in which the bucket is located",
+                  default: "us-east-1"
     desc "s3 BUCKET PATTERN", "Publish to an S3 bucket"
     def s3(bucket, pattern)
       options[:bucket] = bucket
@@ -67,13 +67,13 @@ module Omnibus
     #   $ omnibus publish artifactory libs-omnibus-local pkg/chef*
     #
     method_option :build_record,
-      type: :boolean,
-      desc: "Optionally create an Artifactory build record for the published artifacts",
-      default: true
+                  type: :boolean,
+                  desc: "Optionally create an Artifactory build record for the published artifacts",
+                  default: true
     method_option :properties,
-      type: :hash,
-      desc: "Properites to attach to published artifacts",
-      default: {}
+                  type: :hash,
+                  desc: "Properites to attach to published artifacts",
+                  default: {}
     desc "artifactory REPOSITORY PATTERN", "Publish to an Artifactory instance"
     def artifactory(repository, pattern)
       Omnibus.logger.deprecated("ArtifactoryPublisher") do

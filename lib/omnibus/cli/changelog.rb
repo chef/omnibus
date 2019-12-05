@@ -30,42 +30,42 @@ module Omnibus
     #   $ omnibus changelog generate
     #
     method_option :source_path,
-    desc: "Path to local checkout of git dependencies",
-    type: :string,
-    default: "../"
+                  desc: "Path to local checkout of git dependencies",
+                  type: :string,
+                  default: "../"
 
     method_option :starting_manifest,
-    desc: "Path to version-manifest from the last version (we attempt to pull it from the git history if not given)",
-    type: :string
+                  desc: "Path to version-manifest from the last version (we attempt to pull it from the git history if not given)",
+                  type: :string
 
     method_option :ending_manifest,
-    desc: "Path to the version-manifest from the current version",
-    type: :string,
-    default: "version-manifest.json"
+                  desc: "Path to the version-manifest from the current version",
+                  type: :string,
+                  default: "version-manifest.json"
 
     method_option :skip_components,
-    desc: "Don't include component changes in the changelog",
-    type: :boolean,
-    default: false
+                  desc: "Don't include component changes in the changelog",
+                  type: :boolean,
+                  default: false
 
     method_option :major,
-    desc: "Bump the major version",
-    type: :boolean,
-    default: false
+                  desc: "Bump the major version",
+                  type: :boolean,
+                  default: false
 
     method_option :minor,
-    desc: "Bump the minor version",
-    type: :boolean,
-    default: true
+                  desc: "Bump the minor version",
+                  type: :boolean,
+                  default: true
 
     method_option :patch,
-    desc: "Bump the patch version",
-    type: :boolean,
-    default: false
+                  desc: "Bump the patch version",
+                  type: :boolean,
+                  default: false
 
     method_option :version,
-    desc: "Explicit version for this changelog",
-    type: :string
+                  desc: "Explicit version for this changelog",
+                  type: :string
 
     desc "generate [START] [END]", "Generate a changelog for a new release"
     def generate(start_ref = nil, end_ref = nil)

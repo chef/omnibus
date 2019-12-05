@@ -18,7 +18,6 @@ require "mixlib/versioning"
 
 module Omnibus
   class SemanticVersion
-
     def initialize(version_string)
       @prefix = if version_string =~ /^v/
                   "v"

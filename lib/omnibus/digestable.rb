@@ -20,7 +20,6 @@ require "omnibus/logging"
 
 module Omnibus
   module Digestable
-
     def self.included(other)
       other.send(:include, Logging)
     end

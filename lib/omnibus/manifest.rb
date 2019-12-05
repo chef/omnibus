@@ -44,7 +44,7 @@ module Omnibus
     end
 
     def add(name, entry)
-      if ! entry.is_a? Omnibus::ManifestEntry
+      if !entry.is_a? Omnibus::ManifestEntry
         raise NotAManifestEntry, "#{entry} is not an Omnibus:ManifestEntry"
       end
 

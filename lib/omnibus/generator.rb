@@ -23,52 +23,52 @@ module Omnibus
     namespace :new
 
     argument :name,
-      banner: "NAME",
-      desc: "The name of the Omnibus project",
-      type: :string,
-      required: true
+             banner: "NAME",
+             desc: "The name of the Omnibus project",
+             type: :string,
+             required: true
 
     class_option :path,
-      banner: "PATH",
-      aliases: "-p",
-      desc: "The path to create the Omnibus project",
-      type: :string,
-      default: "."
+                 banner: "PATH",
+                 aliases: "-p",
+                 desc: "The path to create the Omnibus project",
+                 type: :string,
+                 default: "."
 
     class_option :appx_assets,
-      desc: "Generate Windows APPX assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate Windows APPX assets",
+                 type: :boolean,
+                 default: false
 
     class_option :bff_assets,
-      desc: "Generate AIX bff assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate AIX bff assets",
+                 type: :boolean,
+                 default: false
 
     class_option :deb_assets,
-      desc: "Generate Debian deb assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate Debian deb assets",
+                 type: :boolean,
+                 default: false
 
     class_option :dmg_assets,
-      desc: "Generate Mac OS X dmg assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate Mac OS X dmg assets",
+                 type: :boolean,
+                 default: false
 
     class_option :msi_assets,
-      desc: "Generate Windows MSI assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate Windows MSI assets",
+                 type: :boolean,
+                 default: false
 
     class_option :pkg_assets,
-      desc: "Generate Mac OS X pkg assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate Mac OS X pkg assets",
+                 type: :boolean,
+                 default: false
 
     class_option :rpm_assets,
-      desc: "Generate RHEL/CentOS rpm assets",
-      type: :boolean,
-      default: false
+                 desc: "Generate RHEL/CentOS rpm assets",
+                 type: :boolean,
+                 default: false
 
     class << self
       # Set the source root for Thor

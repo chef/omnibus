@@ -78,11 +78,10 @@ module Omnibus
     def write_makeselfinst
       makeselfinst_staging_path = File.join(staging_dir, "makeselfinst")
       render_template(resource_path("makeselfinst.erb"),
-        destination: makeselfinst_staging_path,
-        variables: {
-          install_dir: project.install_dir,
-        }
-      )
+                      destination: makeselfinst_staging_path,
+                      variables: {
+                        install_dir: project.install_dir,
+                      })
       FileUtils.chmod(0755, makeselfinst_staging_path)
     end
 

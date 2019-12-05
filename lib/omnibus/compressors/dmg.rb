@@ -214,14 +214,13 @@ module Omnibus
       log.info(log_key) { "Making the dmg all pretty and stuff" }
 
       render_template(resource_path("create_dmg.osascript.erb"),
-        destination: "#{staging_dir}/create_dmg.osascript",
-        variables: {
-          volume_name:   volume_name,
-          pkg_name:      packager.package_name,
-          window_bounds: window_bounds,
-          pkg_position:  pkg_position,
-        }
-      )
+                      destination: "#{staging_dir}/create_dmg.osascript",
+                      variables: {
+                        volume_name: volume_name,
+                        pkg_name: packager.package_name,
+                        window_bounds: window_bounds,
+                        pkg_position: pkg_position,
+                      })
 
       Dir.chdir(staging_dir) do
         shellout! <<-EOH.gsub(/^ {10}/, "")

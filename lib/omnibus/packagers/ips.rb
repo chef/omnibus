@@ -186,11 +186,10 @@ module Omnibus
     #
     def write_transform_file
       render_template(resource_path("doc-transform.erb"),
-        destination: transform_file,
-        variables: {
-          pathdir: project.install_dir.split("/")[1],
-        }
-      )
+                      destination: transform_file,
+                      variables: {
+                        pathdir: project.install_dir.split("/")[1],
+                      })
     end
 
     #
@@ -202,15 +201,14 @@ module Omnibus
     #
     def write_pkg_metadata
       render_template(resource_path("gen.manifestfile.erb"),
-        destination: pkg_metadata_file,
-        variables: {
-          name:              safe_base_package_name,
-          fmri_package_name: fmri_package_name,
-          description:       project.description,
-          summary:           project.friendly_name,
-          arch:              safe_architecture,
-        }
-      )
+                      destination: pkg_metadata_file,
+                      variables: {
+                        name: safe_base_package_name,
+                        fmri_package_name: fmri_package_name,
+                        description: project.description,
+                        summary: project.friendly_name,
+                        arch: safe_architecture,
+                      })
 
       # Print the full contents of the rendered template file to generate package contents
       log.debug(log_key) { "Rendered Template:\n" + File.read(pkg_metadata_file) }

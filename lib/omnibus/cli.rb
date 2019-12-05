@@ -63,17 +63,17 @@ module Omnibus
     #   $ omnibus build chefdk
     #
     method_option :output_manifest,
-      desc: "Create version-manifest.json in current directory at the end of the build",
-      type: :boolean,
-      default: true
+                  desc: "Create version-manifest.json in current directory at the end of the build",
+                  type: :boolean,
+                  default: true
     method_option :use_manifest,
-      desc: "Use the given manifest when downloading software sources.",
-      type: :string,
-      default: nil
+                  desc: "Use the given manifest when downloading software sources.",
+                  type: :string,
+                  default: nil
     method_option :populate_s3_cache,
-      desc: "Populate the S3 cache.",
-      type: :boolean,
-      default: false
+                  desc: "Populate the S3 cache.",
+                  type: :boolean,
+                  default: false
     desc "build PROJECT", "Build the given Omnibus project"
     def build(name)
       manifest = if @options[:use_manifest]
@@ -105,19 +105,19 @@ module Omnibus
     #   $ omnibus manifest PROJECT
     #
     method_option :os,
-      desc: "An os name in Ohai form. Defaults to the current os.",
-      type: :string
+                  desc: "An os name in Ohai form. Defaults to the current os.",
+                  type: :string
     method_option :platform_family,
-      desc: "A platform family string in Ohai form. Defaults to the current platform_family.",
-      type: :string
+                  desc: "A platform family string in Ohai form. Defaults to the current platform_family.",
+                  type: :string
     method_option :platform,
-      desc: "A platform string in Ohai form. Defaults to the current platform.",
-      type: :string
+                  desc: "A platform string in Ohai form. Defaults to the current platform.",
+                  type: :string
     method_option :platform_version,
-      desc: "A platform version string in Ohai form. Defaults to the current platform.",
-      type: :string
+                  desc: "A platform version string in Ohai form. Defaults to the current platform.",
+                  type: :string
     method_option :architecture,
-      desc: "The target architecture: x86, x64, powerpc. Defaults to the current architecture."
+                  desc: "The target architecture: x86, x64, powerpc. Defaults to the current architecture."
     desc "manifest PROJECT", "Print a manifest for the given Omnibus project"
     def manifest(name)
       # Override ohai information

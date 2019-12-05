@@ -46,24 +46,24 @@ module Omnibus
 
         data = {
           # Package
-          basename:         package.name,
-          md5:              package.md5,
-          sha1:             package.sha1,
-          sha256:           package.sha256,
-          sha512:           package.sha512,
-          platform:         platform_shortname,
+          basename: package.name,
+          md5: package.md5,
+          sha1: package.sha1,
+          sha256: package.sha256,
+          sha512: package.sha512,
+          platform: platform_shortname,
           platform_version: platform_version,
-          arch:             arch,
+          arch: arch,
 
           # Project
-          name:             project.name,
-          friendly_name:    project.friendly_name,
-          homepage:         project.homepage,
-          version:          project.build_version,
-          iteration:        project.build_iteration,
-          license:          project.license,
+          name: project.name,
+          friendly_name: project.friendly_name,
+          homepage: project.homepage,
+          version: project.build_version,
+          iteration: project.build_iteration,
+          license: project.license,
           version_manifest: project.built_manifest.to_hash,
-          license_content:  File.exist?(project.license_file_path) ? File.read(project.license_file_path) : "",
+          license_content: File.exist?(project.license_file_path) ? File.read(project.license_file_path) : "",
         }
 
         instance = new(package, data)
@@ -83,7 +83,7 @@ module Omnibus
         data = File.read(path_for(package))
         hash = FFI_Yajl::Parser.parse(data, symbolize_names: true)
 
-         # Ensure Platform version has been truncated
+        # Ensure Platform version has been truncated
         if hash[:platform_version] && hash[:platform]
           hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
         end

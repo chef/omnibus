@@ -19,10 +19,10 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  "preinstall",
+      preinst: "preinstall",
       postinst: "postinstall",
       # Default PKG naming
-      preinstall:  "preinstall",
+      preinstall: "preinstall",
       postinstall: "postinstall",
     }.freeze
 
@@ -37,27 +37,25 @@ module Omnibus
 
       # Render the license
       render_template(resource_path("license.html.erb"),
-        destination: "#{resources_dir}/license.html",
-        variables: {
-          name:          project.name,
-          friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
-          build_version: project.build_version,
-          package_name:  project.package_name,
-        }
-      )
+                      destination: "#{resources_dir}/license.html",
+                      variables: {
+                        name: project.name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                        build_version: project.build_version,
+                        package_name: project.package_name,
+                      })
 
       # Render the welcome template
       render_template(resource_path("welcome.html.erb"),
-        destination: "#{resources_dir}/welcome.html",
-        variables: {
-          name:          project.name,
-          friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
-          build_version: project.build_version,
-          package_name:  project.package_name,
-        }
-      )
+                      destination: "#{resources_dir}/welcome.html",
+                      variables: {
+                        name: project.name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                        build_version: project.build_version,
+                        package_name: project.package_name,
+                      })
 
       # "Render" the assets
       copy_file(resource_path("background.png"), "#{resources_dir}/background.png")
@@ -214,15 +212,14 @@ module Omnibus
     #
     def write_distribution_file
       render_template(resource_path("distribution.xml.erb"),
-        destination: "#{staging_dir}/Distribution",
-        mode: 0600,
-        variables: {
-          friendly_name: project.friendly_name,
-          identifier:    safe_identifier,
-          version:       safe_version,
-          component_pkg: component_pkg,
-        }
-      )
+                      destination: "#{staging_dir}/Distribution",
+                      mode: 0600,
+                      variables: {
+                        friendly_name: project.friendly_name,
+                        identifier: safe_identifier,
+                        version: safe_version,
+                        component_pkg: component_pkg,
+                      })
     end
 
     #

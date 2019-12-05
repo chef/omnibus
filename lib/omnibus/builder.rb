@@ -94,33 +94,31 @@ module Omnibus
     #
     # @return [void]
     def pip(subcommand, options = {})
-     pip_path = "\"#{install_dir}/embedded/bin/pip\""
-     if Ohai['platform'] == "windows"
-       pip_path = "\"#{windows_safe_path(install_dir)}\\embedded\\Scripts\\pip.exe\""
-     end
-     command("#{pip_path} #{subcommand}", options)
+      pip_path = "\"#{install_dir}/embedded/bin/pip\""
+      if Ohai['platform'] == "windows"
+        pip_path = "\"#{windows_safe_path(install_dir)}\\embedded\\Scripts\\pip.exe\""
+      end
+      command("#{pip_path} #{subcommand}", options)
     end
     expose :pip
 
     def py2pip(subcommand, options = {})
-     pip_path = "\"#{python_2_embedded}/bin/pip\""
-     if Ohai['platform'] == "windows"
-       pip_path = "\"#{windows_safe_path(python_2_embedded)}\\Scripts\\pip.exe\""
-     end
-     command("#{pip_path} #{subcommand}", options)
+      pip_path = "\"#{python_2_embedded}/bin/pip\""
+      if Ohai['platform'] == "windows"
+        pip_path = "\"#{windows_safe_path(python_2_embedded)}\\Scripts\\pip.exe\""
+      end
+      command("#{pip_path} #{subcommand}", options)
     end
     expose :py2pip
 
     def py3pip(subcommand, options = {})
-     pip_path = "\"#{python_3_embedded}/bin/pip\""
-     if Ohai['platform'] == "windows"
-       pip_path = "\"#{windows_safe_path(python_3_embedded)}\\Scripts\\pip.exe\""
-     end
-     command("#{pip_path} #{subcommand}", options)
+      pip_path = "\"#{python_3_embedded}/bin/pip\""
+      if Ohai['platform'] == "windows"
+        pip_path = "\"#{windows_safe_path(python_3_embedded)}\\Scripts\\pip.exe\""
+      end
+      command("#{pip_path} #{subcommand}", options)
     end
     expose :py3pip
-
-
 
     #
     # Execute the given make command. When present, this method will prefer the
@@ -146,15 +144,15 @@ module Omnibus
       options = args.last.is_a?(Hash) ? args.pop : {}
 
       make = options.delete(:bin) ||
-        # Prefer gmake on non-windows environments.
-        if !windows? && Omnibus.which("gmake")
-          env = options.delete(:env) || {}
-          env = { "MAKE" => "gmake" }.merge(env)
-          options[:env] = env
-          "gmake"
-        else
-          "make"
-        end
+             # Prefer gmake on non-windows environments.
+             if !windows? && Omnibus.which("gmake")
+               env = options.delete(:env) || {}
+               env = { "MAKE" => "gmake" }.merge(env)
+               options[:env] = env
+               "gmake"
+             else
+               "make"
+             end
 
       options[:in_msys_bash] = true
       make_cmd = ([make] + args).join(" ").strip
@@ -270,7 +268,8 @@ module Omnibus
       clean_patch_path = patch_path
       if windows?
         clean_patch_path = Pathname.new(patch_path).relative_path_from(
-          Pathname.new(software.project_dir)).to_s
+          Pathname.new(software.project_dir)
+        ).to_s
       end
 
       if target
@@ -497,10 +496,9 @@ module Omnibus
 
       block "Render erb `#{source}'" do
         render_template(source_path,
-          destination: dest,
-          mode:        mode,
-          variables:   vars
-        )
+                        destination: dest,
+                        mode: mode,
+                        variables: vars)
       end
     end
     expose :erb

@@ -40,7 +40,7 @@ module Omnibus
       #
       # extra_package_file '/path/to/foo.txt' #=> /tmp/scratch/path/to/foo.txt
       project.extra_package_files.each do |file|
-        parent      = File.dirname(file)
+        parent = File.dirname(file)
 
         if File.directory?(file)
           destination = File.join(staging_dir, file)
@@ -271,25 +271,24 @@ module Omnibus
       end
 
       render_template(resource_path("control.erb"),
-        destination: File.join(dst_dir, "control"),
-        variables: {
-          name:           safe_base_package_name(debug),
-          version:        safe_epoch + safe_version,
-          iteration:      safe_build_iteration,
-          vendor:         vendor,
-          license:        license,
-          architecture:   safe_architecture,
-          maintainer:     project.maintainer,
-          installed_size: package_size(debug),
-          homepage:       project.homepage,
-          description:    project.description,
-          priority:       priority,
-          section:        section,
-          conflicts:      project.conflicts,
-          replaces:       project.replaces,
-          dependencies:   pkg_dependencies,
-        }
-      )
+                      destination: File.join(dst_dir, "control"),
+                      variables: {
+                        name: safe_base_package_name(debug),
+                        version: safe_epoch + safe_version,
+                        iteration: safe_build_iteration,
+                        vendor: vendor,
+                        license: license,
+                        architecture: safe_architecture,
+                        maintainer: project.maintainer,
+                        installed_size: package_size(debug),
+                        homepage: project.homepage,
+                        description: project.description,
+                        priority: priority,
+                        section: section,
+                        conflicts: project.conflicts,
+                        replaces: project.replaces,
+                        dependencies: pkg_dependencies,
+                      })
     end
 
     #
@@ -306,11 +305,10 @@ module Omnibus
       end
 
       render_template(resource_path("conffiles.erb"),
-        destination: File.join(dst_dir, "conffiles"),
-        variables: {
-          config_files: project.config_files,
-        }
-      )
+                      destination: File.join(dst_dir, "conffiles"),
+                      variables: {
+                        config_files: project.config_files,
+                      })
     end
 
     #
@@ -366,11 +364,10 @@ module Omnibus
       end
 
       render_template(resource_path("md5sums.erb"),
-        destination: File.join(dst_dir, "md5sums"),
-        variables: {
-          md5sums: hash,
-        }
-      )
+                      destination: File.join(dst_dir, "md5sums"),
+                      variables: {
+                        md5sums: hash,
+                      })
     end
 
     #
@@ -402,7 +399,7 @@ module Omnibus
     # @return [Fixnum]
     #
     def package_size(debug = false)
-      path  = "#{project.install_dir}/**/*"
+      path = "#{project.install_dir}/**/*"
       matches = FileSyncer.glob(path)
       extended_debug_package_paths = debug_package_paths.map do |path|
         [path, "#{path}/*"]

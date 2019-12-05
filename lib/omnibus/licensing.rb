@@ -30,7 +30,6 @@ module Omnibus
     CACHE_DIRECTORY = "license-cache".freeze
 
     class << self
-
       # Creates a new instance of Licensing, executes preparation steps, then
       # yields control to a given block, and then creates a summary of the
       # included licenses.
@@ -54,7 +53,6 @@ module Omnibus
       #
       def create_incrementally(project)
         new(project).tap do |license_collector|
-
           license_collector.prepare
           license_collector.validate_license_info
 
@@ -477,7 +475,7 @@ module Omnibus
               dep_license_map[dep_mgr_name][dep_name][dep_version] = {
                 "license" => dependency["license"],
                 "license_files" => dependency["license_files"],
-                "dependency_of" => [ project_name ],
+                "dependency_of" => [project_name],
               }
             end
           end
@@ -520,7 +518,8 @@ module Omnibus
         # dependencies.  In the latter case software definition should set
         # 'skip_transitive_dependency_licensing' to 'true' to correct this
         # error.
-        transitive_dependency_licensing_warning(<<-EOH)
+        # rubocop:disable Layout/ClosingHeredocIndentation, Naming/HeredocDelimiterNaming, Layout/IndentHeredoc
+        transitive_dependency_licensing_warning(<<~EOH)
 Software '#{software.name}' is not supported project type for transitive \
 dependency license collection. See https://github.com/chef/license_scout for \
 the list of supported languages and dependency managers. If this project does \
@@ -528,14 +527,15 @@ not have any transitive dependencies, consider setting \
 'skip_transitive_dependency_licensing' to 'true' in order to correct this error.
 EOH
       rescue LicenseScout::Exceptions::Error => e
-        transitive_dependency_licensing_warning(<<-EOH)
+        transitive_dependency_licensing_warning(<<~EOH)
 Can not automatically detect licensing information for '#{software.name}' using \
 license_scout. Error is: '#{e}'
 EOH
       rescue Exception => e
-        transitive_dependency_licensing_warning(<<-EOH)
+        transitive_dependency_licensing_warning(<<~EOH)
 Unexpected error while running license_scout for '#{software.name}': '#{e}'
 EOH
+        # rubocop:enable Layout/ClosingHeredocIndentation, Naming/HeredocDelimiterNaming, Layout/IndentHeredoc
       end
     end
 
@@ -679,5 +679,4 @@ EOH
       "Chef-MLSA",     # https://www.chef.io/online-master-agreement/
     ].freeze
   end
-
 end
