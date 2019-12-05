@@ -1,0 +1,10 @@
+Style/Encoding:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 100
+
+AllCops:
+  TargetRubyVersion: 2.5
+  Exclude:
+    - 'spec/**/*.rb'
