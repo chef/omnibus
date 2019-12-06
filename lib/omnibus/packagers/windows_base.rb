@@ -138,7 +138,7 @@ module Omnibus
         servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
         @signing_identity_file[:timestamp_servers] = [servers].flatten
         @signing_identity_file[:password] = params[:password] || false
-        end
+      end
 
       @signing_identity_file
     end

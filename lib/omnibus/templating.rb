@@ -49,7 +49,7 @@ module Omnibus
 
       unless options.empty?
         raise ArgumentError,
-          "Unknown option(s): #{options.keys.map(&:inspect).join(', ')}"
+              "Unknown option(s): #{options.keys.map(&:inspect).join(', ')}"
       end
 
       template = ERB.new(File.read(source), nil, "-")

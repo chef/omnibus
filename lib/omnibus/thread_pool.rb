@@ -19,7 +19,6 @@ require "thread"
 
 module Omnibus
   class ThreadPool
-
     #
     # Create a new thread pool of the given size. If a block is given, it is
     # assumed the thread pool is wrapping an operation and will block until all
