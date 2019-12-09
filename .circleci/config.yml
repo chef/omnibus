@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.5-stretch-node-browsers-legacy
+    steps:
+      - checkout
+
+      - run: # Install Ruby dependencies
+          name: Bundle Install
+          command: bundle install --path .bundle
+
+      - run:
+          name: Run rspec
+          command: |
+            bash scripts/format-check.sh
