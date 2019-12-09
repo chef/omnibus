@@ -68,7 +68,7 @@ module Omnibus
       #
       def resource_params
         params = {
-          use_accelerate_endpoint:  s3_configuration[:use_accelerate_endpoint],
+          use_accelerate_endpoint: s3_configuration[:use_accelerate_endpoint],
           force_path_style: s3_configuration[:force_path_style],
           region: s3_configuration[:region],
         }
@@ -93,13 +93,13 @@ module Omnibus
       # parameters for use by the client object.
       #
       # @return [Aws::SharedCredentials, Aws::Credentials]
-      def get_credentials(sts_client_credentials=false)
+      def get_credentials(sts_client_credentials = false)
         if s3_configuration[:role] && !sts_client_credentials
           # The region must be set in order for Aws::STS::Client to be created
           Aws::AssumeRoleCredentials.new(
             client: Aws::STS::Client.new(
               region: s3_configuration[:region],
-              credentials: get_credentials(sts_client_credentials=true),
+              credentials: get_credentials(sts_client_credentials = true),
             ),
             region: s3_configuration[:region],
             role_arn: s3_configuration[:role_arn],
@@ -153,11 +153,11 @@ module Omnibus
       #
       def store_object(key, content, content_md5, acl)
         bucket.put_object({
-          key: key,
-          body: content,
-          content_md5: to_base64_digest(content_md5),
-          acl: acl,
-        })
+                            key: key,
+                            body: content,
+                            content_md5: to_base64_digest(content_md5),
+                            acl: acl,
+                          })
         true
       end
 

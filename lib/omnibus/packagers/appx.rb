@@ -62,15 +62,14 @@ module Omnibus
     #
     def write_manifest_file
       render_template(resource_path("AppxManifest.xml.erb"),
-        destination: "#{windows_safe_path(project.install_dir)}/AppxManifest.xml",
-        variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          version:         windows_package_version,
-          maintainer:      project.maintainer,
-          certificate_subject: certificate_subject,
-        }
-      )
+                      destination: "#{windows_safe_path(project.install_dir)}/AppxManifest.xml",
+                      variables: {
+                        name: project.package_name,
+                        friendly_name: project.friendly_name,
+                        version: windows_package_version,
+                        maintainer: project.maintainer,
+                        certificate_subject: certificate_subject,
+                      })
     end
 
     #

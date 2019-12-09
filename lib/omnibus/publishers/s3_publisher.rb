@@ -47,10 +47,10 @@ module Omnibus
 
     def s3_configuration
       {
-        region:            @options[:region],
-        access_key_id:     Config.publish_s3_access_key,
+        region: @options[:region],
+        access_key_id: Config.publish_s3_access_key,
         secret_access_key: Config.publish_s3_secret_key,
-        bucket_name:       @options[:bucket],
+        bucket_name: @options[:bucket],
       }
     end
 

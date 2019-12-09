@@ -1173,6 +1173,7 @@ module Omnibus
     #
     def dirty!(software)
       raise ProjectAlreadyDirty.new(self) if culprit
+
       @culprit = software
     end
 
@@ -1300,9 +1301,6 @@ module Omnibus
       build
     end
 
-    #
-    #
-    #
     def package_me
       destination = File.expand_path("pkg", Config.project_root)
 
@@ -1327,9 +1325,6 @@ module Omnibus
       end
     end
 
-    #
-    #
-    #
     def compress_me
       destination = File.expand_path("pkg", Config.project_root)
 

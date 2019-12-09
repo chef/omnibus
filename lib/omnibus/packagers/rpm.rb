@@ -21,18 +21,18 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  "pre",
+      preinst: "pre",
       postinst: "post",
-      prerm:    "preun",
-      postrm:   "postun",
+      prerm: "preun",
+      postrm: "postun",
       # Default RPM naming
-      pre:          "pre",
-      post:         "post",
-      preun:        "preun",
-      postun:       "postun",
+      pre: "pre",
+      post: "post",
+      preun: "preun",
+      postun: "postun",
       verifyscript: "verifyscript",
-      pretans:      "pretans",
-      posttrans:    "posttrans",
+      pretans: "pretans",
+      posttrans: "posttrans",
     }.freeze
 
     id :rpm
@@ -75,7 +75,7 @@ module Omnibus
       #
       # extra_package_file '/path/to/foo.txt' #=> /tmp/BUILD/path/to/foo.txt
       project.extra_package_files.each do |file|
-        parent      = File.dirname(file)
+        parent = File.dirname(file)
 
         if File.directory?(file)
           destination = File.join(build_dir, file)
@@ -355,14 +355,13 @@ module Omnibus
     # @return [void]
     #
     def write_rpm_spec(debug = false)
-
       # Create a map of scripts that exist and their contents
       scripts = SCRIPT_MAP.inject({}) do |hash, (source, destination)|
         script_src = source.to_s
         if debug
           script_src = "#{source.to_s}-dbg"
         end
-        path =  File.join(project.package_scripts_path, script_src)
+        path = File.join(project.package_scripts_path, script_src)
 
         if File.file?(path)
           hash[destination] = File.read(path)
@@ -378,38 +377,37 @@ module Omnibus
 
       # Get a list of all files
       files = FileSyncer.glob("#{build_dir(debug)}/**/*")
-                .map    { |path| build_filepath(path, debug) }
-                .reject { |path| path.empty? }
+                        .map    { |path| build_filepath(path, debug) }
+                        .reject { |path| path.empty? }
 
       log.debug(log_key) { "These are the files going into the package(#{safe_base_package_name(debug)}): #{files}" }
 
       render_template(resource_path("spec.erb"),
-        destination: spec_file(debug),
-        variables: {
-          name:            safe_base_package_name(debug),
-          version:         safe_version,
-          epoch:           safe_epoch,
-          iteration:       safe_build_iteration,
-          vendor:          vendor,
-          license:         license,
-          dist_tag:        dist_tag,
-          maintainer:      project.maintainer,
-          homepage:        project.homepage,
-          description:     project.description,
-          priority:        priority,
-          category:        category,
-          conflicts:       project.conflicts,
-          replaces:        project.replaces,
-          dependencies:    pkg_dependencies,
-          user:            project.package_user,
-          group:           project.package_group,
-          scripts:         scripts,
-          config_files:    config_files,
-          files:           files,
-          build_dir:       build_dir(debug),
-          platform_family: Ohai["platform_family"],
-        }
-      )
+                      destination: spec_file(debug),
+                      variables: {
+                        name: safe_base_package_name(debug),
+                        version: safe_version,
+                        epoch: safe_epoch,
+                        iteration: safe_build_iteration,
+                        vendor: vendor,
+                        license: license,
+                        dist_tag: dist_tag,
+                        maintainer: project.maintainer,
+                        homepage: project.homepage,
+                        description: project.description,
+                        priority: priority,
+                        category: category,
+                        conflicts: project.conflicts,
+                        replaces: project.replaces,
+                        dependencies: pkg_dependencies,
+                        user: project.package_user,
+                        group: project.package_group,
+                        scripts: scripts,
+                        config_files: config_files,
+                        files: files,
+                        build_dir: build_dir(debug),
+                        platform_family: Ohai["platform_family"],
+                      })
     end
 
     #
@@ -443,12 +441,11 @@ module Omnibus
           home = Dir.mktmpdir
 
           render_template(resource_path("rpmmacros.erb"),
-            destination: "#{home}/.rpmmacros",
-            variables: {
-              gpg_name: project.maintainer,
-              gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
-            }
-          )
+                          destination: "#{home}/.rpmmacros",
+                          variables: {
+                            gpg_name: project.maintainer,
+                            gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
+                          })
         end
 
         command << " --sign"
@@ -467,7 +464,7 @@ module Omnibus
       FileSyncer.glob("#{stage}/RPMS/**/*.rpm").each do |rpm|
         # RPMbuild doesn't let use choose the final RPM name, it contains the epoch if the
         # corresponding DSL was set so... let's get rid from the RPM name here :/
-        copy_file(rpm, "#{Config.package_dir}/#{rpm.split('/')[-1].sub(/\d+:/, '')}" )
+        copy_file(rpm, "#{Config.package_dir}/#{rpm.split('/')[-1].sub(/\d+:/, '')}")
       end
     end
 
@@ -479,11 +476,13 @@ module Omnibus
     def build_filepath(path, debug = false)
       filepath = rpm_safe("/" + path.gsub("#{build_dir(debug)}/", ""))
       return if config_files.include?(filepath)
+
       full_path = build_dir(debug) + filepath.gsub("[%]", "%")
       # FileSyncer.glob quotes pathnames that contain spaces, which is a problem on el7
       full_path.delete!('"')
       # Mark directories with the %dir directive to prevent rpmbuild from counting their contents twice.
       return mark_filesystem_directories(filepath) if !File.symlink?(full_path) && File.directory?(full_path)
+
       filepath
     end
 
@@ -515,12 +514,11 @@ module Omnibus
       destination = "#{directory}/sign-rpm"
 
       render_template(resource_path("signing.erb"),
-        destination: destination,
-        mode: 0700,
-        variables: {
-          passphrase: signing_passphrase,
-        }
-      )
+                      destination: destination,
+                      mode: 0700,
+                      variables: {
+                        passphrase: signing_passphrase,
+                      })
 
       # Yield the destination to the block
       yield(destination)
@@ -544,10 +542,10 @@ module Omnibus
       string = "\"#{string}\"" if string[/\s/]
 
       string.dup
-        .gsub("[", "[\\[]")
-        .gsub("*", "[*]")
-        .gsub("?", "[?]")
-        .gsub("%", "[%]")
+            .gsub("[", "[\\[]")
+            .gsub("*", "[*]")
+            .gsub("?", "[?]")
+            .gsub("%", "[%]")
     end
 
     #
@@ -611,7 +609,7 @@ module Omnibus
       #
       if version =~ /\-/
         if Ohai["platform_family"] == "wrlinux"
-          converted = version.tr("-", "_") #WRL has an elderly RPM version
+          converted = version.tr("-", "_") # WRL has an elderly RPM version
           log.warn(log_key) do
             "Omnibus replaces dashes (-) with tildes (~) so pre-release " \
             "versions get sorted earlier than final versions.  However, the " \

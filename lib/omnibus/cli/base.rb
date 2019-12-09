@@ -82,21 +82,21 @@ module Omnibus
     end
 
     class_option :config,
-      desc: "Path to the Omnibus config file",
-      aliases: "-c",
-      type: :string,
-      default: Omnibus::DEFAULT_CONFIG
+                 desc: "Path to the Omnibus config file",
+                 aliases: "-c",
+                 type: :string,
+                 default: Omnibus::DEFAULT_CONFIG
     class_option :log_level,
-      desc: "The log level",
-      aliases: "-l",
-      type: :string,
-      enum: Logger::LEVELS.map(&:downcase),
-      default: "info"
+                 desc: "The log level",
+                 aliases: "-l",
+                 type: :string,
+                 enum: Logger::LEVELS.map(&:downcase),
+                 default: "info"
     class_option :override,
-      desc: "Override one or more Omnibus config options",
-      aliases: "-o",
-      type: :hash,
-      default: {}
+                 desc: "Override one or more Omnibus config options",
+                 aliases: "-o",
+                 type: :hash,
+                 default: {}
 
     #
     # Hide the default help task to encourage people to use +-h+ instead of

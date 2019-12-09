@@ -95,7 +95,7 @@ module Omnibus
     def initialize(project, filepath = nil, manifest = nil)
       unless project.is_a?(Project)
         raise ArgumentError,
-          "`project' must be a kind of `Omnibus::Project', but was `#{project.class.inspect}'!"
+              "`project' must be a kind of `Omnibus::Project', but was `#{project.class.inspect}'!"
       end
 
       # Magical methods
@@ -353,7 +353,7 @@ module Omnibus
       unless null?(val)
         unless val.is_a?(Hash)
           raise InvalidValue.new(:source,
-            "be a kind of `Hash', but was `#{val.class.inspect}'")
+                                 "be a kind of `Hash', but was `#{val.class.inspect}'")
         end
 
         val = canonicalize_source(val)
@@ -367,13 +367,13 @@ module Omnibus
         ]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,
-            "only include valid keys. Invalid keys: #{extra_keys.inspect}")
+                                 "only include valid keys. Invalid keys: #{extra_keys.inspect}")
         end
 
         duplicate_keys = val.keys & [:git, :path, :url]
         unless duplicate_keys.size < 2
           raise InvalidValue.new(:source,
-            "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
+                                 "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
         end
 
         if ship_source
@@ -491,7 +491,7 @@ module Omnibus
       if block_given?
         if val.equal?(NULL)
           raise InvalidValue.new(:version,
-            "pass a block when given a version argument")
+                                 "pass a block when given a version argument")
         else
           if val == final_version
             #
@@ -815,15 +815,15 @@ module Omnibus
         extra_linker_flags["LD_OPTIONS"] = ld_options
       end
 
-      env.merge(compiler_flags).
-        merge(extra_linker_flags).
+      env.merge(compiler_flags)
+         .merge(extra_linker_flags).
         # always want to favor pkg-config from embedded location to not hose
         # configure scripts which try to be too clever and ignore our explicit
         # CFLAGS and LDFLAGS in favor of pkg-config info
         merge({ "PKG_CONFIG_PATH" => "#{install_dir}/embedded/lib/pkgconfig" }).
         # Set default values for CXXFLAGS and CPPFLAGS.
-        merge("CXXFLAGS" => compiler_flags["CFLAGS"]).
-        merge("CPPFLAGS" => compiler_flags["CFLAGS"])
+        merge("CXXFLAGS" => compiler_flags["CFLAGS"])
+         .merge("CPPFLAGS" => compiler_flags["CFLAGS"])
     end
     expose :with_standard_compiler_flags
 
@@ -975,7 +975,7 @@ module Omnibus
                                    locked_version: Fetcher.resolve_version(version, source),
                                    locked_source: source,
                                    license: license,
-      })
+                                 })
     end
 
     #

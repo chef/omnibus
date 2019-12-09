@@ -23,11 +23,11 @@ module Omnibus
     end
 
     def to_s
-      <<-EOH
-Could not locate or access the package at the given path:
+      <<~EOH
+        Could not locate or access the package at the given path:
 
-    #{@path}
-EOH
+            #{@path}
+      EOH
     end
   end
 
@@ -37,11 +37,11 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Could not locate or access the package metadata file at the given path:
+      <<~EOH
+        Could not locate or access the package metadata file at the given path:
 
-    #{@path}
-EOH
+            #{@path}
+      EOH
     end
   end
 
@@ -52,16 +52,16 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Missing required attribute `#{@name}' for #{@class}. You must
-specify a value for `#{@name}' in your DSL file:
+      <<~EOH
+        Missing required attribute `#{@name}' for #{@class}. You must
+        specify a value for `#{@name}' in your DSL file:
 
-    #{@name} #{@sample.inspect}
+            #{@name} #{@sample.inspect}
 
-Or set the value on the object:
+        Or set the value on the object:
 
-    #{@class.downcase}.#{@name}(#{@sample.inspect})
-EOH
+            #{@class.downcase}.#{@name}(#{@sample.inspect})
+      EOH
     end
   end
 
@@ -71,12 +71,12 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Attempting to apply the patch `#{@name}', but it was not found at any of the
-following locations:
+      <<~EOH
+        Attempting to apply the patch `#{@name}', but it was not found at any of the
+        following locations:
 
-#{@search_paths.map { |path| "    #{path}" }.join("\n")}
-EOH
+        #{@search_paths.map { |path| "    #{path}" }.join("\n")}
+      EOH
     end
   end
 
@@ -86,12 +86,12 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Attempting to evaluate the template `#{@template}', but it was not found at any of
-the following locations:
+      <<~EOH
+        Attempting to evaluate the template `#{@template}', but it was not found at any of
+        the following locations:
 
-#{@search_paths.map { |path| "    #{path}" }.join("\n")}
-EOH
+        #{@search_paths.map { |path| "    #{path}" }.join("\n")}
+      EOH
     end
   end
 
@@ -102,11 +102,11 @@ EOH
     end
 
     def to_s
-      <<-EOH
-I could not find a project named `#{@name}' in any of the project locations:"
+      <<~EOH
+        I could not find a project named `#{@name}' in any of the project locations:"
 
-#{@possible_paths.map { |path| "    #{path}" }.join("\n")}
-EOH
+        #{@possible_paths.map { |path| "    #{path}" }.join("\n")}
+      EOH
     end
   end
 
@@ -117,11 +117,11 @@ EOH
     end
 
     def to_s
-      <<-EOH
-I could not find a software named `#{@name}' in any of the software locations:"
+      <<~EOH
+        I could not find a software named `#{@name}' in any of the software locations:"
 
-#{@possible_paths.map { |path| "    #{path}" }.join("\n")}
-EOH
+        #{@possible_paths.map { |path| "    #{path}" }.join("\n")}
+      EOH
     end
   end
 
@@ -131,13 +131,13 @@ EOH
     end
 
     def to_s
-      <<-EOH
-I could not load the `#{@name}' gem. Please make sure the gem is installed on
-your local system by running `gem install #{@name}`, or by adding the following
-to your Gemfile:
+      <<~EOH
+        I could not load the `#{@name}' gem. Please make sure the gem is installed on
+        your local system by running `gem install #{@name}`, or by adding the following
+        to your Gemfile:
 
-    gem '#{@name}'
-EOH
+            gem '#{@name}'
+      EOH
     end
   end
 
@@ -147,9 +147,9 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Software must specify a `#{@key}; to cache it in S3 (#{@package})!
-EOH
+      <<~EOH
+        Software must specify a `#{@key}; to cache it in S3 (#{@package})!
+      EOH
     end
   end
 
@@ -166,9 +166,9 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Invalid value for `#{@source}'. Expected #{@source} to #{@message}!
-EOH
+      <<~EOH
+        Invalid value for `#{@source}'. Expected #{@source} to #{@message}!
+      EOH
     end
   end
 
@@ -182,10 +182,10 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Unknown platform `#{@platform}'!
-I do not know how to proceed!"
-EOH
+      <<~EOH
+        Unknown platform `#{@platform}'!
+        I do not know how to proceed!"
+      EOH
     end
   end
 
@@ -199,46 +199,46 @@ EOH
     end
 
     def to_s
-      <<-EOH
-Unknown platform version `#{@version}' for #{@platform}!
-I do not know how to proceed!"
-EOH
+      <<~EOH
+        Unknown platform version `#{@version}' for #{@platform}!
+        I do not know how to proceed!"
+      EOH
     end
   end
 
   class HealthCheckFailed < Error
     def to_s
-      <<-EOH
-The health check failed! Please see above for important information.
-EOH
+      <<~EOH
+        The health check failed! Please see above for important information.
+      EOH
     end
   end
 
   class ChecksumMissing < Error
     def initialize(software)
-      super <<-EOH
-Verification for #{software.name} failed due to a missing checksum.
+      super <<~EOH
+        Verification for #{software.name} failed due to a missing checksum.
 
-This added security check is used to prevent MITM attacks when downloading the
-remote file. You must specify a checksum for each version of software downloaded
-from a remote location.
-EOH
+        This added security check is used to prevent MITM attacks when downloading the
+        remote file. You must specify a checksum for each version of software downloaded
+        from a remote location.
+      EOH
     end
   end
 
   class ChecksumMismatch < Error
     def initialize(software, expected, actual)
-      super <<-EOH
-Verification for #{software.name} failed due to a checksum mismatch:
+      super <<~EOH
+        Verification for #{software.name} failed due to a checksum mismatch:
 
-    expected: #{expected}
-    actual:   #{actual}
+            expected: #{expected}
+            actual:   #{actual}
 
-This added security check is used to prevent MITM attacks when downloading the
-remote file. If you have updated the version or URL for the download, you will
-also need to update the checksum value. You can find the checksum value on the
-software publisher's website.
-EOH
+        This added security check is used to prevent MITM attacks when downloading the
+        remote file. If you have updated the version or URL for the download, you will
+        also need to update the checksum value. You can find the checksum value on the
+        software publisher's website.
+      EOH
     end
   end
 
@@ -258,19 +258,19 @@ EOH
       stdout = cmd.stdout.empty? ? "(nothing)" : cmd.stdout.strip
       stderr = cmd.stderr.empty? ? "(nothing)" : cmd.stderr.strip
 
-      super <<-EOH
-The following shell command exited with status #{status}:
+      super <<~EOH
+        The following shell command exited with status #{status}:
 
-    $ #{command_with_env}
+            $ #{command_with_env}
 
-Output:
+        Output:
 
-    #{stdout}
+            #{stdout}
 
-Error:
+        Error:
 
-    #{stderr}
-EOH
+            #{stderr}
+      EOH
     end
   end
 
@@ -289,15 +289,15 @@ EOH
 
       timeout = cmd.timeout.to_s.reverse.gsub(/...(?=.)/, '\&,').reverse
 
-      super <<-EOH
-The following shell command timed out at #{timeout} seconds:
+      super <<~EOH
+        The following shell command timed out at #{timeout} seconds:
 
-    $ #{command_with_env}
+            $ #{command_with_env}
 
-Please increase the `:timeout' value or run the command manually to make sure it
-is completing successfully. Sometimes it is common for a command to wait for
-user input.
-EOH
+        Please increase the `:timeout' value or run the command manually to make sure it
+        is completing successfully. Sometimes it is common for a command to wait for
+        user input.
+      EOH
     end
   end
 
@@ -306,27 +306,27 @@ EOH
       name = project.name
       culprit = project.culprit.name
 
-      super <<-EOH
-The project `#{name}' was already marked as dirty by `#{culprit}'. You cannot
-mark a project as dirty twice. This is probably a bug in Omnibus and should be
-reported.
-EOH
+      super <<~EOH
+        The project `#{name}' was already marked as dirty by `#{culprit}'. You cannot
+        mark a project as dirty twice. This is probably a bug in Omnibus and should be
+        reported.
+      EOH
     end
   end
 
   class UnresolvableGitReference < Error
     def initialize(ref)
-      super <<-EOH
-Could not resolve `#{ref}' to a valid git SHA-1.
-EOH
+      super <<~EOH
+        Could not resolve `#{ref}' to a valid git SHA-1.
+      EOH
     end
   end
 
   class InvalidVersion < Error
     def initialize(version)
-      super <<-EOF
-'#{version}' could not be parsed as a valid version.
-EOF
+      super <<~EOF
+        '#{version}' could not be parsed as a valid version.
+      EOF
     end
   end
 
@@ -342,13 +342,13 @@ EOF
     end
 
     def to_s
-      <<-EOH
-Encountered error(s) with project's licensing information.
-Failing the build because :fatal_licensing_warnings is set in the configuration.
-Error(s):
+      <<~EOH
+        Encountered error(s) with project's licensing information.
+        Failing the build because :fatal_licensing_warnings is set in the configuration.
+        Error(s):
 
-    #{@errors.join("\n    ")}
-EOH
+            #{@errors.join("\n    ")}
+      EOH
     end
   end
 end

@@ -61,7 +61,6 @@ module Omnibus
   # are common to multiple DSLs (like project and software). The extensions
   # below will be injected into CleanRoom, and hence visible to the DSLs.
   module Sugar
-
     # Returns whether the Windows build target is 32-bit (x86).
     # If this returns false, the target is x64. Itanium is not supported.
     def windows_arch_i386?

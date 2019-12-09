@@ -35,12 +35,13 @@ module Omnibus
     SERIAL_NUMBER = 1
 
     REQUIRED_GIT_FILES = %w{
-HEAD
-description
-hooks
-info
-objects
-refs}.freeze
+      HEAD
+      description
+      hooks
+      info
+      objects
+      refs
+    }.freeze
 
     #
     # @return [Software]

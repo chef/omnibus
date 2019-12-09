@@ -19,12 +19,12 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      preinst:  "Pre-installation Script",
+      preinst: "Pre-installation Script",
       postinst: "Post-installation Script",
-      config:   "Configuration Script",
+      config: "Configuration Script",
       unconfig: "Unconfiguration Script",
-      prerm:    "Pre_rm Script",
-      postrm:   "Unconfiguration Script",
+      prerm: "Pre_rm Script",
+      postrm: "Unconfiguration Script",
     }.freeze
 
     id :bff
@@ -150,11 +150,10 @@ module Omnibus
           config_script_path = File.join(scripts_staging_dir, "config")
           unless File.exists? config_script_path
             render_template(resource_path("config.erb"),
-              destination: "#{scripts_staging_dir}/config",
-              variables: {
-                name: project.name,
-              }
-            )
+                            destination: "#{scripts_staging_dir}/config",
+                            variables: {
+                              name: project.name,
+                            })
           end
 
           File.open(File.join(scripts_staging_dir, "config"), "a") do |file|
@@ -180,17 +179,16 @@ module Omnibus
       end
 
       render_template(resource_path("gen.template.erb"),
-        destination: File.join(staging_dir, "gen.template"),
-        variables: {
-          name:           safe_base_package_name,
-          install_dir:    project.install_dir,
-          friendly_name:  project.friendly_name,
-          version:        bff_version,
-          description:    project.description,
-          files:          files,
-          scripts:        scripts,
-        }
-      )
+                      destination: File.join(staging_dir, "gen.template"),
+                      variables: {
+                        name: safe_base_package_name,
+                        install_dir: project.install_dir,
+                        friendly_name: project.friendly_name,
+                        version: bff_version,
+                        description: project.description,
+                        files: files,
+                        scripts: scripts,
+                      })
 
       # Print the full contents of the rendered template file for mkinstallp's use
       log.debug(log_key) { "Rendered Template:\n" + File.read(File.join(staging_dir, "gen.template")) }
@@ -227,7 +225,7 @@ module Omnibus
       # packaging process are kept.)
       log.debug(log_key) do
         "With .inventory file of:\n" + File.read("#{
-          File.join( staging_dir, '.info', "#{safe_base_package_name}.inventory" )
+          File.join(staging_dir, '.info', "#{safe_base_package_name}.inventory")
         }")
       end
 
@@ -235,7 +233,6 @@ module Omnibus
       FileSyncer.glob(File.join(staging_dir, "tmp/*.bff")).each do |bff|
         copy_file(bff, File.join(Config.package_dir, create_bff_file_name))
       end
-
     ensure
       # chown back to original user's uid/gid so cleanup works correctly
       original_uid = shellout!("id -u").stdout.chomp

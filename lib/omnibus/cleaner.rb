@@ -23,15 +23,15 @@ module Omnibus
     namespace :clean
 
     argument :name,
-      banner: "NAME",
-      desc: "The name of the Omnibus project",
-      type: :string,
-      required: true
+             banner: "NAME",
+             desc: "The name of the Omnibus project",
+             type: :string,
+             required: true
 
     class_option :purge,
-      desc: "Purge the packages and caches",
-      type: :boolean,
-      default: false
+                 desc: "Purge the packages and caches",
+                 type: :boolean,
+                 default: false
 
     def initialize(*)
       super
@@ -48,16 +48,19 @@ module Omnibus
 
     def clean_package_dir
       return unless purge?
+
       FileSyncer.glob("#{Config.package_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_cache_dir
       return unless purge?
+
       FileSyncer.glob("#{Config.cache_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_install_dir
       return unless purge?
+
       remove_file(@project.install_dir)
     end
 

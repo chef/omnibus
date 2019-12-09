@@ -149,13 +149,13 @@ module Omnibus
 
       def s3_configuration
         config = {
-          region:                    Config.s3_region,
-          bucket_name:               Config.s3_bucket,
-          endpoint:                  Config.s3_endpoint,
-          use_accelerate_endpoint:   Config.s3_accelerate,
-          force_path_style:          Config.s3_force_path_style,
+          region: Config.s3_region,
+          bucket_name: Config.s3_bucket,
+          endpoint: Config.s3_endpoint,
+          use_accelerate_endpoint: Config.s3_accelerate,
+          force_path_style: Config.s3_force_path_style,
           s3_authenticated_download: Config.s3_authenticated_download,
-          retry_limit:               Config.fetcher_retries,
+          retry_limit: Config.fetcher_retries,
         }
 
         if Config.s3_profile

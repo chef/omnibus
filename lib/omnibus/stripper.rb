@@ -94,8 +94,5 @@ module Omnibus
         shellout!("chmod -x #{target}")
       end
     end
-
-    private
-
   end
 end

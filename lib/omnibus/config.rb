@@ -375,7 +375,6 @@ module Omnibus
     # @return [true, false]
     default(:s3_ecs_credentials, false)
 
-
     # --------------------------------------------------
     # @!endgroup
     #
@@ -623,9 +622,6 @@ module Omnibus
 
     private
 
-    #
-    #
-    #
     def set_or_return(key, value = NULL, default = NULL, &block)
       instance_variable = :"@#{key}"
 

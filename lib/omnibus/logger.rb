@@ -16,7 +16,6 @@
 
 module Omnibus
   class Logger
-
     require "time"
 
     #
@@ -102,6 +101,7 @@ module Omnibus
     #
     def add(severity, progname, &block)
       return true if io.nil? || severity < level
+
       message = format_message(severity, progname, yield)
       MUTEX.synchronize { io.write(message) }
       true

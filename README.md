@@ -24,6 +24,22 @@ Omnibus is designed to run with a minimal set of prerequisites. You will need th
 - Ruby 2.0.0+
 - Bundler
 
+Development
+-----------
+
+When developing, we want to ensure no formating quality loss. That's why the CI is running a script to ensure the rubocop formatting rules are validated.
+
+You can run it with:
+
+```bash
+$ scripts/format-check.sh
+```
+
+If needed, you can set it up as a pre commit hook by running:
+
+```bash
+$ mv scripts/format-check.sh .git/hooks/pre-commit
+```
 
 Get Started
 -----------

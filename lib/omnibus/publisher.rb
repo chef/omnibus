@@ -76,7 +76,7 @@ module Omnibus
           # the platform map is a simple hash with publish to build platform mappings
           @options[:platform_mappings].each_pair do |build_platform, publish_platforms|
             # Splits `ubuntu-12.04` into `ubuntu` and `12.04`
-            build_platform, build_platform_version = build_platform.rpartition("-") - %w{ - }
+            build_platform, build_platform_version = build_platform.rpartition("-") - %w{-}
 
             # locate the package for the build platform
             packages = build_packages.select do |p|
@@ -92,7 +92,7 @@ module Omnibus
             end
 
             publish_platforms.each do |publish_platform|
-              publish_platform, publish_platform_version = publish_platform.rpartition("-") - %w{ - }
+              publish_platform, publish_platform_version = publish_platform.rpartition("-") - %w{-}
 
               packages.each do |p|
                 # create a copy of our package before mucking with its metadata

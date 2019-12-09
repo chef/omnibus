@@ -71,10 +71,10 @@ module Omnibus
       if signing_identity or signing_identity_file
         puts "starting signing"
         if additional_sign_files
-            additional_sign_files.each do |signfile|
+          additional_sign_files.each do |signfile|
             puts "signing #{signfile}"
             sign_package(signfile)
-            end
+          end
         end
 
       end
@@ -86,12 +86,13 @@ module Omnibus
       candle_vars = ''
       wxs_list = ''
       wixobj_list = ''
-      
+
       if not extra_package_dir.nil?
         if File.directory?(extra_package_dir)
           # Let's collect the DirectoryRefs
           Dir.foreach(extra_package_dir) do |item|
             next if item == '.' or item == '..'
+
             dir_refs.push(item)
           end
         end
@@ -135,7 +136,7 @@ module Omnibus
         # This assumes, rightly or wrongly, that any installers we want to bundle
         # into our installer will be downloaded by omnibus and put in the cache dir
         if bundle_msi
-          bundle_candle_vars ="-dPackageMsi=#{msi_file}"
+          bundle_candle_vars = "-dPackageMsi=#{msi_file}"
           shellout!(candle_command(is_bundle: true, candle_vars: bundle_candle_vars))
 
           bundle_file = windows_safe_path(Config.package_dir, bundle_name)
@@ -158,10 +159,11 @@ module Omnibus
     def additional_sign_files(val = NULL)
       if null?(val)
         @additional_sign_files
-      else 
+      else
         unless val.is_a?(Array)
           raise InvalidValue.new(:additional_sign_files, "be an Array")
         end
+
         @additional_sign_files = val
       end
     end
@@ -199,6 +201,7 @@ module Omnibus
         unless val.is_a?(String)
           raise InvalidValue.new(:extra_package_dir, "be a String")
         end
+
         @extra_package_dir = val
       end
     end
@@ -287,6 +290,7 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:bundle_msi, "be TrueClass or FalseClass")
       end
+
       @bundle_msi ||= val
     end
     expose :bundle_msi
@@ -306,6 +310,7 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:bundle_theme, "be TrueClass or FalseClass")
       end
+
       @bundle_theme ||= val
     end
     expose :bundle_theme
@@ -325,6 +330,7 @@ module Omnibus
       unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
         raise InvalidValue.new(:fast_msi, "be TrueClass or FalseClass")
       end
+
       @fast_msi ||= val
     end
     expose :fast_msi
@@ -356,6 +362,7 @@ module Omnibus
 
       raise "Could not find `#{search_pattern}'!" if file_paths.none?
       raise "Multiple possible matches of `#{search_pattern}'! : #{file_paths}" if file_paths.count > 1
+
       file_paths.first.relative_path_from(install_path).to_s
     end
     expose :gem_path
@@ -393,13 +400,12 @@ module Omnibus
     #
     def write_localization_file
       render_template(resource_path("localization-en-us.wxl.erb"),
-        destination: "#{staging_dir}/localization-en-us.wxl",
-        variables: {
-          name:          project.package_name,
-          friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
-        }
-      )
+                      destination: "#{staging_dir}/localization-en-us.wxl",
+                      variables: {
+                        name: project.package_name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                      })
     end
 
     #
@@ -409,17 +415,16 @@ module Omnibus
     #
     def write_parameters_file
       render_template(resource_path("parameters.wxi.erb"),
-        destination: "#{staging_dir}/parameters.wxi",
-        variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
-          display_version: msi_display_version,
-        }
-      )
+                      destination: "#{staging_dir}/parameters.wxi",
+                      variables: {
+                        name: project.package_name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                        upgrade_code: upgrade_code,
+                        parameters: parameters,
+                        version: windows_package_version,
+                        display_version: msi_display_version,
+                      })
     end
 
     #
@@ -458,16 +463,15 @@ module Omnibus
                         end
 
       render_template(resource_path("source.wxs.erb"),
-        destination: "#{staging_dir}/source.wxs",
-        variables: {
-          name:          project.package_name,
-          friendly_name: project.friendly_name,
-          maintainer:    project.maintainer,
-          hierarchy:     hierarchy,
-          fastmsi:       fast_msi,
-          wix_install_dir: wix_install_dir,
-        }
-      )
+                      destination: "#{staging_dir}/source.wxs",
+                      variables: {
+                        name: project.package_name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                        hierarchy: hierarchy,
+                        fastmsi: fast_msi,
+                        wix_install_dir: wix_install_dir,
+                      })
     end
 
     #
@@ -477,18 +481,17 @@ module Omnibus
     #
     def write_bundle_file
       render_template(resource_path("bundle.wxs.erb"),
-        destination: "#{staging_dir}/bundle.wxs",
-        variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
-          display_version: msi_display_version,
-          msi:             windows_safe_path(Config.package_dir, msi_name),
-        }
-      )
+                      destination: "#{staging_dir}/bundle.wxs",
+                      variables: {
+                        name: project.package_name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                        upgrade_code: upgrade_code,
+                        parameters: parameters,
+                        version: windows_package_version,
+                        display_version: msi_display_version,
+                        msi: windows_safe_path(Config.package_dir, msi_name),
+                      })
     end
 
     #
@@ -498,18 +501,17 @@ module Omnibus
     #
     def write_bundle_theme_file
       render_template(resource_path("bundle_theme.xml.erb"),
-        destination: "#{staging_dir}/bundle_theme.xml",
-        variables: {
-          name:            project.package_name,
-          friendly_name:   project.friendly_name,
-          maintainer:      project.maintainer,
-          upgrade_code:    upgrade_code,
-          parameters:      parameters,
-          version:         windows_package_version,
-          display_version: msi_display_version,
-          msi:             windows_safe_path(Config.package_dir, msi_name),
-        }
-      )
+                      destination: "#{staging_dir}/bundle_theme.xml",
+                      variables: {
+                        name: project.package_name,
+                        friendly_name: project.friendly_name,
+                        maintainer: project.maintainer,
+                        upgrade_code: upgrade_code,
+                        parameters: parameters,
+                        version: windows_package_version,
+                        display_version: msi_display_version,
+                        msi: windows_safe_path(Config.package_dir, msi_name),
+                      })
     end
 
     #

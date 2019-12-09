@@ -65,7 +65,6 @@ module Omnibus
         [include, "#{include}/*"]
       end.flatten
 
-
       source_files = glob(File.join(source, "**/*"))
       source_files = source_files.reject do |source_file|
         basename = relative_path_for(source_file, source)
@@ -162,7 +161,7 @@ module Omnibus
           end
         else
           raise RuntimeError,
-            "Unknown file type: `File.ftype(source_file)' at `#{source_file}'!"
+                "Unknown file type: `File.ftype(source_file)' at `#{source_file}'!"
         end
       end
 

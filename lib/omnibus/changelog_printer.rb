@@ -1,6 +1,5 @@
 module Omnibus
   class ChangeLogPrinter
-
     def initialize(changelog, diff, source_path = "../")
       @changelog = changelog
       @diff = diff
@@ -36,6 +35,7 @@ module Omnibus
 
     def print_new_components
       return if diff.added.empty?
+
       puts "New Components"
       diff.added.each do |entry|
         puts "* #{entry[:name]} (#{entry[:new_version]})"
@@ -45,6 +45,7 @@ module Omnibus
 
     def print_updated_components
       return if diff.updated.empty?
+
       puts "Updated Components"
       diff.updated.each do |entry|
         puts sprintf("* %s (%.8s -> %.8s)",
@@ -60,6 +61,7 @@ module Omnibus
 
     def print_removed_components
       return if diff.removed.empty?
+
       puts "Removed Components"
       diff.removed.each do |entry|
         puts "* #{entry[:name]} (#{entry[:old_version]})"

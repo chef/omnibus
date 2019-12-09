@@ -30,7 +30,7 @@ module Omnibus
     # @param [Project] project
     #
     def initialize(project)
-      @project  = project
+      @project = project
 
       # There can now be multiple packagers per platform
       # but windows is the only platform that uses multiple

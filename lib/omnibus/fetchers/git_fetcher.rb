@@ -290,6 +290,7 @@ module Omnibus
       unless commit_ref
         raise UnresolvableGitReference.new(ref)
       end
+
       commit_ref
     end
 

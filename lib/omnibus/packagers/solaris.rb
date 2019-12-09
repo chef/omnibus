@@ -21,10 +21,10 @@ module Omnibus
     # @return [Hash]
     SCRIPT_MAP = {
       # Default Omnibus naming
-      postinst:  "postinstall",
+      postinst: "postinstall",
       postrm: "postremove",
       # Default Solaris naming
-      postinstall:  "postinstall",
+      postinstall: "postinstall",
       postremove: "postremove",
     }.freeze
 
