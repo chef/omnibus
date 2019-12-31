@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.18 -->
-## [6.1.18](https://github.com/chef/omnibus/tree/6.1.18) (2019-11-28)
+<!-- latest_release 6.1.19 -->
+## [6.1.19](https://github.com/chef/omnibus/tree/6.1.19) (2019-12-31)
 
 #### Merged Pull Requests
-- Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey))
+- Update thor requirement from ~&gt; 0.18 to &gt;= 0.18, &lt; 2.0 [#921](https://github.com/chef/omnibus/pull/921) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update thor requirement from ~&gt; 0.18 to &gt;= 0.18, &lt; 2.0 [#921](https://github.com/chef/omnibus/pull/921) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.19 -->
 - Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey)) <!-- 6.1.18 -->
 - Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain)) <!-- 6.1.17 -->
 - fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey)) <!-- 6.1.16 -->
