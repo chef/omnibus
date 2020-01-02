@@ -37,24 +37,30 @@ module Omnibus
 
       end
       # If there are extra package files let's add them
-      zip_source_path = ""
+      zip_file = windows_safe_path(Config.package_dir, zip_name)
+      zip_source_path = "#{windows_safe_path(project.install_dir)}\\*"
+      cmd = <<-EOH.split.join(" ").squeeze(" ").strip
+        7z a -r
+        #{zip_file}
+        #{zip_source_path}
+        EOH
+      shellout!(cmd)
       
       if not extra_package_dirs.nil?
         extra_package_dirs.each do |extra_package_dir|
           if File.directory?(extra_package_dir)
             # Let's collect the DirectoryRefs
-            zip_source_path += "#{windows_safe_path(extra_package_dir)}\\* "
+            zip_source_path = "#{windows_safe_path(extra_package_dir)}\\* "
+            cmd = <<-EOH.split.join(" ").squeeze(" ").strip
+              7z a -r
+              #{zip_file}
+              #{zip_source_path}
+              EOH
+            shellout!(cmd)
           end
         end
       end
-      zip_file = windows_safe_path(Config.package_dir, zip_name)
-      zip_source_path += "#{windows_safe_path(project.install_dir)}\\*"
-      cmd = <<-EOH.split.join(" ").squeeze(" ").strip
-      7z a -r
-      #{zip_file}
-      #{zip_source_path}
-      EOH
-      shellout!(cmd)
+      
 
     end
 
