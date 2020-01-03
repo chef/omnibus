@@ -38,15 +38,15 @@ module Omnibus
     # @return [Hash<String, Class>]
     #
     PLATFORM_PACKAGER_MAP = {
-      "debian"   => DEB,
-      "fedora"   => RPM,
-      "suse"     => RPM,
-      "rhel"     => RPM,
-      "wrlinux"  => RPM,
-      "aix"      => BFF,
-      "solaris"  => Solaris,
-      "ips"      => IPS,
-      "windows"  => [MSI, ZIP],
+      "debian" => DEB,
+      "fedora" => RPM,
+      "suse" => RPM,
+      "rhel" => RPM,
+      "wrlinux" => RPM,
+      "aix" => BFF,
+      "solaris" => Solaris,
+      "ips" => IPS,
+      "windows" => [MSI, ZIP],
       "mac_os_x" => PKG,
     }.freeze
 

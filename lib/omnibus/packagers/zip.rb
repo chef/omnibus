@@ -29,10 +29,10 @@ module Omnibus
       if signing_identity or signing_identity_file
         puts "starting signing"
         if additional_sign_files
-            additional_sign_files.each do |signfile|
+          additional_sign_files.each do |signfile|
             puts "signing #{signfile}"
             sign_package(signfile)
-            end
+          end
         end
 
       end
@@ -43,9 +43,9 @@ module Omnibus
         7z a -r
         #{zip_file}
         #{zip_source_path}
-        EOH
+      EOH
       shellout!(cmd)
-      
+
       if not extra_package_dirs.nil?
         extra_package_dirs.each do |extra_package_dir|
           if File.directory?(extra_package_dir)
@@ -55,13 +55,11 @@ module Omnibus
               7z a -r
               #{zip_file}
               #{zip_source_path}
-              EOH
+            EOH
             shellout!(cmd)
           end
         end
       end
-      
-
     end
 
     #
@@ -74,10 +72,11 @@ module Omnibus
     def additional_sign_files(val = NULL)
       if null?(val)
         @additional_sign_files
-      else 
+      else
         unless val.is_a?(Array)
           raise InvalidValue.new(:additional_sign_files, "be an Array")
         end
+
         @additional_sign_files = val
       end
     end
@@ -90,6 +89,7 @@ module Omnibus
         unless val.is_a?(Array)
           raise InvalidValue.new(:extra_package_dir, "be an Array")
         end
+
         @extra_package_dirs = val
       end
     end
@@ -107,6 +107,5 @@ module Omnibus
     def zip_name
       "#{project.package_name}-#{project.build_version}-#{project.build_iteration}-#{Config.windows_arch}.zip"
     end
-
   end
 end
