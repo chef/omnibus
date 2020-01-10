@@ -29,6 +29,7 @@ module Omnibus
     autoload :Solaris,  "omnibus/packagers/solaris"
     autoload :IPS,      "omnibus/packagers/ips"
     autoload :RPM,      "omnibus/packagers/rpm"
+    autoload :ZIP,      "omnibus/packagers/zip"
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -45,7 +46,7 @@ module Omnibus
       "aix" => BFF,
       "solaris" => Solaris,
       "ips" => IPS,
-      "windows" => MSI,
+      "windows" => [MSI, ZIP],
       "mac_os_x" => PKG,
     }.freeze
 

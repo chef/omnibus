@@ -149,6 +149,25 @@ module Omnibus
     expose :windows_safe_path
 
     #
+    # Skip this packager during build process
+    #
+    # @example
+    #   skip_package true
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether to delay validation or not
+    #
+    # @return [TrueClass, FalseClass]
+    #   whether to skip this packager type or not
+    def skip_packager(val = false)
+      unless val.is_a?(TrueClass) || val.is_a?(FalseClass)
+        raise InvalidValue.new(:skip_packager, "be TrueClass or FalseClass")
+      end
+
+      @skip_package ||= val
+    end
+    expose :skip_packager
+    #
     # @!endgroup
     # --------------------------------------------------
 
