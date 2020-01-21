@@ -109,10 +109,12 @@ module Omnibus
       let (:s3_access_key) { nil }
       let (:s3_secret_key) { nil }
       let (:s3_profile) { nil }
+      let (:s3_iam_role_arn) { nil }
 
       before do
         Config.s3_bucket s3_bucket
         Config.s3_region s3_region
+        Config.s3_iam_role_arn s3_iam_role_arn
         Config.s3_profile s3_profile
         Config.s3_access_key s3_access_key
         Config.s3_secret_key s3_secret_key
@@ -144,6 +146,21 @@ module Omnibus
         it "sets s3_profile only" do
           config = S3Cache.send(:s3_configuration)
           expect(config[:profile]).to eq(s3_profile)
+          expect(config[:access_key_id]).to eq(nil)
+          expect(config[:secret_access_key]).to eq(nil)
+        end
+      end
+
+      context "s3_iam_role_arn is configured" do
+        let(:s3_iam_role_arn) { "S3_IAM_ROLE_ARN" }
+        let(:s3_profile) { "SHAREDPROFILE" }
+        let(:s3_access_key) { "ACCESS_KEY_ID" }
+        let(:s3_secret_key) { "SECRET_ACCESS_KEY" }
+
+        it "sets s3_iam_role_arn only" do
+          config = S3Cache.send(:s3_configuration)
+          expect(config[:iam_role_arn]).to eq(s3_iam_role_arn)
+          expect(config[:profile]).to eq(nil)
           expect(config[:access_key_id]).to eq(nil)
           expect(config[:secret_access_key]).to eq(nil)
         end
