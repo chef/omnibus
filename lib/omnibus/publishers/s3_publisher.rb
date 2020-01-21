@@ -65,11 +65,13 @@ module Omnibus
         bucket_name: @options[:bucket],
       }
 
-      if Config.publish_s3_profile
-        config[:profile]            = Config.publish_s3_profile
+      if Config.publish_s3_iam_role_arn
+        config[:publish_s3_iam_role_arn] = Config.publish_s3_iam_role_arn
+      elsif Config.publish_s3_profile
+        config[:profile] = Config.publish_s3_profile
       else
-        config[:access_key_id]      = Config.publish_s3_access_key
-        config[:secret_access_key]  = Config.publish_s3_secret_key
+        config[:access_key_id] = Config.publish_s3_access_key
+        config[:secret_access_key] = Config.publish_s3_secret_key
       end
 
       config

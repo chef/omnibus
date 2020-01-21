@@ -84,11 +84,19 @@ use_git_caching false
 # Enable S3 asset caching
 # ------------------------------
 use_s3_caching true
+s3_bucket      ENV['S3_BUCKET']
+
+# There are three ways to authenticate to the S3 bucket
+
+# 1. set `s3_access_key` and `s3_secret_key`
 s3_access_key  ENV['S3_ACCESS_KEY']
 s3_secret_key  ENV['S3_SECRET_KEY']
-# You can use the Shared Credentials files in place of the s3_access_key and s3_secret_key.
+
+# 2. set `s3_profile` to use an AWS profile in the Shared Credentials files
 #s3_profile    ENV['S3_PROFILE']
-s3_bucket      ENV['S3_BUCKET']
+
+# 3. set `s3_iam_role_arn` to use an AWS IAM role
+#s3_iam_role_arn    ENV['S3_IAM_ROLE_ARN']
 ```
 
 For more information, please see the [`Config` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Config).

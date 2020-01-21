@@ -53,10 +53,7 @@ module Omnibus
       # @return [Aws::S3::Resource]
       #
       def client
-        Aws.config.update(
-          region: s3_configuration[:region],
-          credentials: get_credentials
-        )
+        Aws.config.update(region: s3_configuration[:region])
 
         @s3_client ||= Aws::S3::Resource.new(resource_params)
       end
@@ -70,6 +67,7 @@ module Omnibus
         params = {
           use_accelerate_endpoint: s3_configuration[:use_accelerate_endpoint],
           force_path_style: s3_configuration[:force_path_style],
+          credentials: get_credentials,
         }
 
         if s3_configuration[:use_accelerate_endpoint]
@@ -84,12 +82,14 @@ module Omnibus
       end
 
       #
-      # Create credentials object based on credential profile or access key
+      # Create credentials object based on AWS IAM role arn, credential profile or access key
       # parameters for use by the client object.
       #
       # @return [Aws::SharedCredentials, Aws::Credentials]
       def get_credentials
-        if s3_configuration[:profile]
+        if s3_configuration[:iam_role_arn]
+          Aws::AssumeRoleCredentials.new(role_arn: s3_configuration[:iam_role_arn], role_session_name: "omnibus-assume-role-s3-access")
+        elsif s3_configuration[:profile]
           Aws::SharedCredentials.new(profile_name: s3_configuration[:profile])
         elsif s3_configuration[:access_key_id] && s3_configuration[:secret_access_key]
           Aws::Credentials.new(s3_configuration[:access_key_id], s3_configuration[:secret_access_key])
