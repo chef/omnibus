@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.0 -->
-## [7.0.0](https://github.com/chef/omnibus/tree/7.0.0) (2020-01-23)
+<!-- latest_release 7.0.1 -->
+## [7.0.1](https://github.com/chef/omnibus/tree/7.0.1) (2020-01-23)
 
 #### Merged Pull Requests
-- Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow))
+- Add AWS IAM authentication for S3 caching and publishing [#927](https://github.com/chef/omnibus/pull/927) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Add AWS IAM authentication for S3 caching and publishing [#927](https://github.com/chef/omnibus/pull/927) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 7.0.1 -->
 - Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.0 -->
 - Cache gem installs in S3 to speed up tests [#925](https://github.com/chef/omnibus/pull/925) ([tas50](https://github.com/tas50)) <!-- 6.1.21 -->
 - Update the rpm package signing to work with newer rpm version [#892](https://github.com/chef/omnibus/pull/892) ([twk3](https://github.com/twk3)) <!-- 6.1.20 -->
