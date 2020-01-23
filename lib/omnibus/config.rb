@@ -285,7 +285,7 @@ module Omnibus
     #
     # @return [String, nil]
     default(:s3_access_key) do
-      if s3_profile
+      if s3_profile || s3_iam_role_arn
         nil
       else
         raise MissingRequiredAttribute.new(self, :s3_access_key, "'ABCD1234'")
@@ -296,7 +296,7 @@ module Omnibus
     #
     # @return [String, nil]
     default(:s3_secret_key) do
-      if s3_profile
+      if s3_profile || s3_iam_role_arn
         nil
       else
         raise MissingRequiredAttribute.new(self, :s3_secret_key, "'EFGH5678'")
@@ -307,6 +307,11 @@ module Omnibus
     #
     # @return [String, nil]
     default(:s3_profile, nil)
+
+    # The AWS IAM role arn to use with S3 caching.
+    #
+    # @return [String, nil]
+    default(:s3_iam_role_arn, nil)
 
     # The region of the S3 bucket you want to cache software artifacts in.
     # Defaults to 'us-east-1'
@@ -454,6 +459,11 @@ module Omnibus
     #
     # @return [String, nil]
     default(:publish_s3_profile, nil)
+
+    # The AWS IAM role arn to use with S3 publisher.
+    #
+    # @return [String, nil]
+    default(:publish_s3_iam_role_arn, nil)
 
     # Directory pattern for the S3 publisher.
     # Interpolation of metadata keys is supported.
