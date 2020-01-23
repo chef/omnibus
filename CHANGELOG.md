@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 6.1.21 -->
-## [6.1.21](https://github.com/chef/omnibus/tree/6.1.21) (2020-01-14)
+<!-- latest_release 7.0.0 -->
+## [7.0.0](https://github.com/chef/omnibus/tree/7.0.0) (2020-01-23)
 
 #### Merged Pull Requests
-- Cache gem installs in S3 to speed up tests [#925](https://github.com/chef/omnibus/pull/925) ([tas50](https://github.com/tas50))
+- Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.0 -->
 - Cache gem installs in S3 to speed up tests [#925](https://github.com/chef/omnibus/pull/925) ([tas50](https://github.com/tas50)) <!-- 6.1.21 -->
 - Update the rpm package signing to work with newer rpm version [#892](https://github.com/chef/omnibus/pull/892) ([twk3](https://github.com/twk3)) <!-- 6.1.20 -->
 - Update thor requirement from ~&gt; 0.18 to &gt;= 0.18, &lt; 2.0 [#921](https://github.com/chef/omnibus/pull/921) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.19 -->
