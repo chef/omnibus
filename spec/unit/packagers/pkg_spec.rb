@@ -518,25 +518,19 @@ module Omnibus
       end
 
       context "when not an executable" do
-        before do
+        it "returns false" do
           allow(File).to receive(:file?).with("file").and_return(true)
           allow(File).to receive(:executable?).with("file").and_return(false)
           allow(File).to receive(:symlink?).with("file").and_return(false)
-        end
-
-        it "returns false" do
           expect(subject.is_binary?("file")).to be false
         end
       end
 
       context "when is symlink" do
-        before do
+        it "returns false" do
           allow(File).to receive(:file?).with("file").and_return(true)
           allow(File).to receive(:executable?).with("file").and_return(true)
           allow(File).to receive(:symlink?).with("file").and_return(true)
-        end
-
-        it "returns false" do
           expect(subject.is_binary?("file")).to be false
         end
       end
@@ -612,6 +606,18 @@ module Omnibus
           expect(subject).to receive(:shellout!)
             .with("codesign -s '#{subject.signing_identity}' 'file' --options=runtime --force\n")
           subject.sign_binary("file", true)
+        end
+
+        context "with entitlements" do
+          let(:entitlements_file) { File.join(tmp_path, "project-full-name/resources/project-full-name/pkg/entitlements.plist") }
+
+          it "it signs the binary with the entitlements" do
+            allow(subject).to receive(:resource_path).with("entitlements.plist").and_return(entitlements_file)
+            allow(File).to receive(:exist?).with(entitlements_file).and_return(true)
+            expect(subject).to receive(:shellout!)
+              .with("codesign -s '#{subject.signing_identity}' 'file' --options=runtime --entitlements #{entitlements_file} --force\n")
+            subject.sign_binary("file", true)
+          end
         end
       end
     end
