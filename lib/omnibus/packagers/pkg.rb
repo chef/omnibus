@@ -412,6 +412,7 @@ module Omnibus
     def sign_binary(bin, hardened_runtime = false)
       command = "codesign -s '#{signing_identity}' '#{bin}'"
       command << %q{ --options=runtime} if hardened_runtime
+      command << %Q{ --entitlements #{resource_path("entitlements.plist")}} if File.exist?(resource_path("entitlements.plist")) && hardened_runtime
       ## Force re-signing to deal with binaries that have the same sha.
       command << %q{ --force}
       command << %Q{\n}
