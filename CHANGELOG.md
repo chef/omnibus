@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.2 -->
-## [7.0.2](https://github.com/chef/omnibus/tree/7.0.2) (2020-02-01)
+<!-- latest_release 7.0.3 -->
+## [7.0.3](https://github.com/chef/omnibus/tree/7.0.3) (2020-02-13)
 
 #### Merged Pull Requests
-- Enable entitlements file for macOS [#928](https://github.com/chef/omnibus/pull/928) ([jonsmorrow](https://github.com/jonsmorrow))
+- point to 1-stable branch for changes to the overrides.rb file. [#930](https://github.com/chef/omnibus/pull/930) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- point to 1-stable branch for changes to the overrides.rb file. [#930](https://github.com/chef/omnibus/pull/930) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit)) <!-- 7.0.3 -->
 - Enable entitlements file for macOS [#928](https://github.com/chef/omnibus/pull/928) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.2 -->
 - Add AWS IAM authentication for S3 caching and publishing [#927](https://github.com/chef/omnibus/pull/927) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 7.0.1 -->
 - Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.0 -->
