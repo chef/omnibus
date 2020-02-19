@@ -915,6 +915,28 @@ module Omnibus
     expose :text_manifest_path
 
     #
+    # Set or return the code signing identity. Can be used in software definitions
+    # to sign components of the package.
+    #
+    # @example
+    #   code_signing_identity "foo"
+    #
+    # @param [String] val
+    #   the identity to use when code signing
+    #
+    # @return [String]
+    #   the code-signing identity
+    #
+    def code_signing_identity(val = NULL)
+      if null?(val)
+        @code_signing_identity
+      else
+        @code_signing_identity = val
+      end
+    end
+    expose :code_signing_identity
+
+    #
     # @!endgroup
     # --------------------------------------------------
 

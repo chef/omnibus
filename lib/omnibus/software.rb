@@ -936,6 +936,19 @@ module Omnibus
     expose :ship_source
 
     #
+    # Return the code signing identity. Can be used in software definitions
+    # to sign components of the package.
+    # Inherited from the parent project.
+    #
+    # @return [String]
+    #   the code-signing identity
+    #
+    def code_signing_identity
+      @project.code_signing_identity
+    end
+    expose :code_signing_identity
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
