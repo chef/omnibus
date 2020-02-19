@@ -450,7 +450,7 @@ module Omnibus
 
       if Config.fatal_transitive_dependency_licensing_warnings && !transitive_dependency_licensing_warnings.empty?
         warnings_to_raise << transitive_dependency_licensing_warnings
-        warnings_to_raise << "If you are encountering missing license or missing license file errors for **transitive** dependencies, you can provide overrides for the missing information at https://github.com/chef/license_scout/blob/1-stable/lib/license_scout/overrides.rb#L93"
+        warnings_to_raise << "If you are encountering missing license or missing license file errors for **transitive** dependencies, you can provide overrides for the missing information at https://github.com/chef/license_scout/blob/1-stable/lib/license_scout/overrides.rb#L93. \n Promote license_scout to Rubygems with `/expeditor promote chef/license_scout:1-stable X.Y.Z` in slack."
       end
 
       warnings_to_raise.flatten!
