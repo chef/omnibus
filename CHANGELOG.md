@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.4 -->
-## [7.0.4](https://github.com/chef/omnibus/tree/7.0.4) (2020-02-19)
+<!-- latest_release 7.0.5 -->
+## [7.0.5](https://github.com/chef/omnibus/tree/7.0.5) (2020-02-24)
 
 #### Merged Pull Requests
-- Update instructions to get builds passing when a new license needs to be added. [#932](https://github.com/chef/omnibus/pull/932) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit))
+- Update chefstyle requirement from = 0.14.0 to = 0.14.1 [#929](https://github.com/chef/omnibus/pull/929) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 0.14.0 to = 0.14.1 [#929](https://github.com/chef/omnibus/pull/929) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.5 -->
 - Update instructions to get builds passing when a new license needs to be added. [#932](https://github.com/chef/omnibus/pull/932) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit)) <!-- 7.0.4 -->
 - point to 1-stable branch for changes to the overrides.rb file. [#930](https://github.com/chef/omnibus/pull/930) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit)) <!-- 7.0.3 -->
 - Enable entitlements file for macOS [#928](https://github.com/chef/omnibus/pull/928) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.2 -->
