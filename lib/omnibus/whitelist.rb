@@ -1,5 +1,5 @@
 
-# Copyright 2012-2018 Chef Software, Inc.
+# Copyright 2012-2020, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 WHITELIST_LIBS = [
     /ld-linux/,
+    /libanl\.so/,
     /libc\.so/,
     /libcrypt\.so/,
     /libdl/,
@@ -33,6 +34,7 @@ WHITELIST_LIBS = [
   ].freeze
 
 ARCH_WHITELIST_LIBS = [
+  /libanl\.so/,
   /libc\.so/,
   /libcrypt\.so/,
   /libdb-5\.3\.so/,
