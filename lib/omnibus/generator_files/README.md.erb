@@ -47,7 +47,7 @@ $ bin/omnibus clean <%= config[:name] %> --purge
 ### Publish
 
 Omnibus has a built-in mechanism for releasing to a variety of "backends", such
-as Amazon S3. You must set the proper credentials in your 
+as Amazon S3. You must set the proper credentials in your
 [`omnibus.rb`](omnibus.rb) config file or specify them via the command line.
 
 ```shell
@@ -105,17 +105,17 @@ individual build environment using the `kitchen` command.
 
 
 ```shell
-$ bin/kitchen converge ubuntu-1204
+$ bin/kitchen converge ubuntu-1804
 ```
 
 Then login to the instance and build the project as described in the Usage
 section:
 
 ```shell
-$ bundle exec kitchen login ubuntu-1204
+$ bin/kitchen login ubuntu-1804
+[vagrant@ubuntu...] $ .  load-omnibus-toolchain.sh
 [vagrant@ubuntu...] $ cd <%= config[:name] %>
 [vagrant@ubuntu...] $ bundle install
-[vagrant@ubuntu...] $ ...
 [vagrant@ubuntu...] $ bin/omnibus build <%= config[:name] %>
 ```
 
