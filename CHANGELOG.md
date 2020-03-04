@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.6 -->
-## [7.0.6](https://github.com/chef/omnibus/tree/7.0.6) (2020-02-26)
+<!-- latest_release 7.0.7 -->
+## [7.0.7](https://github.com/chef/omnibus/tree/7.0.7) (2020-03-04)
 
 #### Merged Pull Requests
-- Whitelist libanl [#934](https://github.com/chef/omnibus/pull/934) ([lamont-granquist](https://github.com/lamont-granquist))
+- Fix Ubuntu version in generated README.md [#935](https://github.com/chef/omnibus/pull/935) ([stevendanna](https://github.com/stevendanna))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix Ubuntu version in generated README.md [#935](https://github.com/chef/omnibus/pull/935) ([stevendanna](https://github.com/stevendanna)) <!-- 7.0.7 -->
 - Whitelist libanl [#934](https://github.com/chef/omnibus/pull/934) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 7.0.6 -->
 - Update chefstyle requirement from = 0.14.0 to = 0.14.1 [#929](https://github.com/chef/omnibus/pull/929) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.5 -->
 - Update instructions to get builds passing when a new license needs to be added. [#932](https://github.com/chef/omnibus/pull/932) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit)) <!-- 7.0.4 -->
