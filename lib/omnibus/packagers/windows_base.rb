@@ -17,7 +17,8 @@
 module Omnibus
   class Packager::WindowsBase < Packager::Base
     DEFAULT_TIMESTAMP_SERVERS = ["http://timestamp.digicert.com",
-                                 "http://timestamp.verisign.com/scripts/timestamp.dll"]
+                                 "http://timestamp.verisign.com/scripts/timestamp.dll",
+                                 "http://timestamp.globalsign.com/scripts/timstamp.dll"]
 
     #
     # Set the signing certificate name
@@ -201,9 +202,10 @@ module Omnibus
       end
 
       timestamp_servers.each do |ts|
+        puts "signing with timestamp server: #{ts}"
         success = try_sign(safe_package_file, ts)
 
-        puts "signed" if success
+        puts "signed with timestamp server: #{ts}" if success
 
         break if success
       end
