@@ -936,6 +936,7 @@ module Omnibus
     expose :ship_source
 
     #
+    # [MacOS only]
     # Return the code signing identity. Can be used in software definitions
     # to sign components of the package.
     # Inherited from the parent project.
@@ -947,6 +948,20 @@ module Omnibus
       @project.code_signing_identity
     end
     expose :code_signing_identity
+
+    #
+    # [MacOS only]
+    # Return the location of the Entitlements file. Can be used
+    # in software definitions to specify entitlements when signing files.
+    # Inherited from the parent project.
+    #
+    # @return [String]
+    #   the Entitlements file location
+    #
+    def entitlements_file
+      @project.entitlements_file
+    end
+    expose :entitlements_file
 
     #
     # @!endgroup

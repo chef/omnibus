@@ -915,6 +915,7 @@ module Omnibus
     expose :text_manifest_path
 
     #
+    # [MacOS only]
     # Set or return the code signing identity. Can be used in software definitions
     # to sign components of the package.
     #
@@ -935,6 +936,29 @@ module Omnibus
       end
     end
     expose :code_signing_identity
+
+    #
+    # [MacOS only]
+    # Set or return the location of the Entitlements file. Can be used
+    # in software definitions to specify entitlements when signing files.
+    #
+    # @example
+    #   entitlements_file "foo"
+    #
+    # @param [String] val
+    #   the location of the Entitlements file
+    #
+    # @return [String]
+    #   the location of the Entitlements file
+    #
+    def entitlements_file(val = NULL)
+      if null?(val)
+        @entitlements_file
+      else
+        @entitlements_file = val
+      end
+    end
+    expose :entitlements_file
 
     #
     # @!endgroup
