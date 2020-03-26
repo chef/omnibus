@@ -49,10 +49,10 @@ module Omnibus
       end
 
       if compressors.include?(:tgz)
-        return TGZ
+        TGZ
       else
         log.info(log_key) { "No compressor defined for `#{family}'." }
-        return Null
+        Null
       end
     end
     module_function :for_current_system

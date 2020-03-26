@@ -4,7 +4,7 @@ Layout/ClosingHeredocIndentation:
   Exclude:
     - 'lib/omnibus/licensing.rb'
 
-Layout/IndentHeredoc:
+Layout/HeredocIndentation:
   Exclude:
     - 'lib/omnibus/licensing.rb'
 
