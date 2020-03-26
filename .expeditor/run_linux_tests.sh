@@ -50,4 +50,4 @@ else
 fi
 
 echo "+++ bundle exec task"
-bundle exec $1
+bundle exec $@
