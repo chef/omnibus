@@ -77,7 +77,7 @@ module Omnibus
           end
         end
 
-        file = open(from_url, options)
+        file = URI.open(from_url, options)
         # This is a temporary file. Close and flush it before attempting to copy
         # it over.
         file.close
