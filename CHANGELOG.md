@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.10 -->
-## [7.0.10](https://github.com/chef/omnibus/tree/7.0.10) (2020-04-29)
+<!-- latest_release 7.0.11 -->
+## [7.0.11](https://github.com/chef/omnibus/tree/7.0.11) (2020-06-02)
 
 #### Merged Pull Requests
-- Update ohai requirement from &gt;= 13, &lt; 16 to &gt;= 13, &lt; 17 [#939](https://github.com/chef/omnibus/pull/939) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.0.1 to = 1.1.0 [#942](https://github.com/chef/omnibus/pull/942) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=6.1.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.0.1 to = 1.1.0 [#942](https://github.com/chef/omnibus/pull/942) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.11 -->
 - Update ohai requirement from &gt;= 13, &lt; 16 to &gt;= 13, &lt; 17 [#939](https://github.com/chef/omnibus/pull/939) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.10 -->
 - Update chefstyle requirement from = 0.15.1 to = 1.0.1 [#937](https://github.com/chef/omnibus/pull/937) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.9 -->
 - Update chefstyle requirement from = 0.14.1 to = 0.15.1 [#936](https://github.com/chef/omnibus/pull/936) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.8 -->
