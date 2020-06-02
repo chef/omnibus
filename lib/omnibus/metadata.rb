@@ -83,7 +83,7 @@ module Omnibus
         data = File.read(path_for(package))
         hash = FFI_Yajl::Parser.parse(data, symbolize_names: true)
 
-         # Ensure Platform version has been truncated
+        # Ensure Platform version has been truncated
         if hash[:platform_version] && hash[:platform]
           hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
         end
