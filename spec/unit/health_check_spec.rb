@@ -103,8 +103,20 @@ module Omnibus
       let(:file_list) do
         double("Mixlib::Shellout",
           error!: false,
+          error?: false,
           stdout: <<~EOH
             /opt/chefdk/shouldnt/matter
+          EOH
+        )
+      end
+
+      let(:file_list_multiple) do
+        double("Mixlib::Shellout",
+          error!: false,
+          error?: false,
+          stdout: <<~EOH
+            /opt/chefdk/first
+            /opt/chefdk/second
           EOH
         )
       end
@@ -112,6 +124,7 @@ module Omnibus
       let(:empty_list) do
         double("Mixlib::Shellout",
           error!: false,
+          error?: false,
           stdout: <<~EOH
           EOH
         )
@@ -130,6 +143,7 @@ module Omnibus
       let(:bad_list) do
         double("Mixlib::Shellout",
           error!: false,
+          error?: false,
           stdout: <<~EOH
             /somewhere/other/than/install/dir
           EOH
@@ -139,6 +153,7 @@ module Omnibus
       let(:bad_healthcheck) do
         double("Mixlib::Shellout",
           error!: false,
+          error?: false,
           stdout: <<~EOH
             /bin/ls:
               linux-vdso.so.1 =>  (0x00007fff583ff000)
@@ -161,6 +176,7 @@ module Omnibus
       let(:good_healthcheck) do
         double("Mixlib::Shellout",
           error!: false,
+          error?: false,
           stdout: <<~EOH
             /bin/echo:
               linux-vdso.so.1 =>  (0x00007fff8a6ee000)
@@ -170,6 +186,17 @@ module Omnibus
               linux-vdso.so.1 =>  (0x00007fff095b3000)
               libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe868ec0000)
               /lib64/ld-linux-x86-64.so.2 (0x00007fe869252000)
+          EOH
+        )
+      end
+
+      let(:bad_exitstatus_healthcheck) do
+        double("Mixlib::Shellout",
+          error!: -> { raise Mixlib::ShellOut::ShellCommandFailed },
+          error?: true,
+          exitstatus: 135,
+          stdout: <<~EOH
+            /bin/echo:
           EOH
         )
       end
@@ -196,6 +223,33 @@ module Omnibus
           .and_return(good_healthcheck)
 
         expect { subject.run! }.to_not raise_error
+      end
+
+      it "does checks lld for each file if the initial bulk ldd command fails" do
+        allow(subject).to receive(:shellout)
+          .with("find /opt/chefdk/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'")
+          .and_return(file_list_multiple)
+
+        # Bulk ldd command fails
+        allow(subject).to receive(:shellout)
+          .with("xargs ldd", { input: "/opt/chefdk/first\n/opt/chefdk/second\n" })
+          .and_return(bad_exitstatus_healthcheck)
+
+        # First file ldd fails
+        allow(subject).to receive(:shellout)
+          .with("xargs ldd", { input: "/opt/chefdk/first\n" })
+          .and_return(bad_exitstatus_healthcheck)
+
+        # Second file lld succeeds
+        allow(subject).to receive(:shellout)
+          .with("xargs ldd", { input: "/opt/chefdk/second\n" })
+          .and_return(good_healthcheck)
+
+        output = capture_logging do
+          expect { subject.run! }.to_not raise_error
+        end
+        expect(output).to match(/Failed running xargs ldd with exit status 135 when resolving individually/)
+        expect(output).to match(%r{Failed running xargs ldd with exit status 135 against: /opt/chefdk/first})
       end
 
       it "will not perform dll base relocation checks" do
