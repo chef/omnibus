@@ -1,48 +1,45 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.12 -->
-## [7.0.12](https://github.com/chef/omnibus/tree/7.0.12) (2020-06-03)
-
-#### Merged Pull Requests
-- Pin ffi to &lt; 0.13 for windows [#943](https://github.com/chef/omnibus/pull/943) ([james-stocks](https://github.com/james-stocks))
 <!-- latest_release -->
-<!-- release_rollup since=6.1.9 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Pin ffi to &lt; 0.13 for windows [#943](https://github.com/chef/omnibus/pull/943) ([james-stocks](https://github.com/james-stocks)) <!-- 7.0.12 -->
-- Update chefstyle requirement from = 1.0.1 to = 1.1.0 [#942](https://github.com/chef/omnibus/pull/942) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.11 -->
-- Update ohai requirement from &gt;= 13, &lt; 16 to &gt;= 13, &lt; 17 [#939](https://github.com/chef/omnibus/pull/939) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.10 -->
-- Update chefstyle requirement from = 0.15.1 to = 1.0.1 [#937](https://github.com/chef/omnibus/pull/937) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.9 -->
-- Update chefstyle requirement from = 0.14.1 to = 0.15.1 [#936](https://github.com/chef/omnibus/pull/936) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.8 -->
-- Fix Ubuntu version in generated README.md [#935](https://github.com/chef/omnibus/pull/935) ([stevendanna](https://github.com/stevendanna)) <!-- 7.0.7 -->
-- Whitelist libanl [#934](https://github.com/chef/omnibus/pull/934) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 7.0.6 -->
-- Update chefstyle requirement from = 0.14.0 to = 0.14.1 [#929](https://github.com/chef/omnibus/pull/929) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.5 -->
-- Update instructions to get builds passing when a new license needs to be added. [#932](https://github.com/chef/omnibus/pull/932) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit)) <!-- 7.0.4 -->
-- point to 1-stable branch for changes to the overrides.rb file. [#930](https://github.com/chef/omnibus/pull/930) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit)) <!-- 7.0.3 -->
-- Enable entitlements file for macOS [#928](https://github.com/chef/omnibus/pull/928) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.2 -->
-- Add AWS IAM authentication for S3 caching and publishing [#927](https://github.com/chef/omnibus/pull/927) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 7.0.1 -->
-- Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow)) <!-- 7.0.0 -->
-- Cache gem installs in S3 to speed up tests [#925](https://github.com/chef/omnibus/pull/925) ([tas50](https://github.com/tas50)) <!-- 6.1.21 -->
-- Update the rpm package signing to work with newer rpm version [#892](https://github.com/chef/omnibus/pull/892) ([twk3](https://github.com/twk3)) <!-- 6.1.20 -->
-- Update thor requirement from ~&gt; 0.18 to &gt;= 0.18, &lt; 2.0 [#921](https://github.com/chef/omnibus/pull/921) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.19 -->
-- Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey)) <!-- 6.1.18 -->
-- Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain)) <!-- 6.1.17 -->
-- fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey)) <!-- 6.1.16 -->
-- Minor spelling, grammar, punctuation [#917](https://github.com/chef/omnibus/pull/917) ([ehershey](https://github.com/ehershey)) <!-- 6.1.15 -->
-- Remove Solaris 10 platform and enable some hardening flags on Linux/Mac/FreeBSD [#915](https://github.com/chef/omnibus/pull/915) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.14 -->
-- Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50)) <!-- 6.1.13 -->
-- Update chefstyle requirement from = 0.13.3 to = 0.14.0 [#912](https://github.com/chef/omnibus/pull/912) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 6.1.12 -->
-- Don&#39;t mark the cache dirty if it already is. [#911](https://github.com/chef/omnibus/pull/911) ([btm](https://github.com/btm)) <!-- 6.1.11 -->
-- old PR that was merged was very old [#910](https://github.com/chef/omnibus/pull/910) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 6.1.10 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [7.0.12](https://github.com/chef/omnibus/tree/7.0.12) (2020-06-05)
+
+#### Merged Pull Requests
+- old PR that was merged was very old [#910](https://github.com/chef/omnibus/pull/910) ([lamont-granquist](https://github.com/lamont-granquist))
+- Don&#39;t mark the cache dirty if it already is. [#911](https://github.com/chef/omnibus/pull/911) ([btm](https://github.com/btm))
+- Update chefstyle requirement from = 0.13.3 to = 0.14.0 [#912](https://github.com/chef/omnibus/pull/912) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50))
+- Remove Solaris 10 platform and enable some hardening flags on Linux/Mac/FreeBSD [#915](https://github.com/chef/omnibus/pull/915) ([lamont-granquist](https://github.com/lamont-granquist))
+- Minor spelling, grammar, punctuation [#917](https://github.com/chef/omnibus/pull/917) ([ehershey](https://github.com/ehershey))
+- fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey))
+- Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain))
+- Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey))
+- Update thor requirement from ~&gt; 0.18 to &gt;= 0.18, &lt; 2.0 [#921](https://github.com/chef/omnibus/pull/921) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update the rpm package signing to work with newer rpm version [#892](https://github.com/chef/omnibus/pull/892) ([twk3](https://github.com/twk3))
+- Cache gem installs in S3 to speed up tests [#925](https://github.com/chef/omnibus/pull/925) ([tas50](https://github.com/tas50))
+- Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow))
+- Add AWS IAM authentication for S3 caching and publishing [#927](https://github.com/chef/omnibus/pull/927) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Enable entitlements file for macOS [#928](https://github.com/chef/omnibus/pull/928) ([jonsmorrow](https://github.com/jonsmorrow))
+- point to 1-stable branch for changes to the overrides.rb file. [#930](https://github.com/chef/omnibus/pull/930) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit))
+- Update instructions to get builds passing when a new license needs to be added. [#932](https://github.com/chef/omnibus/pull/932) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit))
+- Update chefstyle requirement from = 0.14.0 to = 0.14.1 [#929](https://github.com/chef/omnibus/pull/929) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Whitelist libanl [#934](https://github.com/chef/omnibus/pull/934) ([lamont-granquist](https://github.com/lamont-granquist))
+- Fix Ubuntu version in generated README.md [#935](https://github.com/chef/omnibus/pull/935) ([stevendanna](https://github.com/stevendanna))
+- Update chefstyle requirement from = 0.14.1 to = 0.15.1 [#936](https://github.com/chef/omnibus/pull/936) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 0.15.1 to = 1.0.1 [#937](https://github.com/chef/omnibus/pull/937) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update ohai requirement from &gt;= 13, &lt; 16 to &gt;= 13, &lt; 17 [#939](https://github.com/chef/omnibus/pull/939) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.0.1 to = 1.1.0 [#942](https://github.com/chef/omnibus/pull/942) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Pin ffi to &lt; 0.13 for windows [#943](https://github.com/chef/omnibus/pull/943) ([james-stocks](https://github.com/james-stocks))
+<!-- latest_stable_release -->
+
 ## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-11-01)
 
 #### Merged Pull Requests
 - force builds nil versions [#619](https://github.com/chef/omnibus/pull/619) ([lamont-granquist](https://github.com/lamont-granquist))
 - Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
-<!-- latest_stable_release -->
 
 ## [6.1.7](https://github.com/chef/omnibus/tree/6.1.7) (2019-10-29)
 
