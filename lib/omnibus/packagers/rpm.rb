@@ -656,6 +656,8 @@ module Omnibus
       case Ohai["kernel"]["machine"]
       when "i686"
         "i386"
+      when "armv7l" # raspberry pi 3 CentOS
+        "armv7hl"
       when "armv6l"
         if Ohai["platform"] == "pidora"
           "armv6hl"
