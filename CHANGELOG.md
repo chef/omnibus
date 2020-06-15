@@ -1,18 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.13 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [7.0.13](https://github.com/chef/omnibus/tree/7.0.13) (2020-06-15)
 
 #### Merged Pull Requests
 - Revert &quot;Pin ffi to &lt; 0.13 for windows&quot; now that 1.13.1 is out [#949](https://github.com/chef/omnibus/pull/949) ([tas50](https://github.com/tas50))
-<!-- latest_release -->
-<!-- release_rollup since=7.0.12 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Revert &quot;Pin ffi to &lt; 0.13 for windows&quot; now that 1.13.1 is out [#949](https://github.com/chef/omnibus/pull/949) ([tas50](https://github.com/tas50)) <!-- 7.0.13 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [7.0.12](https://github.com/chef/omnibus/tree/7.0.12) (2020-06-05)
 
 #### Merged Pull Requests
@@ -41,7 +39,6 @@
 - Update ohai requirement from &gt;= 13, &lt; 16 to &gt;= 13, &lt; 17 [#939](https://github.com/chef/omnibus/pull/939) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Update chefstyle requirement from = 1.0.1 to = 1.1.0 [#942](https://github.com/chef/omnibus/pull/942) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Pin ffi to &lt; 0.13 for windows [#943](https://github.com/chef/omnibus/pull/943) ([james-stocks](https://github.com/james-stocks))
-<!-- latest_stable_release -->
 
 ## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-11-01)
 
