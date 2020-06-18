@@ -114,7 +114,8 @@ section:
 ```shell
 $ bin/kitchen login ubuntu-1804
 [vagrant@ubuntu...] $ .  load-omnibus-toolchain.sh
-[vagrant@ubuntu...] $ cd <%= config[:name] %>
+[vagrant@ubuntu...] $ [ -e .bundle ] && sudo chown -R vagrant:vagrant .bundle
+[vagrant@ubuntu...] $ cd <%= config[:name] %>   # or 'cd <%= config[:name] %>/omnibus' if your omnibus project is embedded in your main project
 [vagrant@ubuntu...] $ bundle install
 [vagrant@ubuntu...] $ bin/omnibus build <%= config[:name] %>
 ```

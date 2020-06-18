@@ -46,10 +46,11 @@ $ omnibus new $MY_PROJECT_NAME
 
 This will generate a complete project skeleton in the directory `omnibus-$MY_PROJECT_NAME`
 
+By default this will make a directory called `omnibus-$MY_PROJECT_NAME` assuming you're keeping your omnibus config separate from the repo. However, keeping it *in* your repo is a common practice, so feel to rename this directory to `omnibus` and place it in the top level of your projects source repo.
+
 ```bash
 $ cd omnibus-$MY_PROJECT_NAME
 $ bundle install --binstubs
-$ bin/omnibus build $MY_PROJECT_NAME
 ```
 
 More details can be found in the generated project's README file.
@@ -143,7 +144,7 @@ DSL Method        | Description
 `package`         | Invoke a packager-specific DSL
 `compress`        | Invoke a compressor-specific DSL
 
-By default a timestamp is appended to the build_version. You can turn this behavior off by setting `append_timestamp` to `false` in your configuration file or using `--override append_timestamp:false` at the command line.
+By default a timestamp is appended to the build_version. You can turn this behavior off by setting `append_timestamp` to `false` in your `omnibus.rb` or using `--override append_timestamp:false` at the command line.
 
 For more information, please see the [`Project` documentation](http://www.rubydoc.info/github/chef/omnibus/Omnibus/Project).
 
@@ -266,6 +267,40 @@ $PWD/config/software/foo.rb
 ```
 
 The first instance of `foo.rb` that is encountered will be used. Please note that **local** (vendored) softare definitions take precedence!
+
+## Building
+
+Once you've created your package and software definitions you can build with:
+
+```shell
+./bin/omnibus build $MY_PACKAGE_NAME
+```
+
+However there are several caveats to be aware of:
+
+1. You will almost certainly want to uncomment the `base_dir` in `omnibus.rb`,
+or at the very least change `cache_dir` and `build_dir` as otherwise it'll try
+to use `/var/cache/omnibus` and `/opt/$MY_PROJECT_NAME`, requiring root.
+1. The default configuration created for you references a lot of things
+that are in the default config that come from the `omnibus-software` gem.
+So you want to use those you'll need to either uncomment it in the `Gemfile`,
+or fork it, and then reference your own
+1. If this is a ruby project and you want binstubs in `/opt/$project/bin`, you
+will either need to use [appbundler](https://github.com/chef/appbundler), or
+you will need to have a post install step to create those binstubs.
+    - Side note, appbundler requires that you include your Gemfile and gemspec
+      in your gem.
+    - Also, needs to be in your Gemfile for you to use it, as it also must
+      be in the resulting gem.
+1. If you specify an override of the version of the `ruby`, you will also need
+to override `rubygems` and `bundler` to match the versions in that version of
+`ruby` or you'll get failures around bundler version mismatches.
+
+The build command above will of course build on your local host thus being
+specific to the OS and base system you are on. But the skeleten setup by
+`omnibus new` already setup kitchen for you so that it's easy to build for
+a variety of OSes, See the `README.md` in your generated omnibus directory
+for details.
 
 ## Version Manifest
 
