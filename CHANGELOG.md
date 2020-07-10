@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.14 -->
-## [7.0.14](https://github.com/chef/omnibus/tree/7.0.14) (2020-06-26)
+<!-- latest_release 7.0.15 -->
+## [7.0.15](https://github.com/chef/omnibus/tree/7.0.15) (2020-07-10)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from = 1.1.0 to = 1.1.2 [#954](https://github.com/chef/omnibus/pull/954) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.1.2 to = 1.1.3 [#955](https://github.com/chef/omnibus/pull/955) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.1.2 to = 1.1.3 [#955](https://github.com/chef/omnibus/pull/955) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.15 -->
 - Update chefstyle requirement from = 1.1.0 to = 1.1.2 [#954](https://github.com/chef/omnibus/pull/954) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.14 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
