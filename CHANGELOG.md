@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.19 -->
-## [7.0.19](https://github.com/chef/omnibus/tree/7.0.19) (2020-07-20)
+<!-- latest_release 7.0.20 -->
+## [7.0.20](https://github.com/chef/omnibus/tree/7.0.20) (2020-08-11)
 
 #### Merged Pull Requests
-- Ruby 2.7.1 adds a warning on calling open directly, needs to be URI.open [#940](https://github.com/chef/omnibus/pull/940) ([mattray](https://github.com/mattray))
+- Update chefstyle requirement from = 1.2.0 to = 1.2.1 [#958](https://github.com/chef/omnibus/pull/958) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.2.0 to = 1.2.1 [#958](https://github.com/chef/omnibus/pull/958) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.20 -->
 - Ruby 2.7.1 adds a warning on calling open directly, needs to be URI.open [#940](https://github.com/chef/omnibus/pull/940) ([mattray](https://github.com/mattray)) <!-- 7.0.19 -->
 - Update chefstyle requirement from = 1.1.3 to = 1.2.0 [#957](https://github.com/chef/omnibus/pull/957) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.18 -->
 - Remove legacy CI configs and redundant encoding comment [#956](https://github.com/chef/omnibus/pull/956) ([tas50](https://github.com/tas50)) <!-- 7.0.17 -->
