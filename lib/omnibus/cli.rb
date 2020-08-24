@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-require "thor"
+require "thor" unless defined?(Thor)
 require "omnibus"
-require "ffi_yajl"
+require "ffi_yajl" unless defined?(FFI_Yajl)
 
 module Omnibus
   class CLI < Command::Base

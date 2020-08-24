@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "digest"
-require "fileutils"
+require "digest" unless defined?(Digest)
+require "fileutils" unless defined?(FileUtils)
 
 module Omnibus
   class GitCache

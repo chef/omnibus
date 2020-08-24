@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 
-require "fileutils"
-require "mixlib/shellout"
-require "ostruct"
-require "pathname"
+require "fileutils" unless defined?(FileUtils)
+require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
+require "ostruct" unless defined?(OpenStruct)
+require "pathname" unless defined?(Pathname)
 require "omnibus/whitelist"
 
 module Omnibus

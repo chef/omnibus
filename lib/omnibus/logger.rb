@@ -17,7 +17,7 @@
 module Omnibus
   class Logger
 
-    require "time"
+    require "time" unless defined?(Time.zone_offset)
 
     #
     # The amount of padding on the left column.

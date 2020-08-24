@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "ffi_yajl"
+require "ffi_yajl" unless defined?(FFI_Yajl)
 
 module Omnibus
   class Package

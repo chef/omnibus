@@ -17,7 +17,7 @@
 require "omnibus/core_extensions"
 
 require "cleanroom"
-require "pathname"
+require "pathname" unless defined?(Pathname)
 
 require "omnibus/digestable"
 require "omnibus/exceptions"

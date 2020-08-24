@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "fileutils"
-require "uri"
+require "fileutils" unless defined?(FileUtils)
+require "uri" unless defined?(URI)
 require "omnibus/manifest_entry"
 
 module Omnibus

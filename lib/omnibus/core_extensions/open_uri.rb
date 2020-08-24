@@ -1,4 +1,4 @@
-require "open-uri"
+require "open-uri" unless defined?(OpenURI)
 
 module OpenURI
   class << self

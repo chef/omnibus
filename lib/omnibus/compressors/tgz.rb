@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "rubygems/package"
-require "zlib"
+require "rubygems/package" unless defined?(Gem::Package)
+require "zlib" unless defined?(Zlib)
 
 module Omnibus
   class Compressor::TGZ < Compressor::Base

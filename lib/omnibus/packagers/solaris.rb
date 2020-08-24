@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "socket"
+require "socket" unless defined?(Socket)
 
 module Omnibus
   class Packager::Solaris < Packager::Base

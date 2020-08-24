@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "fileutils"
+require "fileutils" unless defined?(FileUtils)
 require "omnibus/s3_helpers"
 
 module Omnibus

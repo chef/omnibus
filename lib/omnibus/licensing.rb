@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "uri"
-require "fileutils"
+require "uri" unless defined?(URI)
+require "fileutils" unless defined?(FileUtils)
 require "omnibus/download_helpers"
 require "license_scout/collector"
 require "license_scout/reporter"

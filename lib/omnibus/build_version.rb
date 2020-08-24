@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "time"
+require "time" unless defined?(Time.zone_offset)
 
 module Omnibus
   # Provides methods for generating Omnibus project build version

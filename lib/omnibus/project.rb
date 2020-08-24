@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 
-require "time"
-require "ffi_yajl"
+require "time" unless defined?(Time.zone_offset)
+require "ffi_yajl" unless defined?(FFI_Yajl)
 require "omnibus/manifest"
 require "omnibus/manifest_entry"
 require "omnibus/reports"

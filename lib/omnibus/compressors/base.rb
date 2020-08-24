@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "fileutils"
+require "fileutils" unless defined?(FileUtils)
 
 module Omnibus
   class Compressor::Base < Packager::Base
