@@ -73,7 +73,7 @@ module Omnibus
     class << self
       # Set the source root for Thor
       def source_root
-        File.expand_path("../generator_files", __FILE__)
+        File.expand_path("generator_files", __dir__)
       end
     end
 
