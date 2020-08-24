@@ -598,12 +598,10 @@ module Omnibus
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
           files = FileSyncer.glob(source)
-          if files.empty?
-            log.warn(log_key) { "no matched files for glob #{command}" }
-          else
-            files.each do |file|
-              FileUtils.cp_r(file, destination, options)
-            end
+          raise "no matched files for glob #{command}" if files.empty? && !options[:force]
+
+          files.each do |file|
+            FileUtils.cp_r(file, destination, options)
           end
         end
       end
@@ -627,12 +625,10 @@ module Omnibus
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
           files = FileSyncer.glob(source)
-          if files.empty?
-            log.warn(log_key) { "no matched files for glob #{command}" }
-          else
-            files.each do |file|
-              FileUtils.mv(file, destination, options)
-            end
+          raise "no matched files for glob #{command}" if files.empty? && !options[:force]
+
+          files.each do |file|
+            FileUtils.mv(file, destination, options)
           end
         end
       end
@@ -656,12 +652,10 @@ module Omnibus
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
           files = FileSyncer.glob(source)
-          if files.empty?
-            log.warn(log_key) { "no matched files for glob #{command}" }
-          else
-            files.each do |file|
-              FileUtils.ln_s(file, destination, options)
-            end
+          raise "no matched files for glob #{command}" if files.empty? && !options[:force]
+
+          files.each do |file|
+            FileUtils.ln_s(file, destination, options)
           end
         end
       end
