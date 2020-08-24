@@ -4,7 +4,7 @@
 # https://twitter.com/mitchellh/status/283014103189053442
 Signal.trap("INT") { exit 1 }
 
-$:.push File.expand_path("../../lib", __FILE__)
+$:.push File.expand_path("../lib", __dir__)
 $stdout.sync = true
 
 require "omnibus/cli"
