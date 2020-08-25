@@ -781,6 +781,24 @@ module Omnibus
     expose :extra_package_file
 
     #
+    # Add one file in Windows build whose symbol need to be stripped
+    #
+    # @example
+    #   windows_symbol_stripping_file "C:\\omnibus-ruby\\datadog-agent\\src\\github.com\\DataDog\\datadog-agent\\bin\\agent\\security-agent.exe"
+    #
+    # @param [String] val
+    #   the name of the file in Windows build to be stripped
+    #
+    # @return [Array<String>]
+    #   the list of files to be stripped
+    #
+    def windows_symbol_stripping_file(val)
+      windows_symbol_stripping_files << val
+      windows_symbol_stripping_files.dup
+    end
+    expose :windows_symbol_stripping_file
+
+    #
     # A proxy method to the underlying Ohai system.
     #
     # @example
@@ -1070,6 +1088,15 @@ module Omnibus
     #
     def extra_package_files(val = NULL)
       @extra_package_files ||= []
+    end
+
+    #
+    # The list of files in Windows build whose symbol need to be stripped.
+    #
+    # @return [Array<String>]
+    #
+    def windows_symbol_stripping_files(val = NULL)
+      @windows_symbol_stripping_files ||= []
     end
 
     #
