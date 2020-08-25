@@ -50,7 +50,7 @@ module Omnibus
         when "aix"
           log.warn(log_key) { "Currently unsupported in AIX platforms." }
         when "windows"
-          log.warn(log_key) { "Currently unsupported in windows platforms." }
+          strip_windows
         else
           strip_linux
         end
@@ -92,6 +92,69 @@ module Omnibus
         shellout!("strip --strip-debug --strip-unneeded #{source}")
         shellout("objcopy --add-gnu-debuglink=#{target} #{source}")
         shellout!("chmod -x #{target}")
+      end
+    end
+
+    #
+    # Strip symbol from binaries on Windows. Notice that this behavior differs from Linux.
+    #
+    # On Windows, DBG files are the original files, aka the un-stripped files.
+    # On Linux, DBG files are just symbol files.
+    #
+    # On Windows, symbol files can be used for non-live debugging e.g. dlv core c:\share\agent.dbg "C:\Share\agent.DMP"
+    # However, DLV cannot use the pure symbol files in live debugging:
+    #
+    #   C:\>dlv attach 6600 "C:\Program Files\Datadog\Datadog Agent\bin\agent.dbg"
+    #   could not attach to pid 6600: decoding dwarf section info at offset 0x0: too short
+    #
+    #   C:\Program Files\Datadog\Datadog Agent\bin>dlv attach 4024
+    #   could not attach to pid 4024: decoding dwarf section info at offset 0x0: too short
+    #
+    # To enable live debugging on Windows, we make DBG files on Windows the unstripped file.
+    # To perform live debugging, one must manually replace the stripped file with unstripped
+    # first, then can start debugging use DLV.
+    #
+    # To perform non-live debugging, the same command can be used, e.g. dlv core c:\share\agent.dbg "C:\Share\agent.DMP"
+    #
+    def strip_windows
+      path = project.install_dir
+      # log.debug(log_key) { "stripping on windows: #{path}" }
+      log.info(log_key) { "stripping on windows: #{path}" }
+      symboldir = File.join(path, ".debug")
+      # log.debug(log_key) { "putting symbols here: #{symboldir}" }
+      log.info(log_key) { "putting symbols here: #{symboldir}" }
+      yield_shellout_results("find #{path}/ -name '*.exe' -or -name '*.dll'") do |elf|
+        # log.debug(log_key) { "processing: #{elf}" }
+        log.info(log_key) { "processing: #{elf}" }
+        source = elf.strip
+
+        log.info(log_key) { "processing source: #{source}" } # XXX
+
+        next if strip_skip.any? { |exclude| File.fnmatch?(exclude, source, File::FNM_DOTMATCH) }
+
+        debugfile = "#{source}.original"
+        #
+        # Unlike Linux, we have a drive letter in front of the path. Need to drop it before
+        # joining the path.
+        #
+        debugfile = debugfile[2...] if debugfile[1] == ":"
+
+        log.info(log_key) { "processing debugfile: #{debugfile}" } # XXX
+
+        target = File.join(symboldir, debugfile)
+        log.info(log_key) { "processing target: #{target}" } # XXX
+
+        #
+        # elfdir does not have drive letter in front of it.
+        #
+        elfdir = File.dirname(debugfile)
+        log.info(log_key) { "processing elfdir: #{elfdir}" } # XXX
+        FileUtils.mkdir_p "#{symboldir}/#{elfdir}" unless Dir.exist? "#{symboldir}/#{elfdir}"
+
+        # log.debug(log_key) { "stripping #{source}, putting original file into #{target}" }
+        log.info(log_key) { "stripping #{source}, putting original file into #{target}" }
+        shellout!("cp #{source} #{target}")
+        shellout!("strip --strip-debug --strip-unneeded #{source}")
       end
     end
   end

@@ -23,6 +23,9 @@ module Omnibus
     id :msi
 
     setup do
+      # Zip and remove un-stripped files first.
+      shellout!(zip_unstripped_files_command)
+
       if bundle_msi
         helper_tmp_dir = Dir.mktmpdir
         parameters.store('HelperDir', helper_tmp_dir)
@@ -525,6 +528,21 @@ module Omnibus
       7z a -r
       #{windows_safe_path(staging_dir)}\\#{project.name}.zip
       #{windows_safe_path(project.install_dir)}\\*
+      EOH
+    end
+
+    #
+    # Get the shell command to create a zip file that contains
+    # the unstripped binary files. This will delete those files
+    # after zip.
+    #
+    # @return [String]
+    #
+    def zip_unstripped_files_command
+      <<-EOH.split.join(" ").squeeze(" ").strip
+      7z a -r -sdel
+      #{windows_safe_path(Config.package_dir)}\\#{project.name + ".unstripped"}.zip
+      #{windows_safe_path(debug_package_paths)}\\*
       EOH
     end
 
