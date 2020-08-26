@@ -17,4 +17,5 @@ end
 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.5")
   gem "ohai", "<15"
   gem "activesupport", "~> 5.0"
+  gem "cucumber", "< 5"
 end
