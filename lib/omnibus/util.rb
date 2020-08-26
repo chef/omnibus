@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "mixlib/shellout"
+require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 
 module Omnibus
   module Util

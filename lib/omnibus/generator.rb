@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "thor"
+require "thor" unless defined?(Thor)
 
 module Omnibus
   class Generator < Thor::Group

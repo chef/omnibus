@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "uri"
-require "benchmark"
+require "uri" unless defined?(URI)
+require "benchmark" unless defined?(Benchmark)
 
 module Omnibus
   class ArtifactoryPublisher < Publisher

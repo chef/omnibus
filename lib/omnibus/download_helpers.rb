@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "open-uri"
+require "open-uri" unless defined?(OpenURI)
 require "ruby-progressbar"
 
 module Omnibus

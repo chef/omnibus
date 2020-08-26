@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require "erb"
+require "erb" unless defined?(Erb)
 
 module Omnibus
   module Templating

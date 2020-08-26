@@ -17,7 +17,7 @@
 require "aws-sdk-s3"
 require "aws-sdk-core/credentials"
 require "aws-sdk-core/shared_credentials"
-require "base64"
+require "base64" unless defined?(Base64)
 
 module Omnibus
   module S3Helpers

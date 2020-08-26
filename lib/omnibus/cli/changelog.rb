@@ -18,7 +18,7 @@ require "omnibus/changelog"
 require "omnibus/changelog_printer"
 require "omnibus/manifest_diff"
 require "omnibus/semantic_version"
-require "ffi_yajl"
+require "ffi_yajl" unless defined?(FFI_Yajl)
 
 module Omnibus
   class Command::ChangeLog < Command::Base

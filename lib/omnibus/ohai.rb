@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "ohai"
+require "ohai" unless defined?(Ohai::System)
 
 module Omnibus
   class Ohai
