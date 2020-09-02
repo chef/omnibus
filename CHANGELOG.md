@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.23 -->
-## [7.0.23](https://github.com/chef/omnibus/tree/7.0.23) (2020-08-26)
+<!-- latest_release 7.0.24 -->
+## [7.0.24](https://github.com/chef/omnibus/tree/7.0.24) (2020-09-02)
 
 #### Merged Pull Requests
-- Fix Ruby 2.4 tests [#963](https://github.com/chef/omnibus/pull/963) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.2.1 to = 1.3.2 [#967](https://github.com/chef/omnibus/pull/967) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.2.1 to = 1.3.2 [#967](https://github.com/chef/omnibus/pull/967) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.24 -->
 - Fix Ruby 2.4 tests [#963](https://github.com/chef/omnibus/pull/963) ([tas50](https://github.com/tas50)) <!-- 7.0.23 -->
 - Optimize our requires [#960](https://github.com/chef/omnibus/pull/960) ([tas50](https://github.com/tas50)) <!-- 7.0.22 -->
 - Switch expand_path on file to expand_path on dir [#959](https://github.com/chef/omnibus/pull/959) ([tas50](https://github.com/tas50)) <!-- 7.0.21 -->
