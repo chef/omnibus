@@ -110,8 +110,30 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # Set or return the signing passphrase. If this value is provided,
-    # Omnibus will attempt to sign the RPM.
+    # Set or return the the gpg key name to use while signing.
+    # If this value is provided, Omnibus will attempt to sign the RPM.
+    #
+    # @example
+    #   gpg_key_name 'My key <my.address@here.com>'
+    #
+    # @param [String] val
+    #   the name of the GPG key to use during RPM signing
+    #
+    # @return [String]
+    #   the RPM signing GPG key name
+    #
+    def gpg_key_name(val = NULL)
+      if null?(val)
+        @gpg_key_name
+      else
+        @gpg_key_name = val
+      end
+    end
+    expose :gpg_key_name
+
+    #
+    # Set or return the signing passphrase.
+    # If this value is provided, Omnibus will attempt to sign the RPM.
     #
     # @example
     #   signing_passphrase "foo"
@@ -428,8 +450,11 @@ module Omnibus
       command << %{ --buildroot #{build_dir(debug)}}
       command << %{ --define '_topdir #{stage}'}
 
-      if signing_passphrase
+      if gpg_key_name || signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
+
+        key_name = gpg_key_name || project.maintainer
+        log.info(log_key) { "Using gpg key #{key_name}" }
 
         if File.exist?("#{ENV['HOME']}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV['HOME']}'" }
@@ -443,7 +468,7 @@ module Omnibus
           render_template(resource_path("rpmmacros.erb"),
                           destination: "#{home}/.rpmmacros",
                           variables: {
-                            gpg_name: project.maintainer,
+                            gpg_name: key_name,
                             gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
                           })
         end
