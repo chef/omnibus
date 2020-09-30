@@ -136,12 +136,10 @@ module Omnibus
       return false if build_info.nil?
 
       build_info.split(".").any? do |part|
-        begin
-          Time.strptime(part, Omnibus::BuildVersion::TIMESTAMP_FORMAT)
-          true
-        rescue ArgumentError
-          false
-        end
+        Time.strptime(part, Omnibus::BuildVersion::TIMESTAMP_FORMAT)
+        true
+      rescue ArgumentError
+        false
       end
     end
 
