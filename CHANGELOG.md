@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.27 -->
-## [7.0.27](https://github.com/chef/omnibus/tree/7.0.27) (2020-09-30)
+<!-- latest_release 7.0.28 -->
+## [7.0.28](https://github.com/chef/omnibus/tree/7.0.28) (2020-09-30)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from = 1.4.2 to = 1.4.3 [#970](https://github.com/chef/omnibus/pull/970) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50)) <!-- 7.0.28 -->
 - Update chefstyle requirement from = 1.4.2 to = 1.4.3 [#970](https://github.com/chef/omnibus/pull/970) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.27 -->
 - Update chefstyle requirement from = 1.4.0 to = 1.4.2 [#969](https://github.com/chef/omnibus/pull/969) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.26 -->
 - Update chefstyle requirement from = 1.3.2 to = 1.4.0 [#968](https://github.com/chef/omnibus/pull/968) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.25 -->
