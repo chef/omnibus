@@ -155,6 +155,7 @@ module Omnibus
         expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file ruby env>")
         expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file make env>")
         expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.file perl env>")
+        expect(transform_file_contents).to include("<transform file depend -> edit pkg.debug.depend.path usr/local/bin usr/bin>")
       end
     end
 
