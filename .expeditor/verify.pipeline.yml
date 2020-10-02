@@ -1,32 +1,15 @@
 ---
 expeditor:
+  cached_folders:
+    - vendor
   defaults:
     buildkite:
       retry:
         automatic:
           limit: 1
       timeout_in_minutes: 30
-      retry:
-        automatic:
-          limit: 1
 
 steps:
-- label: run-lint-and-specs-ruby-2.4
-  command:
-    - .expeditor/run_linux_tests.sh rake
-  expeditor:
-    executor:
-      docker:
-        image: ruby:2.4-buster
-
-- label: run-lint-and-specs-ruby-2.5
-  command:
-    - .expeditor/run_linux_tests.sh rake
-  expeditor:
-    executor:
-      docker:
-        image: ruby:2.5-buster
-
 - label: run-lint-and-specs-ruby-2.6
   command:
     - .expeditor/run_linux_tests.sh rake
