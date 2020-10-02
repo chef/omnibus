@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.28 -->
-## [7.0.28](https://github.com/chef/omnibus/tree/7.0.28) (2020-09-30)
+<!-- latest_release 7.0.29 -->
+## [7.0.29](https://github.com/chef/omnibus/tree/7.0.29) (2020-10-02)
 
 #### Merged Pull Requests
-- Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50))
+- Fix dependency path for env with racc gem [#972](https://github.com/chef/omnibus/pull/972) ([jaymalasinha](https://github.com/jaymalasinha))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix dependency path for env with racc gem [#972](https://github.com/chef/omnibus/pull/972) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 7.0.29 -->
 - Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50)) <!-- 7.0.28 -->
 - Update chefstyle requirement from = 1.4.2 to = 1.4.3 [#970](https://github.com/chef/omnibus/pull/970) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.27 -->
 - Update chefstyle requirement from = 1.4.0 to = 1.4.2 [#969](https://github.com/chef/omnibus/pull/969) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.26 -->
