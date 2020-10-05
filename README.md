@@ -25,8 +25,7 @@ This project is managed by the CHEF Release Engineering team. For more informati
 
 Omnibus is designed to run with a minimal set of prerequisites. You will need the following:
 
-- Ruby 2.4+
-- Bundler
+- Ruby 2.6+
 
 ## Get Started
 
