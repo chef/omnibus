@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.31 -->
-## [7.0.31](https://github.com/chef/omnibus/tree/7.0.31) (2020-10-05)
+<!-- latest_release 7.0.32 -->
+## [7.0.32](https://github.com/chef/omnibus/tree/7.0.32) (2020-10-13)
 
 #### Merged Pull Requests
-- Remove old pins we don&#39;t need anymore [#974](https://github.com/chef/omnibus/pull/974) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.4.3 to = 1.4.5 [#976](https://github.com/chef/omnibus/pull/976) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.4.3 to = 1.4.5 [#976](https://github.com/chef/omnibus/pull/976) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.32 -->
 - Remove old pins we don&#39;t need anymore [#974](https://github.com/chef/omnibus/pull/974) ([tas50](https://github.com/tas50)) <!-- 7.0.31 -->
 - Require Ruby 2.6 or later [#971](https://github.com/chef/omnibus/pull/971) ([tas50](https://github.com/tas50)) <!-- 7.0.30 -->
 - Fix dependency path for env with racc gem [#972](https://github.com/chef/omnibus/pull/972) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 7.0.29 -->
