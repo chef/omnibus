@@ -46,7 +46,7 @@ module Omnibus
       "amazon" => RPM,
       "aix" => BFF,
       "solaris" => Solaris,
-      "omnios"   => IPS,
+      "omnios" => IPS,
       "ips" => IPS,
       "windows" => [MSI, APPX],
       "mac_os_x" => PKG,
