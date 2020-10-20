@@ -428,6 +428,8 @@ module Omnibus
                          ARCH_WHITELIST_LIBS
                        when "mac_os_x"
                          MAC_WHITELIST_LIBS
+                       when "omnios"
+                         OMNIOS_WHITELIST_LIBS
                        when "solaris2"
                          SOLARIS_WHITELIST_LIBS
                        when "smartos"
