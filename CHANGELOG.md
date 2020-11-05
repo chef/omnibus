@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.33 -->
-## [7.0.33](https://github.com/chef/omnibus/tree/7.0.33) (2020-10-20)
+<!-- latest_release 7.0.34 -->
+## [7.0.34](https://github.com/chef/omnibus/tree/7.0.34) (2020-11-05)
 
 #### Merged Pull Requests
-- use 7zip for FastUnzip MSI action to boost zip expansion performance [#977](https://github.com/chef/omnibus/pull/977) ([mwrock](https://github.com/mwrock))
+- Update chefstyle requirement from = 1.4.5 to = 1.5.0 [#978](https://github.com/chef/omnibus/pull/978) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.13 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.4.5 to = 1.5.0 [#978](https://github.com/chef/omnibus/pull/978) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.34 -->
 - use 7zip for FastUnzip MSI action to boost zip expansion performance [#977](https://github.com/chef/omnibus/pull/977) ([mwrock](https://github.com/mwrock)) <!-- 7.0.33 -->
 - Update chefstyle requirement from = 1.4.3 to = 1.4.5 [#976](https://github.com/chef/omnibus/pull/976) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.32 -->
 - Remove old pins we don&#39;t need anymore [#974](https://github.com/chef/omnibus/pull/974) ([tas50](https://github.com/tas50)) <!-- 7.0.31 -->
