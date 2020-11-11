@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "chef-utils"
+require "chef-utils" unless defined?(ChefUtils::CANARY)
 
 module Omnibus
   module Sugarable
