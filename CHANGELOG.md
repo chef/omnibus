@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.0.0 -->
+## [8.0.0](https://github.com/chef/omnibus/tree/8.0.0) (2020-11-11)
+
+#### Merged Pull Requests
+- Replace chef-sugar for DSL helpers with chef-utils 15.4+ [#980](https://github.com/chef/omnibus/pull/980) ([lamont-granquist](https://github.com/lamont-granquist))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=7.0.34 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Replace chef-sugar for DSL helpers with chef-utils 15.4+ [#980](https://github.com/chef/omnibus/pull/980) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.0.0 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [7.0.34](https://github.com/chef/omnibus/tree/7.0.34) (2020-11-11)
