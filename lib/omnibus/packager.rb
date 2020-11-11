@@ -1,5 +1,5 @@
 #
-# Copyright 2014-2018 Chef Software, Inc.
+# Copyright 2014-2020, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,16 +66,16 @@ module Omnibus
       family = Ohai["platform_family"]
       version = Ohai["platform_version"]
 
-      if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
+      if family == "solaris2" && ChefUtils::VersionString.new(version).satisfies?(">= 5.11")
         family = "ips"
-      elsif family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.10")
+      elsif family == "solaris2" && ChefUtils::VersionString.new(version).satisfies?(">= 5.10")
         family = "solaris"
       end
       if klass = PLATFORM_PACKAGER_MAP[family]
         package_types = klass.is_a?(Array) ? klass : [ klass ]
 
         if package_types.include?(APPX) &&
-            !Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 6.2")
+            !ChefUtils::VersionString.new(version).satisfies?(">= 6.2")
           log.warn(log_key) { "APPX generation is only supported on Windows versions 2012 and above" }
           package_types -= [APPX]
         end

@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency "aws-sdk-s3",       "~> 1"
-  gem.add_dependency "chef-sugar",       ">= 3.3"
+  gem.add_dependency "chef-utils",       ">= 15.4"
   gem.add_dependency "chef-cleanroom",   "~> 1.0"
   gem.add_dependency "ffi-yajl",         "~> 2.2"
   gem.add_dependency "mixlib-shellout",  ">= 2.0", "< 4.0"

@@ -207,12 +207,7 @@ module Omnibus
       end
 
       context "on aix" do
-        before do
-          # There's no AIX in Fauxhai :(
-          stub_ohai(platform: "solaris2", version: "5.11") do |data|
-            data["platform"] = "aix"
-          end
-        end
+        before { stub_ohai(platform: "aix") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(

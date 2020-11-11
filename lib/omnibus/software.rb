@@ -525,7 +525,7 @@ module Omnibus
       return if final_version.nil?
 
       begin
-        Chef::Sugar::Constraints::Version.new(final_version)
+        ChefUtils::VersionString.new(final_version)
       rescue ArgumentError
         log.warn(log_key) do
           "Version #{final_version} for software #{name} was not parseable. " \
