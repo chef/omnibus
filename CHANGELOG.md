@@ -1,43 +1,40 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 7.0.34 -->
-## [7.0.34](https://github.com/chef/omnibus/tree/7.0.34) (2020-11-05)
-
-#### Merged Pull Requests
-- Update chefstyle requirement from = 1.4.5 to = 1.5.0 [#978](https://github.com/chef/omnibus/pull/978) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
-<!-- release_rollup since=7.0.13 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update chefstyle requirement from = 1.4.5 to = 1.5.0 [#978](https://github.com/chef/omnibus/pull/978) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.34 -->
-- use 7zip for FastUnzip MSI action to boost zip expansion performance [#977](https://github.com/chef/omnibus/pull/977) ([mwrock](https://github.com/mwrock)) <!-- 7.0.33 -->
-- Update chefstyle requirement from = 1.4.3 to = 1.4.5 [#976](https://github.com/chef/omnibus/pull/976) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.32 -->
-- Remove old pins we don&#39;t need anymore [#974](https://github.com/chef/omnibus/pull/974) ([tas50](https://github.com/tas50)) <!-- 7.0.31 -->
-- Require Ruby 2.6 or later [#971](https://github.com/chef/omnibus/pull/971) ([tas50](https://github.com/tas50)) <!-- 7.0.30 -->
-- Fix dependency path for env with racc gem [#972](https://github.com/chef/omnibus/pull/972) ([jaymalasinha](https://github.com/jaymalasinha)) <!-- 7.0.29 -->
-- Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50)) <!-- 7.0.28 -->
-- Update chefstyle requirement from = 1.4.2 to = 1.4.3 [#970](https://github.com/chef/omnibus/pull/970) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.27 -->
-- Update chefstyle requirement from = 1.4.0 to = 1.4.2 [#969](https://github.com/chef/omnibus/pull/969) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.26 -->
-- Update chefstyle requirement from = 1.3.2 to = 1.4.0 [#968](https://github.com/chef/omnibus/pull/968) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.25 -->
-- Update chefstyle requirement from = 1.2.1 to = 1.3.2 [#967](https://github.com/chef/omnibus/pull/967) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.24 -->
-- Fix Ruby 2.4 tests [#963](https://github.com/chef/omnibus/pull/963) ([tas50](https://github.com/tas50)) <!-- 7.0.23 -->
-- Optimize our requires [#960](https://github.com/chef/omnibus/pull/960) ([tas50](https://github.com/tas50)) <!-- 7.0.22 -->
-- Switch expand_path on file to expand_path on dir [#959](https://github.com/chef/omnibus/pull/959) ([tas50](https://github.com/tas50)) <!-- 7.0.21 -->
-- Update chefstyle requirement from = 1.2.0 to = 1.2.1 [#958](https://github.com/chef/omnibus/pull/958) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.20 -->
-- Ruby 2.7.1 adds a warning on calling open directly, needs to be URI.open [#940](https://github.com/chef/omnibus/pull/940) ([mattray](https://github.com/mattray)) <!-- 7.0.19 -->
-- Update chefstyle requirement from = 1.1.3 to = 1.2.0 [#957](https://github.com/chef/omnibus/pull/957) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.18 -->
-- Remove legacy CI configs and redundant encoding comment [#956](https://github.com/chef/omnibus/pull/956) ([tas50](https://github.com/tas50)) <!-- 7.0.17 -->
-- Fill in some of the gotchas that are easy to hit with omnibus [#951](https://github.com/chef/omnibus/pull/951) ([jaymzh](https://github.com/jaymzh)) <!-- 7.0.16 -->
-- Update chefstyle requirement from = 1.1.2 to = 1.1.3 [#955](https://github.com/chef/omnibus/pull/955) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.15 -->
-- Update chefstyle requirement from = 1.1.0 to = 1.1.2 [#954](https://github.com/chef/omnibus/pull/954) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 7.0.14 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [7.0.34](https://github.com/chef/omnibus/tree/7.0.34) (2020-11-11)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from = 1.1.0 to = 1.1.2 [#954](https://github.com/chef/omnibus/pull/954) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.1.2 to = 1.1.3 [#955](https://github.com/chef/omnibus/pull/955) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Fill in some of the gotchas that are easy to hit with omnibus [#951](https://github.com/chef/omnibus/pull/951) ([jaymzh](https://github.com/jaymzh))
+- Remove legacy CI configs and redundant encoding comment [#956](https://github.com/chef/omnibus/pull/956) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.1.3 to = 1.2.0 [#957](https://github.com/chef/omnibus/pull/957) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Ruby 2.7.1 adds a warning on calling open directly, needs to be URI.open [#940](https://github.com/chef/omnibus/pull/940) ([mattray](https://github.com/mattray))
+- Update chefstyle requirement from = 1.2.0 to = 1.2.1 [#958](https://github.com/chef/omnibus/pull/958) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Switch expand_path on file to expand_path on dir [#959](https://github.com/chef/omnibus/pull/959) ([tas50](https://github.com/tas50))
+- Optimize our requires [#960](https://github.com/chef/omnibus/pull/960) ([tas50](https://github.com/tas50))
+- Fix Ruby 2.4 tests [#963](https://github.com/chef/omnibus/pull/963) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.2.1 to = 1.3.2 [#967](https://github.com/chef/omnibus/pull/967) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.3.2 to = 1.4.0 [#968](https://github.com/chef/omnibus/pull/968) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.4.0 to = 1.4.2 [#969](https://github.com/chef/omnibus/pull/969) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.4.2 to = 1.4.3 [#970](https://github.com/chef/omnibus/pull/970) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50))
+- Fix dependency path for env with racc gem [#972](https://github.com/chef/omnibus/pull/972) ([jaymalasinha](https://github.com/jaymalasinha))
+- Require Ruby 2.6 or later [#971](https://github.com/chef/omnibus/pull/971) ([tas50](https://github.com/tas50))
+- Remove old pins we don&#39;t need anymore [#974](https://github.com/chef/omnibus/pull/974) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.4.3 to = 1.4.5 [#976](https://github.com/chef/omnibus/pull/976) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- use 7zip for FastUnzip MSI action to boost zip expansion performance [#977](https://github.com/chef/omnibus/pull/977) ([mwrock](https://github.com/mwrock))
+- Update chefstyle requirement from = 1.4.5 to = 1.5.0 [#978](https://github.com/chef/omnibus/pull/978) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+<!-- latest_stable_release -->
+
 ## [7.0.13](https://github.com/chef/omnibus/tree/7.0.13) (2020-06-15)
 
 #### Merged Pull Requests
 - Revert &quot;Pin ffi to &lt; 0.13 for windows&quot; now that 1.13.1 is out [#949](https://github.com/chef/omnibus/pull/949) ([tas50](https://github.com/tas50))
-<!-- latest_stable_release -->
 
 ## [7.0.12](https://github.com/chef/omnibus/tree/7.0.12) (2020-06-05)
 
