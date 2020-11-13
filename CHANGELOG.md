@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.0.3 -->
-## [8.0.3](https://github.com/chef/omnibus/tree/8.0.3) (2020-11-13)
+<!-- latest_release 8.0.4 -->
+## [8.0.4](https://github.com/chef/omnibus/tree/8.0.4) (2020-11-13)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from = 1.5.0 to = 1.5.1 [#984](https://github.com/chef/omnibus/pull/984) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Remove EOL Windows Support (pre-2012) [#983](https://github.com/chef/omnibus/pull/983) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.34 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Remove EOL Windows Support (pre-2012) [#983](https://github.com/chef/omnibus/pull/983) ([tas50](https://github.com/tas50)) <!-- 8.0.4 -->
 - Update chefstyle requirement from = 1.5.0 to = 1.5.1 [#984](https://github.com/chef/omnibus/pull/984) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.3 -->
 - Switch from fauxhai to fauxhai-ng [#982](https://github.com/chef/omnibus/pull/982) ([tas50](https://github.com/tas50)) <!-- 8.0.2 -->
 - Remove SLES 11 check [#981](https://github.com/chef/omnibus/pull/981) ([tas50](https://github.com/tas50)) <!-- 8.0.1 -->
