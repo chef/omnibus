@@ -177,17 +177,17 @@ module Omnibus
 
     describe ".platform_shortname" do
       it "returns el on rhel" do
-        stub_ohai(platform: "redhat", version: "6.9")
+        stub_ohai(platform: "redhat", version: "6")
         expect(described_class.platform_shortname).to eq("el")
       end
 
       it "returns sles on suse" do
-        stub_ohai(platform: "suse", version: "12.2")
+        stub_ohai(platform: "suse", version: "12")
         expect(described_class.platform_shortname).to eq("sles")
       end
 
       it "returns .platform on all other systems" do
-        stub_ohai(platform: "ubuntu", version: "16.04")
+        stub_ohai(platform: "ubuntu", version: "20.04")
         expect(described_class.platform_shortname).to eq("ubuntu")
       end
     end
@@ -196,7 +196,7 @@ module Omnibus
       shared_examples "a version manipulator" do |platform_shortname, version, expected|
         context "on #{platform_shortname}-#{version}" do
           it "returns the correct value" do
-            stub_ohai(platform: "ubuntu", version: "16.04") do |data|
+            stub_ohai(platform: "ubuntu", version: "20.04") do |data|
               data["platform"] = platform_shortname
               data["platform_version"] = version
             end
@@ -245,7 +245,7 @@ module Omnibus
 
       context "given an unknown platform" do
         before do
-          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "20.04") do |data|
             data["platform"] = "bacon"
             data["platform_version"] = "1.crispy"
           end
@@ -259,7 +259,7 @@ module Omnibus
 
       context "given an unknown windows platform version" do
         before do
-          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "20.04") do |data|
             data["platform"] = "windows"
             data["platform_version"] = "1.2.3"
           end
