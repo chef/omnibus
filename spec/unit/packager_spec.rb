@@ -10,17 +10,10 @@ module Omnibus
         end
       end
 
-      context "on Windows 2012 R2" do
+      context "on Windows" do
         before { stub_ohai(platform: "windows", version: "2012R2") }
         it "prefers MSI and APPX" do
           expect(described_class.for_current_system).to eq([Packager::MSI, Packager::APPX])
-        end
-      end
-
-      context "on Windows 2008 R2" do
-        before { stub_ohai(platform: "windows", version: "2008R2") }
-        it "prefers MSI only" do
-          expect(described_class.for_current_system).to eq([Packager::MSI])
         end
       end
 
