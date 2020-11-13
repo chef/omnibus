@@ -16,8 +16,7 @@ module Omnibus
         md5:    "abc123",
         sha1:   "abc123",
         sha256: "abcd1234",
-        sha512: "abcdef123456"
-      )
+        sha512: "abcdef123456")
     end
 
     let(:project) do
@@ -29,15 +28,13 @@ module Omnibus
         build_iteration:  "1",
         license:          "Apache-2.0",
         built_manifest:    double(Manifest,
-                                  to_hash: {
-                                    manifest_format: 2,
-                                    build_version: "1.2.3",
-                                    build_git_revision: "SHA",
-                                    license: "Apache-2.0",
-                                  }
-                                ),
-        license_file_path: license_path
-      )
+          to_hash: {
+            manifest_format: 2,
+            build_version: "1.2.3",
+            build_git_revision: "SHA",
+            license: "Apache-2.0",
+          }),
+        license_file_path: license_path)
     end
 
     let(:data) { { foo: "bar" } }
@@ -180,17 +177,17 @@ module Omnibus
 
     describe ".platform_shortname" do
       it "returns el on rhel" do
-        stub_ohai(platform: "redhat", version: "6.9")
+        stub_ohai(platform: "redhat", version: "6")
         expect(described_class.platform_shortname).to eq("el")
       end
 
       it "returns sles on suse" do
-        stub_ohai(platform: "suse", version: "12.2")
+        stub_ohai(platform: "suse", version: "12")
         expect(described_class.platform_shortname).to eq("sles")
       end
 
       it "returns .platform on all other systems" do
-        stub_ohai(platform: "ubuntu", version: "16.04")
+        stub_ohai(platform: "ubuntu", version: "20.04")
         expect(described_class.platform_shortname).to eq("ubuntu")
       end
     end
@@ -199,7 +196,7 @@ module Omnibus
       shared_examples "a version manipulator" do |platform_shortname, version, expected|
         context "on #{platform_shortname}-#{version}" do
           it "returns the correct value" do
-            stub_ohai(platform: "ubuntu", version: "16.04") do |data|
+            stub_ohai(platform: "ubuntu", version: "20.04") do |data|
               data["platform"] = platform_shortname
               data["platform_version"] = version
             end
@@ -219,6 +216,7 @@ module Omnibus
       it_behaves_like "a version manipulator", "fedora", "11.5", "11"
       it_behaves_like "a version manipulator", "freebsd", "10.0", "10"
       it_behaves_like "a version manipulator", "gentoo", "4.9.95-gentoo", "rolling"
+      it_behaves_like "a version manipulator", "kali", "rolling", "rolling"
       it_behaves_like "a version manipulator", "mac_os_x", "10.9.1", "10.9"
       it_behaves_like "a version manipulator", "omnios", "r151010", "r151010"
       it_behaves_like "a version manipulator", "openbsd", "5.4.4", "5.4"
@@ -247,7 +245,7 @@ module Omnibus
 
       context "given an unknown platform" do
         before do
-          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "20.04") do |data|
             data["platform"] = "bacon"
             data["platform_version"] = "1.crispy"
           end
@@ -261,7 +259,7 @@ module Omnibus
 
       context "given an unknown windows platform version" do
         before do
-          stub_ohai(platform: "ubuntu", version: "16.04") do |data|
+          stub_ohai(platform: "ubuntu", version: "20.04") do |data|
             data["platform"] = "windows"
             data["platform_version"] = "1.2.3"
           end

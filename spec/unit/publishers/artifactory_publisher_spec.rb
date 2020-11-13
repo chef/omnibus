@@ -10,8 +10,7 @@ module Omnibus
         path: "/path/to/files/chef.deb",
         name: "chef.deb",
         content: "BINARY",
-        validate!: true
-      )
+        validate!: true)
     end
 
     let(:metadata) do
@@ -90,8 +89,7 @@ module Omnibus
               license: "Apache-2.0",
             },
           },
-        }
-      )
+        })
     end
 
     let(:packages) { [package] }

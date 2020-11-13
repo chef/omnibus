@@ -202,33 +202,33 @@ module Omnibus
     end
 
     describe "#build_iteration" do
-      let(:fauxhai_options) { Hash.new }
+      let(:fauxhai_options) { {} }
 
       before { stub_ohai(fauxhai_options) }
 
       context "when on RHEL" do
-        let(:fauxhai_options) { { platform: "redhat", version: "6.9" } }
+        let(:fauxhai_options) { { platform: "redhat", version: "8" } }
         it "returns a RHEL iteration" do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context "when on Debian" do
-        let(:fauxhai_options) { { platform: "debian", version: "8.11" } }
+        let(:fauxhai_options) { { platform: "debian", version: "10" } }
         it "returns a Debian iteration" do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context "when on FreeBSD" do
-        let(:fauxhai_options) { { platform: "freebsd", version: "10.4" } }
+        let(:fauxhai_options) { { platform: "freebsd", version: "12" } }
         it "returns a FreeBSD iteration" do
           expect(subject.build_iteration).to eq(1)
         end
       end
 
       context "when on Windows" do
-        before { stub_ohai(platform: "windows", version: "2008R2") }
+        before { stub_ohai(platform: "windows", version: "2019") }
         before { stub_const("File::ALT_SEPARATOR", '\\') }
         it "returns a Windows iteration" do
           expect(subject.build_iteration).to eq(1)
@@ -236,7 +236,7 @@ module Omnibus
       end
 
       context "when on OS X" do
-        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.13" } }
+        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.15" } }
         it "returns a generic iteration" do
           expect(subject.build_iteration).to eq(1)
         end
@@ -340,7 +340,7 @@ module Omnibus
         subject.compress(:tgz)
 
         expect(Compressor).to receive(:for_current_system)
-          .with([:dmg, :tgz])
+          .with(%i{dmg tgz})
           .and_call_original
 
         subject.compressor

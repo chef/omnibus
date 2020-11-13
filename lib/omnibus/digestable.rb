@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "openssl"
-require "pathname"
+require "openssl" unless defined?(OpenSSL)
+require "pathname" unless defined?(Pathname)
 require "omnibus/logging"
 
 module Omnibus

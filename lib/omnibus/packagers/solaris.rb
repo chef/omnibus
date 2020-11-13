@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "socket"
+require "socket" unless defined?(Socket)
 
 module Omnibus
   class Packager::Solaris < Packager::Base
@@ -76,7 +76,7 @@ module Omnibus
     # Generate a Prototype file for solaris build
     #
     def write_prototype_file
-      shellout! "cd #{install_dirname} && find #{install_basename} -print > #{staging_dir_path('files')}"
+      shellout! "cd #{install_dirname} && find #{install_basename} -print > #{staging_dir_path("files")}"
 
       File.open staging_dir_path("files.clean"), "w+" do |fout|
         File.open staging_dir_path("files") do |fin|
@@ -100,10 +100,10 @@ module Omnibus
       end
 
       # generate the prototype's file list
-      shellout! "cd #{install_dirname} && pkgproto < #{staging_dir_path('files.clean')} > #{staging_dir_path('Prototype.files')}"
+      shellout! "cd #{install_dirname} && pkgproto < #{staging_dir_path("files.clean")} > #{staging_dir_path("Prototype.files")}"
 
       # fix up the user and group in the file list to root
-      shellout! "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < #{staging_dir_path('Prototype.files')} >> #{staging_dir_path('Prototype')}"
+      shellout! "awk '{ $5 = \"root\"; $6 = \"root\"; print }' < #{staging_dir_path("Prototype.files")} >> #{staging_dir_path("Prototype")}"
     end
 
     #
@@ -139,7 +139,7 @@ module Omnibus
     # @return [void]
     #
     def create_solaris_file
-      shellout! "pkgmk -o -r #{install_dirname} -d #{staging_dir} -f #{staging_dir_path('Prototype')}"
+      shellout! "pkgmk -o -r #{install_dirname} -d #{staging_dir} -f #{staging_dir_path("Prototype")}"
       shellout! "pkgchk -vd #{staging_dir} #{project.package_name}"
       shellout! "pkgtrans #{staging_dir} #{package_path} #{project.package_name}"
     end

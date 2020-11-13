@@ -4,17 +4,17 @@ module Omnibus
   describe Compressor do
     describe ".for_current_system" do
       context "on Mac OS X" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.12") }
+        before { stub_ohai(platform: "mac_os_x", version: "10.15") }
 
         context "when :dmg is activated" do
           it "prefers dmg" do
-            expect(described_class.for_current_system([:tgz, :dmg])).to eq(Compressor::DMG)
+            expect(described_class.for_current_system(%i{tgz dmg})).to eq(Compressor::DMG)
           end
         end
 
         context "when :dmg is not activated" do
           it "prefers tgz" do
-            expect(described_class.for_current_system([:tgz, :foo])).to eq(Compressor::TGZ)
+            expect(described_class.for_current_system(%i{tgz foo})).to eq(Compressor::TGZ)
           end
         end
 
@@ -30,7 +30,7 @@ module Omnibus
 
         context "when :tgz activated" do
           it "prefers tgz" do
-            expect(described_class.for_current_system([:tgz, :foo])).to eq(Compressor::TGZ)
+            expect(described_class.for_current_system(%i{tgz foo})).to eq(Compressor::TGZ)
           end
         end
 

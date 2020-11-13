@@ -17,7 +17,7 @@
 module Omnibus
   class Logger
 
-    require "time"
+    require "time" unless defined?(Time.zone_offset)
 
     #
     # The amount of padding on the left column.
@@ -102,6 +102,7 @@ module Omnibus
     #
     def add(severity, progname, &block)
       return true if io.nil? || severity < level
+
       message = format_message(severity, progname, yield)
       MUTEX.synchronize { io.write(message) }
       true
@@ -138,7 +139,7 @@ module Omnibus
       else
         left = "#{format_severity(severity)} | "
       end
-      "#{left.rjust(LEFT)}#{Time.now.iso8601()} | #{message}\n"
+      "#{left.rjust(LEFT)}#{Time.now.iso8601} | #{message}\n"
     end
 
     #

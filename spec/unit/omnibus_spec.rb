@@ -15,7 +15,7 @@ describe Omnibus do
 
     Omnibus::Config.project_root(File.join(tmp_path, "/foo/bar"))
     Omnibus::Config.local_software_dirs([File.join(tmp_path, "/local"), File.join(tmp_path, "/other")])
-    Omnibus::Config.software_gems(["omnibus-software", "custom-omnibus-software"])
+    Omnibus::Config.software_gems(%w{omnibus-software custom-omnibus-software})
   end
 
   describe "#which" do

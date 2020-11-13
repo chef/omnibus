@@ -17,7 +17,7 @@
 require "omnibus/core_extensions"
 
 require "cleanroom"
-require "pathname"
+require "pathname" unless defined?(Pathname)
 
 require "omnibus/digestable"
 require "omnibus/exceptions"
@@ -208,7 +208,7 @@ module Omnibus
     # @return [Pathname]
     #
     def source_root
-      @source_root ||= Pathname.new(File.expand_path("../..", __FILE__))
+      @source_root ||= Pathname.new(File.expand_path("..", __dir__))
     end
 
     #

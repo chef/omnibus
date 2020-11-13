@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "fileutils"
+require "fileutils" unless defined?(FileUtils)
 
 module Omnibus
   class Compressor::Base < Packager::Base
@@ -30,7 +30,7 @@ module Omnibus
     # @param [Project] project
     #
     def initialize(project)
-      @project  = project
+      @project = project
 
       # There can now be multiple packagers per platform
       # but windows is the only platform that uses multiple

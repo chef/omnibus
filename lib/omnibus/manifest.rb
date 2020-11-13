@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "ffi_yajl"
+require "ffi_yajl" unless defined?(FFI_Yajl)
 
 module Omnibus
   class Manifest
@@ -44,7 +44,7 @@ module Omnibus
     end
 
     def add(name, entry)
-      if ! entry.is_a? Omnibus::ManifestEntry
+      unless entry.is_a? Omnibus::ManifestEntry
         raise NotAManifestEntry, "#{entry} is not an Omnibus:ManifestEntry"
       end
 

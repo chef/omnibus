@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2017, Chef Software Inc.
+# Copyright 2012-2018, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "fileutils"
-require "uri"
+require "fileutils" unless defined?(FileUtils)
+require "uri" unless defined?(URI)
 require "omnibus/manifest_entry"
 
 module Omnibus
@@ -206,6 +206,46 @@ module Omnibus
     expose :maintainer
 
     #
+    # Sets the bin_dirs where this software installs bins.
+    #
+    # @example
+    #   bin_dirs ['/opt/chef-workstation/bin']
+    #
+    # @param [Array<String>] val
+    #   the bin_dirs of the software
+    #
+    # @return [Array<String>]
+    #
+    def bin_dirs(val = NULL)
+      if null?(val)
+        @bin_dirs || [windows_safe_path("#{install_dir}/bin"), windows_safe_path("#{install_dir}/embedded/bin")]
+      else
+        @bin_dirs = val
+      end
+    end
+    expose :bin_dirs
+
+    #
+    # Sets the lib_dirs where this software installs libs.
+    #
+    # @example
+    #   lib_dirs ['/opt/chef-workstation/bin']
+    #
+    # @param [Array<String>] val
+    #   the lib_dirs of the software
+    #
+    # @return [Array<String>]
+    #
+    def lib_dirs(val = NULL)
+      if null?(val)
+        @lib_dirs || [windows_safe_path("#{install_dir}/embedded/lib")]
+      else
+        @lib_dirs = val
+      end
+    end
+    expose :lib_dirs
+
+    #
     # Add a software dependency to this software.
     #
     # @example
@@ -305,7 +345,7 @@ module Omnibus
             "only include valid keys. Invalid keys: #{extra_keys.inspect}")
         end
 
-        duplicate_keys = val.keys & [:git, :file, :path, :url]
+        duplicate_keys = val.keys & %i{git file path url}
         unless duplicate_keys.size < 2
           raise InvalidValue.new(:source,
             "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
@@ -485,7 +525,7 @@ module Omnibus
       return if final_version.nil?
 
       begin
-        Chef::Sugar::Constraints::Version.new(final_version)
+        ChefUtils::VersionString.new(final_version)
       rescue ArgumentError
         log.warn(log_key) do
           "Version #{final_version} for software #{name} was not parseable. " \
@@ -509,7 +549,7 @@ module Omnibus
     #   the list of currently whitelisted files
     #
     def whitelist_file(file)
-      file = Regexp.new(file) unless file.kind_of?(Regexp)
+      file = Regexp.new(file) unless file.is_a?(Regexp)
       whitelist_files << file
       whitelist_files.dup
     end
@@ -668,40 +708,18 @@ module Omnibus
             "ARFLAGS" => "-X64 cru",
           }
         when "solaris2"
-          if platform_version.satisfies?("<= 5.10")
-            solaris_flags = {
-              # this override is due to a bug in libtool documented here:
-              # http://lists.gnu.org/archive/html/bug-libtool/2005-10/msg00004.html
-              "CC" => "gcc -static-libgcc",
-              "LDFLAGS" => "-R#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-            }
-          elsif platform_version.satisfies?(">= 5.11")
-            solaris_flags = {
-              "CC" => "gcc -m64 -static-libgcc",
-              "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
-              "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-            }
-          end
-          solaris_flags
+          {
+            "CC" => "gcc -m64 -static-libgcc",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib -static-libgcc",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+          }
         when "freebsd"
           {
             "CC" => "clang",
             "CXX" => "clang++",
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
-        when "suse"
-          suse_flags = {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
-          }
-          # Enable gcc version 4.8 if it is available
-          if which("gcc-4.8") && platform_version.satisfies?("< 12")
-            suse_flags["CC"] = "gcc-4.8"
-            suse_flags["CXX"] = "g++-4.8"
-          end
-          suse_flags
         when "windows"
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
           opt_flag = windows_arch_i386? ? "-march=i686" : "-march=x86-64"
@@ -721,7 +739,7 @@ module Omnibus
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
         end
 
@@ -987,17 +1005,18 @@ module Omnibus
       fetcher.version_guid
     end
 
+    # This is the real version if one exists (nil if there's no real version)
+    def real_version
+      @real_version ||= fetcher.version_for_cache || version
+    end
+
     # Returns the version to be used in cache.
     def version_for_cache
-      @version_for_cache ||= if fetcher.version_for_cache
-                               fetcher.version_for_cache
-                             elsif version
-                               version
+      @version_for_cache ||= if real_version
+                               real_version
                              else
                                log.warn(log_key) do
-                                 "No version given! This is probably a bad thing. I am going to " \
-                                 "assume the version `0.0.0', but that is most certainly not your " \
-                                 "desired behavior. If git caching seems off, this is probably why."
+                                 "No version given! Git caching disabled." \
                                end
 
                                "0.0.0"
@@ -1070,7 +1089,13 @@ module Omnibus
     #
     def build_me(build_wrappers = [])
       if Config.use_git_caching
-        if project.dirty?
+        if !real_version
+          log.info(log_key) do
+            "Forcing a build because resolved version is nil"
+          end
+          execute_build(build_wrappers)
+          project.dirty!(self) unless project.dirty? # omnibus can only be mildly dirty
+        elsif project.dirty?
           log.info(log_key) do
             "Building because `#{project.culprit.name}' dirtied the cache"
           end

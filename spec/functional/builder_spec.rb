@@ -22,6 +22,7 @@ module Omnibus
         ext = name == "ruby" ? ".exe" : ".bat"
         source = Bundler.which(name + ext)
         raise "Could not find #{name} in bundler environment" unless source
+
         File.open(File.join(embedded_bin_dir, name + ".bat"), "w") do |f|
           f.write <<-EOH.gsub(/^ {12}/, "")
             @"#{source}" %*
@@ -221,7 +222,7 @@ module Omnibus
         output = capture_logging { subject.build }
 
         appbundler_path = File.join(embedded_bin_dir, "appbundler")
-        appbundler_path.gsub!(/\//, '\\') if windows?
+        appbundler_path.gsub!(%r{/}, '\\') if windows?
         expect(output).to include("#{appbundler_path} '#{project_dir}' '#{bin_dir}'")
       end
     end

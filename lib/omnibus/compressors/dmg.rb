@@ -234,8 +234,7 @@ module Omnibus
           pkg_name: packager.package_name,
           window_bounds: window_bounds,
           pkg_position: pkg_position,
-        }
-      )
+        })
 
       Dir.chdir(staging_dir) do
         shellout! <<-EOH.gsub(/^ {10}/, "")
@@ -316,10 +315,10 @@ module Omnibus
       Dir.chdir(staging_dir) do
         shellout! <<-EOH.gsub(/^ {10}/, "")
           # Convert the png to an icon
-          sips -i "#{resource_path('icon.png')}"
+          sips -i "#{resource_path("icon.png")}"
 
           # Extract the icon into its own resource
-          DeRez -only icns "#{resource_path('icon.png')}" > tmp.rsrc
+          DeRez -only icns "#{resource_path("icon.png")}" > tmp.rsrc
 
           # Append the icon reosurce to the DMG
           Rez -append tmp.rsrc -o "#{package_path}"

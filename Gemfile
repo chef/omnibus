@@ -13,7 +13,3 @@ group :debug do
   gem "pry-byebug"
   gem "pry-stack_explorer"
 end
-
-if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("2.5")
-  gem "ohai", "<15"
-end

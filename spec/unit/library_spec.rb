@@ -125,7 +125,8 @@ module Omnibus
               erchef, # project dep
               chef, # project dep
               chefdk, # project dep
-           ])
+           ]
+          )
         end
       end
     end

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "open-uri"
+require "open-uri" unless defined?(OpenURI)
 require "ruby-progressbar"
 
 module Omnibus
@@ -77,7 +77,11 @@ module Omnibus
           end
         end
 
-        file = open(from_url, options)
+        if RUBY_VERSION.to_f < 2.7
+          file = open(from_url, options)
+        else
+          file = URI.open(from_url, options)
+        end
         # This is a temporary file. Close and flush it before attempting to copy
         # it over.
         file.close

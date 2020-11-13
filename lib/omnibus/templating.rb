@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require "erb"
+require "erb" unless defined?(Erb)
 
 module Omnibus
   module Templating
@@ -73,7 +73,7 @@ module Omnibus
 
       unless options.empty?
         raise ArgumentError,
-          "Unknown option(s): #{options.keys.map(&:inspect).join(', ')}"
+          "Unknown option(s): #{options.keys.map(&:inspect).join(", ")}"
       end
 
       # String value returned from #render_template_content

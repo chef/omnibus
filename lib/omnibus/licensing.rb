@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-require "uri"
-require "fileutils"
+require "uri" unless defined?(URI)
+require "fileutils" unless defined?(FileUtils)
 require "omnibus/download_helpers"
 require "license_scout/collector"
 require "license_scout/reporter"
@@ -130,8 +130,7 @@ module Omnibus
     #
     # @return [void]
     #
-    def execute_pre_build(software)
-    end
+    def execute_pre_build(software); end
 
     # Callback that gets called by Software#build_me after the build is done.
     # Invokes license copying for the given software. This ensures that
@@ -246,7 +245,7 @@ module Omnibus
 
         out << "This product bundles #{name} #{version},\n"
         out << "which is available under a \"#{license}\" License.\n"
-        if !license_files.empty?
+        unless license_files.empty?
           out << "For details, see:\n"
           license_files.each do |license_file|
             out << "#{license_package_location(name, license_file)}\n"
@@ -440,7 +439,7 @@ module Omnibus
 
       if Config.fatal_transitive_dependency_licensing_warnings && !transitive_dependency_licensing_warnings.empty?
         warnings_to_raise << transitive_dependency_licensing_warnings
-        warnings_to_raise << "If you are encountering missing license or missing license file errors for **transitive** dependencies, you can provide overrides for the missing information at https://github.com/chef/license_scout/blob/master/lib/license_scout/overrides.rb#L93"
+        warnings_to_raise << "If you are encountering missing license or missing license file errors for **transitive** dependencies, you can provide overrides for the missing information at https://github.com/chef/license_scout/blob/1-stable/lib/license_scout/overrides.rb#L93. \n Promote license_scout to Rubygems with `/expeditor promote chef/license_scout:1-stable X.Y.Z` in slack."
       end
 
       warnings_to_raise.flatten!

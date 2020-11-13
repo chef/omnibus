@@ -9,12 +9,12 @@ module Omnibus
       describe "#client" do
         it "raises an error if it is not overridden" do
           expect { s3_configuration }.to raise_error(RuntimeError,
-                                                     "You must override s3_configuration")
+            "You must override s3_configuration")
         end
 
         it "raises an error stating that s3_configuration must be overriden" do
           expect { client }.to raise_error(RuntimeError,
-                                           "You must override s3_configuration")
+            "You must override s3_configuration")
         end
       end
     end
@@ -40,6 +40,8 @@ module Omnibus
       let(:instance) { klass.new }
       let(:key_pair) { { access_key_id: "key_id", secret_access_key: "access_key" } }
       let(:profile) { "my-profile" }
+      let(:iam_role_arn) { "my-iam-role-arn" }
+      let(:role_session_name) { "omnibus-assume-role-s3-access" }
       let(:config) { { bucket_name: "foo", region: "us-east-1" } }
 
       it "uses configured key pairs" do
@@ -52,16 +54,33 @@ module Omnibus
         instance.send(:get_credentials)
       end
 
-      it "preferrs shared credentials profiles over key pairs" do
+      it "prefers shared credentials profiles over key pairs" do
+        allow_any_instance_of(klass).to receive(:s3_configuration).and_return(
+          {
+            **config,
+            **key_pair,
+            iam_role_arn: nil,
+            profile: profile,
+          }
+        )
+        expect(Aws::Credentials).to_not receive(:new)
+        expect(Aws::AssumeRoleCredentials).to_not receive(:new)
+        allow(Aws::SharedCredentials).to receive(:new).with(profile_name: profile)
+        instance.send(:get_credentials)
+      end
+
+      it "prefers AWS IAM role arn over profiles and key pairs" do
         allow_any_instance_of(klass).to receive(:s3_configuration).and_return(
           {
             **config,
             **key_pair,
             profile: profile,
+            iam_role_arn: iam_role_arn,
           }
         )
         expect(Aws::Credentials).to_not receive(:new)
-        allow(Aws::SharedCredentials).to receive(:new).with(profile_name: profile)
+        expect(Aws::SharedCredentials).to_not receive(:new)
+        allow(Aws::AssumeRoleCredentials).to receive(:new).with(role_arn: iam_role_arn, role_session_name: role_session_name)
         instance.send(:get_credentials)
       end
 

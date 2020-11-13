@@ -44,8 +44,7 @@ module Omnibus
           maintainer: project.maintainer,
           build_version: project.build_version,
           package_name: project.package_name,
-        }
-      )
+        })
 
       # Render the welcome template
       render_template(resource_path("welcome.html.erb"),
@@ -56,8 +55,7 @@ module Omnibus
           maintainer: project.maintainer,
           build_version: project.build_version,
           package_name: project.package_name,
-        }
-      )
+        })
 
       # "Render" the assets
       copy_file(resource_path("background.png"), "#{resources_dir}/background.png")
@@ -65,6 +63,8 @@ module Omnibus
 
     build do
       write_scripts
+
+      sign_software_libs_and_bins
 
       build_component_pkg
 
@@ -179,6 +179,67 @@ module Omnibus
       end
     end
 
+    def sign_software_libs_and_bins
+      if signing_identity
+        log.info(log_key) { "Finding libraries and binaries that require signing." }
+
+        bin_dirs = Set[]
+        lib_dirs = Set[]
+        binaries = Set[]
+        libraries = Set[]
+
+        # Capture lib_dirs and bin_dirs from each software
+        project.softwares.each do |software|
+          lib_dirs.merge(software.lib_dirs)
+          bin_dirs.merge(software.bin_dirs)
+        end
+
+        # Find all binaries in each bind_dir
+        bin_dirs.each do |dir|
+          binaries.merge Dir["#{dir}/*"]
+        end
+        # Filter out symlinks, non-files, and non-executables
+        log.debug(log_key) { "  Filtering non-binary files:" }
+        binaries.select! { |bin| is_binary?(bin) }
+
+        # Use otool to find all libries that are used by our binaries
+        binaries.each do |bin|
+          libraries.merge find_linked_libs bin
+        end
+
+        # Find all libraries in each lib_dir and add any we missed with otool
+        lib_dirs.each do |dir|
+          libraries.merge Dir["#{dir}/*"]
+        end
+
+        # Filter Mach-O libraries and bundles
+        log.debug(log_key) { "  Filtering non-library files:" }
+        libraries.select! { |lib| is_macho?(lib) }
+
+        # Use otool to find all libries that are used by our libraries
+        otool_libs = Set[]
+        libraries.each do |lib|
+          otool_libs.merge find_linked_libs lib
+        end
+
+        # Filter Mach-O libraries and bundles
+        otool_libs.select! { |lib| is_macho?(lib) }
+        libraries.merge otool_libs
+
+        log.info(log_key) { "  Signing libraries:" } unless libraries.empty?
+        libraries.each do |library|
+          log.debug(log_key) { "    Signing: #{library}" }
+          sign_library(library)
+        end
+
+        log.info(log_key) { "  Signing binaries:" } unless binaries.empty?
+        binaries.each do |binary|
+          log.debug(log_key) { "    Signing: #{binary}" }
+          sign_binary(binary, true)
+        end
+      end
+    end
+
     #
     # Construct the intermediate build product. It can be installed with the
     # Installer.app, but doesn't contain the data needed to customize the
@@ -187,15 +248,19 @@ module Omnibus
     # @return [void]
     #
     def build_component_pkg
-      command = <<-EOH.gsub(/^ {8}/, "")
+      command = <<~EOH
         pkgbuild \\
           --identifier "#{safe_identifier}" \\
           --version "#{safe_version}" \\
           --scripts "#{scripts_dir}" \\
           --root "#{project.install_dir}" \\
           --install-location "#{project.install_dir}" \\
-          "#{component_pkg}"
+          --preserve-xattr \\
       EOH
+
+      command << %Q{  --sign "#{signing_identity}" \\\n} if signing_identity
+      command << %Q{  "#{component_pkg}"}
+      command << %Q{\n}
 
       Dir.chdir(staging_dir) do
         shellout!(command)
@@ -221,8 +286,7 @@ module Omnibus
           identifier: safe_identifier,
           version: safe_version,
           component_pkg: component_pkg,
-        }
-      )
+        })
     end
 
     #
@@ -232,7 +296,7 @@ module Omnibus
     # @return [void]
     #
     def build_product_pkg
-      command = <<-EOH.gsub(/^ {8}/, "")
+      command = <<~EOH
         productbuild \\
           --distribution "#{staging_dir}/Distribution" \\
           --resources "#{resources_dir}" \\
@@ -322,6 +386,58 @@ module Omnibus
 
         converted
       end
+    end
+
+    #
+    # Given a file path return any linked libraries.
+    #
+    # @param [String] file_path
+    #    The path to a file
+    # @return [Array<String>]
+    #    The linked libs
+    #
+    def find_linked_libs(file_path)
+      # Find all libaries for each bin
+      command = "otool -L #{file_path}"
+
+      stdout = shellout!(command).stdout
+      stdout.slice!(file_path)
+      stdout.scan(/#{install_dir}\S*/)
+    end
+
+    def sign_library(lib)
+      sign_binary(lib)
+    end
+
+    def sign_binary(bin, hardened_runtime = false)
+      command = "codesign -s '#{signing_identity}' '#{bin}'"
+      command << %q{ --options=runtime} if hardened_runtime
+      command << %Q{ --entitlements #{resource_path("entitlements.plist")}} if File.exist?(resource_path("entitlements.plist")) && hardened_runtime
+      ## Force re-signing to deal with binaries that have the same sha.
+      command << %q{ --force}
+      command << %Q{\n}
+
+      shellout!(command)
+    end
+
+    def is_binary?(bin)
+      is_binary = File.file?(bin) &&
+        File.executable?(bin) &&
+        !File.symlink?(bin)
+      log.debug(log_key) { "    removing from signing: #{bin}" } unless is_binary
+      is_binary
+    end
+
+    def is_macho?(lib)
+      is_macho = false
+      if is_binary?(lib)
+        command = "file #{lib}"
+
+        stdout = shellout!(command).stdout
+        is_macho = stdout.match?(/Mach-O.*library/) || stdout.match?(/Mach-O.*bundle/)
+      end
+      log.debug(log_key) { "    removing from signing: #{lib}" } unless is_macho
+      is_macho
     end
   end
 end

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "thor"
+require "thor" unless defined?(Thor)
 
 module Omnibus
   class Cleaner < Thor::Group
@@ -48,16 +48,19 @@ module Omnibus
 
     def clean_package_dir
       return unless purge?
+
       FileSyncer.glob("#{Config.package_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_cache_dir
       return unless purge?
+
       FileSyncer.glob("#{Config.cache_dir}/**/*").each(&method(:remove_file))
     end
 
     def clean_install_dir
       return unless purge?
+
       remove_file(@project.install_dir)
     end
 

@@ -6,8 +6,7 @@ module Omnibus
       double(Software,
         name: "chefdk",
         install_dir: project_dir,
-        project_dir: project_dir
-      )
+        project_dir: project_dir)
     end
 
     let(:project_dir) { on_windows ? "C:/opscode/chefdk" : "/opt/chefdk" }
@@ -238,7 +237,7 @@ module Omnibus
         it "appends platform host to the options" do
           expect(subject).to receive(:command)
             .with("./configure --build=x86_64-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
-          subject.configure()
+          subject.configure
         end
       end
 
@@ -254,7 +253,7 @@ module Omnibus
         it "appends platform host to the options" do
           expect(subject).to receive(:command)
             .with("./configure --build=i686-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
-          subject.configure()
+          subject.configure
         end
       end
 
@@ -305,7 +304,8 @@ module Omnibus
           .with("config/patches", "good_patch")
           .and_return(
             [ ["#{project_dir}/patch_location1/good_patch", "#{project_dir}/patch_location2/good_patch"],
-              "#{project_dir}/patch_location2/good_patch" ])
+              "#{project_dir}/patch_location2/good_patch" ]
+          )
       end
 
       it "is a DSL method" do
@@ -355,10 +355,10 @@ module Omnibus
 
       let(:software) do
         double(Software,
-               name: "chefdk",
-               install_dir: tmp_dir,
-               project_dir: tmp_dir,
-               overridden?: false)
+          name: "chefdk",
+          install_dir: tmp_dir,
+          project_dir: tmp_dir,
+          overridden?: false)
       end
 
       let(:before_build_shasum) do

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "fileutils"
+require "fileutils" unless defined?(FileUtils)
 require "omnibus/s3_helpers"
 
 module Omnibus
@@ -147,7 +147,9 @@ module Omnibus
           force_path_style: Config.s3_force_path_style,
         }
 
-        if Config.s3_profile
+        if Config.s3_iam_role_arn
+          config[:iam_role_arn] = Config.s3_iam_role_arn
+        elsif Config.s3_profile
           config[:profile] = Config.s3_profile
         else
           config[:access_key_id] = Config.s3_access_key

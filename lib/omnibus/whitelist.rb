@@ -1,5 +1,5 @@
 
-# Copyright 2012-2018 Chef Software, Inc.
+# Copyright 2012-2020, Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 WHITELIST_LIBS = [
     /ld-linux/,
+    /libanl\.so/,
     /libc\.so/,
     /libcrypt\.so/,
     /libdl/,
@@ -33,6 +34,7 @@ WHITELIST_LIBS = [
   ].freeze
 
 ARCH_WHITELIST_LIBS = [
+  /libanl\.so/,
   /libc\.so/,
   /libcrypt\.so/,
   /libdb-5\.3\.so/,
@@ -54,6 +56,27 @@ AIX_WHITELIST_LIBS = [
   /libc\.a/,
   /libcrypt\.a/,
   /unix$/,
+].freeze
+
+OMNIOS_WHITELIST_LIBS = [
+  /libc\.so\.1/,
+  /libcrypt\./,
+  /libcrypt\.so\.1/,
+  /libdl\.so\.1/,
+  /libgcc_s\.so\.1/,
+  /libgen\.so\.1/,
+  /libm\.so\.2/,
+  /libmd\.so\.1/,
+  /libmp\.so/,
+  /libmp\.so\.2/,
+  /libnsl\.so\.1/,
+  /libpthread\.so\.1/,
+  /librt\.so\.1/,
+  /libsocket\.so\.1/,
+  /libssp\.s/,
+  /libssp\.so./,
+  /libssp\.so\.0/,
+  /libgcc_s\.so\.1/,
 ].freeze
 
 SOLARIS_WHITELIST_LIBS = [
@@ -133,8 +156,11 @@ MAC_WHITELIST_LIBS = [
   /libffi\.dylib/,
   /libncurses\.5\.4\.dylib/,
   /libiconv/,
+  /libidn2\.0\.dylib/,
   /libstdc\+\+\.6\.dylib/,
   /libc\+\+\.1\.dylib/,
+  /libc\+\+\.1\.dylib/,
+  /libzstd\.1\.dylib/,
   /Security/,
 ].freeze
 

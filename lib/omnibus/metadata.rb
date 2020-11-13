@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "ffi_yajl"
+require "ffi_yajl" unless defined?(FFI_Yajl)
 
 module Omnibus
   class Metadata
@@ -83,7 +83,7 @@ module Omnibus
         data = File.read(path_for(package))
         hash = FFI_Yajl::Parser.parse(data, symbolize_names: true)
 
-         # Ensure Platform version has been truncated
+        # Ensure Platform version has been truncated
         if hash[:platform_version] && hash[:platform]
           hash[:platform_version] = truncate_platform_version(hash[:platform_version], hash[:platform])
         end
@@ -176,7 +176,7 @@ module Omnibus
         when "aix", "alpine", "mac_os_x", "openbsd", "slackware", "solaris2", "opensuse", "opensuseleap", "ubuntu", "amazon"
           # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
           platform_version.split(".")[0..1].join(".")
-        when "arch", "gentoo"
+        when "arch", "gentoo", "kali"
           # Arch Linux / Gentoo do not have a platform_version ohai attribute, they are rolling release (lsb_release -r)
           "rolling"
         when "windows"

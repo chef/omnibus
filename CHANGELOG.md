@@ -1,10 +1,95 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.0.4 -->
+## [8.0.4](https://github.com/chef/omnibus/tree/8.0.4) (2020-11-13)
+
+#### Merged Pull Requests
+- Remove EOL Windows Support (pre-2012) [#983](https://github.com/chef/omnibus/pull/983) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=7.0.34 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Remove EOL Windows Support (pre-2012) [#983](https://github.com/chef/omnibus/pull/983) ([tas50](https://github.com/tas50)) <!-- 8.0.4 -->
+- Update chefstyle requirement from = 1.5.0 to = 1.5.1 [#984](https://github.com/chef/omnibus/pull/984) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.3 -->
+- Switch from fauxhai to fauxhai-ng [#982](https://github.com/chef/omnibus/pull/982) ([tas50](https://github.com/tas50)) <!-- 8.0.2 -->
+- Remove SLES 11 check [#981](https://github.com/chef/omnibus/pull/981) ([tas50](https://github.com/tas50)) <!-- 8.0.1 -->
+- Replace chef-sugar for DSL helpers with chef-utils 15.4+ [#980](https://github.com/chef/omnibus/pull/980) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.0.0 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [7.0.34](https://github.com/chef/omnibus/tree/7.0.34) (2020-11-11)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from = 1.1.0 to = 1.1.2 [#954](https://github.com/chef/omnibus/pull/954) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.1.2 to = 1.1.3 [#955](https://github.com/chef/omnibus/pull/955) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Fill in some of the gotchas that are easy to hit with omnibus [#951](https://github.com/chef/omnibus/pull/951) ([jaymzh](https://github.com/jaymzh))
+- Remove legacy CI configs and redundant encoding comment [#956](https://github.com/chef/omnibus/pull/956) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.1.3 to = 1.2.0 [#957](https://github.com/chef/omnibus/pull/957) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Ruby 2.7.1 adds a warning on calling open directly, needs to be URI.open [#940](https://github.com/chef/omnibus/pull/940) ([mattray](https://github.com/mattray))
+- Update chefstyle requirement from = 1.2.0 to = 1.2.1 [#958](https://github.com/chef/omnibus/pull/958) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Switch expand_path on file to expand_path on dir [#959](https://github.com/chef/omnibus/pull/959) ([tas50](https://github.com/tas50))
+- Optimize our requires [#960](https://github.com/chef/omnibus/pull/960) ([tas50](https://github.com/tas50))
+- Fix Ruby 2.4 tests [#963](https://github.com/chef/omnibus/pull/963) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.2.1 to = 1.3.2 [#967](https://github.com/chef/omnibus/pull/967) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.3.2 to = 1.4.0 [#968](https://github.com/chef/omnibus/pull/968) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.4.0 to = 1.4.2 [#969](https://github.com/chef/omnibus/pull/969) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.4.2 to = 1.4.3 [#970](https://github.com/chef/omnibus/pull/970) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Test on Ruby 2.7 in buildkite [#926](https://github.com/chef/omnibus/pull/926) ([tas50](https://github.com/tas50))
+- Fix dependency path for env with racc gem [#972](https://github.com/chef/omnibus/pull/972) ([jaymalasinha](https://github.com/jaymalasinha))
+- Require Ruby 2.6 or later [#971](https://github.com/chef/omnibus/pull/971) ([tas50](https://github.com/tas50))
+- Remove old pins we don&#39;t need anymore [#974](https://github.com/chef/omnibus/pull/974) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.4.3 to = 1.4.5 [#976](https://github.com/chef/omnibus/pull/976) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- use 7zip for FastUnzip MSI action to boost zip expansion performance [#977](https://github.com/chef/omnibus/pull/977) ([mwrock](https://github.com/mwrock))
+- Update chefstyle requirement from = 1.4.5 to = 1.5.0 [#978](https://github.com/chef/omnibus/pull/978) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+<!-- latest_stable_release -->
+
+## [7.0.13](https://github.com/chef/omnibus/tree/7.0.13) (2020-06-15)
+
+#### Merged Pull Requests
+- Revert &quot;Pin ffi to &lt; 0.13 for windows&quot; now that 1.13.1 is out [#949](https://github.com/chef/omnibus/pull/949) ([tas50](https://github.com/tas50))
+
+## [7.0.12](https://github.com/chef/omnibus/tree/7.0.12) (2020-06-05)
+
+#### Merged Pull Requests
+- old PR that was merged was very old [#910](https://github.com/chef/omnibus/pull/910) ([lamont-granquist](https://github.com/lamont-granquist))
+- Don&#39;t mark the cache dirty if it already is. [#911](https://github.com/chef/omnibus/pull/911) ([btm](https://github.com/btm))
+- Update chefstyle requirement from = 0.13.3 to = 0.14.0 [#912](https://github.com/chef/omnibus/pull/912) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Switch back to chef-sugar [#914](https://github.com/chef/omnibus/pull/914) ([tas50](https://github.com/tas50))
+- Remove Solaris 10 platform and enable some hardening flags on Linux/Mac/FreeBSD [#915](https://github.com/chef/omnibus/pull/915) ([lamont-granquist](https://github.com/lamont-granquist))
+- Minor spelling, grammar, punctuation [#917](https://github.com/chef/omnibus/pull/917) ([ehershey](https://github.com/ehershey))
+- fix typo [#916](https://github.com/chef/omnibus/pull/916) ([ehershey](https://github.com/ehershey))
+- Remove myself as maintainer [#919](https://github.com/chef/omnibus/pull/919) ([scotthain](https://github.com/scotthain))
+- Typos, formatting, links to other generated files [#918](https://github.com/chef/omnibus/pull/918) ([ehershey](https://github.com/ehershey))
+- Update thor requirement from ~&gt; 0.18 to &gt;= 0.18, &lt; 2.0 [#921](https://github.com/chef/omnibus/pull/921) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update the rpm package signing to work with newer rpm version [#892](https://github.com/chef/omnibus/pull/892) ([twk3](https://github.com/twk3))
+- Cache gem installs in S3 to speed up tests [#925](https://github.com/chef/omnibus/pull/925) ([tas50](https://github.com/tas50))
+- Implement deep signing for macOS Notarization [#924](https://github.com/chef/omnibus/pull/924) ([jonsmorrow](https://github.com/jonsmorrow))
+- Add AWS IAM authentication for S3 caching and publishing [#927](https://github.com/chef/omnibus/pull/927) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Enable entitlements file for macOS [#928](https://github.com/chef/omnibus/pull/928) ([jonsmorrow](https://github.com/jonsmorrow))
+- point to 1-stable branch for changes to the overrides.rb file. [#930](https://github.com/chef/omnibus/pull/930) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit))
+- Update instructions to get builds passing when a new license needs to be added. [#932](https://github.com/chef/omnibus/pull/932) ([PrajaktaPurohit](https://github.com/PrajaktaPurohit))
+- Update chefstyle requirement from = 0.14.0 to = 0.14.1 [#929](https://github.com/chef/omnibus/pull/929) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Whitelist libanl [#934](https://github.com/chef/omnibus/pull/934) ([lamont-granquist](https://github.com/lamont-granquist))
+- Fix Ubuntu version in generated README.md [#935](https://github.com/chef/omnibus/pull/935) ([stevendanna](https://github.com/stevendanna))
+- Update chefstyle requirement from = 0.14.1 to = 0.15.1 [#936](https://github.com/chef/omnibus/pull/936) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 0.15.1 to = 1.0.1 [#937](https://github.com/chef/omnibus/pull/937) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update ohai requirement from &gt;= 13, &lt; 16 to &gt;= 13, &lt; 17 [#939](https://github.com/chef/omnibus/pull/939) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.0.1 to = 1.1.0 [#942](https://github.com/chef/omnibus/pull/942) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Pin ffi to &lt; 0.13 for windows [#943](https://github.com/chef/omnibus/pull/943) ([james-stocks](https://github.com/james-stocks))
+
+## [6.1.9](https://github.com/chef/omnibus/tree/6.1.9) (2019-11-01)
+
+#### Merged Pull Requests
+- force builds nil versions [#619](https://github.com/chef/omnibus/pull/619) ([lamont-granquist](https://github.com/lamont-granquist))
+- Update chefstyle requirement from = 0.12 to = 0.13.3 [#900](https://github.com/chef/omnibus/pull/900) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+
+## [6.1.7](https://github.com/chef/omnibus/tree/6.1.7) (2019-10-29)
+
+#### Merged Pull Requests
+- Add Whitelist Libs for Catalina [#909](https://github.com/chef/omnibus/pull/909) ([jonsmorrow](https://github.com/jonsmorrow))
+- add `kali` as rolling OS [#907](https://github.com/chef/omnibus/pull/907) ([jmartin-r7](https://github.com/jmartin-r7))
+- Update artifactory requirement from ~&gt; 2.0 to ~&gt; 3.0 [#899](https://github.com/chef/omnibus/pull/899) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+
 ## [6.1.4](https://github.com/chef/omnibus/tree/6.1.4) (2019-09-19)
 
 #### Merged Pull Requests
@@ -14,7 +99,6 @@
 - Pretty print version manifest to pkg folder [#839](https://github.com/chef/omnibus/pull/839) ([balasankarc](https://github.com/balasankarc))
 - Unmount dmg before detaching [#897](https://github.com/chef/omnibus/pull/897) ([jaymalasinha](https://github.com/jaymalasinha))
 - use chef-fauxhai, chef-sugar-ng and chef-cleanroom gems [#903](https://github.com/chef/omnibus/pull/903) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_stable_release -->
 
 ## [6.0.30](https://github.com/chef/omnibus/tree/6.0.30) (2019-06-13)
 

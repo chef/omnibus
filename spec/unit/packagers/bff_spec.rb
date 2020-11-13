@@ -301,7 +301,7 @@ module Omnibus
         # A note - the /opt/ here is essentially project.install_dir one level up.
         # There is nothing magical about 'opt' as a directory.
         expect(subject).to receive(:shellout!)
-          .with(/chown -Rh 0:0 #{staging_dir}\/opt$/)
+          .with(%r{chown -Rh 0:0 #{staging_dir}/opt$})
         subject.create_bff_file
       end
 
@@ -312,7 +312,7 @@ module Omnibus
 
       it "uses the correct command" do
         expect(subject).to receive(:shellout!)
-          .with(/\/usr\/sbin\/mkinstallp -d/)
+          .with(%r{/usr/sbin/mkinstallp -d})
         subject.create_bff_file
       end
 

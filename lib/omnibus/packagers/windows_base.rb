@@ -59,11 +59,11 @@ module Omnibus
             raise InvalidValue.new(:params, "be a Hash")
           end
 
-          valid_keys = [:store, :timestamp_servers, :machine_store, :algorithm]
+          valid_keys = %i{store timestamp_servers machine_store algorithm}
           invalid_keys = params.keys - valid_keys
           unless invalid_keys.empty?
-            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(', ')}]. "\
-                                   "Found invalid keys [#{invalid_keys.join(', ')}]")
+            raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(", ")}]. "\
+                                   "Found invalid keys [#{invalid_keys.join(", ")}]")
           end
 
           if !params[:machine_store].nil? && !(
@@ -117,11 +117,11 @@ module Omnibus
         success = try_sign(package_file, ts)
         break if success
       end
-      raise FailedToSignWindowsPackage.new if !success
+      raise FailedToSignWindowsPackage.new unless success
     end
 
     def try_sign(package_file, url)
-      cmd = Array.new.tap do |arr|
+      cmd = [].tap do |arr|
         arr << "signtool.exe"
         arr << "sign /v"
         arr << "/t #{url}"
@@ -158,8 +158,9 @@ module Omnibus
     #
     def certificate_subject
       return "CN=#{project.package_name}" unless signing_identity
+
       store = machine_store? ? "LocalMachine" : "CurrentUser"
-      cmd = Array.new.tap do |arr|
+      cmd = [].tap do |arr|
         arr << "powershell.exe"
         arr << "-ExecutionPolicy Bypass"
         arr << "-NoProfile"
