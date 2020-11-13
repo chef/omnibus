@@ -227,9 +227,9 @@ module Omnibus
         end
       end
 
-      context "on freebsd 10" do
+      context "on freebsd" do
         before do
-          stub_ohai(platform: "freebsd", version: "10.4")
+          stub_ohai(platform: "freebsd", version: "12.1")
         end
 
         it "sets the defaults" do
@@ -245,95 +245,9 @@ module Omnibus
             "OMNIBUS_INSTALL_DIR" => "/opt/project"
           )
         end
-
-        context "with gcc 4.9 installed" do
-          before do
-            allow(subject).to receive(:which).and_return("/usr/local/bin/gcc49")
-          end
-        end
       end
 
-      context "on freebsd 10" do
-        before do
-          stub_ohai(platform: "freebsd", version: "10.4")
-        end
-
-        it "Clang as the default compiler" do
-          expect(subject.with_standard_compiler_flags).to eq(
-            "CC"              => "clang",
-            "CXX"             => "clang++",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "LDFLAGS"         => "-L/opt/project/embedded/lib",
-            "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-            "OMNIBUS_INSTALL_DIR" => "/opt/project"
-          )
-        end
-      end
-
-      context "on sles 11" do
-        before do
-          # sles identifies as suse
-          stub_ohai(platform: "suse", version: "11.4")
-          allow(subject).to receive(:which).with("gcc-4.8").and_return(false)
-        end
-        it "sets the defaults" do
-          expect(subject.with_standard_compiler_flags).to eq(
-            "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-            "OMNIBUS_INSTALL_DIR" => "/opt/project"
-          )
-        end
-
-        context "with gcc 4.8 installed" do
-
-          before do
-            allow(subject).to receive(:which).and_return("/usr/bin/gcc-4.8")
-          end
-
-          it "sets the compiler args" do
-            expect(subject.with_standard_compiler_flags).to eq(
-              "CC"              => "gcc-4.8",
-              "CXX"             => "g++-4.8",
-              "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-              "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-              "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-              "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-              "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-              "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-              "OMNIBUS_INSTALL_DIR" => "/opt/project"
-            )
-          end
-        end
-      end
-
-      context "on sles 12" do
-        before do
-          # sles identifies as suse
-          stub_ohai(platform: "suse", version: "12.2")
-          allow(subject).to receive(:which).with("gcc-4.8").and_return(true)
-        end
-
-        it "sets the defaults" do
-          expect(subject.with_standard_compiler_flags).to eq(
-            "LDFLAGS"         => "-Wl,-rpath,/opt/project/embedded/lib -L/opt/project/embedded/lib",
-            "CFLAGS"          => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "CXXFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "CPPFLAGS"        => "-I/opt/project/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
-            "LD_RUN_PATH"     => "/opt/project/embedded/lib",
-            "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
-            "OMNIBUS_INSTALL_DIR" => "/opt/project"
-          )
-        end
-      end
-
-      context "on Windows" do
+      context "on windows" do
         let(:win_arch_i386) { true }
 
         before do
