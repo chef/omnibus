@@ -225,6 +225,7 @@ module Omnibus
         unless val.is_a?(String)
           raise InvalidValue.new(:project_name, "be an String")
         end
+
         @project_name = val
       end
     end
@@ -249,6 +250,7 @@ module Omnibus
         unless val.is_a?(Array)
           raise InvalidValue.new(:platforms, "be an Array")
         end
+
         @platforms = val
       end
     end
@@ -276,6 +278,7 @@ module Omnibus
         unless File.file?(val)
           raise InvalidValue.new(:ib_executable, "must exist")
         end
+
         @ib_executable = val
       end
     end
@@ -303,6 +306,7 @@ module Omnibus
         unless File.file?(val)
           raise InvalidValue.new(:ib_license, "must exist")
         end
+
         @ib_license = val
       end
     end
@@ -327,6 +331,7 @@ module Omnibus
         unless val.is_a?(String)
           raise InvalidValue.new(:ib_project_file, "be an String")
         end
+
         @ib_project_file = val
       end
     end
