@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.0.6 -->
-## [8.0.6](https://github.com/chef/omnibus/tree/8.0.6) (2020-11-16)
+<!-- latest_release 8.0.7 -->
+## [8.0.7](https://github.com/chef/omnibus/tree/8.0.7) (2020-11-17)
 
 #### Merged Pull Requests
-- Revert addition of InstallBuilder builder [#985](https://github.com/chef/omnibus/pull/985) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.5.1 to = 1.5.2 [#986](https://github.com/chef/omnibus/pull/986) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.34 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update chefstyle requirement from = 1.5.1 to = 1.5.2 [#986](https://github.com/chef/omnibus/pull/986) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.7 -->
 - Revert addition of InstallBuilder builder [#985](https://github.com/chef/omnibus/pull/985) ([tas50](https://github.com/tas50)) <!-- 8.0.6 -->
 - Add Installbuilder packager(installbuilder) [#908](https://github.com/chef/omnibus/pull/908) ([niekrasp](https://github.com/niekrasp)) <!-- 8.0.5 -->
 - Remove EOL Windows Support (pre-2012) [#983](https://github.com/chef/omnibus/pull/983) ([tas50](https://github.com/tas50)) <!-- 8.0.4 -->
