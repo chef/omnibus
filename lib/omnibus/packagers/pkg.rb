@@ -424,7 +424,7 @@ module Omnibus
       is_binary = File.file?(bin) &&
         File.executable?(bin) &&
         !File.symlink?(bin)
-      log.debug(log_key) { "    removing from signing: #{bin}" } unless is_binary
+      log.debug(log_key) { "    removing non-binary file from signing: #{bin}" } unless is_binary
       is_binary
     end
 
@@ -434,9 +434,9 @@ module Omnibus
         command = "file #{lib}"
 
         stdout = shellout!(command).stdout
-        is_macho = stdout.match?(/Mach-O.*library/) || stdout.match?(/Mach-O.*bundle/)
+        is_macho = stdout.match?(/Mach-O.*(library|bundle)/)
       end
-      log.debug(log_key) { "    removing from signing: #{lib}" } unless is_macho
+      log.debug(log_key) { "    removing non-Mach-O library file from signing: #{lib}" } unless is_macho
       is_macho
     end
   end
