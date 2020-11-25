@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.0.8 -->
-## [8.0.8](https://github.com/chef/omnibus/tree/8.0.8) (2020-11-23)
+<!-- latest_release 8.0.9 -->
+## [8.0.9](https://github.com/chef/omnibus/tree/8.0.9) (2020-11-25)
 
 #### Merged Pull Requests
-- Improve debug messages for macOS code signing [#987](https://github.com/chef/omnibus/pull/987) ([tas50](https://github.com/tas50))
+- Create sleep loop in compress_dmg [#989](https://github.com/chef/omnibus/pull/989) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
 <!-- release_rollup since=7.0.34 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Create sleep loop in compress_dmg [#989](https://github.com/chef/omnibus/pull/989) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.0.9 -->
 - Improve debug messages for macOS code signing [#987](https://github.com/chef/omnibus/pull/987) ([tas50](https://github.com/tas50)) <!-- 8.0.8 -->
 - Update chefstyle requirement from = 1.5.1 to = 1.5.2 [#986](https://github.com/chef/omnibus/pull/986) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.7 -->
 - Revert addition of InstallBuilder builder [#985](https://github.com/chef/omnibus/pull/985) ([tas50](https://github.com/tas50)) <!-- 8.0.6 -->
