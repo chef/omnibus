@@ -219,8 +219,11 @@ module Omnibus
             sync
             hdiutil unmount "#{device}"
             # Give some time to the system so unmount dmg
-            sleep 5
-            hdiutil detach "#{device}" &&\
+            ATTEMPTS=0
+            until [ $ATTEMPTS -eq 5 ] || hdiutil detach "/dev/sda1"; do
+              sleep 10
+              echo Attempt number $(( ATTEMPTS++ ))
+            done
             hdiutil convert \\
               "#{staging_dir}/project-writable.dmg" \\
               -format UDZO \\
