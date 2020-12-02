@@ -697,6 +697,11 @@ module Omnibus
       opts ||= {}
       compiler_flags =
         case Ohai["platform"]
+        when  "mac_os_x"
+          {
+            "CFLAGS" => "-target arm64-apple-macos11",
+            "LDFLAGS" => ""
+          }
         when "aix"
           {
             "CC" => "xlc_r -q64",
