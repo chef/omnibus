@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.0.10 -->
+## [8.0.10](https://github.com/chef/omnibus/tree/8.0.10) (2020-12-22)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from = 1.5.2 to = 1.5.8 [#993](https://github.com/chef/omnibus/pull/993) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=8.0.9 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Update chefstyle requirement from = 1.5.2 to = 1.5.8 [#993](https://github.com/chef/omnibus/pull/993) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.10 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [8.0.9](https://github.com/chef/omnibus/tree/8.0.9) (2020-12-14)
