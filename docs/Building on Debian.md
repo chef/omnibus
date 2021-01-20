@@ -39,21 +39,25 @@ package :deb do
   license 'Apache 2.0'
   priority 'extra'
   section 'databases'
+  gpg_key_name 'Maintainer <maintainer@example.com>'
+  signing_passphrase 'acbd1234'
 end
 ```
 
 Some DSL methods available include:
 
-| DSL Method           | Description                                 |
-| :------------------: | --------------------------------------------|
-| `vendor`             | The name of the package producer            |
-| `license`            | The default license for the package         |
-| `priority`           | The priority for the package                |
-| `section`            | The section for this package                |
+| DSL Method           | Description                                                                  |
+| :------------------: | -----------------------------------------------------------------------------|
+| `gpg_key_name`       | The name of the key to sign the DEB with (defaults to value of `maintainer`) |
+| `signing_passphrase` | The passphrase to sign the DEB with                                          |
+| `vendor`             | The name of the package producer                                             |
+| `license`            | The default license for the package                                          |
+| `priority`           | The priority for the package                                                 |
+| `section`            | The section for this package                                                 |
 
 If you are unfamilar with any of these terms, you should just accept the defaults. For more information on the purpose of any of these configuration options, please see the DEB spec.
 
 For more information, please see the [`Packager::DEB` documentation](http://rubydoc.info/github/opscode/omnibus/Omnibus/Packager/DEB).
 
 ### Notes on DEB-signing
-At this time, signing Debian packages is not supported.
+To sign an DEB, you will need a GPG keypair. You can [create your own signing key](http://www.madboa.com/geek/gpg-quickstart/) or [import an existing one](http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/gpg-cs.html).

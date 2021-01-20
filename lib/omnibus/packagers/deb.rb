@@ -74,6 +74,9 @@ module Omnibus
       # Create the deb
       create_deb_file
 
+      # Sign the deb
+      sign_deb_file
+
       # Now the debug build
       if debug_build?
         # Render the Debian +control+ file
@@ -90,12 +93,59 @@ module Omnibus
 
         # Create the deb
         create_deb_file(true)
+
+        # Sign the deb
+        sign_deb_file(true)
       end
     end
 
     #
     # @!group DSL methods
     # --------------------------------------------------
+
+    #
+    # Set or return the the gpg key name to use while signing.
+    # If this value is provided, Omnibus will attempt to sign the DEB.
+    #
+    # @example
+    #   gpg_key_name 'My key <my.address@here.com>'
+    #
+    # @param [String] val
+    #   the name of the GPG key to use during RPM signing
+    #
+    # @return [String]
+    #   the RPM signing GPG key name
+    #
+    def gpg_key_name(val = NULL)
+      if null?(val)
+        @gpg_key_name
+      else
+        @gpg_key_name = val
+      end
+    end
+    expose :gpg_key_name
+
+    #
+    # Set or return the signing passphrase. If this value is provided,
+    # Omnibus will attempt to sign the DEB.
+    #
+    # @example
+    #   signing_passphrase "foo"
+    #
+    # @param [String] val
+    #   the passphrase to use when signing the DEB
+    #
+    # @return [String]
+    #   the DEB-signing passphrase
+    #
+    def signing_passphrase(val = NULL)
+      if null?(val)
+        @signing_passphrase
+      else
+        @signing_passphrase = val
+      end
+    end
+    expose :signing_passphrase
 
     #
     # Set or return the vendor who made this package.
@@ -388,6 +438,64 @@ module Omnibus
       # Execute the build command
       Dir.chdir(Config.package_dir) do
         shellout!("fakeroot dpkg-deb -z9 -Zgzip -D --build #{staging_path} #{package_name(debug)}")
+      end
+    end
+
+    #
+    # Sign the  +.deb+ file with gpg. This has to be done as separate steps
+    # from creating the +.deb+ file. See +debsigs+ source for behavior
+    # replicated here. +https://gitlab.com/debsigs/debsigs/blob/master/debsigs.txt#L103-124+
+    #
+    # @return [void]
+    def sign_deb_file(debug = false)
+      if !signing_passphrase && !gpg_key_name
+        log.info(log_key) { "Signing not enabled for .deb file" }
+        return
+      end
+
+      log.info(log_key) { "Signing enabled for .deb file" }
+      key_name = gpg_key_name || project.maintainer
+      log.info(log_key) { "Using gpg key #{key_name}" }
+
+      # Check our dependencies and determine command for GnuPG. +Omnibus.which+ returns the path, or nil.
+      gpg = nil
+      if Omnibus.which("gpg2")
+        gpg = "gpg2"
+      elsif Omnibus.which("gpg")
+        gpg = "gpg"
+      end
+
+      if gpg && Omnibus.which("ar")
+        # Create a directory that will be cleaned when we leave the block
+        Dir.mktmpdir do |tmp_dir|
+          Dir.chdir(tmp_dir) do
+            # Extract the deb file contents
+            shellout!("ar x #{Config.package_dir}/#{package_name(debug)}")
+            # Concatenate contents, in order per +debsigs+ documentation.
+            shellout!("cat debian-binary control.tar.* data.tar.* > complete")
+            # Create signature (as +root+)
+            gpg_command =  "#{gpg} --armor --sign --detach-sign"
+            gpg_command << " --local-user '#{key_name}'"
+            gpg_command << " --homedir #{ENV['HOME']}/.gnupg"
+            ## pass the +signing_passphrase+ via +STDIN+
+            gpg_command << " --batch --no-tty"
+            ## Check `gpg` for the compatibility/need of pinentry-mode
+            # - We're calling gpg with the +--pinentry-mode+ argument, and +STDIN+ of +/dev/null+
+            # - This _will_ fail with exit code 2 no matter what. We want to check the +STDERR+
+            #   for the error message about the parameter. If it is _not present_ in the
+            #   output, then we _do_ want to add it. (If +grep -q+ is +1+, add parameter)
+            if shellout("#{gpg} --pinentry-mode loopback </dev/null 2>&1 | grep -q pinentry-mode").exitstatus == 1
+              gpg_command << " --pinentry-mode loopback"
+            end
+            gpg_command << " --passphrase-fd 0"
+            gpg_command << " -o _gpgorigin complete"
+            shellout!("fakeroot #{gpg_command}", input: signing_passphrase)
+            # Append +_gpgorigin+ to the +.deb+ file (as +root+)
+            shellout!("fakeroot ar rc #{Config.package_dir}/#{package_name(debug)} _gpgorigin")
+          end
+        end
+      else
+        log.info(log_key) { "Signing not possible. Ensure that GnuPG and GNU AR are available" }
       end
     end
 

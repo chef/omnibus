@@ -259,6 +259,46 @@ module Omnibus
       end
     end
 
+    describe "#sign_deb_file", :not_supported_on_windows do
+      context "when DEB signing is not enabled" do
+        before do
+          subject.signing_passphrase(nil)
+        end
+
+        it "logs a message" do
+          output = capture_logging { subject.sign_deb_file }
+          expect(output).to include("Signing not enabled for .deb file")
+        end
+      end
+
+      context "when DEB signing is enabled" do
+        before do
+          allow(subject).to receive(:shellout!)
+          allow(subject).to receive(:package_name).and_return("safe")
+          subject.signing_passphrase("foobar")
+        end
+
+        it "logs a message" do
+          output = capture_logging { subject.sign_deb_file }
+          expect(output).to include("Signing enabled for .deb file")
+        end
+
+        it "finds gpg and ar commands" do
+          output = capture_logging { subject.sign_deb_file }
+          expect(output).not_to include("Signing not possible.")
+        end
+
+        it "runs correct commands" do
+          expect(subject).to receive(:shellout!)
+            .at_least(:once).with(/ar x/)
+            .at_least(:once).with(/cat debian-binary control\.tar/)
+            .at_least(:once).with(/fakeroot gpg/)
+            .at_least(:once).with(/fakeroot ar rc/)
+          subject.sign_deb_file
+        end
+      end
+    end
+
     describe '#package_size' do
       before do
         project.install_dir(staging_dir)
