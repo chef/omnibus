@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.0.11 -->
-## [8.0.11](https://github.com/chef/omnibus/tree/8.0.11) (2020-12-30)
+<!-- latest_release 8.0.12 -->
+## [8.0.12](https://github.com/chef/omnibus/tree/8.0.12) (2021-01-27)
 
 #### Merged Pull Requests
-- Update chefstyle requirement from = 1.5.8 to = 1.5.9 [#994](https://github.com/chef/omnibus/pull/994) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Add cumulus platform support [#996](https://github.com/chef/omnibus/pull/996) ([predominant](https://github.com/predominant))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.9 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Add cumulus platform support [#996](https://github.com/chef/omnibus/pull/996) ([predominant](https://github.com/predominant)) <!-- 8.0.12 -->
 - Update chefstyle requirement from = 1.5.8 to = 1.5.9 [#994](https://github.com/chef/omnibus/pull/994) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.11 -->
 - Update chefstyle requirement from = 1.5.2 to = 1.5.8 [#993](https://github.com/chef/omnibus/pull/993) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.10 -->
 <!-- release_rollup -->
