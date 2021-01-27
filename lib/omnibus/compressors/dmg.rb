@@ -259,8 +259,8 @@ module Omnibus
           sync
           hdiutil unmount "#{@device}"
           # Give some time to the system so unmount dmg
-          ATTEMPTS=0
-          until [ $ATTEMPTS -eq 5 ] || hdiutil detach "#{@device}"; do
+          ATTEMPTS=1
+          until [ $ATTEMPTS -eq 6 ] || hdiutil detach "#{@device}"; do
             sleep 10
             echo Attempt number $(( ATTEMPTS++ ))
           done
