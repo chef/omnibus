@@ -16,7 +16,6 @@ Easily create full-stack installers for your project across a variety of platfor
 
 Seth Chisamore and Christopher Maier of CHEF gave an introductory talk on Omnibus at ChefConf 2013, entitled **Eat the Whole Bowl: Building a Full-Stack Installer with Omnibus**:
 
-- [Video](http://www.youtube.com/watch?v=q8iJAntXCNY)
 - [Slides](https://speakerdeck.com/schisamo/eat-the-whole-bowl-building-a-full-stack-installer-with-omnibus)
 
 This project is managed by the CHEF Release Engineering team. For more information on the Release Engineering team's contribution, triage, and release process, please consult the [CHEF Release Engineering OSS Management Guide](https://docs.google.com/a/opscode.com/document/d/1oJB0vZb_3bl7_ZU2YMDBkMFdL-EWplW1BJv_FXTUOzg/edit).
