@@ -1,23 +1,21 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.0.15 -->
-## [8.0.15](https://github.com/chef/omnibus/tree/8.0.15) (2021-02-12)
-
-#### Merged Pull Requests
-- Update chefstyle requirement from = 1.6.1 to = 1.6.2 [#998](https://github.com/chef/omnibus/pull/998) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
-<!-- release_rollup since=8.0.9 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update chefstyle requirement from = 1.6.1 to = 1.6.2 [#998](https://github.com/chef/omnibus/pull/998) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.15 -->
-- Update chefstyle requirement from = 1.5.9 to = 1.6.1 [#997](https://github.com/chef/omnibus/pull/997) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.14 -->
-- Update dmg unmount logging to start at attempt 1 [#990](https://github.com/chef/omnibus/pull/990) ([tas50](https://github.com/tas50)) <!-- 8.0.13 -->
-- Add cumulus platform support [#996](https://github.com/chef/omnibus/pull/996) ([predominant](https://github.com/predominant)) <!-- 8.0.12 -->
-- Update chefstyle requirement from = 1.5.8 to = 1.5.9 [#994](https://github.com/chef/omnibus/pull/994) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.11 -->
-- Update chefstyle requirement from = 1.5.2 to = 1.5.8 [#993](https://github.com/chef/omnibus/pull/993) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.10 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [8.0.15](https://github.com/chef/omnibus/tree/8.0.15) (2021-02-13)
+
+#### Merged Pull Requests
+- Update chefstyle requirement from = 1.5.2 to = 1.5.8 [#993](https://github.com/chef/omnibus/pull/993) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.5.8 to = 1.5.9 [#994](https://github.com/chef/omnibus/pull/994) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Add cumulus platform support [#996](https://github.com/chef/omnibus/pull/996) ([predominant](https://github.com/predominant))
+- Update dmg unmount logging to start at attempt 1 [#990](https://github.com/chef/omnibus/pull/990) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.5.9 to = 1.6.1 [#997](https://github.com/chef/omnibus/pull/997) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.6.1 to = 1.6.2 [#998](https://github.com/chef/omnibus/pull/998) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+<!-- latest_stable_release -->
+
 ## [8.0.9](https://github.com/chef/omnibus/tree/8.0.9) (2020-12-14)
 
 #### Merged Pull Requests
@@ -31,7 +29,6 @@
 - Update chefstyle requirement from = 1.5.1 to = 1.5.2 [#986](https://github.com/chef/omnibus/pull/986) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Improve debug messages for macOS code signing [#987](https://github.com/chef/omnibus/pull/987) ([tas50](https://github.com/tas50))
 - Create sleep loop in compress_dmg [#989](https://github.com/chef/omnibus/pull/989) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
-<!-- latest_stable_release -->
 
 ## [7.0.34](https://github.com/chef/omnibus/tree/7.0.34) (2020-11-11)
 
