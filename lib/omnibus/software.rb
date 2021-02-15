@@ -718,7 +718,7 @@ module Omnibus
             "CC" => "clang",
             "CXX" => "clang++",
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O3 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
         when "windows"
           arch_flag = windows_arch_i386? ? "-m32" : "-m64"
@@ -739,7 +739,7 @@ module Omnibus
         else
           {
             "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
-            "CFLAGS" => "-I#{install_dir}/embedded/include -O2 -D_FORTIFY_SOURCE=2 -fstack-protector",
+            "CFLAGS" => "-I#{install_dir}/embedded/include -O3 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
         end
 
