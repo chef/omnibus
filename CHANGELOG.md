@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.0.16 -->
+## [8.0.16](https://github.com/chef/omnibus/tree/8.0.16) (2021-02-15)
+
+#### Merged Pull Requests
+- Switch from -02 to -03 on Linux/macOS [#999](https://github.com/chef/omnibus/pull/999) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=8.0.15 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Switch from -02 to -03 on Linux/macOS [#999](https://github.com/chef/omnibus/pull/999) ([tas50](https://github.com/tas50)) <!-- 8.0.16 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [8.0.15](https://github.com/chef/omnibus/tree/8.0.15) (2021-02-13)
