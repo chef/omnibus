@@ -173,9 +173,13 @@ module Omnibus
         when "centos", "cumulus", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos"
           # Only want MAJOR (e.g. Debian 7, OmniOS r151006, SmartOS 20120809T221258Z)
           platform_version.split(".").first
-        when "aix", "alpine", "mac_os_x", "openbsd", "slackware", "solaris2", "opensuse", "opensuseleap", "ubuntu", "amazon"
-          # Only want MAJOR.MINOR (e.g. Mac OS X 10.9, Ubuntu 12.04)
+        when "aix", "alpine", "openbsd", "slackware", "solaris2", "opensuse", "opensuseleap", "ubuntu", "amazon"
+          # Only want MAJOR.MINOR (e.g. Ubuntu 12.04)
           platform_version.split(".")[0..1].join(".")
+        when "mac_os_x", "darwin", "macos"
+          # If running macOS >= 11, use only MAJOR version. Otherwise, use MAJOR.MINOR
+          pv_bits = platform_version.split(".")
+          pv_bits[0].to_i >= 11 ? pv_bits[0] : pv_bits[0..1].join(".")
         when "arch", "gentoo", "kali"
           # Arch Linux / Gentoo do not have a platform_version ohai attribute, they are rolling release (lsb_release -r)
           "rolling"

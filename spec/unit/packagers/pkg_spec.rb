@@ -47,8 +47,8 @@ module Omnibus
     end
 
     describe "#package_name" do
-      it "includes the name, version, and build iteration" do
-        expect(subject.package_name).to eq("project-full-name-1.2.3-2.pkg")
+      it "includes the name, version, build iteration, and architecture" do
+        expect(subject.package_name).to eq("project-full-name-1.2.3-2.x86_64.pkg")
       end
     end
 
@@ -301,7 +301,7 @@ module Omnibus
             productbuild \\
               --distribution "#{staging_dir}/Distribution" \\
               --resources "#{staging_dir}/Resources" \\
-              "#{package_dir}/project-full-name-1.2.3-2.pkg"
+              "#{package_dir}/project-full-name-1.2.3-2.x86_64.pkg"
           EOH
 
           subject.build_product_pkg
@@ -319,7 +319,7 @@ module Omnibus
               --distribution "#{staging_dir}/Distribution" \\
               --resources "#{staging_dir}/Resources" \\
               --sign "My Special Identity" \\
-              "#{package_dir}/project-full-name-1.2.3-2.pkg"
+              "#{package_dir}/project-full-name-1.2.3-2.x86_64.pkg"
           EOH
           subject.build_product_pkg
         end
