@@ -125,7 +125,7 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.pkg"
+      "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.pkg"
     end
 
     #
@@ -318,6 +318,15 @@ module Omnibus
     #
     def component_pkg
       "#{safe_base_package_name}-core.pkg"
+    end
+
+    #
+    # Return the architecture
+    #
+    # @return [String]
+    #
+    def safe_architecture
+      @safe_architecture ||= Ohai["kernel"]["machine"]
     end
 
     #

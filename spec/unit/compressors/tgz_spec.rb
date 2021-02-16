@@ -38,25 +38,25 @@ module Omnibus
 
     describe "#package_name" do
       it "returns the name of the packager" do
-        expect(subject.package_name).to eq("project-1.2.3-2.pkg.tar.gz")
+        expect(subject.package_name).to eq("project-1.2.3-2.x86_64.pkg.tar.gz")
       end
     end
 
     describe "#write_tgz" do
       before do
-        File.open("#{staging_dir}/project-1.2.3-2.pkg", "wb") do |f|
+        File.open("#{staging_dir}/project-1.2.3-2.x86_64.pkg", "wb") do |f|
           f.write " " * 1_000_000
         end
       end
 
       it "generates the file" do
         subject.write_tgz
-        expect("#{staging_dir}/project-1.2.3-2.pkg.tar.gz").to be_a_file
+        expect("#{staging_dir}/project-1.2.3-2.x86_64.pkg.tar.gz").to be_a_file
       end
 
       it "has the correct content" do
         subject.write_tgz
-        file = File.open("#{staging_dir}/project-1.2.3-2.pkg.tar.gz", "rb")
+        file = File.open("#{staging_dir}/project-1.2.3-2.x86_64.pkg.tar.gz", "rb")
         contents = file.read
         file.close
 
