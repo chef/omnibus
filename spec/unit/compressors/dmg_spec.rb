@@ -190,7 +190,7 @@ module Omnibus
 
         expect(contents).to include('set found_disk to do shell script "ls /Volumes/ | grep \'Project One*\'"')
         expect(contents).to include("	set the bounds of Finder window 1 to {100, 100, 750, 600}")
-        expect(contents).to include('  	set position of item "project-1.2.3-2.pkg" of container window to {535, 50}')
+        expect(contents).to include('  	set position of item "project-1.2.3-2.x86_64.pkg" of container window to {535, 50}')
       end
 
       it "runs the apple script" do
@@ -229,7 +229,7 @@ module Omnibus
               -format UDZO \\
               -imagekey \\
               zlib-level=9 \\
-              -o "#{package_dir}/project-1.2.3-2.dmg" \\
+              -o "#{package_dir}/project-1.2.3-2.x86_64.dmg" \\
               -puppetstrings
           EOH
 
@@ -247,7 +247,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil verify \\
-              "#{package_dir}/project-1.2.3-2.dmg" \\
+              "#{package_dir}/project-1.2.3-2.x86_64.dmg" \\
               -puppetstrings
           EOH
 
@@ -289,10 +289,10 @@ module Omnibus
             DeRez -only icns "#{icon}" > tmp.rsrc
 
             # Append the icon reosurce to the DMG
-            Rez -append tmp.rsrc -o "#{package_dir}/project-1.2.3-2.dmg"
+            Rez -append tmp.rsrc -o "#{package_dir}/project-1.2.3-2.x86_64.dmg"
 
             # Source the icon
-            SetFile -a C "#{package_dir}/project-1.2.3-2.dmg"
+            SetFile -a C "#{package_dir}/project-1.2.3-2.x86_64.dmg"
           EOH
 
         subject.set_dmg_icon
@@ -301,11 +301,11 @@ module Omnibus
 
     describe "#package_name" do
       it "reflects the packager's unmodified package_name" do
-        expect(subject.package_name).to eq("project-1.2.3-2.dmg")
+        expect(subject.package_name).to eq("project-1.2.3-2.x86_64.dmg")
       end
 
       it "reflects the packager's modified package_name" do
-        package_basename = "projectsub-1.2.3-3"
+        package_basename = "projectsub-1.2.3-3.x86_64"
         allow(project.packagers_for_system[0]).to receive(:package_name)
           .and_return("#{package_basename}.pkg")
 
