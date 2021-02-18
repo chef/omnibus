@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.0 -->
-## [8.1.0](https://github.com/chef/omnibus/tree/8.1.0) (2021-02-16)
+<!-- latest_release 8.1.1 -->
+## [8.1.1](https://github.com/chef/omnibus/tree/8.1.1) (2021-02-18)
 
 #### Merged Pull Requests
-- Add support for macOS 11 and multiple architectures [#1002](https://github.com/chef/omnibus/pull/1002) ([tduffield](https://github.com/tduffield))
+- pull in new fastmsi dll that uses an absolute path to point to 7z.exe [#1003](https://github.com/chef/omnibus/pull/1003) ([mwrock](https://github.com/mwrock))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- pull in new fastmsi dll that uses an absolute path to point to 7z.exe [#1003](https://github.com/chef/omnibus/pull/1003) ([mwrock](https://github.com/mwrock)) <!-- 8.1.1 -->
 - Add support for macOS 11 and multiple architectures [#1002](https://github.com/chef/omnibus/pull/1002) ([tduffield](https://github.com/tduffield)) <!-- 8.1.0 -->
 - Update chefstyle requirement from = 1.6.2 to = 1.7.1 [#1001](https://github.com/chef/omnibus/pull/1001) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.17 -->
 - Switch from -02 to -03 on Linux/macOS [#999](https://github.com/chef/omnibus/pull/999) ([tas50](https://github.com/tas50)) <!-- 8.0.16 -->
