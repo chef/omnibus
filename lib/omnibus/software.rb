@@ -1003,6 +1003,7 @@ module Omnibus
                                    locked_version: Fetcher.resolve_version(version, source),
                                    locked_source: source,
                                    license: license,
+                                   dependencies: dependencies
                                  })
     end
 
