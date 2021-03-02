@@ -8,8 +8,10 @@
 %define __spec_clean_post true
 %define __spec_clean_pre true
 
+<% if not fips %>
 # Use md5
 %define _binary_filedigest_algorithm 1
+<% end %>
 
 # Use gzip payload compression
 %define _binary_payload w9.gzdio

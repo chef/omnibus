@@ -31,6 +31,7 @@ module Omnibus
       /ld-linux/,
       /libc\.so/,
       /libcrypt\.so/,
+      /libdb-4.5\.so/,
       /libdb-4.7\.so/,
       /libdb-5.3\.so/,
       /libdl/,
