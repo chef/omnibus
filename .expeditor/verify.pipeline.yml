@@ -25,3 +25,11 @@ steps:
     executor:
       docker:
         image: ruby:2.7-buster
+
+- label: run-lint-and-specs-ruby-3.0
+  command:
+    - .expeditor/run_linux_tests.sh rake
+  expeditor:
+    executor:
+      docker:
+        image: ruby:3.0-buster
