@@ -278,6 +278,10 @@ module Omnibus
 
       let(:cumulative_downloaded_length) { 100 }
 
+      let(:uri_open_target) do
+        RUBY_VERSION.to_f < 2.7 ? subject : URI
+      end
+
       def capturing_stdout
         old_stdout, $stdout = $stdout, progress_bar_output
         yield
@@ -286,7 +290,7 @@ module Omnibus
       end
 
       before do
-        expect(subject).to receive(:open).with(source[:url], expected_open_opts) do |_url, open_uri_opts|
+        expect(uri_open_target).to receive(:open).with(source[:url], expected_open_opts) do |_url, open_uri_opts|
           open_uri_opts[:content_length_proc].call(reported_content_length)
           open_uri_opts[:progress_proc].call(cumulative_downloaded_length)
 
