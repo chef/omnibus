@@ -286,6 +286,7 @@ module Omnibus
           identifier: safe_identifier,
           version: safe_version,
           component_pkg: component_pkg,
+          host_architecture: safe_architecture,
         })
     end
 
