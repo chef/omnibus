@@ -290,7 +290,23 @@ module Omnibus
 
         expect(contents).to include('<pkg-ref id="com.getchef.project-full-name"/>')
         expect(contents).to include('<line choice="com.getchef.project-full-name"/>')
+        expect(contents).to include('hostArchitectures="x86_64"')
         expect(contents).to include("project-full-name-core.pkg")
+      end
+
+      context "for arm64 builds" do
+        before do
+          stub_ohai(platform: "mac_os_x", version: "11.0") do |data|
+            data["kernel"]["machine"] = "arm64"
+          end
+        end
+
+        it "sets the hostArchitectures to include arm64" do
+          subject.write_distribution_file
+          contents = File.read("#{staging_dir}/Distribution")
+
+          expect(contents).to include('hostArchitectures="arm64"')
+        end
       end
     end
 
