@@ -630,13 +630,25 @@ module Omnibus
     end
 
     #
-    # Debian does not follow the standards when naming 64-bit packages.
+    # Set or return the architecture to set in the DEB control file
+    #
+    # @example
+    #   safe_architecture 'all'
+    #
+    # @param [String] val
+    #   A valid architecture for DEB control file
     #
     # @return [String]
+    #   the architecture
     #
-    def safe_architecture
-      @safe_architecture ||= shellout!("dpkg --print-architecture").stdout.split("\n").first || "noarch"
+    def safe_architecture(val = NULL)
+      if null?(val)
+        @safe_architecture ||= shellout!("dpkg --print-architecture").stdout.split("\n").first || "noarch"
+      else
+        @safe_architecture = val
+      end
     end
+    expose :safe_architecture
 
     #
     # Install the specified packages
