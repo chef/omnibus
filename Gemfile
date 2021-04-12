@@ -1,3 +1,5 @@
+# POC: Dynamically loading omnibus and omnibus-software in Gemfile
+
 source "https://rubygems.org"
 
 gemspec
