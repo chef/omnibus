@@ -1399,6 +1399,12 @@ module Omnibus
         package_path = File.join(Config.package_dir, packager.package_name)
         FileUtils.cp(package_path, destination, preserve: true)
         FileUtils.cp("#{package_path}.metadata.json", destination, preserve: true)
+
+        # If we also generate a debug package, copy it back into the workspace
+        if packager.debug_build?
+          debug_package_path = File.join(Config.package_dir, packager.package_name(true))
+          FileUtils.cp(debug_package_path, destination, preserve: true)
+        end
       end
     end
 
