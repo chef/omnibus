@@ -25,28 +25,22 @@ module Omnibus
 
     def updated
       @updated ||=
-        begin
-          (first.entry_names & second.entry_names).collect do |name|
-            diff(first.entry_for(name), second.entry_for(name))
-          end.compact
-        end
+        (first.entry_names & second.entry_names).collect do |name|
+          diff(first.entry_for(name), second.entry_for(name))
+        end.compact
     end
 
     def removed
       @removed ||=
-        begin
-          (first.entry_names - second.entry_names).collect do |name|
-            removed_entry(first.entry_for(name))
-          end
+        (first.entry_names - second.entry_names).collect do |name|
+          removed_entry(first.entry_for(name))
         end
     end
 
     def added
       @added ||=
-        begin
-          (second.entry_names - first.entry_names).collect do |name|
-            new_entry(second.entry_for(name))
-          end
+        (second.entry_names - first.entry_names).collect do |name|
+          new_entry(second.entry_for(name))
         end
     end
 
