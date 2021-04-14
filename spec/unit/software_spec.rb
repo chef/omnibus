@@ -190,8 +190,8 @@ module Omnibus
         end
       end
 
-      context "on mac_os_x" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.13") }
+      context "on macOS" do
+        before { stub_ohai(platform: "mac_os_x") }
 
         it "sets the defaults" do
           expect(subject.with_standard_compiler_flags).to eq(
