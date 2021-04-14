@@ -235,8 +235,8 @@ module Omnibus
         end
       end
 
-      context "when on OS X" do
-        let(:fauxhai_options) { { platform: "mac_os_x", version: "10.15" } }
+      context "when on macOS" do
+        let(:fauxhai_options) { { platform: "mac_os_x" } }
         it "returns a generic iteration" do
           expect(subject.build_iteration).to eq(1)
         end

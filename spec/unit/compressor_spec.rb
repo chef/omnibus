@@ -3,8 +3,8 @@ require "spec_helper"
 module Omnibus
   describe Compressor do
     describe ".for_current_system" do
-      context "on Mac OS X" do
-        before { stub_ohai(platform: "mac_os_x", version: "10.15") }
+      context "on macOS" do
+        before { stub_ohai(platform: "mac_os_x") }
 
         context "when :dmg is activated" do
           it "prefers dmg" do
