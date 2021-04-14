@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.3 -->
-## [8.1.3](https://github.com/chef/omnibus/tree/8.1.3) (2021-03-12)
+<!-- latest_release 8.1.4 -->
+## [8.1.4](https://github.com/chef/omnibus/tree/8.1.4) (2021-04-14)
 
 #### Merged Pull Requests
-- Add hostArchitectures to macOS Distribution file [#1005](https://github.com/chef/omnibus/pull/1005) ([tduffield](https://github.com/tduffield))
+- Prevent test failures with the latest fauxhai [#1009](https://github.com/chef/omnibus/pull/1009) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Prevent test failures with the latest fauxhai [#1009](https://github.com/chef/omnibus/pull/1009) ([tas50](https://github.com/tas50)) <!-- 8.1.4 -->
 - Add hostArchitectures to macOS Distribution file [#1005](https://github.com/chef/omnibus/pull/1005) ([tduffield](https://github.com/tduffield)) <!-- 8.1.3 -->
 - Update chefstyle requirement from = 1.7.1 to = 1.7.2 [#1004](https://github.com/chef/omnibus/pull/1004) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.2 -->
 - pull in new fastmsi dll that uses an absolute path to point to 7z.exe [#1003](https://github.com/chef/omnibus/pull/1003) ([mwrock](https://github.com/mwrock)) <!-- 8.1.1 -->
