@@ -373,12 +373,12 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(software_name, lockdir: nil, gem: nil, without: nil, extra_bin_files: nil , **options)
+    def appbundle(software_name, **options)
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
 
-        lockdir ||=
+        options["lockdir"] ||=
           begin
             app_software = project.softwares.find do |p|
               p.name == software_name
@@ -390,19 +390,19 @@ module Omnibus
             app_software.project_dir
           end
 
-        command = [ appbundler_bin, "'#{lockdir}'", "'#{bin_dir}'" ]
+        command = [ appbundler_bin, "'#{options["lockdir"]}'", "'#{bin_dir}'" ]
 
         # This option is almost entirely for support of ChefDK and enables transitive gemfile lock construction in order
         # to be able to decouple the dev gems for all the different components of ChefDK.  AKA:  don't use it outside of
         # ChefDK.  You should also explicitly specify the lockdir when going down this road.
-        command << [ "'#{gem}'" ] if gem
+        command << [ "'#{options["gem"]}'" ] if options["gem"]
 
         # FIXME: appbundler lacks support for this argument when not also specifying the gem (2-arg appbundling lacks support)
         # (if you really need this bug fixed, though, fix it in appbundler, don't try using the 3-arg version to try to
         # get `--without` support, you will likely wind up going down a sad path).
-        command << [ "--without", without.join(",") ] unless without.nil?
+        command << [ options["without"], options["without"].join(",") ] unless options["without"].nil?
 
-        command << [ "--extra-bin-files", extra_bin_files.join(",") ] unless extra_bin_files.nil? || extra_bin_files.empty?
+        command << [ options["extra_bin_files"], options["extra_bin_files"].join(",") ] unless options["extra_bin_files"].nil? || options["extra_bin_files"].empty?
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
@@ -535,7 +535,7 @@ module Omnibus
     def mkdir(directory, options = {})
       build_commands << BuildCommand.new("mkdir `#{directory}'") do
         Dir.chdir(software.project_dir) do
-          FileUtils.mkdir_p(directory, options)
+          FileUtils.mkdir_p(directory, **options)
         end
       end
     end
@@ -557,7 +557,7 @@ module Omnibus
           parent = File.dirname(file)
           FileUtils.mkdir_p(parent) unless File.directory?(parent)
 
-          FileUtils.touch(file, options)
+          FileUtils.touch(file, **options)
         end
       end
     end
@@ -578,7 +578,7 @@ module Omnibus
       build_commands << BuildCommand.new("delete `#{path}'") do
         Dir.chdir(software.project_dir) do
           FileSyncer.glob(path).each do |file|
-            FileUtils.rm_rf(file, options)
+            FileUtils.rm_rf(file, **options)
           end
         end
       end
@@ -629,7 +629,7 @@ module Omnibus
             log.warn(log_key) { "no matched files for glob #{command}" }
           else
             files.each do |file|
-              FileUtils.cp_r(file, destination, options)
+              FileUtils.cp_r(file, destination, **options)
             end
           end
         end
@@ -658,7 +658,7 @@ module Omnibus
             log.warn(log_key) { "no matched files for glob #{command}" }
           else
             files.each do |file|
-              FileUtils.mv(file, destination, options)
+              FileUtils.mv(file, destination, **options)
             end
           end
         end
@@ -683,14 +683,14 @@ module Omnibus
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
           if options.delete(:unchecked)
-            FileUtils.ln_s(source, destination, options)
+            FileUtils.ln_s(source, destination, options = {})
           else
             files = FileSyncer.glob(source)
             if files.empty?
               log.warn(log_key) { "no matched files for glob #{command}" }
             else
               files.each do |file|
-                FileUtils.ln_s(file, destination, options)
+                FileUtils.ln_s(file, destination, **options)
               end
             end
           end
