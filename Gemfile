@@ -12,4 +12,5 @@ group :debug do
   gem "pry"
   gem "pry-byebug"
   gem "pry-stack_explorer"
+  gem "ruby2_keywords"
 end

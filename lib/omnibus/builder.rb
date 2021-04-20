@@ -19,6 +19,7 @@ require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 require "ostruct" unless defined?(OpenStruct)
 require "pathname" unless defined?(Pathname)
 require "omnibus/whitelist"
+require "ruby2_keywords"
 
 module Omnibus
   class Builder
@@ -373,7 +374,7 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(software_name, {lockdir: nil}, {gem: nil}, {without: nil}, {extra_bin_files: nil}, {**options})
+    ruby2_keywords def appbundle(software_name, *)
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
@@ -413,7 +414,7 @@ module Omnibus
     expose :appbundle
 
     #
-    # Execute the given Rake command against the embedded Ruby's rake. Thiss
+    # Execute the given Rake command against the embedded Ruby's rake. This
     # command assumes the +rake+ gem has been installed.
     #
     # @example
