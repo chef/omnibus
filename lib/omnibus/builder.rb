@@ -373,12 +373,12 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(software_name, **options)
+    def appbundle(software_name, {lockdir: nil, gem: nil, without: nil, extra_bin_files: nil, **options})
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
 
-        options[:lockdir] ||=
+        lockdir ||=
           begin
             app_software = project.softwares.find do |p|
               p.name == software_name
@@ -390,19 +390,19 @@ module Omnibus
             app_software.project_dir
           end
 
-        command = [ appbundler_bin, "'#{options[:lockdir]}'", "'#{bin_dir}'" ]
+        command = [ appbundler_bin, "'#{lockdir}'", "'#{bin_dir}'" ]
 
         # This option is almost entirely for support of ChefDK and enables transitive gemfile lock construction in order
         # to be able to decouple the dev gems for all the different components of ChefDK.  AKA:  don't use it outside of
         # ChefDK.  You should also explicitly specify the lockdir when going down this road.
-        command << [ "'#{options[:gem]}'" ] if options[:gem]
+        command << [ "'#{gem}'" ] if gem
 
         # FIXME: appbundler lacks support for this argument when not also specifying the gem (2-arg appbundling lacks support)
         # (if you really need this bug fixed, though, fix it in appbundler, don't try using the 3-arg version to try to
         # get `--without` support, you will likely wind up going down a sad path).
-        command << [ options[:without], options[:without].join(",") ] unless options[:without].nil?
+        command << [ "--without", without.join(",") ] unless without.nil?
 
-        command << [ options[:extra_bin_files], options[:extra_bin_files].join(",") ] unless options[:extra_bin_files].nil? || options[:extra_bin_files].empty?
+        command << [ "--extra-bin-files", extra_bin_files.join(",") ] unless extra_bin_files.nil? || extra_bin_files.empty?
 
         # Ensure the main bin dir exists
         FileUtils.mkdir_p(bin_dir)
@@ -413,7 +413,7 @@ module Omnibus
     expose :appbundle
 
     #
-    # Execute the given Rake command against the embedded Ruby's rake. This
+    # Execute the given Rake command against the embedded Ruby's rake. Thiss
     # command assumes the +rake+ gem has been installed.
     #
     # @example
