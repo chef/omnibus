@@ -19,7 +19,6 @@ require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 require "ostruct" unless defined?(OpenStruct)
 require "pathname" unless defined?(Pathname)
 require "omnibus/whitelist"
-require "ruby2_keywords"
 
 module Omnibus
   class Builder
@@ -374,10 +373,15 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    ruby2_keywords def appbundle(software_name, *)
+    def appbundle(software_name, options = {})
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
+
+        lockdir = options[:lockdir]
+        gem = options[:gem]
+        without = options[:without]
+        extra_bin_files = options[:extra_bin_files]
 
         lockdir ||=
           begin
