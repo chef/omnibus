@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.7 -->
-## [8.1.7](https://github.com/chef/omnibus/tree/8.1.7) (2021-04-28)
+<!-- latest_release 8.1.8 -->
+## [8.1.8](https://github.com/chef/omnibus/tree/8.1.8) (2021-04-28)
 
 #### Merged Pull Requests
-- Pin to Ohai gem &lt; 17 [#1013](https://github.com/chef/omnibus/pull/1013) ([schisamo](https://github.com/schisamo))
+- Add Ruby 3 testing [#1006](https://github.com/chef/omnibus/pull/1006) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Add Ruby 3 testing [#1006](https://github.com/chef/omnibus/pull/1006) ([tas50](https://github.com/tas50)) <!-- 8.1.8 -->
 - Pin to Ohai gem &lt; 17 [#1013](https://github.com/chef/omnibus/pull/1013) ([schisamo](https://github.com/schisamo)) <!-- 8.1.7 -->
 - Update chefstyle requirement from = 1.7.4 to = 1.7.5 [#1011](https://github.com/chef/omnibus/pull/1011) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.6 -->
 - Update chefstyle requirement from = 1.7.2 to = 1.7.4 [#1007](https://github.com/chef/omnibus/pull/1007) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.5 -->
