@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.9 -->
-## [8.1.9](https://github.com/chef/omnibus/tree/8.1.9) (2021-04-30)
+<!-- latest_release 8.1.10 -->
+## [8.1.10](https://github.com/chef/omnibus/tree/8.1.10) (2021-04-30)
 
 #### Merged Pull Requests
-- Revert &quot;argument changes to support ruby 3&quot; [#1016](https://github.com/chef/omnibus/pull/1016) ([tas50](https://github.com/tas50))
+- Upgrade to GitHub-native Dependabot [#1012](https://github.com/chef/omnibus/pull/1012) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Upgrade to GitHub-native Dependabot [#1012](https://github.com/chef/omnibus/pull/1012) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.10 -->
 - Revert &quot;argument changes to support ruby 3&quot; [#1016](https://github.com/chef/omnibus/pull/1016) ([tas50](https://github.com/tas50)) <!-- 8.1.9 -->
 - Add Ruby 3 testing [#1006](https://github.com/chef/omnibus/pull/1006) ([tas50](https://github.com/tas50)) <!-- 8.1.8 -->
 - Pin to Ohai gem &lt; 17 [#1013](https://github.com/chef/omnibus/pull/1013) ([schisamo](https://github.com/schisamo)) <!-- 8.1.7 -->
