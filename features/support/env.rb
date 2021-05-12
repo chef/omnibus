@@ -1,6 +1,6 @@
 require "aruba"
 require "aruba/cucumber"
-require "aruba/in_process"
+require "aruba/processes/in_process"
 
 require "omnibus/cli"
 
