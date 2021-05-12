@@ -373,10 +373,15 @@ module Omnibus
     # @param (see #command)
     # @return (see #command)
     #
-    def appbundle(software_name, lockdir: nil, gem: nil, without: nil, extra_bin_files: nil , **options)
+    def appbundle(software_name, options = {})
       build_commands << BuildCommand.new("appbundle `#{software_name}'") do
         bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
+
+        lockdir = options[:lockdir]
+        gem = options[:gem]
+        without = options[:without]
+        extra_bin_files = options[:extra_bin_files]
 
         lockdir ||=
           begin
@@ -535,7 +540,7 @@ module Omnibus
     def mkdir(directory, options = {})
       build_commands << BuildCommand.new("mkdir `#{directory}'") do
         Dir.chdir(software.project_dir) do
-          FileUtils.mkdir_p(directory, options)
+          FileUtils.mkdir_p(directory, **options)
         end
       end
     end
@@ -557,7 +562,7 @@ module Omnibus
           parent = File.dirname(file)
           FileUtils.mkdir_p(parent) unless File.directory?(parent)
 
-          FileUtils.touch(file, options)
+          FileUtils.touch(file, **options)
         end
       end
     end
@@ -578,7 +583,7 @@ module Omnibus
       build_commands << BuildCommand.new("delete `#{path}'") do
         Dir.chdir(software.project_dir) do
           FileSyncer.glob(path).each do |file|
-            FileUtils.rm_rf(file, options)
+            FileUtils.rm_rf(file, **options)
           end
         end
       end
@@ -629,7 +634,7 @@ module Omnibus
             log.warn(log_key) { "no matched files for glob #{command}" }
           else
             files.each do |file|
-              FileUtils.cp_r(file, destination, options)
+              FileUtils.cp_r(file, destination, **options)
             end
           end
         end
@@ -658,7 +663,7 @@ module Omnibus
             log.warn(log_key) { "no matched files for glob #{command}" }
           else
             files.each do |file|
-              FileUtils.mv(file, destination, options)
+              FileUtils.mv(file, destination, **options)
             end
           end
         end
@@ -690,7 +695,7 @@ module Omnibus
               log.warn(log_key) { "no matched files for glob #{command}" }
             else
               files.each do |file|
-                FileUtils.ln_s(file, destination, options)
+                FileUtils.ln_s(file, destination, **options)
               end
             end
           end
