@@ -124,6 +124,8 @@ refs}.freeze
     def incremental
       log.internal(log_key) { "Performing incremental cache" }
 
+      git_cmd("config --list")
+
       create_cache_path
       remove_git_dirs
 
