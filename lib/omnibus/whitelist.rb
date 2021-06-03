@@ -164,6 +164,7 @@ MAC_WHITELIST_LIBS = [
   /libc\+\+\.1\.dylib/,
   /libc\+\+\.1\.dylib/,
   /libzstd\.1\.dylib/,
+  /libcurl\.4\.dylib/,
   /Security/,
 ].freeze
 
