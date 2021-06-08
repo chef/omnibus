@@ -694,6 +694,24 @@ module Omnibus
     end
     expose :runtime_dependency
 
+    #
+    # Add a package that is a recommended runtime dependency of this project.
+    #
+    # @example
+    #   runtime_recommended_dependency 'foo'
+    #
+    # @param [String] val
+    #   the name of the recommended runtime dependency
+    #
+    # @return [Array<String>]
+    #   the list of recommended runtime dependencies
+    #
+    def runtime_recommended_dependency(val)
+      runtime_recommended_dependencies << val
+      runtime_recommended_dependencies.dup
+    end
+    expose :runtime_recommended_dependency
+
     # Add package(s) that this project extends.
     #
     # Use this to avoid packaging many files and libraries already included by
@@ -1108,6 +1126,15 @@ module Omnibus
     #
     def runtime_dependencies
       @runtime_dependencies ||= []
+    end
+
+    #
+    # The list of recommended software dependencies for this project.
+    #
+    # @return [Array<String>]
+    #
+    def runtime_recommended_dependencies
+      @runtime_recommended_dependencies ||= []
     end
 
     # The list of packages this project extends.
