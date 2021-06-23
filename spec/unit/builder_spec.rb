@@ -23,7 +23,7 @@ module Omnibus
       allow(subject).to receive(:windows?).and_return(on_windows)
       allow(subject).to receive(:windows_safe_path) do |*args|
         path = File.join(*args)
-        path.gsub!(File::SEPARATOR, '\\') if on_windows
+        path.gsub!(File::SEPARATOR, "\\") if on_windows
       end
     end
 
