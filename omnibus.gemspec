@@ -29,12 +29,13 @@ Gem::Specification.new do |gem|
   gem.add_dependency "ruby-progressbar", "~> 1.7"
   gem.add_dependency "thor",             ">= 0.18", "< 2.0"
   gem.add_dependency "license_scout",    "~> 1.0"
+  gem.add_dependency "contracts",        ">= 0.16.0", "< 0.17.0"
 
   gem.add_dependency "mixlib-versioning"
   gem.add_dependency "pedump"
 
   gem.add_development_dependency "artifactory", "~> 3.0"
-  gem.add_development_dependency "aruba",       "~> 0.5"
+  gem.add_development_dependency "aruba",       "~> 1.1"
   gem.add_development_dependency "chefstyle",   "= 1.7.5"
   gem.add_development_dependency "fauxhai-ng",  ">= 7.5"
   gem.add_development_dependency "rspec",       "~> 3.0"
