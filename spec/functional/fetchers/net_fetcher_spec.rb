@@ -246,7 +246,7 @@ module Omnibus
 
       context "when the file is less than 10240 bytes" do
         let(:source_url) { "https://downloads.chef.io/packages-chef-io-public.key" }
-        let(:source_md5) { "012a2c4e2a8edb86b2c072f02eea9f40" }
+        let(:source_md5) { "369efc3a19b9118cdf51c7e87a34f266" }
 
         it "downloads the file" do
           fetch!
