@@ -8,8 +8,8 @@
 %define __spec_clean_post true
 %define __spec_clean_pre true
 
-# Use md5
-%define _binary_filedigest_algorithm 1
+# Use SHA256 checksums for all files
+%define _binary_filedigest_algorithm 8
 
 %define _binary_payload <%= compression %>
 
