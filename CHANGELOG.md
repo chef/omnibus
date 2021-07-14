@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.12 -->
-## [8.1.12](https://github.com/chef/omnibus/tree/8.1.12) (2021-06-25)
+<!-- latest_release 8.1.13 -->
+## [8.1.13](https://github.com/chef/omnibus/tree/8.1.13) (2021-07-14)
 
 #### Merged Pull Requests
-- Fix omnibus builds failure [#1024](https://github.com/chef/omnibus/pull/1024) ([jayashrig158](https://github.com/jayashrig158))
+- Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.13 -->
 - Fix omnibus builds failure [#1024](https://github.com/chef/omnibus/pull/1024) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.12 -->
 - Updating aruba version from 0.5 to 1.1 [#1019](https://github.com/chef/omnibus/pull/1019) ([skeshari12](https://github.com/skeshari12)) <!-- 8.1.11 -->
 - Upgrade to GitHub-native Dependabot [#1012](https://github.com/chef/omnibus/pull/1012) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.10 -->
