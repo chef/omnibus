@@ -2,7 +2,6 @@
 
 [![Gem Version](http://img.shields.io/gem/v/omnibus.svg)][gem]
 [![Build Status](https://badge.buildkite.com/446fd6049a9a5eeab50112aba117d3b7670ec085acb91f78dd.svg?branch=master)](https://buildkite.com/chef-oss/chef-omnibus-master-verify)
-[![AppVeyor Build Status](http://img.shields.io/appveyor/ci/chef/omnibus.svg?label=AppVeyor)][appveyor]
 
 **Umbrella Project**: [Chef Foundation](https://github.com/chef/chef-oss-practices/blob/master/projects/chef-foundation.md)
 
