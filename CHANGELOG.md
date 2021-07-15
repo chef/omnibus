@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.13 -->
-## [8.1.13](https://github.com/chef/omnibus/tree/8.1.13) (2021-07-14)
+<!-- latest_release 8.1.14 -->
+## [8.1.14](https://github.com/chef/omnibus/tree/8.1.14) (2021-07-15)
 
 #### Merged Pull Requests
-- Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158))
+- Updates rpm spec to use SHA256 for filedigest, from MD5 [#1027](https://github.com/chef/omnibus/pull/1027) ([collinmcneese](https://github.com/collinmcneese))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Updates rpm spec to use SHA256 for filedigest, from MD5 [#1027](https://github.com/chef/omnibus/pull/1027) ([collinmcneese](https://github.com/collinmcneese)) <!-- 8.1.14 -->
 - Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.13 -->
 - Fix omnibus builds failure [#1024](https://github.com/chef/omnibus/pull/1024) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.12 -->
 - Updating aruba version from 0.5 to 1.1 [#1019](https://github.com/chef/omnibus/pull/1019) ([skeshari12](https://github.com/skeshari12)) <!-- 8.1.11 -->
