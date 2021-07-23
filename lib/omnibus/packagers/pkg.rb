@@ -254,7 +254,7 @@ module Omnibus
           --version "#{safe_version}" \\
           --scripts "#{scripts_dir}" \\
           --root "#{project.install_dir}" \\
-          --install-location "#{project.install_dir}" \\
+          --install-location "#{project.package_install_dir}" \\
           --preserve-xattr \\
       EOH
 

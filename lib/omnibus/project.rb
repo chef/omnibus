@@ -242,6 +242,31 @@ module Omnibus
     end
     expose :maintainer
 
+
+    #
+    # **[Required]** Set or retrieve the the package install location.
+    #
+    # @example
+    #   install location '/opt/servicenow'
+    #
+    # @raise [MissingRequiredAttribute] if a value was not set before being
+    #   subsequently retrieved
+    #
+    # @param [String] val
+    #   the path where the package needs to be installed
+    #
+    # @return [String]
+    #
+    def package_install_dir(val = NULL)
+      if null?(val)
+        @package_install_dir || raise(MissingRequiredAttribute.new(self, :package_install_dir, "/opt/servicenow"))
+      else
+        @package_install_dir = val
+      end
+    end
+    expose :package_install_dir
+
+
     #
     # **[Required]** Set or retrive the package homepage.
     #
