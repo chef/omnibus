@@ -404,6 +404,16 @@ module Omnibus
       end
     end
 
+    describe "#rpm_file" do
+      before do
+        allow(subject).to receive(:package_name).and_return("package_name.rpm")
+      end
+
+      it "includes the package_name rpm" do
+        expect(subject.rpm_file).to eq("#{staging_dir}/RPMS/#{architecture}/package_name.rpm")
+      end
+    end
+
     describe "#rpm_safe" do
       it "adds quotes when required" do
         expect(subject.rpm_safe("file path")).to eq('"file path"')
