@@ -442,9 +442,14 @@ module Omnibus
             })
         end
 
+        sign_cmd = "rpmsign --addsign #{rpm_file}"
+        if dist_tag != "el8"
+          sign_cmd.prepend("#{signing_script} \"").concat("\"")
+        end
+
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
-          shellout!("#{signing_script} \"rpmsign --addsign #{rpm_file}\"", environment: { "HOME" => home })
+          shellout!("#{sign_cmd}", environment: { "HOME" => home })
         end
       end
 
