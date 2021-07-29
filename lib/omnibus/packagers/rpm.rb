@@ -417,6 +417,10 @@ module Omnibus
       command << %{ -bb}
       command << %{ --buildroot #{staging_dir}/BUILD}
       command << %{ --define '_topdir #{staging_dir}'}
+      command << " #{spec_file}"
+
+      log.info(log_key) { "Creating .rpm file" }
+      shellout!("#{command}")
 
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
@@ -438,17 +442,18 @@ module Omnibus
             })
         end
 
-        command << " --sign"
-        command << " #{spec_file}"
-
+        sign_cmd = "rpmsign --addsign #{rpm_file}"
         with_rpm_signing do |signing_script|
-          log.info(log_key) { "Creating .rpm file" }
-          shellout!("#{signing_script} \"#{command}\"", environment: { "HOME" => home })
+          log.info(log_key) { "Signing the built rpm file" }
+
+          # RHEL 8 has gpg-agent running so we can skip the expect script since the agent
+          # takes care of the passphrase entering on the signing
+          if dist_tag != ".el8"
+            sign_cmd.prepend("#{signing_script} \"").concat("\"")
+          end
+
+          shellout!("#{sign_cmd}", environment: { "HOME" => home })
         end
-      else
-        log.info(log_key) { "Creating .rpm file" }
-        command << " #{spec_file}"
-        shellout!("#{command}")
       end
 
       FileSyncer.glob("#{staging_dir}/RPMS/**/*.rpm").each do |rpm|
@@ -481,6 +486,15 @@ module Omnibus
     #
     def spec_file
       "#{staging_dir}/SPECS/#{package_name}.spec"
+    end
+
+    #
+    # The full path to the rpm file.
+    #
+    # @return [String]
+    #
+    def rpm_file
+      "#{staging_dir}/RPMS/#{safe_architecture}/#{package_name}"
     end
 
     #
