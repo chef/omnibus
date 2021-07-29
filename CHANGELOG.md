@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.14 -->
-## [8.1.14](https://github.com/chef/omnibus/tree/8.1.14) (2021-07-15)
+<!-- latest_release 8.1.15 -->
+## [8.1.15](https://github.com/chef/omnibus/tree/8.1.15) (2021-07-29)
 
 #### Merged Pull Requests
-- Updates rpm spec to use SHA256 for filedigest, from MD5 [#1027](https://github.com/chef/omnibus/pull/1027) ([collinmcneese](https://github.com/collinmcneese))
+- Add rpmsign instead of using rpmbuild for rpms [#1031](https://github.com/chef/omnibus/pull/1031) ([mimaslanka](https://github.com/mimaslanka))
 <!-- latest_release -->
 <!-- release_rollup since=8.0.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Add rpmsign instead of using rpmbuild for rpms [#1031](https://github.com/chef/omnibus/pull/1031) ([mimaslanka](https://github.com/mimaslanka)) <!-- 8.1.15 -->
 - Updates rpm spec to use SHA256 for filedigest, from MD5 [#1027](https://github.com/chef/omnibus/pull/1027) ([collinmcneese](https://github.com/collinmcneese)) <!-- 8.1.14 -->
 - Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.13 -->
 - Fix omnibus builds failure [#1024](https://github.com/chef/omnibus/pull/1024) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.12 -->
