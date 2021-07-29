@@ -445,7 +445,11 @@ module Omnibus
         sign_cmd = "rpmsign --addsign #{rpm_file}"
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> 1b118c7fd41e23617651f8f8b7088c974d7bd8c6
           if dist_tag != "el8"
             sign_cmd.prepend("#{signing_script} \"").concat("\"")
           end
