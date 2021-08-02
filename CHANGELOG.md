@@ -1,35 +1,33 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.1.15 -->
-## [8.1.15](https://github.com/chef/omnibus/tree/8.1.15) (2021-07-29)
-
-#### Merged Pull Requests
-- Add rpmsign instead of using rpmbuild for rpms [#1031](https://github.com/chef/omnibus/pull/1031) ([mimaslanka](https://github.com/mimaslanka))
 <!-- latest_release -->
-<!-- release_rollup since=8.0.15 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Add rpmsign instead of using rpmbuild for rpms [#1031](https://github.com/chef/omnibus/pull/1031) ([mimaslanka](https://github.com/mimaslanka)) <!-- 8.1.15 -->
-- Updates rpm spec to use SHA256 for filedigest, from MD5 [#1027](https://github.com/chef/omnibus/pull/1027) ([collinmcneese](https://github.com/collinmcneese)) <!-- 8.1.14 -->
-- Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.13 -->
-- Fix omnibus builds failure [#1024](https://github.com/chef/omnibus/pull/1024) ([jayashrig158](https://github.com/jayashrig158)) <!-- 8.1.12 -->
-- Updating aruba version from 0.5 to 1.1 [#1019](https://github.com/chef/omnibus/pull/1019) ([skeshari12](https://github.com/skeshari12)) <!-- 8.1.11 -->
-- Upgrade to GitHub-native Dependabot [#1012](https://github.com/chef/omnibus/pull/1012) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.10 -->
-- Revert &quot;argument changes to support ruby 3&quot; [#1016](https://github.com/chef/omnibus/pull/1016) ([tas50](https://github.com/tas50)) <!-- 8.1.9 -->
-- Add Ruby 3 testing [#1006](https://github.com/chef/omnibus/pull/1006) ([tas50](https://github.com/tas50)) <!-- 8.1.8 -->
-- Pin to Ohai gem &lt; 17 [#1013](https://github.com/chef/omnibus/pull/1013) ([schisamo](https://github.com/schisamo)) <!-- 8.1.7 -->
-- Update chefstyle requirement from = 1.7.4 to = 1.7.5 [#1011](https://github.com/chef/omnibus/pull/1011) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.6 -->
-- Update chefstyle requirement from = 1.7.2 to = 1.7.4 [#1007](https://github.com/chef/omnibus/pull/1007) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.5 -->
-- Prevent test failures with the latest fauxhai [#1009](https://github.com/chef/omnibus/pull/1009) ([tas50](https://github.com/tas50)) <!-- 8.1.4 -->
-- Add hostArchitectures to macOS Distribution file [#1005](https://github.com/chef/omnibus/pull/1005) ([tduffield](https://github.com/tduffield)) <!-- 8.1.3 -->
-- Update chefstyle requirement from = 1.7.1 to = 1.7.2 [#1004](https://github.com/chef/omnibus/pull/1004) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.1.2 -->
-- pull in new fastmsi dll that uses an absolute path to point to 7z.exe [#1003](https://github.com/chef/omnibus/pull/1003) ([mwrock](https://github.com/mwrock)) <!-- 8.1.1 -->
-- Add support for macOS 11 and multiple architectures [#1002](https://github.com/chef/omnibus/pull/1002) ([tduffield](https://github.com/tduffield)) <!-- 8.1.0 -->
-- Update chefstyle requirement from = 1.6.2 to = 1.7.1 [#1001](https://github.com/chef/omnibus/pull/1001) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot])) <!-- 8.0.17 -->
-- Switch from -02 to -03 on Linux/macOS [#999](https://github.com/chef/omnibus/pull/999) ([tas50](https://github.com/tas50)) <!-- 8.0.16 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [8.1.15](https://github.com/chef/omnibus/tree/8.1.15) (2021-08-02)
+
+#### Merged Pull Requests
+- Switch from -02 to -03 on Linux/macOS [#999](https://github.com/chef/omnibus/pull/999) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.6.2 to = 1.7.1 [#1001](https://github.com/chef/omnibus/pull/1001) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Add support for macOS 11 and multiple architectures [#1002](https://github.com/chef/omnibus/pull/1002) ([tduffield](https://github.com/tduffield))
+- pull in new fastmsi dll that uses an absolute path to point to 7z.exe [#1003](https://github.com/chef/omnibus/pull/1003) ([mwrock](https://github.com/mwrock))
+- Update chefstyle requirement from = 1.7.1 to = 1.7.2 [#1004](https://github.com/chef/omnibus/pull/1004) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Add hostArchitectures to macOS Distribution file [#1005](https://github.com/chef/omnibus/pull/1005) ([tduffield](https://github.com/tduffield))
+- Prevent test failures with the latest fauxhai [#1009](https://github.com/chef/omnibus/pull/1009) ([tas50](https://github.com/tas50))
+- Update chefstyle requirement from = 1.7.2 to = 1.7.4 [#1007](https://github.com/chef/omnibus/pull/1007) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Update chefstyle requirement from = 1.7.4 to = 1.7.5 [#1011](https://github.com/chef/omnibus/pull/1011) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Pin to Ohai gem &lt; 17 [#1013](https://github.com/chef/omnibus/pull/1013) ([schisamo](https://github.com/schisamo))
+- Add Ruby 3 testing [#1006](https://github.com/chef/omnibus/pull/1006) ([tas50](https://github.com/tas50))
+- Revert &quot;argument changes to support ruby 3&quot; [#1016](https://github.com/chef/omnibus/pull/1016) ([tas50](https://github.com/tas50))
+- Upgrade to GitHub-native Dependabot [#1012](https://github.com/chef/omnibus/pull/1012) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
+- Updating aruba version from 0.5 to 1.1 [#1019](https://github.com/chef/omnibus/pull/1019) ([skeshari12](https://github.com/skeshari12))
+- Fix omnibus builds failure [#1024](https://github.com/chef/omnibus/pull/1024) ([jayashrig158](https://github.com/jayashrig158))
+- Whitelist  SystemConfiguration libs [#1021](https://github.com/chef/omnibus/pull/1021) ([jayashrig158](https://github.com/jayashrig158))
+- Updates rpm spec to use SHA256 for filedigest, from MD5 [#1027](https://github.com/chef/omnibus/pull/1027) ([collinmcneese](https://github.com/collinmcneese))
+- Add rpmsign instead of using rpmbuild for rpms [#1031](https://github.com/chef/omnibus/pull/1031) ([mimaslanka](https://github.com/mimaslanka))
+<!-- latest_stable_release -->
+
 ## [8.0.15](https://github.com/chef/omnibus/tree/8.0.15) (2021-02-13)
 
 #### Merged Pull Requests
@@ -39,7 +37,6 @@
 - Update dmg unmount logging to start at attempt 1 [#990](https://github.com/chef/omnibus/pull/990) ([tas50](https://github.com/tas50))
 - Update chefstyle requirement from = 1.5.9 to = 1.6.1 [#997](https://github.com/chef/omnibus/pull/997) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
 - Update chefstyle requirement from = 1.6.1 to = 1.6.2 [#998](https://github.com/chef/omnibus/pull/998) ([dependabot-preview[bot]](https://github.com/dependabot-preview[bot]))
-<!-- latest_stable_release -->
 
 ## [8.0.9](https://github.com/chef/omnibus/tree/8.0.9) (2020-12-14)
 
