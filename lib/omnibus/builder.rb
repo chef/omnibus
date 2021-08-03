@@ -318,7 +318,7 @@ module Omnibus
 
         # Check if we are building a go binary and then check if we are on
         # Red Hat or CentOS so we build the binary properly with a build-id
-        if command.start_with? "build" && (rhel? || centos?)
+        if command.start_with?("build", " build") && (rhel? || centos?)
           command << " -ldflags=-linkmode=external"
         end
 
