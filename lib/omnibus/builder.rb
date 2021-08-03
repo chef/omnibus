@@ -292,6 +292,41 @@ module Omnibus
     end
     expose :compiler_safe_path
 
+ #
+    # @!endgroup
+    # --------------------------------------------------
+
+    #
+    # @!group Go DSL methods
+    #
+    # The following DSL methods are available from within build blocks and
+    # expose Go DSL methods.
+    # --------------------------------------------------
+
+    #
+    # Execute the given Go command or script against the embedded Go.
+    #
+    # @example
+    #   go 'build -o hello'
+    #
+    # @param (see #command)
+    # @return (see #command)
+    #
+    def go(command, options = {})
+      build_commands << BuildCommand.new("go `#{command}'") do
+        bin = embedded_bin("go")
+
+        # Check if we are building a go binary and then check if we are on
+        # Red Hat or CentOS so we build the binary properly with a build-id
+        if command.start_with? "build" && (rhel? || centos?)
+          command << " -ldflags=-linkmode=external"
+        end
+
+        shellout!("#{bin} #{command}", options)
+      end
+    end
+    expose :go
+
     #
     # @!endgroup
     # --------------------------------------------------

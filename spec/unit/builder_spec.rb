@@ -39,6 +39,12 @@ module Omnibus
       end
     end
 
+    describe "#go" do
+      it "is a DSL method" do
+        expect(subject).to have_exposed_method(:go)
+      end
+    end
+
     describe "#ruby" do
       it "is a DSL method" do
         expect(subject).to have_exposed_method(:ruby)
