@@ -35,7 +35,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "pedump"
 
   gem.add_development_dependency "artifactory", "~> 3.0"
-  gem.add_development_dependency "aruba",       "~> 1.1"
+  gem.add_development_dependency "aruba",       "~> 2.0"
   gem.add_development_dependency "chefstyle",   "= 1.7.5"
   gem.add_development_dependency "fauxhai-ng",  ">= 7.5"
   gem.add_development_dependency "rspec",       "~> 3.0"
