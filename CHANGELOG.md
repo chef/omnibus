@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.1.16 -->
+## [8.1.16](https://github.com/chef/omnibus/tree/8.1.16) (2021-08-03)
+
+#### Merged Pull Requests
+- Update aruba requirement from ~&gt; 1.1 to ~&gt; 2.0 [#1029](https://github.com/chef/omnibus/pull/1029) ([dependabot[bot]](https://github.com/dependabot[bot]))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=8.1.15 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Update aruba requirement from ~&gt; 1.1 to ~&gt; 2.0 [#1029](https://github.com/chef/omnibus/pull/1029) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 8.1.16 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [8.1.15](https://github.com/chef/omnibus/tree/8.1.15) (2021-08-02)
