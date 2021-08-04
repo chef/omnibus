@@ -292,7 +292,7 @@ module Omnibus
     end
     expose :compiler_safe_path
 
- #
+    #
     # @!endgroup
     # --------------------------------------------------
 

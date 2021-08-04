@@ -194,6 +194,7 @@ DSL Method          | Description
 `patch`             | Apply a patch from disk
 `workers`           | The maximum number of builders
 `windows_safe_path` | Format the path to be safe for shelling out on Windows
+`go`                | Execute the code as the embedded Go
 `ruby`              | Execute the code as the embedded Ruby
 `gem`               | Execute the code as the embedded Rubygems
 `bundle`            | Execute the code as the embedded Bundler
