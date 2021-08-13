@@ -314,11 +314,11 @@ module Omnibus
     #
     def go(command, options = {})
       build_commands << BuildCommand.new("go `#{command}'") do
-        bin = embedded_bin("go")
+        bin = windows? ? windows_safe_path("#{install_dir}/embedded/go/bin/go") : embedded_bin("go")
 
         # Check if we are building a go binary and then check if we are on
         # Red Hat or CentOS so we build the binary properly with a build-id
-        if command.start_with?("build", " build") && (rhel? || centos?)
+        if command.start_with?("build", " build") && rhel?
           command << " -ldflags=-linkmode=external"
         end
 
