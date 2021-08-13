@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.2.0 -->
-## [8.2.0](https://github.com/chef/omnibus/tree/8.2.0) (2021-08-10)
+<!-- latest_release 8.2.1 -->
+## [8.2.1](https://github.com/chef/omnibus/tree/8.2.1) (2021-08-13)
 
 #### Merged Pull Requests
-- Add new DSL for GO to builder [#1032](https://github.com/chef/omnibus/pull/1032) ([mimaslanka](https://github.com/mimaslanka))
+- Fix pathing for go on windows [#1034](https://github.com/chef/omnibus/pull/1034) ([mimaslanka](https://github.com/mimaslanka))
 <!-- latest_release -->
 <!-- release_rollup since=8.1.15 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix pathing for go on windows [#1034](https://github.com/chef/omnibus/pull/1034) ([mimaslanka](https://github.com/mimaslanka)) <!-- 8.2.1 -->
 - Add new DSL for GO to builder [#1032](https://github.com/chef/omnibus/pull/1032) ([mimaslanka](https://github.com/mimaslanka)) <!-- 8.2.0 -->
 - Update aruba requirement from ~&gt; 1.1 to ~&gt; 2.0 [#1029](https://github.com/chef/omnibus/pull/1029) ([dependabot[bot]](https://github.com/dependabot[bot])) <!-- 8.1.16 -->
 <!-- release_rollup -->
