@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-WHITELIST_LIBS = [
+ALLOWLIST_LIBS = [
     /ld-linux/,
     /libanl\.so/,
     /libc\.so/,
@@ -33,7 +33,7 @@ WHITELIST_LIBS = [
     /linux-gate\.so/,
   ].freeze
 
-ARCH_WHITELIST_LIBS = [
+ARCH_ALLOWLIST_LIBS = [
   /libanl\.so/,
   /libc\.so/,
   /libcrypt\.so/,
@@ -48,7 +48,7 @@ ARCH_WHITELIST_LIBS = [
   /libutil\.so/,
 ].freeze
 
-AIX_WHITELIST_LIBS = [
+AIX_ALLOWLIST_LIBS = [
   /libpthread\.a/,
   /libpthreads\.a/,
   /libdl.a/,
@@ -58,7 +58,7 @@ AIX_WHITELIST_LIBS = [
   /unix$/,
 ].freeze
 
-OMNIOS_WHITELIST_LIBS = [
+OMNIOS_ALLOWLIST_LIBS = [
   /libc\.so\.1/,
   /libcrypt\./,
   /libcrypt\.so\.1/,
@@ -79,7 +79,7 @@ OMNIOS_WHITELIST_LIBS = [
   /libgcc_s\.so\.1/,
 ].freeze
 
-SOLARIS_WHITELIST_LIBS = [
+SOLARIS_ALLOWLIST_LIBS = [
   /libaio\.so/,
   /libavl\.so/,
   /libcrypt_[di]\.so/,
@@ -119,7 +119,7 @@ SOLARIS_WHITELIST_LIBS = [
   /s9_preload\.so\.1/,
 ].freeze
 
-SMARTOS_WHITELIST_LIBS = [
+SMARTOS_ALLOWLIST_LIBS = [
   /libm.so/,
   /libpthread.so/,
   /librt.so/,
@@ -141,7 +141,7 @@ SMARTOS_WHITELIST_LIBS = [
   /libz\.so/, # while we package our own libz, this get dragged along from Solaris 11's libelf library for some reason...
 ].freeze
 
-MAC_WHITELIST_LIBS = [
+MAC_ALLOWLIST_LIBS = [
   /libobjc\.A\.dylib/,
   /libSystem\.B\.dylib/,
   /CoreFoundation/,
@@ -165,7 +165,7 @@ MAC_WHITELIST_LIBS = [
   /SystemConfiguration/,
 ].freeze
 
-FREEBSD_WHITELIST_LIBS = [
+FREEBSD_ALLOWLIST_LIBS = [
   /libc\.so/,
   /libgcc_s\.so/,
   /libcrypt\.so/,

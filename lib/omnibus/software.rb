@@ -537,7 +537,7 @@ module Omnibus
     expose :version
 
     #
-    # Add a file to the healthcheck whitelist.
+    # Add a file to the healthcheck allowlist.
     #
     # @example
     #   whitelist_file '/path/to/file'
@@ -546,7 +546,7 @@ module Omnibus
     #   the name of a file to ignore in the healthcheck
     #
     # @return [Array<String>]
-    #   the list of currently whitelisted files
+    #   the list of currently allowed files
     #
     def whitelist_file(file)
       file = Regexp.new(file) unless file.is_a?(Regexp)
