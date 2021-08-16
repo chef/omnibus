@@ -43,7 +43,7 @@ module Omnibus
     it_behaves_like "a cleanroom setter", :license_file, %{license_file 'LICENSES/artistic.txt'}
     it_behaves_like "a cleanroom setter", :skip_transitive_dependency_licensing, %{skip_transitive_dependency_licensing true}
     it_behaves_like "a cleanroom setter", :dependency_licenses, %{dependency_licenses [{license: "MIT"}]}
-    it_behaves_like "a cleanroom setter", :whitelist_file, %{whitelist_file '/opt/whatever'}
+    it_behaves_like "a cleanroom setter", :allow_file, %{allow_file '/opt/whatever'}
     it_behaves_like "a cleanroom setter", :relative_path, %{relative_path '/path/to/extracted'}
     it_behaves_like "a cleanroom setter", :build, %|build {}|
     it_behaves_like "a cleanroom getter", :project_dir
@@ -453,17 +453,17 @@ module Omnibus
       end
     end
 
-    describe "#whitelist_file" do
-      it "appends to the whitelist_files array" do
-        expect(subject.whitelist_files.size).to eq(0)
-        subject.whitelist_file(%r{foo/bar})
-        expect(subject.whitelist_files.size).to eq(1)
+    describe "#allow_file" do
+      it "appends to the allow_files array" do
+        expect(subject.allow_files.size).to eq(0)
+        subject.allow_file(%r{foo/bar})
+        expect(subject.allow_files.size).to eq(1)
       end
 
       it "converts Strings to Regexp instances" do
-        subject.whitelist_file "foo/bar"
-        expect(subject.whitelist_files.size).to eq(1)
-        expect(subject.whitelist_files.first).to be_kind_of(Regexp)
+        subject.allow_file "foo/bar"
+        expect(subject.allow_files.size).to eq(1)
+        expect(subject.allow_files.first).to be_kind_of(Regexp)
       end
     end
 

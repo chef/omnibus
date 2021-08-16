@@ -540,7 +540,7 @@ module Omnibus
     # Add a file to the healthcheck allowlist.
     #
     # @example
-    #   whitelist_file '/path/to/file'
+    #   allow_file '/path/to/file'
     #
     # @param [String, Regexp] file
     #   the name of a file to ignore in the healthcheck
@@ -548,12 +548,12 @@ module Omnibus
     # @return [Array<String>]
     #   the list of currently allowed files
     #
-    def whitelist_file(file)
+    def allow_file(file)
       file = Regexp.new(file) unless file.is_a?(Regexp)
-      whitelist_files << file
-      whitelist_files.dup
+      allow_files << file
+      allow_files.dup
     end
-    expose :whitelist_file
+    expose :allow_file
 
     #
     # The path relative to fetch_dir where relevant project files are
@@ -926,8 +926,8 @@ module Omnibus
     #
     # @return [Array<String>]
     #
-    def whitelist_files
-      @whitelist_files ||= []
+    def allow_files
+      @allow_files ||= []
     end
 
     #

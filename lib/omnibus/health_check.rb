@@ -384,9 +384,9 @@ module Omnibus
     #
     # @return [Array<String, Regexp>]
     #
-    def whitelist_files
+    def allow_files
       project.library.components.inject([]) do |array, component|
-        array += component.whitelist_files
+        array += component.allow_files
         array
       end
     end
@@ -446,7 +446,7 @@ module Omnibus
         safe ||= true if reg.match(name)
       end
 
-      whitelist_files.each do |reg|
+      allow_files.each do |reg|
         safe ||= true if reg.match(current_library)
       end
 
