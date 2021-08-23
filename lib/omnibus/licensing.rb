@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+require "csv"
 require "uri"
 require "fileutils"
 require "omnibus/download_helpers"
@@ -209,6 +210,8 @@ module Omnibus
         f.puts components_license_summary
         f.puts ""
         f.puts dependencies_license_summary
+        f.puts ""
+        f.puts third_party_license_summary
       end
     end
 
@@ -249,6 +252,30 @@ module Omnibus
             out << "#{license_package_location(name, license_file)}\n"
           end
         end
+        out << "\n"
+      end
+
+      out
+    end
+
+    #
+    # Summary of the third party licenses included in the project.
+    # It is in the form of:
+    # ...
+    # This product bundles a third-party transitive dependency code.cloudfoundry.org/garden,
+    # which is available under a "Apache-2.0" License.
+    # ...
+    #
+    # @return [String]
+    #
+    def third_party_license_summary
+      out = "\n\n"
+
+      third_party_license_map.keys.sort.each do |name|
+        license = third_party_license_map[name][:license]
+
+        out << "This product bundles the third-party transitive dependency #{name},\n"
+        out << "which is available under a \"#{license}\" License.\n"
         out << "\n"
       end
 
@@ -325,6 +352,44 @@ module Omnibus
             version: component.version,
             project_dir: component.project_dir,
           }
+        end
+
+        map
+      end
+    end
+
+    #
+    # Map that collects information about the third party licenses of the
+    # softwares included in the project.
+    #
+    # @example
+    # {
+    #   ...
+    #   "python" => {
+    #     "license" => "Python",
+    #     "license_files" => nil,
+    #     "version" => nil,
+    #     "project_dir" => nil
+    #   },
+    #   ...
+    # }
+    #
+    # @return [Hash]
+    #
+    def third_party_license_map
+      @third_party_license_map ||= begin
+        map = {}
+
+        if project.third_party_licenses && project.third_party_licenses != "Unspecified"
+          license_table = CSV.parse(File.read(project.third_party_licenses), headers: true)
+          license_table.each do |lic|
+            map[lic["Origin"]] = {
+              license: lic["License"],
+              license_files: nil,
+              version: nil,
+              project_dir: nil,
+            }
+          end
         end
 
         map
