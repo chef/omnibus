@@ -4,7 +4,38 @@ module Omnibus
   describe Util do
     subject { Class.new { include Util }.new }
 
-    describe '#shellout!' do
+    describe "#retry_block" do
+      class OurTestException < StandardError; end
+      let(:expected_retries) { 3 }
+      let(:expected_calls) { expected_retries + 1 }
+      let(:sentinel) { double }
+
+      it "retries the block if the passed exception is raised" do
+        expect(sentinel).to receive(:call_me).and_raise(OurTestException)
+        expect(sentinel).to receive(:call_me).and_return(:test_return)
+        block_return = nil
+        expect do
+          block_return = subject.retry_block("test", [OurTestException], expected_retries) { sentinel.call_me }
+        end.to_not raise_error
+        expect(block_return).to eq(:test_return)
+      end
+
+      it "raises the last exception if the number of retries is exceeded" do
+        expect(sentinel).to receive(:call_me).exactly(expected_calls).times.and_raise(OurTestException)
+        expect do
+          subject.retry_block("test", [OurTestException], expected_retries) { sentinel.call_me }
+        end.to raise_error(OurTestException)
+      end
+
+      it "doesn't retry exceptions not listed by the user" do
+        expect(sentinel).to receive(:call_me).exactly(1).times.and_raise(StandardError)
+        expect do
+          subject.retry_block("test", [OurTestException], expected_retries) { sentinel.call_me }
+        end.to raise_error(StandardError)
+      end
+    end
+
+    describe "#shellout!" do
       let(:shellout) do
         double(Mixlib::ShellOut,
           command:     "evil command",

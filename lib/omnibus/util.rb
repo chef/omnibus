@@ -120,6 +120,34 @@ module Omnibus
     end
 
     #
+    # Retry the given block if a retriable exception is
+    # raised. Returns the value of the block call if successful.
+    #
+    # @param [String] logstr
+    #   Description of the action being retried. Used in log output.
+    #
+    # @param [Array<Exception>] retried_exceptions
+    #   List of exceptions to retry.  Any other exceptions are raisesd.
+    #
+    # @param [Integer] retries
+    #   Number of times to retry the given block.
+    #
+    def retry_block(logstr, retried_exceptions = [], retries = Omnibus::Config.fetcher_retries, &block)
+      yield
+    rescue Exception => e
+      raise e unless retried_exceptions.any? { |eclass| e.is_a?(eclass) }
+
+      if retries != 0
+        log.info(log_key) { "Retrying failed #{logstr} due to #{e} (#{retries} retries left)..." }
+        retries -= 1
+        retry
+      else
+        log.error(log_key) { "#{logstr} failed - #{e.class}!" }
+        raise
+      end
+    end
+
+    #
     # Convert the given path to be appropiate for shelling out on Windows.
     #
     # @param [String, Array<String>] pieces
