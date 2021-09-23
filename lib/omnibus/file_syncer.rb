@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-require "fileutils"
+require "fileutils" unless defined?(FileUtils)
 
 module Omnibus
   module FileSyncer
@@ -34,6 +34,7 @@ module Omnibus
     #   the list of all files
     #
     def glob(pattern)
+      pattern = Pathname.new(pattern).cleanpath.to_s
       Dir.glob(pattern, File::FNM_DOTMATCH).sort.reject do |file|
         basename = File.basename(file)
         IGNORED_FILES.include?(basename)
@@ -58,23 +59,23 @@ module Omnibus
     #
     def all_files_under(source, options = {})
       excludes = Array(options[:exclude]).map do |exclude|
-        [exclude, "#{exclude}/*"]
+        [exclude, "#{exclude}/**"]
       end.flatten
 
       includes = Array(options[:include]).map do |include|
-        [include, "#{include}/*"]
+        [include, "#{include}/**"]
       end.flatten
 
       source_files = glob(File.join(source, "**/*"))
       source_files = source_files.reject do |source_file|
         basename = relative_path_for(source_file, source)
-        excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH) }
+        excludes.any? { |exclude| File.fnmatch?(exclude, basename, File::FNM_DOTMATCH | File::FNM_PATHNAME) }
       end
 
       if not includes.empty?
         source_files = source_files.reject do |source_file|
           basename = relative_path_for(source_file, source)
-          includes.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH) }
+          includes.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH | File::FNM_PATHNAME) }
         end
       end
 

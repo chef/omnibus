@@ -18,6 +18,8 @@ require "fileutils"
 
 module Omnibus
   class PathFetcher < Fetcher
+    @@source_path_mutexes = Hash.new { |h, k| h[k] = Mutex.new }
+
     #
     # Fetch if the local directory checksum is different than the path directory
     # checksum.
@@ -60,11 +62,13 @@ module Omnibus
     def fetch
       log.info(log_key) { "Copying from `#{source_path}'" }
 
-      create_required_directories
-      FileSyncer.sync(source_path, project_dir, source_options)
-      # Reset target shasum on every fetch
-      @target_shasum = nil
-      target_shasum
+      @@source_path_mutexes[source_path].synchronize {
+        create_required_directories
+        FileSyncer.sync(source_path, project_dir, source_options)
+        # Reset target shasum on every fetch
+        @target_shasum = nil
+        target_shasum
+      }
     end
 
     #
