@@ -16,6 +16,7 @@
 
 require "fileutils"
 require "mixlib/shellout"
+require "omnibus/download_helpers"
 require "ostruct"
 require "pathname"
 require "httparty"
@@ -24,6 +25,7 @@ module Omnibus
   class Builder
     include Cleanroom
     include Digestable
+    include DownloadHelpers
     include Instrumentation
     include Logging
     include Templating
@@ -814,10 +816,8 @@ module Omnibus
         path = (known_licenses.key? source) ? known_licenses[source] : source
         destination = "#{dir_name}/" + path.split("/")[-1]
         if path.start_with? "http"
-          File.open(destination, "wb") do |f|
-            log.info(log_key) { "Downloading license file from #{path} to #{destination}" }
-            f.write HTTParty.get(path).parsed_response
-          end
+          log.info(log_key) { "Downloading license file from #{path} to #{destination}" }
+          download_file!(path, destination)
         else
           Dir.chdir(software.project_dir) do
             log.info(log_key) { "Moving license file from #{path} to #{destination}" }
