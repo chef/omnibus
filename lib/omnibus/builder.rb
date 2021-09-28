@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2019, Chef Software Inc.
+# Copyright:: Copyright (c) Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ module Omnibus
       warn_for_shell_commands(command)
 
       build_commands << BuildCommand.new("Execute: `#{command}'") do
-        shellout!(command, options)
+        shellout!(command, **options)
       end
     end
     expose :command
@@ -248,7 +248,7 @@ module Omnibus
       patches << patch_path
       options[:in_msys_bash] = true
       build_commands << BuildCommand.new("Apply patch `#{source}'") do
-        shellout!(patch_cmd, options)
+        shellout!(patch_cmd, **options)
       end
     end
     expose :patch
@@ -350,7 +350,7 @@ module Omnibus
     def ruby(command, options = {})
       build_commands << BuildCommand.new("ruby `#{command}'") do
         bin = embedded_bin("ruby")
-        shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", **options)
       end
     end
     expose :ruby
@@ -367,7 +367,7 @@ module Omnibus
     def gem(command, options = {})
       build_commands << BuildCommand.new("gem `#{command}'") do
         bin = embedded_bin("gem")
-        shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", **options)
       end
     end
     expose :gem
@@ -387,7 +387,7 @@ module Omnibus
     def bundle(command, options = {})
       build_commands << BuildCommand.new("bundle `#{command}'") do
         bin = embedded_bin("bundle")
-        shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", **options)
       end
     end
     expose :bundle
@@ -465,7 +465,7 @@ module Omnibus
     def rake(command, options = {})
       build_commands << BuildCommand.new("rake `#{command}'") do
         bin = embedded_bin("rake")
-        shellout!("#{bin} #{command}", options)
+        shellout!("#{bin} #{command}", **options)
       end
     end
     expose :rake
@@ -723,7 +723,7 @@ module Omnibus
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
           if options.delete(:unchecked)
-            FileUtils.ln_s(source, destination, options)
+            FileUtils.ln_s(source, destination, **options)
           else
             files = FileSyncer.glob(source)
             if files.empty?
@@ -751,7 +751,7 @@ module Omnibus
     def sync(source, destination, options = {})
       build_commands << BuildCommand.new("sync `#{source}' to `#{destination}'") do
         Dir.chdir(software.project_dir) do
-          FileSyncer.sync(source, destination, options)
+          FileSyncer.sync(source, destination, **options)
         end
       end
     end
@@ -908,7 +908,7 @@ module Omnibus
       options[:live_stream] ||= log.live_stream(:debug)
 
       # Use Util's shellout
-      super(command_string, options)
+      super(command_string, **options)
     end
 
     #
