@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.2.3 -->
+## [8.2.3](https://github.com/chef/omnibus/tree/8.2.3) (2021-10-12)
+
+#### Merged Pull Requests
+- Whitelist libbrotlidec for curl builds on macOS [#1041](https://github.com/chef/omnibus/pull/1041) ([skeshari12](https://github.com/skeshari12))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=8.2.2 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Whitelist libbrotlidec for curl builds on macOS [#1041](https://github.com/chef/omnibus/pull/1041) ([skeshari12](https://github.com/skeshari12)) <!-- 8.2.3 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [8.2.2](https://github.com/chef/omnibus/tree/8.2.2) (2021-09-28)
