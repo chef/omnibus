@@ -152,7 +152,6 @@ MAC_WHITELIST_LIBS = [
   /Foundation/,
   /IOKit$/,
   /Tk$/,
-  /libbrotlidec\.1\.dylib/,
   /libutil\.dylib/,
   /libffi\.dylib/,
   /libncurses\.5\.4\.dylib/,
