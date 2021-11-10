@@ -1,5 +1,5 @@
 #
-# Copyright 2012-2018 Chef Software, Inc.
+# Copyright:: Copyright (c) Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #
 
 require "singleton" unless defined?(Singleton)
+require "omnibus/sugarable" unless defined?(Sugarable)
 
 module Omnibus
   class Config
@@ -22,6 +23,7 @@ module Omnibus
     include NullArgumentable
     include Singleton
     include Util
+    include Sugarable
 
     class << self
       #
