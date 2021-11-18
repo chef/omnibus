@@ -75,7 +75,19 @@ module Omnibus
       if not includes.empty?
         source_files = source_files.reject do |source_file|
           basename = relative_path_for(source_file, source)
-          includes.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH | File::FNM_PATHNAME) }
+          # File::FNM_PATHNAME Prohibit wildcards from matching a slash ('/')
+          # which means includes.none? will return true when the path includes a '/':
+          #
+          #   File.fnmatch?(".debug"), .debug/opt, File::FNM_DOTMATCH | File::FNM_PATHNAME) = false
+          #   File.fnmatch?(".debug/**"), .debug/opt, File::FNM_DOTMATCH | File::FNM_PATHNAME) = true
+          #   includes.none? { |include| File.fnmatch?(include), .debug/opt, File::FNM_DOTMATCH | File::FNM_PATHNAME) } = false
+          #
+          #   File.fnmatch?(".debug"), .debug/opt/datadog-agent, File::FNM_DOTMATCH | File::FNM_PATHNAME) = false
+          #   File.fnmatch?(".debug/**"), .debug/opt/datadog-agent, File::FNM_DOTMATCH | File::FNM_PATHNAME) = false
+          #   includes.none? { |include| File.fnmatch?(include), .debug/opt/datadog-agent, File::FNM_DOTMATCH | File::FNM_PATHNAME) } = true
+          #
+          # As per above, we can see that it would not include any subfolder beneath the fist level of nesting.
+          includes.none? { |include| File.fnmatch?(include, basename, File::FNM_DOTMATCH) }
         end
       end
 
