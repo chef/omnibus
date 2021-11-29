@@ -833,7 +833,7 @@ module Omnibus
     # Set or retrieve the {#license} of the project.
     #
     # @example
-    #   license 'Apache 2.0'
+    #   license 'Apache-2.0'
     #
     # @param [String] val
     #   the license to set for the project.
@@ -875,7 +875,7 @@ module Omnibus
 
     #
     # Set or retrieve the location of the {#license_file}
-    # of the project.  It can either be a relative path inside
+    # of the project. It can either be a relative path inside
     # the project source directory or a URL.
     #
     #

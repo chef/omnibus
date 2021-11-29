@@ -414,7 +414,7 @@ module Omnibus
     # Set or retrieve the {#license} of the software to build.
     #
     # @example
-    #   license 'Apache 2.0'
+    #   license 'Apache-2.0'
     #
     # @param [String] val
     #   the license to set for the software.
@@ -432,7 +432,7 @@ module Omnibus
 
     #
     # Set or retrieve the location of a {#license_file}
-    # of the software.  It can either be a relative path inside
+    # of the software. It can either be a relative path inside
     # the source package or a URL.
     #
     #

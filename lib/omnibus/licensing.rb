@@ -164,9 +164,9 @@ module Omnibus
         licensing_warning("Project '#{project.name}' does not contain licensing information.")
       end
 
-      # Check license file exists
-      if project.license != "Unspecified" && project.license_file.nil?
-        licensing_warning("Project '#{project.name}' does not point to a license file.")
+      # Check license file exists or project license is standard
+      if project.license != "Unspecified" && !STANDARD_LICENSES.keys.include?(project.license) && project.license_file.nil?
+        licensing_warning("Project '#{project.name}' does not point to a license file and its license is not standard (#{project.license}).")
       end
 
       # Check used license is a standard license
@@ -181,9 +181,9 @@ module Omnibus
           licensing_warning("Software '#{software_name}' does not contain licensing information.")
         end
 
-        # Check if the software specifies any license files
-        if license_info[:license] != "Unspecified" && license_info[:license_files].empty?
-          licensing_warning("Software '#{software_name}' does not point to any license files.")
+        # Check if the software specifies any license files or if it's a standard license
+        if license_info[:license] != "Unspecified" && !STANDARD_LICENSES.keys.include?(license_info[:license]) && license_info[:license_files].empty?
+          licensing_warning("Software '#{software_name}' does not point to any license files and its license is not standard (#{license_info[:license]}).")
         end
 
         # Check if the software license is one of the standard licenses
@@ -347,9 +347,15 @@ module Omnibus
           # license files.
           next if component.license == :project_license
 
+          license_files = component.license_files
+          # If the license is a standard license, use the STANDARD_LICENSES URL associated with it
+          if component.license_files.empty? && STANDARD_LICENSES.keys.include?(component.license)
+            license_files = [STANDARD_LICENSES[component.license]]
+          end
+
           map[component.name] = {
             license: component.license,
-            license_files: component.license_files,
+            license_files: license_files,
             version: component.version,
             project_dir: component.project_dir,
           }
@@ -697,7 +703,6 @@ EOH
       # Below licenses are compiled based on https://opensource.org/licenses/alphabetical
       #
       "AFL-3.0" => "https://opensource.org/licenses/AFL-3.0",             # Academic Free License 3.0
-      "AGPL-3.0" => "https://opensource.org/licenses/AGPL-3.0",           # Affero General Public License
       "APL-1.0" => "https://opensource.org/licenses/APL-1.0",             # Adaptive Public License
       "Apache-2.0" => "https://opensource.org/licenses/Apache-2.0",       # Apache License 2.0
       "APSL-2.0" => "https://opensource.org/licenses/APSL-2.0",           # Apple Public Source License
