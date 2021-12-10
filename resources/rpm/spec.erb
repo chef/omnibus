@@ -13,6 +13,9 @@
 
 %define _binary_payload <%= compression %>
 
+# Disable creation of build-id links
+%define _build_id_links none
+
 # Metadata
 Name: <%= name %>
 Version: <%= version %>
