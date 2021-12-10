@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.2.6 -->
-## [8.2.6](https://github.com/chef/omnibus/tree/8.2.6) (2021-11-10)
+<!-- latest_release 8.2.7 -->
+## [8.2.7](https://github.com/chef/omnibus/tree/8.2.7) (2021-12-10)
 
 #### Merged Pull Requests
-- Allow ohai versions &gt; 17 to be used [#1040](https://github.com/chef/omnibus/pull/1040) ([balasankarc](https://github.com/balasankarc))
+- Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
 <!-- release_rollup since=8.2.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.7 -->
 - Allow ohai versions &gt; 17 to be used [#1040](https://github.com/chef/omnibus/pull/1040) ([balasankarc](https://github.com/balasankarc)) <!-- 8.2.6 -->
 - Make the omnibus config sugarable [#1045](https://github.com/chef/omnibus/pull/1045) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.2.5 -->
 - Revert &quot;Fix mac_x-10 failure for chef-workstation&quot; [#1042](https://github.com/chef/omnibus/pull/1042) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.4 -->
