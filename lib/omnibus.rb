@@ -57,6 +57,7 @@ module Omnibus
   autoload :Publisher,        "omnibus/publisher"
   autoload :Reports,          "omnibus/reports"
   autoload :S3Cache,          "omnibus/s3_cache"
+  autoload :S3LicenseCache,   "omnibus/s3_license_cache"
   autoload :Software,         "omnibus/software"
   autoload :Sugarable,        "omnibus/sugarable"
   autoload :Templating,       "omnibus/templating"

@@ -114,6 +114,12 @@ module Omnibus
     default(:cache_dir) { File.join(base_dir, "cache") }
 
     # The absolute path to the directory on the virtual machine where
+    # licenses will be cached.
+    #
+    # @return [String]
+    default(:license_cache_dir) { File.join(base_dir, "cache", "licenses") }
+
+    # The absolute path to the directory on the virtual machine where
     # git caching will occur and software's will be progressively cached.
     #
     # @return [String]

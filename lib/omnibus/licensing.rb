@@ -678,7 +678,12 @@ EOH
             end
           else
             begin
-              download_file!(license_file, output_file, enable_progress_bar: false)
+              if Config.use_s3_caching && Config.s3_authenticated_download
+                get_from_s3(software, license_file, output_file)
+              else
+                log.info(log_key) { "Fetching license file from `#{license_file}'" }
+                download_file!(license_file, output_file, enable_progress_bar: false)
+              end
               File.chmod 0644, output_file unless windows?
             rescue SocketError,
                    Errno::ECONNREFUSED,
@@ -695,6 +700,24 @@ EOH
             end
           end
         end
+      end
+    end
+
+    #
+    # Downloads the license file from s3 using get_object.
+    #
+    # @param [Software] software
+    # @param [String] license_file
+    # @param [String] destination
+    #
+    def get_from_s3(software, license_file, destination)
+      log.info(log_key) { "Fetching license file from S3 object `#{S3LicenseCache.key_for(software, license_file)}' in bucket `#{Config.s3_bucket}'" }
+      begin
+        S3LicenseCache.get_object(software, license_file, destination)
+      rescue Aws::S3::Errors::NoSuchKey => e
+        log.error(log_key) {
+          "Download failed - #{e.class}!"
+        }
       end
     end
 
