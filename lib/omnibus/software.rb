@@ -1108,6 +1108,7 @@ module Omnibus
 
       @overrides
     end
+    expose :overrides
 
     #
     # Determine if this software version overridden externally, relative to the
