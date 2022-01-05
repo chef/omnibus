@@ -1,5 +1,5 @@
 
-# Copyright 2012-2018 Chef Software, Inc.
+# Copyright:: Copyright (c) Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -400,7 +400,7 @@ module Omnibus
     #   each line
     #
     def read_shared_libs(command)
-      cmd = shellout(command)
+      cmd = shellout!(command)
       cmd.stdout.each_line do |line|
         yield line
       end
