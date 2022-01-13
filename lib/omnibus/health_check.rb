@@ -336,15 +336,11 @@ module Omnibus
     #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
     #
     def health_check_ldd
-      regexp_ends = ".*(" + IGNORED_ENDINGS.map { |e| e.gsub(/\./, '\.') }.join("|") + ")$"
-      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(%r{/}, '\/') + ".*" }.join("|")
-      regexp = regexp_ends + "|" + regexp_patterns
-
       current_library = nil
       bad_libs = {}
       good_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}'", "xargs ldd") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f", "xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -412,14 +408,18 @@ module Omnibus
       # construct the list of files to check
       #
 
-      find_output = shellout!(find_command).stdout
+      find_output = shellout!(find_command).stdout.lines
+
+      find_output.reject! { |file| IGNORED_ENDINGS.any? { |ending| file.end_with?(ending) } }
+
+      find_output.reject! { |file| IGNORED_SUBSTRINGS.any? { |substr| file.include?(substr) } }
 
       if find_output.empty?
         # probably the find_command is busted, it should never be empty or why are you using omnibus?
         raise "Internal Error: Health Check found no lines"
       end
 
-      if find_output.lines.any? { |file| file !~ Regexp.new(project.install_dir) }
+      if find_output.any? { |file| file !~ Regexp.new(project.install_dir) }
         # every file in the find output should be within the install_dir
         raise "Internal Error: Health Check lines not matching the install_dir"
       end
@@ -429,7 +429,7 @@ module Omnibus
       #
 
       # this command will typically fail if the last file isn't a valid lib/binary which happens often
-      ldd_output = shellout(ldd_command, input: find_output).stdout
+      ldd_output = shellout(ldd_command, input: find_output.join("\n")).stdout
 
       #
       # do the output process to determine if the files are good or bad

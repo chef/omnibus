@@ -1,5 +1,5 @@
 
-# Copyright 2012-2020, Chef Software Inc.
+# Copyright:: Copyright (c) Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -184,24 +184,29 @@ FREEBSD_WHITELIST_LIBS = [
 
 IGNORED_ENDINGS = %w{
   .TXT
-  .[ch]
-  .[ch]pp
-  .[eh]rl
   .app
   .appup
   .bat
   .beam
+  .c
   .cc
   .cmake
   .conf
+  .cpp
   .css
-  .e*rb
+  .erb
+  .erl
   .feature
   .gemspec
   .gif
   .gitignore
   .gitkeep
-  .h*h
+  .h
+  .h
+  .hh
+  .hpp
+  .hrl
+  .html
   .jar
   .java
   .jpg
@@ -222,10 +227,13 @@ IGNORED_ENDINGS = %w{
   .png
   .pod
   .properties
-  .py[oc]*
-  .r*html
+  .py
+  .pyc
+  .pyo
   .rake
+  .rb
   .rdoc
+  .rhtml
   .ri
   .rst
   .scss
@@ -246,7 +254,7 @@ IGNORED_ENDINGS = %w{
   license
 }.freeze
 
-IGNORED_PATTERNS = %w{
+IGNORED_SUBSTRINGS = %w{
   /build_info/
   /licenses/
   /LICENSES/
