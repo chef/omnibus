@@ -20,6 +20,7 @@ WHITELIST_LIBS = [
     /libc\.so/,
     /libcrypt\.so/,
     /libdl/,
+    /lib-dynload/,
     /libfreebl\d\.so/,
     /libgcc_s\.so/,
     /libm\.so/,
