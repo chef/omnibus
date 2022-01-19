@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.2.7 -->
-## [8.2.7](https://github.com/chef/omnibus/tree/8.2.7) (2021-12-10)
+<!-- latest_release 8.2.8 -->
+## [8.2.8](https://github.com/chef/omnibus/tree/8.2.8) (2022-01-19)
 
 #### Merged Pull Requests
-- Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50))
 <!-- latest_release -->
 <!-- release_rollup since=8.2.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50)) <!-- 8.2.8 -->
 - Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.7 -->
 - Allow ohai versions &gt; 17 to be used [#1040](https://github.com/chef/omnibus/pull/1040) ([balasankarc](https://github.com/balasankarc)) <!-- 8.2.6 -->
 - Make the omnibus config sugarable [#1045](https://github.com/chef/omnibus/pull/1045) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.2.5 -->
