@@ -431,23 +431,21 @@ module Omnibus
     end
 
     def is_binary?(bin)
-      is_binary = File.file?(bin) &&
-        File.executable?(bin) &&
-        !File.symlink?(bin)
-      log.debug(log_key) { "    removing non-binary file from signing: #{bin}" } unless is_binary
-      is_binary
+      return false unless File.file?(bin) && File.executable?(bin) && !File.symlink?(bin)
+
+      log.debug(log_key) { "    skipping non-binary file from signing: #{bin}" }
+      true
     end
 
     def is_macho?(lib)
-      is_macho = false
-      if is_binary?(lib)
-        command = "file #{lib}"
+      return false unless File.file?(bin) && File.executable?(bin) && !File.symlink?(bin)
 
-        stdout = shellout!(command).stdout
-        is_macho = stdout.match?(/Mach-O.*(library|bundle)/)
+      if shellout!("file #{lib}").stdout.match?(/Mach-O.*(library|bundle)/) # https://rubular.com/r/nRgaQlAbkM9wHL
+        log.debug(log_key) { "    skipping non-Mach-O library file from signing: #{lib}" }
+        return true
       end
-      log.debug(log_key) { "    removing non-Mach-O library file from signing: #{lib}" } unless is_macho
-      is_macho
+
+      false
     end
   end
 end
