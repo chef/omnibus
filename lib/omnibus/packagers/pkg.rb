@@ -438,7 +438,7 @@ module Omnibus
     end
 
     def is_macho?(lib)
-      return false unless File.file?(bin) && File.executable?(bin) && !File.symlink?(bin)
+      return false unless File.file?(lib) && File.executable?(lib) && !File.symlink?(lib)
 
       if shellout!("file #{lib}").stdout.match?(/Mach-O.*(library|bundle)/) # https://rubular.com/r/nRgaQlAbkM9wHL
         log.debug(log_key) { "    skipping non-Mach-O library file from signing: #{lib}" }
