@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.2.8 -->
-## [8.2.8](https://github.com/chef/omnibus/tree/8.2.8) (2022-01-19)
+<!-- latest_release 8.2.9 -->
+## [8.2.9](https://github.com/chef/omnibus/tree/8.2.9) (2022-01-20)
 
 #### Merged Pull Requests
-- Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50))
+- fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef))
 <!-- latest_release -->
 <!-- release_rollup since=8.2.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 8.2.9 -->
 - Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50)) <!-- 8.2.8 -->
 - Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.7 -->
 - Allow ohai versions &gt; 17 to be used [#1040](https://github.com/chef/omnibus/pull/1040) ([balasankarc](https://github.com/balasankarc)) <!-- 8.2.6 -->
