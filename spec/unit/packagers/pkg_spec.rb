@@ -557,7 +557,9 @@ module Omnibus
 
       context "when is a Mach-O library" do
         before do
-          allow(subject).to receive(:is_binary?).with("file").and_return(true)
+          allow(File).to receive(:file?).with("file").and_return(true)
+          allow(File).to receive(:executable?).with("file").and_return(true)
+          allow(File).to receive(:symlink?).with("file").and_return(false)
           expect(subject).to receive(:shellout!).with("file file").and_return(shellout)
           allow(shellout).to receive(:stdout)
             .and_return("file: Mach-O 64-bit dynamically linked shared library x86_64")
@@ -570,7 +572,9 @@ module Omnibus
 
       context "when is a Mach-O Bundle" do
         before do
-          allow(subject).to receive(:is_binary?).with("file").and_return(true)
+          allow(File).to receive(:file?).with("file").and_return(true)
+          allow(File).to receive(:executable?).with("file").and_return(true)
+          allow(File).to receive(:symlink?).with("file").and_return(false)
           expect(subject).to receive(:shellout!).with("file file").and_return(shellout)
           allow(shellout).to receive(:stdout)
             .and_return("file: Mach-O 64-bit bundle x86_64")
@@ -583,7 +587,9 @@ module Omnibus
 
       context "when is not a Mach-O Bundle or Mach-O library" do
         before do
-          allow(subject).to receive(:is_binary?).with("file").and_return(true)
+          allow(File).to receive(:file?).with("file").and_return(true)
+          allow(File).to receive(:executable?).with("file").and_return(true)
+          allow(File).to receive(:symlink?).with("file").and_return(false)
           expect(subject).to receive(:shellout!).with("file file").and_return(shellout)
           allow(shellout).to receive(:stdout)
             .and_return("file: ASCII text")
