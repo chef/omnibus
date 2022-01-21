@@ -66,7 +66,7 @@ module Omnibus
     def run!
       measure("Health check time") do
         log.info(log_key) { "Running health on #{project.name}" }
-        bad_libs, good_libs =  case Ohai["platform"]
+        bad_libs, good_libs = case Ohai["platform"]
                     when "mac_os_x"
                       health_check_otool
                     when "aix"
@@ -76,10 +76,12 @@ module Omnibus
                       # explicit dependencies on windows. Most dependencies are
                       # implicit and hence not detected.
                       log.warn(log_key) { "Skipping dependency health checks on Windows." }
-                      {}
+                      [{}, {}]
+                    when "solaris2"
+                      health_check_solaris
                     else
                       health_check_ldd
-                    end
+                              end
 
         unresolved = []
         unreliable = []
@@ -167,8 +169,8 @@ module Omnibus
           raise HealthCheckFailed
         end
 
-        unless good_libs.keys.length > 0
-          raise "Internal error: no good libraries or bad libraries were found"
+        if good_libs.keys.length == 0 && !windows?
+          raise "Internal error: no good libraries were found"
         end
 
         conflict_map = {}
@@ -297,7 +299,7 @@ module Omnibus
         end
       end
 
-      return bad_libs, good_libs
+      [bad_libs, good_libs]
     end
 
     #
@@ -311,7 +313,7 @@ module Omnibus
       bad_libs = {}
       good_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"RISC System\" | awk -F: '{print $1}'", "xargs -n 1 ldd") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"XCOFF\" | awk -F: '{print $1}'", "xargs -n 1 ldd") do |line|
         case line
         when /^(.+) needs:$/
           current_library = Regexp.last_match[1]
@@ -326,7 +328,42 @@ module Omnibus
         end
       end
 
-      return bad_libs, good_libs
+      [bad_libs, good_libs]
+    end
+
+    #
+    # Run healthchecks on Solaris.
+    #
+    # @return [Hash<String, Hash<String, Hash<String, Int>>>]
+    #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
+    #
+    def health_check_solaris
+      current_library = nil
+      bad_libs = {}
+      good_libs = {}
+
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'", "xargs -n 1 ldd") do |line|
+        case line
+        when /^(.+):$/
+          current_library = Regexp.last_match[1]
+          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
+        when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
+          name = Regexp.last_match[1]
+          linked = Regexp.last_match[2]
+          ( bad_libs, good_libs ) = check_for_bad_library(bad_libs, good_libs, current_library, name, linked)
+        when /^\s+(.+) \(.+\)$/
+          next
+        when /^\s+statically linked$/
+          next
+        when /^\s+not a dynamic executable$/ # ignore non-executable files
+        else
+          log.warn(log_key) do
+            "Line did not match for #{current_library}\n#{line}"
+          end
+        end
+      end
+
+      [bad_libs, good_libs]
     end
 
     #
@@ -340,7 +377,8 @@ module Omnibus
       bad_libs = {}
       good_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f", "xargs ldd") do |line|
+      # This algorithm runs on both Linux and FreeBSD and needs to be MANUALLY tested on both
+      read_shared_libs("find #{project.install_dir}/ -type f", "xargs -n 1 ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -353,11 +391,11 @@ module Omnibus
           next
         when /^\s+statically linked$/
           next
-        when /^\s+libjvm.so/
+        when /^\s+libjvm.so/ # FIXME: should remove if it doesn't blow up server
           next
-        when /^\s+libjava.so/
+        when /^\s+libjava.so/ # FIXME: should remove if it doesn't blow up server
           next
-        when /^\s+libmawt.so/
+        when /^\s+libmawt.so/ # FIXME: should remove if it doesn't blow up server
           next
         when /^\s+not a dynamic executable$/ # ignore non-executable files
         else
@@ -367,7 +405,7 @@ module Omnibus
         end
       end
 
-      return bad_libs, good_libs
+      [bad_libs, good_libs]
     end
 
     private
@@ -403,14 +441,13 @@ module Omnibus
     #   each line
     #
     def read_shared_libs(find_command, ldd_command, &output_proc)
-
       #
       # construct the list of files to check
       #
 
       find_output = shellout!(find_command).stdout.lines
 
-      find_output.reject! { |file| IGNORED_ENDINGS.any? { |ending| file.end_with?(ending) } }
+      find_output.reject! { |file| IGNORED_ENDINGS.any? { |ending| file.end_with?("#{ending}\n") } }
 
       find_output.reject! { |file| IGNORED_SUBSTRINGS.any? { |substr| file.include?(substr) } }
 
@@ -429,7 +466,7 @@ module Omnibus
       #
 
       # this command will typically fail if the last file isn't a valid lib/binary which happens often
-      ldd_output = shellout(ldd_command, input: find_output.join("\n")).stdout
+      ldd_output = shellout(ldd_command, input: find_output.join).stdout
 
       #
       # do the output process to determine if the files are good or bad
@@ -501,7 +538,7 @@ module Omnibus
         log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
       end
 
-      return bad_libs, good_libs
+      [bad_libs, good_libs]
     end
   end
 end

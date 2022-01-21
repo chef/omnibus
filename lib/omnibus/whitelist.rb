@@ -177,6 +177,7 @@ FREEBSD_WHITELIST_LIBS = [
   /libkvm\.so/,
   /libprocstat\.so/,
   /libmd\.so/,
+  /libdl\.so/,
 ].freeze
 
 IGNORED_ENDINGS = %w{
@@ -215,6 +216,7 @@ IGNORED_ENDINGS = %w{
   .lua
   .md
   .mkd
+  .mo
   .npmignore
   .out
   .packlist
@@ -229,19 +231,23 @@ IGNORED_ENDINGS = %w{
   .pyo
   .rake
   .rb
+  .rbs
   .rdoc
   .rhtml
   .ri
+  .rpm
   .rst
   .scss
   .sh
   .sql
   .svg
   .toml
+  .tt
   .ttf
   .txt
   .xml
   .yml
+  COPYING
   Gemfile
   LICENSE
   Makefile
