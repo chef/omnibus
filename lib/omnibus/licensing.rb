@@ -400,7 +400,7 @@ module Omnibus
     # Logs the given message as info.
     #
     # This method should only be used for detecting in a license is known or not.
-    # In the future, we will introduce a configurable way to whitelist or blacklist
+    # In the future, we will introduce a configurable way to allow or reject
     # the allowed licenses. Once we implement that we need to stop using this method.
     #
     # @param [String] message

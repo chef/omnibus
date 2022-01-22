@@ -18,7 +18,7 @@ require "fileutils" unless defined?(FileUtils)
 require "mixlib/shellout" unless defined?(Mixlib::ShellOut)
 require "ostruct" unless defined?(OpenStruct)
 require "pathname" unless defined?(Pathname)
-require "omnibus/whitelist"
+require "omnibus/allowlist"
 
 module Omnibus
   class Builder

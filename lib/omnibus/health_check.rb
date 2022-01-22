@@ -15,7 +15,7 @@
 #
 
 require "omnibus/sugarable"
-require "omnibus/whitelist"
+require "omnibus/allowlist"
 begin
   require "pedump"
 rescue LoadError
@@ -380,13 +380,13 @@ module Omnibus
     end
 
     #
-    # The list of whitelisted (ignored) files from the project and softwares.
+    # The list of allowed (ignored) files from the project and softwares.
     #
     # @return [Array<String, Regexp>]
     #
-    def whitelist_files
+    def allow_files
       project.library.components.inject([]) do |array, component|
-        array += component.whitelist_files
+        array += component.allow_files
         array
       end
     end
@@ -423,30 +423,30 @@ module Omnibus
     def check_for_bad_library(bad_libs, current_library, name, linked)
       safe = nil
 
-      whitelist_libs = case Ohai["platform"]
+      allowlist_libs = case Ohai["platform"]
                        when "arch"
-                         ARCH_WHITELIST_LIBS
+                         ARCH_ALLOWLIST_LIBS
                        when "mac_os_x"
-                         MAC_WHITELIST_LIBS
+                         MAC_ALLOWLIST_LIBS
                        when "omnios"
-                         OMNIOS_WHITELIST_LIBS
+                         OMNIOS_ALLOWLIST_LIBS
                        when "solaris2"
-                         SOLARIS_WHITELIST_LIBS
+                         SOLARIS_ALLOWLIST_LIBS
                        when "smartos"
-                         SMARTOS_WHITELIST_LIBS
+                         SMARTOS_ALLOWLIST_LIBS
                        when "freebsd"
-                         FREEBSD_WHITELIST_LIBS
+                         FREEBSD_ALLOWLIST_LIBS
                        when "aix"
-                         AIX_WHITELIST_LIBS
+                         AIX_ALLOWLIST_LIBS
                        else
-                         WHITELIST_LIBS
+                         ALLOWLIST_LIBS
                        end
 
-      whitelist_libs.each do |reg|
+      allowlist_libs.each do |reg|
         safe ||= true if reg.match(name)
       end
 
-      whitelist_files.each do |reg|
+      allow_files.each do |reg|
         safe ||= true if reg.match(current_library)
       end
 
@@ -463,7 +463,7 @@ module Omnibus
           bad_libs[current_library][name][linked] = 1
         end
       else
-        log.debug(log_key) { "    -> PASSED: #{name} is either whitelisted or safely provided." }
+        log.debug(log_key) { "    -> PASSED: #{name} is either allowed or safely provided." }
       end
 
       bad_libs
