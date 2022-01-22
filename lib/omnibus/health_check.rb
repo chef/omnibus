@@ -378,7 +378,7 @@ module Omnibus
       good_libs = {}
 
       # This algorithm runs on both Linux and FreeBSD and needs to be MANUALLY tested on both
-      read_shared_libs("find #{project.install_dir}/ -type f", "xargs -n 1 ldd") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f", "xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
