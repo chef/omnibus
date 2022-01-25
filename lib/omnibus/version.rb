@@ -15,5 +15,5 @@
 #
 
 module Omnibus
-  VERSION = "8.2.9".freeze
+  VERSION = "8.3.0".freeze
 end
