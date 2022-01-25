@@ -66,22 +66,25 @@ module Omnibus
     def run!
       measure("Health check time") do
         log.info(log_key) { "Running health on #{project.name}" }
-        bad_libs, good_libs = case Ohai["platform"]
-                    when "mac_os_x"
-                      health_check_otool
-                    when "aix"
-                      health_check_aix
-                    when "windows"
-                      # TODO: objdump -p will provided a very limited check of
-                      # explicit dependencies on windows. Most dependencies are
-                      # implicit and hence not detected.
-                      log.warn(log_key) { "Skipping dependency health checks on Windows." }
-                      [{}, {}]
-                    when "solaris2"
-                      health_check_solaris
-                    else
-                      health_check_ldd
-                              end
+        bad_libs, good_libs =
+          case Ohai["platform"]
+          when "mac_os_x"
+            health_check_otool
+          when "aix"
+            health_check_aix
+          when "windows"
+            # TODO: objdump -p will provided a very limited check of
+            # explicit dependencies on windows. Most dependencies are
+            # implicit and hence not detected.
+            log.warn(log_key) { "Skipping dependency health checks on Windows." }
+            [{}, {}]
+          when "solaris2"
+            health_check_solaris
+          when "freebsd", "openbsd", "netbsd"
+            health_check_freebsd
+          else
+            health_check_linux
+          end
 
         unresolved = []
         unreliable = []
@@ -367,17 +370,51 @@ module Omnibus
     end
 
     #
+    # Run healthchecks on FreeBSD
+    #
+    # @return [Hash<String, Hash<String, Hash<String, Int>>>]
+    #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
+    #
+    def health_check_freebsd
+      current_library = nil
+      bad_libs = {}
+      good_libs = {}
+
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'", "xargs ldd") do |line|
+        case line
+        when /^(.+):$/
+          current_library = Regexp.last_match[1]
+          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
+        when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
+          name = Regexp.last_match[1]
+          linked = Regexp.last_match[2]
+          ( bad_libs, good_libs ) = check_for_bad_library(bad_libs, good_libs, current_library, name, linked)
+        when /^\s+(.+) \(.+\)$/
+          next
+        when /^\s+statically linked$/
+          next
+        when /^\s+not a dynamic executable$/ # ignore non-executable files
+        else
+          log.warn(log_key) do
+            "Line did not match for #{current_library}\n#{line}"
+          end
+        end
+      end
+
+      [bad_libs, good_libs]
+    end
+
+    #
     # Run healthchecks against ldd.
     #
     # @return [Hash<String, Hash<String, Hash<String, Int>>>]
     #   the bad libraries (library_name -> dependency_name -> satisfied_lib_path -> count)
     #
-    def health_check_ldd
+    def health_check_linux
       current_library = nil
       bad_libs = {}
       good_libs = {}
 
-      # This algorithm runs on both Linux and FreeBSD and needs to be MANUALLY tested on both
       read_shared_libs("find #{project.install_dir}/ -type f", "xargs ldd") do |line|
         case line
         when /^(.+):$/
