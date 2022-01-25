@@ -1,5 +1,5 @@
 
-# Copyright 2012-2020, Chef Software Inc.
+# Copyright:: Copyright (c) Chef Software Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -177,28 +177,34 @@ FREEBSD_WHITELIST_LIBS = [
   /libkvm\.so/,
   /libprocstat\.so/,
   /libmd\.so/,
+  /libdl\.so/,
 ].freeze
 
 IGNORED_ENDINGS = %w{
   .TXT
-  .[ch]
-  .[ch]pp
-  .[eh]rl
   .app
   .appup
   .bat
   .beam
+  .c
   .cc
   .cmake
   .conf
+  .cpp
   .css
-  .e*rb
+  .erb
+  .erl
   .feature
   .gemspec
   .gif
   .gitignore
   .gitkeep
-  .h*h
+  .h
+  .h
+  .hh
+  .hpp
+  .hrl
+  .html
   .jar
   .java
   .jpg
@@ -210,6 +216,7 @@ IGNORED_ENDINGS = %w{
   .lua
   .md
   .mkd
+  .mo
   .npmignore
   .out
   .packlist
@@ -219,21 +226,28 @@ IGNORED_ENDINGS = %w{
   .png
   .pod
   .properties
-  .py[oc]*
-  .r*html
+  .py
+  .pyc
+  .pyo
   .rake
+  .rb
+  .rbs
   .rdoc
+  .rhtml
   .ri
+  .rpm
   .rst
   .scss
   .sh
   .sql
   .svg
   .toml
+  .tt
   .ttf
   .txt
   .xml
   .yml
+  COPYING
   Gemfile
   LICENSE
   Makefile
@@ -243,7 +257,7 @@ IGNORED_ENDINGS = %w{
   license
 }.freeze
 
-IGNORED_PATTERNS = %w{
+IGNORED_SUBSTRINGS = %w{
   /build_info/
   /licenses/
   /LICENSES/
