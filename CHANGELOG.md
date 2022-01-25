@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.2.9 -->
-## [8.2.9](https://github.com/chef/omnibus/tree/8.2.9) (2022-01-20)
+<!-- latest_release 8.3.0 -->
+## [8.3.0](https://github.com/chef/omnibus/tree/8.3.0) (2022-01-25)
 
 #### Merged Pull Requests
-- fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef))
+- Better healthcheck correctness [#1056](https://github.com/chef/omnibus/pull/1056) ([lamont-granquist](https://github.com/lamont-granquist))
 <!-- latest_release -->
 <!-- release_rollup since=8.2.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Better healthcheck correctness [#1056](https://github.com/chef/omnibus/pull/1056) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.3.0 -->
 - fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 8.2.9 -->
 - Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50)) <!-- 8.2.8 -->
 - Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.7 -->
