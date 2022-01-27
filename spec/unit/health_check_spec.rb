@@ -176,7 +176,7 @@ module Omnibus
 
       it "raises an exception when there are external dependencies" do
         allow(subject).to receive(:shellout)
-          .with("find /opt/chefdk/ -type f")
+          .with("find /opt/chefdk/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'")
           .and_return(file_list)
 
         allow(subject).to receive(:shellout)
@@ -188,7 +188,7 @@ module Omnibus
 
       it "does not raise an exception when the healthcheck passes" do
         allow(subject).to receive(:shellout)
-          .with("find /opt/chefdk/ -type f")
+          .with("find /opt/chefdk/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'")
           .and_return(file_list)
 
         allow(subject).to receive(:shellout)
@@ -204,7 +204,7 @@ module Omnibus
 
       it "raises an exception if there's nothing in the file list" do
         allow(subject).to receive(:shellout)
-          .with("find /opt/chefdk/ -type f")
+          .with("find /opt/chefdk/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'")
           .and_return(empty_list)
 
         expect { subject.run! }.to raise_error(RuntimeError, "Internal Error: Health Check found no lines")
@@ -212,7 +212,7 @@ module Omnibus
 
       it "raises an exception if the file list command raises" do
         allow(subject).to receive(:shellout)
-          .with("find /opt/chefdk/ -type f")
+          .with("find /opt/chefdk/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'")
           .and_return(failed_list)
 
         expect { subject.run! }.to raise_error(RuntimeError, "Mixlib::Shellout::ShellCommandFailed")
@@ -220,7 +220,7 @@ module Omnibus
 
       it "raises an exception if the file list command has no entries in the install_dir" do
         allow(subject).to receive(:shellout)
-          .with("find /opt/chefdk/ -type f")
+          .with("find /opt/chefdk/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'")
           .and_return(bad_list)
 
         expect { subject.run! }.to raise_error(RuntimeError, "Internal Error: Health Check lines not matching the install_dir")
