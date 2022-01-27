@@ -35,6 +35,11 @@ Packager: <%= maintainer %>
 <% dependencies.each do |name| -%>
 Requires: <%= name %>
 <% end -%>
+<% script_dependencies.each do |script, script_deps_list| -%>
+<% script_deps_list.each do |name| -%>
+Requires(<%= script %>): <%= name %>
+<% end -%>
+<% end -%>
 <% conflicts.each do |name| -%>
 Conflicts: <%= name %>
 <% end -%>

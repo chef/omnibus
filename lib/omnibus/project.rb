@@ -712,6 +712,28 @@ module Omnibus
     end
     expose :runtime_recommended_dependency
 
+    #
+    # Add a package that is a runtime dependency of a script of this project.
+    #
+    # @example
+    #   runtime_script_dependency :preinst, 'foo'
+    #   runtime_script_dependency :postinst, 'bar'
+    #
+    # @param [String] script
+    #   the script that requires this runtime dependency
+    # @param [String] val
+    #   the name of the script runtime dependency
+    #
+    # @return [Hash<Symbol, Array<String>>]
+    #   the list of script runtime dependencies
+    #
+    def runtime_script_dependency(script, val)
+      runtime_script_dependencies[script] ||= []
+      runtime_script_dependencies[script] << val
+      runtime_script_dependencies.dup
+    end
+    expose :runtime_script_dependency
+
     # Add package(s) that this project extends.
     #
     # Use this to avoid packaging many files and libraries already included by
@@ -1159,6 +1181,15 @@ module Omnibus
     #
     def runtime_recommended_dependencies
       @runtime_recommended_dependencies ||= []
+    end
+
+    #
+    # The hash of scripts software dependencies for this project.
+    #
+    # @return [Hash<Symbol>, Array<String>]
+    #
+    def runtime_script_dependencies
+      @runtime_script_dependencies ||= {}
     end
 
     # The list of packages this project extends.

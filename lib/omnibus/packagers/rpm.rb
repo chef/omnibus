@@ -418,6 +418,7 @@ module Omnibus
       end
 
       pkg_dependencies = project.runtime_dependencies
+      script_dependencies = project.runtime_script_dependencies
       if debug
         pkg_dependencies = ["#{safe_base_package_name} = #{safe_epoch}:#{safe_version}-#{safe_build_iteration}"]
       end
@@ -447,6 +448,7 @@ module Omnibus
                         conflicts: project.conflicts,
                         replaces: project.replaces,
                         dependencies: pkg_dependencies,
+                        script_dependencies: script_dependencies,
                         user: project.package_user,
                         group: project.package_group,
                         scripts: scripts,
