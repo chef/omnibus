@@ -31,6 +31,7 @@ WHITELIST_LIBS = [
     /libutil\.so/,
     /linux-vdso.+/,
     /linux-gate\.so/,
+    /libffi\.so\.6/,
   ].freeze
 
 ARCH_WHITELIST_LIBS = [
