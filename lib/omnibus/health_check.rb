@@ -415,7 +415,7 @@ module Omnibus
       bad_libs = {}
       good_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f", "xargs ldd") do |line|
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'", "xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
