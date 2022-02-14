@@ -49,12 +49,18 @@ ARCH_WHITELIST_LIBS = [
 ].freeze
 
 AIX_WHITELIST_LIBS = [
+  /libc\.a/,
+  /libcfg\.a/,
+  /libcorcfg\.a/,
+  /libcrypt\.a/,
+  /libdl\.a/,
+  /liblvm\.a/,
+  /libodm\.a/,
+  /libperfstat\.a/,
   /libpthread\.a/,
   /libpthreads\.a/,
-  /libdl.a/,
   /librtl\.a/,
-  /libc\.a/,
-  /libcrypt\.a/,
+  /libsrc\.a/,
   /unix$/,
 ].freeze
 
