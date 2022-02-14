@@ -28,6 +28,7 @@ WHITELIST_LIBS = [
     /libresolv\.so/,
     /librt\.so/,
     /libstdc\+\+\.so/,
+    /libtinfo\.so\.5/,
     /libutil\.so/,
     /linux-vdso.+/,
     /linux-gate\.so/,
