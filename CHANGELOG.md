@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.3.1 -->
-## [8.3.1](https://github.com/chef/omnibus/tree/8.3.1) (2022-01-28)
+<!-- latest_release 8.3.2 -->
+## [8.3.2](https://github.com/chef/omnibus/tree/8.3.2) (2022-02-15)
 
 #### Merged Pull Requests
-- Fix omnibus healthcheck spinning on chef-server builds  [#1060](https://github.com/chef/omnibus/pull/1060) ([lamont-granquist](https://github.com/lamont-granquist))
+- Whitelist files for `make` on AIX [#1062](https://github.com/chef/omnibus/pull/1062) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
 <!-- release_rollup since=8.2.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Whitelist files for `make` on AIX [#1062](https://github.com/chef/omnibus/pull/1062) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.2 -->
 - Fix omnibus healthcheck spinning on chef-server builds  [#1060](https://github.com/chef/omnibus/pull/1060) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.3.1 -->
 - Better healthcheck correctness [#1056](https://github.com/chef/omnibus/pull/1056) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.3.0 -->
 - fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 8.2.9 -->
