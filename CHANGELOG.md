@@ -1,27 +1,25 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.3.2 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [8.3.2](https://github.com/chef/omnibus/tree/8.3.2) (2022-02-15)
 
 #### Merged Pull Requests
+- Whitelist libbrotlidec for curl builds on macOS [#1041](https://github.com/chef/omnibus/pull/1041) ([skeshari12](https://github.com/skeshari12))
+- Revert &quot;Fix mac_x-10 failure for chef-workstation&quot; [#1042](https://github.com/chef/omnibus/pull/1042) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Make the omnibus config sugarable [#1045](https://github.com/chef/omnibus/pull/1045) ([lamont-granquist](https://github.com/lamont-granquist))
+- Allow ohai versions &gt; 17 to be used [#1040](https://github.com/chef/omnibus/pull/1040) ([balasankarc](https://github.com/balasankarc))
+- Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50))
+- fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef))
+- Better healthcheck correctness [#1056](https://github.com/chef/omnibus/pull/1056) ([lamont-granquist](https://github.com/lamont-granquist))
+- Fix omnibus healthcheck spinning on chef-server builds  [#1060](https://github.com/chef/omnibus/pull/1060) ([lamont-granquist](https://github.com/lamont-granquist))
 - Whitelist files for `make` on AIX [#1062](https://github.com/chef/omnibus/pull/1062) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
-<!-- latest_release -->
-<!-- release_rollup since=8.2.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Whitelist files for `make` on AIX [#1062](https://github.com/chef/omnibus/pull/1062) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.2 -->
-- Fix omnibus healthcheck spinning on chef-server builds  [#1060](https://github.com/chef/omnibus/pull/1060) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.3.1 -->
-- Better healthcheck correctness [#1056](https://github.com/chef/omnibus/pull/1056) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.3.0 -->
-- fixed typo in referenced argument name [#1054](https://github.com/chef/omnibus/pull/1054) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 8.2.9 -->
-- Avoid double logging removal of non-mach-o libs [#988](https://github.com/chef/omnibus/pull/988) ([tas50](https://github.com/tas50)) <!-- 8.2.8 -->
-- Don&#39;t generate build-id files in RPM packages [#1050](https://github.com/chef/omnibus/pull/1050) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.7 -->
-- Allow ohai versions &gt; 17 to be used [#1040](https://github.com/chef/omnibus/pull/1040) ([balasankarc](https://github.com/balasankarc)) <!-- 8.2.6 -->
-- Make the omnibus config sugarable [#1045](https://github.com/chef/omnibus/pull/1045) ([lamont-granquist](https://github.com/lamont-granquist)) <!-- 8.2.5 -->
-- Revert &quot;Fix mac_x-10 failure for chef-workstation&quot; [#1042](https://github.com/chef/omnibus/pull/1042) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.2.4 -->
-- Whitelist libbrotlidec for curl builds on macOS [#1041](https://github.com/chef/omnibus/pull/1041) ([skeshari12](https://github.com/skeshari12)) <!-- 8.2.3 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [8.2.2](https://github.com/chef/omnibus/tree/8.2.2) (2021-09-28)
 
 #### Merged Pull Requests
@@ -29,7 +27,6 @@
 - Add new DSL for GO to builder [#1032](https://github.com/chef/omnibus/pull/1032) ([mimaslanka](https://github.com/mimaslanka))
 - Fix pathing for go on windows [#1034](https://github.com/chef/omnibus/pull/1034) ([mimaslanka](https://github.com/mimaslanka))
 - Fixes for omnibus for ruby-3.0 [#1038](https://github.com/chef/omnibus/pull/1038) ([lamont-granquist](https://github.com/lamont-granquist))
-<!-- latest_stable_release -->
 
 ## [8.1.15](https://github.com/chef/omnibus/tree/8.1.15) (2021-08-02)
 
