@@ -15,10 +15,13 @@
 #
 
 WHITELIST_LIBS = [
+    /afalg\.so/,
     /ld-linux/,
+    /legacy\.so/,
     /libanl\.so/,
     /libc\.so/,
     /libcrypt\.so/,
+    /libcrypto\.so\.3/,
     /libdl/,
     /libfreebl\d\.so/,
     /libgcc_s\.so/,
@@ -27,10 +30,12 @@ WHITELIST_LIBS = [
     /libpthread/,
     /libresolv\.so/,
     /librt\.so/,
+    /libssl\.so\.3/,
     /libstdc\+\+\.so/,
     /libutil\.so/,
     /linux-vdso.+/,
     /linux-gate\.so/,
+    /loader_attic\.so/,
   ].freeze
 
 ARCH_WHITELIST_LIBS = [
