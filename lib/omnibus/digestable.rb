@@ -36,7 +36,7 @@ module Omnibus
     # @return [String]
     #   the hexdigest of the file at the path
     #
-    def digest(path, type = :md5)
+    def digest(path, type = :sha256)
       digest = digest_from_type(type)
 
       update_with_file_contents(digest, path)
@@ -68,7 +68,7 @@ module Omnibus
     # @return [String]
     #   the hexdigest of the directory
     #
-    def digest_directory(path, type = :md5, options = {})
+    def digest_directory(path, type = :sha256, options = {})
       digest = digest_from_type(type)
       log.info(log_key) { "Digesting #{path} with #{type}" }
       FileSyncer.all_files_under(path, options).each do |filename|

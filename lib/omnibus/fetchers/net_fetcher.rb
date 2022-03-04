@@ -31,7 +31,7 @@ module Omnibus
     ALL_EXTENSIONS = WIN_7Z_EXTENSIONS + TAR_EXTENSIONS
 
     # Digest types used for verifying file checksums
-    DIGESTS = [:sha512, :sha256, :sha1, :md5]
+    DIGESTS = [:sha512, :sha256]
 
     #
     # A fetch is required if the downloaded_file (such as a tarball) does not

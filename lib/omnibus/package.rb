@@ -45,24 +45,6 @@ module Omnibus
     end
 
     #
-    # The MD5 checksum for this file.
-    #
-    # @return [String]
-    #
-    def md5
-      @md5 ||= digest(path, :md5)
-    end
-
-    #
-    # The SHA1 checksum for this file.
-    #
-    # @return [String]
-    #
-    def sha1
-      @sha1 ||= digest(path, :sha1)
-    end
-
-    #
     # The SHA256 checksum for this file.
     #
     # @return [String]

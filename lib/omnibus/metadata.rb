@@ -47,8 +47,6 @@ module Omnibus
         data = {
           # Package
           basename: package.name,
-          md5: package.md5,
-          sha1: package.sha1,
           sha256: package.sha256,
           sha512: package.sha512,
           platform: platform_shortname,
