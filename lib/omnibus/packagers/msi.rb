@@ -353,7 +353,7 @@ module Omnibus
         raise InvalidValue.new(:glob, "be an String")
       end
 
-      install_path = Pathname.new(project.install_dir)
+      install_path = Pathname.new(install_dir)
 
       # Find path in which the Chef gem is installed
       search_pattern = install_path.join("**", "gems")
@@ -448,10 +448,10 @@ module Omnibus
       paths = []
 
       # Remove C:/
-      install_dir = project.install_dir.split("/")[1..-1].join("/")
+      safe_install_dir = install_dir.split("/")[1..-1].join("/")
 
       # Grab all parent paths
-      Pathname.new(install_dir).ascend do |path|
+      Pathname.new(safe_install_dir).ascend do |path|
         paths << path.to_s
       end
 
@@ -536,7 +536,7 @@ module Omnibus
       <<-EOH.split.join(" ").squeeze(" ").strip
       7z a -r
       #{windows_safe_path(staging_dir)}\\#{project.name}.zip
-      #{windows_safe_path(project.install_dir)}\\*
+      #{windows_safe_path(install_dir)}\\*
       EOH
     end
 
@@ -557,7 +557,7 @@ module Omnibus
         EOH
       else
         <<-EOH.split.join(" ").squeeze(" ").strip
-          heat.exe dir "#{windows_safe_path(project.install_dir)}"
+          heat.exe dir "#{windows_safe_path(install_dir)}"
             -nologo -srd -sreg -gg -cg ProjectDir
             -dr PROJECTLOCATION
             -var "var.ProjectSourceDir"
@@ -589,7 +589,7 @@ module Omnibus
             -nologo
             #{wix_candle_flags}
             #{wix_extension_switches(wix_candle_extensions)}
-            -dProjectSourceDir="#{windows_safe_path(project.install_dir)}"
+            -dProjectSourceDir="#{windows_safe_path(install_dir)}"
             #{candle_vars}
             "project-files.wxs"
             #{wxs_list}
