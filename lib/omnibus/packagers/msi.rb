@@ -101,6 +101,7 @@ module Omnibus
       # Harvest the files with heat.exe, recursively generate fragment for
       # project directory
       Dir.chdir(staging_dir) do
+        instance_eval(&@pre_heat) if @pre_heat
         shellout!(heat_command)
 
         # Let's also harvest our extras
@@ -152,6 +153,15 @@ module Omnibus
     #
     # @!group DSL methods
     # --------------------------------------------------
+
+    #
+    # Adds a command/step that will run prior to harvesting
+    # with heat.exe
+    #
+    def pre_heat(&block)
+      block ? @pre_heat = block : @pre_heat
+    end
+    expose :pre_heat
 
     #
     # set or retrieve additional files to sign
