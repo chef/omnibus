@@ -22,7 +22,17 @@ module Omnibus
   class Packager::MSI < Packager::WindowsBase
     id :msi
 
+    # Override the default install dir to place the install files in
+    # the staging directory. That way we can modify it as we want and it won't
+    # impact other packagers, and Omnibus will take care of cleaning it for us after the build.
+    def install_dir
+      "#{staging_dir}\\install_dir"
+    end
+
     setup do
+      # Create a copy of the install directory
+      FileUtils.copy_entry windows_safe_path(project.install_dir), windows_safe_path(install_dir)
+
       if bundle_msi
         helper_tmp_dir = Dir.mktmpdir
         parameters.store('HelperDir', helper_tmp_dir)
