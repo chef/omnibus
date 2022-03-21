@@ -36,12 +36,27 @@ module Omnibus
       include S3Helpers
 
       #
+      # The AWS::S3::Bucket object associated with the cache S3 bucket.
+      #
+      # On ARM Linux and Windows runners, this operation takes up to 40s, so it's better
+      # to only do it once and then keep the object for all future operations.
+      #
+      # @return[AWS::S3::Bucket]
+      #
+      def bucket
+        if @bucket.nil?
+          @bucket = client.bucket(Config.s3_bucket)
+        end
+        @bucket
+      end
+
+      #
       # The list of objects in the cache, by their key.
       #
       # @return [Array<String>]
       #
       def keys
-        client.bucket(Config.s3_bucket).objects.map(&:key)
+        bucket.objects.map(&:key)
       end
 
       #
@@ -116,11 +131,10 @@ module Omnibus
       # @param [String] destination
       #
       def get_object(software, license_file, destination)
-        object = client.bucket(Config.s3_bucket).object(key_for(software, license_file))
+        object = bucket.object(key_for(software, license_file))
+
         object.get(
-          response_target: destination,
-          bucket: Config.s3_bucket,
-          key: key_for(software, license_file)
+          response_target: destination
         )
       end
 

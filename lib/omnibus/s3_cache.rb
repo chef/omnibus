@@ -105,6 +105,7 @@ module Omnibus
 
       def get_object(filename, software)
         object = client.bucket(Config.s3_bucket).object(S3Cache.key_for(software))
+
         object.get(
           response_target: filename,
           bucket: Config.s3_bucket,
