@@ -201,15 +201,16 @@ module Omnibus
         shellout(cmd)
       end
 
-      timestamp_servers.each do |ts|
-        puts "signing with timestamp server: #{ts}"
-        success = try_sign(safe_package_file, ts)
-
-        puts "signed with timestamp server: #{ts}" if success
-
-        break if success
+      retry_block("signing with timestamp servers", [FailedToSignWindowsPackage], retries = 5, delay = 5) do
+        success = false
+        timestamp_servers.each do |ts|
+          puts "signing with timestamp server: #{ts}"
+          success = try_sign(safe_package_file, ts)
+          puts "signed with timestamp server: #{ts}" if success
+          break if success
+        end
+        raise FailedToSignWindowsPackage.new if !success
       end
-      raise FailedToSignWindowsPackage.new if !success
     end
 
     def try_sign(package_file, url)
