@@ -108,6 +108,7 @@ SOLARIS_WHITELIST_LIBS = [
   /libuutil\.so/,
   /libkstat\.so/,
   # solaris 11 libraries:
+  /libstdc\+\+\.so/,
   /libc\.so\.1/,
   /libm\.so\.2/,
   /libdl\.so\.1/,
@@ -176,6 +177,8 @@ MAC_WHITELIST_LIBS = [
 
 FREEBSD_WHITELIST_LIBS = [
   /libc\.so/,
+  /libc\+\+\.so/,
+  /libcxxrt\.so/,
   /libgcc_s\.so/,
   /libcrypt\.so/,
   /libm\.so/,
