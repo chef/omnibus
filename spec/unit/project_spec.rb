@@ -229,7 +229,7 @@ module Omnibus
 
       context "when on Windows" do
         before { stub_ohai(platform: "windows", version: "2019") }
-        before { stub_const("File::ALT_SEPARATOR", '\\') }
+        before { stub_const("File::ALT_SEPARATOR", '\\') } # rubocop:disable Style/StringLiterals
         it "returns a Windows iteration" do
           expect(subject.build_iteration).to eq(1)
         end
