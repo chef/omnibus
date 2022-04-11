@@ -222,7 +222,7 @@ module Omnibus
         output = capture_logging { subject.build }
 
         appbundler_path = File.join(embedded_bin_dir, "appbundler")
-        appbundler_path.gsub!(%r{/}, '\\') if windows?
+        appbundler_path.gsub!(%r{/}, '\\') if windows? # rubocop:disable Style/StringLiterals
         expect(output).to include("#{appbundler_path} '#{project_dir}' '#{bin_dir}'")
       end
     end

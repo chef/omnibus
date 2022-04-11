@@ -179,7 +179,7 @@ module Omnibus
       if null?(val)
         @install_dir || raise(MissingRequiredAttribute.new(self, :install_dir, "/opt/chef"))
       else
-        @install_dir = val.tr('\\', "/").squeeze("/").chomp("/")
+        @install_dir = val.tr('\\', "/").squeeze("/").chomp("/") # rubocop:disable Style/StringLiterals
       end
     end
     expose :install_dir

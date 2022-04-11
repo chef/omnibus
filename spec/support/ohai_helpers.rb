@@ -14,7 +14,7 @@ module Omnibus
         # If we asked for Windows, we should also specify that magical
         # +File::ALT_SEPARATOR+ variable
         if options[:platform] && options[:platform] == "windows"
-          stub_const("File::ALT_SEPARATOR", '\\')
+          stub_const("File::ALT_SEPARATOR", '\\') # rubocop:disable Style/StringLiterals
         end
       end
     end
