@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 8.3.3 -->
+## [8.3.3](https://github.com/chef/omnibus/tree/8.3.3) (2022-04-12)
+
+#### Merged Pull Requests
+- Whitelist files for Chef Infra Client builds [#1064](https://github.com/chef/omnibus/pull/1064) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=8.3.2 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Whitelist files for Chef Infra Client builds [#1064](https://github.com/chef/omnibus/pull/1064) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.3 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [8.3.2](https://github.com/chef/omnibus/tree/8.3.2) (2022-02-15)
