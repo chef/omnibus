@@ -60,7 +60,7 @@ RSpec.shared_examples "a software" do |name = "chefdk"|
 
     allow(software).to receive(:embedded_bin) do |binary|
       p = File.join(embedded_bin_dir, binary)
-      p.gsub!(%r{/}, '\\') if windows?
+      p.gsub!(%r{/}, '\\') if windows? # rubocop:disable Style/StringLiterals
       p
     end
   end
