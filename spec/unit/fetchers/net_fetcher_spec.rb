@@ -421,19 +421,19 @@ module Omnibus
           it_behaves_like "an extractor", "zip", {},
             ['7z.exe x C:\\file.zip -oC:\\tmp\\project -r -y']
           it_behaves_like "an extractor", "tar", {},
-            [['tar xf C:\\file.tar -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar xf C:/file.tar --force-local -CC:/tmp/project", { returns: [0] }]]
           it_behaves_like "an extractor", "tgz", {},
-            [['tar zxf C:\\file.tgz -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar zxf C:/file.tgz --force-local -CC:/tmp/project", { returns: [0] }]]
           it_behaves_like "an extractor", "tar.gz", {},
-            [['tar zxf C:\\file.tar.gz -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar zxf C:/file.tar.gz --force-local -CC:/tmp/project", { returns: [0] }]]
           it_behaves_like "an extractor", "tar.bz2", {},
-            [['tar jxf C:\\file.tar.bz2 -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar jxf C:/file.tar.bz2 --force-local -CC:/tmp/project", { returns: [0] }]]
           it_behaves_like "an extractor", "txz", {},
-            [['tar Jxf C:\\file.txz -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar Jxf C:/file.txz --force-local -CC:/tmp/project", { returns: [0] }]]
           it_behaves_like "an extractor", "tar.xz", {},
-            [['tar Jxf C:\\file.tar.xz -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar Jxf C:/file.tar.xz --force-local -CC:/tmp/project", { returns: [0] }]]
           it_behaves_like "an extractor", "tar.lzma", {},
-            [['tar --lzma -xf C:\\file.tar.lzma -CC:\\tmp\\project', { returns: [0] }]]
+            [["tar --lzma -xf C:/file.tar.lzma --force-local -CC:/tmp/project", { returns: [0] }]]
         end
 
         context "when seven_zip extract strategy is chosen" do
@@ -469,19 +469,19 @@ module Omnibus
           it_behaves_like "an extractor", "zip", { extract: :lax_tar },
             ['7z.exe x C:\\file.zip -oC:\\tmp\\project -r -y']
           it_behaves_like "an extractor", "tar", { extract: :lax_tar },
-            [['tar xf C:\\file.tar -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar xf C:/file.tar --force-local -CC:/tmp/project", { returns: [0, 1] }]]
           it_behaves_like "an extractor", "tgz", { extract: :lax_tar },
-            [['tar zxf C:\\file.tgz -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar zxf C:/file.tgz --force-local -CC:/tmp/project", { returns: [0, 1] }]]
           it_behaves_like "an extractor", "tar.gz", { extract: :lax_tar },
-            [['tar zxf C:\\file.tar.gz -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar zxf C:/file.tar.gz --force-local -CC:/tmp/project", { returns: [0, 1] }]]
           it_behaves_like "an extractor", "tar.bz2", { extract: :lax_tar },
-            [['tar jxf C:\\file.tar.bz2 -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar jxf C:/file.tar.bz2 --force-local -CC:/tmp/project", { returns: [0, 1] }]]
           it_behaves_like "an extractor", "txz", { extract: :lax_tar },
-            [['tar Jxf C:\\file.txz -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar Jxf C:/file.txz --force-local -CC:/tmp/project", { returns: [0, 1] }]]
           it_behaves_like "an extractor", "tar.xz", { extract: :lax_tar },
-            [['tar Jxf C:\\file.tar.xz -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar Jxf C:/file.tar.xz --force-local -CC:/tmp/project", { returns: [0, 1] }]]
           it_behaves_like "an extractor", "tar.lzma", { extract: :lax_tar },
-            [['tar --lzma -xf C:\\file.tar.lzma -CC:\\tmp\\project', { returns: [0, 1] }]]
+            [["tar --lzma -xf C:/file.tar.lzma --force-local -CC:/tmp/project", { returns: [0, 1] }]]
         end
       end
 

@@ -212,7 +212,7 @@ module Omnibus
     #   :seven_zip - use 7zip for all tar/compressed tar files on windows.
     #   :lax_tar - use tar.exe on windows but ignore errors.
     #
-    # Both 7z and bsdtar have issues on windows.
+    # 7z has issues on windows.
     #
     # 7z cannot extract and untar at the same time. You need to extract to a
     # temporary location and then extract again into project_dir.
@@ -220,15 +220,6 @@ module Omnibus
     # 7z also doesn't handle symlinks well. A symlink to a non-existent
     # location simply results in a text file with the target path written in
     # it. It does this without throwing any errors.
-    #
-    # bsdtar will exit(1) if it is encounters symlinks on windows. So we can't
-    # use shellout! directly.
-    #
-    # bsdtar will also exit(1) and fail to overwrite files at the destination
-    # during extraction if a file already exists at the destination and is
-    # marked read-only. This used to be a problem when we weren't properly
-    # cleaning an existing project_dir. It should be less of a problem now...
-    # but who knows.
     #
     def extract
       # Only used by tar
@@ -243,7 +234,7 @@ module Omnibus
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
 
-          shellout!("tar #{compression_switch}xf #{safe_downloaded_file} -C#{safe_project_dir}", returns: returns)
+          shellout!("tar #{compression_switch}xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
             log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
