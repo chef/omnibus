@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 8.3.4 -->
-## [8.3.4](https://github.com/chef/omnibus/tree/8.3.4) (2022-05-09)
+<!-- latest_release 9.0.0 -->
+## [9.0.0](https://github.com/chef/omnibus/tree/9.0.0) (2022-05-09)
 
 #### Merged Pull Requests
-- Add -rpath to LDFLAGS for FreeBSD [#1067](https://github.com/chef/omnibus/pull/1067) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Replace BSD tar with GNU tar on Windows [#1065](https://github.com/chef/omnibus/pull/1065) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
 <!-- release_rollup since=8.3.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Replace BSD tar with GNU tar on Windows [#1065](https://github.com/chef/omnibus/pull/1065) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.0 -->
 - Add -rpath to LDFLAGS for FreeBSD [#1067](https://github.com/chef/omnibus/pull/1067) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.4 -->
 - Whitelist files for Chef Infra Client builds [#1064](https://github.com/chef/omnibus/pull/1064) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.3 -->
 <!-- release_rollup -->
