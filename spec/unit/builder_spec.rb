@@ -171,7 +171,7 @@ module Omnibus
       context "when :bin is present" do
         it "uses the custom bin" do
           expect(subject).to receive(:command)
-            .with("/path/to/make", in_msys_bash: true)
+            .with("/path/to/make", { in_msys_bash: true })
           subject.make(bin: "/path/to/make")
         end
       end
@@ -185,7 +185,7 @@ module Omnibus
 
         it "uses gmake and sets MAKE=gmake" do
           expect(subject).to receive(:command)
-            .with("gmake", env: { "MAKE" => "gmake" }, in_msys_bash: true)
+            .with("gmake", { env: { "MAKE" => "gmake" }, in_msys_bash: true } )
           subject.make
         end
       end
@@ -198,26 +198,26 @@ module Omnibus
 
         it "uses make" do
           expect(subject).to receive(:command)
-            .with("make", in_msys_bash: true)
+            .with("make", { in_msys_bash: true } )
           subject.make
         end
       end
 
       it "accepts 0 options" do
         expect(subject).to receive(:command)
-          .with("make", in_msys_bash: true)
+          .with("make", { in_msys_bash: true } )
         expect { subject.make }.to_not raise_error
       end
 
       it "accepts an additional command string" do
         expect(subject).to receive(:command)
-          .with("make install", in_msys_bash: true)
+          .with("make install", { in_msys_bash: true } )
         expect { subject.make("install") }.to_not raise_error
       end
 
       it "persists given options" do
         expect(subject).to receive(:command)
-          .with("make", timeout: 3600, in_msys_bash: true)
+          .with("make", { timeout: 3600, in_msys_bash: true } )
         subject.make(timeout: 3600)
       end
     end
@@ -242,7 +242,7 @@ module Omnibus
 
         it "appends platform host to the options" do
           expect(subject).to receive(:command)
-            .with("./configure --build=x86_64-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
+            .with("./configure --build=x86_64-w64-mingw32 --prefix=#{project_dir}/embedded", { in_msys_bash: true } )
           subject.configure
         end
       end
@@ -258,7 +258,7 @@ module Omnibus
 
         it "appends platform host to the options" do
           expect(subject).to receive(:command)
-            .with("./configure --build=i686-w64-mingw32 --prefix=#{project_dir}/embedded", in_msys_bash: true)
+            .with("./configure --build=i686-w64-mingw32 --prefix=#{project_dir}/embedded", { in_msys_bash: true } )
           subject.configure
         end
       end
@@ -266,7 +266,7 @@ module Omnibus
       context "when :bin is present" do
         it "uses the custom bin" do
           expect(subject).to receive(:command)
-            .with("/path/to/configure --prefix=#{project_dir}/embedded", in_msys_bash: true)
+            .with("/path/to/configure --prefix=#{project_dir}/embedded", { in_msys_bash: true } )
           subject.configure(bin: "/path/to/configure")
         end
       end
@@ -274,32 +274,32 @@ module Omnibus
       context "when :prefix is present" do
         it "emits non-empty prefix" do
           expect(subject).to receive(:command)
-            .with("./configure --prefix=/some/prefix", in_msys_bash: true)
+            .with("./configure --prefix=/some/prefix", { in_msys_bash: true } )
           subject.configure(prefix: "/some/prefix")
         end
 
         it "omits prefix if empty" do
           expect(subject).to receive(:command)
-            .with("./configure", in_msys_bash: true)
+            .with("./configure", { in_msys_bash: true } )
           subject.configure(prefix: "")
         end
       end
 
       it "accepts 0 options" do
         expect(subject).to receive(:command)
-          .with("./configure --prefix=#{project_dir}/embedded", in_msys_bash: true)
+          .with("./configure --prefix=#{project_dir}/embedded", { in_msys_bash: true } )
         expect { subject.configure }.to_not raise_error
       end
 
       it "accepts an additional command string" do
         expect(subject).to receive(:command)
-          .with("./configure --prefix=#{project_dir}/embedded --myopt", in_msys_bash: true)
+          .with("./configure --prefix=#{project_dir}/embedded --myopt", { in_msys_bash: true } )
         expect { subject.configure("--myopt") }.to_not raise_error
       end
 
       it "persists given options" do
         expect(subject).to receive(:command)
-          .with("./configure --prefix=#{project_dir}/embedded", timeout: 3600, in_msys_bash: true)
+          .with("./configure --prefix=#{project_dir}/embedded", { timeout: 3600, in_msys_bash: true } )
         subject.configure(timeout: 3600)
       end
     end
@@ -321,28 +321,28 @@ module Omnibus
       it "invokes patch with patch level 1 unless specified" do
         expect { subject.patch(source: "good_patch") }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", in_msys_bash: true)
+          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", { in_msys_bash: true } )
         run_build_command
       end
 
       it "invokes patch with patch level provided" do
         expect { subject.patch(source: "good_patch", plevel: 0) }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("patch -p0 -i #{project_dir}/patch_location2/good_patch", in_msys_bash: true)
+          .with("patch -p0 -i #{project_dir}/patch_location2/good_patch", { in_msys_bash: true } )
         run_build_command
       end
 
       it "invokes patch differently if target is provided" do
         expect { subject.patch(source: "good_patch", target: "target/path") }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("cat #{project_dir}/patch_location2/good_patch | patch -p1 target/path", in_msys_bash: true)
+          .with("cat #{project_dir}/patch_location2/good_patch | patch -p1 target/path", { in_msys_bash: true } )
         run_build_command
       end
 
       it "persists other options" do
         expect { subject.patch(source: "good_patch", timeout: 3600) }.to_not raise_error
         expect(subject).to receive(:shellout!)
-          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", timeout: 3600, in_msys_bash: true)
+          .with("patch -p1 -i #{project_dir}/patch_location2/good_patch", { timeout: 3600, in_msys_bash: true } )
         run_build_command
       end
     end
