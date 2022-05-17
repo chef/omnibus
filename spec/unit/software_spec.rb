@@ -543,7 +543,7 @@ module Omnibus
 
       it "fetches from a fully expanded git path" do
         expect(subject.source).to eq(git: "https://github.com/chef/ohai.git")
-        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", git: "https://github.com/chef/ohai.git").and_return("1.2.8")
+        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", { git: "https://github.com/chef/ohai.git" } ).and_return("1.2.8")
         subject.send(:fetcher)
       end
 
@@ -552,7 +552,7 @@ module Omnibus
 
         it "fetches from the override path" do
           expect(subject.source).to eq(git: "https://blah.com/git.git")
-          expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", git: "https://blah.com/git.git").and_return("1.2.8")
+          expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", { git: "https://blah.com/git.git" } ).and_return("1.2.8")
           subject.send(:fetcher)
         end
       end
@@ -562,7 +562,7 @@ module Omnibus
 
         it "fetches from the override path" do
           expect(subject.source).to eq(git: "https://github.com/a/b.git")
-          expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", git: "https://github.com/a/b.git").and_return("1.2.8")
+          expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", { git: "https://github.com/a/b.git" } ).and_return("1.2.8")
           subject.send(:fetcher)
         end
       end
@@ -577,7 +577,7 @@ module Omnibus
 
       it "fetches from the git spec" do
         expect(subject.source).to eq(git: "https://blah.com/git.git")
-        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", git: "https://blah.com/git.git").and_return("1.2.8")
+        expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", { git: "https://blah.com/git.git" } ).and_return("1.2.8")
         subject.send(:fetcher)
       end
 
@@ -586,7 +586,7 @@ module Omnibus
 
         it "fetches from the override path" do
           expect(subject.source).to eq(git: "https://github.com/a/b.git")
-          expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", git: "https://github.com/a/b.git").and_return("1.2.8")
+          expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", { git: "https://github.com/a/b.git" } ).and_return("1.2.8")
           subject.send(:fetcher)
         end
       end
