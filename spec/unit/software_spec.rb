@@ -239,7 +239,7 @@ module Omnibus
             "CXXFLAGS"  => "-I/opt/project/embedded/include -O3 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "CPPFLAGS"  => "-I/opt/project/embedded/include -O3 -D_FORTIFY_SOURCE=2 -fstack-protector",
             "CXX" => "clang++",
-            "LDFLAGS" => "-L/opt/project/embedded/lib -rpath /opt/project/embedded/lib",
+            "LDFLAGS" => "-L/opt/project/embedded/lib -Wl,-rpath,/opt/project/embedded/lib",
             "LD_RUN_PATH" => "/opt/project/embedded/lib",
             "PKG_CONFIG_PATH" => "/opt/project/embedded/lib/pkgconfig",
             "OMNIBUS_INSTALL_DIR" => "/opt/project"

@@ -717,7 +717,7 @@ module Omnibus
           {
             "CC" => "clang",
             "CXX" => "clang++",
-            "LDFLAGS" => "-L#{install_dir}/embedded/lib -rpath #{install_dir}/embedded/lib",
+            "LDFLAGS" => "-L#{install_dir}/embedded/lib -Wl,-rpath,#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O3 -D_FORTIFY_SOURCE=2 -fstack-protector",
           }
         when "windows"
