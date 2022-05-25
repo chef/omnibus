@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.1 -->
-## [9.0.1](https://github.com/chef/omnibus/tree/9.0.1) (2022-05-24)
+<!-- latest_release 9.0.2 -->
+## [9.0.2](https://github.com/chef/omnibus/tree/9.0.2) (2022-05-25)
 
 #### Merged Pull Requests
-- IPACK-204 [#1069](https://github.com/chef/omnibus/pull/1069) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress))
 <!-- latest_release -->
 <!-- release_rollup since=8.3.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress)) <!-- 9.0.2 -->
 - IPACK-204 [#1069](https://github.com/chef/omnibus/pull/1069) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.1 -->
 - Replace BSD tar with GNU tar on Windows [#1065](https://github.com/chef/omnibus/pull/1065) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.0 -->
 - Add -rpath to LDFLAGS for FreeBSD [#1067](https://github.com/chef/omnibus/pull/1067) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.4 -->
