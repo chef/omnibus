@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.2 -->
-## [9.0.2](https://github.com/chef/omnibus/tree/9.0.2) (2022-05-25)
+<!-- latest_release 9.0.3 -->
+## [9.0.3](https://github.com/chef/omnibus/tree/9.0.3) (2022-05-26)
 
 #### Merged Pull Requests
-- [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress))
+- Replace dependency on nokogiri with rexml [#1070](https://github.com/chef/omnibus/pull/1070) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
 <!-- latest_release -->
 <!-- release_rollup since=8.3.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Replace dependency on nokogiri with rexml [#1070](https://github.com/chef/omnibus/pull/1070) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.3 -->
 - [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress)) <!-- 9.0.2 -->
 - IPACK-204 [#1069](https://github.com/chef/omnibus/pull/1069) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.1 -->
 - Replace BSD tar with GNU tar on Windows [#1065](https://github.com/chef/omnibus/pull/1065) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.0 -->
