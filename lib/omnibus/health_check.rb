@@ -482,6 +482,7 @@ module Omnibus
       # construct the list of files to check
       #
 
+      puts "Im trying to find this command : #{find_command}\n"
       find_output = shellout!(find_command).stdout.lines
 
       find_output.reject! { |file| IGNORED_ENDINGS.any? { |ending| file.end_with?("#{ending}\n") } }
