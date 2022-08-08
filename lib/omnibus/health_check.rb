@@ -484,6 +484,7 @@ module Omnibus
 
       puts "Im trying to find this command : #{find_command}\n"
       find_output = shellout!(find_command).stdout.lines
+      puts "This is the results I got back from that find : \n #{find_output}"
 
       find_output.reject! { |file| IGNORED_ENDINGS.any? { |ending| file.end_with?("#{ending}\n") } }
 
