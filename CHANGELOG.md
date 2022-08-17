@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.4 -->
-## [9.0.4](https://github.com/chef/omnibus/tree/9.0.4) (2022-08-16)
+<!-- latest_release 9.0.5 -->
+## [9.0.5](https://github.com/chef/omnibus/tree/9.0.5) (2022-08-17)
 
 #### Merged Pull Requests
-- Whitelist liblzma [#1076](https://github.com/chef/omnibus/pull/1076) ([poorndm](https://github.com/poorndm))
+- Revert the changes - liblzma [#1077](https://github.com/chef/omnibus/pull/1077) ([poorndm](https://github.com/poorndm))
 <!-- latest_release -->
 <!-- release_rollup since=8.3.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Revert the changes - liblzma [#1077](https://github.com/chef/omnibus/pull/1077) ([poorndm](https://github.com/poorndm)) <!-- 9.0.5 -->
 - Whitelist liblzma [#1076](https://github.com/chef/omnibus/pull/1076) ([poorndm](https://github.com/poorndm)) <!-- 9.0.4 -->
 - Replace dependency on nokogiri with rexml [#1070](https://github.com/chef/omnibus/pull/1070) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.3 -->
 - [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress)) <!-- 9.0.2 -->
