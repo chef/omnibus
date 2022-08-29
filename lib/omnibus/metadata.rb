@@ -135,6 +135,11 @@ module Omnibus
       #
       def platform_version
         truncate_platform_version(Ohai["platform_version"], platform_shortname)
+      rescue Omnibus::UnknownPlatformVersion
+        puts "<===Debugging the build===>"
+        p Ohai["platform_version"]
+        p platform_shortname
+        raise
       end
 
       #
