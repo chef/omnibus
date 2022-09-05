@@ -218,7 +218,7 @@ module Omnibus
           # version is the same as Windows 2012R2. It's only here for completeness
           # and documentation.
           when /6\.3\.\d+/, "8.1" then "8.1"
-          when /^10\.0/ then "10"
+          when "10", /^10\.0/ then "10"
           else
             raise UnknownPlatformVersion.new(platform, platform_version)
           end
