@@ -77,12 +77,15 @@ module Omnibus
           @options[:platform_mappings].each_pair do |build_platform, publish_platforms|
             # Splits `ubuntu-12.04-x86_64` into `ubuntu`, `12.04` and `x86_64`
             build_platform, build_platform_version, build_architecture = build_platform.split("-")
-
+            
+            log.info(log_key) { "******Debugging Package Meta data*********" } 
+            log.info(log_key) "#{build_platform},#{build_platform_version},#{build_architecture}"
             # locate the package for the build platform
             packages = build_packages.select do |p|
               p.metadata[:platform] == build_platform &&
                 p.metadata[:platform_version] == build_platform_version &&
                 p.metadata[:arch] == build_architecture
+              log.info(log_key) "Package Metadata #{p.metadata[:platform]},#{p.metadata[:platform_version]},#{p.metadata[:arch]}"
             end
 
             if packages.empty?
