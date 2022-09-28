@@ -88,11 +88,13 @@ OMNIOS_WHITELIST_LIBS = [
 SOLARIS_WHITELIST_LIBS = [
   /libaio\.so/,
   /libavl\.so/,
+  /libbsm\.so/,
   /libcrypt_[di]\.so/,
   /libcrypto.so/,
   /libcurses\.so/,
   /libdoor\.so/,
   /libgen\.so/,
+  /libinetutil\.so/,
   /libmd5\.so/,
   /libmd\.so/,
   /libmp\.so/,
@@ -102,6 +104,7 @@ SOLARIS_WHITELIST_LIBS = [
   /libsocket\.so/,
   /libssl.so/,
   /libthread.so/,
+  /libtsol\.so/,
   /libuutil\.so/,
   /libkstat\.so/,
   # solaris 11 libraries:
