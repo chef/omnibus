@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.7 -->
-## [9.0.7](https://github.com/chef/omnibus/tree/9.0.7) (2022-09-28)
+<!-- latest_release 9.0.8 -->
+## [9.0.8](https://github.com/chef/omnibus/tree/9.0.8) (2022-10-07)
 
 #### Merged Pull Requests
-- Add solaris basic os libs to acceptlist, currently called whitelist. [#1082](https://github.com/chef/omnibus/pull/1082) ([marcparadise](https://github.com/marcparadise))
+- INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress))
 <!-- latest_release -->
 <!-- release_rollup since=8.3.2 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress)) <!-- 9.0.8 -->
 - Add solaris basic os libs to acceptlist, currently called whitelist. [#1082](https://github.com/chef/omnibus/pull/1082) ([marcparadise](https://github.com/marcparadise)) <!-- 9.0.7 -->
 - Updated regex to match exactly 10, and 10.x [#1078](https://github.com/chef/omnibus/pull/1078) ([kanad-progress](https://github.com/kanad-progress)) <!-- 9.0.6 -->
 - Revert the changes - liblzma [#1077](https://github.com/chef/omnibus/pull/1077) ([poorndm](https://github.com/poorndm)) <!-- 9.0.5 -->
