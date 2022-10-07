@@ -345,11 +345,16 @@ module Omnibus
       bad_libs = {}
       good_libs = {}
 
-      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'", "xargs -n 1 ldd") do |line|
+      # The case/when below depends on the "current_library" being output with a : at the end
+      # and then the dependencies on subsequent lines in the form "library.so.1 => /lib/64/library.so.1"
+      # This output format only happens if ldd is passed multiple libraries (for Solaris, similar to Linux)
+      # FIXME if any of the `when` clauses in the `health_check_*` methods run before the `current_library`
+      # they probably should error out with an explicit callout of formatting with their environment's
+      # respective ldd parsing
+      read_shared_libs("find #{project.install_dir}/ -type f | xargs file | grep \"ELF\" | awk -F: '{print $1}' | sed -e 's/:$//'", "xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
-          log.debug(log_key) { "Analyzing dependencies for #{current_library}" }
         when /^\s+(.+) \=\>\s+(.+)( \(.+\))?$/
           name = Regexp.last_match[1]
           linked = Regexp.last_match[2]
