@@ -1,28 +1,26 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.8 -->
-## [9.0.8](https://github.com/chef/omnibus/tree/9.0.8) (2022-10-07)
-
-#### Merged Pull Requests
-- INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress))
 <!-- latest_release -->
-<!-- release_rollup since=8.3.2 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress)) <!-- 9.0.8 -->
-- Add solaris basic os libs to acceptlist, currently called whitelist. [#1082](https://github.com/chef/omnibus/pull/1082) ([marcparadise](https://github.com/marcparadise)) <!-- 9.0.7 -->
-- Updated regex to match exactly 10, and 10.x [#1078](https://github.com/chef/omnibus/pull/1078) ([kanad-progress](https://github.com/kanad-progress)) <!-- 9.0.6 -->
-- Revert the changes - liblzma [#1077](https://github.com/chef/omnibus/pull/1077) ([poorndm](https://github.com/poorndm)) <!-- 9.0.5 -->
-- Whitelist liblzma [#1076](https://github.com/chef/omnibus/pull/1076) ([poorndm](https://github.com/poorndm)) <!-- 9.0.4 -->
-- Replace dependency on nokogiri with rexml [#1070](https://github.com/chef/omnibus/pull/1070) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.3 -->
-- [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress)) <!-- 9.0.2 -->
-- IPACK-204 [#1069](https://github.com/chef/omnibus/pull/1069) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.1 -->
-- Replace BSD tar with GNU tar on Windows [#1065](https://github.com/chef/omnibus/pull/1065) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 9.0.0 -->
-- Add -rpath to LDFLAGS for FreeBSD [#1067](https://github.com/chef/omnibus/pull/1067) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.4 -->
-- Whitelist files for Chef Infra Client builds [#1064](https://github.com/chef/omnibus/pull/1064) ([jeremiahsnapp](https://github.com/jeremiahsnapp)) <!-- 8.3.3 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [9.0.8](https://github.com/chef/omnibus/tree/9.0.8) (2022-10-20)
+
+#### Merged Pull Requests
+- Whitelist files for Chef Infra Client builds [#1064](https://github.com/chef/omnibus/pull/1064) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Add -rpath to LDFLAGS for FreeBSD [#1067](https://github.com/chef/omnibus/pull/1067) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Replace BSD tar with GNU tar on Windows [#1065](https://github.com/chef/omnibus/pull/1065) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- IPACK-204 [#1069](https://github.com/chef/omnibus/pull/1069) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- [IPACK-200]: explicitly delegate keyword arguments [#1068](https://github.com/chef/omnibus/pull/1068) ([kanad-progress](https://github.com/kanad-progress))
+- Replace dependency on nokogiri with rexml [#1070](https://github.com/chef/omnibus/pull/1070) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
+- Whitelist liblzma [#1076](https://github.com/chef/omnibus/pull/1076) ([poorndm](https://github.com/poorndm))
+- Revert the changes - liblzma [#1077](https://github.com/chef/omnibus/pull/1077) ([poorndm](https://github.com/poorndm))
+- Updated regex to match exactly 10, and 10.x [#1078](https://github.com/chef/omnibus/pull/1078) ([kanad-progress](https://github.com/kanad-progress))
+- Add solaris basic os libs to acceptlist, currently called whitelist. [#1082](https://github.com/chef/omnibus/pull/1082) ([marcparadise](https://github.com/marcparadise))
+- INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress))
+<!-- latest_stable_release -->
+
 ## [8.3.2](https://github.com/chef/omnibus/tree/8.3.2) (2022-02-15)
 
 #### Merged Pull Requests
@@ -36,7 +34,6 @@
 - Better healthcheck correctness [#1056](https://github.com/chef/omnibus/pull/1056) ([lamont-granquist](https://github.com/lamont-granquist))
 - Fix omnibus healthcheck spinning on chef-server builds  [#1060](https://github.com/chef/omnibus/pull/1060) ([lamont-granquist](https://github.com/lamont-granquist))
 - Whitelist files for `make` on AIX [#1062](https://github.com/chef/omnibus/pull/1062) ([jeremiahsnapp](https://github.com/jeremiahsnapp))
-<!-- latest_stable_release -->
 
 ## [8.2.2](https://github.com/chef/omnibus/tree/8.2.2) (2021-09-28)
 
