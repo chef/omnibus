@@ -232,7 +232,7 @@ module Omnibus
           # file to live **inside** the project directory. project_dir should already
           # exist due to create_required_directories
           log.info(log_key) { "`#{safe_downloaded_file}' is a regular file - naming copy `#{target_filename}'" }
-          FileUtils.cp(downloaded_file, File.join(project_dir, target_filename))
+          FileUtils.cp(downloaded_file, File.join(project_dir, File.basename(target_filename)))
         end
       end
       if ship_source?

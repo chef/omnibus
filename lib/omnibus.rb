@@ -69,6 +69,7 @@ module Omnibus
   autoload :NetFetcher,  "omnibus/fetchers/net_fetcher"
   autoload :NullFetcher, "omnibus/fetchers/null_fetcher"
   autoload :PathFetcher, "omnibus/fetchers/path_fetcher"
+  autoload :FileFetcher, "omnibus/fetchers/file_fetcher"
 
   autoload :ArtifactoryPublisher, "omnibus/publishers/artifactory_publisher"
   autoload :NullPublisher,        "omnibus/publishers/null_publisher"
