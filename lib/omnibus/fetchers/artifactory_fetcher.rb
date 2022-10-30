@@ -45,7 +45,8 @@ module Omnibus
         error_message = "You have to provide either source[:authorization] or environment variables for artifactory client"
         raise error_message if username.nil? || password.nil?
 
-        source[:authorization] = "Basic #{Base64.encode64("#{username}:#{password}")}"
+        # strict_encode64 is needed for error "header field value cannot include CR/LF"
+        source[:authorization] = "Basic #{Base64.strict_encode64("#{username}:#{password}")}"
       end
 
       log.debug(:debug) { "Path to file #{source[:path]} in #{source[:repository]}" }
