@@ -41,7 +41,7 @@ module Omnibus
 
       unless source.key?(:authorization)
         username = ENV['ARTIFACTORY_USERNAME'] || nil
-        password = ENV['ARTIFACTORY_PASSWORD'] || ENV['ARTIFACTORY_API_KEY'] || nil
+        password = ENV['ARTIFACTORY_PASSWORD'] || nil
         error_message = "You have to provide either source[:authorization] or environment variables for artifactory client"
         raise error_message if username.nil? || password.nil?
 
