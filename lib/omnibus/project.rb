@@ -1084,7 +1084,7 @@ module Omnibus
 
       write_json_manifest
       write_text_manifest
-      # HealthCheck.run!(self)
+      HealthCheck.run!(self)
       package_me
       compress_me
     end

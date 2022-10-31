@@ -601,6 +601,12 @@ module Omnibus
     # @return [true, false]
     default(:fatal_transitive_dependency_licensing_warnings, false)
 
+    # Fail the build when health check does not succeed. This may only be set to false
+    # for very specific use-cases in the omnibus project. e.g. creating a wrapper installer
+    #
+    # @return [true, false]
+    default(:health_check, true)
+
     # --------------------------------------------------
     # @!endgroup
     #
