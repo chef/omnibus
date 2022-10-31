@@ -64,7 +64,7 @@ module Omnibus
     #   if the healthchecks pass
     #
     def run!
-      if !Config.health_check
+      unless Config.health_check
         log.info(log_key) { "Health check skipped as specified in config for #{project.name}" }
         return true
       end
