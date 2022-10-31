@@ -64,6 +64,10 @@ module Omnibus
     #   if the healthchecks pass
     #
     def run!
+      if !Config.health_check
+        log.info(log_key) { "Health check skipped as specified in config for #{project.name}" }
+        return true
+      end
       measure("Health check time") do
         log.info(log_key) { "Running health on #{project.name}" }
         bad_libs, good_libs =
