@@ -662,6 +662,7 @@ module Omnibus
     #
     def copy(source, destination, options = {})
       command = "copy `#{source}' to `#{destination}'"
+      puts "DEBUG: #{command}"
       build_commands << BuildCommand.new(command) do
         Dir.chdir(software.project_dir) do
           files = FileSyncer.glob(source)
@@ -907,6 +908,7 @@ module Omnibus
       # Set the live stream to :debug so users will see build output
       options[:live_stream] ||= log.live_stream(:debug)
 
+      puts "DEBUG:: #{command_string}, #{options.inspect}"
       # Use Util's shellout
       super(command_string, **options)
     end
