@@ -351,4 +351,15 @@ module Omnibus
       EOH
     end
   end
+
+  class InternalSourceMissing < Error
+    def initialize(software)
+      super <<~EOH
+        Internal source missing for #{software.name}.
+
+        When :use_internal_sources is set in the configuration you must specify an
+        internal_source for sources fetched from a url.
+      EOH
+    end
+  end
 end
