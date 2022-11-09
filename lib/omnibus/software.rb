@@ -336,7 +336,7 @@ module Omnibus
         extra_keys = val.keys - [
           :git, :file, :path, :url, # fetcher types
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
-          :cookie, :warning, :unsafe, :extract, :cached_name, :authorization, # used by net_fetcher
+          :cookie, :warning, :unsafe, :extract, :cached_name, :authorization, :internal, # used by net_fetcher
           :options, # used by path_fetcher
           :submodules # used by git_fetcher
         ]
@@ -351,14 +351,43 @@ module Omnibus
             "not include duplicate keys. Duplicate keys: #{duplicate_keys.inspect}")
         end
 
-        @source ||= {}
-        @source.merge!(val)
+        if Config.use_internal_sources && val[:url]
+          if internal_source_set? && val[:internal].nil?
+            # We only want to replace the hash types here
+            hash_types = %i{md5 sha1 sha256 sha512}
+            val.each_key do |key|
+              val.delete(key) unless hash_types.include?(key)
+            end
+          end
+
+          @source ||= {}
+          @source.merge!(val)
+        else
+          @source ||= {}
+          @source.merge!(val)
+        end
       end
 
       override = canonicalize_source(overrides[:source])
       apply_overrides(:source, override)
     end
     expose :source
+
+    def internal_source_set?
+      @source && @source[:internal] == true
+    end
+
+    def internal_source(val = NULL)
+      unless val.is_a?(Hash)
+        raise InvalidValue.new(:internal_source,
+          "be a kind of `Hash', but was `#{val.class.inspect}'")
+      end
+      if Config.use_internal_sources
+        val[:internal] = true
+        source(val)
+      end
+    end
+    expose :internal_source
 
     #
     # Set or retrieve the {#default_version} of the software to build.

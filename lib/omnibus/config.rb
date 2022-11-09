@@ -607,6 +607,12 @@ module Omnibus
     # @return [true, false]
     default(:health_check, true)
 
+    # Use the internal_source URL when fetching software dependencies. e.g. when creating an
+    # omnibus package using artifactory as the source url.
+    #
+    # @return [true, false]
+    default(:use_internal_sources, false)
+
     # --------------------------------------------------
     # @!endgroup
     #
