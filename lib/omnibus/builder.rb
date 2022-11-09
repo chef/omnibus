@@ -248,7 +248,13 @@ module Omnibus
       patches << patch_path
       options[:in_msys_bash] = true
       build_commands << BuildCommand.new("Apply patch `#{source}'") do
+        puts "DEBUG:: PATCH CONTENTS"
+        puts File.read clean_patch_path
+        puts "DEBUG:: ORIGINAL FILE"
+        puts File.read target
         shellout!(patch_cmd, **options)
+        puts "DEBUG:: MODIFIED FILE"
+        puts File.read target
       end
     end
     expose :patch
