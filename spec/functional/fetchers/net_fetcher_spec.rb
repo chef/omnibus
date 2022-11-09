@@ -173,6 +173,26 @@ module Omnibus
         end
       end
 
+      context "when use_internal_sources is true and no internal source url" do
+        before { Omnibus::Config.use_internal_sources(true) }
+
+        it "raises an exception" do
+          expect { fetch! }.to raise_error(InternalSourceMissing)
+        end
+      end
+
+      context "when use_internal_sources is true and internal source url given" do
+        before { Omnibus::Config.use_internal_sources(true) }
+        let(:source) do
+          { url: source_url, md5: source_md5, internal: true }
+        end
+
+        it "downloads the file" do
+          fetch!
+          expect(downloaded_file).to be_a_file
+        end
+      end
+
       context "source with sha1" do
         let(:source) do
           { url: source_url, sha1: source_sha1 }
