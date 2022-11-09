@@ -251,10 +251,10 @@ module Omnibus
         puts "DEBUG:: PATCH CONTENTS"
         puts File.read clean_patch_path
         puts "DEBUG:: ORIGINAL FILE"
-        puts File.read target
+        puts File.read target unless target.nil?
         shellout!(patch_cmd, **options)
         puts "DEBUG:: MODIFIED FILE"
-        puts File.read target
+        puts File.read target unless target.nil?
       end
     end
     expose :patch
