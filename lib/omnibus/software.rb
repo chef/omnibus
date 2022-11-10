@@ -433,6 +433,7 @@ module Omnibus
     # @return [Boolean]
     #
     def skip_transitive_dependency_licensing(val = NULL)
+      puts "skip_transitive_dependency_licensing is SET TO :  #{skip_transitive_dependency_licensing} "
       if null?(val)
         @skip_transitive_dependency_licensing || false
       else
