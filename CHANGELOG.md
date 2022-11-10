@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.9 -->
-## [9.0.9](https://github.com/chef/omnibus/tree/9.0.9) (2022-10-31)
+<!-- latest_release 9.0.10 -->
+## [9.0.10](https://github.com/chef/omnibus/tree/9.0.10) (2022-11-10)
 
 #### Merged Pull Requests
-- Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef))
+- Fix failing s3 accelerate test with a version pin [#1088](https://github.com/chef/omnibus/pull/1088) ([gscho](https://github.com/gscho))
 <!-- latest_release -->
 <!-- release_rollup since=9.0.8 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Fix failing s3 accelerate test with a version pin [#1088](https://github.com/chef/omnibus/pull/1088) ([gscho](https://github.com/gscho)) <!-- 9.0.10 -->
 - Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 9.0.9 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
