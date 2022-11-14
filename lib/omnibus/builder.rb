@@ -964,8 +964,9 @@ module Omnibus
           delay *= 2
 
           log.warn(log_key) do
+
             label = "#{(Config.build_retries - tries) + 1}/#{Config.build_retries}"
-            "[#{label}] Failed to execute command. Retrying in #{delay} seconds..."
+            "[#{label}] Failed to execute command #{e.inspect}. Retrying in #{delay} seconds..."
           end
 
           sleep(delay)
