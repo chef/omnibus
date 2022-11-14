@@ -147,6 +147,8 @@ module Omnibus
     def download_url
       if Config.use_s3_caching
         S3Cache.url_for(self)
+      elsif Config.use_internal_sources && !source[:internal]
+        raise InternalSourceMissing.new(self)
       else
         source[:url]
       end

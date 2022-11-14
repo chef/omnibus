@@ -16,10 +16,18 @@ module Omnibus
       }
     end
 
+    let(:internal_source) do
+      {
+        url: "http://internal.com/",
+        md5: "efgh5678",
+      }
+    end
+
     let(:rel_path) { "software" }
 
     subject do
       local_source = source
+      local_internal_source = internal_source
       local_rel_path = rel_path
 
       described_class.new(project).evaluate do
@@ -27,6 +35,7 @@ module Omnibus
         default_version "1.2.3"
 
         source local_source
+        internal_source local_internal_source
         relative_path local_rel_path
       end
     end
@@ -589,6 +598,14 @@ module Omnibus
           expect(Omnibus::Fetcher).to receive(:resolve_version).with("1.2.3", { git: "https://github.com/a/b.git" } ).and_return("1.2.8")
           subject.send(:fetcher)
         end
+      end
+    end
+
+    context "when software internal_source is given" do
+      before { Omnibus::Config.use_internal_sources(true) }
+
+      it "sets the source with internal: true" do
+        expect(subject.source).to eq(url: "http://internal.com/", md5: "efgh5678", internal: true)
       end
     end
 
