@@ -1,20 +1,18 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.11 -->
-## [9.0.11](https://github.com/chef/omnibus/tree/9.0.11) (2022-11-14)
-
-#### Merged Pull Requests
-- BS-94/use internal sources [#1087](https://github.com/chef/omnibus/pull/1087) ([gscho](https://github.com/gscho))
 <!-- latest_release -->
-<!-- release_rollup since=9.0.8 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- BS-94/use internal sources [#1087](https://github.com/chef/omnibus/pull/1087) ([gscho](https://github.com/gscho)) <!-- 9.0.11 -->
-- Fix failing s3 accelerate test with a version pin [#1088](https://github.com/chef/omnibus/pull/1088) ([gscho](https://github.com/gscho)) <!-- 9.0.10 -->
-- Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 9.0.9 -->
+<!-- latest_release -->
+<!-- release_rollup -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [9.0.11](https://github.com/chef/omnibus/tree/9.0.11) (2022-11-15)
+
+#### Merged Pull Requests
+- Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef))
+- Fix failing s3 accelerate test with a version pin [#1088](https://github.com/chef/omnibus/pull/1088) ([gscho](https://github.com/gscho))
+- BS-94/use internal sources [#1087](https://github.com/chef/omnibus/pull/1087) ([gscho](https://github.com/gscho))
+<!-- latest_stable_release -->
+
 ## [9.0.8](https://github.com/chef/omnibus/tree/9.0.8) (2022-10-20)
 
 #### Merged Pull Requests
@@ -29,7 +27,6 @@
 - Updated regex to match exactly 10, and 10.x [#1078](https://github.com/chef/omnibus/pull/1078) ([kanad-progress](https://github.com/kanad-progress))
 - Add solaris basic os libs to acceptlist, currently called whitelist. [#1082](https://github.com/chef/omnibus/pull/1082) ([marcparadise](https://github.com/marcparadise))
 - INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress))
-<!-- latest_stable_release -->
 
 ## [8.3.2](https://github.com/chef/omnibus/tree/8.3.2) (2022-02-15)
 
