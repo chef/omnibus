@@ -1,25 +1,22 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.12 -->
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
 ## [9.0.12](https://github.com/chef/omnibus/tree/9.0.12) (2022-11-17)
 
 #### Merged Pull Requests
 - Update ohai Dependency  [#1092](https://github.com/chef/omnibus/pull/1092) ([poorndm](https://github.com/poorndm))
-<!-- latest_release -->
-<!-- release_rollup since=9.0.11 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- Update ohai Dependency  [#1092](https://github.com/chef/omnibus/pull/1092) ([poorndm](https://github.com/poorndm)) <!-- 9.0.12 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [9.0.11](https://github.com/chef/omnibus/tree/9.0.11) (2022-11-15)
 
 #### Merged Pull Requests
 - Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef))
 - Fix failing s3 accelerate test with a version pin [#1088](https://github.com/chef/omnibus/pull/1088) ([gscho](https://github.com/gscho))
 - BS-94/use internal sources [#1087](https://github.com/chef/omnibus/pull/1087) ([gscho](https://github.com/gscho))
-<!-- latest_stable_release -->
 
 ## [9.0.8](https://github.com/chef/omnibus/tree/9.0.8) (2022-10-20)
 
