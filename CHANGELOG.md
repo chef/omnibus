@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 9.0.12 -->
+## [9.0.12](https://github.com/chef/omnibus/tree/9.0.12) (2022-11-17)
+
+#### Merged Pull Requests
+- Update ohai Dependency  [#1092](https://github.com/chef/omnibus/pull/1092) ([poorndm](https://github.com/poorndm))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=9.0.11 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Update ohai Dependency  [#1092](https://github.com/chef/omnibus/pull/1092) ([poorndm](https://github.com/poorndm)) <!-- 9.0.12 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [9.0.11](https://github.com/chef/omnibus/tree/9.0.11) (2022-11-15)
