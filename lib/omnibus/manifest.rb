@@ -69,7 +69,10 @@ module Omnibus
 
     def to_hash
       software_hash = @data.inject({}) do |memo, (k, v)|
-        memo[k] = v.to_hash
+        h = v.to_hash
+        h[:locked_source].delete(:authorization) if h[:locked_source]
+
+        memo[k] = h
         memo
       end
       ret = {
