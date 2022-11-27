@@ -30,6 +30,7 @@ module Omnibus
     include Util
 
     #
+    #
     # Since builder is also a proxy object to software, we dynamically re-define
     # all the methods that exist on {Software} as proxy methhods here. This
     # permits developers to use {Software} methods as if they were directly
