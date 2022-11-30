@@ -481,7 +481,7 @@ module Omnibus
     def heat_command
       if fast_msi
         <<-EOH.split.join(" ").squeeze(" ").strip
-          heat.exe file "#{project.name}.zip"
+          heat.exe file "#{zip_name}.zip"
           -cg ProjectDir
           -dr INSTALLLOCATION
           -nologo -sfrag -srd -sreg -gg
