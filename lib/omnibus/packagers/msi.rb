@@ -308,6 +308,30 @@ module Omnibus
     expose :gem_path
 
     #
+    # Provide a custom zip name
+    #
+    # @example
+    #   zip_name 'chef'
+    #
+    # @param [TrueClass, FalseClass] value
+    #   whether we're building a zip-based MSI or not
+    #
+    # @return [TrueClass, FalseClass]
+    #   whether we're building a zip-based MSI or not
+    def zip_name(val = NULL)
+      if null?(val)
+        @zip_name || project.name
+      else
+        unless val.is_a?(String)
+          raise InvalidValue.new(:zip_name, "be an String")
+        end
+
+        @zip_name = val
+      end
+    end
+    expose :zip_name
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -443,7 +467,7 @@ module Omnibus
     def zip_command
       <<-EOH.split.join(" ").squeeze(" ").strip
       7z a -r
-      #{windows_safe_path(staging_dir)}\\#{project.name}.zip
+      #{windows_safe_path(staging_dir)}\\#{zip_name}.zip
       #{windows_safe_path(project.install_dir)}\\*
       EOH
     end
