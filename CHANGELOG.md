@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 9.0.13 -->
+## [9.0.13](https://github.com/chef/omnibus/tree/9.0.13) (2022-12-08)
+
+#### Merged Pull Requests
+- Remove authorization from version manifest hash [#1094](https://github.com/chef/omnibus/pull/1094) ([gcs-devel](https://github.com/gcs-devel))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=9.0.12 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Remove authorization from version manifest hash [#1094](https://github.com/chef/omnibus/pull/1094) ([gcs-devel](https://github.com/gcs-devel)) <!-- 9.0.13 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [9.0.12](https://github.com/chef/omnibus/tree/9.0.12) (2022-11-17)
