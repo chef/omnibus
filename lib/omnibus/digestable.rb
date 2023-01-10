@@ -38,6 +38,7 @@ module Omnibus
     #   the hexdigest of the file at the path
     #
     def digest(path, type = :md5)
+      puts ">> digest << "
       digest = digest_from_type(type)
 
       update_with_file_contents(digest, path)

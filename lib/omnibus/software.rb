@@ -1070,6 +1070,8 @@ module Omnibus
     # @return [Fetcher]
     #
     def fetcher
+      puts "GIT #{Config.use_git_caching} / S3 > #{Config.use_s3_caching}"
+      puts "> software fetcher"
       @fetcher ||=
         if source_type == :url && File.basename(source[:url], "?*").end_with?(*NetFetcher::ALL_EXTENSIONS)
           Fetcher.fetcher_class_for_source(source).new(manifest_entry, fetch_dir, build_dir)
@@ -1117,6 +1119,7 @@ module Omnibus
     # @return [true]
     #
     def build_me(build_wrappers = [])
+      puts "< execute_build #{Config.use_git_caching}"
       if Config.use_git_caching
         if !real_version
           log.info(log_key) do
@@ -1247,6 +1250,7 @@ module Omnibus
     # @return [void]
     #
     def execute_build(build_wrappers)
+      puts "<<< sw execute_build"
       fetcher.clean
 
       build_wrappers.each { |wrapper| wrapper.execute_pre_build(self) }

@@ -65,6 +65,7 @@ module Omnibus
       # @return [true]
       #
       def populate
+        puts ">> S3Cache populate <"
         missing.each do |software|
           without_caching do
             software.fetch
@@ -96,6 +97,7 @@ module Omnibus
       # @return [true]
       #
       def fetch_missing
+        puts ">> S3Cache fetch_missing < "
         missing.each do |software|
           without_caching do
             software.fetch
@@ -117,6 +119,7 @@ module Omnibus
       # @return [String]
       #
       def key_for(software)
+        puts ">>> S3Cache key_for < "
         unless software.name
           raise InsufficientSpecification.new(:name, software)
         end
@@ -139,6 +142,7 @@ module Omnibus
       private
 
       def s3_configuration
+        puts ">>> S3Cache s3_configuration"
         config = {
           region: Config.s3_region,
           bucket_name: Config.s3_bucket,

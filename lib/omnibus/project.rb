@@ -1070,6 +1070,7 @@ module Omnibus
     end
 
     def build
+      puts ">> build "
       FileUtils.rm_rf(install_dir)
       FileUtils.mkdir_p(install_dir)
 
@@ -1120,6 +1121,7 @@ module Omnibus
     # compatibility.
     #
     def build_me
+      puts "project build me "
       # Download all softwares in parallel
       download
       build

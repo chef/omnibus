@@ -41,6 +41,7 @@ module Omnibus
     # @return [true, false]
     #
     def fetch_required?
+      puts ">> fetch_required ?"
       !(File.exist?(downloaded_file) && digest(downloaded_file, digest_type) == checksum)
     end
 
@@ -62,6 +63,7 @@ module Omnibus
     #   true if the project directory was removed, false otherwise
     #
     def clean
+      puts ">> clean <"
       needs_cleaning = File.exist?(project_dir)
       if needs_cleaning
         log.info(log_key) { "Cleaning project directory `#{project_dir}'" }
@@ -80,6 +82,7 @@ module Omnibus
     # @return [void]
     #
     def fetch
+      puts ">> fetch "
       log.info(log_key) { "Downloading from `#{download_url}'" }
 
       create_required_directories
@@ -97,6 +100,7 @@ module Omnibus
     # @return [String]
     #
     def version_for_cache
+      puts " >>version_for_cache <<"
       "download_url:#{source[:url]}|#{digest_type}:#{checksum}"
     end
 
@@ -145,6 +149,7 @@ module Omnibus
     # @return [String]
     #
     def download_url
+      puts ">> download_url <<"
       if Config.use_s3_caching
         S3Cache.url_for(self)
       elsif Config.use_internal_sources && !source[:internal]
@@ -162,6 +167,7 @@ module Omnibus
     # @return [void]
     #
     def download
+      puts " >> download "
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
       options = {}
@@ -224,6 +230,7 @@ module Omnibus
     # it. It does this without throwing any errors.
     #
     def extract
+      puts ">> extract <<"
       # Only used by tar
       compression_switch = ""
       compression_switch = "z"        if downloaded_file.end_with?("gz")
