@@ -293,6 +293,10 @@ you will need to have a post install step to create those binstubs.
 1. If you specify an override of the version of the `ruby`, you will also need
 to override `rubygems` and `bundler` to match the versions in that version of
 `ruby` or you'll get failures around bundler version mismatches.
+1. Update software dependencies listed in the project configuration in `config/projects/$MY_PROJECT_NAME.rb`. 
+You can refer the software `.rb` files present in the `config/software` folder.
+2. The `install_dir` specified in the project file typically requires `root` privilege at build time. 
+Change it another location such as `"/tmp/#{name}"` to avoid running as `root`.
 
 The build command above will of course build on your local host thus being
 specific to the OS and base system you are on. But the skeleten setup by
