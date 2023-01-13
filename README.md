@@ -279,6 +279,10 @@ However there are several caveats to be aware of:
 1. You will almost certainly want to uncomment the `base_dir` in `omnibus.rb`,
 or at the very least change `cache_dir` and `build_dir` as otherwise it'll try
 to use `/var/cache/omnibus` and `/opt/$MY_PROJECT_NAME`, requiring root.
+1. Update software dependencies listed in the project configuration in `config/projects/$MY_PROJECT_NAME.rb`. 
+You can refer the software `.rb` files present in the `config/software` folder.
+1. The `install_dir` specified in the project file typically requires `root` privilege at build time. 
+Change it another location such as `"/tmp/#{name}"` to avoid running as `root`.
 1. The default configuration created for you references a lot of things
 that are in the default config that come from the `omnibus-software` gem.
 So you want to use those you'll need to either uncomment it in the `Gemfile`,
