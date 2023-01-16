@@ -31,6 +31,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "license_scout",    "~> 1.0"
   gem.add_dependency "contracts",        ">= 0.16.0", "< 0.17.0"
   gem.add_dependency "rexml",            "~> 3.2"
+  gem.add_runtime_dependency 'mixlib-cli', '~> 1.7', '>= 1.7.0'
 
   gem.add_dependency "mixlib-versioning"
   gem.add_dependency "pedump"
