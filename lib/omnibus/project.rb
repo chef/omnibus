@@ -326,6 +326,50 @@ module Omnibus
     expose :conflict
 
     #
+    # Retrieve the AMI ID for builds that use an AMI, otherwise fetches 
+    # the hostname for non-ami based builds that the project was built on.
+    #
+    # @return [String]
+    #   the ami or hostname of the machine that the build occurred on and
+    #   returns 'unknown' if both the ami and hostname values are not present
+    #
+    def ami_id()
+      Omnibus::BuildkiteMetadata.ami_id
+    end
+    expose :ami_id
+
+    #
+    # Checks the machine that the project is being built on to see if the 
+    # project is a docker build.
+    #
+    # @return [Boolean]
+    #   a boolean representing if the omnibus build was built in a docker container
+    #
+    def is_docker_build()
+      Omnibus::BuildkiteMetadata.is_docker_build
+    end
+    expose :is_docker_build
+
+    #
+    # Retrieve the docker os image parameter if the project is built on docker.
+    #
+    # @return [Boolean]
+    #   a boolean representing if the omnibus build was built in a docker container
+    #
+    def docker_image()
+      Omnibus::BuildkiteMetadata.docker_image
+    end
+    expose :docker_image
+
+    #
+    # Retrieve the current omnibus version.
+    #
+    def omnibus_version()
+        @omnibus_version ||= Omnibus::VERSION
+    end
+    expose :omnibus_version
+
+    #
     # Set or retrieve the version of the project.
     #
     # @example Using a string
@@ -1054,7 +1098,7 @@ module Omnibus
     #
     def built_manifest
       log.info(log_key) { "Building version manifest" }
-      m = Omnibus::Manifest.new(build_version, build_git_revision, license)
+      m = Omnibus::Manifest.new(build_version, build_git_revision, license, ami_id, is_docker_build, docker_image, omnibus_version)
       softwares.each do |software|
         m.add(software.name, software.manifest_entry)
       end
