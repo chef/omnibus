@@ -453,6 +453,10 @@ module Omnibus
     end
 
     def is_macho?(lib)
+      log.debug(log_key) { "is_macho: #{lib}" }
+      log.debug(log_key) { "file exists? #{File.file?(lib)}" }
+      log.debug(log_key) { "file is executable? #{File.executable?(lib)}" }
+      log.debug(log_key) { "file is not a symlink #{!File.symlink?(lib)}" }
       return false unless File.file?(lib) && File.executable?(lib) && !File.symlink?(lib)
 
       if shellout!("file #{lib}").stdout.match?(/Mach-O.*(library|bundle)/) # https://rubular.com/r/nRgaQlAbkM9wHL
