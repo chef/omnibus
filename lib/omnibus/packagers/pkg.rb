@@ -198,6 +198,8 @@ module Omnibus
         bin_dirs.each do |dir|
           binaries.merge Dir["#{dir}/*"]
         end
+
+        log.debug(log_key) { "  Filtering non-library files:" }
         # Filter out symlinks, non-files, and non-executables
         log.debug(log_key) { "  Filtering non-binary files:" }
         binaries.select! { |bin| is_binary?(bin) }
@@ -211,6 +213,12 @@ module Omnibus
         lib_dirs.each do |dir|
           libraries.merge Dir["#{dir}/*"]
         end
+
+        log.debug(log_key) { "  Dumping libs pre otool:" }
+        log.debug(log_key) { libraries.inspect }
+
+        log.debug(log_key) { "  Dumping bins pre otool:" }
+        log.debug(log_key) { binaries.inspect }
 
         # Filter Mach-O libraries and bundles
         log.debug(log_key) { "  Filtering non-library files:" }
@@ -226,11 +234,17 @@ module Omnibus
         otool_libs.select! { |lib| is_macho?(lib) }
         libraries.merge otool_libs
 
+        log.debug(log_key) { "Dumping libs to sign" }
+        log.debug(log_key) { libraries.inspect }
+
         log.info(log_key) { "  Signing libraries:" } unless libraries.empty?
         libraries.each do |library|
           log.debug(log_key) { "    Signing: #{library}" }
           sign_library(library)
         end
+
+        log.debug(log_key) { "Dumping bins to sign" }
+        log.debug(log_key) { binaries.inspect }
 
         log.info(log_key) { "  Signing binaries:" } unless binaries.empty?
         binaries.each do |binary|
@@ -409,8 +423,9 @@ module Omnibus
     def find_linked_libs(file_path)
       # Find all libaries for each bin
       command = "otool -L #{file_path}"
-
       stdout = shellout!(command).stdout
+      log.debug(log_key) { "otool found:" }
+      log.debug(log_key) { stdout.slice!(file_path) }
       stdout.slice!(file_path)
       stdout.scan(/#{install_dir}\S*/)
     end
