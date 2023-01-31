@@ -21,37 +21,35 @@ module Omnibus
   #
   class BuildkiteMetadata
 
-    #
-    # Create a new builder object for evaluation.
-    #
-    def initialize()
-    end
-
     class << self
 
-      def ami_id()
+      def ami_id
         ami_id = "unknown"
-        if ENV["BUILDKITE_AGENT_META_DATA_AWS_AMI_ID"]
+        if !ENV["BUILDKITE_AGENT_META_DATA_AWS_AMI_ID"].nil? && !ENV["BUILDKITE_AGENT_META_DATA_AWS_AMI_ID"].empty?
           ami_id = ENV["BUILDKITE_AGENT_META_DATA_AWS_AMI_ID"]
-        elsif ENV["BUILDKITE_AGENT_META_DATA_HOSTNAME"]
+        elsif !ENV["BUILDKITE_AGENT_META_DATA_HOSTNAME"].nil? && !ENV["BUILDKITE_AGENT_META_DATA_HOSTNAME"].empty?
           ami_id = ENV["BUILDKITE_AGENT_META_DATA_HOSTNAME"]
         end
         ami_id
       end
-      
-      def is_docker_build()
-        ENV["BUILDKITE_AGENT_META_DATA_DOCKER"] ? true : false
+
+      def is_docker_build
+        !ENV["BUILDKITE_AGENT_META_DATA_DOCKER"].nil? && !ENV["BUILDKITE_AGENT_META_DATA_DOCKER"].empty? ? true : false
       end
 
-      def docker_image()
+      def docker_version
+        ENV["BUILDKITE_AGENT_META_DATA_DOCKER"] if is_docker_build
+      end
+
+      def docker_image
         buildkite_command = ENV["BUILDKITE_COMMAND"]
-        if is_docker_build() && buildkite_command && buildkite_command.include?("OS_IMAGE")
-          os_image = buildkite_command.match(/OS_IMAGE=(?<image_id>.*?) /)
+        if is_docker_build && buildkite_command && buildkite_command.include?("OS_IMAGE")
+          os_image = buildkite_command.match(/OS_IMAGE=(?<image_id>[\S]*)/)
           os_image[:image_id]
         end
       end
 
-      def omnibus_version()
+      def omnibus_version
         Omnibus::VERSION
       end
 

@@ -24,16 +24,17 @@ module Omnibus
 
     include Logging
 
-    LATEST_MANIFEST_FORMAT = 3
+    LATEST_MANIFEST_FORMAT = 2
 
-    attr_reader :build_version, :build_git_revision, :license, :ami_id, :is_docker_build, :docker_image, :omnibus_version
-    def initialize(version = nil, git_rev = nil, license = "Unspecified", ami_id = "unknown", is_docker_build = false, docker_image = nil, omnibus_version = nil)
+    attr_reader :build_version, :build_git_revision, :license, :ami_id, :is_docker_build, :docker_version, :docker_image, :omnibus_version
+    def initialize(version = nil, git_rev = nil, license = "Unspecified", ami_id = "unknown", is_docker_build = false, docker_version = nil, docker_image = nil, omnibus_version = nil)
       @data = {}
       @build_version = version
       @build_git_revision = git_rev
       @license = license
       @ami_id = ami_id
       @is_docker_build = is_docker_build
+      @docker_version = docker_version
       @docker_image = docker_image
       @omnibus_version = omnibus_version
     end
@@ -88,6 +89,7 @@ module Omnibus
       ret[:license] = license
       ret[:ami_id] = ami_id
       ret[:is_docker_build] = is_docker_build if is_docker_build
+      ret[:docker_version] = docker_version if docker_version
       ret[:docker_image] = docker_image if docker_image
       ret[:omnibus_version] = omnibus_version
       ret
@@ -131,6 +133,7 @@ module Omnibus
                                  manifest_data[:license],
                                  manifest_data[:ami_id],
                                  manifest_data[:is_docker_build],
+                                 manifest_data[:docker_version],
                                  manifest_data[:docker_image],
                                  manifest_data[:omnibus_version])
       manifest_data[:software].each do |name, entry_data|
