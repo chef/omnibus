@@ -75,7 +75,7 @@ module Omnibus
         memo[k] = h
         memo
       end
-      
+
       build_system_metadata = Omnibus::BuildSystemMetadata.to_hash
 
       ret = {

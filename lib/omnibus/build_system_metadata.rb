@@ -25,10 +25,10 @@ module Omnibus
 
     class << self
 
-      def to_hash 
-        #if !ENV["BUILDKITE"].nil? && ENV["BUILDKITE"]
-        Omnibus::Buildkite.to_hash
-        #end
+      def to_hash
+        if !ENV["BUILDKITE"].nil? && !ENV["BUILDKITE"].empty?
+          Omnibus::Buildkite.to_hash
+        end
       end
 
     end
