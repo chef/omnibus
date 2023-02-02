@@ -1,7 +1,7 @@
 require "spec_helper"
 
 module Omnibus
-  describe BuildkiteMetadata do
+  describe Buildkite do
 
     let(:ami_id) { "ami-1234ab5678cd9ef01" }
     let(:hostname) { "CHF-V-ABC-DE000.local" }
@@ -11,22 +11,29 @@ module Omnibus
 
     subject(:buildkite_metadata) { described_class }
 
+    before(:each) do
+      clear_defaults
+    end
+
     describe "#ami_id" do
-      it "returns the ami_id if present" do
-        without_ami_id_and_hostname
+      it "returns the ami_id if one is found" do
         with_ami_id
         expect(buildkite_metadata.ami_id).to eq(ami_id)
       end
 
-      it "returns the hostname as ami_id if present" do
-        without_ami_id_and_hostname
+      it "returns the unknown if nothing present" do
+        expect(buildkite_metadata.ami_id).to eq("unknown")
+      end
+    end
+
+    describe "#hostname" do
+      it "returns the hostname if one is found" do
         with_hostname
-        expect(buildkite_metadata.ami_id).to eq(hostname)
+        expect(buildkite_metadata.hostname).to eq(hostname)
       end
 
       it "returns the unknown if nothing present" do
-        without_ami_id_and_hostname
-        expect(buildkite_metadata.ami_id).to eq("unknown")
+        expect(buildkite_metadata.hostname).to eq("unknown")
       end
     end
 
@@ -37,42 +44,70 @@ module Omnibus
       end
 
       it "returns false if docker metadata is missing" do
-        without_docker
         expect(buildkite_metadata.is_docker_build).to eq(false)
       end
     end
 
     describe "#docker_version" do
-      it "returns the docker version if present" do
+      it "returns the docker version if one is found" do
         with_docker
         expect(buildkite_metadata.docker_version).to eq(docker_version)
       end
 
       it "returns nothing if docker version is missing" do
-        without_docker
         expect(buildkite_metadata.docker_version).to be_nil
       end
     end
 
     describe "#docker_image" do
-      it "returns the docker image id if present" do
+      it "returns the docker image id if one is found" do
         with_docker
         expect(buildkite_metadata.docker_image).to eq(docker_image)
       end
 
       it "returns nothing if docker image id is missing" do
-        without_docker
         expect(buildkite_metadata.docker_image).to be_nil
       end
     end
 
     describe "#omnibus_version" do
-      it "returns the omnibus_version if present" do
+      it "returns the omnibus_version if one is found" do
         expect(buildkite_metadata.omnibus_version).to eq(Omnibus::VERSION)
       end
     end
 
-    context "platform builds on unix" do
+    describe "#to_hash" do
+      it "returns an ami_id if one is found" do
+        with_ami_id
+        expect(buildkite_metadata.to_hash[:ami_id]).to eq(ami_id)
+      end
+
+      it "returns an hostname if one is found" do
+        with_hostname
+        expect(buildkite_metadata.to_hash[:hostname]).to eq(hostname)
+      end
+
+      it "returns is_docker_build if one is found" do
+        with_docker
+        expect(buildkite_metadata.to_hash[:is_docker_build]).to eq(true)
+      end
+
+      it "returns a docker_version if one is found" do
+        with_docker
+        expect(buildkite_metadata.to_hash[:docker_version]).to eq(docker_version)
+      end
+
+      it "returns a docker_image if one is found" do
+        with_docker
+        expect(buildkite_metadata.to_hash[:docker_image]).to eq(docker_image)
+      end
+
+      it "returns an omnibus_version if one is found" do
+        expect(buildkite_metadata.to_hash[:omnibus_version]).to eq(Omnibus::VERSION)
+      end
+    end
+
+    context "platform builds on linux" do
       it "uses docker" do
         with_ami_id
         with_docker
@@ -86,7 +121,6 @@ module Omnibus
 
       it "does not use docker" do
         with_ami_id
-        without_docker
 
         expect(buildkite_metadata.ami_id).to eq(ami_id)
         expect(buildkite_metadata.is_docker_build).to eq(false)
@@ -110,7 +144,6 @@ module Omnibus
 
       it "does not use docker" do
         with_ami_id
-        without_docker
 
         expect(buildkite_metadata.ami_id).to eq(ami_id)
         expect(buildkite_metadata.is_docker_build).to eq(false)
@@ -125,7 +158,7 @@ module Omnibus
         with_hostname
         with_docker
 
-        expect(buildkite_metadata.ami_id).to eq(hostname)
+        expect(buildkite_metadata.hostname).to eq(hostname)
         expect(buildkite_metadata.is_docker_build).to eq(true)
         expect(buildkite_metadata.docker_version).to eq(docker_version)
         expect(buildkite_metadata.docker_image).to eq(docker_image)
@@ -134,18 +167,13 @@ module Omnibus
 
       it "does not use docker" do
         with_hostname
-        without_docker
 
-        expect(buildkite_metadata.ami_id).to eq(hostname)
+        expect(buildkite_metadata.hostname).to eq(hostname)
         expect(buildkite_metadata.is_docker_build).to eq(false)
         expect(buildkite_metadata.docker_version).to be_nil
         expect(buildkite_metadata.docker_image).to be_nil
         expect(buildkite_metadata.omnibus_version).to eq(Omnibus::VERSION)
       end
-    end
-
-    def without_ami_id_and_hostname
-      stub_env("BUILDKITE_AGENT_META_DATA_AWS_AMI_ID", nil)
     end
 
     def with_ami_id
@@ -159,6 +187,16 @@ module Omnibus
     def with_docker
       stub_env("BUILDKITE_AGENT_META_DATA_DOCKER", docker_version)
       stub_env("BUILDKITE_COMMAND", docker_command)
+    end
+
+    def clear_defaults
+      without_ami_id_and_hostname
+      without_docker
+    end
+
+    def without_ami_id_and_hostname
+      stub_env("BUILDKITE_AGENT_META_DATA_AWS_AMI_ID", nil)
+      stub_env("BUILDKITE_AGENT_META_DATA_HOSTNAME", nil)
     end
 
     def without_docker

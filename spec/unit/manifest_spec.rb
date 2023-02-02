@@ -75,26 +75,6 @@ module Omnibus
       it "returns a license if one was passed in" do
         expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache").to_hash[:license]).to eq("Apache")
       end
-
-      it "returns an ami_id if one is passed in" do
-        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache", "ami-1234ab5678cd9ef01").to_hash[:ami_id]).to eq("ami-1234ab5678cd9ef01")
-      end
-
-      it "returns is_docker_build if one is passed in" do
-        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache", "ami-1234ab5678cd9ef01", true).to_hash[:is_docker_build]).to eq(true)
-      end
-
-      it "returns a docker_version if one is passed in" do
-        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache", "ami-1234ab5678cd9ef01", true, "20.0.0").to_hash[:docker_version]).to eq("20.0.0")
-      end
-
-      it "returns a docker_image if one is passed in" do
-        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache", "ami-1234ab5678cd9ef01",  true, "20.0.0", "artifactory-url.com/release-type/base-platform").to_hash[:docker_image]).to eq("artifactory-url.com/release-type/base-platform")
-      end
-
-      it "returns an omnibus_version if one is passed in" do
-        expect(Omnibus::Manifest.new("1.2.3", "e8e8e8", "Apache", "ami-1234ab5678cd9ef01",  true, "20.0.0", "artifactory-url.com/release-type/base-platform", Omnibus::VERSION).to_hash[:omnibus_version]).to eq(Omnibus::VERSION)
-      end
     end
 
     describe "#from_hash" do
@@ -137,11 +117,6 @@ module Omnibus
             build_version: "12.4.0+20150629082811",
             build_git_revision: "2e763ac957b308ba95cef256c2491a5a55a163cc",
             license: "Unspecified",
-            ami_id: "ami-1234ab5678cd9ef01",
-            is_docker_build: true,
-            docker_version: "20.0.0",
-            docker_image: "artifactory-url.com/release-type/base-platform",
-            omnibus_version: Omnibus::VERSION,
             software: {
               zlib: {
                 locked_source: {
