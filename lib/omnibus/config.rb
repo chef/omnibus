@@ -611,7 +611,7 @@ module Omnibus
     # omnibus package using artifactory as the source url.
     #
     # @return [true, false]
-    default(:use_internal_sources, true)
+    default(:use_internal_sources, false)
 
     # --------------------------------------------------
     # @!endgroup
