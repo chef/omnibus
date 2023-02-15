@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.15 -->
-## [9.0.15](https://github.com/chef/omnibus/tree/9.0.15) (2023-02-03)
+<!-- latest_release 9.0.16 -->
+## [9.0.16](https://github.com/chef/omnibus/tree/9.0.16) (2023-02-15)
 
 #### Merged Pull Requests
-- BS-147 Adding build metadata to omnibus version manifest [#1103](https://github.com/chef/omnibus/pull/1103) ([justingruber](https://github.com/justingruber))
+- retry download without s3 cache flag if cache miss [#1104](https://github.com/chef/omnibus/pull/1104) ([justingruber](https://github.com/justingruber))
 <!-- latest_release -->
 <!-- release_rollup since=9.0.12 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- retry download without s3 cache flag if cache miss [#1104](https://github.com/chef/omnibus/pull/1104) ([justingruber](https://github.com/justingruber)) <!-- 9.0.16 -->
 - BS-147 Adding build metadata to omnibus version manifest [#1103](https://github.com/chef/omnibus/pull/1103) ([justingruber](https://github.com/justingruber)) <!-- 9.0.15 -->
 - Update PULL_REQUEST_TEMPLATE.md [#1097](https://github.com/chef/omnibus/pull/1097) ([gcs-devel](https://github.com/gcs-devel)) <!-- 9.0.14 -->
 - Remove authorization from version manifest hash [#1094](https://github.com/chef/omnibus/pull/1094) ([gcs-devel](https://github.com/gcs-devel)) <!-- 9.0.13 -->
