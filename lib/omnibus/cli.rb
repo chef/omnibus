@@ -85,7 +85,13 @@ module Omnibus
       project = Project.load(name, manifest)
       say("Building #{project.name} #{project.build_version}...")
       Omnibus::S3Cache.populate if @options[:populate_s3_cache] && !Omnibus::S3Cache.fetch_missing.empty?
-      project.download
+      begin
+        project.download
+      rescue
+        Config.use_s3_caching(false) if Config.use_s3_caching
+        project = Project.load(name, nil)
+        project.download
+      end
       project.build
 
       if @options[:output_manifest]
