@@ -62,6 +62,7 @@ AIX_WHITELIST_LIBS = [
   /librtl\.a/,
   /libsrc\.a/,
   /unix$/,
+  /libcrypto.so/,
 ].freeze
 
 OMNIOS_WHITELIST_LIBS = [
