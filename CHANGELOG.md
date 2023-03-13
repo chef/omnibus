@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 9.0.18 -->
+## [9.0.18](https://github.com/chef/omnibus/tree/9.0.18) (2023-03-13)
+
+#### Merged Pull Requests
+- omnibus/cli: Exit with non-zero code on failure [#822](https://github.com/chef/omnibus/pull/822) ([legal90](https://github.com/legal90))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=9.0.17 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- omnibus/cli: Exit with non-zero code on failure [#822](https://github.com/chef/omnibus/pull/822) ([legal90](https://github.com/legal90)) <!-- 9.0.18 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [9.0.17](https://github.com/chef/omnibus/tree/9.0.17) (2023-02-20)
