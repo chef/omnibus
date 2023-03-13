@@ -32,6 +32,10 @@ module Omnibus
 
         super
       end
+
+      def exit_on_failure?
+        true
+      end
     end
 
     include Logging
