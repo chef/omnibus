@@ -98,20 +98,18 @@ module Omnibus
         raise Error.new("Only works with RPM 4")
       end
 
-      fips = rv[:minor].to_i >= 14 ? true : false
-
       # Generate the spec
-      write_rpm_spec(fips)
+      write_rpm_spec()
 
       # Generate the rpm
-      create_rpm_file(fips)
+      create_rpm_file()
 
       if debug_build?
         # Generate the spec
-        write_rpm_spec(fips, true)
+        write_rpm_spec(true)
 
         # Generate the rpm
-        create_rpm_file(fips, true)
+        create_rpm_file(true)
       end
     end
 
@@ -401,7 +399,7 @@ module Omnibus
     #
     # @return [void]
     #
-    def write_rpm_spec(fips, debug = false)
+    def write_rpm_spec(debug = false)
       # Create a map of scripts that exist and their contents
       scripts = SCRIPT_MAP.inject({}) do |hash, (source, destination)|
         script_src = source.to_s
@@ -456,7 +454,6 @@ module Omnibus
                         files: files,
                         build_dir: build_dir(debug),
                         platform_family: Ohai["platform_family"],
-                        fips: fips,
                       })
     end
 
@@ -467,7 +464,7 @@ module Omnibus
     #
     # @return [void]
     #
-    def create_rpm_file(fips, debug = false)
+    def create_rpm_file(debug = false)
       stage = staging_dir
       if debug
         stage = staging_dbg_dir
@@ -495,8 +492,8 @@ module Omnibus
           # Generate a temporary home directory
           home = Dir.mktmpdir
         end
-
-        if fips
+        rpm_414_or_later = rpm_version()[:minor].to_i >= 14 ? true : false
+        if rpm_414_or_later
           with_rpm_passphrase do |passphrase_file|
             if not has_rpmmacros
               gpg_extra_args = ""
@@ -512,7 +509,7 @@ module Omnibus
                                 gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
                                 gpg_passphrase_file: passphrase_file,
                                 gpg_extra_args: gpg_extra_args,
-                                fips: true,
+                                rpm_414_or_later: true,
                               })
             end
 
@@ -531,7 +528,7 @@ module Omnibus
                             variables: {
                               gpg_name: key_name,
                               gpg_path: "#{ENV['HOME']}/.gnupg", # TODO: Make this configurable
-                              fips: false,
+                              rpm_414_or_later: false,
                             })
           end
 

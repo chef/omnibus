@@ -2,7 +2,11 @@
 %_gpg_path <%= gpg_path %>
 %_gpg_name <%= gpg_name %>
 
-<% if fips %>
+# These are SHA256 
+%_source_filedigest_algorithm 8
+%_binary_filedigest_algorithm 8
+
+<% if rpm_414_or_later %>
 # Necessary since RPM 4.11 (CentOS 7), otherwise the GPG signing
 # machinery in RPM will ask for password via pinentry.
 %__gpg_sign_cmd %{__gpg} \
@@ -11,7 +15,4 @@
     --no-secmem-warning -u "%{_gpg_name}" -sbo %{__signature_filename} \
     %{__plaintext_filename} <%= gpg_extra_args %>
 
-# These are SHA256 - we use them to build packages installable in FIPS mode
-%_source_filedigest_algorithm 8
-%_binary_filedigest_algorithm 8
 <% end %>

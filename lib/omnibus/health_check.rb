@@ -32,6 +32,7 @@ module Omnibus
       /libc\.so/,
       /libdb-4.5\.so/,
       /libdb-4.7\.so/,
+      /libdb-4.8\.so/,
       /libdb-5.3\.so/,
       /libdl/,
       /libfreebl\d\.so/,
