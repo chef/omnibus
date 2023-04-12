@@ -380,6 +380,10 @@ module Omnibus
           val[:ship_source] = true
         end
 
+        if ship_source_offer
+          val[:ship_source_offer] = true
+        end
+
         @source ||= {}
         @source.merge!(val)
       end
@@ -934,6 +938,31 @@ module Omnibus
       end
     end
     expose :ship_source
+
+    #
+    # Tells if the an offer to provide sources should be shipped alongside the built
+    # software.
+    #
+    # If set to true, the source offer will be put in {sources_dir}/{software_name}
+    # by the fetcher, and will be copied to {install_dir}/sources/{software_name}
+    # by the Project which created this Software.
+    #
+    # @example
+    #   ship_source_offer true
+    #
+    # @param [Boolean] val
+    #   the new value of ship_source_offer.
+    #
+    # @return [Boolean]
+    #
+    def ship_source_offer(val = NULL)
+      if null?(val)
+        @ship_source_offer || false
+      else
+        @ship_source_offer = val
+      end
+    end
+    expose :ship_source_offer
 
     #
     # [MacOS only]

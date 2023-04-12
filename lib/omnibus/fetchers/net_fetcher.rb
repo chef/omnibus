@@ -140,6 +140,15 @@ module Omnibus
     end
 
     #
+    # Tells if the source offer should be shipped
+    #
+    # @return [Boolean]
+    #
+    def ship_source_offer?
+      source[:ship_source_offer]
+    end
+
+    #
     # The checksum as defined by the user in the software definition.
     #
     # @return [String]
@@ -243,6 +252,15 @@ module Omnibus
         else
           FileUtils.cp(downloaded_file, "#{sources_dir}/#{name}")
         end
+      end
+      if ship_source_offer?
+        offer = <<~EOH
+          This package ships #{name}.
+          Contact Datadog Support (http://docs.datadoghq.com/help/) to request the sources of this software."
+        EOH
+        FileUtils.mkdir_p("#{sources_dir}/#{name}")
+        log.info(log_key) { "Adding source offer in #{sources_dir}/#{name}/offer.txt" }
+        File.open("#{sources_dir}/#{name}/offer.txt", 'w') { |file| file.write(offer) }
       end
     end
 
