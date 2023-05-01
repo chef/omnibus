@@ -36,7 +36,7 @@ module Omnibus
     #   the list of variables to pass to the template
     #
     def render_template_content(source, variables = {})
-      template = ERB.new(File.read(source), nil, "-")
+      template = ERB.new(File.read(source), nil, trim_mode: "-")
 
       struct =
         if variables.empty?
