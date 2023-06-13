@@ -448,7 +448,7 @@ module Omnibus
 
           # RHEL 8 has gpg-agent running so we can skip the expect script since the agent
           # takes care of the passphrase entering on the signing
-          if dist_tag != ".el8"
+          if dist_tag != ".el8" && dist_tag != ".el9"
             sign_cmd.prepend("#{signing_script} \"").concat("\"")
           end
 

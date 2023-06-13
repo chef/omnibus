@@ -1,18 +1,42 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.9 -->
-## [9.0.9](https://github.com/chef/omnibus/tree/9.0.9) (2022-10-31)
+<!-- latest_release 9.0.20 -->
+## [9.0.20](https://github.com/chef/omnibus/tree/9.0.20) (2023-06-13)
 
 #### Merged Pull Requests
-- Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef))
+- Fix Ruby 3.1 deprecation warning with ERB.new [#1108](https://github.com/chef/omnibus/pull/1108) ([stanhu](https://github.com/stanhu))
 <!-- latest_release -->
-<!-- release_rollup since=9.0.8 -->
+<!-- release_rollup since=9.0.17 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
-- Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 9.0.9 -->
+- Fix Ruby 3.1 deprecation warning with ERB.new [#1108](https://github.com/chef/omnibus/pull/1108) ([stanhu](https://github.com/stanhu)) <!-- 9.0.20 -->
+- Skip erroneous package signing arg for el9 [#1109](https://github.com/chef/omnibus/pull/1109) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 9.0.19 -->
+- omnibus/cli: Exit with non-zero code on failure [#822](https://github.com/chef/omnibus/pull/822) ([legal90](https://github.com/legal90)) <!-- 9.0.18 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [9.0.17](https://github.com/chef/omnibus/tree/9.0.17) (2023-02-20)
+
+#### Merged Pull Requests
+- Remove authorization from version manifest hash [#1094](https://github.com/chef/omnibus/pull/1094) ([gcs-devel](https://github.com/gcs-devel))
+- Update PULL_REQUEST_TEMPLATE.md [#1097](https://github.com/chef/omnibus/pull/1097) ([gcs-devel](https://github.com/gcs-devel))
+- BS-147 Adding build metadata to omnibus version manifest [#1103](https://github.com/chef/omnibus/pull/1103) ([justingruber](https://github.com/justingruber))
+- retry download without s3 cache flag if cache miss [#1104](https://github.com/chef/omnibus/pull/1104) ([justingruber](https://github.com/justingruber))
+- adding this lib as a safe dependency to solve the error on an aix build [#1105](https://github.com/chef/omnibus/pull/1105) ([sean-simmons-progress](https://github.com/sean-simmons-progress))
+<!-- latest_stable_release -->
+
+## [9.0.12](https://github.com/chef/omnibus/tree/9.0.12) (2022-11-17)
+
+#### Merged Pull Requests
+- Update ohai Dependency  [#1092](https://github.com/chef/omnibus/pull/1092) ([poorndm](https://github.com/poorndm))
+
+## [9.0.11](https://github.com/chef/omnibus/tree/9.0.11) (2022-11-15)
+
+#### Merged Pull Requests
+- Add config flag to toggle health-check [#1086](https://github.com/chef/omnibus/pull/1086) ([vkarve-chef](https://github.com/vkarve-chef))
+- Fix failing s3 accelerate test with a version pin [#1088](https://github.com/chef/omnibus/pull/1088) ([gscho](https://github.com/gscho))
+- BS-94/use internal sources [#1087](https://github.com/chef/omnibus/pull/1087) ([gscho](https://github.com/gscho))
+
 ## [9.0.8](https://github.com/chef/omnibus/tree/9.0.8) (2022-10-20)
 
 #### Merged Pull Requests
@@ -27,7 +51,6 @@
 - Updated regex to match exactly 10, and 10.x [#1078](https://github.com/chef/omnibus/pull/1078) ([kanad-progress](https://github.com/kanad-progress))
 - Add solaris basic os libs to acceptlist, currently called whitelist. [#1082](https://github.com/chef/omnibus/pull/1082) ([marcparadise](https://github.com/marcparadise))
 - INFC-268 fix Solaris build [#1083](https://github.com/chef/omnibus/pull/1083) ([tpowell-progress](https://github.com/tpowell-progress))
-<!-- latest_stable_release -->
 
 ## [8.3.2](https://github.com/chef/omnibus/tree/8.3.2) (2022-02-15)
 

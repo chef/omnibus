@@ -20,12 +20,12 @@ Gem::Specification.new do |gem|
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency "aws-sdk-s3",       "~> 1"
+  gem.add_dependency "aws-sdk-s3",       "~> 1.116.0"
   gem.add_dependency "chef-utils",       ">= 15.4"
   gem.add_dependency "chef-cleanroom",   "~> 1.0"
   gem.add_dependency "ffi-yajl",         "~> 2.2"
   gem.add_dependency "mixlib-shellout",  ">= 2.0", "< 4.0"
-  gem.add_dependency "ohai",             ">= 15", "< 18"
+  gem.add_dependency "ohai",             ">= 16", "< 19"
   gem.add_dependency "ruby-progressbar", "~> 1.7"
   gem.add_dependency "thor",             ">= 0.18", "< 2.0"
   gem.add_dependency "license_scout",    "~> 1.0"

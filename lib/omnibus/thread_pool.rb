@@ -46,14 +46,16 @@ module Omnibus
     #
     # @param [Integer] size
     #   the number of items to put in the thread pool
+    # @param [Boolean] abort_on_exception
+    #   if the thread should abort the main thread also on a failure
     #
-    def initialize(size)
+    def initialize(size, abort_on_exception = true)
       @size = size
       @jobs = Queue.new
 
       @pool = Array.new(@size) do |i|
         Thread.new do
-          Thread.abort_on_exception = true
+          Thread.abort_on_exception = abort_on_exception
           Thread.current[:id] = i
 
           catch(:exit) do

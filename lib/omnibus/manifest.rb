@@ -69,13 +69,20 @@ module Omnibus
 
     def to_hash
       software_hash = @data.inject({}) do |memo, (k, v)|
-        memo[k] = v.to_hash
+        h = v.to_hash
+        h[:locked_source].delete(:authorization) if h[:locked_source]
+
+        memo[k] = h
         memo
       end
+
+      build_system_metadata = Omnibus::BuildSystemMetadata.to_hash
+
       ret = {
         manifest_format: LATEST_MANIFEST_FORMAT,
         software: software_hash,
       }
+      ret[:build_system_metadata] = build_system_metadata if build_system_metadata
       ret[:build_version] = build_version if build_version
       ret[:build_git_revision] = build_git_revision if build_git_revision
       ret[:license] = license
@@ -115,7 +122,9 @@ module Omnibus
     end
 
     def self.from_hash_v2(manifest_data)
-      m = Omnibus::Manifest.new(manifest_data[:build_version], manifest_data[:build_git_revision], manifest_data[:license])
+      m = Omnibus::Manifest.new(manifest_data[:build_version],
+                                 manifest_data[:build_git_revision],
+                                 manifest_data[:license])
       manifest_data[:software].each do |name, entry_data|
         m.add(name, Omnibus::ManifestEntry.new(name, keys_to_syms(entry_data)))
       end

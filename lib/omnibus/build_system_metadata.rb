@@ -14,6 +14,23 @@
 # limitations under the License.
 #
 
+require "omnibus/build_system_metadata/buildkite"
+
 module Omnibus
-  VERSION = "9.0.20".freeze
+  # Provides methods for fetching Omnibus project build metadata from Buildkite
+  #
+  # @note Requires environment variables provided whichever platform metdata is being pulled from
+  #
+  class BuildSystemMetadata
+
+    class << self
+
+      def to_hash
+        if !ENV["BUILDKITE"].nil? && !ENV["BUILDKITE"].empty?
+          Omnibus::Buildkite.to_hash
+        end
+      end
+
+    end
+  end
 end
