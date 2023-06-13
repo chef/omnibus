@@ -637,7 +637,7 @@ module Omnibus
     #
     def strip(path)
       regexp_ends = ".*(" + IGNORED_ENDINGS.map { |e| e.gsub(/\./, '\.') }.join("|") + ")$"
-      regexp_patterns = IGNORED_PATTERNS.map { |e| ".*" + e.gsub(%r{/}, '\/') + ".*" }.join("|")
+      regexp_patterns = IGNORED_SUBSTRINGS.map { |e| ".*" + e.gsub(%r{/}, '\/') + ".*" }.join("|")
       regexp = regexp_ends + "|" + regexp_patterns
 
       # Do not actually care if strip runs on non-strippable file, as its a no-op.  Hence the `|| true` appended.
