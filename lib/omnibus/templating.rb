@@ -37,7 +37,6 @@ module Omnibus
     #
     def render_template_content(source, variables = {})
       template = ERB.new(File.read(source), trim_mode: "-")
-
       struct =
         if variables.empty?
           Struct.new("Empty")
