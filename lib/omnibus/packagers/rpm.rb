@@ -434,7 +434,7 @@ module Omnibus
           # Generate a temporary home directory
           home = Dir.mktmpdir
           if dist_tag == ".rocky"
-            project.maintainer="Opscode Packages"
+            project.maintainer = "Opscode Packages"
           end
           render_template(resource_path("rpmmacros.erb"),
             destination: "#{home}/.rpmmacros",
