@@ -424,7 +424,6 @@ module Omnibus
 
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
-        log.info(log_key) { "DIST_tag:#{dist_tag}" }
         if File.exist?("#{ENV["HOME"]}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}'" }
           home = ENV["HOME"]
@@ -433,14 +432,10 @@ module Omnibus
 
           # Generate a temporary home directory
           home = Dir.mktmpdir
-          if dist_tag == "rocky"
-            project.maintainer = "Opscode Packages"
-          end
-          log.info(log_key) { "PROJECT_MAINTAINER :#{project.maintainer}" }
           render_template(resource_path("rpmmacros.erb"),
             destination: "#{home}/.rpmmacros",
             variables: {
-              gpg_name: project.maintainer,
+              gpg_name: "Opscode Packages",
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
         end
