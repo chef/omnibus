@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.20 -->
-## [9.0.20](https://github.com/chef/omnibus/tree/9.0.20) (2023-06-13)
+<!-- latest_release 9.0.21 -->
+## [9.0.21](https://github.com/chef/omnibus/tree/9.0.21) (2023-06-26)
 
 #### Merged Pull Requests
-- Fix Ruby 3.1 deprecation warning with ERB.new [#1108](https://github.com/chef/omnibus/pull/1108) ([stanhu](https://github.com/stanhu))
+- Update gpg_name to fix RockyLinux rpm signing issue [#1118](https://github.com/chef/omnibus/pull/1118) ([poorndm](https://github.com/poorndm))
 <!-- latest_release -->
 <!-- release_rollup since=9.0.17 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update gpg_name to fix RockyLinux rpm signing issue [#1118](https://github.com/chef/omnibus/pull/1118) ([poorndm](https://github.com/poorndm)) <!-- 9.0.21 -->
 - Fix Ruby 3.1 deprecation warning with ERB.new [#1108](https://github.com/chef/omnibus/pull/1108) ([stanhu](https://github.com/stanhu)) <!-- 9.0.20 -->
 - Skip erroneous package signing arg for el9 [#1109](https://github.com/chef/omnibus/pull/1109) ([vkarve-chef](https://github.com/vkarve-chef)) <!-- 9.0.19 -->
 - omnibus/cli: Exit with non-zero code on failure [#822](https://github.com/chef/omnibus/pull/822) ([legal90](https://github.com/legal90)) <!-- 9.0.18 -->
