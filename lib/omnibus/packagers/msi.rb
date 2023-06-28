@@ -37,7 +37,7 @@ module Omnibus
         helper_tmp_dir = Dir.mktmpdir
         parameters.store('HelperDir', helper_tmp_dir)
         FileUtils.mv "#{install_dir}/bin/upgrade-helper.exe", "#{helper_tmp_dir}"
-        if signing_identity or signing_identity_file
+        if signing_identity or signing_identity_file or dd_wcssign
           Dir["#{helper_tmp_dir}" + "/**/*.{exe,dll}"].each do |signfile|
             sign_package(signfile)
           end
@@ -78,7 +78,7 @@ module Omnibus
     end
 
     build do
-      if signing_identity or signing_identity_file
+      if signing_identity or signing_identity_file or dd_wcssign
         puts "starting signing"
         if additional_sign_files
           additional_sign_files.each do |signfile|
@@ -140,7 +140,7 @@ module Omnibus
         msi_file = windows_safe_path(Config.package_dir, msi_name)
         shellout!(light_command(msi_file, wixobj_list: wixobj_list), returns: [0, 204])
 
-        if signing_identity or signing_identity_file
+        if signing_identity or signing_identity_file or dd_wcssign
           sign_package(msi_file)
         end
 
@@ -153,7 +153,7 @@ module Omnibus
           bundle_file = windows_safe_path(Config.package_dir, bundle_name)
           shellout!(light_command(bundle_file, is_bundle: true), returns: [0, 204])
 
-          if signing_identity or signing_identity_file
+          if signing_identity or signing_identity_file or dd_wcssign
             sign_package(bundle_file, is_bundle: true)
           end
         end

@@ -26,7 +26,7 @@ module Omnibus
     end
 
     build do
-      if signing_identity or signing_identity_file
+      if signing_identity or signing_identity_file or dd_wcssign
         puts "starting signing"
         if additional_sign_files
           additional_sign_files.each do |signfile|

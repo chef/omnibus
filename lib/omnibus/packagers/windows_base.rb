@@ -181,6 +181,22 @@ module Omnibus
       end
     end
 
+    def dd_wcssign(enabled = false)
+      if enabled
+        if signing_identity
+          raise Error, "You cannot specify signing_identity with dd_wcssign"
+        end
+        if signing_identity_file
+          raise Error, "You cannot specify signing_identity_file with dd_wcssign"
+        end
+
+        @dd_wcssign = enabled
+      end
+
+      @dd_wcssign
+    end
+    expose :dd_wcssign
+
     #
     # Iterates through available timestamp servers and tries to sign
     # the file with with each server, stopping after the first to succeed.
@@ -207,18 +223,30 @@ module Omnibus
 
       retry_block("signing with timestamp servers", [FailedToSignWindowsPackage], retries = 5, delay = 5) do
         success = false
-        timestamp_servers.each do |ts|
-          puts "signing with timestamp server: #{ts}"
-          success = try_sign(safe_package_file, ts)
-          puts "signed with timestamp server: #{ts}" if success
-          break if success
+        if dd_wcssign
+          success = try_sign(safe_package_file, NULL)
+        else
+          timestamp_servers.each do |ts|
+            puts "signing with timestamp server: #{ts}"
+            success = try_sign(safe_package_file, ts)
+            puts "signed with timestamp server: #{ts}" if success
+            break if success
+          end
         end
         raise FailedToSignWindowsPackage.new if !success
       end
     end
 
     def try_sign(package_file, url)
-      if signing_identity
+      if dd_wcssign
+        puts "signing with dd-wcs"
+        cmd = Array.new.tap do |arr|
+          arr << "dd-wcs"
+          arr << "sign"
+          arr << "\"#{package_file}\""
+        end.join(" ")
+      elsif signing_identity
+        puts "signing with signtool (machine store)"
         cmd = Array.new.tap do |arr|
           arr << "signtool.exe"
           arr << "sign /v"
@@ -231,6 +259,7 @@ module Omnibus
           arr << "\"#{package_file}\""
         end.join(" ")
       elsif signing_identity_file
+        puts "signing with signtool (pfx file)"
         cmd = Array.new.tap do |arr|
           arr << "signtool.exe"
           arr << "sign /v"
