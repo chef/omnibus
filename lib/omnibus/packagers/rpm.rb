@@ -656,7 +656,7 @@ module Omnibus
           "armv6l"
         end
       else
-          Ohai["kernel"]["machine"]
+        Ohai["kernel"]["machine"]
       end
     end
   end
