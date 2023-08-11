@@ -219,13 +219,14 @@ module Omnibus
     #   the dist_tag for this package
     #
     def dist_tag(val = NULL)
-      if null?(val)
-        @dist_tag || ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
-      else
-        @dist_tag = val
-      end
       if Ohai["platform"] == "rocky" && dist_tag == ".el8"
         @dist_tag = "rocky-8"
+      else
+        if null?(val)
+          @dist_tag || ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
+        else
+          @dist_tag = val
+        end
       end
     end
     expose :dist_tag
