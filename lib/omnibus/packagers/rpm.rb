@@ -285,14 +285,15 @@ module Omnibus
     # @return [String]
     #
     def package_name
+      plat = Ohai["platform"] 
       if dist_tag
         "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
-        log.info(log_key) { "PACKGAE PARAMS : SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
-        log.info(log_key) { "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
+        log.info(log_key) { "PACKGAE PARAMS : PLATFORM SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
+        log.info(log_key) { "#{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
       else
         "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
         log.info(log_key) { "PACKGAE PARAMS : SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION : SAFE_ARCH" }
-        log.info(log_key) { "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}" }
+        log.info(log_key) { "#{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}" }
       end
     end
 
@@ -657,11 +658,7 @@ module Omnibus
           "armv6l"
         end
       else
-        if Ohai["platform"] == "rocky"
-          "rocky"
-        else
           Ohai["kernel"]["machine"]
-        end
       end
     end
   end
