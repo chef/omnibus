@@ -419,6 +419,7 @@ module Omnibus
       command << %{ --define '_topdir #{staging_dir}'}
       command << " #{spec_file}"
 
+      log.info(log_key) { "SAFE_ARCHITECTURE : #{safe_architecture}"}
       log.info(log_key) { "Creating .rpm file" }
       shellout!("#{command}")
 
@@ -652,7 +653,11 @@ module Omnibus
           "armv6l"
         end
       else
-        Ohai["kernel"]["machine"]
+        if Ohai["platform"] == "rocky"
+          "rocky"
+        else
+          Ohai["kernel"]["machine"]
+        end
       end
     end
   end
