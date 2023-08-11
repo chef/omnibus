@@ -225,7 +225,7 @@ module Omnibus
         @dist_tag = val
       end
       if Ohai["platform"] == "rocky" && dist_tag == ".el8"
-        dist_tag = "rocky-8"
+        @dist_tag = "rocky-8"
       end
     end
     expose :dist_tag
