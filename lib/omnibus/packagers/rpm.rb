@@ -285,7 +285,7 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      if Ohai["platform"] == "rocky" and dist_tag == "el8"
+      if Ohai["platform"] == "rocky" && dist_tag == "el8"
         dist_tag = "rocky-8"
       end
       if dist_tag
