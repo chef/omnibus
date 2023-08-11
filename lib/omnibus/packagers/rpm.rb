@@ -290,9 +290,6 @@ module Omnibus
     #
     def package_name
       if dist_tag
-        if dist_tag == ".el8" && Ohai["platform"] == "rocky"
-          dist_tag = "rocky-8"
-        end
         "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
       else
         "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
