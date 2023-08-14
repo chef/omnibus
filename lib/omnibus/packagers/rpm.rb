@@ -420,17 +420,17 @@ module Omnibus
       command << " #{spec_file}"
 
       plat = Ohai["platform"]
-      log.info(log_key) { "SAFE_ARCHITECTURE : #{safe_architecture}" }
-      log.info(log_key) { "PACKGAE PARAMS : PLATFORM SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
-      log.info(log_key) { "#{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
+      log.info(log_key) { "WITHIN create_rpm_file SAFE_ARCHITECTURE : #{safe_architecture}" }
+      log.info(log_key) { "with in create_rpm_file PACKGAE PARAMS : PLATFORM SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
+      log.info(log_key) { "within create_rpm_file #{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
       log.info(log_key) { "Creating .rpm file" }
       shellout!("#{command}")
-      log.info(log_key) { "CREATED rpm file is  : #{rpm_file} " }
+      log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
       plat = Ohai["platform"]
-      log.info(log_key) { "BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
+      log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
       if Ohai["platform"] == "rocky"
         rpm_file.gsub(".el8", "rocky.el8")
-        log.info(log_key) { "RPM FILE after replace : #{rpm_file}" }
+        log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file}" }
       end
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
@@ -563,10 +563,10 @@ module Omnibus
     #
     def safe_base_package_name
       plat = Ohai["platform"]
-      log.info(log_key) { "BEFORE REPLACE PLATFORM PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
+      log.info(log_key) { "WITHin SFAE_PKG BEFORE REPLACE PLATFORM PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
       if Ohai["platform"] == "rocky"
-        project.package_name.sub(".el8", "rocky.el8")
-        log.info(log_key) { "PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
+        project.package_name.gsub(".el8", "rocky.el8")
+        log.info(log_key) { "WITHin SFAE_PKG PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
       end
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
