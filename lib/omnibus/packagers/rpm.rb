@@ -219,14 +219,10 @@ module Omnibus
     #   the dist_tag for this package
     #
     def dist_tag(val = NULL)
-      if Ohai["platform"] == "rocky" && @dist_tag == ".el8"
-        @dist_tag = "rocky-8"
+      if null?(val)
+        @dist_tag || ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
       else
-        if null?(val)
-          @dist_tag || ".#{Omnibus::Metadata.platform_shortname}#{Omnibus::Metadata.platform_version}"
-        else
-          @dist_tag = val
-        end
+        @dist_tag = val
       end
     end
     expose :dist_tag
@@ -561,6 +557,9 @@ module Omnibus
     # @return [String]
     #
     def safe_base_package_name
+      if Ohai["platform"] == "rocky"
+        package_name.sub(".el8","rocky.el8")
+      end
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
