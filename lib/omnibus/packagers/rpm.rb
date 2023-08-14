@@ -500,6 +500,7 @@ module Omnibus
     # @return [String]
     #
     def spec_file
+      log.info(log_key) { "Within spec_file(502)  package name is :  #{package_name}" }
       "#{staging_dir}/SPECS/#{package_name}.spec"
     end
 
@@ -509,6 +510,7 @@ module Omnibus
     # @return [String]
     #
     def rpm_file
+      log.info(log_key) { "Within rpm_file(512)  package name is :  #{package_name}" }
       "#{staging_dir}/RPMS/#{safe_architecture}/#{package_name}"
     end
 
@@ -568,12 +570,6 @@ module Omnibus
     # @return [String]
     #
     def safe_base_package_name
-      plat = Ohai["platform"]
-      log.info(log_key) { "WITHin SFAE_PKG BEFORE REPLACE PLATFORM PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
-      if Ohai["platform"] == "rocky"
-        project.package_name.gsub(".el8", "rocky.el8")
-        log.info(log_key) { "WITHin SFAE_PKG PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
-      end
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
