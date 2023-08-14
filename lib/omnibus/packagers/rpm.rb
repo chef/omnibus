@@ -429,7 +429,7 @@ module Omnibus
       plat = Ohai["platform"]
       log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
       if Ohai["platform"] == "rocky"
-        rpm_file.gsub(".el8", "rocky.el8")
+        rpm_file.gsub("el8", "rocky.el8")
         log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file}" }
       end
       if signing_passphrase
