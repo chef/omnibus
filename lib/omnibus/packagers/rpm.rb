@@ -285,10 +285,15 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      if dist_tag
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+      plat = Ohai["platform"]
+      if plat == "rocky"
+        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{plat}#{dist_tag}.#{safe_architecture}.rpm"
       else
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+        if dist_tag
+          "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+        else
+          "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+        end
       end
     end
 
@@ -412,6 +417,7 @@ module Omnibus
     # @return [void]
     #
     def create_rpm_file
+      plat = Ohai["platform"]
       command =  %{rpmbuild}
       command << %{ --target #{safe_architecture}}
       command << %{ -bb}
