@@ -558,7 +558,11 @@ module Omnibus
     #
     def safe_base_package_name
       plat = Ohai["platform"]
-      log.info(log_key) { "PLATFORM : #{plat} " }
+      log.info(log_key) { "BEFORE REPLACE PLATFORM PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
+      if Ohai["platform"] == "rocky"
+        project.package_name.sub(".el8", "rocky.el8")
+        log.info(log_key) { "PLATFORM : #{plat}  PACKAGE_NAME : #{project.package_name}" }
+      end
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
