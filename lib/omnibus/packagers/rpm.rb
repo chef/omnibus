@@ -446,6 +446,12 @@ module Omnibus
             })
         end
 
+        plat = Ohai["platform"]
+        log.info(log_key) { "BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
+        if Ohai["platform"] == "rocky"
+          rpm_file.sub(".el8", "rocky.el8")
+          log.info(log_key) { "RPM FILE after replace : #{rpm_file}" }
+        end
         sign_cmd = "rpmsign --addsign #{rpm_file}"
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
