@@ -44,6 +44,7 @@ module Omnibus
       "rhel" => RPM,
       "wrlinux" => RPM,
       "amazon" => RPM,
+      "rocky"  => RPM,
       "aix" => BFF,
       "solaris" => Solaris,
       "omnios" => IPS,
