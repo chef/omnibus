@@ -557,7 +557,8 @@ module Omnibus
     # @return [String]
     #
     def safe_base_package_name
-      log.info(log_key) { "PLATFORM : Ohai["platform"] " }
+      plat = Ohai["platform"]
+      log.info(log_key) { "PLATFORM : #{plat} " }
       if project.package_name =~ /\A[a-z0-9\.\+\-]+\z/
         project.package_name.dup
       else
