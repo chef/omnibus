@@ -432,10 +432,8 @@ module Omnibus
       log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
       log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
       if Ohai["platform"] == "rocky"
-        # rename rpm_file to rocky_rpm_file
         log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
-        copy_file("#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm")
-        copy_file#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm", #{rpm_file})
+        copy_file("#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm", #{rpm_file} )
         log.info(log_key) {"Copied the old_rpm content to new_rpm_file"}
       end
       if signing_passphrase
