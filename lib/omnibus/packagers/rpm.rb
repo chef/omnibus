@@ -429,7 +429,7 @@ module Omnibus
 
       if Ohai["platform"] == "rocky"
         log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
-        rpm_file.gsub! "#{dist_tag}", rocky.el8'
+        rpm_file.gsub! "#{dist_tag}", "rocky.el8"
         log.info(log_key) {"Copied the old_rpm content to new_rpm_file"}
       end
       if signing_passphrase
