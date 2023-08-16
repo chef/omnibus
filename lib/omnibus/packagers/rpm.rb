@@ -287,7 +287,7 @@ module Omnibus
     def package_name
       plat = Ohai["platform"]
       if plat == "rocky"
-        package_name_old = #{package_name}
+        package_name_old = "#{package_name}"
         "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{plat}#{dist_tag}.#{safe_architecture}.rpm"
       else
         if dist_tag
