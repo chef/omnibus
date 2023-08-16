@@ -442,7 +442,6 @@ module Omnibus
         command1 << " #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm "
         command1 << " #{rpm_file}"
         shellout!("#{command1}")
-        
       end
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
