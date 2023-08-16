@@ -285,10 +285,15 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      if dist_tag
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+      plat = Ohai["platform"]
+      if plat == "rocky"
+        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{plat}#{dist_tag}.#{safe_architecture}.rpm"
       else
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+        if dist_tag
+          "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
+        else
+          "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
+        end
       end
     end
 
@@ -419,9 +424,20 @@ module Omnibus
       command << %{ --define '_topdir #{staging_dir}'}
       command << " #{spec_file}"
 
+      plat = Ohai["platform"]
+      log.info(log_key) { "with in create_rpm_file PACKGAE PARAMS : PLATFORM SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
+      log.info(log_key) { "within create_rpm_file #{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
       log.info(log_key) { "Creating .rpm file" }
       shellout!("#{command}")
-
+      log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
+      log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
+      if Ohai["platform"] == "rocky"
+        # rename rpm_file to rocky_rpm_file
+        log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
+        copy_file("#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm")
+        copy_file#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm", #{rpm_file})
+        log.info(log_key) {"Copied the old_rpm content to new_rpm_file"}
+      end
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
 
@@ -441,7 +457,6 @@ module Omnibus
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
         end
-
         sign_cmd = "rpmsign --addsign #{rpm_file}"
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
@@ -485,6 +500,7 @@ module Omnibus
     # @return [String]
     #
     def spec_file
+      log.info(log_key) { "Within spec_file(502)  package name is :  #{package_name}" }
       "#{staging_dir}/SPECS/#{package_name}.spec"
     end
 
@@ -494,6 +510,7 @@ module Omnibus
     # @return [String]
     #
     def rpm_file
+      log.info(log_key) { "Within rpm_file(512)  package name is :  #{package_name}" }
       "#{staging_dir}/RPMS/#{safe_architecture}/#{package_name}"
     end
 
