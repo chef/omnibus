@@ -438,9 +438,11 @@ module Omnibus
       if Ohai["platform"] == "rocky"
         # rename rpm_file to rocky_rpm_file
         log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
-        command1 << %{mv}
+        log.info(log_key) { " CP #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm " }
+        command1 << %{cp}
         command1 << " #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm "
         command1 << " #{rpm_file}"
+        log.info(log_key) { " COMMAND1 : #{command1}"}
         shellout!("#{command1}")
       end
       if signing_passphrase
