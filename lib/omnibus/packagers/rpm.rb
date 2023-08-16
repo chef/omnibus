@@ -441,7 +441,7 @@ module Omnibus
         command1 << %{cp}
         command1 << " #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm "
         command1 << " #{rpm_file}"
-        log.info(log_key) { " COMMAND1 : #{command1}"}
+        log.info(log_key) { " COMMAND1 : #{command1}" }
         shellout!("#{command1}")
       end
       if signing_passphrase
