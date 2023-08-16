@@ -174,7 +174,7 @@ module Omnibus
       # rubocop:disable Lint/DuplicateCaseCondition
       def truncate_platform_version(platform_version, platform)
         case platform
-        when "centos", "cumulus", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "sles", "suse", "smartos"
+        when "centos", "cumulus", "debian", "el", "fedora", "freebsd", "omnios", "pidora", "raspbian", "rhel", "rocky", "sles", "suse", "smartos"
           # Only want MAJOR (e.g. Debian 7, OmniOS r151006, SmartOS 20120809T221258Z)
           platform_version.split(".").first
         when "aix", "alpine", "openbsd", "slackware", "solaris2", "opensuse", "opensuseleap", "ubuntu", "amazon"
