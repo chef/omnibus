@@ -145,7 +145,11 @@ module Omnibus
       #
       def platform_shortname
         if rhel?
-          "el"
+          if "rocky" == Ohai["platform"]
+            "rocky"
+          else
+            "el"
+          end
         elsif suse?
           "sles"
         else

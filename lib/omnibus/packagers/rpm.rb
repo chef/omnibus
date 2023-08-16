@@ -426,12 +426,7 @@ module Omnibus
       shellout!("#{command}")
       log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
       log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
-
-      if Ohai["platform"] == "rocky"
-        log.info(log_key) { "within create_rpm_file RPM FILE before  replace : #{rpm_file} " }
-        rpm_file.gsub! "#{dist_tag}", "rocky.el8"
-        log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
-      end
+      
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
 
