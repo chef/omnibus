@@ -285,15 +285,10 @@ module Omnibus
     # @return [String]
     #
     def package_name
-      plat = Ohai["platform"]
-      if plat == "rocky"
-        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{plat}#{dist_tag}.#{safe_architecture}.rpm"
+      if dist_tag
+        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
       else
-        if dist_tag
-          "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm"
-        else
-          "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
-        end
+        "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{safe_architecture}.rpm"
       end
     end
 
@@ -431,9 +426,10 @@ module Omnibus
       shellout!("#{command}")
       log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
       log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
+
       if Ohai["platform"] == "rocky"
         log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
-        copy_file("#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm", #{rpm_file} )
+        rpm_file.gsub! 'el8', 'rocky.el8'
         log.info(log_key) {"Copied the old_rpm content to new_rpm_file"}
       end
       if signing_passphrase
