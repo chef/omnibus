@@ -426,7 +426,6 @@ module Omnibus
       shellout!("#{command}")
       log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
       log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
-      
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
 
