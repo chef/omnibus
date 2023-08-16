@@ -418,14 +418,8 @@ module Omnibus
       command << %{ --buildroot #{staging_dir}/BUILD}
       command << %{ --define '_topdir #{staging_dir}'}
       command << " #{spec_file}"
-
-      plat = Ohai["platform"]
-      log.info(log_key) { "with in create_rpm_file PACKGAE PARAMS : PLATFORM SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
-      log.info(log_key) { "within create_rpm_file #{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
       log.info(log_key) { "Creating .rpm file" }
       shellout!("#{command}")
-      log.info(log_key) { "within create_rpm_file CREATED rpm file is  : #{rpm_file} " }
-      log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
 
@@ -488,7 +482,6 @@ module Omnibus
     # @return [String]
     #
     def spec_file
-      log.info(log_key) { "Within spec_file(502)  package name is :  #{package_name}" }
       "#{staging_dir}/SPECS/#{package_name}.spec"
     end
 
@@ -498,7 +491,6 @@ module Omnibus
     # @return [String]
     #
     def rpm_file
-      log.info(log_key) { "Within rpm_file(512)  package name is :  #{package_name}" }
       "#{staging_dir}/RPMS/#{safe_architecture}/#{package_name}"
     end
 
