@@ -287,7 +287,6 @@ module Omnibus
     def package_name
       plat = Ohai["platform"]
       if plat == "rocky"
-        package_name_old = "#{package_name}"
         "#{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}.#{plat}#{dist_tag}.#{safe_architecture}.rpm"
       else
         if dist_tag
@@ -438,9 +437,8 @@ module Omnibus
       log.info(log_key) { "within create_rpm_file BEFORE REPLACE RPM FILE : #{plat}  RPM FILE : #{rpm_file} " }
       if Ohai["platform"] == "rocky"
         # rename rpm_file to rocky_rpm_file
-        temp_rpm_file = "/tmp/#{package_name_old}"
-        log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} and old_file #{temp_rpm_file}" }
-        command1 << "mv #{temp_rpm_file} #{rpm_file}"
+        log.info(log_key) { "within create_rpm_file RPM FILE after replace : #{rpm_file} " }
+        command1 << "mv #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}.rpm" #{rpm_file}"
         shellout!("#{command1}")
         
       end
