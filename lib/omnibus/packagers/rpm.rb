@@ -427,7 +427,7 @@ module Omnibus
       command << " #{spec_file}"
 
       plat = Ohai["platform"]
-      og.info(log_key) { "WITHIN create_rpm_file : SPEC_FILE :
+      log.info(log_key) { "WITHIN create_rpm_file : SPEC_FILE : " }
       log.info(log_key) { "WITHIN create_rpm_file SAFE_ARCHITECTURE : #{safe_architecture}" }
       log.info(log_key) { "with in create_rpm_file PACKGAE PARAMS : PLATFORM SAFE_BASE_PKG_NAME : SAFE_VER : SFAE_BUILD_ITERATION  : DIST_TAG : : SAFE_ARCH" }
       log.info(log_key) { "within create_rpm_file #{plat} : #{safe_base_package_name}-#{safe_version}-#{safe_build_iteration}#{dist_tag}.#{safe_architecture}" }
