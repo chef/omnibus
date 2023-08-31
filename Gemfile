@@ -1,4 +1,5 @@
 source "https://rubygems.org"
+gem "license_scout", git: "https://github.com/chef/license_scout", branch: "nikhil/adding-ruby-shadow"
 
 gemspec
 
