@@ -80,6 +80,7 @@ module Omnibus
         servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
         @signing_identity[:timestamp_servers] = [servers].flatten
         @signing_identity[:machine_store] = params[:machine_store] || false
+        @signing_identity[:keypair_alias] = params[:keypair_alias]
       end
 
       @signing_identity
@@ -108,7 +109,7 @@ module Omnibus
 
     def keypair_alias
       signing_identity[:keypair_alias]
-    end    
+    end
 
     #
     # Iterates through available timestamp servers and tries to sign
