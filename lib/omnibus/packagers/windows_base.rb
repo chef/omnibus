@@ -59,7 +59,7 @@ module Omnibus
             raise InvalidValue.new(:params, "be a Hash")
           end
 
-          valid_keys = %i{store timestamp_servers machine_store algorithm}
+          valid_keys = %i{store timestamp_servers machine_store algorithm keypair_alias}
           invalid_keys = params.keys - valid_keys
           unless invalid_keys.empty?
             raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(", ")}]. "\
@@ -106,6 +106,10 @@ module Omnibus
       signing_identity[:machine_store]
     end
 
+    def keypair_alias
+      signing_identity[:keypair_alias]
+    end    
+
     #
     # Iterates through available timestamp servers and tries to sign
     # the file with with each server, stopping after the first to succeed.
@@ -124,7 +128,7 @@ module Omnibus
       cmd = [].tap do |arr|
         arr << "smctl.exe"
         arr << "sign"
-        arr << "--keypair-alias #{thumbprint}"
+        arr << "--keypair-alias #{keypair_alias}"
         arr << "--certificate #{thumbprint}"
         arr << "--input #{package_file}"
       end.join(" ")
