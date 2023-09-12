@@ -122,15 +122,11 @@ module Omnibus
 
     def try_sign(package_file, url)
       cmd = [].tap do |arr|
-        arr << "signtool.exe"
-        arr << "sign /v"
-        arr << "/t #{url}"
-        arr << "/fd #{algorithm}"
-        arr << "/sm" if machine_store?
-        arr << "/s #{cert_store_name}"
-        arr << "/sha1 #{thumbprint}"
-        arr << "/d #{project.package_name}"
-        arr << "\"#{package_file}\""
+        arr << "smctl.exe"
+        arr << "sign"
+        arr << "--keypair-alias #{thumbprint}"
+        arr << "--certificate #{thumbprint}"
+        arr << "--input #{package_file}"
       end.join(" ")
       status = shellout(cmd)
       if status.exitstatus != 0
