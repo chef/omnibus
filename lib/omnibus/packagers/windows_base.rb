@@ -128,6 +128,16 @@ module Omnibus
 
       status = shellout(cmd)
 
+      # TODO: Once things are working, remove this block
+      puts "---- These are some temporary debug statements ----"
+      puts "package_file: #{package_file}"
+      puts "cmd: #{cmd}"
+      puts "status: #{status}"
+      puts "status.exitstatus: #{status.exitstatus}"
+      puts "status.stdout: #{status.stdout}"
+      puts "status.stderr: #{status.stderr}"
+      puts "---- end of temporary debug statements -----"
+
       # log the error if the signing failed
       if status.exitstatus != 0
         log.warn(log_key) do
