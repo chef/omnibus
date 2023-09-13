@@ -77,6 +77,7 @@ module Omnibus
 
         @signing_identity[:store] = params[:store] || "My"
         @signing_identity[:algorithm] = params[:algorithm] || "SHA256"
+        # TODO: Remove dependency on timestamp_servers when is_signed? is in working condition
         servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
         @signing_identity[:timestamp_servers] = [servers].flatten
         @signing_identity[:machine_store] = params[:machine_store] || false
@@ -111,20 +112,43 @@ module Omnibus
       signing_identity[:machine_store]
     end
 
-    #
-    # Iterates through available timestamp servers and tries to sign
-    # the file with with each server, stopping after the first to succeed.
-    # If none succeed, an exception is raised.
-    #
+    # signs the package with the given certificate
     def sign_package(package_file)
-      success = false
-      timestamp_servers.each do |ts|
-        success = try_sign(package_file, ts)
-        break if success
-      end
-      raise FailedToSignWindowsPackage.new unless success
+      raise FailedToSignWindowsPackage.new unless is_signed?(package_file)
     end
 
+    def is_signed?(package_file)
+      cmd = [].tap do |arr|
+        arr << "smctl.exe"
+        arr << "sign"
+        arr << "--keypair-alias #{keypair_alias}"
+        arr << "--certificate #{thumbprint}"
+        arr << "--input #{package_file}"
+      end.join(" ")
+
+      status = shellout(cmd)
+
+      # log the error if the signing failed
+      if status.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to verify signature of #{package_file}
+
+                STDOUT
+                ------
+                #{status.stdout}
+
+                STDERR
+                ------
+                #{status.stderr}
+          EOH
+        end
+      end
+
+      status.exitstatus == 0
+    end
+
+    # TODO: Remove this method once is_signed? is in working condition
     def try_sign(package_file, url)
       cmd = [].tap do |arr|
         arr << "signtool.exe"
