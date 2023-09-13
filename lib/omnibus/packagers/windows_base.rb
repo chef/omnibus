@@ -59,7 +59,7 @@ module Omnibus
             raise InvalidValue.new(:params, "be a Hash")
           end
 
-          valid_keys = %i{store timestamp_servers machine_store algorithm}
+          valid_keys = %i{store timestamp_servers machine_store algorithm keypair_alias}
           invalid_keys = params.keys - valid_keys
           unless invalid_keys.empty?
             raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(", ")}]. "\
@@ -80,6 +80,7 @@ module Omnibus
         servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
         @signing_identity[:timestamp_servers] = [servers].flatten
         @signing_identity[:machine_store] = params[:machine_store] || false
+        @signing_identity[:keypair_alias] = params[:keypair_alias]
       end
 
       @signing_identity
@@ -100,6 +101,10 @@ module Omnibus
 
     def timestamp_servers
       signing_identity[:timestamp_servers]
+    end
+
+    def keypair_alias
+      signing_identity[:keypair_alias]
     end
 
     def machine_store?
