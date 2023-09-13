@@ -121,8 +121,7 @@ module Omnibus
       cmd = [].tap do |arr|
         arr << "smctl.exe"
         arr << "sign"
-        arr << "--keypair-alias #{keypair_alias}"
-        arr << "--certificate #{thumbprint}"
+        arr << "--fingerprint #{thumbprint}"
         arr << "--input #{package_file}"
       end.join(" ")
 
