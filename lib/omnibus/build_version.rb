@@ -127,7 +127,7 @@ module Omnibus
 
       unless build_version_items.empty?
         log.info(log_key) { "Temporary logs - build_version_items: #{build_version_items}" }
-        build_tag << "_" << build_version_items.join(".")
+        build_tag << "-" << build_version_items.join(".")
       end
 
       log.info(log_key) { "Temporary logs - final build_tag returned: #{build_tag}" }
