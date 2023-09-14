@@ -122,7 +122,7 @@ module Omnibus
       log.info(log_key) { "Temporary logs - has_timestamp?(version): #{has_timestamp?(version)}" }
       log.info(log_key) { "Temporary logs - version: #{version}" }
       if Config.append_timestamp && !has_timestamp?(version)
-        [version, Omnibus::BuildVersion.build_start_time].join("_")
+        [version, Omnibus::BuildVersion.build_start_time].join("-")
       else
         version
       end
