@@ -127,16 +127,13 @@ module Omnibus
 
       status = shellout(cmd)
 
-      # TODO: Once things are working, remove this block
-      puts "---- These are some temporary debug statements ----"
-      puts "package_file class: #{package_file.class}"
-      puts "package_file: #{package_file}"
-      puts "cmd: #{cmd}"
-      puts "status: #{status}"
-      puts "status.exitstatus: #{status.exitstatus}"
-      puts "status.stdout: #{status.stdout}"
-      puts "status.stderr: #{status.stderr}"
-      puts "---- end of temporary debug statements -----"
+      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: package_file: #{package_file}" }
+      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: cmd: #{cmd}" }
+      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status: #{status}" }
+      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.exitstatus: #{status.exitstatus}" }
+      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stdout: #{status.stdout}" }
+      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stderr: #{status.stderr}" }
+
 
       # log the error if the signing failed
       if status.exitstatus != 0
