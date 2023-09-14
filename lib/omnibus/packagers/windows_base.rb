@@ -16,9 +16,6 @@
 
 module Omnibus
   class Packager::WindowsBase < Packager::Base
-    DEFAULT_TIMESTAMP_SERVERS = ["http://timestamp.digicert.com",
-                                 "http://timestamp.verisign.com/scripts/timestamp.dll"].freeze
-
     #
     # Set the signing certificate name
     #
@@ -59,9 +56,17 @@ module Omnibus
             raise InvalidValue.new(:params, "be a Hash")
           end
 
-          valid_keys = %i{store timestamp_servers machine_store algorithm keypair_alias}
+          valid_keys = %i{store machine_store algorithm keypair_alias}
           invalid_keys = params.keys - valid_keys
           unless invalid_keys.empty?
+
+            # log a deprecated warning if timestamp_server is used
+            if invalid_keys.include?(:timestamp_servers)
+              log.deprecated(log_key) do
+                "The signing_identity is updated to use smctl.exe. which does not require timestamp_servers" \
+                "Please remove timestamp_servers from your signing_identity"
+              end
+
             raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(", ")}]. "\
                                    "Found invalid keys [#{invalid_keys.join(", ")}]")
           end
@@ -77,9 +82,6 @@ module Omnibus
 
         @signing_identity[:store] = params[:store] || "My"
         @signing_identity[:algorithm] = params[:algorithm] || "SHA256"
-        # TODO: Remove dependency on timestamp_servers when is_signed? is in working condition
-        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
-        @signing_identity[:timestamp_servers] = [servers].flatten
         @signing_identity[:machine_store] = params[:machine_store] || false
         @signing_identity[:keypair_alias] = params[:keypair_alias]
       end
@@ -152,38 +154,6 @@ module Omnibus
         end
       end
 
-      status.exitstatus == 0
-    end
-
-    # TODO: Remove this method once is_signed? is in working condition
-    def try_sign(package_file, url)
-      cmd = [].tap do |arr|
-        arr << "signtool.exe"
-        arr << "sign /v"
-        arr << "/t #{url}"
-        arr << "/fd #{algorithm}"
-        arr << "/sm" if machine_store?
-        arr << "/s #{cert_store_name}"
-        arr << "/sha1 #{thumbprint}"
-        arr << "/d #{project.package_name}"
-        arr << "\"#{package_file}\""
-      end.join(" ")
-      status = shellout(cmd)
-      if status.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to add timestamp with timeserver #{url}
-
-                STDOUT
-                ------
-                #{status.stdout}
-
-                STDERR
-                ------
-                #{status.stderr}
-          EOH
-        end
-      end
       status.exitstatus == 0
     end
 
