@@ -118,7 +118,7 @@ module Omnibus
       end
 
       unless build_version_items.empty?
-        build_tag << "+" << build_version_items.join(".")
+        build_tag << "_" << build_version_items.join(".")
       end
 
       build_tag
