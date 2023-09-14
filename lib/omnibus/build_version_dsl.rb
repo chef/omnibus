@@ -136,7 +136,7 @@ module Omnibus
     # @param [String] version
     # @return [Boolean]
     def has_timestamp?(version)
-      _ver, build_info = version.split("_")
+      _ver, build_info = version.split("-")
       return false if build_info.nil?
 
       build_info.split(".").any? do |part|
