@@ -225,7 +225,6 @@ module Omnibus
     #
     def windows_package_version
       major, minor, patch = project.build_version.split(/[.+-]/)
-      patch = patch.gsub(/\+/, '')
       [major, minor, patch, project.build_iteration].join(".")
     end
   end
