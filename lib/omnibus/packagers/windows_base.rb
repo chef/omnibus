@@ -118,6 +118,13 @@ module Omnibus
     end
 
     def is_signed?(package_file)
+
+      # NOTE: This is a temporary workaround for the package_file name containing + in the name
+      #       This leads to the command failing; could be a bug in the smctl.exe
+      # TODO: Remove this gsub once the package_file name is fixed
+
+      package_file = package_file.gsub("+", "_")
+
       cmd = [].tap do |arr|
         arr << "smctl.exe"
         arr << "sign"
@@ -129,6 +136,7 @@ module Omnibus
 
       # TODO: Once things are working, remove this block
       puts "---- These are some temporary debug statements ----"
+      puts "package_file class: #{package_file.class}"
       puts "package_file: #{package_file}"
       puts "cmd: #{cmd}"
       puts "status: #{status}"
