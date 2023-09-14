@@ -52,6 +52,11 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
+      log.info(log_key) { "Temporary logs - Building APPX package" }
+      log.info(log_key) { "Temporary logs - Package Name: #{project.package_name}" }
+      log.info(log_key) { "Temporary logs - Build Version: #{project.build_version}" }
+      log.info(log_key) { "Temporary logs - Build Iteration: #{project.build_iteration}" }
+      log.info(log_key) { "Temporary logs - Windows Arch: #{Config.windows_arch}" }
       "#{project.package_name}-#{project.build_version}-#{project.build_iteration}-#{Config.windows_arch}.appx"
     end
 

@@ -87,13 +87,18 @@ module Omnibus
     #   and can be influenced by users.
     def semver
       build_tag = version_tag
+      # Add logs to help debug: Remove later
+      log.info(log_key) { "Temporary logs - build_tag: #{build_tag}" }
 
       # PRERELEASE VERSION
+      log.info(log_key) { "Temporary logs - prerelease_version: #{prerelease_version?}" }
       if prerelease_version?
         # ensure all dashes are dots per precedence rules (#12) in Semver
         # 2.0.0-rc.1
+        log.info(log_key) { "Temporary logs - prerelease_tag: #{prerelease_tag}" }
         prerelease = prerelease_tag.tr("-", ".")
         build_tag << "-" << prerelease
+        log.info(log_key) { "Temporary logs - updated build_tag: #{build_tag}" }
       end
 
       # BUILD VERSION
@@ -106,6 +111,7 @@ module Omnibus
       #
       # format: YYYYMMDDHHMMSS example: 20130131123345
       if Config.append_timestamp
+        log.info(log_key) { "Temporary logs - build_start_time: #{build_start_time}" }
         build_version_items << build_start_time
       end
 
@@ -114,12 +120,17 @@ module Omnibus
       #
       # format: git.COMMITS_SINCE_TAG.GIT_SHA example: git.207.694b062
       unless commits_since_tag == 0
+        log.info(log_key) { "Temporary logs - commits_since_tag: #{commits_since_tag}" }
+        log.info(log_key) { "Temporary logs - git_sha_tag: #{git_sha_tag}" }
         build_version_items << ["git", commits_since_tag, git_sha_tag].join(".")
       end
 
       unless build_version_items.empty?
+        log.info(log_key) { "Temporary logs - build_version_items: #{build_version_items}" }
         build_tag << "_" << build_version_items.join(".")
       end
+
+      log.info(log_key) { "Temporary logs - final build_tag returned: #{build_tag}" }
 
       build_tag
     end
