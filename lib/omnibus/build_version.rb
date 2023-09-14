@@ -90,15 +90,15 @@ module Omnibus
       log.info(log_key) { "class Omnibus::BuildVersion - semver method: build tag: #{build_tag}" }
 
       # PRERELEASE VERSION
-      log.info(log_key) { "class Omnibus::BuildVersion - semver method: prerelease_version?: #{prerelease_version?}"}
+      log.info(log_key) { "class Omnibus::BuildVersion - semver method: prerelease_version?: #{prerelease_version?}" }
 
       if prerelease_version?
         # ensure all dashes are dots per precedence rules (#12) in Semver
         # 2.0.0-rc.1
-        log.info(log_key) { "class Omnibus::BuildVersion - semver method: prerelease_tag: #{prerelease_tag}"}
+        log.info(log_key) { "class Omnibus::BuildVersion - semver method: prerelease_tag: #{prerelease_tag}" }
         prerelease = prerelease_tag.tr("-", ".")
         build_tag << "-" << prerelease
-        log.info(log_key) { "class Omnibus::BuildVersion - semver method: build_tag after prerelease: #{build_tag}"}
+        log.info(log_key) { "class Omnibus::BuildVersion - semver method: build_tag after prerelease: #{build_tag}" }
       end
 
       # BUILD VERSION
@@ -126,7 +126,7 @@ module Omnibus
       end
 
       unless build_version_items.empty?
-        log.info(log_key) { "class Omnibus::BuildVersion - semver method: build_version_items: #{build_version_items}"}
+        log.info(log_key) { "class Omnibus::BuildVersion - semver method: build_version_items: #{build_version_items}" }
         build_tag << "-" << build_version_items.join(".")
       end
 

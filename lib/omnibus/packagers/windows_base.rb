@@ -66,6 +66,7 @@ module Omnibus
                 "The signing_identity is updated to use smctl.exe. which does not require timestamp_servers" \
                 "Please remove timestamp_servers from your signing_identity"
               end
+            end
 
             raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(", ")}]. "\
                                    "Found invalid keys [#{invalid_keys.join(", ")}]")
@@ -135,7 +136,6 @@ module Omnibus
       log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.exitstatus: #{status.exitstatus}" }
       log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stdout: #{status.stdout}" }
       log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stderr: #{status.stderr}" }
-
 
       # log the error if the signing failed
       if status.exitstatus != 0
