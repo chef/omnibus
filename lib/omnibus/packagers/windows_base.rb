@@ -130,12 +130,12 @@ module Omnibus
 
       status = shellout(cmd)
 
-      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: package_file: #{package_file}" }
-      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: cmd: #{cmd}" }
-      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status: #{status}" }
-      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.exitstatus: #{status.exitstatus}" }
-      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stdout: #{status.stdout}" }
-      log.info(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stderr: #{status.stderr}" }
+      log.debug(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: package_file: #{package_file}" }
+      log.debug(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: cmd: #{cmd}" }
+      log.debug(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status: #{status}" }
+      log.debug(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.exitstatus: #{status.exitstatus}" }
+      log.debug(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stdout: #{status.stdout}" }
+      log.debug(log_key) { "class Omnibus::Packager::WindowsBase - is_signed? method: status.stderr: #{status.stderr}" }
 
       # log the error if the signing failed
       if status.exitstatus != 0

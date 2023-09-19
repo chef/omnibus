@@ -117,9 +117,9 @@ module Omnibus
     # @param [String] version
     # @return [String]
     def maybe_append_timestamp(version)
-      log.info(log_key) { "class Omnibus::BuildVersionDSL - maybe_append_timestamp method: Config.append_timestamp: #{Config.append_timestamp}" }
-      log.info(log_key) { "class Omnibus::BuildVersionDSL - maybe_append_timestamp method: version: #{version}" }
-      log.info(log_key) { "class Omnibus::BuildVersionDSL - maybe_append_timestamp method: has_timestamp?(version): #{has_timestamp?(version)}" }
+      log.debug(log_key) { "class Omnibus::BuildVersionDSL - maybe_append_timestamp method: Config.append_timestamp: #{Config.append_timestamp}" }
+      log.debug(log_key) { "class Omnibus::BuildVersionDSL - maybe_append_timestamp method: version: #{version}" }
+      log.debug(log_key) { "class Omnibus::BuildVersionDSL - maybe_append_timestamp method: has_timestamp?(version): #{has_timestamp?(version)}" }
       if Config.append_timestamp && !has_timestamp?(version)
         [version, Omnibus::BuildVersion.build_start_time].join("-")
       else
