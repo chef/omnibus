@@ -52,10 +52,10 @@ module Omnibus
 
     # @see Base#package_name
     def package_name
-      log.debug(log_key) { "class Omnibus::Packager::APPX - package_name method: package_name: #{project.package_name}" }
-      log.debug(log_key) { "class Omnibus::Packager::APPX - package_name method: build_version: #{project.build_version}" }
-      log.debug(log_key) { "class Omnibus::Packager::APPX - package_name method: build_iteration: #{project.build_iteration}" }
-      log.debug(log_key) { "class Omnibus::Packager::APPX - package_name method: Config.windows_arch: #{Config.windows_arch}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - package_name: #{project.package_name}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - build_version: #{project.build_version}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - build_iteration: #{project.build_iteration}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - Config.windows_arch: #{Config.windows_arch}" }
 
       "#{project.package_name}-#{project.build_version}-#{project.build_iteration}-#{Config.windows_arch}.appx"
     end
