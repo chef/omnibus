@@ -129,38 +129,17 @@ module Omnibus
           allow(subject).to receive(:shellout!)
         end
 
-        describe "#timestamp_servers" do
-          it "defaults to using ['http://timestamp.digicert.com','http://timestamp.verisign.com/scripts/timestamp.dll']" do
+        describe "#keypair_alias" do
+          it "defaults to 'Chef Software, Inc.'" do
             subject.signing_identity("foo")
-            expect(subject).to receive(:try_sign).with(appx, "http://timestamp.digicert.com").and_return(false)
-            expect(subject).to receive(:try_sign).with(appx, "http://timestamp.verisign.com/scripts/timestamp.dll").and_return(true)
+            expect(subject).to receive(:is_signed?).with(appx).and_return(true)
             subject.sign_package(appx)
           end
 
-          it "uses the timestamp server if provided through the #timestamp_server dsl" do
-            subject.signing_identity("foo", timestamp_servers: "http://fooserver")
-            expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(true)
+          it "uses the keypair alias if provided through the #keypair_alias dsl" do
+            subject.signing_identity("foo", keypair_alias: "bar")
+            expect(subject).to receive(:is_signed?).with(appx).and_return(true)
             subject.sign_package(appx)
-          end
-
-          it "tries all timestamp server if provided through the #timestamp_server dsl" do
-            subject.signing_identity("foo", timestamp_servers: ["http://fooserver", "http://barserver"])
-            expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(false)
-            expect(subject).to receive(:try_sign).with(appx, "http://barserver").and_return(true)
-            subject.sign_package(appx)
-          end
-
-          it "tries all timestamp server if provided through the #timestamp_servers dsl and stops at the first available" do
-            subject.signing_identity("foo", timestamp_servers: ["http://fooserver", "http://barserver"])
-            expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(true)
-            expect(subject).not_to receive(:try_sign).with(appx, "http://barserver")
-            subject.sign_package(appx)
-          end
-
-          it "raises an exception if there are no available timestamp servers" do
-            subject.signing_identity("foo", timestamp_servers: "http://fooserver")
-            expect(subject).to receive(:try_sign).with(appx, "http://fooserver").and_return(false)
-            expect { subject.sign_package(appx) }.to raise_error(FailedToSignWindowsPackage)
           end
         end
       end
