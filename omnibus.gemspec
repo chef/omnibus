@@ -36,6 +36,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency "license_scout",    "~> 1.0"
 
   gem.add_dependency 'httparty'
+  # Must be pinned otherwise it does not compile on rpm based on centos6
+  gem.add_dependency 'ffi', '=1.15.5'
 
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "artifactory", "~> 2.0"
