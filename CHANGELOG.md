@@ -1,18 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.0.23 -->
-## [9.0.23](https://github.com/chef/omnibus/tree/9.0.23) (2023-09-22)
+<!-- latest_release -->
+<!-- latest_release -->
+<!-- release_rollup -->
+<!-- release_rollup -->
+<!-- latest_stable_release -->
+## [9.0.23](https://github.com/chef/omnibus/tree/9.0.23) (2023-09-25)
 
 #### Merged Pull Requests
 - CHEF-5815: Update signing of all msi packages with new cli tool - `smctl` [#1128](https://github.com/chef/omnibus/pull/1128) ([ahasunos](https://github.com/ahasunos))
-<!-- latest_release -->
-<!-- release_rollup since=9.0.22 -->
-### Changes not yet released to rubygems.org
-
-#### Merged Pull Requests
-- CHEF-5815: Update signing of all msi packages with new cli tool - `smctl` [#1128](https://github.com/chef/omnibus/pull/1128) ([ahasunos](https://github.com/ahasunos)) <!-- 9.0.23 -->
-<!-- release_rollup -->
 <!-- latest_stable_release -->
+
 ## [9.0.22](https://github.com/chef/omnibus/tree/9.0.22) (2023-08-18)
 
 #### Merged Pull Requests
@@ -21,7 +19,6 @@
 - Fix Ruby 3.1 deprecation warning with ERB.new [#1108](https://github.com/chef/omnibus/pull/1108) ([stanhu](https://github.com/stanhu))
 - Update gpg_name to fix RockyLinux rpm signing issue [#1118](https://github.com/chef/omnibus/pull/1118) ([poorndm](https://github.com/poorndm))
 - Update metadata with rocky platform [#1125](https://github.com/chef/omnibus/pull/1125) ([poorndm](https://github.com/poorndm))
-<!-- latest_stable_release -->
 
 ## [9.0.17](https://github.com/chef/omnibus/tree/9.0.17) (2023-02-20)
 
