@@ -2,14 +2,17 @@
 
 <!-- latest_release -->
 <!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=9.0.23 -->
+### Changes not yet released to rubygems.org
 <!-- release_rollup -->
 <!-- latest_stable_release -->
+## [9.0.23](https://github.com/chef/omnibus/tree/9.0.23) (2023-09-25)
+<!-- latest_stable_release -->
+
 ## [9.0.23](https://github.com/chef/omnibus/tree/9.0.23) (2023-09-25)
 
 #### Merged Pull Requests
 - CHEF-5815: Update signing of all msi packages with new cli tool - `smctl` [#1128](https://github.com/chef/omnibus/pull/1128) ([ahasunos](https://github.com/ahasunos))
-<!-- latest_stable_release -->
 
 ## [9.0.22](https://github.com/chef/omnibus/tree/9.0.22) (2023-08-18)
 
