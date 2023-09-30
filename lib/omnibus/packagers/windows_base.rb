@@ -122,13 +122,29 @@ module Omnibus
 
     def is_signed?(package_file)
       # On investigation, it was found that the file is read-only and the signing fails because of that
-      # Attempt #1 - Check if changing the permission on the file helps
+      # Attempt #1 - Check if changing the permission on the file helps - Didn't help!!
+      # Attempt #2 - remove read only using attrib command
       # Attempt #2 - Write a powershell script to bypass the execution policy
 
-      # WARNING: Giving a full 0777 permission
-      # Lower it down to atleast 0666 or 0644 preferably (whatever minimum permission helps)
-      if File.readable?(package_file)
-        File.chmod(0777, package_file)
+      remove_read_only_cmd = "attrib -R #{package_file}"
+      remove_read_only_cmd_status = shellout(remove_read_only_cmd)
+
+      if remove_read_only_cmd_status != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to remove read only status for #{package_file}
+
+                STDOUT
+                ------
+                #{remove_read_only_cmd_status.stdout}
+
+                STDERR
+                ------
+                #{remove_read_only_cmd_status.stderr}
+          EOH
+        end
+      else
+        log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
       end
 
       cmd = [].tap do |arr|
