@@ -125,7 +125,14 @@ module Omnibus
 
       # Attempt #n - Write a powershell script to bypass the execution policy
       # Attempt #3 - Remove readonly using setitemproperty
-      remove_read_only_cmd = "Set-ItemProperty -Path '#{package_file}' -Name IsReadOnly -Value $false"
+
+      # remove_read_only_cmd = "Set-ItemProperty -Path '#{package_file}' -Name IsReadOnly -Value $false"
+
+      remove_read_only_cmd = [].tap do |arr|
+        arr << '%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\powershell.exe'
+        arr << "-Command"
+        arr << "Set-ItemProperty -Path '#{package_file}' -Name IsReadOnly -Value $false"
+      end.join(" ")
       remove_read_only_cmd_status = shellout(remove_read_only_cmd)
 
       if remove_read_only_cmd_status != 0
