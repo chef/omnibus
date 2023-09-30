@@ -122,11 +122,10 @@ module Omnibus
 
     def is_signed?(package_file)
       # On investigation, it was found that the file is read-only and the signing fails because of that
-      # Attempt #1 - Check if changing the permission on the file helps - Didn't help!!
-      # Attempt #2 - remove read only using attrib command
-      # Attempt #2 - Write a powershell script to bypass the execution policy
 
-      remove_read_only_cmd = "attrib -R #{package_file}"
+      # Attempt #n - Write a powershell script to bypass the execution policy
+      # Attempt #3 - Remove readonly using setitemproperty
+      remove_read_only_cmd = "Set-ItemProperty -Path '#{package_file}' -Name IsReadOnly -Value $false"
       remove_read_only_cmd_status = shellout(remove_read_only_cmd)
 
       if remove_read_only_cmd_status != 0
