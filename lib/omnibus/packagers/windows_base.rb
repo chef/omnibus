@@ -122,65 +122,29 @@ module Omnibus
 
     def is_signed?(package_file)
       # On investigation, it was found that the file is read-only and the signing fails because of that
+      cmd_bypass_execution_policy = [].tap do |arr|
+        arr << "powershell.exe"
+        arr << "-ExecutionPolicy Bypass"
+        arr << "-NoProfile"
+        arr << "-Command (attrib -R #{package_file})"
+      end.join(" ")
 
-      icacls_cmd = "icacls #{package_file}"
-      icacls_cmd_status = shellout(icacls_cmd)
-      if icacls_cmd_status.exitstatus != 0
+      remove_read_only_cmd = shellout(cmd_bypass_execution_policy)
+
+      if remove_read_only_cmd.exitstatus != 0
         log.warn(log_key) do
           <<-EOH.strip
-                Failed to view attribute of #{package_file}
-
+                Failed to remove read only status for #{package_file}
                 STDOUT
                 ------
-                #{icacls_cmd_status.stdout}
-
+                #{remove_read_only_cmd.stdout}
                 STDERR
                 ------
-                #{icacls_cmd_status.stderr}
+                #{remove_read_only_cmd.stderr}
           EOH
         end
       else
-        log.debug(log_key) { "icacls stdout: #{icacls_cmd_status.stdout}" }
-      end
-
-      icacls_cmd_reset = "icacls #{package_file} /L /reset"
-      icacls_cmd_status_1 = shellout(icacls_cmd_reset)
-      if icacls_cmd_status_1.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to reset attribute of #{package_file}
-
-                STDOUT
-                ------
-                #{icacls_cmd_status_1.stdout}
-
-                STDERR
-                ------
-                #{icacls_cmd_status_1.stderr}
-          EOH
-        end
-      else
-        log.debug(log_key) { "icacls stdout: #{icacls_cmd_status_1.stdout}" }
-      end
-
-      icacls_cmd = "icacls #{package_file}"
-      icacls_cmd_status = shellout(icacls_cmd)
-      if icacls_cmd_status.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to view attribute of #{package_file}
-
-                STDOUT
-                ------
-                #{icacls_cmd_status.stdout}
-
-                STDERR
-                ------
-                #{icacls_cmd_status.stderr}
-          EOH
-        end
-      else
-        log.debug(log_key) { "icacls stdout: #{icacls_cmd_status.stdout}" }
+        log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
       end
 
       cmd = [].tap do |arr|
