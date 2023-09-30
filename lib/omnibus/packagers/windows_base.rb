@@ -121,7 +121,6 @@ module Omnibus
     end
 
     def is_signed?(package_file)
-
       # On investigation, it was found that the file is read-only and the signing fails because of that
       # Attempt #1 - Check if changing the permission on the file helps
       # Attempt #2 - Write a powershell script to bypass the execution policy
@@ -131,7 +130,6 @@ module Omnibus
       if File.readable?(package_file)
         File.chmod(0777, package_file)
       end
-
 
       cmd = [].tap do |arr|
         arr << "smctl.exe"
