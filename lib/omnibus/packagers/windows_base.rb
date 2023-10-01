@@ -154,13 +154,47 @@ module Omnibus
       # Call the function to remove read-only attribute from the directory
       remove_read_only_attribute(pkg_dir)
 
+      # https://docs.digicert.com/en/software-trust-manager/tools/command-line-interface/smctl-command-manual/manage-signatures.html
+      # Verify if the file can be signed without actually signing it (default value 'false').
+      sign_cmd_dry_run = [].tap do |arr|
+        arr << "smctl.exe"
+        arr << "sign"
+        arr << "--fingerprint #{thumbprint}"
+        arr << "--input #{package_file}"
+        arr << "--dryrun"
+      end.join(" ")
+
+      dry_run_cmd = construct_powershell_command_execution_policy_bypass(sign_cmd_dry_run)
+
+      dry_run = shellout(dry_run_cmd)
+
+      if dry_run.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to check --dryrun for #{package_file}
+
+                STDOUT
+                ------
+                #{dry_run.stdout}
+
+                STDERR
+                ------
+                #{dry_run.stderr}
+          EOH
+        end
+      else
+        log.debug(log_key) { "--dryrun status is: #{dry_run.exitstatus} with stdout as: #{dry_run.stdout}" }
+      end
+
       sign_cmd = [].tap do |arr|
         arr << "smctl.exe"
         arr << "sign"
         arr << "--fingerprint #{thumbprint}"
         arr << "--input #{package_file}"
+        arr << "--verbose"
       end.join(" ")
 
+      cmd = construct_powershell_command_execution_policy_bypass(sign_cmd)
       cmd = [].tap do |arr|
         arr << "powershell.exe"
         arr << "-ExecutionPolicy Bypass"
@@ -254,6 +288,15 @@ module Omnibus
         puts "Error while removing read-only attribute from '#{directory_path}': #{e.message}"
         log.debug(log_key) { "#{self.class}##{__method__} - Error while removing read-only attribute from '#{directory_path}': #{e.message}" }
       end
+    end
+
+    def construct_powershell_command_execution_policy_bypass(command)
+      [].tap do |arr|
+        arr << "powershell.exe"
+        arr << "-ExecutionPolicy Bypass"
+        arr << "-NoProfile"
+        arr << "-Command (#{command})"
+      end.join(" ")
     end
   end
 end
