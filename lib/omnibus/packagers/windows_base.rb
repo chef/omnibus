@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require "fileutils"
 
 module Omnibus
   class Packager::WindowsBase < Packager::Base
@@ -123,30 +124,35 @@ module Omnibus
     def is_signed?(package_file)
       # On investigation, it was found that the file is read-only and the signing fails because of that
 
-      cmd_bypass_execution_policy = [].tap do |arr|
-        arr << "powershell.exe"
-        arr << "-ExecutionPolicy Bypass"
-        arr << "-NoProfile"
-        arr << "-Command (attrib -R #{package_file})"
-      end.join(" ")
+      # cmd_bypass_execution_policy = [].tap do |arr|
+      #   arr << "powershell.exe"
+      #   arr << "-ExecutionPolicy Bypass"
+      #   arr << "-NoProfile"
+      #   arr << "-Command (attrib -R #{package_file})"
+      # end.join(" ")
 
-      remove_read_only_cmd = shellout(cmd_bypass_execution_policy)
+      # remove_read_only_cmd = shellout(cmd_bypass_execution_policy)
 
-      if remove_read_only_cmd.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to remove read only status for #{package_file}
-                STDOUT
-                ------
-                #{remove_read_only_cmd.stdout}
-                STDERR
-                ------
-                #{remove_read_only_cmd.stderr}
-          EOH
-        end
-      else
-        log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
-      end
+      # if remove_read_only_cmd.exitstatus != 0
+      #   log.warn(log_key) do
+      #     <<-EOH.strip
+      #           Failed to remove read only status for #{package_file}
+      #           STDOUT
+      #           ------
+      #           #{remove_read_only_cmd.stdout}
+      #           STDERR
+      #           ------
+      #           #{remove_read_only_cmd.stderr}
+      #     EOH
+      #   end
+      # else
+      #   log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
+      # end
+
+      pkg_dir = "C:/omnibus-ruby/"
+
+      # Call the function to remove read-only attribute from the directory
+      remove_read_only_attribute(pkg_dir)
 
       sign_cmd = [].tap do |arr|
         arr << "smctl.exe"
@@ -228,6 +234,26 @@ module Omnibus
     def windows_package_version
       major, minor, patch = project.build_version.split(/[.+-]/)
       [major, minor, patch, project.build_iteration].join(".")
+    end
+
+    private
+
+    def remove_read_only_attribute(directory_path)
+      # Ensure the directory exists
+      unless File.directory?(directory_path)
+        puts "Directory '#{directory_path}' does not exist."
+        return
+      end
+
+      begin
+        # Remove the read-only attribute from the directory
+        FileUtils.chmod_R(0755, directory_path)
+        puts "Removed read-only attribute from directory '#{directory_path}'."
+        log.debug(log_key) { "#{self.class}##{__method__} - Removed read-only attribute from directory!" }
+      rescue => e
+        puts "Error while removing read-only attribute from '#{directory_path}': #{e.message}"
+        log.debug(log_key) { "#{self.class}##{__method__} - Error while removing read-only attribute from '#{directory_path}': #{e.message}" }
+      end
     end
   end
 end
