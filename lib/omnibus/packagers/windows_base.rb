@@ -123,6 +123,31 @@ module Omnibus
     def is_signed?(package_file)
       # On investigation, it was found that the file is read-only and the signing fails because of that
 
+      cmd_bypass_execution_policy = [].tap do |arr|
+        arr << "powershell.exe"
+        arr << "-ExecutionPolicy Bypass"
+        arr << "-NoProfile"
+        arr << "-Command (attrib -R #{package_file})"
+      end.join(" ")
+
+      remove_read_only_cmd = shellout(cmd_bypass_execution_policy)
+
+      if remove_read_only_cmd.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to remove read only status for #{package_file}
+                STDOUT
+                ------
+                #{remove_read_only_cmd.stdout}
+                STDERR
+                ------
+                #{remove_read_only_cmd.stderr}
+          EOH
+        end
+      else
+        log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
+      end
+
       sign_cmd = [].tap do |arr|
         arr << "smctl.exe"
         arr << "sign"
