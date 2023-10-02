@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require "fileutils"
+require "fileutils" unless defined?(FileUtils)
 
 module Omnibus
   class Packager::WindowsBase < Packager::Base
@@ -164,9 +164,9 @@ module Omnibus
         arr << "--dryrun"
       end.join(" ")
 
-      dry_run_cmd = construct_powershell_command_execution_policy_bypass(sign_cmd_dry_run)
+      # dry_run_cmd = construct_powershell_command_execution_policy_bypass(sign_cmd_dry_run)
 
-      dry_run = shellout(dry_run_cmd)
+      dry_run = shellout(sign_cmd_dry_run)
 
       if dry_run.exitstatus != 0
         log.warn(log_key) do
@@ -194,15 +194,15 @@ module Omnibus
         arr << "--verbose"
       end.join(" ")
 
-      cmd = construct_powershell_command_execution_policy_bypass(sign_cmd)
-      cmd = [].tap do |arr|
-        arr << "powershell.exe"
-        arr << "-ExecutionPolicy Bypass"
-        arr << "-NoProfile"
-        arr << "-Command (#{sign_cmd})"
-      end.join(" ")
+      # cmd = construct_powershell_command_execution_policy_bypass(sign_cmd)
+      # cmd = [].tap do |arr|
+      #   arr << "powershell.exe"
+      #   arr << "-ExecutionPolicy Bypass"
+      #   arr << "-NoProfile"
+      #   arr << "-Command (#{sign_cmd})"
+      # end.join(" ")
 
-      status = shellout(cmd)
+      status = shellout(sign_cmd)
 
       log.debug(log_key) { "#{self.class}##{__method__} - package_file: #{package_file}" }
       log.debug(log_key) { "#{self.class}##{__method__} - cmd: #{cmd}" }
@@ -290,13 +290,13 @@ module Omnibus
       end
     end
 
-    def construct_powershell_command_execution_policy_bypass(command)
-      [].tap do |arr|
-        arr << "powershell.exe"
-        arr << "-ExecutionPolicy Bypass"
-        arr << "-NoProfile"
-        arr << "-Command (#{command})"
-      end.join(" ")
-    end
+    # def construct_powershell_command_execution_policy_bypass(command)
+    #   [].tap do |arr|
+    #     arr << "powershell.exe"
+    #     arr << "-ExecutionPolicy Bypass"
+    #     arr << "-NoProfile"
+    #     arr << "-Command (#{command})"
+    #   end.join(" ")
+    # end
   end
 end
