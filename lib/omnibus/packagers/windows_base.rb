@@ -122,7 +122,7 @@ module Omnibus
     end
 
     def is_signed?(package_file)
-      # On investigation, it was found that the file is read-only and the signing fails because of that
+      # On investigation, it was found that the file is read-only and the signing fails because of that & cert sync issue
       # Perform cert sync
       cert_sync_cmd = [].tap do |arr|
         arr << "smctl.exe"
@@ -130,30 +130,13 @@ module Omnibus
         arr << "certsync"
         arr << "--keypair-alias=key_495941360"
       end.join(" ")
-      puts "Executing command: #{cert_sync_cmd}"
+
+      log.debug(log_key) { "Executing command: #{cert_sync_cmd}" }
       cert_sync = shellout(cert_sync_cmd)
-
-      if cert_sync.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to perform cert sync #{package_file}
-
-                STDOUT
-                ------
-                #{cert_sync.stdout}
-
-                STDERR
-                ------
-                #{cert_sync.stderr}
-          EOH
-        end
-      else
-        log.debug(log_key) { "cert sync success: #{cert_sync.exitstatus} with stdout as: #{cert_sync.stdout}" }
-      end
-
-      pkg_dir = "C:/omnibus-ruby/"
+      log_command_exec_msg(cert_sync, cert_sync_cmd, "Failed to perform cert sync")
 
       # Call the function to remove read-only attribute from the directory
+      pkg_dir = "C:/omnibus-ruby/"
       remove_read_only_attribute(pkg_dir)
 
       # https://docs.digicert.com/en/software-trust-manager/tools/command-line-interface/smctl-command-manual/manage-signatures.html
@@ -166,27 +149,8 @@ module Omnibus
         arr << "--dryrun"
       end.join(" ")
 
-      # dry_run_cmd = construct_powershell_command_execution_policy_bypass(sign_cmd_dry_run)
-
       dry_run = shellout(sign_cmd_dry_run)
-
-      if dry_run.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to check --dryrun for #{package_file}
-
-                STDOUT
-                ------
-                #{dry_run.stdout}
-
-                STDERR
-                ------
-                #{dry_run.stderr}
-          EOH
-        end
-      else
-        log.debug(log_key) { "--dryrun status is: #{dry_run.exitstatus} with stdout as: #{dry_run.stdout}" }
-      end
+      log_command_exec_msg(dry_run, sign_cmd_dry_run, "Failed to check --dryrun for #{package_file}")
 
       sign_cmd = [].tap do |arr|
         arr << "smctl.exe"
@@ -197,25 +161,7 @@ module Omnibus
       end.join(" ")
 
       status = shellout(sign_cmd)
-
-      # log the error if the signing failed
-      if status.exitstatus != 0
-        log.warn(log_key) do
-          <<-EOH.strip
-                Failed to verify signature of #{package_file}
-
-                STDOUT
-                ------
-                #{status.stdout}
-
-                STDERR
-                ------
-                #{status.stderr}
-          EOH
-        end
-      else
-        log.debug(log_key) { "Ran command #{sign_cmd} successfully for package #{package} with status #{status.exitstatus} and stdout #{status.stdout}" }
-      end
+      log_command_exec_msg(status, sign_cmd, "Failed to sign #{package_file}")
 
       status.exitstatus == 0
     end
@@ -279,13 +225,25 @@ module Omnibus
       end
     end
 
-    # def construct_powershell_command_execution_policy_bypass(command)
-    #   [].tap do |arr|
-    #     arr << "powershell.exe"
-    #     arr << "-ExecutionPolicy Bypass"
-    #     arr << "-NoProfile"
-    #     arr << "-Command (#{command})"
-    #   end.join(" ")
-    # end
+    def log_command_exec_msg(status, command = "", message = "")
+      if status.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed running command: #{command}
+                #{message}
+
+                STDOUT
+                ------
+                #{status.stdout}
+
+                STDERR
+                ------
+                #{status.stderr}
+          EOH
+        end
+      else
+        log.debug(log_key) { "Ran command #{command} successfully with exit status: #{status.exitstatus} and stdout: #{status.stdout}" }
+      end
+    end
   end
 end
