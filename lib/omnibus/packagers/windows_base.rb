@@ -123,32 +123,6 @@ module Omnibus
 
     def is_signed?(package_file)
       # On investigation, it was found that the file is read-only and the signing fails because of that
-
-      # cmd_bypass_execution_policy = [].tap do |arr|
-      #   arr << "powershell.exe"
-      #   arr << "-ExecutionPolicy Bypass"
-      #   arr << "-NoProfile"
-      #   arr << "-Command (attrib -R #{package_file})"
-      # end.join(" ")
-
-      # remove_read_only_cmd = shellout(cmd_bypass_execution_policy)
-
-      # if remove_read_only_cmd.exitstatus != 0
-      #   log.warn(log_key) do
-      #     <<-EOH.strip
-      #           Failed to remove read only status for #{package_file}
-      #           STDOUT
-      #           ------
-      #           #{remove_read_only_cmd.stdout}
-      #           STDERR
-      #           ------
-      #           #{remove_read_only_cmd.stderr}
-      #     EOH
-      #   end
-      # else
-      #   log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
-      # end
-
       # Perform cert sync
       cert_sync_cmd = [].tap do |arr|
         arr << "smctl.exe"
@@ -222,22 +196,7 @@ module Omnibus
         arr << "--verbose"
       end.join(" ")
 
-      # cmd = construct_powershell_command_execution_policy_bypass(sign_cmd)
-      # cmd = [].tap do |arr|
-      #   arr << "powershell.exe"
-      #   arr << "-ExecutionPolicy Bypass"
-      #   arr << "-NoProfile"
-      #   arr << "-Command (#{sign_cmd})"
-      # end.join(" ")
-
       status = shellout(sign_cmd)
-
-      log.debug(log_key) { "#{self.class}##{__method__} - package_file: #{package_file}" }
-      log.debug(log_key) { "#{self.class}##{__method__} - cmd: #{cmd}" }
-      log.debug(log_key) { "#{self.class}##{__method__} - status: #{status}" }
-      log.debug(log_key) { "#{self.class}##{__method__} - status.exitstatus: #{status.exitstatus}" }
-      log.debug(log_key) { "#{self.class}##{__method__} - status.stdout: #{status.stdout}" }
-      log.debug(log_key) { "#{self.class}##{__method__} - status.stderr: #{status.stderr}" }
 
       # log the error if the signing failed
       if status.exitstatus != 0
@@ -254,6 +213,8 @@ module Omnibus
                 #{status.stderr}
           EOH
         end
+      else
+        log.debug(log_key) { "Ran command #{sign_cmd} successfully for package #{package} with status #{status.exitstatus} and stdout #{status.stdout}" }
       end
 
       status.exitstatus == 0
