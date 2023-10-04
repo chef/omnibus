@@ -149,6 +149,34 @@ module Omnibus
       #   log.debug(log_key) { "Successfully removed read-only attribute for #{package_file}" }
       # end
 
+      # Perform cert sync
+      cert_sync_cmd = [].tap do |arr|
+        arr << "smctl.exe"
+        arr << "windows"
+        arr << "certsync"
+        arr << "--keypair-alias=key_495941360"
+      end.join(" ")
+      puts "Executing command: #{cert_sync_cmd}"
+      cert_sync = shellout(cert_sync_cmd)
+
+      if cert_sync.exitstatus != 0
+        log.warn(log_key) do
+          <<-EOH.strip
+                Failed to perform cert sync #{package_file}
+
+                STDOUT
+                ------
+                #{cert_sync.stdout}
+
+                STDERR
+                ------
+                #{cert_sync.stderr}
+          EOH
+        end
+      else
+        log.debug(log_key) { "cert sync success: #{cert_sync.exitstatus} with stdout as: #{cert_sync.stdout}" }
+      end
+
       pkg_dir = "C:/omnibus-ruby/"
 
       # Call the function to remove read-only attribute from the directory
