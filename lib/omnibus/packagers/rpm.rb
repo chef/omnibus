@@ -95,8 +95,10 @@ module Omnibus
     #
     def signing_passphrase(val = NULL)
       if null?(val)
+        log.info(log_key) { " ****DEBUGGING ******* FROm IF block  signing_passphrase : val is #{val}" }
         @signing_passphrase
       else
+        log.info(log_key) { " ****DEBUGGING ******* FROM ELSE block signing_passphrase : val is #{val}" }
         @signing_passphrase = val
       end
     end
