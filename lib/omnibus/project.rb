@@ -1055,6 +1055,13 @@ module Omnibus
     def built_manifest
       log.info(log_key) { "Building version manifest" }
       m = Omnibus::Manifest.new(build_version, build_git_revision, license)
+      log.info(log_key) { "Adding software to manifest" }
+
+      # log the caller stack for debugging purposes - Remove later
+      log.debug(log_key) { "Caller stack:" }
+      log.debug(log_key) { caller.join("\n") }
+      log.debug(log_key) { "End caller stack" }
+
       softwares.each do |software|
         m.add(software.name, software.manifest_entry)
       end

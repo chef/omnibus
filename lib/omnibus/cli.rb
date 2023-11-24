@@ -95,6 +95,14 @@ module Omnibus
       project.build
 
       if @options[:output_manifest]
+
+        log.debug(log_key) { "-------------------------------------------" }
+        log.debug(log_key) { "Writing version-manifest.json" }
+        log.debug(log_key) { "Contents: " }
+        log.debug(log_key) { project.built_manifest.to_hash }
+        log.debug(log_key) { "@options[:output_manifest] = #{@options[:output_manifest]}" }
+        log.debug(log_key) { "-------------------------------------------" }
+
         FileUtils.mkdir_p("pkg")
         File.open(::File.join("pkg", "version-manifest.json"), "w") do |f|
           f.write(FFI_Yajl::Encoder.encode(project.built_manifest.to_hash, pretty: true))
