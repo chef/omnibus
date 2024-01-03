@@ -8,8 +8,12 @@
 %define __spec_clean_post true
 %define __spec_clean_pre true
 
-# Use gzip payload compression
-%define _binary_payload w9.gzdio
+# Setup payload compression
+<% if compression_threads != 1 && compression_algo == "xzdio" %>
+%define _binary_payload w<%= compression_level %>T<%= compression_threads %>.xzdio
+<% else %>
+%define _binary_payload w<%= compression_level %>.<%= compression_algo %>
+<% end %>
 
 # Metadata
 Name: <%= name %>
