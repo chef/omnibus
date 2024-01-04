@@ -4,30 +4,54 @@ module Omnibus
 
     class << self
       def generate_sbom(project, tool_name)
-        tool_name = "syft" if tool_name.nil?
+        tool_name ||= "syft"
         log.info(log_key) { "Generating SBOM ..." }
 
         begin
-          # Install Syft
-          project.shellout!("curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin")
-
-          # check for syft version
-          project.shellout!("syft version")
-
-          # list the files in the default root
-          project.shellout!("ls -l #{project.default_root}")
-
-          # Generate SBOM
-          project.shellout!("#{tool_name} packages #{project.default_root} --output spdx-json > sbom.json")
-
-          # display the SBOM
-          project.shellout!("cat sbom.json")
+          install_syft(project)
+          check_syft_version(project)
+          list_files(project)
+          generate_sbom_file(project, tool_name)
+          display_sbom(project)
 
           log.info(log_key) { "SBOM generated successfully" }
         rescue => e
           log.error(log_key) { "SBOM generation failed: #{e.message}" }
           raise
         end
+      end
+
+      private
+
+      def install_syft(project)
+        log.info(log_key) { "Installing syft..." }
+        project.shellout!("curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin")
+        log.info(log_key) { "Syft installed successfully" }
+      end
+
+      def check_syft_version(project)
+        log.info(log_key) { "Checking syft version..." }
+        project.shellout!("syft version")
+        log.info(log_key) { "Syft version checked successfully" }
+      end
+
+      def list_files(project)
+        log.info(log_key) { "Listing files..." }
+        project.shellout!("ls -l #{project.default_root}")
+        project.shellout!("ls -l #{project.default_root}/#{project.name}")
+        log.info(log_key) { "Files listed successfully" }
+      end
+
+      def generate_sbom_file(project, tool_name)
+        log.info(log_key) { "Generating SBOM file..." }
+        project.shellout!("#{tool_name} packages #{project.default_root}/#{project.name} --output spdx-json > sbom.json")
+        log.info(log_key) { "SBOM file generated successfully" }
+      end
+
+      def display_sbom(project)
+        log.info(log_key) { "Displaying SBOM..." }
+        project.shellout!("cat sbom.json")
+        log.info(log_key) { "SBOM displayed successfully" }
       end
     end
   end
