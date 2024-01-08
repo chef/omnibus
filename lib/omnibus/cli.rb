@@ -99,7 +99,7 @@ module Omnibus
 
       log.info(log_key) { "Generating SBOM after build..." }
       require "omnibus/sbom"
-      Omnibus::SBOM.generate_sbom(project, tool_name)
+      Omnibus::SBOM.generate_sbom(project, "syft")
       log.info(log_key) { "SBOM generated successfully after build step!" }
 
       if @options[:output_manifest]
