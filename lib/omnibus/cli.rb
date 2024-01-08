@@ -94,6 +94,14 @@ module Omnibus
       end
       project.build
 
+      log.info(log_key) { "Build complete!" }
+      log.info(log_key) { "#{project.methods}"}
+
+      log.info(log_key) { "Generating SBOM after build..." }
+      require "omnibus/sbom"
+      Omnibus::SBOM.generate_sbom(project, tool_name)
+      log.info(log_key) { "SBOM generated successfully after build step!" }
+
       if @options[:output_manifest]
         FileUtils.mkdir_p("pkg")
         File.open(::File.join("pkg", "version-manifest.json"), "w") do |f|
