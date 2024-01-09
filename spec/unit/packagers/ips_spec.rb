@@ -246,7 +246,9 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with("pkgdepend resolve -m #{staging_dir}/project.p5m.4")
         expect(subject).to receive(:shellout!)
-          .with("pkgmogrify #{staging_dir}/project.p5m.4.res #{staging_dir}/version-lock > #{staging_dir}/project.p5m.5.res")
+          .with("pkgmogrify -DARCH=`uname -p` #{staging_dir}/project.p5m.4.res #{staging_dir}/doc-transform | pkgfmt > #{staging_dir}/project.p5m.4.res-transformed")
+        expect(subject).to receive(:shellout!)
+          .with("pkgmogrify #{staging_dir}/project.p5m.4.res-transformed #{staging_dir}/version-lock > #{staging_dir}/project.p5m.5.res")
         subject.generate_pkg_deps
       end
     end

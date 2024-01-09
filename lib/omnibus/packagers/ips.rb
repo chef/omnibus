@@ -292,7 +292,10 @@ module Omnibus
       shellout!("pkgdepend generate -md #{source_dir} #{pkg_manifest_file}.2 | pkgfmt > #{pkg_manifest_file}.3")
       shellout!("pkgmogrify -DARCH=`uname -p` #{pkg_manifest_file}.3 #{transform_file} | pkgfmt > #{pkg_manifest_file}.4")
       shellout!("pkgdepend resolve -m #{pkg_manifest_file}.4")
-      shellout!("pkgmogrify #{pkg_manifest_file}.4.res #{versionlock_file} > #{pkg_manifest_file}.5.res")
+      # extra step added to truncate bash and other version requirements that may cause conflicts on
+      # Solaris patch versions slightly older than the OS that the build is running on.
+      shellout!("pkgmogrify -DARCH=`uname -p` #{pkg_manifest_file}.4.res #{transform_file} | pkgfmt > #{pkg_manifest_file}.4.res-transformed")
+      shellout!("pkgmogrify #{pkg_manifest_file}.4.res-transformed #{versionlock_file} > #{pkg_manifest_file}.5.res")
     end
 
     #
