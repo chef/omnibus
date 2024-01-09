@@ -48,13 +48,12 @@ module Omnibus
       def generate_sbom_file(project, tool_name)
         log.info(log_key) { "Generating SBOM file..." }
         # project.shellout!("#{tool_name} packages #{project.default_root}/#{project.name} --output spdx-json > sbom.json")
-        project.shellout!("#{tool_name} packages #{Omnibus::Config.project_root}/../ --output spdx-json > sbom-2.json")
+        project.shellout!("#{tool_name} #{Omnibus::Config.project_root}/../Gemfile.lock --output spdx-json > sbom-2.json")
         log.info(log_key) { "SBOM file generated successfully" }
       end
 
       def display_sbom(project)
         log.info(log_key) { "Displaying SBOM..." }
-        # project.shellout!("cat sbom.json")
         project.shellout!("cat sbom-2.json")
         log.info(log_key) { "SBOM displayed successfully" }
       end
