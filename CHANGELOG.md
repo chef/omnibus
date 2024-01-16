@@ -1,9 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release -->
+<!-- latest_release 9.0.24 -->
+## [9.0.24](https://github.com/chef/omnibus/tree/9.0.24) (2024-01-16)
+
+#### Merged Pull Requests
+- Truncate `depend fmri` version specifiers to allow Solaris install flexibility [#1144](https://github.com/chef/omnibus/pull/1144) ([tpowell-progress](https://github.com/tpowell-progress))
 <!-- latest_release -->
 <!-- release_rollup since=9.0.23 -->
 ### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Truncate `depend fmri` version specifiers to allow Solaris install flexibility [#1144](https://github.com/chef/omnibus/pull/1144) ([tpowell-progress](https://github.com/tpowell-progress)) <!-- 9.0.24 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [9.0.23](https://github.com/chef/omnibus/tree/9.0.23) (2023-09-25)
