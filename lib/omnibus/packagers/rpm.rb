@@ -437,7 +437,7 @@ module Omnibus
           render_template(resource_path("rpmmacros.erb"),
             destination: "#{home}/.rpmmacros",
             variables: {
-              gpg_name: project.maintainer,
+              gpg_name: "Opscode Packages",
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
         end

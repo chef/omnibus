@@ -34,19 +34,19 @@ module Omnibus
       before { Config.append_timestamp(true) }
 
       it "appends a timestamp to a static (String) version" do
-        expect(subject_with_version.build_version).to eq("1.0.0+#{today_string}")
+        expect(subject_with_version.build_version).to eq("1.0.0-#{today_string}")
       end
 
       it "doesn't append timestamp to something that already looks like it has a timestamp" do
-        semver = "1.0.0+#{today_string}.git.222.694b062"
-        expect(described_class.new(semver).build_version).to eq("1.0.0+#{today_string}.git.222.694b062")
+        semver = "1.0.0-#{today_string}.git.222.694b062"
+        expect(described_class.new(semver).build_version).to eq("1.0.0-#{today_string}.git.222.694b062")
       end
 
       it "appends a timestamp to a DSL-built version" do
         allow(BuildVersion).to receive(:new).and_return(BuildVersion.new)
         allow(BuildVersion).to receive(:new).with("/etc/zoo").and_return(zoo_version)
         subject_with_description.resolve(zoo_software)
-        expect(subject_with_description.build_version).to eq("5.5.5+#{today_string}")
+        expect(subject_with_description.build_version).to eq("5.5.5-#{today_string}")
       end
     end
 

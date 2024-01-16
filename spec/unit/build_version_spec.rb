@@ -109,12 +109,12 @@ module Omnibus
       end
 
       it "generates a version matching format 'MAJOR.MINOR.PATCH-PRERELEASE+TIMESTAMP.git.COMMITS_SINCE.GIT_SHA'" do
-        expect(build_version.semver).to match(/11.0.0-alpha1\+#{today_string}[0-9]+.git.207.694b062/)
+        expect(build_version.semver).to match(/11.0.0-alpha1\-#{today_string}[0-9]+.git.207.694b062/)
       end
 
       it "uses ENV['BUILD_TIMESTAMP'] to generate timestamp if set" do
         stub_env("BUILD_TIMESTAMP", "2012-12-25_16-41-40")
-        expect(build_version.semver).to eq("11.0.0-alpha1+20121225164140.git.207.694b062")
+        expect(build_version.semver).to eq("11.0.0-alpha1-20121225164140.git.207.694b062")
       end
 
       it "fails on invalid ENV['BUILD_TIMESTAMP'] values" do
@@ -124,7 +124,7 @@ module Omnibus
 
       it "uses ENV['BUILD_ID'] to generate timestamp if set and BUILD_TIMESTAMP is not set" do
         stub_env("BUILD_ID", "2012-12-25_16-41-40")
-        expect(build_version.semver).to eq("11.0.0-alpha1+20121225164140.git.207.694b062")
+        expect(build_version.semver).to eq("11.0.0-alpha1-20121225164140.git.207.694b062")
       end
 
       it "fails on invalid ENV['BUILD_ID'] values" do
@@ -136,7 +136,7 @@ module Omnibus
         let(:git_describe) { "11.0.0-alpha-3-207-g694b062" }
 
         it "converts all dashes to dots" do
-          expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
+          expect(build_version.semver).to match(/11.0.0-alpha.3\-#{today_string}[0-9]+.git.207.694b062/)
         end
       end
 
@@ -144,7 +144,7 @@ module Omnibus
         let(:git_describe) { "11.0.0-alpha2" }
 
         it "appends a timestamp with no git info" do
-          expect(build_version.semver).to match(/11.0.0-alpha2\+#{today_string}[0-9]+/)
+          expect(build_version.semver).to match(/11.0.0-alpha2\-#{today_string}[0-9]+/)
         end
       end
 
@@ -152,20 +152,20 @@ module Omnibus
         let(:git_describe) { "11.0.0-alpha-3-207-g694b062" }
         context "by default" do
           it "appends a timestamp" do
-            expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
+            expect(build_version.semver).to match(/11.0.0-alpha.3\-#{today_string}[0-9]+.git.207.694b062/)
           end
         end
 
         context "when Config.append_timestamp is true" do
           it "appends a timestamp" do
-            expect(build_version.semver).to match(/11.0.0-alpha.3\+#{today_string}[0-9]+.git.207.694b062/)
+            expect(build_version.semver).to match(/11.0.0-alpha.3\-#{today_string}[0-9]+.git.207.694b062/)
           end
         end
 
         context "when Config.append_timestamp is false" do
           before { Config.append_timestamp(false) }
           it "does not append a timestamp" do
-            expect(build_version.semver).to match(/11.0.0-alpha.3\+git.207.694b062/)
+            expect(build_version.semver).to match(/11.0.0-alpha.3\-git.207.694b062/)
           end
         end
       end
