@@ -1,4 +1,7 @@
 <transform dir path=<%= pathdir %>$ -> edit group bin sys>
+<transform dir path=<%= pathdir %>$ -> edit group bin sys>
+<transform depend fmri=pkg:/shell -> edit fmri '@.+' ''>
+<transform depend fmri=pkg:/system -> edit fmri '@.+' ''>
 <transform file depend -> edit pkg.debug.depend.file ruby env>
 <transform file depend -> edit pkg.debug.depend.file make env>
 <transform file depend -> edit pkg.debug.depend.file perl env>
