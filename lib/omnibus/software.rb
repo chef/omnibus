@@ -722,7 +722,7 @@ module Omnibus
             "OBJECT_MODE" => "64",
             "ARFLAGS" => "-X64 cru",
           }
-        when "mac_os_x"
+        when "mac_os_x", "macos"
           {
             "LDFLAGS" => "-L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",

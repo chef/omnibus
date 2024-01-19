@@ -45,7 +45,7 @@ module Omnibus
         log.info(log_key) { "Running strip on #{project.name}" }
         # TODO: properly address missing platforms / linux
         case Ohai["platform"]
-        when "mac_os_x"
+        when "mac_os_x", "macos"
           log.warn(log_key) { "Currently unsupported in macOS platforms." }
         when "aix"
           log.warn(log_key) { "Currently unsupported in AIX platforms." }

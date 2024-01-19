@@ -48,6 +48,7 @@ module Omnibus
       "ips" => IPS,
       "windows" => [MSI, ZIP],
       "mac_os_x" => PKG,
+      "macos" => PKG,
     }.freeze
 
     #

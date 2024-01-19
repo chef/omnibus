@@ -38,7 +38,7 @@ module Omnibus
     def for_current_system(compressors)
       family = Ohai["platform_family"]
 
-      if family == "mac_os_x"
+      if family == "mac_os_x" || family == "macos"
         if compressors.include?(:dmg)
           return DMG
         end
