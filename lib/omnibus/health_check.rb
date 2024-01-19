@@ -149,6 +149,10 @@ module Omnibus
       /libiconv/,
       /libstdc\+\+\.6\.dylib/,
       /libc\+\+\.1\.dylib/,
+      /libzstd\.1\.dylib/,
+      /Security/,
+      /SystemConfiguration/,
+      /libresolv\.9\.dylib/,
     ].freeze
 
     FREEBSD_WHITELIST_LIBS = [
@@ -246,7 +250,7 @@ module Omnibus
       measure("Health check time") do
         log.info(log_key) { "Running health on #{project.name}" }
         bad_libs =  case Ohai["platform"]
-                    when "mac_os_x"
+                    when "macos", "mac_os_x"
                       health_check_otool
                     when "aix"
                       health_check_aix
@@ -450,6 +454,27 @@ module Omnibus
       end
     end
 
+    # Get the dylib install path if present.
+    # When present, it would confuse the healthcheck into thinking the
+    # library is linking with an identically named library, while this not the
+    # indication of any link, and it should jjust be ignored.
+    def get_macos_dylib_install_name(lib)
+      # otool -D expected output:
+      # $> otool -D ..../libddwaf.dylib
+      # /opt/datadog-agent/embedded/lib/python3.11/site-packages/ddtrace/appsec/ddwaf/libddwaf/x86_64/lib/libddwaf.dylib:
+      # @rpath/libddwaf.dylib
+      yield_shellout_results("otool -D #{lib}") do |line|
+        case line
+        when /^(.+):$/
+          # This is the name of the library we're inspecting, nothing to do here
+        when /^(.+).dylib$/
+          install_name = Regexp.last_match[0]
+          return install_name
+        end
+      end
+      return nil
+    end
+
     #
     # Run healthchecks against otool.
     #
@@ -459,15 +484,21 @@ module Omnibus
     def health_check_otool
       current_library = nil
       bad_libs = {}
+      install_name = nil
 
-      yield_shellout_results("find #{project.install_dir}/ -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      yield_shellout_results("find #{project.install_dir} -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
-        when /^\s+(.+) \(.+\)$/
+          install_name = get_macos_dylib_install_name(current_library)
+        when /^\s+(.+) \(.+\)?$/
           linked = Regexp.last_match[1]
           name = File.basename(linked)
-          bad_libs = check_for_bad_macos_library(bad_libs, current_library, name, linked)
+          # If this is just the install name being mentionned, but not an actually
+          # linked dependency then we have nothing to check
+          unless install_name && install_name == linked
+            bad_libs = check_for_bad_macos_library(bad_libs, current_library, name, linked)
+          end
         end
       end
 
