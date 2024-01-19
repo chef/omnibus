@@ -260,8 +260,11 @@ module Omnibus
                       # implicit and hence not detected.
                       log.warn(log_key) { "Skipping dependency health checks on Windows." }
                       {}
-                    else
+                    when "ubuntu", "centos", "opensuseleap"
                       health_check_ldd
+                    else
+                      log.error(log_key) { "Unknown platform \"#{Ohai['platform']}\", cannot perform healthcheck" }
+                      raise HealthCheckFailed
                     end
 
         unresolved = []
