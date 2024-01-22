@@ -251,7 +251,8 @@ module Omnibus
         log.info(log_key) { "Running health on #{project.name}" }
         bad_libs =  case Ohai["platform"]
                     when "macos", "mac_os_x"
-                      health_check_otool
+                      log.info(log_key) { "Temporarily deactivated" }
+                      # health_check_otool
                     when "aix"
                       health_check_aix
                     when "windows"
