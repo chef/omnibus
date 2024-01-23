@@ -28,6 +28,16 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      - name: Clone omnibus-ruby repo
+        uses: actions/checkout@v4
+        with:
+          repository: datadog/omnibus-ruby
+          persist-credentials: false
+          path: omnibus-ruby
+          token: ${{ steps.app-token.outputs.token }}
+          ref: datadog-5.5.0
+          fetch-depth: 0
+
       - name: Setup Python3
         uses: actions/setup-python@v4
         with:
@@ -40,13 +50,19 @@ jobs:
           pip3 install -r requirements.txt
           pip3 install -r tasks/libs/requirements-github.txt
 
+      - name: Get new commit sha1
+        working-directory: omnibus-ruby
+        id: new_sha
+        run: |
+          git fetch
+          NEW_SHA=$(git rev-parse origin/datadog-5.5.0)
+          echo NEW_SHA=${NEW_SHA} >> "${GITHUB_OUTPUT}"
+
       - name: Update release.json
         working-directory: datadog-agent
-        env:
-          OMNIBUS_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          inv -e release.set-release-json 'nightly::OMNIBUS_RUBY_VERSION' ${OMNIBUS_SHA}
-          inv -e release.set-release-json 'nightly-a7::OMNIBUS_RUBY_VERSION' ${OMNIBUS_SHA}
+          inv -e release.set-release-json 'nightly::OMNIBUS_RUBY_VERSION' ${{ steps.new_sha.outputs.NEW_SHA }}
+          inv -e release.set-release-json 'nightly-a7::OMNIBUS_RUBY_VERSION'  ${{ steps.new_sha.outputs.NEW_SHA }}
 
       - name: Compute milestone
         working-directory: datadog-agent
