@@ -446,9 +446,9 @@ module Omnibus
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
 
-          # RHEL 8 has gpg-agent running so we can skip the expect script since the agent
+          # RHEL 8 and Amazon-2023 has gpg-agent running so we can skip the expect script since the agent
           # takes care of the passphrase entering on the signing
-          if dist_tag != ".el8" && dist_tag != ".el9"
+          if dist_tag != ".el8" && dist_tag != ".el9" && dist_tag != ".amazon2023"
             sign_cmd.prepend("#{signing_script} \"").concat("\"")
           end
 
