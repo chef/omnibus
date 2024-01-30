@@ -1,8 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
+<!-- latest_release 9.0.25 -->
+## [9.0.25](https://github.com/chef/omnibus/tree/9.0.25) (2024-01-30)
+
+#### Merged Pull Requests
+- Chef 9376 rpm signing enabled for amazon-2023/muhtuja [#1145](https://github.com/chef/omnibus/pull/1145) ([muthuja](https://github.com/muthuja))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=9.0.24 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Chef 9376 rpm signing enabled for amazon-2023/muhtuja [#1145](https://github.com/chef/omnibus/pull/1145) ([muthuja](https://github.com/muthuja)) <!-- 9.0.25 -->
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 ## [9.0.24](https://github.com/chef/omnibus/tree/9.0.24) (2024-01-16)
