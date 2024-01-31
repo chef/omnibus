@@ -85,7 +85,10 @@ jobs:
           commit-message: 'omnibus: bump OMNIBUS_RUBY_VERSION'
           title: '[omnibus][automated] Bump OMNIBUS_RUBY_VERSION'
           branch: 'automated/omnibus-ruby/${{ github.event.number }}'
-          labels: 'team/agent-platform,changelog/no-changelog,qa/no-code-change'
+          labels: 'team/agent-platform,changelog/no-changelog,qa/no-code-change,qa/skip-qa'
           milestone: ${{ steps.milestone.outputs.MILESTONE_ID }}
-          body: 'Automatically created by merging ${{ github.event.pull_request.html_url }}'
+          body: >
+            Automatically created by merging ${{ github.event.pull_request.html_url }}
+
+            :warning: This PR is opened with the skip-qa labels by default. Please make sure this is appropriate
 
