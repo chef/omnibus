@@ -21,6 +21,7 @@ module Omnibus
 
     autoload :Base,     "omnibus/packagers/base"
     autoload :BFF,      "omnibus/packagers/bff"
+    autoload :OCIRU,    "omnibus/packagers/ociru"
     autoload :DEB,      "omnibus/packagers/deb"
     autoload :Makeself, "omnibus/packagers/makeself"
     autoload :MSI,      "omnibus/packagers/msi"
@@ -38,10 +39,10 @@ module Omnibus
     # @return [Hash<String, Class>]
     #
     PLATFORM_PACKAGER_MAP = {
-      "debian" => DEB,
-      "fedora" => RPM,
-      "suse" => RPM,
-      "rhel" => RPM,
+      "debian" => [DEB, OCIRU],
+      "fedora" => [RPM, OCIRU],
+      "suse" => [RPM, OCIRU],
+      "rhel" => [RPM, OCIRU],
       "wrlinux" => RPM,
       "aix" => BFF,
       "solaris" => Solaris,

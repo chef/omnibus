@@ -27,7 +27,6 @@ module Omnibus
     include DownloadHelpers
     include Sugarable
 
-    OUTPUT_DIRECTORY = "LICENSES".freeze
     CACHE_DIRECTORY = "license-cache".freeze
 
     class << self
@@ -466,7 +465,7 @@ module Omnibus
     # @return [String]
     #
     def output_dir
-      File.expand_path(OUTPUT_DIRECTORY, project.install_dir)
+      project.third_party_licenses_path
     end
 
     #

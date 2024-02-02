@@ -896,6 +896,26 @@ module Omnibus
     expose :third_party_licenses
 
     #
+    # Location of 3rd party licenses directory that omnibus will create and that
+    # will contain licenses of all 3rd party software.
+    #
+    # If no path is specified  install_dir/LICENSES is used.
+    #
+    # @example
+    #   third_party_licenses_path
+    #
+    # @return [String]
+    #
+    def third_party_licenses_path(path = NULL)
+      if null?(path)
+        @third_party_licenses_path || File.join(install_dir, "LICENSES")
+      else
+        @third_party_licenses_path = File.join(install_dir, path)
+      end
+    end
+    expose :third_party_licenses_path
+
+    #
     # Set or retrieve the location of the {#license_file}
     # of the project. It can either be a relative path inside
     # the project source directory or a URL.

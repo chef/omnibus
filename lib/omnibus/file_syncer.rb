@@ -126,19 +126,20 @@ module Omnibus
       source_files = all_files_under(source, options)
 
       # Ensure the destination directory exists
-      FileUtils.mkdir_p(destination) unless File.directory?(destination)
+      create_sync_dir(source, destination)
 
       # Copy over the filtered source files
       source_files.each do |source_file|
         relative_path = relative_path_for(source_file, source)
 
         # Create the parent directory
-        parent = File.join(destination, File.dirname(relative_path))
-        FileUtils.mkdir_p(parent) unless File.directory?(parent)
+        dirname = File.dirname(relative_path)
+        parent = File.join(destination, dirname)
+        create_sync_dir(File.join(source, dirname), parent)
 
         case File.ftype(source_file).to_sym
         when :directory
-          FileUtils.mkdir_p("#{destination}/#{relative_path}")
+          create_sync_dir(File.join(source, relative_path), File.join(destination, relative_path))
         when :link
           target = File.readlink(source_file)
 
@@ -242,6 +243,20 @@ module Omnibus
         stat.nlink > 1
       else
         false
+      end
+    end
+
+    #
+    # Create a "destination" directory with the same name and permissions
+    # as the source directory
+    #
+    def create_sync_dir(source, destination)
+      if not File.directory?(destination)
+        FileUtils.mkdir_p(destination, :mode => File.stat(source).mode)
+      else
+        if File.stat(source).mode != File.stat(destination).mode
+          File.chmod(File.stat(source).mode, destination)
+        end
       end
     end
   end
