@@ -223,7 +223,9 @@ module Omnibus
 
       filelist = {}
       results.each do |r|
-        filelist.merge(r)
+        unless r.nil?
+          filelist.merge(r)
+        end
       end
       filelist.delete("/.")
 
