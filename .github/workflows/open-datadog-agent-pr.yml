@@ -7,7 +7,7 @@ on:
 
 jobs:
   open_bump_pr:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'no-auto-bump')
     runs-on: ubuntu-latest
     steps:
       - name: Create Token

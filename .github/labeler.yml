@@ -1,0 +1,7 @@
+no-auto-bump:
+  - changed-files:
+    - all-globs-to-all-files:
+      - '!**/*.rb'
+      - '!bin/*'
+      - '!Gemfile'
+      - '!omnibus.gemspec'
