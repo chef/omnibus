@@ -128,6 +128,10 @@ module Omnibus
       # Ensure the destination directory exists
       create_sync_dir(source, destination)
 
+      # Clear any hardlink that we might have seen while syncing a previous directory
+      # This can happen when generating 2 different packages in a row
+      hardlink_sources.clear
+
       # Copy over the filtered source files
       source_files.each do |source_file|
         relative_path = relative_path_for(source_file, source)
