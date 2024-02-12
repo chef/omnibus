@@ -26,7 +26,6 @@ jobs:
           path: datadog-agent
           token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
-          fetch-tags: true
 
       - name: Clone omnibus-ruby repo
         uses: actions/checkout@v4
@@ -64,16 +63,6 @@ jobs:
           inv -e release.set-release-json 'nightly::OMNIBUS_RUBY_VERSION' ${{ steps.new_sha.outputs.NEW_SHA }}
           inv -e release.set-release-json 'nightly-a7::OMNIBUS_RUBY_VERSION'  ${{ steps.new_sha.outputs.NEW_SHA }}
 
-      - name: Compute milestone
-        working-directory: datadog-agent
-        env:
-          GITHUB_TOKEN: '${{ steps.app-token.outputs.token }}'
-        id: milestone
-        run: |
-          MILESTONE_NAME=$(inv agent.version --no-include-git --no-include-pre)
-          MILESTONE_ID=$(inv github.get-milestone-id ${MILESTONE_NAME})
-          echo MILESTONE_ID=${MILESTONE_ID} >> "$GITHUB_OUTPUT"
-
       - name: create datadog-agent PR
         uses: peter-evans/create-pull-request@v5
         with:
@@ -86,7 +75,6 @@ jobs:
           title: '[omnibus][automated] Bump OMNIBUS_RUBY_VERSION'
           branch: 'automated/omnibus-ruby/${{ github.event.number }}'
           labels: 'team/agent-platform,changelog/no-changelog,qa/no-code-change,qa/skip-qa'
-          milestone: ${{ steps.milestone.outputs.MILESTONE_ID }}
           body: >
             Automatically created by merging ${{ github.event.pull_request.html_url }}
 
