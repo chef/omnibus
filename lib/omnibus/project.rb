@@ -80,6 +80,7 @@ module Omnibus
     def initialize(filepath = nil, manifest = nil)
       @filepath = filepath
       @manifest = manifest
+      @package_summary = {}
     end
 
     #
@@ -1402,6 +1403,15 @@ module Omnibus
       m
     end
 
+    def build_summary
+      summary = { "build" => {} }
+      softwares.each do |s|
+        summary["build"][s.name] = s.build_summary
+      end
+      summary["packaging"] = @package_summary
+      summary
+    end
+
     def download
       ThreadPool.new(Config.workers) do |pool|
         softwares.each do |software|
@@ -1445,11 +1455,21 @@ module Omnibus
 
       package_me
       compress_me
+
+      write_build_summary
     end
 
     def write_json_manifest
       File.open(json_manifest_path, "w") do |f|
         f.write(FFI_Yajl::Encoder.encode(built_manifest.to_hash, pretty: true))
+      end
+    end
+
+    def write_build_summary
+      out_path = "#{Config.project_root}/pkg/build-summary.json"
+      log.info(log_key) { "Writing build summary to #{out_path}" }
+      File.open(out_path, "w") do |f|
+        f.write(FFI_Yajl::Encoder.encode(build_summary.to_hash, pretty: true))
       end
     end
 
@@ -1495,7 +1515,7 @@ module Omnibus
           next
         end
         # Run the actual packager
-        packager.run!
+        @package_summary[packager.id] = packager.run!
 
         # Copy the generated package and metadata back into the workspace
         package_path = File.join(Config.package_dir, packager.package_name)

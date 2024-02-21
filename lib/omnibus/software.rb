@@ -103,6 +103,8 @@ module Omnibus
       @project  = project
       @manifest = manifest
 
+      @build_summary = { "cached" => false, "build_duration" => 0 }
+
       # Overrides
       @overrides = NULL
     end
@@ -1271,6 +1273,7 @@ module Omnibus
           project.dirty!(self)
         elsif git_cache.restore
           log.info(log_key) { "Restored from cache" }
+          @build_summary["cached"] = true
         else
           log.info(log_key) { "Could not restore from cache" }
           execute_build(build_wrappers)
@@ -1335,6 +1338,14 @@ module Omnibus
 
         digest.hexdigest
       end
+    end
+
+    def store_build_duration(duration)
+      @build_summary['build_duration'] = duration
+    end
+
+    def build_summary
+      @build_summary
     end
 
     private
