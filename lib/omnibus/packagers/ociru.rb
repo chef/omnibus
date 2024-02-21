@@ -84,13 +84,10 @@ module Omnibus
       # create the final package
       package_file = windows_safe_path(Config.package_dir, package_name)
       cmd = <<-EOH.split.join(" ").squeeze(" ").strip
-        tar -C #{staging_dir} -c #{tar_flag}
-        -f #{package_file}
-        .
+        tar -C #{staging_dir} -cf #{package_file} .
       EOH
-      compress_env = { "XZ_OPT" => "-T#{compression_threads} -1" }
-      measure("Final package compression") do
-        shellout!(cmd, environment: compress_env)
+      measure("Final package archive") do
+        shellout!(cmd)
       end
     end
 
@@ -186,17 +183,7 @@ module Omnibus
     end
 
     def package_name
-      case compression_algorithm
-      when "gzip"
-        ext = "gz"
-      when "xz"
-        ext = "xz"
-      when "ztsd"
-        ext = "zst"
-      else
-        raise ArgumentError, "Unknown archive format '#{compression_algorithm}'"
-      end
-      "#{project.package_name}_#{project.build_version}-#{project.build_iteration}_oci_#{oci_architecture}.tar.#{ext}"
+      "#{project.package_name}_#{project.build_version}-#{project.build_iteration}_oci_#{oci_architecture}.tar"
     end
 
     # The remote_updater packager doesn't support debug packaging
