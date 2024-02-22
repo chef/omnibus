@@ -1409,6 +1409,7 @@ module Omnibus
         summary["build"][s.name] = s.build_summary
       end
       summary["packaging"] = @package_summary
+      summary["strip"] = @strip_duration if strip_build
       summary
     end
 
@@ -1445,7 +1446,7 @@ module Omnibus
       write_text_manifest
       HealthCheck.run!(self)
 
-      Stripper.run!(self) if strip_build
+      @strip_duration = Stripper.run!(self) if strip_build
 
       # Remove any package this project extends, after the health check ran
       extended_packages.each do |packages, _|
