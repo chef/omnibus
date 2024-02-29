@@ -113,7 +113,7 @@ module Omnibus
         end
 
         it "returns an array of software descriptions, with all top level deps first, assuming they are not themselves transitive deps" do
-          expect(library.build_order(&:name)).to eql(
+          expect(library.build_order.map(&:name)).to eql(
             [
               preparation, # first
               erlang, # via erchef project
@@ -125,7 +125,8 @@ module Omnibus
               erchef, # project dep
               chef, # project dep
               chefdk, # project dep
-            ].map(&:name))
+            ].map(&:name)
+          )
         end
       end
     end
