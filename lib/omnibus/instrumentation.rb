@@ -24,7 +24,7 @@ module Omnibus
     ensure
       elapsed = Time.now - start
       log.info(log_key) { "#{label}: #{elapsed.to_f.round(4)}s" }
-      return elapsed
+      elapsed
     end
   end
 end
