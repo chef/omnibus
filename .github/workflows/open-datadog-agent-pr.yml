@@ -74,7 +74,7 @@ jobs:
           commit-message: 'omnibus: bump OMNIBUS_RUBY_VERSION'
           title: '[omnibus][automated] Bump OMNIBUS_RUBY_VERSION'
           branch: 'automated/omnibus-ruby/${{ github.event.number }}'
-          labels: 'team/agent-platform,changelog/no-changelog,qa/no-code-change,qa/skip-qa'
+          labels: 'team/agent-platform,changelog/no-changelog,qa/no-code-change'
           body: >
             Automatically created by merging ${{ github.event.pull_request.html_url }}
 
