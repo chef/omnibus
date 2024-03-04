@@ -1446,7 +1446,7 @@ module Omnibus
       write_text_manifest
       HealthCheck.run!(self)
 
-      @strip_duration = Stripper.run!(self) if strip_build
+      Stripper.run!(self) if strip_build
 
       # Remove any package this project extends, after the health check ran
       extended_packages.each do |packages, _|
@@ -1464,6 +1464,14 @@ module Omnibus
       File.open(json_manifest_path, "w") do |f|
         f.write(FFI_Yajl::Encoder.encode(built_manifest.to_hash, pretty: true))
       end
+    end
+
+    def store_strip_duration(duration)
+      @strip_duration = duration
+    end
+
+    def store_package_duration(packager, duration)
+      @package_summary[packager] = duration
     end
 
     def write_build_summary
@@ -1516,7 +1524,7 @@ module Omnibus
           next
         end
         # Run the actual packager
-        @package_summary[packager.id] = packager.run!
+        packager.run!
 
         # Copy the generated package and metadata back into the workspace
         package_path = File.join(Config.package_dir, packager.package_name)

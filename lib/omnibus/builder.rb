@@ -762,12 +762,11 @@ module Omnibus
         end
       end
 
-      build_time = measure("Build #{software.name}") do
+      measure("Build #{software.name}", software.method(:store_build_duration)) do
         build_commands.each do |command|
           execute(command)
         end
       end
-      software.store_build_duration(build_time)
 
       log.info(log_key) { "Finished build" }
     end

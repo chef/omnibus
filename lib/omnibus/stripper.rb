@@ -41,7 +41,7 @@ module Omnibus
     #   if the checks pass
     #
     def run!
-      measure("Stripping time") do
+      measure("Stripping time", project.method(:store_strip_duration)) do
         log.info(log_key) { "Running strip on #{project.name}" }
         # TODO: properly address missing platforms / linux
         case Ohai["platform"]

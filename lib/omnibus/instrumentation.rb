@@ -18,13 +18,15 @@ module Omnibus
   module Instrumentation
     include Logging
 
-    def measure(label, &block)
+    def measure(label, duration_cb = nil)
       start = Time.now
       yield
     ensure
       elapsed = Time.now - start
       log.info(log_key) { "#{label}: #{elapsed.to_f.round(4)}s" }
-      elapsed
+      if duration_cb
+        duration_cb.call(elapsed)
+      end
     end
   end
 end
