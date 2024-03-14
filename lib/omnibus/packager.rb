@@ -31,6 +31,7 @@ module Omnibus
     autoload :IPS,      "omnibus/packagers/ips"
     autoload :RPM,      "omnibus/packagers/rpm"
     autoload :ZIP,      "omnibus/packagers/zip"
+    autoload :XZ,       "omnibus/packagers/xz"
 
     #
     # The list of Ohai platform families mapped to the respective packager
@@ -39,10 +40,10 @@ module Omnibus
     # @return [Hash<String, Class>]
     #
     PLATFORM_PACKAGER_MAP = {
-      "debian" => [DEB, OCIRU],
-      "fedora" => [RPM, OCIRU],
-      "suse" => [RPM, OCIRU],
-      "rhel" => [RPM, OCIRU],
+      "debian" => [DEB, XZ],
+      "fedora" => [RPM, XZ],
+      "suse" => [RPM, XZ],
+      "rhel" => [RPM, XZ],
       "wrlinux" => RPM,
       "aix" => BFF,
       "solaris" => Solaris,
