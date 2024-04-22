@@ -75,23 +75,28 @@ module Omnibus
       log.debug(log_key) { "stripping on linux: #{path}" }
       symboldir = File.join(path, ".debug")
       log.debug(log_key) { "putting symbols here: #{symboldir}" }
-      yield_shellout_results("find #{path}/ -type f -exec file {} \\; | grep 'ELF' | cut -f1 -d:") do |elf|
-        log.debug(log_key) { "processing: #{elf}" }
-        source = elf.strip
 
-        next if strip_skip.any? { |exclude| File.fnmatch?(exclude, source, File::FNM_DOTMATCH) }
+      ThreadPool.new(Config.workers) do |pool|
+        yield_shellout_results("find #{path}/ -type f -exec file {} \\; | grep 'ELF' | cut -f1 -d:") do |elf|
+          pool.schedule do
+            log.debug(log_key) { "processing: #{elf}" }
+            source = elf.strip
 
-        debugfile = "#{source}.dbg"
-        target = File.join(symboldir, debugfile)
+            next if strip_skip.any? { |exclude| File.fnmatch?(exclude, source, File::FNM_DOTMATCH) }
 
-        elfdir = File.dirname(debugfile)
-        FileUtils.mkdir_p "#{symboldir}/#{elfdir}" unless Dir.exist? "#{symboldir}/#{elfdir}"
+            debugfile = "#{source}.dbg"
+            target = File.join(symboldir, debugfile)
 
-        log.debug(log_key) { "stripping #{source}, putting debug info into #{target}" }
-        shellout!("objcopy --only-keep-debug #{source} #{target}")
-        shellout!("strip --strip-debug --strip-unneeded #{source}")
-        shellout("objcopy --add-gnu-debuglink=#{target} #{source}")
-        shellout!("chmod -x #{target}")
+            elfdir = File.dirname(debugfile)
+            FileUtils.mkdir_p "#{symboldir}/#{elfdir}" unless Dir.exist? "#{symboldir}/#{elfdir}"
+
+            log.debug(log_key) { "stripping #{source}, putting debug info into #{target}" }
+            shellout!("objcopy --only-keep-debug #{source} #{target}")
+            shellout!("strip --strip-debug --strip-unneeded #{source}")
+            shellout("objcopy --add-gnu-debuglink=#{target} #{source}")
+            shellout!("chmod -x #{target}")
+          end
+        end
       end
     end
 
