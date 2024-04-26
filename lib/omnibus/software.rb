@@ -1426,7 +1426,7 @@ module Omnibus
       builder.build
       build_wrappers.each { |wrapper| wrapper.execute_post_build(self) }
 
-      if Config.use_git_caching
+      if Config.use_git_caching && !always_build
         git_cache.incremental
         log.info(log_key) { "Dirtied the cache" }
       end
