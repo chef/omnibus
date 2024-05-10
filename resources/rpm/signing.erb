@@ -10,6 +10,7 @@ password = '<%= passphrase %>'
 require 'pty'
 
 puts rpm_cmd
+log.info(log_key) { " <<< DEBUGGING Stmt  - omnibus-signing.erb  rpm_cmd - #{rpm_cmd}"}
 PTY.spawn(rpm_cmd) do |r, w, pid|
   # Older versions of rpmsign will prompt right away for the passphrase
   prompt = r.read(19)

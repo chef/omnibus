@@ -421,10 +421,10 @@ module Omnibus
 
       log.info(log_key) { "Creating .rpm file" }
       shellout!("#{command}")
-
+      log.info(log_key) { "<<<DEBUGGING Stmt  - omnibus-rpm.rb to check signing_passphrase : #{signing_passphrase} " }
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
-
+        log.info(log_key) { "<<<DEBUGGING Stmt  - omnibus-rpm.rb to  signing_passphrase : #{signing_passphrase} is enabled checking for RPM-macros " }
         if File.exist?("#{ENV["HOME"]}/.rpmmacros")
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}'" }
           home = ENV["HOME"]
@@ -443,6 +443,7 @@ module Omnibus
         end
 
         sign_cmd = "rpmsign --addsign #{rpm_file}"
+        log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb Sign_cmd -#{sign_cmd} - rpm file - #{rpm_file}" }
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
 
@@ -450,6 +451,7 @@ module Omnibus
           # takes care of the passphrase entering on the signing
           if dist_tag != ".el8" && dist_tag != ".el9" && dist_tag != ".amazon2023"
             sign_cmd.prepend("#{signing_script} \"").concat("\"")
+            log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb RHEL 8 and Amazon-2023 has gpg-agent running so skipping the expect script -sign_cmd -  #{sign_cmd}"}
           end
 
           shellout!("#{sign_cmd}", environment: { "HOME" => home })
@@ -510,7 +512,7 @@ module Omnibus
     def with_rpm_signing(&block)
       directory   = Dir.mktmpdir
       destination = "#{directory}/sign-rpm"
-
+      log.info(log_key) { " <<<DEBUGGING Stmt  - omnibus-rpm.rb - with_rpm_signing defn - render signing.erb &  passphrase: signing_passphrase" }
       render_template(resource_path("signing.erb"),
         destination: destination,
         mode: 0700,
