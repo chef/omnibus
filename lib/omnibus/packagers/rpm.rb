@@ -452,6 +452,7 @@ module Omnibus
           if dist_tag != ".el8" && dist_tag != ".el9" && dist_tag != ".amazon2023"
             sign_cmd.prepend("#{signing_script} \"").concat("\"")
             log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb RHEL 8 and Amazon-2023 has gpg-agent running so skipping the expect script -sign_cmd -  #{sign_cmd} AND signing_script -> #{signing_script}" }
+            echo "<<<<<< signing_script - `cat #{signing_script}` "
           end
 
           shellout!("#{sign_cmd}", environment: { "HOME" => home })
