@@ -512,7 +512,7 @@ module Omnibus
     def with_rpm_signing(&block)
       directory   = Dir.mktmpdir
       destination = "#{directory}/sign-rpm"
-      log.info(log_key) { " <<<DEBUGGING Stmt  - omnibus-rpm.rb - with_rpm_signing defn - render signing.erb &  passphrase: signing_passphrase" }
+      log.info(log_key) { " <<<DEBUGGING Stmt  - omnibus-rpm.rb - with_rpm_signing defn - render signing.erb &  passphrase: signing_passphrase : #{signing_passphrase}" }
       render_template(resource_path("signing.erb"),
         destination: destination,
         mode: 0700,
