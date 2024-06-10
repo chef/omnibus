@@ -162,16 +162,19 @@ module Omnibus
           raise InsufficientSpecification.new(:version, software)
         end
 
-        unless software.hash
-          raise InsufficientSpecification.new(:hash, software)
-        end
-
-        # We add Software#shasum in the cache key. It's an accurate way
-        # to know if a software definition changed, as it takes into account the
-        # resolved version (ie. the git commit hash if the source is a git repository,
-        # the hashsum of the downloaded file if the source is a remote file), the project,
-        # and all build commands run in the software definition.
-        "licenses/#{software.name}-#{software.version}-#{software.shasum}/#{File.basename(license_file)}"
+        # We add a custom hash of the software recipe in the cache key. It's an accurate way
+        # to know if a software definition changed, as it takes into account recipe file
+        # which contains the software version and all the commands used to build it
+        # We can't rely on the software.shasum directly: software.shasum includes
+        # project.shasum, which value depends on the install directory.
+        # As our OCI builds change their install directory for each pipeline by design,
+        # this would end up creating a new cache entry for every pipeline, ultimately
+        # heavily slowing down each cache lookup.
+        digest = Digest::SHA256.new
+        # This assumes all our softwares have an associated recipe file, unlike what's
+        # done by omnibus in software.shasum
+        update_with_file_contents(digest, software.filepath)
+        "licenses/#{software.name}-#{software.version}-#{digest.hexdigest}/#{File.basename(license_file)}"
       end
 
       private
