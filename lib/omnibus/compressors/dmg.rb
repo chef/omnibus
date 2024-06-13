@@ -36,12 +36,15 @@ module Omnibus
     build do
       create_writable_dmg
       attach_dmg
+      copy_assets_to_dmg
       # Give some time to the system so attached dmg shows up in Finder
       sleep 5
       set_volume_icon
       prettify_dmg
       compress_dmg
       set_dmg_icon
+      verify_dmg
+      remove_writable_dmg
     end
 
     #
@@ -118,7 +121,7 @@ module Omnibus
     def clean_disks
       log.info(log_key) { "Cleaning previously mounted disks" }
 
-      existing_disks = shellout!("mount | grep /Volumes/#{volume_name} | awk '{print $1}'")
+      existing_disks = shellout!("mount | grep \"/Volumes/#{volume_name}\" | awk '{print $1}'")
       existing_disks.stdout.lines.each do |existing_disk|
         existing_disk.chomp!
 
@@ -138,13 +141,12 @@ module Omnibus
 
       shellout! <<-EOH.gsub(/^ {8}/, "")
         hdiutil create \\
-          -srcfolder "#{resources_dir}" \\
           -volname "#{volume_name}" \\
           -fs HFS+ \\
           -fsargs "-c c=64,a=16,e=16" \\
-          -format UDRW \\
           -size 512000k \\
-          "#{writable_dmg}"
+          "#{writable_dmg}" \\
+          -puppetstrings
       EOH
     end
 
@@ -160,6 +162,7 @@ module Omnibus
 
         cmd = shellout! <<-EOH.gsub(/^ {10}/, "")
           hdiutil attach \\
+            -puppetstrings \\
             -readwrite \\
             -noverify \\
             -noautoopen \\
@@ -167,6 +170,17 @@ module Omnibus
         EOH
 
         cmd.stdout.strip
+      end
+    end
+
+    #
+    # Copy assets to dmg
+    #
+    def copy_assets_to_dmg
+      log.info(log_key) { "Copying assets into dmg" }
+
+      FileSyncer.glob("#{resources_dir}/*").each do |file|
+        FileUtils.cp_r(file, "/Volumes/#{volume_name}")
       end
     end
 
@@ -230,7 +244,9 @@ module Omnibus
     end
 
     #
-    # Compress the dmg using hdiutil and zlib.
+    # Compress the dmg using hdiutil and zlib. zlib offers better compression
+    # levels than bzip2 (10.4+) or LZFSE (10.11+), but takes longer to compress.
+    # We're willing to trade slightly longer build times for smaller package sizes.
     #
     # @return [void]
     #
@@ -239,15 +255,53 @@ module Omnibus
 
       Dir.chdir(staging_dir) do
         shellout! <<-EOH.gsub(/^ {10}/, "")
-          chmod -Rf go-w /Volumes/#{volume_name}
+          chmod -Rf go-w "/Volumes/#{volume_name}"
           sync
-          hdiutil detach "#{@device}"
+          hdiutil unmount "#{@device}"
+          # Give some time to the system so unmount dmg
+          ATTEMPTS=1
+          until [ $ATTEMPTS -eq 6 ] || hdiutil detach "#{@device}"; do
+            sleep 10
+            echo Attempt number $(( ATTEMPTS++ ))
+          done
           hdiutil convert \\
             "#{writable_dmg}" \\
             -format UDZO \\
             -imagekey \\
             zlib-level=9 \\
-            -o "#{package_path}"
+            -o "#{package_path}" \\
+            -puppetstrings
+        EOH
+      end
+    end
+
+    #
+    # Verify checksum on created dmg.
+    #
+    # @return [void]
+    #
+    def verify_dmg
+      log.info(log_key) { "Verifying dmg" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, "")
+          hdiutil verify \\
+            "#{package_path}" \\
+            -puppetstrings
+        EOH
+      end
+    end
+
+    #
+    # Remove writable dmg.
+    #
+    # @return [void]
+    #
+    def remove_writable_dmg
+      log.info(log_key) { "Removing writable dmg" }
+
+      Dir.chdir(staging_dir) do
+        shellout! <<-EOH.gsub(/^ {10}/, "")
           rm -rf "#{writable_dmg}"
         EOH
       end

@@ -5,6 +5,7 @@ module Omnibus
     let(:project) do
       Project.new.tap do |project|
         project.name("project")
+        project.friendly_name("Project One")
         project.homepage("https://example.com")
         project.install_dir("/opt/project")
         project.build_version("1.2.3")
@@ -85,13 +86,12 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil create \\
-              -srcfolder "#{staging_dir}/Resources" \\
-              -volname "Project" \\
+              -volname "Project One" \\
               -fs HFS+ \\
               -fsargs "-c c=64,a=16,e=16" \\
-              -format UDRW \\
               -size 512000k \\
-              "#{staging_dir}/project-writable.dmg"
+              "#{staging_dir}/project-writable.dmg" \\
+              -puppetstrings
           EOH
 
         subject.create_writable_dmg
@@ -115,6 +115,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil attach \\
+              -puppetstrings \\
               -readwrite \\
               -noverify \\
               -noautoopen \\
@@ -129,7 +130,14 @@ module Omnibus
       end
     end
 
-    describe '#set_volume_icon' do
+    describe "#copy_assets_to_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.copy_assets_to_dmg }
+        expect(output).to include("Copying assets into dmg")
+      end
+    end
+
+    describe "#set_volume_icon" do
       it "logs a message" do
         output = capture_logging { subject.set_volume_icon }
         expect(output).to include("Setting volume icon")
@@ -155,10 +163,10 @@ module Omnibus
             iconutil -c icns tmp.iconset
 
             # Copy it over
-            cp tmp.icns "/Volumes/Project/.VolumeIcon.icns"
+            cp tmp.icns "/Volumes/Project One/.VolumeIcon.icns"
 
             # Source the icon
-            SetFile -a C "/Volumes/Project"
+            SetFile -a C "/Volumes/Project One"
           EOH
 
         subject.set_volume_icon
@@ -181,7 +189,7 @@ module Omnibus
         contents = File.read("#{staging_dir}/create_dmg.osascript")
 
         expect(contents).to include('tell application "Finder"')
-        expect(contents).to include('  tell disk "Project"')
+        expect(contents).to include('  tell disk "Project One"')
         expect(contents).to include("    open")
         expect(contents).to include("    set current view of container window to icon view")
         expect(contents).to include("    set toolbar visible of container window to false")
@@ -221,23 +229,63 @@ module Omnibus
 
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
-            chmod -Rf go-w /Volumes/Project
+            chmod -Rf go-w "/Volumes/Project One"
             sync
-            hdiutil detach "#{device}"
+            hdiutil unmount "#{device}"
+            # Give some time to the system so unmount dmg
+            ATTEMPTS=1
+            until [ $ATTEMPTS -eq 6 ] || hdiutil detach "/dev/sda1"; do
+              sleep 10
+              echo Attempt number $(( ATTEMPTS++ ))
+            done
             hdiutil convert \\
               "#{staging_dir}/project-writable.dmg" \\
               -format UDZO \\
               -imagekey \\
               zlib-level=9 \\
-              -o "#{package_dir}/project-1.2.3-2.dmg"
-            rm -rf "#{staging_dir}/project-writable.dmg"
+              -o "#{package_dir}/project-1.2.3-2.dmg" \\
+              -puppetstrings
           EOH
 
         subject.compress_dmg
       end
     end
 
-    describe '#set_dmg_icon' do
+    describe "#verify_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.verify_dmg }
+        expect(output).to include("Verifying dmg")
+      end
+
+      it "runs the command" do
+        expect(subject).to receive(:shellout!)
+          .with <<-EOH.gsub(/^ {12}/, "")
+            hdiutil verify \\
+              "#{package_dir}/project-1.2.3-2.dmg" \\
+              -puppetstrings
+          EOH
+
+        subject.verify_dmg
+      end
+    end
+
+    describe "#remove_writable_dmg" do
+      it "logs a message" do
+        output = capture_logging { subject.remove_writable_dmg }
+        expect(output).to include("Removing writable dmg")
+      end
+
+      it "runs the command" do
+        expect(subject).to receive(:shellout!)
+          .with <<-EOH.gsub(/^ {12}/, "")
+            rm -rf "#{staging_dir}/project-writable.dmg"
+          EOH
+
+        subject.remove_writable_dmg
+      end
+    end
+
+    describe "#set_dmg_icon" do
       it "logs a message" do
         output = capture_logging { subject.set_dmg_icon }
         expect(output).to include("Setting dmg icon")
@@ -291,8 +339,7 @@ module Omnibus
 
     describe '#volume_name' do
       it "is the project friendly_name" do
-        project.friendly_name("Friendly Bacon Bits")
-        expect(subject.volume_name).to eq("Friendly Bacon Bits")
+        expect(subject.volume_name).to eq("Project One")
       end
     end
   end
