@@ -7,7 +7,7 @@ on:
 
 jobs:
   open_bump_pr:
-    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'no-auto-bump')
+    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'no-auto-bump') && github.ref == 'refs/heads/datadog-5.5.0'
     runs-on: ubuntu-latest
     steps:
       - name: Create Token
@@ -40,7 +40,7 @@ jobs:
       - name: Setup Python3
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11.5"
+          python-version: "3.11.8"
           cache: "pip"
 
       - name: Install python deps
