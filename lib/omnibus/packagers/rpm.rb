@@ -441,26 +441,33 @@ module Omnibus
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
           end
-      #INSTALL_USER_NAME = "chef-ci"
-      PACKAGE_SIGNING_KEY = `cat /home/chef-ci/private_key`
-      #PACKAGE_SIGNING_KEY_UNIQUE_ID=${vault("account/static/packages/test_keys", "packages_at_chef_io_unique_id")},
-      PACKAGE_SIGNING_KEY_UNIQUE_ID = "E3531A01"
-      PACKAGE_SIGNING_KEY = "${PACKAGE_SIGNING_KEY:?PACKAGE_SIGNING_KEY must be set}"
-      PACKAGE_SIGNING_KEY_UNIQUE_ID = "${PACKAGE_SIGNING_KEY_UNIQUE_ID:?PACKAGE_SIGNING_KEY_UNIQUE_ID must be set}"
+  # Read the private key from the file
+  package_signing_key = File.read('/home/chef-ci/private_key').strip
+  package_signing_key_unique_id = "E3531A01"
 
-      echo "PACKAGE_SIGNING_KEY= $PACKAGE_SIGNING_KEY"
-      echo "PACKAGE_SIGNING_KEY_UNIQUE_I = $PACKAGE_SIGNING_KEY_UNIQUE_ID"
+  # Ensure the environment variables are set
+  raise "PACKAGE_SIGNING_KEY must be set" if package_signing_key.empty?
+  raise "PACKAGE_SIGNING_KEY_UNIQUE_ID must be set" if package_signing_key_unique_id.empty?
 
-      echo "--- Importing packages@chef.io gpg signing key"
-      if ! gpg --list-secret-keys "$PACKAGE_SIGNING_KEY_UNIQUE_ID"; then
-        echo "$PACKAGE_SIGNING_KEY" | gpg --import
-      fi
+  puts "PACKAGE_SIGNING_KEY= #{package_signing_key}"
+  puts "PACKAGE_SIGNING_KEY_UNIQUE_ID= #{package_signing_key_unique_id}"
 
-      echo "--- Installing .rpmmacros"
-      cat <<-EOF > ~/.rpmmacros
-         %_signature gpg
-         %_gpg_name  Opscode Packages
-      EOF
+  # Importing the GPG signing key
+  puts "--- Importing packages@chef.io gpg signing key"
+  unless system("gpg --list-secret-keys '#{package_signing_key_unique_id}'")
+  IO.popen("gpg --import", "w") do |gpg_io|
+    gpg_io.write(package_signing_key)
+  end
+end
+
+# Install the .rpmmacros file
+puts "--- Installing .rpmmacros"
+File.open("#{Dir.home}/.rpmmacros", 'w') do |file|
+  file.write <<~EOF
+    %_signature gpg
+    %_gpg_name Opscode Packages
+  EOF
+end
 
         sign_cmd = "rpmsign --addsign #{rpm_file}"
         log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb Sign_cmd -#{sign_cmd} - rpm file - #{rpm_file}" }
