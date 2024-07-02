@@ -441,12 +441,12 @@ module Omnibus
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
           end
-      INSTALL_USER_NAME="chef-ci"
-      PACKAGE_SIGNING_KEY=`cat /home/chef-ci/private_key`
+      #INSTALL_USER_NAME = "chef-ci"
+      PACKAGE_SIGNING_KEY = `cat /home/chef-ci/private_key`
       #PACKAGE_SIGNING_KEY_UNIQUE_ID=${vault("account/static/packages/test_keys", "packages_at_chef_io_unique_id")},
-      PACKAGE_SIGNING_KEY_UNIQUE_ID="E3531A01"
-      PACKAGE_SIGNING_KEY="${PACKAGE_SIGNING_KEY:?PACKAGE_SIGNING_KEY must be set}"
-      PACKAGE_SIGNING_KEY_UNIQUE_ID="${PACKAGE_SIGNING_KEY_UNIQUE_ID:?PACKAGE_SIGNING_KEY_UNIQUE_ID must be set}"
+      PACKAGE_SIGNING_KEY_UNIQUE_ID = "E3531A01"
+      PACKAGE_SIGNING_KEY = "${PACKAGE_SIGNING_KEY:?PACKAGE_SIGNING_KEY must be set}"
+      PACKAGE_SIGNING_KEY_UNIQUE_ID = "${PACKAGE_SIGNING_KEY_UNIQUE_ID:?PACKAGE_SIGNING_KEY_UNIQUE_ID must be set}"
 
       echo "PACKAGE_SIGNING_KEY= $PACKAGE_SIGNING_KEY"
       echo "PACKAGE_SIGNING_KEY_UNIQUE_I = $PACKAGE_SIGNING_KEY_UNIQUE_ID"
