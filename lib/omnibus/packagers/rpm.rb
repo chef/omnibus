@@ -441,8 +441,15 @@ module Omnibus
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
           end
-          gpg --import "/home/chef-ci/private_key"
-        sign_cmd = "rpmsign --addsign --define "_gpg_name E3531A01" #{rpm_file}"
+        # private_key_file = "/home/chef-ci/private_key"
+        # import_command = "gpg --import #{private_key_file}"
+        # stdout, stderr, status = Open3.capture3(import_command)
+        # if status.success?
+        #   puts "Key imported successfully"
+        # else
+        #   puts "Error importing key: #{stderr}"
+        # end
+        sign_cmd = "rpmsign --addsign --define '_gpg_name E3531A01' #{rpm_file}"
         log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb Sign_cmd -#{sign_cmd} - rpm file - #{rpm_file}" }
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
