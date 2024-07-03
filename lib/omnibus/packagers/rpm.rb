@@ -440,7 +440,7 @@ module Omnibus
               gpg_name: "Opscode Packages",
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
-          end
+        end
         # private_key_file = "/home/chef-ci/private_key"
         # import_command = "gpg --import #{private_key_file}"
         # stdout, stderr, status = Open3.capture3(import_command)
