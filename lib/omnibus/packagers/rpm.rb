@@ -441,7 +441,8 @@ module Omnibus
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
           end
-        sign_cmd = "rpmsign --define 'Opscode Packages' E3531A01 --addsign #{rpm_file}"
+          gpg --import "/home/chef-ci/private_key"
+        sign_cmd = "rpmsign --addsign --define "_gpg_name E3531A01" #{rpm_file}"
         log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb Sign_cmd -#{sign_cmd} - rpm file - #{rpm_file}" }
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
