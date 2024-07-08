@@ -426,8 +426,9 @@ module Omnibus
         log.info(log_key) { "Signing enabled for .rpm file" }
         log.info(log_key) { "<<<DEBUGGING Stmt  - omnibus-rpm.rb to  signing_passphrase : #{signing_passphrase} is enabled checking for RPM-macros " }
         if File.exist?("#{ENV["HOME"]}/.rpmmacros")
-          log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}'" }
+          log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}' \n rpmmacros:" }
           home = ENV["HOME"]
+          shellout!(cat "#{ENV["HOME"]}/.rpmmacros")
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
 
