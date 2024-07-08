@@ -429,8 +429,7 @@ module Omnibus
           log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}' \n rpmmacros:" }
           home = ENV["HOME"]
           command2 = "cat #{ENV["HOME"]}/.rpmmacros "
-            shellout!("#{command2}")
-          shellout!(cat "#{ENV["HOME"]}/.rpmmacros")
+          shellout!("#{command2}")
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
 
