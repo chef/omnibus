@@ -451,8 +451,9 @@ module Omnibus
         # else
         #   puts "Error importing key: #{stderr}"
         # end
-        gpg_key_id = "E3531A01"
-        sign_cmd = "rpmsign --addsign --define '_gpg_name #{gpg_key_id}' #{rpm_file}"
+        #gpg_key_id = "E3531A01"
+        #sign_cmd = "rpmsign --addsign --define '_gpg_name #{gpg_key_id}' #{rpm_file}"
+        sign_cmd = "rpmsign --addsign #{rpm_file}"
         log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb Sign_cmd -#{sign_cmd} - rpm file - #{rpm_file}" }
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
