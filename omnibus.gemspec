@@ -32,6 +32,11 @@ Gem::Specification.new do |gem|
   gem.add_dependency "contracts",        ">= 0.16.0", "< 0.17.0"
   gem.add_dependency "rexml",            "~> 3.2"
 
+  if Gem::Version.new(RUBY_VERSION) <= Gem::Version.new("3.1.0")
+    gem.add_dependency "ffi", "< 1.17.0"
+    gem.add_dependency "train-core", "< 3.12.5"
+  end
+
   gem.add_dependency "mixlib-versioning"
   gem.add_dependency "pedump"
 
