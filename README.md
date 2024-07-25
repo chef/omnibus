@@ -157,7 +157,8 @@ Here is an example:
 name "ruby"
 default_version "1.9.2-p290"
 source url: "http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-#{version}.tar.gz",
-       md5: "604da71839a6ae02b5b5b5e1b792d5eb"
+       md5: "604da71839a6ae02b5b5b5e1b792d5eb",
+       extract: false
 
 dependency "zlib"
 dependency "ncurses"
