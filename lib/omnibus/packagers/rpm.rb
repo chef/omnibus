@@ -401,7 +401,7 @@ module Omnibus
                          else # default to gzip
                            "gzdio"
                          end
-      "w#{compression_level}.#{compression_name}"
+      "w#{compression_level}T.#{compression_name}"
     end
 
     #
