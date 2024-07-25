@@ -28,7 +28,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "ohai",             ">= 16", "< 19"
   gem.add_dependency "ruby-progressbar", "~> 1.7"
   gem.add_dependency "thor",             ">= 0.18", "< 2.0"
-  gem.add_dependency "license_scout",    "~> 1.0"
+  gem.add_dependency "license_scout",    "~> 1.3.8"
   gem.add_dependency "contracts",        ">= 0.16.0", "< 0.17.0"
   gem.add_dependency "rexml",            "~> 3.2"
 
