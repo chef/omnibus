@@ -35,6 +35,7 @@ WHITELIST_LIBS = [
 
 ARCH_WHITELIST_LIBS = [
   /libanl\.so/,
+  /libatomic\.so/,
   /libc\.so/,
   /libcrypt\.so/,
   /libdb-5\.3\.so/,
