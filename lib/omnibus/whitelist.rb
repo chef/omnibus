@@ -17,6 +17,7 @@
 WHITELIST_LIBS = [
     /ld-linux/,
     /libanl\.so/,
+    /libatomic\.so/,
     /libc\.so/,
     /libcrypt\.so/,
     /libdl/,
@@ -35,6 +36,7 @@ WHITELIST_LIBS = [
 
 ARCH_WHITELIST_LIBS = [
   /libanl\.so/,
+  /libatomic\.so/,
   /libc\.so/,
   /libcrypt\.so/,
   /libdb-5\.3\.so/,
@@ -69,6 +71,7 @@ OMNIOS_WHITELIST_LIBS = [
   /libc\.so\.1/,
   /libcrypt\./,
   /libcrypt\.so\.1/,
+  /libatomic\.so/,
   /libdl\.so\.1/,
   /libgcc_s\.so\.1/,
   /libgen\.so\.1/,
