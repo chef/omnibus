@@ -421,13 +421,15 @@ module Omnibus
 
       log.info(log_key) { "Creating .rpm file" }
       shellout!("#{command}")
-
+      log.info(log_key) { "<<<DEBUGGING Stmt  - omnibus-rpm.rb to check signing_passphrase : #{signing_passphrase} " }
       if signing_passphrase
         log.info(log_key) { "Signing enabled for .rpm file" }
-
+        log.info(log_key) { "<<<DEBUGGING Stmt  - omnibus-rpm.rb to  signing_passphrase : #{signing_passphrase} is enabled checking for RPM-macros " }
         if File.exist?("#{ENV["HOME"]}/.rpmmacros")
-          log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}'" }
+          log.info(log_key) { "Detected .rpmmacros file at `#{ENV["HOME"]}' \n rpmmacros:" }
           home = ENV["HOME"]
+          command2 = "cat #{ENV["HOME"]}/.rpmmacros "
+          shellout!("#{command2}")
         else
           log.info(log_key) { "Using default .rpmmacros file from Omnibus" }
 
@@ -441,8 +443,18 @@ module Omnibus
               gpg_path: "#{ENV["HOME"]}/.gnupg", # TODO: Make this configurable
             })
         end
-
+        # private_key_file = "/home/chef-ci/private_key"
+        # import_command = "gpg --import #{private_key_file}"
+        # stdout, stderr, status = Open3.capture3(import_command)
+        # if status.success?
+        #   puts "Key imported successfully"
+        # else
+        #   puts "Error importing key: #{stderr}"
+        # end
+        # gpg_key_id = "E3531A01"
+        # sign_cmd = "rpmsign --addsign --define '_gpg_name #{gpg_key_id}' #{rpm_file}"
         sign_cmd = "rpmsign --addsign #{rpm_file}"
+        log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb Sign_cmd -#{sign_cmd} - rpm file - #{rpm_file}" }
         with_rpm_signing do |signing_script|
           log.info(log_key) { "Signing the built rpm file" }
 
@@ -450,6 +462,10 @@ module Omnibus
           # takes care of the passphrase entering on the signing
           if dist_tag != ".el8" && dist_tag != ".el9" && dist_tag != ".amazon2023"
             sign_cmd.prepend("#{signing_script} \"").concat("\"")
+            log.info(log_key) { " DEBUGGING Stmt  - omnibus-rpm.rb RHEL 8 and Amazon-2023 has gpg-agent running so skipping the expect script -sign_cmd -  #{sign_cmd} AND signing_script -> #{signing_script}" }
+            log.info(log_key) { "<<<<<< signing_script - cat #{signing_script} " }
+            command1 = "cat #{signing_script} "
+            shellout!("#{command1}")
           end
 
           shellout!("#{sign_cmd}", environment: { "HOME" => home })
@@ -510,7 +526,7 @@ module Omnibus
     def with_rpm_signing(&block)
       directory   = Dir.mktmpdir
       destination = "#{directory}/sign-rpm"
-
+      log.info(log_key) { " <<<DEBUGGING Stmt  - omnibus-rpm.rb - with_rpm_signing defn - render signing.erb &  passphrase: signing_passphrase : #{signing_passphrase}" }
       render_template(resource_path("signing.erb"),
         destination: destination,
         mode: 0700,
