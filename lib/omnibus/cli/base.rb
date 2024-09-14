@@ -69,9 +69,7 @@ module Omnibus
         if %w{true false nil}.include?(value)
           log.debug(log_key) { "Detected #{value.inspect} should be an object" }
           value = { "true" => true, "false" => false, "nil" => nil }[value]
-        end
-
-        if value =~ /\A[[:digit:]]+\Z/
+        elsif value =~ /\A[[:digit:]]+\Z/
           log.debug(log_key) { "Detected #{value.inspect} should be an integer" }
           value = value.to_i
         end
