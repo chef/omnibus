@@ -786,7 +786,8 @@ module Omnibus
           }
         else
           {
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib -L#{install_dir}/embedded/lib",
+            # -z origin makes the rpath interpret the $ORIGIN variable as the binary path
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib,-z,origin -L#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
         end
