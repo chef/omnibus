@@ -785,11 +785,27 @@ module Omnibus
             "CFLAGS" => "-I#{install_dir}/embedded/include #{arch_flag} -O2 -fno-lto #{opt_flag}",
           }
         else
-          {
+          flags = {
             # -z origin makes the rpath interpret the $ORIGIN variable as the binary path
-            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib,-z,origin -L#{install_dir}/embedded/lib",
+            "LDFLAGS" => "-Wl,-rpath,#{install_dir}/embedded/lib,-z,origin -L#{install_dir}/embedded/lib -Wl,-rpath-link=#{install_dir}/embedded/lib",
             "CFLAGS" => "-I#{install_dir}/embedded/include -O2",
           }
+          # List of environment variables to forward and potentially map to an alternate name
+          # If the value is nil, the key will simply be forwarded from ENV to flags
+          to_forward = {
+            DD_CC: "CC",
+            DD_CXX: "CXX",
+            DD_CMAKE_TOOLCHAIN: nil,
+          }
+          to_forward.each do |orig, forwarded|
+            if ENV[orig.to_s]
+              flags[forwarded] = ENV[orig.to_s] if forwarded
+              # Forward the toolchain env since some invoke tasks
+              # rely on it down the line
+              flags[orig.to_s] = ENV[orig.to_s]
+            end
+          end
+          flags
         end
 
       # merge LD_RUN_PATH into the environment.  most unix distros will fall

@@ -241,9 +241,13 @@ module Omnibus
       cmake_cmd << "-DCMAKE_INSTALL_LIBDIR=#{libdir}" if libdir && libdir != ""
       rpath = options.delete(:rpath) || "#{prefix}/#{libdir}"
       cmake_cmd << "-DCMAKE_INSTALL_RPATH=#{rpath}" if rpath && rpath != ""
+
+      if ENV['DD_CMAKE_TOOLCHAIN']
+        cmake_cmd << "--toolchain #{ENV['DD_CMAKE_TOOLCHAIN']}"
+      end
+
       cmake_cmd.concat args
       cmake_cmd = cmake_cmd.join(" ").strip
-
       command(cmake_cmd, options)
 
       make("-j #{workers}", options)
