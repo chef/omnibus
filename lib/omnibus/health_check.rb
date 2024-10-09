@@ -511,16 +511,40 @@ module Omnibus
       # feed the list of files to the "ldd" command
       #
 
-      # this command will typically fail if the last file isn't a valid lib/binary which happens often
-      ldd_output = shellout(ldd_command, input: find_output.join).stdout
+      # instance Mixlib::ShellOut
+      ldd_cmd = shellout(ldd_command, input: find_output.join)
 
-      #
-      # do the output process to determine if the files are good or bad
-      #
+      # Optimized path: Attempt to run the `ldd` command on all file paths. If it succeeds, then process
+      # the stdout result in bulk. If the command returned a non-zero exit status code, then something went wrong.
+      # Each path will have to be manually resolved
+      unless ldd_cmd.error?
+        # do the output process to determine if the files are good or bad
+        ldd_cmd.stdout.each_line do |line|
+          output_proc.call(line)
+        end
+      else
+        log.debug(log_key) { "Failed running #{ldd_command} with exit status #{ldd_cmd.exitstatus} when resolving individually" }
 
-      ldd_output.each_line do |line|
-        output_proc.call(line)
+        # Verify each path separately
+        find_output.each do |path|
+          ldd_cmd = shellout(ldd_command, input: path)
+          if ldd_cmd.error?
+            log.debug(log_key) { "Failed running #{ldd_command} with exit status #{ldd_cmd.exitstatus} against: #{path}" }
+          end
+
+          ldd_output = ldd_cmd.stdout
+
+          # Yield the path first
+          output_proc.call("#{path.rstrip}:")
+
+          # do the output process to determine if the files are good or bad
+          ldd_output.each_line do |line|
+            output_proc.call(line)
+          end
+        end
       end
+
+      nil
     end
 
     #
