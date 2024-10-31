@@ -25,8 +25,8 @@ module Omnibus
       #
       # /opt/hamlet => /tmp/daj29013/proto_install/opt/hamlet
       # Create the proto_install directory inside staging_dir
-      destination = File.join(source_dir, project.install_dir)
-      FileSyncer.sync(project.install_dir, destination, exclude: exclusions)
+      destination = File.join(source_dir, project.build_dir)
+      FileSyncer.sync(project.build_dir, destination, exclude: exclusions)
       write_transform_file
     end
 

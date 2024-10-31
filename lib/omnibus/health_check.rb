@@ -489,7 +489,7 @@ module Omnibus
       bad_libs = {}
       install_name = nil
 
-      yield_shellout_results("find #{project.install_dir} -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
+      yield_shellout_results("find #{project.build_dir} -type f | egrep '\.(dylib|bundle)$' | xargs otool -L") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -532,7 +532,7 @@ module Omnibus
       if !safe
         rpath_regexp = Regexp.new("@rpath")
         loader_path_regexp = Regexp.new("@loader_path")
-        install_dir_regexp = Regexp.new(project.install_dir)
+        build_dir_regexp = Regexp.new(project.build_dir)
         loader_path = File.dirname(current_library)
 
         # Do the linker's work of replacing @rpath with the rpaths defined by the library
@@ -563,7 +563,7 @@ module Omnibus
           possible_paths = [linked]
         end
 
-        linked_present = possible_paths.any? { |path| path =~ install_dir_regexp }
+        linked_present = possible_paths.any? { |path| path =~ build_dir_regexp }
       end
 
       if !safe && !linked_present
@@ -624,7 +624,7 @@ module Omnibus
       current_library = nil
       bad_libs = {}
 
-      yield_shellout_results("find #{project.install_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}' | xargs ldd") do |line|
+      yield_shellout_results("find #{project.build_dir}/ -type f -regextype posix-extended ! -regex '#{regexp}' | xargs ldd") do |line|
         case line
         when /^(.+):$/
           current_library = Regexp.last_match[1]
@@ -724,7 +724,7 @@ module Omnibus
       log.debug(log_key) { "  --> Dependency: #{name}" }
       log.debug(log_key) { "  --> Provided by: #{linked}" }
 
-      if !safe && linked !~ Regexp.new(project.install_dir)
+      if !safe && linked !~ Regexp.new(project.build_dir)
         log.debug(log_key) { "    -> FAILED: #{current_library} has unsafe dependencies" }
         bad_libs[current_library] ||= {}
         bad_libs[current_library][name] ||= {}

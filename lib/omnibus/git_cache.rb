@@ -205,6 +205,16 @@ module Omnibus
       @install_dir ||= software.project.install_dir.sub(/^([A-Za-z]:)/, "")
     end
 
+    # The build directory for this software's project. Drive letters are
+    # stripped for Windows.
+    #
+    # @return [String]
+    #
+    def build_dir
+      @build_dir ||= software.project.build_dir.sub(/^([A-Za-z]:)/, "")
+    end
+
+
     # Override the log_key for this class to include the software name
     #
     # @return [String]

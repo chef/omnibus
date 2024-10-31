@@ -186,6 +186,15 @@ module Omnibus
     end
     expose :install_dir
 
+    def build_dir(val = NULL)
+      if null?(val)
+        @build_dir || raise(MissingRequiredAttribute.new(self, :build_dir, "/opt/datadog-agent"))
+      else
+        @build_dir = val.tr('\\', "/").squeeze("/").chomp("/")
+      end
+    end
+    expose :build_dir
+
     def sources_dir(val = NULL)
       if null?(val)
         @sources_dir || File.expand_path("#{files_path}/sources")

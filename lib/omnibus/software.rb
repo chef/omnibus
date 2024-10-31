@@ -614,7 +614,7 @@ module Omnibus
     # @return [String]
     #
     def build_dir
-      File.expand_path("#{Config.build_dir}/#{project.name}")
+      @project.build_dir
     end
     expose :build_dir
 

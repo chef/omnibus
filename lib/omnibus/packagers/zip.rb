@@ -38,7 +38,7 @@ module Omnibus
       end
       # If there are extra package files let's add them
       zip_file = windows_safe_path(Config.package_dir, zip_name)
-      zip_source_path = "#{windows_safe_path(project.install_dir)}\\*"
+      zip_source_path = "#{windows_safe_path(project.build_dir)}\\*"
       cmd = <<-EOH.split.join(" ").squeeze(" ").strip
         7z a -r
         #{zip_file}
