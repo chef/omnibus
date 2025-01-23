@@ -151,8 +151,15 @@ module Omnibus
     # @return [void]
     #
     def git_clone
-      retry_block("git clone", [CommandTimeout, CommandFailed]) do
-        git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
+      retry_block("custom git clone", [CommandTimeout, CommandFailed]) do
+        log.info(log_key) { "Cloning repository #{source_url} at revision #{resolved_version}" }
+        git("init")
+        git("remote add origin #{source_url}")
+        git("fetch origin #{resolved_version}")
+        git("checkout #{resolved_version}")
+        if clone_submodules?
+          git("submodule update --init --recursive")
+        end
       end
     end
 
