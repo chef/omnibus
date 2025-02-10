@@ -12,7 +12,7 @@ Gem::Specification.new do |gem|
   gem.description    = gem.summary
   gem.homepage       = "https://github.com/chef/omnibus"
 
-  gem.required_ruby_version = ">= 2.6"
+  gem.required_ruby_version = ">= 3.0"
 
   gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/{*,.kitchen*}")
   gem.bindir = "bin"
@@ -28,12 +28,12 @@ Gem::Specification.new do |gem|
   gem.add_dependency "ohai",             ">= 16", "< 19"
   gem.add_dependency "ruby-progressbar", "~> 1.7"
   gem.add_dependency "thor",             ">= 0.18", "< 2.0"
-  gem.add_dependency "license_scout",    "~> 1.0"
+  gem.add_dependency "license_scout",    "~> 1.3.17"
   gem.add_dependency "contracts",        ">= 0.16.0", "< 0.17.0"
-  gem.add_dependency "rexml",            "~> 3.2"
+  gem.add_dependency "rexml",            "~> 3.4"
 
   if Gem::Version.new(RUBY_VERSION) <= Gem::Version.new("3.1.0")
-    gem.add_dependency "ffi", "< 1.17.0"
+    gem.add_dependency "ffi", "<= 1.17.0"
   end
 
   gem.add_dependency "mixlib-versioning"
