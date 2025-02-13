@@ -7,6 +7,11 @@ set -ue
 export USER="root"
 export LANG=C.UTF-8 LANGUAGE=C.UTF-8
 
+echo "--- updating Rubygems"
+gem install rubygems-update
+update_rubygems
+gem update --system
+
 echo "--- bundle install"
 
 bundle config --local path vendor/bundle
