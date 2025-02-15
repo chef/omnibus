@@ -187,7 +187,9 @@ module Omnibus
 
     def self.fetcher_class_for_source(source)
       if source
-        if source[:url]
+        if source[:repository]
+          ArtifactoryFetcher
+        elsif source[:url]
           NetFetcher
         elsif source[:git]
           GitFetcher
