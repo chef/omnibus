@@ -801,6 +801,16 @@ module Omnibus
     end
     expose :text_manifest_path
 
+    def generate_sbom(is_sbom_gen_enabled, tool_name = nil)
+      if is_sbom_gen_enabled
+        # require "omnibus/sbom"
+        # Omnibus::SBOM.generate_sbom(self, tool_name)
+        puts "sbom generation is enabled but not generating here!"
+      end
+    end
+
+    expose :generate_sbom
+
     #
     # @!endgroup
     # --------------------------------------------------
