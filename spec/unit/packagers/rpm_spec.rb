@@ -215,7 +215,7 @@ module Omnibus
         expect(contents).to include("URL: https://example.com")
         expect(contents).to include("Packager: Chef Software")
         expect(contents).to include("Obsoletes: old-project")
-        expect(contents).to include("_binary_payload w9.gzdio")
+        expect(contents).to include("_binary_payload w9T.gzdio")
       end
 
       context "when RPM compression type xz is configured" do
@@ -226,7 +226,7 @@ module Omnibus
         it "has the correct binary_payload line" do
           subject.write_rpm_spec
           contents = File.read(spec_file)
-          expect(contents).to include("_binary_payload w9.xzdio")
+          expect(contents).to include("_binary_payload w9T.xzdio")
         end
 
         context "when RPM compression level is also configured" do
@@ -237,7 +237,7 @@ module Omnibus
           it "has the correct binary_payload line" do
             subject.write_rpm_spec
             contents = File.read(spec_file)
-            expect(contents).to include("_binary_payload w6.xzdio")
+            expect(contents).to include("_binary_payload w6T.xzdio")
           end
         end
       end
@@ -250,7 +250,7 @@ module Omnibus
         it "has the correct binary_payload line" do
           subject.write_rpm_spec
           contents = File.read(spec_file)
-          expect(contents).to include("_binary_payload w9.bzdio")
+          expect(contents).to include("_binary_payload w9T.bzdio")
         end
 
         context "when RPM compression level is also configured" do
@@ -261,7 +261,7 @@ module Omnibus
           it "has the correct binary_payload line" do
             subject.write_rpm_spec
             contents = File.read(spec_file)
-            expect(contents).to include("_binary_payload w6.bzdio")
+            expect(contents).to include("_binary_payload w6T.bzdio")
           end
         end
       end
