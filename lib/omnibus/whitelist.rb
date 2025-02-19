@@ -166,6 +166,7 @@ MAC_WHITELIST_LIBS = [
   /libutil\.dylib/,
   /libffi\.dylib/,
   /libncurses\.5\.4\.dylib/,
+  /libcurl\.4\.dylib/,
   /libiconv/,
   /libidn2\.0\.dylib/,
   /libstdc\+\+\.6\.dylib/,
