@@ -82,6 +82,7 @@ module Omnibus
       @manifest = manifest
       @package_summary = {}
       @skip_healthcheck = false
+      @disable_version_manifest = false
     end
 
     #
