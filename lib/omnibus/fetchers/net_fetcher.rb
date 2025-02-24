@@ -81,6 +81,7 @@ module Omnibus
     #
     def fetch
       log.info(log_key) { "Downloading from `#{download_url}'" }
+      log.info(log_key) { "-----DEBUG" }
 
       create_required_directories
       download
@@ -121,6 +122,8 @@ module Omnibus
     def downloaded_file
       filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
+      puts "********START DEBUGGING FROM HERE********"
+      log.info(log_key) { "-----DEBUG-----file name is #{filename}" }
       File.join(Config.cache_dir, filename)
     end
 
@@ -128,7 +131,7 @@ module Omnibus
     # The checksum as defined by the user in the software definition.
     #
     # @return [String]
-    #
+    # 
     def checksum
       source[digest_type]
     end
@@ -162,6 +165,8 @@ module Omnibus
     # @return [void]
     #
     def download
+      log.info(log_key) { "-----DEBUG-----" }
+      puts "********START DEBUGGING FROM HERE********"
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
       options = {}
