@@ -235,7 +235,7 @@ module Omnibus
       compression_switch = "z"        if downloaded_file.end_with?("gz")
       compression_switch = "--lzma -" if downloaded_file.end_with?("lzma")
       compression_switch = "j"        if downloaded_file.end_with?("bz2")
-      compression_switch = "J"        if downloaded_file.end_with?("xz")
+      #compression_switch = "J"        if downloaded_file.end_with?("xz")
 
       if Ohai["platform"] == "windows"
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
@@ -322,7 +322,7 @@ module Omnibus
     # @return [String]
     #
     def tar
-      Omnibus.which("gtar") ? "gtar" : "tar"
+      Omnibus.which("gtar") ? "tar" : "tar"
     end
   end
 end
