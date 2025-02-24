@@ -131,7 +131,7 @@ module Omnibus
     # The checksum as defined by the user in the software definition.
     #
     # @return [String]
-    # 
+    #
     def checksum
       source[digest_type]
     end
