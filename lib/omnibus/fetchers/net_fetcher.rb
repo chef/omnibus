@@ -123,7 +123,8 @@ module Omnibus
       filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
       puts "********START DEBUGGING FROM HERE********"
-      log.info(log_key) { "-----DEBUG-----file name is #{filename}" }
+      log.info(log_key) { "-----DEBUG-----file name is #{filename} ---DEBUG--Dir:#{File.join(Config.cache_dir, filename)}" }
+      log.info(log_key) { "-----DEBUG-----checking file #{File.exist?(File.join(Config.cache_dir, filename))}" }
       File.join(Config.cache_dir, filename)
     end
 
