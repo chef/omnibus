@@ -241,8 +241,12 @@ module Omnibus
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
+          #list the files in project_dir
+          shellout!("ls -lR #{project_dir}", returns: [0])
+          #change the permissions if not set
+          shellout!("find #{project_dir} -type f -not -perm /111 -exec chmod 755 {} \\;", returns: [0])
 
-          shellout!("tar #{compression_switch}xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
+          shellout!("tar #{compression_switch}-xf #{downloaded_file} --force-local -C#{project_dir} -v", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
             log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
