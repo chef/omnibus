@@ -122,6 +122,10 @@ module Omnibus
       filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
       File.join(Config.cache_dir, filename)
+      # Install xz
+      log.info(log_key) { "-----DEBUG-----Installing xz--------" }
+      shellout!("brew install xz")
+      log.info(log_key) { "-----DEBUG-----Installing xz complete--------" }
     end
 
     #
@@ -163,9 +167,6 @@ module Omnibus
     #
     def download
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
-      log.info(log_key) { "-----DEBUG-----installing xz just to test------" }
-      shellout!(brew install xz)
-      log.info(log_key) { "-----DEBUG-----completing installation of xz------" }
 
       options = {}
 
