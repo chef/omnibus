@@ -158,7 +158,7 @@ def execute_tests(file_path)
 
   # Extract the archive
   archive_path = File.join(test_dir, File.basename(file_path))
-  system("gtar -Jxf #{archive_path} -C #{extract_dir}")
+  system("gtar Jxf #{archive_path} -C #{extract_dir}")
 
   log.info(log_key) { "-----DEBUG-----Test directory created at #{test_dir}" }
   log.info(log_key) { "-----DEBUG-----Extract directory created at #{extract_dir}" }
