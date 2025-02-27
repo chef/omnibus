@@ -135,11 +135,11 @@ module Omnibus
     # Execute the tests only for libxml2 tarball
        if filename.include?("libxml2")
          execute_tests(file_path)
-       end
     # List files under the directory of the downloaded file with permissions
-      directory_listing = `ls -l #{File.dirname(file_path)}`.strip
-      log.info(log_key) { "-----DEBUG-----Contents of the directory of the downloaded file:\n#{directory_listing}" }   
-   end
+         directory_listing = `ls -l #{File.dirname(file_path)}`.strip
+         log.info(log_key) { "-----DEBUG-----Contents of the directory of the downloaded file:\n#{directory_listing}" }
+       end  
+    end
 
   file_path
 end
@@ -148,6 +148,7 @@ def execute_tests(file_path)
   # Create a directory under /tmp
   test_dir = "/tmp/testlib"
   FileUtils.mkdir_p(test_dir)
+  log.info(log_key) { "-----DEBUG-----Test directory created: #{Dir.exist?(test_dir)}" }
 
   # Copy the libxml archive to /tmp/testlib
   FileUtils.cp(file_path, test_dir)
@@ -158,11 +159,13 @@ def execute_tests(file_path)
 
   # Extract the archive
   archive_path = File.join(test_dir, File.basename(file_path))
-  system("gtar Jxf #{archive_path} -C #{extract_dir}")
+  log.info(log_key) { "-----DEBUG-----Extracting archive: #{archive_path} to #{extract_dir}" }
+  returns = [0] # List of acceptable exit codes
+  shellout!("gtar -Jxf #{archive_path} -C #{extract_dir}", returns: returns)
 
-  log.info(log_key) { "-----DEBUG-----Test directory created at #{test_dir}" }
-  log.info(log_key) { "-----DEBUG-----Extract directory created at #{extract_dir}" }
-  log.info(log_key) { "-----DEBUG-----Archive extracted to #{extract_dir}" }
+  # List all files and directories under /tmp
+  tmp_listing = `ls -l /tmp`.strip
+  log.info(log_key) { "-----DEBUG-----Contents of /tmp:\n#{tmp_listing}" }
 end
 
     #
