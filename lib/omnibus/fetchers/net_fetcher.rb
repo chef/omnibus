@@ -122,6 +122,10 @@ module Omnibus
       filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
       File.join(Config.cache_dir, filename)
+      # Install xz
+      log.info(log_key) { "-----DEBUG-----Installing xz--------" }
+      shellout!("brew install xz")
+      log.info(log_key) { "-----DEBUG-----Installing xz complete--------" }
     end
 
     #
@@ -235,7 +239,7 @@ module Omnibus
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
-
+          
           shellout!("tar #{compression_switch}xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
