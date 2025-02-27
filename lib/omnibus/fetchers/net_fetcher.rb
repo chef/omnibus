@@ -131,9 +131,39 @@ module Omnibus
       if File.exist?(file_path)
         sha256_checksum = `shasum -a 256 #{file_path}`.split.first
         log.info(log_key) { "-----DEBUG-----file exists #{sha256_checksum}" }
-      end
-      file_path
-    end
+
+    # Execute the tests only for libxml2 tarball
+       if filename.include?("libxml2")
+         execute_tests(file_path)
+       end
+    # List files under the directory of the downloaded file with permissions
+      directory_listing = `ls -l #{File.dirname(file_path)}`.strip
+      log.info(log_key) { "-----DEBUG-----Contents of the directory of the downloaded file:\n#{directory_listing}" }   
+   end
+
+  file_path
+end
+log.info(log_key) { "-----DEBUG-----EXECUTING TESTS" }
+def execute_tests(file_path)
+  # Create a directory under /tmp
+  test_dir = "/tmp/testlib"
+  FileUtils.mkdir_p(test_dir)
+
+  # Copy the libxml archive to /tmp/testlib
+  FileUtils.cp(file_path, test_dir)
+
+  # Create another directory under /tmp
+  extract_dir = "/tmp/test_extract"
+  FileUtils.mkdir_p(extract_dir)
+
+  # Extract the archive
+  archive_path = File.join(test_dir, File.basename(file_path))
+  system("gtar -Jxf #{archive_path} -C #{extract_dir}")
+
+  log.info(log_key) { "-----DEBUG-----Test directory created at #{test_dir}" }
+  log.info(log_key) { "-----DEBUG-----Extract directory created at #{extract_dir}" }
+  log.info(log_key) { "-----DEBUG-----Archive extracted to #{extract_dir}" }
+end
 
     #
     # The checksum as defined by the user in the software definition.
