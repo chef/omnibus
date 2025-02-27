@@ -235,7 +235,10 @@ module Omnibus
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
-
+          
+          log.info(log_key) { "-----DEBUG-----installing xz just to test------" }
+          shellout!(brew install xz)
+          log.info(log_key) { "-----DEBUG-----completing installation of xz------" }
           shellout!("tar #{compression_switch}xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
