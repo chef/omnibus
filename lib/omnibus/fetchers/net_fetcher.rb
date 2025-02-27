@@ -242,7 +242,7 @@ module Omnibus
       compression_switch = "z"        if downloaded_file.end_with?("gz")
       compression_switch = "--lzma -" if downloaded_file.end_with?("lzma")
       compression_switch = "j"        if downloaded_file.end_with?("bz2")
-      #compression_switch = "J"        if downloaded_file.end_with?("xz")
+      compression_switch = "J"        if downloaded_file.end_with?("xz")
 
       # Check and log the permissions and contents of project_dir
       directory_listing = `ls -l #{project_dir}`.strip
@@ -332,7 +332,7 @@ module Omnibus
     # @return [String]
     #
     def tar
-      Omnibus.which("gtar") ? "tar" : "tar"
+      Omnibus.which("gtar") ? "gtar" : "tar"
     end
   end
 end
