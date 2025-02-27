@@ -156,16 +156,21 @@ def execute_tests(file_path)
   # Create another directory under /tmp
   extract_dir = "/tmp/test_extract"
   FileUtils.mkdir_p(extract_dir)
-
+   # List all files and directories under /tmp
+  tmp_listing = `ls -l /tmp`.strip
+  log.info(log_key) { "-----DEBUG-----Contents of /tmp:\n#{tmp_listing}" }
+  #check the xz and gtar versions
+  log.info(log_key) { "-----DEBUG-----checking gtar and xz versions and path" }
+  shellout!("gtar --version")
+  shellout!("which gtar")
+  shellout!("xz --version")
+  shellout!("which xz")
+  log.info(log_key) { "-----DEBUG-----end of the test to here" }
   # Extract the archive
   archive_path = File.join(test_dir, File.basename(file_path))
   log.info(log_key) { "-----DEBUG-----Extracting archive: #{archive_path} to #{extract_dir}" }
   returns = [0] # List of acceptable exit codes
   shellout!("gtar -Jxf #{archive_path} -C #{extract_dir}", returns: returns)
-
-  # List all files and directories under /tmp
-  tmp_listing = `ls -l /tmp`.strip
-  log.info(log_key) { "-----DEBUG-----Contents of /tmp:\n#{tmp_listing}" }
 end
 
     #
