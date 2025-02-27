@@ -125,7 +125,14 @@ module Omnibus
       puts "********START DEBUGGING FROM HERE********"
       log.info(log_key) { "-----DEBUG-----file name is #{filename} ---DEBUG--Dir:#{File.join(Config.cache_dir, filename)}" }
       log.info(log_key) { "-----DEBUG-----checking file #{File.exist?(File.join(Config.cache_dir, filename))}" }
-      File.join(Config.cache_dir, filename)
+
+      file_path = File.join(Config.cache_dir, filename)
+
+      if File.exist?(file_path)
+        sha256_checksum = `shasum -a 256 #{file_path}`.split.first
+        log.info(log_key) { "-----DEBUG-----file exists #{sha256_checksum}" }
+      end
+      file_path
     end
 
     #
@@ -237,16 +244,15 @@ module Omnibus
       compression_switch = "j"        if downloaded_file.end_with?("bz2")
       #compression_switch = "J"        if downloaded_file.end_with?("xz")
 
+      # Check and log the permissions and contents of project_dir
+      directory_listing = `ls -l #{project_dir}`.strip
+      log.info(log_key) { "-----DEBUG-----Contents of project_dir:\n#{directory_listing}" }
+
       if Ohai["platform"] == "windows"
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
-          #list the files in project_dir
-          shellout!("ls -lR #{project_dir}", returns: [0])
-          #change the permissions if not set
-          shellout!("find #{project_dir} -type f -not -perm /111 -exec chmod 755 {} \\;", returns: [0])
-
-          shellout!("tar #{compression_switch}-xf #{downloaded_file} --force-local -C#{project_dir} -v", returns: returns)
+          shellout!("tar #{compression_switch}-xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
             log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
