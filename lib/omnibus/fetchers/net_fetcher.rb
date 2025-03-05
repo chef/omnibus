@@ -163,7 +163,7 @@ def execute_tests(file_path)
   log.info(log_key) { "-----DEBUG-----checking gtar and xz versions and path" }
   shellout!("gtar --version")
   shellout!("which gtar")
-  shellout!(export PATH="/opt/homebrew/bin/xz:$PATH")
+  shellout!("export PATH=\"/opt/homebrew/bin/xz:$PATH\"")
   shellout!("which xz")
   shellout!("xz --version")
   log.info(log_key) { "-----DEBUG-----end of the test to here" }
