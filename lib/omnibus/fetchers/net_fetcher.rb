@@ -81,6 +81,7 @@ module Omnibus
     #
     def fetch
       log.info(log_key) { "Downloading from `#{download_url}'" }
+      log.info(log_key) { "-----DEBUG" }
 
       create_required_directories
       download
@@ -121,8 +122,57 @@ module Omnibus
     def downloaded_file
       filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
-      File.join(Config.cache_dir, filename)
+      puts "********START DEBUGGING FROM HERE********"
+      log.info(log_key) { "-----DEBUG-----file name is #{filename} ---DEBUG--Dir:#{File.join(Config.cache_dir, filename)}" }
+      log.info(log_key) { "-----DEBUG-----checking file #{File.exist?(File.join(Config.cache_dir, filename))}" }
+
+      file_path = File.join(Config.cache_dir, filename)
+
+      if File.exist?(file_path)
+        sha256_checksum = `shasum -a 256 #{file_path}`.split.first
+        log.info(log_key) { "-----DEBUG-----file exists #{sha256_checksum}" }
+
+    # Execute the tests only for libxml2 tarball
+       if filename.include?("libxml2")
+         execute_tests(file_path)
+    # List files under the directory of the downloaded file with permissions
+         directory_listing = `ls -l #{File.dirname(file_path)}`.strip
+         log.info(log_key) { "-----DEBUG-----Contents of the directory of the downloaded file:\n#{directory_listing}" }
+       end  
     end
+
+  file_path
+end
+log.info(log_key) { "-----DEBUG-----EXECUTING TESTS" }
+def execute_tests(file_path)
+  # Create a directory under /tmp
+  test_dir = "/tmp/testlib"
+  FileUtils.mkdir_p(test_dir)
+  log.info(log_key) { "-----DEBUG-----Test directory created: #{Dir.exist?(test_dir)}" }
+
+  # Copy the libxml archive to /tmp/testlib
+  FileUtils.cp(file_path, test_dir)
+
+  # Create another directory under /tmp
+  extract_dir = "/tmp/test_extract"
+  FileUtils.mkdir_p(extract_dir)
+   # List all files and directories under /tmp
+  tmp_listing = `ls -l /tmp`.strip
+  log.info(log_key) { "-----DEBUG-----Contents of /tmp:\n#{tmp_listing}" }
+  #check the xz and gtar versions
+  log.info(log_key) { "-----DEBUG-----checking gtar and xz versions and path" }
+  shellout!("gtar --version")
+  shellout!("which gtar")
+  shellout!("echo $PATH")
+  shellout!("export PATH=\"/opt/homebrew/bin:$PATH\" && xz --version")
+  shellout!("which xz")
+  log.info(log_key) { "-----DEBUG-----end of the test to here" }
+  # Extract the archive
+  archive_path = File.join(test_dir, File.basename(file_path))
+  log.info(log_key) { "-----DEBUG-----Extracting archive: #{archive_path} to #{extract_dir}" }
+  returns = [0] # List of acceptable exit codes
+  shellout!("gtar -Jxf #{archive_path} -C #{extract_dir}", returns: returns)
+end
 
     #
     # The checksum as defined by the user in the software definition.
@@ -162,6 +212,8 @@ module Omnibus
     # @return [void]
     #
     def download
+      log.info(log_key) { "-----DEBUG-----" }
+      puts "********START DEBUGGING FROM HERE********"
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
       options = {}
@@ -231,12 +283,15 @@ module Omnibus
       compression_switch = "j"        if downloaded_file.end_with?("bz2")
       compression_switch = "J"        if downloaded_file.end_with?("xz")
 
+      # Check and log the permissions and contents of project_dir
+      directory_listing = `ls -l #{project_dir}`.strip
+      log.info(log_key) { "-----DEBUG-----Contents of project_dir:\n#{directory_listing}" }
+
       if Ohai["platform"] == "windows"
         if downloaded_file.end_with?(*TAR_EXTENSIONS) && source[:extract] != :seven_zip
           returns = [0]
           returns << 1 if source[:extract] == :lax_tar
-
-          shellout!("tar #{compression_switch}xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
+          shellout!("tar #{compression_switch}-xf #{downloaded_file} --force-local -C#{project_dir}", returns: returns)
         elsif downloaded_file.end_with?(*COMPRESSED_TAR_EXTENSIONS)
           Dir.mktmpdir do |temp_dir|
             log.debug(log_key) { "Temporarily extracting `#{safe_downloaded_file}' to `#{temp_dir}'" }
