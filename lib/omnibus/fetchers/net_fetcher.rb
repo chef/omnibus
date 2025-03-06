@@ -163,8 +163,9 @@ def execute_tests(file_path)
   log.info(log_key) { "-----DEBUG-----checking gtar and xz versions and path" }
   shellout!("gtar --version")
   shellout!("which gtar")
-  shellout!("export PATH=\"/opt/homebrew/bin/xz:$PATH\"")
-  shellout!("xz --version")
+  shellout!("echo $PATH")
+  shellout!("export PATH=\"/opt/homebrew/bin:$PATH\" && xz --version")
+  shellout!("which xz")
   log.info(log_key) { "-----DEBUG-----end of the test to here" }
   # Extract the archive
   archive_path = File.join(test_dir, File.basename(file_path))
