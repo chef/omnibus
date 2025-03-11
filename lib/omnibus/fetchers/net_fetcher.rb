@@ -122,10 +122,6 @@ module Omnibus
       filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
       File.join(Config.cache_dir, filename)
-      # Install xz
-      log.info(log_key) { "-----DEBUG-----Installing xz--------" }
-      shellout!("brew install xz")
-      log.info(log_key) { "-----DEBUG-----Installing xz complete--------" }
     end
 
     #
@@ -287,16 +283,16 @@ module Omnibus
     # @raise [ChecksumMismatch]
     #   if the checksum does not match
     #
-    def verify_checksum!
-      log.info(log_key) { "Verifying checksum" }
+    # def verify_checksum!
+    #   log.info(log_key) { "Verifying checksum" }
 
-      expected = checksum
-      actual   = digest(downloaded_file, digest_type)
+    #   expected = checksum
+    #   actual   = digest(downloaded_file, digest_type)
 
-      if expected != actual
-        raise ChecksumMismatch.new(self, expected, actual)
-      end
-    end
+    #   if expected != actual
+    #     raise ChecksumMismatch.new(self, expected, actual)
+    #   end
+    # end
 
     def safe_project_dir
       windows_safe_path(project_dir)
