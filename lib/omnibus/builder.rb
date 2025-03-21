@@ -96,9 +96,9 @@ module Omnibus
     #
     # @return [void]
     def pip(subcommand, options = {})
-      pip_path = "\"#{build_dir}/embedded/bin/pip\""
+      pip_path = "\"#{install_dir}/embedded/bin/pip\""
       if Ohai['platform'] == "windows"
-        pip_path = "\"#{windows_safe_path(build_dir)}\\embedded\\Scripts\\pip.exe\""
+        pip_path = "\"#{windows_safe_path(install_dir)}\\embedded\\Scripts\\pip.exe\""
       end
       command("#{pip_path} #{subcommand}", options)
     end
@@ -429,7 +429,7 @@ module Omnibus
           p.name == software_name
         end
 
-        bin_dir            = "#{build_dir}/bin"
+        bin_dir            = "#{install_dir}/bin"
         appbundler_bin     = embedded_bin("appbundler")
 
         # Ensure the main bin dir exists
@@ -725,7 +725,7 @@ module Omnibus
     #       Default: [:config_guess, :config_sub]
     def update_config_guess(target: ".", install: [:config_guess, :config_sub])
       build_commands << BuildCommand.new("update_config_guess `target: #{target} install: #{install.inspect}'") do
-        config_guess_dir = "#{build_dir}/embedded/lib/config_guess"
+        config_guess_dir = "#{install_dir}/embedded/lib/config_guess"
         %w{config.guess config.sub}.each do |c|
           unless File.exist?(File.join(config_guess_dir, c))
             raise "Can not find #{c}. Make sure you add a dependency on 'config_guess' in your software definition"
@@ -830,7 +830,7 @@ module Omnibus
     #
     def ship_license(source)
       build_commands << BuildCommand.new("Adding License: '#{source}'") do
-        dir_name = "#{build_dir}/licenses/#{self.name}"
+        dir_name = "#{install_dir}/licenses/#{self.name}"
         FileUtils.mkdir_p(dir_name)
         known_licenses = {
           "LGPLv2" => "https://www.gnu.org/licenses/old-licenses/lgpl-2.0.txt",

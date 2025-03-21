@@ -59,12 +59,12 @@ module Omnibus
       #
       # /opt/hamlet => /tmp/daj29013/BUILD/opt/hamlet
       skip = exclusions + debug_package_paths
-      destination = File.join(build_dir, project.build_dir)
-      FileSyncer.sync(project.build_dir, destination, exclude: skip)
+      destination = File.join(build_dir, project.install_dir)
+      FileSyncer.sync(project.install_dir, destination, exclude: skip)
 
       if debug_build?
-        destination_dbg = File.join(build_dir(true), project.build_dir)
-        FileSyncer.sync(project.build_dir, destination_dbg, include: debug_package_paths)
+        destination_dbg = File.join(build_dir(true), project.install_dir)
+        FileSyncer.sync(project.install_dir, destination_dbg, include: debug_package_paths)
       end
 
       # Copy over any user-specified extra package files.

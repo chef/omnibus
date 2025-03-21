@@ -15,7 +15,6 @@ Given(/^I have an omnibus project named "(.+)"$/) do |name|
     maintainer 'Mrs. Maintainer'
     homepage 'https://example.com'
     install_dir "#{abs_path}/output"
-    build_dir "#{abs_path}/output"
 
     build_version '1.0.0'
 

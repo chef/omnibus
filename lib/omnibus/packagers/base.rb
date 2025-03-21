@@ -143,16 +143,6 @@ module Omnibus
     end
     expose :install_dir
 
-    # Retrieve the path at which the project is being built from the
-    #
-    # @return [String]
-    #
-    def build_dir
-      project.build_dir
-    end
-    expose :build_dir
-
-
     #
     # (see Util#windows_safe_path)
     #
