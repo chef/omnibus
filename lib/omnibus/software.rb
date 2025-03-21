@@ -1291,6 +1291,8 @@ module Omnibus
         elsif git_cache.restore
           log.info(log_key) { "Restored from cache" }
           @build_summary["cached"] = true
+          # Ensure we ship the source offer even when restoring from cache
+          fetcher.clean
         else
           log.info(log_key) { "Could not restore from cache" }
           execute_build(build_wrappers)

@@ -22,11 +22,13 @@ module Omnibus
 
     #
     # Fetch if the local directory checksum is different than the path directory
-    # checksum.
+    # checksum, or if target directory does not exist.
     #
     # @return [true, false]
     #
     def fetch_required?
+      return true unless File.directory?(project_dir)
+
       target_shasum != destination_shasum
     end
 
@@ -67,7 +69,6 @@ module Omnibus
         FileSyncer.sync(source_path, project_dir, source_options)
         # Reset target shasum on every fetch
         @target_shasum = nil
-        target_shasum
       }
     end
 

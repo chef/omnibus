@@ -70,10 +70,6 @@ module Omnibus
                   desc: "Use the given manifest when downloading software sources.",
                   type: :string,
                   default: nil
-    method_option :populate_s3_cache,
-                  desc: "Populate the S3 cache.",
-                  type: :boolean,
-                  default: false
     desc "build PROJECT", "Build the given Omnibus project"
     def build(name)
       manifest = if @options[:use_manifest]
@@ -85,8 +81,11 @@ module Omnibus
       project = Project.load(name, manifest)
       say("Building #{project.name} #{project.build_version}...")
       # Not sure why we need the !Omnibus::S3Cache.fetch_missing.empty? check here
-      Omnibus::S3Cache.populate if @options[:populate_s3_cache] && !Omnibus::S3Cache.fetch_missing.empty?
-      Omnibus::S3LicenseCache.populate if @options[:populate_s3_cache]
+      # We only want to populate the cache when we actually can. In some cases, we're only reading anonymously
+      # from the cache bucket (mostly when the build isn't ran on gitlab). When that is the case, we want to disable
+      # the cache population since it would fail.
+      Omnibus::S3Cache.populate if Omnibus::Config.use_s3_caching && Omnibus::Config.s3_authenticated_download && !Omnibus::S3Cache.fetch_missing.empty?
+      Omnibus::S3LicenseCache.populate if Omnibus::Config.use_s3_caching && Omnibus::Config.s3_authenticated_download
       project.download
       project.build
 

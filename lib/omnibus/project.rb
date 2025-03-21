@@ -82,6 +82,7 @@ module Omnibus
       @manifest = manifest
       @package_summary = {}
       @skip_healthcheck = false
+      @disable_version_manifest = false
     end
 
     #
@@ -1020,7 +1021,7 @@ module Omnibus
     #
     def text_manifest_path(path = NULL)
       if null?(path)
-        @test_manifest_path || File.join(install_dir, "version-manifest.txt")
+        @text_manifest_path || File.join(install_dir, "version-manifest.txt")
       else
         @text_manifest_path = path
       end
@@ -1452,8 +1453,10 @@ module Omnibus
       # Install shipped sources in the sources/ folder
       install_sources
 
-      write_json_manifest
-      write_text_manifest
+      unless @disable_version_manifest
+        write_json_manifest
+        write_text_manifest
+      end
       unless @skip_healthcheck
         HealthCheck.run!(self)
       end
@@ -1635,6 +1638,16 @@ module Omnibus
       end
     end
     expose :skip_healthcheck
+
+    def disable_version_manifest(val)
+      if val.nil?
+        @disable_version_manifest
+      else
+        @disable_version_manifest = val
+      end
+    end
+    expose :disable_version_manifest
+
     #
     # @!endgroup
     # --------------------------------------------------

@@ -118,6 +118,29 @@ module Omnibus
     expose :signing_identity
 
     #
+    # Set or return the install location. If this value is provided,
+    # the created PKG will be configured to install at this location,
+    # defaulting to the project's install dir otherwise.
+    #
+    # @example
+    #   install_location "/opt/my-package"
+    #
+    # @param [String] val
+    #   the location override for where to install the packate
+    #
+    # @return [String]
+    #   the location where the package will be installed
+    #
+    def install_location(val = NULL)
+      if null?(val)
+        @install_location || project.install_dir
+      else
+        @install_location = val
+      end
+    end
+    expose :install_location
+
+    #
     # @!endgroup
     # --------------------------------------------------
 
@@ -191,7 +214,7 @@ module Omnibus
           --version "#{safe_version}" \\
           --scripts "#{scripts_dir}" \\
           --root "#{project.install_dir}" \\
-          --install-location "/opt/datadog-agent" \\
+          --install-location "#{install_location}" \\
           "#{component_pkg}"
       EOH
 
