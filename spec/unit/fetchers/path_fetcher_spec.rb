@@ -67,9 +67,10 @@ module Omnibus
     describe '#version_for_cache' do
       let(:shasum) { "abcd1234" }
 
+      # Excluding .git directory to avoid errors due to lock files
       before do
         allow(subject).to receive(:digest_directory)
-          .with(source_path, :sha256, {})
+          .with(source_path, :sha256, exclude: ['.git'])
           .and_return(shasum)
       end
 
