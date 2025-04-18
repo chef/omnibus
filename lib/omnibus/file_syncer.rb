@@ -148,7 +148,7 @@ module Omnibus
           target = File.readlink(source_file)
 
           Dir.chdir(destination) do
-            FileUtils.ln_sf(target, "#{destination}/#{relative_path}", force: true)
+            FileUtils.ln_sf(target, "#{destination}/#{relative_path}")
           end
         when :file
           source_stat = File.stat(source_file)
