@@ -16,9 +16,6 @@
 
 module Omnibus
   class Packager::WindowsBase < Packager::Base
-    DEFAULT_TIMESTAMP_SERVERS = ["http://timestamp.digicert.com",
-                                 "http://timestamp.verisign.com/scripts/timestamp.dll"].freeze
-
     #
     # Set the signing certificate name
     #
@@ -59,9 +56,18 @@ module Omnibus
             raise InvalidValue.new(:params, "be a Hash")
           end
 
-          valid_keys = %i{store timestamp_servers machine_store algorithm}
+          valid_keys = %i{store machine_store algorithm keypair_alias}
           invalid_keys = params.keys - valid_keys
           unless invalid_keys.empty?
+
+            # log a deprecated warning if timestamp_server is used
+            if invalid_keys.include?(:timestamp_servers)
+              log.deprecated(log_key) do
+                "The signing_identity is updated to use smctl.exe. which does not require timestamp_servers" \
+                "Please remove timestamp_servers from your signing_identity"
+              end
+            end
+
             raise InvalidValue.new(:params, "contain keys from [#{valid_keys.join(", ")}]. "\
                                    "Found invalid keys [#{invalid_keys.join(", ")}]")
           end
@@ -77,9 +83,8 @@ module Omnibus
 
         @signing_identity[:store] = params[:store] || "My"
         @signing_identity[:algorithm] = params[:algorithm] || "SHA256"
-        servers = params[:timestamp_servers] || DEFAULT_TIMESTAMP_SERVERS
-        @signing_identity[:timestamp_servers] = [servers].flatten
         @signing_identity[:machine_store] = params[:machine_store] || false
+        @signing_identity[:keypair_alias] = params[:keypair_alias]
       end
 
       @signing_identity
@@ -102,41 +107,41 @@ module Omnibus
       signing_identity[:timestamp_servers]
     end
 
+    def keypair_alias
+      signing_identity[:keypair_alias]
+    end
+
     def machine_store?
       signing_identity[:machine_store]
     end
 
-    #
-    # Iterates through available timestamp servers and tries to sign
-    # the file with with each server, stopping after the first to succeed.
-    # If none succeed, an exception is raised.
-    #
+    # signs the package with the given certificate
     def sign_package(package_file)
-      success = false
-      timestamp_servers.each do |ts|
-        success = try_sign(package_file, ts)
-        break if success
-      end
-      raise FailedToSignWindowsPackage.new unless success
+      raise FailedToSignWindowsPackage.new unless is_signed?(package_file)
     end
 
-    def try_sign(package_file, url)
+    def is_signed?(package_file)
       cmd = [].tap do |arr|
-        arr << "signtool.exe"
-        arr << "sign /v"
-        arr << "/t #{url}"
-        arr << "/fd #{algorithm}"
-        arr << "/sm" if machine_store?
-        arr << "/s #{cert_store_name}"
-        arr << "/sha1 #{thumbprint}"
-        arr << "/d #{project.package_name}"
-        arr << "\"#{package_file}\""
+        arr << "smctl.exe"
+        arr << "sign"
+        arr << "--fingerprint #{thumbprint}"
+        arr << "--input #{package_file}"
       end.join(" ")
+
       status = shellout(cmd)
+
+      log.debug(log_key) { "#{self.class}##{__method__} - package_file: #{package_file}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - cmd: #{cmd}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - status: #{status}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - status.exitstatus: #{status.exitstatus}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - status.stdout: #{status.stdout}" }
+      log.debug(log_key) { "#{self.class}##{__method__} - status.stderr: #{status.stderr}" }
+
+      # log the error if the signing failed
       if status.exitstatus != 0
         log.warn(log_key) do
           <<-EOH.strip
-                Failed to add timestamp with timeserver #{url}
+                Failed to verify signature of #{package_file}
 
                 STDOUT
                 ------
@@ -148,6 +153,7 @@ module Omnibus
           EOH
         end
       end
+
       status.exitstatus == 0
     end
 
