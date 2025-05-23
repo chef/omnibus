@@ -204,6 +204,7 @@ module Omnibus
 
       configure = options.delete(:bin) || "./configure"
       configure_cmd = [configure]
+      install_man = options.delete(:install_man) || false
 
       # Pass the host platform as well. Different versions of config.guess
       # arrive at differently terrible wild ass guesses for what MSYSTEM=MINGW64
@@ -220,6 +221,12 @@ module Omnibus
       default_prefix = if !windows? then "#{install_dir}/embedded" else python_3_embedded end
       prefix = options.delete(:prefix) || default_prefix
       configure_cmd << "--prefix=#{prefix}" if prefix && prefix != ""
+      unless install_man
+        man_dir = Dir.mktmpdir
+        # Force man pages to be installed in a dummy tmp dir unless
+        # installation is explicitely enabled
+        configure_cmd << "--mandir=#{man_dir}"
+      end
 
       configure_cmd.concat args
       configure_cmd = configure_cmd.join(" ").strip
