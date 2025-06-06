@@ -222,9 +222,11 @@ module Omnibus
       prefix = options.delete(:prefix) || default_prefix
       configure_cmd << "--prefix=#{prefix}" if prefix && prefix != ""
       unless install_man
-        man_dir = Dir.mktmpdir
-        # Force man pages to be installed in a dummy tmp dir unless
-        # installation is explicitely enabled
+        # We can't generate a temporary directory here since it would cause
+        # the command line to change during each build, which causes the
+        # git cache tag to change for each build, rendering it useless
+        man_dir = Config.man_dir
+        FileUtils.mkdir_p(man_dir)
         configure_cmd << "--mandir=#{man_dir}"
       end
 
