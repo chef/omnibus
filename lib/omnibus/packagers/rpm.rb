@@ -707,52 +707,7 @@ module Omnibus
     # @return [String]
     #
     def safe_version
-      version = project.build_version.dup
-
-      # RPM 4.10+ added support for using the tilde (~) as a way to mark
-      # versions as lower priority in comparisons. More details on this
-      # feature can be found here:
-      #
-      #   http://rpm.org/ticket/56
-      #
-      if version =~ /\-/
-        if Ohai["platform_family"] == "wrlinux"
-          converted = version.tr("-", "_") # WRL has an elderly RPM version
-          log.warn(log_key) do
-            "Omnibus replaces dashes (-) with tildes (~) so pre-release " \
-            "versions get sorted earlier than final versions.  However, the " \
-            "version of rpmbuild on Wind River Linux does not support this. " \
-            "All dashes will be replaced with underscores (_). Converting " \
-            "`#{project.build_version}' to `#{converted}'."
-          end
-        else
-          converted = version.tr("-", "~")
-          log.warn(log_key) do
-            "Tildes hold special significance in the RPM package versions. " \
-            "They mark a version as lower priority in RPM's version compare " \
-            "logic. We'll replace all dashes (-) with tildes (~) so pre-release" \
-            "versions get sorted earlier then final versions. Converting" \
-            "`#{project.build_version}' to `#{converted}'."
-          end
-        end
-
-        version = converted
-      end
-
-      if version =~ /\A[a-zA-Z0-9\.\+\:\~]+\z/
-        version
-      else
-        converted = version.gsub(/[^a-zA-Z0-9\.\+\:\~]+/, "_")
-
-        log.warn(log_key) do
-          "The `version' component of RPM package names can only include " \
-          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
-          "plus signs (+), tildes (~), colons (:) and underscores (_). " \
-          "Converting `#{project.build_version}' to `#{converted}'."
-        end
-
-        converted
-      end
+      self.class.safe_version(project.build_version)
     end
 
     #
@@ -883,5 +838,63 @@ module Omnibus
       end
     end
     expose :compression_algo
+
+    #
+    # Return a safe version string out of the input version
+    # RPM package versions cannot contain dashes, so we will convert them to
+    # underscores.
+    # @param [String] string
+    #   the string to sanitize
+    #
+    # @return [String]
+    #
+    def self.safe_version(raw_version)
+      # RPM 4.10+ added support for using the tilde (~) as a way to mark
+      # versions as lower priority in comparisons. More details on this
+      # feature can be found here:
+      #
+      #   http://rpm.org/ticket/56
+      #
+      version = raw_version.dup
+
+      if version =~ /\-/
+        if Ohai["platform_family"] == "wrlinux"
+          converted = version.tr("-", "_") # WRL has an elderly RPM version
+          log.warn(log_key) do
+            "Omnibus replaces dashes (-) with tildes (~) so pre-release " \
+            "versions get sorted earlier than final versions.  However, the " \
+            "version of rpmbuild on Wind River Linux does not support this. " \
+            "All dashes will be replaced with underscores (_). Converting " \
+            "`#{version}' to `#{converted}'."
+          end
+        else
+          converted = version.tr("-", "~")
+          log.warn(log_key) do
+            "Tildes hold special significance in the RPM package versions. " \
+            "They mark a version as lower priority in RPM's version compare " \
+            "logic. We'll replace all dashes (-) with tildes (~) so pre-release" \
+            "versions get sorted earlier then final versions. Converting" \
+            "`#{version}' to `#{converted}'."
+          end
+        end
+
+        version = converted
+      end
+
+      if version =~ /\A[a-zA-Z0-9\.\+\:\~]+\z/
+        version
+      else
+        converted = version.gsub(/[^a-zA-Z0-9\.\+\:\~]+/, "_")
+
+        log.warn(log_key) do
+          "The `version' component of RPM package names can only include " \
+          "alphabetical characters (a-z, A-Z), numbers (0-9), dots (.), " \
+          "plus signs (+), tildes (~), colons (:) and underscores (_). " \
+          "Converting `#{version}' to `#{converted}'."
+        end
+
+        converted
+      end
+    end
   end
 end
