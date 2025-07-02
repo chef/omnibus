@@ -21,30 +21,13 @@ module Omnibus
     setup do
       # Clean any previously mounted disks
       clean_disks
-
-      # Create the resources directory
-      create_directory(resources_dir)
-
-      # Copy the compiled pkg into the dmg
-      copy_file(packager.package_path, "#{resources_dir}/")
-
-      # Copy support files
-      support = create_directory("#{resources_dir}/.support")
-      copy_file(resource_path("background.png"), "#{support}/background.png")
     end
 
     build do
-      create_writable_dmg
-      attach_dmg
-      copy_assets_to_dmg
-      # Give some time to the system so attached dmg shows up in Finder
-      sleep 5
-      set_volume_icon
-      prettify_dmg
-      compress_dmg
+      create_volume_icon
+      create_compressed_dmg
       set_dmg_icon
       verify_dmg
-      remove_writable_dmg
     end
 
     #
@@ -100,15 +83,6 @@ module Omnibus
     # --------------------------------------------------
 
     #
-    # The path where the MSI resources will live.
-    #
-    # @return [String]
-    #
-    def resources_dir
-      File.expand_path("#{staging_dir}/Resources")
-    end
-
-    #
     # Cleans any previously left over mounted disks.
     #
     # We are trying to detach disks that look like:
@@ -134,63 +108,12 @@ module Omnibus
     end
 
     #
-    # Create a writable dmg we can put assets on.
-    #
-    def create_writable_dmg
-      log.info(log_key) { "Creating writable dmg" }
-
-      shellout! <<-EOH.gsub(/^ {8}/, "")
-        hdiutil create \\
-          -volname "#{volume_name}" \\
-          -fs HFS+ \\
-          -fsargs "-c c=64,a=16,e=16" \\
-          -size 512000k \\
-          "#{writable_dmg}" \\
-          -puppetstrings
-      EOH
-    end
-
-    #
-    # Attach the dmg, storing a reference to the device for later use.
-    #
-    # @return [String]
-    #   the name of the attached device
-    #
-    def attach_dmg
-      @device ||= Dir.chdir(staging_dir) do
-        log.info(log_key) { "Attaching dmg as disk" }
-
-        cmd = shellout! <<-EOH.gsub(/^ {10}/, "")
-          hdiutil attach \\
-            -puppetstrings \\
-            -readwrite \\
-            -noverify \\
-            -noautoopen \\
-            "#{writable_dmg}" | egrep '^/dev/' | sed 1q | awk '{print $1}'
-        EOH
-
-        cmd.stdout.strip
-      end
-    end
-
-    #
-    # Copy assets to dmg
-    #
-    def copy_assets_to_dmg
-      log.info(log_key) { "Copying assets into dmg" }
-
-      FileSyncer.glob("#{resources_dir}/*").each do |file|
-        FileUtils.cp_r(file, "/Volumes/#{volume_name}")
-      end
-    end
-
-    #
     # Create the icon for the volume using sips.
     #
     # @return [void]
     #
-    def set_volume_icon
-      log.info(log_key) { "Setting volume icon" }
+    def create_volume_icon
+      log.info(log_key) { "Creating volume icon" }
 
       icon = resource_path("icon.png")
 
@@ -209,70 +132,29 @@ module Omnibus
           sips -z 512 512   #{icon} --out tmp.iconset/icon_512x512.png
           sips -z 1024 1024 #{icon} --out tmp.iconset/icon_512x512@2x.png
           iconutil -c icns tmp.iconset
-
-          # Copy it over
-          cp tmp.icns "/Volumes/#{volume_name}/.VolumeIcon.icns"
-
-          # Source the icon
-          SetFile -a C "/Volumes/#{volume_name}"
         EOH
       end
     end
 
     #
-    # Use Applescript to setup the DMG with pretty logos and colors.
+    # Create a compressed dmg.
     #
-    # @return [void]
-    #
-    def prettify_dmg
-      log.info(log_key) { "Making the dmg all pretty and stuff" }
+    def create_compressed_dmg
+      log.info(log_key) { "Creating compressed dmg" }
 
-      render_template(resource_path("create_dmg.osascript.erb"),
-                      destination: "#{staging_dir}/create_dmg.osascript",
-                      variables: {
-                        volume_name: volume_name,
-                        pkg_name: packager.package_name,
-                        window_bounds: window_bounds,
-                        pkg_position: pkg_position,
-                      })
-
-      Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, "")
-          osascript "#{staging_dir}/create_dmg.osascript"
-        EOH
-      end
-    end
-
-    #
-    # Compress the dmg using hdiutil and zlib. zlib offers better compression
-    # levels than bzip2 (10.4+) or LZFSE (10.11+), but takes longer to compress.
-    # We're willing to trade slightly longer build times for smaller package sizes.
-    #
-    # @return [void]
-    #
-    def compress_dmg
-      log.info(log_key) { "Compressing dmg" }
-
-      Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, "")
-          chmod -Rf go-w "/Volumes/#{volume_name}"
-          sync
-          hdiutil unmount "#{@device}"
-          # Give some time to the system so unmount dmg
-          ATTEMPTS=1
-          until [ $ATTEMPTS -eq 6 ] || hdiutil detach "#{@device}"; do
-            sleep 10
-            echo Attempt number $(( ATTEMPTS++ ))
-          done
-          hdiutil convert \\
-            "#{writable_dmg}" \\
-            -format UDZO \\
-            -imagekey \\
-            zlib-level=9 \\
-            -o "#{package_path}" \\
-            -puppetstrings
-        EOH
-      end
+      shellout! <<-EOH.gsub(/^ {8}/, "")
+        pip install dmgbuild==1.6.5
+        dmgbuild \\
+          --detach-retries=5 \\
+          --settings="#{resource_path('settings.py')}" \\
+          -Dbackground="#{resource_path('background.png')}" \\
+          -Dpkg="#{packager.package_path}" \\
+          -Dpkg_position="#{pkg_position}" \\
+          -Dvolume_icon="#{staging_dir}/tmp.icns" \\
+          -Dwindow_bounds="#{window_bounds}" \\
+          "#{volume_name}" \\
+          "#{package_path}"
+      EOH
     end
 
     #
@@ -288,21 +170,6 @@ module Omnibus
           hdiutil verify \\
             "#{package_path}" \\
             -puppetstrings
-        EOH
-      end
-    end
-
-    #
-    # Remove writable dmg.
-    #
-    # @return [void]
-    #
-    def remove_writable_dmg
-      log.info(log_key) { "Removing writable dmg" }
-
-      Dir.chdir(staging_dir) do
-        shellout! <<-EOH.gsub(/^ {10}/, "")
-          rm -rf "#{writable_dmg}"
         EOH
       end
     end
@@ -336,13 +203,6 @@ module Omnibus
     def package_name
       extname = File.extname(packager.package_name)
       packager.package_name.sub(extname, ".dmg")
-    end
-
-    # The path to the writable dmg on disk.
-    #
-    # @return [String]
-    def writable_dmg
-      File.expand_path("#{staging_dir}/#{project.name}-writable.dmg")
     end
 
     #

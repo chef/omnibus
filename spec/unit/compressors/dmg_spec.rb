@@ -60,12 +60,6 @@ module Omnibus
       end
     end
 
-    describe '#resources_dir' do
-      it "is nested inside the staging_dir" do
-        expect(subject.resources_dir).to eq("#{staging_dir}/Resources")
-      end
-    end
-
     describe '#clean_disks' do
       it "logs a message" do
         allow(subject).to receive(:shellout!)
@@ -76,71 +70,10 @@ module Omnibus
       end
     end
 
-    describe '#create_writable_dmg' do
+    describe "#create_volume_icon" do
       it "logs a message" do
-        output = capture_logging { subject.create_writable_dmg }
-        expect(output).to include("Creating writable dmg")
-      end
-
-      it "runs the hdiutil command" do
-        expect(subject).to receive(:shellout!)
-          .with <<-EOH.gsub(/^ {12}/, "")
-            hdiutil create \\
-              -volname "Project One" \\
-              -fs HFS+ \\
-              -fsargs "-c c=64,a=16,e=16" \\
-              -size 512000k \\
-              "#{staging_dir}/project-writable.dmg" \\
-              -puppetstrings
-          EOH
-
-        subject.create_writable_dmg
-      end
-    end
-
-    describe '#attach_dmg' do
-      before do
-        allow(subject).to receive(:shellout!)
-          .and_return(shellout)
-      end
-
-      let(:shellout) { double(Mixlib::ShellOut, stdout: "hello\n") }
-
-      it "logs a message" do
-        output = capture_logging { subject.attach_dmg }
-        expect(output).to include("Attaching dmg as disk")
-      end
-
-      it "runs the hdiutil command" do
-        expect(subject).to receive(:shellout!)
-          .with <<-EOH.gsub(/^ {12}/, "")
-            hdiutil attach \\
-              -puppetstrings \\
-              -readwrite \\
-              -noverify \\
-              -noautoopen \\
-              "#{staging_dir}/project-writable.dmg" | egrep '^/dev/' | sed 1q | awk '{print $1}'
-          EOH
-
-        subject.attach_dmg
-      end
-
-      it "returns the stripped stdout" do
-        expect(subject.attach_dmg).to eq("hello")
-      end
-    end
-
-    describe "#copy_assets_to_dmg" do
-      it "logs a message" do
-        output = capture_logging { subject.copy_assets_to_dmg }
-        expect(output).to include("Copying assets into dmg")
-      end
-    end
-
-    describe "#set_volume_icon" do
-      it "logs a message" do
-        output = capture_logging { subject.set_volume_icon }
-        expect(output).to include("Setting volume icon")
+        output = capture_logging { subject.create_volume_icon }
+        expect(output).to include("Creating volume icon")
       end
 
       it "runs the sips commands" do
@@ -161,93 +94,35 @@ module Omnibus
             sips -z 512 512   #{icon} --out tmp.iconset/icon_512x512.png
             sips -z 1024 1024 #{icon} --out tmp.iconset/icon_512x512@2x.png
             iconutil -c icns tmp.iconset
-
-            # Copy it over
-            cp tmp.icns "/Volumes/Project One/.VolumeIcon.icns"
-
-            # Source the icon
-            SetFile -a C "/Volumes/Project One"
           EOH
 
-        subject.set_volume_icon
+        subject.create_volume_icon
       end
     end
 
-    describe '#prettify_dmg' do
+    describe '#create_compressed_dmg' do
       it "logs a message" do
-        output = capture_logging { subject.prettify_dmg }
-        expect(output).to include("Making the dmg all pretty and stuff")
+        output = capture_logging { subject.create_compressed_dmg }
+        expect(output).to include("Creating compressed dmg")
       end
 
-      it "renders the apple script template" do
-        subject.prettify_dmg
-        expect("#{staging_dir}/create_dmg.osascript").to be_a_file
-      end
-
-      it "has the correct content" do
-        subject.prettify_dmg
-        contents = File.read("#{staging_dir}/create_dmg.osascript")
-
-        expect(contents).to include('tell application "Finder"')
-        expect(contents).to include('  tell disk "Project One"')
-        expect(contents).to include("    open")
-        expect(contents).to include("    set current view of container window to icon view")
-        expect(contents).to include("    set toolbar visible of container window to false")
-        expect(contents).to include("    set statusbar visible of container window to false")
-        expect(contents).to include("    set the bounds of container window to {100, 100, 750, 600}")
-        expect(contents).to include("    set theViewOptions to the icon view options of container window")
-        expect(contents).to include("    set arrangement of theViewOptions to not arranged")
-        expect(contents).to include("    set icon size of theViewOptions to 72")
-        expect(contents).to include('    set background picture of theViewOptions to file ".support:background.png"')
-        expect(contents).to include("    delay 5")
-        expect(contents).to include('    set position of item "project-1.2.3-2.pkg" of container window to {535, 50}')
-        expect(contents).to include("    update without registering applications")
-        expect(contents).to include("    delay 5")
-        expect(contents).to include("  end tell")
-        expect(contents).to include("end tell")
-      end
-
-      it "runs the apple script" do
+      it "runs the dmgbuild command" do
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
-            osascript "#{staging_dir}/create_dmg.osascript"
+            pip install dmgbuild==1.6.5
+            dmgbuild \\
+              --detach-retries=5 \\
+              --settings="#{subject.resource_path('settings.py')}" \\
+              -Dbackground="#{subject.resource_path('background.png')}" \\
+              -Dpkg="#{package_dir}/project-1.2.3-2.pkg" \\
+              -Dpkg_position="535, 50" \\
+              -Dvolume_icon="#{staging_dir}/tmp.icns" \\
+              -Dwindow_bounds="100, 100, 750, 600" \\
+              "Project One" \\
+              "#{subject.package_path}"
           EOH
 
-        subject.prettify_dmg
-      end
-    end
-
-    describe '#compress_dmg' do
-      it "logs a message" do
-        output = capture_logging { subject.compress_dmg }
-        expect(output).to include("Compressing dmg")
-      end
-
-      it "runs the magical command series" do
-        device = "/dev/sda1"
-        subject.instance_variable_set(:@device, device)
-
-        expect(subject).to receive(:shellout!)
-          .with <<-EOH.gsub(/^ {12}/, "")
-            chmod -Rf go-w "/Volumes/Project One"
-            sync
-            hdiutil unmount "#{device}"
-            # Give some time to the system so unmount dmg
-            ATTEMPTS=1
-            until [ $ATTEMPTS -eq 6 ] || hdiutil detach "/dev/sda1"; do
-              sleep 10
-              echo Attempt number $(( ATTEMPTS++ ))
-            done
-            hdiutil convert \\
-              "#{staging_dir}/project-writable.dmg" \\
-              -format UDZO \\
-              -imagekey \\
-              zlib-level=9 \\
-              -o "#{package_dir}/project-1.2.3-2.dmg" \\
-              -puppetstrings
-          EOH
-
-        subject.compress_dmg
+        subject.create_compressed_dmg
       end
     end
 
@@ -266,22 +141,6 @@ module Omnibus
           EOH
 
         subject.verify_dmg
-      end
-    end
-
-    describe "#remove_writable_dmg" do
-      it "logs a message" do
-        output = capture_logging { subject.remove_writable_dmg }
-        expect(output).to include("Removing writable dmg")
-      end
-
-      it "runs the command" do
-        expect(subject).to receive(:shellout!)
-          .with <<-EOH.gsub(/^ {12}/, "")
-            rm -rf "#{staging_dir}/project-writable.dmg"
-          EOH
-
-        subject.remove_writable_dmg
       end
     end
 
@@ -324,16 +183,6 @@ module Omnibus
           .and_return("#{package_basename}.pkg")
 
         expect(subject.package_name).to eq("#{package_basename}.dmg")
-      end
-    end
-
-    describe '#writable_dmg' do
-      it "is in the staging_dir" do
-        expect(subject.writable_dmg).to include(staging_dir)
-      end
-
-      it "is project-writable" do
-        expect(subject.writable_dmg).to include("project-writable.dmg")
       end
     end
 
