@@ -222,12 +222,19 @@ module Omnibus
           # version is the same as Windows 2012R2. It's only here for completeness
           # and documentation.
           when /6\.3\.\d+/, "8.1" then "8.1"
-          when "10", /^10\.0/, "2016" then "2016"
-          when "10.0.14393" then "2016"
-          when "10.0.17763", "2019" then "2019"
-          when "10.0.20348", "2022" then "2022"
-          when /^10\.0\.2.*/, "2025" then "2025"
-          when "11", /^11\.0/ then "11"
+          # Server versions with specific build numbers
+          when "10.0.14393" then "2016"    # Windows Server 2016
+          when "10.0.17763" then "2019"    # Windows Server 2019
+          when "10.0.20348" then "2022"    # Windows Server 2022
+          when "10.0.25398", "10.0.26100" then "2025"  # Windows Server 2025
+
+          # Windows 11 versions (specific build numbers)
+          when "10.0.22000", "10.0.22621", "10.0.22631" then "11"    # Windows 11 versions
+
+          # Default Windows 10 case - catch any remaining 10.0.x versions not specifically matched
+          when "10", /10\.0\.\d+/ then "10"
+          # For future Windows 11 with actual 11.0 version number
+          when "11", /11\.0/ then "11"
           else
             raise UnknownPlatformVersion.new(platform, platform_version)
           end
