@@ -114,7 +114,7 @@ module Omnibus
               --detach-retries=5 \\
               --settings="#{subject.resource_path('settings.py')}" \\
               -Dbackground="#{subject.resource_path('background.png')}" \\
-              -Dpkg="#{package_dir}/project-1.2.3-2.pkg" \\
+              -Dpkg="#{package_dir}/project-1.2.3-2.x86_64.pkg" \\
               -Dpkg_position="535, 50" \\
               -Dvolume_icon="#{staging_dir}/tmp.icns" \\
               -Dwindow_bounds="100, 100, 750, 600" \\
@@ -136,7 +136,7 @@ module Omnibus
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
             hdiutil verify \\
-              "#{package_dir}/project-1.2.3-2.dmg" \\
+              "#{package_dir}/project-1.2.3-2.x86_64.dmg" \\
               -puppetstrings
           EOH
 
@@ -162,10 +162,10 @@ module Omnibus
             DeRez -only icns "#{icon}" > tmp.rsrc
 
             # Append the icon reosurce to the DMG
-            Rez -append tmp.rsrc -o "#{package_dir}/project-1.2.3-2.dmg"
+            Rez -append tmp.rsrc -o "#{package_dir}/project-1.2.3-2.x86_64.dmg"
 
             # Source the icon
-            SetFile -a C "#{package_dir}/project-1.2.3-2.dmg"
+            SetFile -a C "#{package_dir}/project-1.2.3-2.x86_64.dmg"
           EOH
 
         subject.set_dmg_icon
@@ -174,11 +174,11 @@ module Omnibus
 
     describe '#package_name' do
       it 'reflects the packager\'s unmodified package_name' do
-        expect(subject.package_name).to eq("project-1.2.3-2.dmg")
+        expect(subject.package_name).to eq("project-1.2.3-2.x86_64.dmg")
       end
 
       it 'reflects the packager\'s modified package_name' do
-        package_basename = "projectsub-1.2.3-3"
+        package_basename = "projectsub-1.2.3-3.x86_64"
         allow(project.packagers_for_system[0]).to receive(:package_name)
           .and_return("#{package_basename}.pkg")
 

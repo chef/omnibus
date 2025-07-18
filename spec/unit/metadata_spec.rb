@@ -220,6 +220,8 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
       it_behaves_like "a version manipulator", "gentoo", "2004.3", "2004.3"
       it_behaves_like "a version manipulator", "ios_xr", "6.0.0.14I", "6"
       it_behaves_like "a version manipulator", "mac_os_x", "10.9.1", "10.9"
+      it_behaves_like "a version manipulator", "mac_os_x", "10.15.7", "10.15"
+      it_behaves_like "a version manipulator", "mac_os_x", "11.2.1", "11"
       it_behaves_like "a version manipulator", "nexus", "5.0", "5"
       it_behaves_like "a version manipulator", "omnios", "r151010", "r151010"
       it_behaves_like "a version manipulator", "openbsd", "5.4.4", "5.4"

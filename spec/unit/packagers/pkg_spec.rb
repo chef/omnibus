@@ -47,8 +47,8 @@ module Omnibus
     end
 
     describe '#package_name' do
-      it "includes the name, version, and build iteration" do
-        expect(subject.package_name).to eq("project-full-name-1.2.3-2.pkg")
+      it "includes the name, version, build iteration, and architecture" do
+        expect(subject.package_name).to eq("project-full-name-1.2.3-2.x86_64.pkg")
       end
     end
 
@@ -137,7 +137,23 @@ module Omnibus
 
         expect(contents).to include('<pkg-ref id="com.getchef.project-full-name"/>')
         expect(contents).to include('<line choice="com.getchef.project-full-name"/>')
+        expect(contents).to include('hostArchitectures="x86_64"')
         expect(contents).to include("project-full-name-core.pkg")
+      end
+
+      context "for arm64 builds" do
+        before do
+          stub_ohai(platform: "mac_os_x", version: "11.0") do |data|
+            data["kernel"]["machine"] = "arm64"
+          end
+        end
+
+        it "sets the hostArchitectures to include arm64" do
+          subject.write_distribution_file
+          contents = File.read("#{staging_dir}/Distribution")
+
+          expect(contents).to include('hostArchitectures="arm64"')
+        end
       end
     end
 
@@ -148,7 +164,7 @@ module Omnibus
             productbuild \\
               --distribution "#{staging_dir}/Distribution" \\
               --resources "#{staging_dir}/Resources" \\
-              "#{package_dir}/project-full-name-1.2.3-2.pkg"
+              "#{package_dir}/project-full-name-1.2.3-2.x86_64.pkg"
           EOH
 
           subject.build_product_pkg
@@ -166,7 +182,7 @@ module Omnibus
               --distribution "#{staging_dir}/Distribution" \\
               --resources "#{staging_dir}/Resources" \\
               --sign "My Special Identity" \\
-              "#{package_dir}/project-full-name-1.2.3-2.pkg"
+              "#{package_dir}/project-full-name-1.2.3-2.x86_64.pkg"
             EOH
           subject.build_product_pkg
         end
