@@ -208,6 +208,7 @@ module Omnibus
           return platform_version if ["2000", "xp", "2003r2", "2008", "7", "2008r2",
                                      "2012", "8", "2012r2", "8.1", "10", "11",
                                      "2016", "2019", "2022", "2025"].include?(platform_version)
+                                     
           case platform_version
           when "5.0.2195", "2000"   then "2000"
           when "5.1.2600", "xp"     then "xp"
