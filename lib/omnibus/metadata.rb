@@ -232,7 +232,7 @@ module Omnibus
           # Windows Server 2016 "10.0.14393"
           # Windows Server 2019 "10.0.17763"
           # Windows Server 2022 "10.0.20348"
-          # Windows Server 2025 "10.0.25398", "10.0.26100" 
+          # Windows Server 2025 "10.0.25398", "10.0.26100"
           when "10.0.14393" then "2016"
           when "10.0.17763" then "2019"
           when "10.0.20348" then "2022"
