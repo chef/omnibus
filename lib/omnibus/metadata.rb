@@ -207,8 +207,8 @@ module Omnibus
           #
           
           # First check if we already have a friendly version name
-          return platform_version if ["2000", "xp", "2003r2", "2008", "7", "2008r2", 
-                                     "2012", "8", "2012r2", "8.1", "10", "11", 
+          return platform_version if ["2000", "xp", "2003r2", "2008", "7", "2008r2",
+                                     "2012", "8", "2012r2", "8.1", "10", "11",
                                      "2016", "2019", "2022", "2025"].include?(platform_version)
           
           case platform_version
@@ -229,13 +229,17 @@ module Omnibus
           # and documentation.
           when /6\.3\.\d+/, "8.1" then "8.1"
           # Server versions with specific build numbers
-          when "10.0.14393" then "2016"    # Windows Server 2016
-          when "10.0.17763" then "2019"    # Windows Server 2019
-          when "10.0.20348" then "2022"    # Windows Server 2022
-          when "10.0.25398", "10.0.26100" then "2025"  # Windows Server 2025
+          # Windows Server 2016 "10.0.14393"
+          # Windows Server 2019 "10.0.17763"
+          # Windows Server 2022 "10.0.20348"
+          # Windows Server 2025 "10.0.25398", "10.0.26100" 
+          when "10.0.14393" then "2016"
+          when "10.0.17763" then "2019"
+          when "10.0.20348" then "2022"
+          when "10.0.25398", "10.0.26100" then "2025"
 
           # Windows 11 versions (specific build numbers)
-          when "10.0.22000", "10.0.22621", "10.0.22631" then "11"    # Windows 11 versions
+          when "10.0.22000", "10.0.22621", "10.0.22631" then "11"
 
           # Default Windows 10 case - catch any remaining 10.0.x versions not specifically matched
           when "10", /10\.0\.\d+/ then "10"
