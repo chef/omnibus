@@ -108,7 +108,7 @@ module Omnibus
         @s3_bucket ||= begin
                          bucket = client.bucket(s3_configuration[:bucket_name])
                          unless bucket.exists?
-                           bucket_config = if s3_configuration[:region] == "us-east-1"
+                           bucket_config = if s3_configuration[:region] == "us-west-2"
                                              nil
                                            else
                                              {
