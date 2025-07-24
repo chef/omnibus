@@ -109,7 +109,6 @@ module Omnibus
       it "runs the dmgbuild command" do
         expect(subject).to receive(:shellout!)
           .with <<-EOH.gsub(/^ {12}/, "")
-            pip install dmgbuild==1.6.5
             dmgbuild \\
               --detach-retries=5 \\
               --settings="#{subject.resource_path('settings.py')}" \\

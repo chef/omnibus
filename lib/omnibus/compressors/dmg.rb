@@ -143,7 +143,6 @@ module Omnibus
       log.info(log_key) { "Creating compressed dmg" }
 
       shellout! <<-EOH.gsub(/^ {8}/, "")
-        pip install dmgbuild==1.6.5
         dmgbuild \\
           --detach-retries=5 \\
           --settings="#{resource_path('settings.py')}" \\
