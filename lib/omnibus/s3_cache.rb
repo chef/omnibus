@@ -83,7 +83,7 @@ module Omnibus
           md5 = digest(fetcher.downloaded_file, :md5)
 
           File.open(fetcher.downloaded_file, "rb") do |file|
-            store_object(key, file, md5, "public-read")
+            store_object(key, file, md5, Config.s3_acl)
           end
         end
 

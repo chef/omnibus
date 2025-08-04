@@ -338,6 +338,12 @@ module Omnibus
     # @return [true, false]
     default(:s3_accelerate, false)
 
+
+    # The ACL to use when uploading objects to S3.
+    #
+    # @return [String]
+    default(:s3_acl, "private")
+
     # --------------------------------------------------
     # @!endgroup
     #
