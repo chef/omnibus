@@ -119,7 +119,7 @@ module Omnibus
     # @return [String]
     #
     def downloaded_file
-      # filename = source[:cached_name] if source[:cached_name]
+      filename = source[:cached_name] if source[:cached_name]
       filename ||= File.basename(source[:url], "?*")
       File.join(Config.cache_dir, filename)
     end
