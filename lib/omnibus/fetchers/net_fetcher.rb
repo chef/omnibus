@@ -155,7 +155,6 @@ module Omnibus
       end
     end
 
-
     #
     # Download the given file using Ruby's +OpenURI+ implementation. This method
     # may emit warnings as defined in software definitions using the +:warning+
