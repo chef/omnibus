@@ -177,8 +177,8 @@ module Omnibus
         before { Omnibus::Config.use_internal_sources(true) }
 
         it "logs a message and fetches from the source URL" do
-          expect(fetcher).to receive(:log).with("Internal source missing for #{fetcher}. Fetching from source URL instead.")
-          expect(fetcher).to receive(:fetch_from_source_url)
+          expect(fetch).to receive(:log).with("****** Internal source missing for : #{fetch}. Fetching from source URL instead. ******")
+          expect(fetch).to receive(:fetch_from_source_url)
           fetcher.fetch!
         end
       end
