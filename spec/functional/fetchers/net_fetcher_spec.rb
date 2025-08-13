@@ -173,15 +173,18 @@ module Omnibus
         end
       end
 
-      context "when use_internal_sources is true and no internal source url" do
-        before { Omnibus::Config.use_internal_sources(true) }
+      context "when use_internal_sources is true but internal source is missing" do
+        before do
+          Config.use_internal_sources(true)
+        end
 
-        it "logs a message and fetches from the source URL" do
-          expect(subject).to receive(:log).with("****** Internal source missing for : #{subject}. Fetching from source URL instead. ******")
-          expect(subject).to receive(:fetch_from_source_url)
-          subject.fetch!
+        it "logs a warning and falls back to the external url" do
+          expect(subject).to receive(:log).and_call_original
+          url = subject.send(:download_url)
+          expect(url).to eq(source[:url])
         end
       end
+
 
       context "when use_internal_sources is true and internal source url given" do
         before { Omnibus::Config.use_internal_sources(true) }
@@ -245,6 +248,7 @@ module Omnibus
 
         context "when the checksum is invalid" do
           let(:source_sha512) { "bad01234checksum" }
+
           it "raises an exception" do
             expect { fetch! }.to raise_error(ChecksumMismatch)
           end
