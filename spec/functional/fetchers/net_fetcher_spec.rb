@@ -179,7 +179,7 @@ module Omnibus
         it "logs a message and fetches from the source URL" do
           expect(subject).to receive(:log).with("****** Internal source missing for : #{subject}. Fetching from source URL instead. ******")
           expect(subject).to receive(:fetch_from_source_url)
-          fetcher.fetch!
+          subject.fetch!
         end
       end
 
