@@ -162,22 +162,52 @@ module Omnibus
     #
     # @return [void]
     #
-    def download
-      log.warn(log_key) { source[:warning] } if source.key?(:warning)
+    # def download
+    #   log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
+    #   options = {}
+
+    #   if source[:unsafe]
+    #     log.warn(log_key) { "Permitting unsafe redirects!" }
+    #     options[:allow_unsafe_redirects] = true
+    #   end
+
+    #   # Set the cookie if one was given
+    #   options["Cookie"] = source[:cookie] if source[:cookie]
+    #   options["Authorization"] = source[:authorization] if source[:authorization]
+
+    #   download_file!(download_url, downloaded_file, options)
+    # end
+    def download
       options = {}
 
-      if source[:unsafe]
-        log.warn(log_key) { "Permitting unsafe redirects!" }
-        options[:allow_unsafe_redirects] = true
-      end
-
-      # Set the cookie if one was given
       options["Cookie"] = source[:cookie] if source[:cookie]
       options["Authorization"] = source[:authorization] if source[:authorization]
 
-      download_file!(download_url, downloaded_file, options)
+      begin
+        # Attempt the original download which tries internal source if configured
+        super
+      rescue OpenURI::HTTPError => e
+        # Check if the error is a 404 from internal source while internal sources are enabled
+        if e.io.status[0] == "404" && Config.use_internal_sources && source[:internal]
+          log.warn(log_key) { "Internal source returned 404 Not Found for #{name}, falling back to external source URL." }
+
+          # Temporarily disable internal sources to force external URL usage
+          Config.use_internal_sources(false)
+          begin
+            # Retry download explicitly from external source URL
+            download_file!(source[:url], downloaded_file, options)
+          ensure
+            # Restore the original internal sources config
+            Config.use_internal_sources(true)
+          end
+        else
+          # Raise any other HTTP errors as usual
+          raise
+        end
+      end
     end
+
 
     #
     # Extract the downloaded file, using the magical logic based off of the
