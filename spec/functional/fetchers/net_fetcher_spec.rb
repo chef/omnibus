@@ -185,7 +185,6 @@ module Omnibus
         end
       end
 
-
       context "when use_internal_sources is true and internal source url given" do
         before { Omnibus::Config.use_internal_sources(true) }
         let(:source) do
