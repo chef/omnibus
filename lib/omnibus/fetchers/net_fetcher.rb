@@ -179,30 +179,29 @@ module Omnibus
     #   download_file!(download_url, downloaded_file, options)
     # end
     def download
+      log.warn(log_key) { source[:warning] } if source.key?(:warning)
+
       options = {}
 
+      if source[:unsafe]
+        log.warn(log_key) { "Permitting unsafe redirects!" }
+        options[:allow_unsafe_redirects] = true
+      end
+
+      # Set the cookie if one was given
       options["Cookie"] = source[:cookie] if source[:cookie]
       options["Authorization"] = source[:authorization] if source[:authorization]
 
       begin
-        # Attempt the original download which tries internal source if configured
-        super
+        # Attempt download from internal or S3 source URL
+        download_file!(download_url, downloaded_file, options)
       rescue OpenURI::HTTPError => e
-        # Check if the error is a 404 from internal source while internal sources are enabled
+        # If 404 comes from internal source, fallback to external URL
         if e.io.status[0] == "404" && Config.use_internal_sources && source[:internal]
           log.warn(log_key) { "Internal source returned 404 Not Found for #{name}, falling back to external source URL." }
-
-          # Temporarily disable internal sources to force external URL usage
-          Config.use_internal_sources(false)
-          begin
-            # Retry download explicitly from external source URL
-            download_file!(source[:url], downloaded_file, options)
-          ensure
-            # Restore the original internal sources config
-            Config.use_internal_sources(true)
-          end
+          download_file!(source[:url], downloaded_file, options)
         else
-          # Raise any other HTTP errors as usual
+          # Re-raise other errors
           raise
         end
       end
