@@ -208,7 +208,6 @@ module Omnibus
       end
     end
 
-
     #
     # Extract the downloaded file, using the magical logic based off of the
     # ending file extension. In the rare event the file cannot be extracted, it
