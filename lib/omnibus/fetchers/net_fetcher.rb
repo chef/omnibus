@@ -271,6 +271,9 @@ module Omnibus
     # @return [Symbol]
     #
     def digest_type
+      if source[:url].to_s.downcase.end_with?(".git")
+        return nil
+      end
       DIGESTS.each do |digest|
         return digest if source.key? digest
       end
@@ -284,6 +287,8 @@ module Omnibus
     #   if the checksum does not match
     #
     def verify_checksum!
+      return if digest_type.nil?  # skip verification for git urls
+
       log.info(log_key) { "Verifying checksum" }
 
       # Check if the source is a Git repository
