@@ -287,13 +287,13 @@ module Omnibus
       log.info(log_key) { "Verifying checksum" }
     
       # Check if the source is a Git repository
-      if source[:url] =~ /git@|https?:\/\/.*\.git/
+      if source[:url] =~ %r{git@|https?:\/\/.*\.git}
         log.warn(log_key) { "Skipping checksum verification for Git source: #{source[:url]}" }
         return
       end
     
       expected = checksum
-      actual   = digest(downloaded_file, digest_type)
+      actual = digest(downloaded_file, digest_type)
     
       if expected != actual
         raise ChecksumMismatch.new(self, expected, actual)
