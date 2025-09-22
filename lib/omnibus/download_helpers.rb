@@ -89,7 +89,8 @@ module Omnibus
         enable_progress_bar = options.delete(:enable_progress_bar)
         enable_progress_bar = true if enable_progress_bar.nil?
 
-        options.merge!(download_headers)
+        # Safely merge download headers if they exist
+        options.merge!(download_headers || {})
         options[:read_timeout] = Config.fetcher_read_timeout
 
         fetcher_retries ||= Config.fetcher_retries
@@ -136,6 +137,17 @@ module Omnibus
           log.error(log_key) { "Download failed - #{e.class}!" }
           raise
         end
+      end
+
+      #
+      # Default empty implementation of download_headers
+      # This can be overridden by classes that include this module
+      #
+      # @return [Hash]
+      #   empty hash of headers by default
+      #
+      def download_headers
+        {}
       end
 
       #
