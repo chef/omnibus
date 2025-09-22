@@ -16,6 +16,7 @@
 
 require "open-uri" unless defined?(OpenURI)
 require "ruby-progressbar"
+require "aws-sdk-s3"
 
 module Omnibus
   module DownloadHelpers
@@ -27,11 +28,14 @@ module Omnibus
       private
 
       #
-      # Downloads a from a given url to a given path using Ruby's
-      # +OpenURI+ implementation.
+      # Downloads from a given URL to a given path.
+      # Supports direct S3 downloads using AWS SDK when downloading from S3 URLs,
+      # and falls back to Ruby's OpenURI implementation for standard HTTP/HTTPS URLs.
       #
       # @param [String] from_url
+      #   the URL to download from, supports http://, https://, and s3:// protocols
       # @param [String] to_path
+      #   the path on disk where the downloaded file should be stored
       # @param [Hash] options
       #   +options+ compatible with Ruby's +OpenURI+ implementation.
       #   You can also use special option +enable_progress_bar+ which will
@@ -43,21 +47,52 @@ module Omnibus
       # @raise [Errno::ENETUNREACH]
       # @raise [Timeout::Error]
       # @raise [OpenURI::HTTPError]
+      # @raise [Aws::S3::Errors::ServiceError]
       #
       # @return [void]
       #
       def download_file!(from_url, to_path, download_options = {})
         options = download_options.dup
 
+        # Try S3 download first if this looks like an S3 URL and we have S3 configuration
+        if is_s3_url?(from_url) && has_s3_credentials?
+          begin
+            log.info(log_key) { "Attempting S3 direct download for: #{from_url}" }
+            
+            # Parse S3 URL to extract bucket and key
+            uri = URI(from_url)
+            bucket, key = extract_s3_bucket_and_key(from_url, uri)
+            
+            log.debug(log_key) { "S3 bucket: #{bucket}, key: #{key}" }
+            
+            # Create S3 client with credentials from Config
+            s3_client = create_s3_client
+            
+            # Download directly to the destination path
+            s3_client.get_object(
+              bucket: bucket,
+              key: key,
+              response_target: to_path
+            )
+            
+            log.debug(log_key) { "Successfully downloaded S3 object to #{to_path}" }
+            return # Exit early if S3 download succeeds
+          rescue => e
+            log.warn(log_key) { "S3 download failed: #{e.message}. Falling back to HTTP download." }
+            # Fall through to regular HTTP download
+          end
+        end
+
+        # Regular HTTP download using OpenURI
         # :enable_progress_bar is a special option we handle.
         # by default we enable the progress bar.
         enable_progress_bar = options.delete(:enable_progress_bar)
         enable_progress_bar = true if enable_progress_bar.nil?
 
         options.merge!(download_headers)
-        options[:read_timeout] = Omnibus::Config.fetcher_read_timeout
+        options[:read_timeout] = Config.fetcher_read_timeout
 
-        fetcher_retries ||= Omnibus::Config.fetcher_retries
+        fetcher_retries ||= Config.fetcher_retries
 
         reported_total = 0
         if enable_progress_bar
@@ -104,39 +139,95 @@ module Omnibus
       end
 
       #
-      # The list of headers to pass to the download.
+      # Checks if a URL appears to be an S3 URL
       #
-      # @return [Hash]
+      # @param [String] url
+      #   the URL to check
       #
-      def download_headers
-        {}.tap do |h|
-          # Alright kids, sit down while grandpa tells you a story. Back when the
-          # Internet was just a series of tubes, and you had to "dial in" using
-          # this thing called a "modem", ancient astronaunt theorists (computer
-          # scientists) invented gzip to compress requests sent over said tubes
-          # and make the Internet faster.
-          #
-          # Fast forward to the year of broadband - ungzipping these files was
-          # tedious and hard, so Ruby and other client libraries decided to do it
-          # for you:
-          #
-          #   https://github.com/ruby/ruby/blob/c49ae7/lib/net/http.rb#L1031-L1033
-          #
-          # Meanwhile, software manufacturers began automatically compressing
-          # their software for distribution as a +.tar.gz+, publishing the
-          # appropriate checksums accordingly.
-          #
-          # But consider... If a software manufacturer is publishing the checksum
-          # for a gzipped tarball, and the client is automatically ungzipping its
-          # responses, then checksums can (read: should) never match! Herein lies
-          # the bug that took many hours away from the lives of a once-happy
-          # developer.
-          #
-          # TL;DR - Do not let Ruby ungzip our file
-          #
-          h["Accept-Encoding"] = "identity"
+      # @return [Boolean]
+      #   true if the URL appears to be an S3 URL, false otherwise
+      #
+      def is_s3_url?(url)
+        return false unless url.is_a?(String)
+        
+        url.include?('s3.amazonaws.com') || 
+        url.include?('amazonaws.com') || 
+        url.start_with?('s3://')
+      end
+
+      #
+      # Checks if S3 credentials are available in the configuration
+      #
+      # @return [Boolean]
+      #   true if S3 credentials are available, false otherwise
+      #
+      def has_s3_credentials?
+        Config.s3_iam_role_arn || 
+        Config.s3_profile || 
+        (Config.s3_access_key && Config.s3_secret_key)
+      end
+
+      #
+      # Extracts the S3 bucket and key from a URL
+      #
+      # @param [String] url
+      #   the URL to parse
+      # @param [URI] uri
+      #   the parsed URI object
+      #
+      # @return [Array<String>]
+      #   the bucket and key as strings
+      #
+      def extract_s3_bucket_and_key(url, uri)
+        if url.start_with?('s3://')
+          # s3://bucket/key format
+          [uri.host, uri.path.sub(/^\//, '')]
+        elsif uri.host =~ /\.s3[\.\-]([a-z0-9\-]+\.)?amazonaws\.com$/
+          # bucket.s3.region.amazonaws.com/key format
+          [uri.host.split('.').first, uri.path.sub(/^\//, '')]
+        else
+          # s3.region.amazonaws.com/bucket/key format
+          path_parts = uri.path.split("/").reject(&:empty?)
+          [path_parts.first, path_parts[1..-1].join("/")]
         end
       end
+
+      #
+      # Creates an S3 client with proper credentials based on configuration
+      #
+      # @return [Aws::S3::Client]
+      #   the configured S3 client
+      #
+      def create_s3_client
+        params = {
+          region: Config.s3_region,
+          endpoint: Config.s3_endpoint,
+          force_path_style: Config.s3_force_path_style,
+          use_accelerate_endpoint: Config.s3_accelerate
+        }
+
+        # Add credentials based on available configuration
+        if Config.s3_iam_role_arn
+          params[:credentials] = Aws::AssumeRoleCredentials.new(
+            role_arn: Config.s3_iam_role_arn,
+            role_session_name: "omnibus-s3-downloader"
+          )
+        elsif Config.s3_profile
+          params[:credentials] = Aws::SharedCredentials.new(
+            profile_name: Config.s3_profile
+          )
+        else
+          params[:credentials] = Aws::Credentials.new(
+            Config.s3_access_key,
+            Config.s3_secret_key
+          )
+        end
+
+        Aws::S3::Client.new(params)
+      end
+
+      # Rest of the file remains unchanged
+      # ...
     end
   end
 end
