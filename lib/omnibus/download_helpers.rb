@@ -16,7 +16,6 @@
 
 require "open-uri" unless defined?(OpenURI)
 require "ruby-progressbar"
-require "aws-sdk-s3"
 
 module Omnibus
   module DownloadHelpers
@@ -29,7 +28,7 @@ module Omnibus
 
       #
       # Downloads from a given URL to a given path.
-      # Supports direct S3 downloads using AWS SDK when downloading from S3 URLs,
+      # Supports direct S3 downloads using AWS SDK when downloading from S3 URLs (if available),
       # and falls back to Ruby's OpenURI implementation for standard HTTP/HTTPS URLs.
       #
       # @param [String] from_url
@@ -47,38 +46,48 @@ module Omnibus
       # @raise [Errno::ENETUNREACH]
       # @raise [Timeout::Error]
       # @raise [OpenURI::HTTPError]
-      # @raise [Aws::S3::Errors::ServiceError]
       #
       # @return [void]
       #
       def download_file!(from_url, to_path, download_options = {})
         options = download_options.dup
 
-        # Try S3 download first if this looks like an S3 URL and we have S3 configuration
+        # Try S3 download first if this is an S3 URL and we have S3 credentials
         if is_s3_url?(from_url) && has_s3_credentials?
           begin
             log.info(log_key) { "Attempting S3 direct download for: #{from_url}" }
             
-            # Parse S3 URL to extract bucket and key
-            uri = URI(from_url)
-            bucket, key = extract_s3_bucket_and_key(from_url, uri)
-            
-            log.debug(log_key) { "S3 bucket: #{bucket}, key: #{key}" }
-            
-            # Create S3 client with credentials from Config
-            s3_client = create_s3_client
-            
-            # Download directly to the destination path
-            s3_client.get_object(
-              bucket: bucket,
-              key: key,
-              response_target: to_path
-            )
-            
-            log.debug(log_key) { "Successfully downloaded S3 object to #{to_path}" }
-            return # Exit early if S3 download succeeds
+            # Use AWS SDK for S3 direct download if aws-sdk-s3 is available
+            begin
+              require "aws-sdk-s3"
+              
+              # Parse S3 URL to extract bucket and key
+              uri = URI(from_url)
+              bucket, key = extract_s3_bucket_and_key(from_url, uri)
+              
+              log.debug(log_key) { "S3 bucket: #{bucket}, key: #{key}" }
+              
+              # Create S3 client with credentials from Config
+              s3_client = create_s3_client
+              
+              # Download directly to the destination path
+              s3_client.get_object(
+                bucket: bucket,
+                key: key,
+                response_target: to_path
+              )
+              
+              log.debug(log_key) { "Successfully downloaded S3 object to #{to_path}" }
+              return # Exit early if S3 download succeeds
+            rescue LoadError => e
+              log.warn(log_key) { "AWS SDK for S3 not available: #{e.message}. Falling back to HTTP download." }
+              # Fall through to regular HTTP download if aws-sdk-s3 isn't available
+            rescue => e
+              log.warn(log_key) { "S3 download failed: #{e.message}. Falling back to HTTP download." }
+              # Fall through to regular HTTP download
+            end
           rescue => e
-            log.warn(log_key) { "S3 download failed: #{e.message}. Falling back to HTTP download." }
+            log.warn(log_key) { "S3 download setup failed: #{e.message}. Falling back to HTTP download." }
             # Fall through to regular HTTP download
           end
         end
@@ -89,27 +98,39 @@ module Omnibus
         enable_progress_bar = options.delete(:enable_progress_bar)
         enable_progress_bar = true if enable_progress_bar.nil?
 
-        # Safely merge download headers if they exist
-        options.merge!(download_headers || {})
+        # Safely access download_headers or use empty hash
+        headers = {}
+        begin
+          headers = download_headers if respond_to?(:download_headers)
+        rescue => e
+          log.warn(log_key) { "Error getting download headers: #{e.message}. Using empty headers." }
+        end
+        options.merge!(headers)
+        
         options[:read_timeout] = Config.fetcher_read_timeout
 
         fetcher_retries ||= Config.fetcher_retries
 
         reported_total = 0
         if enable_progress_bar
-          progress_bar = ProgressBar.create(
-            output: $stdout,
-            format: "%e %B %p%% (%r KB/sec)",
-            rate_scale: ->(rate) { rate / 1024 }
-          )
+          begin
+            progress_bar = ProgressBar.create(
+              output: $stdout,
+              format: "%e %B %p%% (%r KB/sec)",
+              rate_scale: ->(rate) { rate / 1024 }
+            )
 
-          options[:content_length_proc] = ->(total) do
-            reported_total = total
-            progress_bar.total = total
-          end
-          options[:progress_proc] = ->(step) do
-            downloaded_amount = reported_total ? [step, reported_total].min : step
-            progress_bar.progress = downloaded_amount
+            options[:content_length_proc] = ->(total) do
+              reported_total = total
+              progress_bar.total = total
+            end
+            options[:progress_proc] = ->(step) do
+              downloaded_amount = reported_total ? [step, reported_total].min : step
+              progress_bar.progress = downloaded_amount
+            end
+          rescue => e
+            log.warn(log_key) { "Could not create progress bar: #{e.message}" }
+            # Proceed without progress bar
           end
         end
 
@@ -140,17 +161,6 @@ module Omnibus
       end
 
       #
-      # Default empty implementation of download_headers
-      # This can be overridden by classes that include this module
-      #
-      # @return [Hash]
-      #   empty hash of headers by default
-      #
-      def download_headers
-        {}
-      end
-
-      #
       # Checks if a URL appears to be an S3 URL
       #
       # @param [String] url
@@ -174,9 +184,10 @@ module Omnibus
       #   true if S3 credentials are available, false otherwise
       #
       def has_s3_credentials?
-        Config.s3_iam_role_arn || 
-        Config.s3_profile || 
-        (Config.s3_access_key && Config.s3_secret_key)
+        Config.use_s3_caching && 
+        (Config.s3_iam_role_arn || 
+         Config.s3_profile || 
+         (Config.s3_access_key && Config.s3_secret_key))
       end
 
       #
@@ -237,9 +248,6 @@ module Omnibus
 
         Aws::S3::Client.new(params)
       end
-
-      # Rest of the file remains unchanged
-      # ...
     end
   end
 end
