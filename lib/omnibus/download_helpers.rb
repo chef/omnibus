@@ -162,9 +162,23 @@ module Omnibus
       def is_s3_url?(url)
         return false unless url.is_a?(String)
         
-        url.include?('s3.amazonaws.com') || 
-        url.include?('amazonaws.com') || 
-        url.start_with?('s3://')
+        return true if url.start_with?('s3://')
+
+        begin
+          uri = URI.parse(url)
+          host = uri.host
+          return false unless host
+          # Match S3 endpoints:
+          #   s3.amazonaws.com
+          #   s3-<region>.amazonaws.com
+          #   s3.<region>.amazonaws.com
+          #   bucket.s3.amazonaws.com, bucket.s3-<region>.amazonaws.com, etc.
+          #   Only allow amazonaws.com S3 patterns, not any host containing 'amazonaws.com'
+          s3_host_regex = /\A(.+\.)?(s3[\.-][a-z0-9-]+|s3)\.amazonaws\.com\z/i
+          !!(host =~ s3_host_regex)
+        rescue URI::InvalidURIError
+          false
+        end
       end
 
       #
