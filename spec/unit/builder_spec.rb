@@ -162,6 +162,10 @@ module Omnibus
     describe "#make" do
       before do
         allow(subject).to receive(:command)
+        # Ensure tests are deterministic regardless of the host environment:
+        # by default, pretend gmake is not present. Individual contexts may
+        # override this with a more specific stub.
+        allow(Omnibus).to receive(:which).with("gmake").and_return(nil)
       end
 
       it "is a DSL method" do

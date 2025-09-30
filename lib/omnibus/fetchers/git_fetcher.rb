@@ -33,7 +33,11 @@ module Omnibus
     # @return [String]
     #
     def version_guid
-      "git:#{current_revision}"
+      # If current_revision cannot be determined (e.g., before checkout),
+      # fall back to the resolved_version (locked version) so callers get a
+      # usable GUID in tests and code paths that query the GUID before
+      # cloning.
+      "git:#{current_revision || resolved_version}"
     end
 
     #

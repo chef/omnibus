@@ -1,5 +1,9 @@
 AllCops:
   TargetRubyVersion: 2.6
+  Exclude:
+    - 'spec/tmp/**'
+    # - '**/*.spec'
+    - 'vendor/**/*'
 
 # all of these could/should be corrected. Have at it if you want.
 
