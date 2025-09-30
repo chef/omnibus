@@ -113,7 +113,10 @@ module Omnibus
         end
 
         if RUBY_VERSION.to_f < 2.7
-          file = open(from_url, open_uri_opts)
+          # Avoid calling Kernel.open with a non-constant value which can
+          # trigger security linters. Use OpenURI.open_uri explicitly which
+          # is what `open` from open-uri delegates to for URIs.
+          file = OpenURI.open_uri(from_url, open_uri_opts)
         else
           file = URI.open(from_url, open_uri_opts)
         end
