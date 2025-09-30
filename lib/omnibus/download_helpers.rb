@@ -84,9 +84,8 @@ module Omnibus
         enable_progress_bar = options.delete(:enable_progress_bar)
         enable_progress_bar = true if enable_progress_bar.nil?
 
-        # Safely merge download headers if they exist
+        # Safely extract download headers if they exist
         headers = download_headers || {}
-        options.merge!(headers)
         options[:read_timeout] = Config.fetcher_read_timeout
 
         fetcher_retries ||= Config.fetcher_retries
@@ -110,9 +109,9 @@ module Omnibus
         end
 
         if RUBY_VERSION.to_f < 2.7
-          file = open(from_url, options)
+          file = open(from_url, headers, options)
         else
-          file = URI.open(from_url, options)
+          file = URI.open(from_url, headers, **options)
         end
         # This is a temporary file. Close and flush it before attempting to copy
         # it over.
