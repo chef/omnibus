@@ -85,7 +85,8 @@ module Omnibus
         enable_progress_bar = true if enable_progress_bar.nil?
 
         # Safely merge download headers if they exist
-        options.merge!(download_headers || {})
+        headers = download_headers || {}
+        options.merge!(headers)
         options[:read_timeout] = Config.fetcher_read_timeout
 
         fetcher_retries ||= Config.fetcher_retries
