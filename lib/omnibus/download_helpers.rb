@@ -118,7 +118,12 @@ module Omnibus
           # is what `open` from open-uri delegates to for URIs.
           file = OpenURI.open_uri(from_url, open_uri_opts)
         else
-          file = URI.open(from_url, open_uri_opts)
+          # Use the instance-style open recommended by some linters to avoid
+          # calling a class method with a non-constant value. This parses the
+          # URL and then calls #open on the resulting URI object, which uses
+          # OpenURI under the hood for HTTP/HTTPS URIs.
+          uri = URI.parse(from_url)
+          file = uri.open(open_uri_opts)
         end
         # This is a temporary file. Close and flush it before attempting to copy
         # it over.
