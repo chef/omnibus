@@ -58,23 +58,18 @@ module Omnibus
         if is_s3_url?(from_url) && has_s3_credentials?
           begin
             log.info(log_key) { "Attempting S3 direct download for: #{from_url}" }
-            
             # Parse S3 URL to extract bucket and key
             uri = URI(from_url)
             bucket, key = extract_s3_bucket_and_key(from_url, uri)
-            
             log.debug(log_key) { "S3 bucket: #{bucket}, key: #{key}" }
-            
             # Create S3 client with credentials from Config
             s3_client = create_s3_client
-            
             # Download directly to the destination path
             s3_client.get_object(
               bucket: bucket,
               key: key,
               response_target: to_path
             )
-            
             log.debug(log_key) { "Successfully downloaded S3 object to #{to_path}" }
             return # Exit early if S3 download succeeds
           rescue => e
@@ -161,13 +156,13 @@ module Omnibus
       #
       def is_s3_url?(url)
         return false unless url.is_a?(String)
-        
-        return true if url.start_with?('s3://')
+        return true if url.start_with?("s3://")
 
         begin
           uri = URI.parse(url)
           host = uri.host
           return false unless host
+
           # Match S3 endpoints:
           #   s3.amazonaws.com
           #   s3-<region>.amazonaws.com
@@ -188,9 +183,9 @@ module Omnibus
       #   true if S3 credentials are available, false otherwise
       #
       def has_s3_credentials?
-        Config.s3_iam_role_arn || 
-        Config.s3_profile || 
-        (Config.s3_access_key && Config.s3_secret_key)
+        Config.s3_iam_role_arn ||
+          Config.s3_profile ||
+          (Config.s3_access_key && Config.s3_secret_key)
       end
 
       #
@@ -205,12 +200,12 @@ module Omnibus
       #   the bucket and key as strings
       #
       def extract_s3_bucket_and_key(url, uri)
-        if url.start_with?('s3://')
+        if url.start_with?("s3://")
           # s3://bucket/key format
-          [uri.host, uri.path.sub(/^\//, '')]
+          [uri.host, uri.path.sub(%r{^/}, "")]
         elsif uri.host =~ /\.s3[\.\-]([a-z0-9\-]+\.)?amazonaws\.com$/
           # bucket.s3.region.amazonaws.com/key format
-          [uri.host.split('.').first, uri.path.sub(/^\//, '')]
+          [uri.host.split(".").first, uri.path.sub(%r{^/}, "")]
         else
           # s3.region.amazonaws.com/bucket/key format
           path_parts = uri.path.split("/").reject(&:empty?)
@@ -229,7 +224,7 @@ module Omnibus
           region: Config.s3_region,
           endpoint: Config.s3_endpoint,
           force_path_style: Config.s3_force_path_style,
-          use_accelerate_endpoint: Config.s3_accelerate
+          use_accelerate_endpoint: Config.s3_accelerate,
         }
 
         # Add credentials based on available configuration
