@@ -14,7 +14,7 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = ">= 3.0"
 
-  gem.files = %w{ LICENSE README.md Rakefile Gemfile } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/{*,.kitchen*}")
+  gem.files = %w{ LICENSE README.md Rakefile Gemfile Notice.txt } + Dir.glob("*.gemspec") + Dir.glob("{bin,lib,resources,spec}/**/{*,.kitchen*}")
   gem.bindir = "bin"
   gem.executables = %w{omnibus}
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
