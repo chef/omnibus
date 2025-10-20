@@ -15,6 +15,7 @@
 #
 
 require "fileutils" unless defined?(FileUtils)
+require "omnibus/thread_pool"
 
 module Omnibus
   module FileSyncer
@@ -123,63 +124,102 @@ module Omnibus
           "the `copy' method instead."
       end
 
+      # Collect source files
       source_files = all_files_under(source, options)
-
-      # Ensure the destination directory exists
-      create_sync_dir(source, destination)
 
       # Clear any hardlink that we might have seen while syncing a previous directory
       # This can happen when generating 2 different packages in a row
       hardlink_sources.clear
 
-      # Copy over the filtered source files
+      # First gather all the directories and their permissions
+      dir_mode_map = {}
+      dir_mode_map[destination] = File.stat(source).mode
       source_files.each do |source_file|
         relative_path = relative_path_for(source_file, source)
-
-        # Create the parent directory
+        # Add source itself if it's a directory
+        if File.ftype(source_file) == "directory"
+          dest_target = File.join(destination, relative_path)
+          unless dir_mode_map.key?(dest_target)
+            dir_mode_map[dest_target] = File.stat(source_file).mode
+          end
+        end
+        # Add parent
         dirname = File.dirname(relative_path)
-        parent = File.join(destination, dirname)
-        create_sync_dir(File.join(source, dirname), parent)
+        dest_dir = File.join(destination, dirname)
+        unless dir_mode_map.key?(dest_dir)
+          src_dir = File.join(source, dirname)
+          dir_mode_map[dest_dir] = File.stat(src_dir).mode
+        end
+      end
 
+      # Create directories sorted by depth (shallowest first) to ensure correct permissions
+      dir_mode_map.sort_by { |path, _| path.count(File::SEPARATOR) }.each do |dest_dir, mode|
+        FileUtils.mkdir_p(dest_dir, :mode => mode)
+      end
+
+      # Categorize files for processing
+      regular_files = []
+      symlinks = []
+      hardlinks = []
+
+      source_files.each do |source_file|
         case File.ftype(source_file).to_sym
         when :directory
-          create_sync_dir(File.join(source, relative_path), File.join(destination, relative_path))
+          # Skip - already created
         when :link
-          target = File.readlink(source_file)
-
-          Dir.chdir(destination) do
-            FileUtils.ln_sf(target, "#{destination}/#{relative_path}")
-          end
+          symlinks << source_file
         when :file
           source_stat = File.stat(source_file)
-          # Detect 'files' which are hard links and use ln instead of cp to
-          # duplicate them, provided their source is in place already
-          if hardlink? source_stat
-            if existing = hardlink_sources[[source_stat.dev, source_stat.ino]]
-              FileUtils.ln(existing, "#{destination}/#{relative_path}", force: true)
-            else
+          if hardlink?(source_stat)
+            hardlinks << [source_file, source_stat]
+          else
+            regular_files << source_file
+          end
+        else
+          raise RuntimeError,
+                "Unknown file type: `File.ftype(source_file)' at `#{source_file}'!"
+        end
+      end
+
+      # Process regular files and symlinks in parallel
+      parallel_items = regular_files + symlinks
+      thread_count = [8, parallel_items.size].min
+
+      if parallel_items.any?
+        ThreadPool.new(thread_count) do |pool|
+          regular_files.each do |source_file|
+            pool.schedule do
+              relative_path = relative_path_for(source_file, source)
               begin
                 FileUtils.cp(source_file, "#{destination}/#{relative_path}")
               rescue Errno::EACCES
                 FileUtils.cp_r(source_file, "#{destination}/#{relative_path}", remove_destination: true)
               end
-              hardlink_sources.store([source_stat.dev, source_stat.ino], "#{destination}/#{relative_path}")
-            end
-          else
-            # First attempt a regular copy. If we don't have write
-            # permission on the File, open will probably fail with
-            # EACCES (making it hard to sync files with permission
-            # r--r--r--). Rescue this error and use cp_r's
-            # :remove_destination option.
-            begin
-              FileUtils.cp(source_file, "#{destination}/#{relative_path}")
-            rescue Errno::EACCES
-              FileUtils.cp_r(source_file, "#{destination}/#{relative_path}", remove_destination: true)
             end
           end
+
+          symlinks.each do |source_file|
+            pool.schedule do
+              relative_path = relative_path_for(source_file, source)
+              target = File.readlink(source_file)
+              FileUtils.ln_sf(target, "#{destination}/#{relative_path}")
+            end
+          end
+        end
+      end
+
+      # Process hardlinks serially (to maintain hardlink relationships)
+      hardlinks.each do |source_file, source_stat|
+        relative_path = relative_path_for(source_file, source)
+        if existing = hardlink_sources[[source_stat.dev, source_stat.ino]]
+          FileUtils.ln(existing, "#{destination}/#{relative_path}", force: true)
         else
-          raise RuntimeError,
-                "Unknown file type: `File.ftype(source_file)' at `#{source_file}'!"
+          begin
+            FileUtils.cp(source_file, "#{destination}/#{relative_path}")
+          rescue Errno::EACCES
+            FileUtils.cp_r(source_file, "#{destination}/#{relative_path}", remove_destination: true)
+          end
+          hardlink_sources.store([source_stat.dev, source_stat.ino], "#{destination}/#{relative_path}")
         end
       end
 
@@ -247,20 +287,6 @@ module Omnibus
         stat.nlink > 1
       else
         false
-      end
-    end
-
-    #
-    # Create a "destination" directory with the same name and permissions
-    # as the source directory
-    #
-    def create_sync_dir(source, destination)
-      if not File.directory?(destination)
-        FileUtils.mkdir_p(destination, :mode => File.stat(source).mode)
-      else
-        if File.stat(source).mode != File.stat(destination).mode
-          File.chmod(File.stat(source).mode, destination)
-        end
       end
     end
   end
