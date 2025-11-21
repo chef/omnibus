@@ -50,6 +50,7 @@ module Omnibus
       "windows" => [MSI, ZIP],
       "mac_os_x" => PKG,
       "macos" => PKG,
+      "ociru" => XZ,
     }.freeze
 
     #
@@ -62,7 +63,11 @@ module Omnibus
     # @return [[~Packager::Base]]
     #
     def for_current_system
-      family = Ohai["platform_family"]
+      if Config.host_distribution
+        family = Config.host_distribution
+      else
+        family = Ohai["platform_family"]
+      end
       version = Ohai["platform_version"]
 
       if family == "solaris2" && Chef::Sugar::Constraints::Version.new(version).satisfies?(">= 5.11")
