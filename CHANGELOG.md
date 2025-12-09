@@ -1,15 +1,16 @@
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
 
-<!-- latest_release 9.1.5 -->
-## [9.1.5](https://github.com/chef/omnibus/tree/9.1.5) (2025-10-14)
+<!-- latest_release 9.1.6 -->
+## [9.1.6](https://github.com/chef/omnibus/tree/9.1.6) (2025-12-09)
 
 #### Merged Pull Requests
-- Revert &quot;adding a Notice.txt&quot; [#1181](https://github.com/chef/omnibus/pull/1181) ([sean-sype-simmons](https://github.com/sean-sype-simmons))
+- add el-10 to the packagers rpm file [#1183](https://github.com/chef/omnibus/pull/1183) ([muthuja](https://github.com/muthuja))
 <!-- latest_release -->
 <!-- release_rollup since=9.0.24 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- add el-10 to the packagers rpm file [#1183](https://github.com/chef/omnibus/pull/1183) ([muthuja](https://github.com/muthuja)) <!-- 9.1.6 -->
 - Revert &quot;adding a Notice.txt&quot; [#1181](https://github.com/chef/omnibus/pull/1181) ([sean-sype-simmons](https://github.com/sean-sype-simmons)) <!-- 9.1.5 -->
 - adding a Notice.txt [#1180](https://github.com/chef/omnibus/pull/1180) ([johnmccrae](https://github.com/johnmccrae)) <!-- 9.1.4 -->
 - Updating ohai and license_scout [#1179](https://github.com/chef/omnibus/pull/1179) ([johnmccrae](https://github.com/johnmccrae)) <!-- 9.1.3 -->
