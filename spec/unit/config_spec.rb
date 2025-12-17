@@ -41,6 +41,7 @@ module Omnibus
     include_examples "a configurable", :solaris_linker_mapfile, "files/mapfiles/solaris"
     include_examples "a configurable", :append_timestamp, true
     include_examples "a configurable", :build_retries, 0
+    include_examples "a configurable", :enable_progress_bar, true
     include_examples "a configurable", :use_git_caching, true
     include_examples "a configurable", :fetcher_read_timeout, 60
     include_examples "a configurable", :fetcher_retries, 5

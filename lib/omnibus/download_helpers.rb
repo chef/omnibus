@@ -80,9 +80,10 @@ module Omnibus
 
         # Regular HTTP download using OpenURI
         # :enable_progress_bar is a special option we handle.
-        # by default we enable the progress bar.
+        # by default we enable the progress bar, see: ./config.rb
+        # the options.delete is here to still handle the override from ./licensing.rb
         enable_progress_bar = options.delete(:enable_progress_bar)
-        enable_progress_bar = true if enable_progress_bar.nil?
+        enable_progress_bar = Config.enable_progress_bar if enable_progress_bar.nil?
 
         # Safely extract download headers if they exist and ensure we send
         # Accept-Encoding => "identity" by default (tests and some proxies expect it)

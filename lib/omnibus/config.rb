@@ -575,6 +575,11 @@ module Omnibus
     # @return [Integer]
     default(:build_retries, 0)
 
+    # Display a progress bar during download.
+    #
+    # @return [true, false]
+    default(:enable_progress_bar, true)
+
     # Use the incremental build caching implemented via git. This will
     # drastically improve build times, but may result in hidden and
     # unexpected bugs.
