@@ -148,7 +148,8 @@ module Omnibus
       if Config.use_s3_caching
         S3Cache.url_for(self)
       elsif Config.use_internal_sources && !source[:internal]
-        raise InternalSourceMissing.new(self)
+        log.warn(log_key) { "Internal source missing for #{name}; falling back to external source URL." }
+        source[:url]
       else
         source[:url]
       end
@@ -161,6 +162,22 @@ module Omnibus
     #
     # @return [void]
     #
+    # def download
+    #   log.warn(log_key) { source[:warning] } if source.key?(:warning)
+
+    #   options = {}
+
+    #   if source[:unsafe]
+    #     log.warn(log_key) { "Permitting unsafe redirects!" }
+    #     options[:allow_unsafe_redirects] = true
+    #   end
+
+    #   # Set the cookie if one was given
+    #   options["Cookie"] = source[:cookie] if source[:cookie]
+    #   options["Authorization"] = source[:authorization] if source[:authorization]
+
+    #   download_file!(download_url, downloaded_file, options)
+    # end
     def download
       log.warn(log_key) { source[:warning] } if source.key?(:warning)
 
@@ -175,7 +192,19 @@ module Omnibus
       options["Cookie"] = source[:cookie] if source[:cookie]
       options["Authorization"] = source[:authorization] if source[:authorization]
 
-      download_file!(download_url, downloaded_file, options)
+      begin
+        # Attempt download from internal or S3 source URL
+        download_file!(download_url, downloaded_file, options)
+      rescue OpenURI::HTTPError => e
+        # If 404 comes from internal source, fallback to external URL
+        if e.io.status[0] == "404" && Config.use_internal_sources && source[:internal]
+          log.warn(log_key) { "Internal source returned 404 Not Found for #{name}, falling back to external source URL." }
+          download_file!(source[:url], downloaded_file, options)
+        else
+          # Re-raise other errors
+          raise
+        end
+      end
     end
 
     #

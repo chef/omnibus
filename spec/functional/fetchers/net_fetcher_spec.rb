@@ -173,11 +173,15 @@ module Omnibus
         end
       end
 
-      context "when use_internal_sources is true and no internal source url" do
-        before { Omnibus::Config.use_internal_sources(true) }
+      context "when use_internal_sources is true but internal source is missing" do
+        before do
+          Config.use_internal_sources(true)
+        end
 
-        it "raises an exception" do
-          expect { fetch! }.to raise_error(InternalSourceMissing)
+        it "logs a warning and falls back to the external url" do
+          expect(subject).to receive(:log).and_call_original
+          url = subject.send(:download_url)
+          expect(url).to eq(source[:url])
         end
       end
 
