@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "aws-sdk-s3",       "~> 1.116.0"
   gem.add_dependency "chef-utils",       ">= 15.4"
   gem.add_dependency "chef-cleanroom",   "~> 1.0"
-  gem.add_dependency "ffi-yajl",         "~> 2.2"
+  gem.add_dependency "ffi-yajl",         ">= 2.2", "< 4.0"
   gem.add_dependency "mixlib-shellout",  ">= 2.0", "< 4.0"
   # Require at least Ohai 18.2.6 to pick up fixes while staying within the 18.x series
   gem.add_dependency "ohai",             ">= 18.2.6", "< 19"
