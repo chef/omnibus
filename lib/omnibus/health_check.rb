@@ -136,6 +136,7 @@ module Omnibus
       # Symlink of the previous one
       /libgcc_s\.1\.dylib/,
       /CoreFoundation/,
+      /Foundation/,
       /CoreServices/,
       /Tcl$/,
       /Cocoa$/,
@@ -149,6 +150,7 @@ module Omnibus
       /libiconv/,
       /libstdc\+\+\.6\.dylib/,
       /libc\+\+\.1\.dylib/,
+      /libc\+\+abi\.dylib/,
       /libzstd\.1\.dylib/,
       /Security/,
       /SystemConfiguration/,
