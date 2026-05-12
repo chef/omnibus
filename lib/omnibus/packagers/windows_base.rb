@@ -197,6 +197,32 @@ module Omnibus
     end
     expose :dd_wcssign
 
+    def dd_wcs_cert(val = NULL)
+      if val != NULL
+        unless dd_wcssign
+          raise Error, "You must specify dd_wcssign with dd_wcs_cert"
+        end
+
+        @dd_wcs_cert = val
+      end
+
+      @dd_wcs_cert
+    end
+    expose :dd_wcs_cert
+
+    def dd_wcs_config(val = NULL)
+      if val != NULL
+        unless dd_wcssign
+          raise Error, "You must specify dd_wcssign with dd_wcs_config"
+        end
+
+        @dd_wcs_config = val
+      end
+
+      @dd_wcs_config
+    end
+    expose :dd_wcs_config
+
     #
     # Iterates through available timestamp servers and tries to sign
     # the file with with each server, stopping after the first to succeed.
@@ -243,6 +269,8 @@ module Omnibus
         cmd = Array.new.tap do |arr|
           arr << "dd-wcs"
           arr << "sign"
+          arr << "--cert #{dd_wcs_cert}" if dd_wcs_cert
+          arr << "--config #{dd_wcs_config}" if dd_wcs_config
           arr << "\"#{package_file}\""
         end.join(" ")
       elsif signing_identity
