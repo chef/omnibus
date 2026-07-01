@@ -188,10 +188,16 @@ module Omnibus
     # recovery of build output. Hashes calculated on output files will be
     # invalid if we muck around with files after they have been produced.
     #
+    # We also explicitly disable GPG signing of commits and tags. The git cache
+    # is an internal implementation detail, and a user's global git config
+    # (e.g. commit.gpgSign=true or tag.gpgSign=true) would otherwise force
+    # signing, which requires a GPG key and turns lightweight tags into
+    # annotated ones, breaking the cache operations.
+    #
     # @return [Mixlib::Shellout] the underlying command object.
     #
     def git_cmd(command)
-      shellout!("git -c core.autocrlf=false --git-dir=#{cache_path} --work-tree=#{install_dir} #{command}")
+      shellout!("git -c core.autocrlf=false -c commit.gpgSign=false -c tag.gpgSign=false -c tag.forceSignAnnotated=false --git-dir=#{cache_path} --work-tree=#{install_dir} #{command}")
     end
 
     #
