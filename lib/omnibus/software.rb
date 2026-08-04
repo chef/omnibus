@@ -320,6 +320,13 @@ module Omnibus
     # @option val [Boolean] :submodules (false)
     #   clone git submodules
     #
+    # @option val [Integer] :depth (nil)
+    #   when set to a positive integer, perform a shallow fetch of the resolved
+    #   revision at this depth instead of cloning the full history. Works for
+    #   tag, branch, and SHA pins. The component's build must not depend on git
+    #   history (e.g. `git describe`), and the remote must allow fetching a
+    #   reachable SHA (uploadpack.allowReachableSHA1InWant / allowAnySHA1InWant).
+    #
     # If multiple checksum types are provided, only the strongest will be used.
     #
     # @return [Hash]
@@ -338,7 +345,8 @@ module Omnibus
           :md5, :sha1, :sha256, :sha512, # hash type - common to all fetchers
           :cookie, :warning, :unsafe, :extract, :cached_name, :authorization, :internal, # used by net_fetcher
           :options, # used by path_fetcher
-          :submodules # used by git_fetcher
+          :submodules, # used by git_fetcher
+          :depth # used by git_fetcher
         ]
         unless extra_keys.empty?
           raise InvalidValue.new(:source,

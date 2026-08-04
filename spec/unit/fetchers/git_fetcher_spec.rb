@@ -123,5 +123,130 @@ module Omnibus
         expect(subject.version_for_cache).to eq("revision:123abcd1234")
       end
     end
+
+    describe "#git_clone" do
+      let(:git_source) { "https://example.com/repo.git" }
+      let(:locked_source) { { git: git_source } }
+      let(:manifest_entry) do
+        double(ManifestEntry,
+          name: "software",
+          locked_version: "123abcd1234",
+          described_version: "v1.2.3",
+          locked_source: locked_source)
+      end
+
+      context "when depth is not set" do
+        it "performs a full clone" do
+          expect(subject).to receive(:git).with("clone #{git_source} .")
+          subject.send(:git_clone)
+        end
+
+        context "with submodules" do
+          let(:locked_source) { { git: git_source, submodules: true } }
+
+          it "clones recursively" do
+            expect(subject).to receive(:git).with("clone --recursive #{git_source} .")
+            subject.send(:git_clone)
+          end
+        end
+      end
+
+      context "when depth is not positive" do
+        let(:locked_source) { { git: git_source, depth: 0 } }
+
+        it "performs a full clone" do
+          expect(subject).to receive(:git).with("clone #{git_source} .")
+          subject.send(:git_clone)
+        end
+      end
+
+      context "when depth is set" do
+        let(:locked_source) { { git: git_source, depth: 1 } }
+
+        it "initializes an empty repo and fetches the resolved revision" do
+          expect(subject).to receive(:git).with("init --quiet .")
+          expect(subject).to receive(:git_fetch)
+          subject.send(:git_clone)
+        end
+      end
+    end
+
+    describe "#git_checkout" do
+      let(:git_source) { "https://example.com/repo.git" }
+      let(:locked_source) { { git: git_source, submodules: true } }
+      let(:manifest_entry) do
+        double(ManifestEntry,
+          name: "software",
+          locked_version: "123abcd1234",
+          described_version: "v1.2.3",
+          locked_source: locked_source)
+      end
+
+      before { allow(subject).to receive(:git_fetch) }
+
+      context "when depth is not set" do
+        it "updates submodules at full depth" do
+          expect(subject).to receive(:git).with("checkout 123abcd1234 -f -q")
+          expect(subject).to receive(:git).with("submodule update --recursive")
+          subject.send(:git_checkout)
+        end
+      end
+
+      context "when depth is set" do
+        let(:locked_source) { { git: git_source, submodules: true, depth: 1 } }
+
+        it "initializes submodules (at full depth to avoid non-tip failures)" do
+          expect(subject).to receive(:git).with("checkout 123abcd1234 -f -q")
+          expect(subject).to receive(:git).with("submodule update --init --recursive")
+          subject.send(:git_checkout)
+        end
+      end
+    end
+
+    describe "#git_fetch" do
+      let(:git_source) { "https://example.com/repo.git" }
+      let(:locked_source) { { git: git_source } }
+      let(:manifest_entry) do
+        double(ManifestEntry,
+          name: "software",
+          locked_version: "123abcd1234",
+          described_version: "v1.2.3",
+          locked_source: locked_source)
+      end
+
+      context "when depth is not set" do
+        it "fetches the described_version with full history" do
+          expect(subject).to receive(:git).with("fetch #{git_source} v1.2.3")
+          subject.send(:git_fetch)
+        end
+      end
+
+      context "when depth is set" do
+        let(:locked_source) { { git: git_source, depth: 1 } }
+
+        it "fetches the resolved revision at the requested depth" do
+          expect(subject).to receive(:git).with("fetch --depth 1 #{git_source} 123abcd1234")
+          subject.send(:git_fetch)
+        end
+
+        context "with a larger depth" do
+          let(:locked_source) { { git: git_source, depth: 5 } }
+
+          it "uses the requested depth" do
+            expect(subject).to receive(:git).with("fetch --depth 5 #{git_source} 123abcd1234")
+            subject.send(:git_fetch)
+          end
+        end
+
+        context "with submodules" do
+          let(:locked_source) { { git: git_source, depth: 1, submodules: true } }
+
+          it "recurses submodules" do
+            expect(subject).to receive(:git).with("fetch --depth 1 --recurse-submodules=on-demand #{git_source} 123abcd1234")
+            subject.send(:git_fetch)
+          end
+        end
+      end
+    end
   end
 end
