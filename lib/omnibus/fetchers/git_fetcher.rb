@@ -113,6 +113,23 @@ module Omnibus
     end
 
     #
+    # The depth to use for a shallow fetch, or nil for a full clone. A shallow
+    # fetch is requested by setting a positive `depth` source option.
+    #
+    # In shallow mode the resolved revision (SHA) is fetched directly at this
+    # depth, so it works for tag, branch, and SHA pins alike. The build must
+    # not depend on git history (e.g. `git describe`), and the remote must
+    # allow fetching a reachable SHA
+    # (uploadpack.allowReachableSHA1InWant / allowAnySHA1InWant).
+    #
+    # @return [Integer, nil]
+    #
+    def clone_depth
+      depth = source[:depth]
+      depth if depth.to_i > 0
+    end
+
+    #
     # Determine if a directory is empty
     #
     # @return [true, false]
@@ -145,8 +162,19 @@ module Omnibus
     # @return [void]
     #
     def git_clone
-      retry_block("git clone", [CommandTimeout, CommandFailed]) do
-        git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
+      if clone_depth
+        # A shallow fetch needs an exact revision, so initialize an empty repo
+        # and fetch the resolved SHA directly rather than `git clone`ing the
+        # full history. This works for tag, branch, and SHA pins alike and is
+        # immune to a pinned branch tip moving between resolution and fetch.
+        retry_block("git init", [CommandTimeout, CommandFailed]) do
+          git("init --quiet .")
+        end
+        git_fetch
+      else
+        retry_block("git clone", [CommandTimeout, CommandFailed]) do
+          git("clone#{" --recursive" if clone_submodules?} #{source_url} .")
+        end
       end
     end
 
@@ -161,8 +189,18 @@ module Omnibus
       # support the --detach flag.
       git("checkout #{resolved_version} -f -q")
       if clone_submodules?
+        # In shallow mode there was no `clone --recursive`, so submodules are
+        # neither initialized nor populated yet; --init handles that. We do NOT
+        # pass --depth: `git submodule update --depth` shallow-fetches the
+        # submodule's branch and fails when the pinned submodule commit is not
+        # near that branch's tip (the same non-tip problem this fetcher avoids
+        # for the top-level repo by fetching the resolved SHA). Submodules are
+        # therefore fetched at full depth. No depth-pinned component currently
+        # uses submodules.
+        submodule_cmd = "submodule update --recursive"
+        submodule_cmd = "submodule update --init --recursive" if clone_depth
         retry_block("git submodule update", [CommandTimeout, CommandFailed]) do
-          git("submodule update --recursive")
+          git(submodule_cmd)
         end
       end
     end
@@ -173,8 +211,14 @@ module Omnibus
     # @return [void]
     #
     def git_fetch
-      fetch_cmd = "fetch #{source_url} #{described_version}"
+      # In shallow mode fetch the resolved SHA directly: it is immutable, so
+      # this is race-free and works whether the pin is a tag, branch, or SHA.
+      # Otherwise fetch the pinned ref and let git_checkout resolve it.
+      ref = clone_depth ? resolved_version : described_version
+      fetch_cmd = +"fetch"
+      fetch_cmd << " --depth #{clone_depth}" if clone_depth
       fetch_cmd << " --recurse-submodules=on-demand" if clone_submodules?
+      fetch_cmd << " #{source_url} #{ref}"
       retry_block("git fetch", [CommandTimeout, CommandFailed]) do
         git(fetch_cmd)
       end
