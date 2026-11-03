@@ -343,6 +343,19 @@ module Omnibus
     # @return [String]
     default(:s3_acl, "private")
 
+    # Read cached artifacts through a presigned URL instead of a public URL.
+    # Required when the cache bucket is private, such as a GCS bucket accessed
+    # over the S3-compatible XML API, where anonymous reads are rejected.
+    #
+    # @return [true, false]
+    default(:s3_cache_presign, false)
+
+    # How long, in seconds, a presigned cache read URL stays valid. Must exceed
+    # the longest source fetch a single build might take.
+    #
+    # @return [Integer]
+    default(:s3_cache_presign_expiry, 3600)
+
     # --------------------------------------------------
     # @!endgroup
     #

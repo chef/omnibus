@@ -103,6 +103,34 @@ module Omnibus
       end
     end
 
+    describe ".url_for" do
+      let(:object) { double("object", public_url: "https://public", presigned_url: "https://signed") }
+      let(:bucket) { double("bucket", object: object) }
+      let(:client) { double("client", bucket: bucket) }
+
+      before do
+        allow(S3Cache).to receive(:client).and_return(client)
+        Config.s3_bucket "omnibus-cache"
+      end
+
+      context "when s3_cache_presign is false (the default)" do
+        it "returns the public URL" do
+          expect(object).to receive(:public_url)
+          expect(S3Cache.url_for(ruby_19)).to eq("https://public")
+        end
+      end
+
+      context "when s3_cache_presign is true" do
+        before { Config.s3_cache_presign true }
+
+        it "returns a presigned GET URL using the configured expiry" do
+          Config.s3_cache_presign_expiry 1800
+          expect(object).to receive(:presigned_url).with(:get, expires_in: 1800)
+          expect(S3Cache.url_for(ruby_19)).to eq("https://signed")
+        end
+      end
+    end
+
     describe ".s3_configuration" do
       let (:s3_bucket) { "omnibus-cache" }
       let (:s3_region) { "eu-west-1" }
