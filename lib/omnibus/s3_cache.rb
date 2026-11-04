@@ -133,7 +133,13 @@ module Omnibus
       end
 
       def url_for(software)
-        client.bucket(Config.s3_bucket).object(S3Cache.key_for(software)).public_url
+        object = client.bucket(Config.s3_bucket).object(S3Cache.key_for(software))
+
+        if Config.s3_cache_presign
+          object.presigned_url(:get, expires_in: Config.s3_cache_presign_expiry)
+        else
+          object.public_url
+        end
       end
 
       private
